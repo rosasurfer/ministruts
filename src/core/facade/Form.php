@@ -11,8 +11,12 @@ use const rosasurfer\ministruts\ACTION_FORM_KEY;
 /**
  * Form
  *
- * A {@link Facade} for the properties of the {@link ActionForm} assigned to the current HTTP request, and the properties
- * of the {@link ActionForm} assigned to the previous HTTP request if the current request is a result of an HTTP redirect.
+ * A {@link Facade} for accessing the properties of the {@link ActionForm} assigned to the current HTTP request, and for
+ * accessing the properties of the {@link ActionForm} assigned to the previous HTTP request if the current request is a
+ * result of an HTTP redirect.
+ *
+ * The {@link Form} facade is used to access either one or the other form's properties. The {@link Forms} facade is used to
+ * access properties of both forms together in a single API call.
  */
 class Form extends Facade {
 
@@ -26,7 +30,7 @@ class Form extends Facade {
      * @return mixed
      */
     public static function get($name, $default = null) {
-        $form = static::target();
+        $form = static::current();
         return $form->get($name, $default);
     }
 
@@ -41,18 +45,18 @@ class Form extends Facade {
      * @return ActionForm
      */
     public static function current($type = null) {
-        $form = static::target();
+        $form = Request::getAttribute(ACTION_FORM_KEY);
 
-        if (!isset($type) || $form instanceof $type)
+        if ($form && (!isset($type) || $form instanceof $type))
             return $form;
         return new EmptyActionForm(Request::instance());
     }
 
 
     /**
-     * If the current request is a result of an HTTP redirect return the {@link ActionForm} instance assigned to the previous
-     * HTTP request. Otherwise return an instance of {@link EmptyActionForm}. Use the optional $type parameter to distinguish
-     * between multiple different {@link ActionForm}s in the same page.
+     * If the current request is a result of an HTTP redirect return the {@link ActionForm} instance assigned to the
+     * previous HTTP request. Otherwise return an instance of {@link EmptyActionForm}. Use the optional $type parameter
+     * to distinguish between multiple different {@link ActionForm}s in the same page.
      *
      * @param  string $type [optional] - ensure the returned instance matches the specified class name, or return an
      *                                   EmptyActionForm if this is not the case
@@ -60,22 +64,10 @@ class Form extends Facade {
      * @return ActionForm
      */
     public static function old($type = null) {
-        $form = new EmptyActionForm(Request::instance());           // @TODO: resolve the real instance
+        $form = Request::getAttribute(ACTION_FORM_KEY.'.old');
 
-        if (!isset($type) || $form instanceof $type)
+        if ($form && (!isset($type) || $form instanceof $type))
             return $form;
         return new EmptyActionForm(Request::instance());
-    }
-
-
-    /**
-     * Resolve the {@link ActionForm} instance responsible for handling the specified method call.
-     *
-     * @param  string $method [optional] - method name (default: ignored)
-     *
-     * @return ActionForm - always the instance assigned to the current HTTP request
-     */
-    protected static function target($method = null) {
-        return Request::getAttribute(ACTION_FORM_KEY);
     }
 }

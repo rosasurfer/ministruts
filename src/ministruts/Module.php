@@ -437,12 +437,6 @@ class Module extends CObject {
                 $mapping->setFormClassName($classNames[0]);
             }
 
-            // attribute form-scope="(request|session)" "request"
-            if (isset($tag['form-scope'])) {
-                if (!isset($tag['form']))    throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'": The "form" attribute must be specified if "form-scope" is defined.');
-                $mapping->setFormScope((string) $tag['form-scope']);
-            }
-
             // attribute form-validate-first="%Boolean" "true"
             $formValidateFirst = false;
             if ($mapping->getFormClassName()) {

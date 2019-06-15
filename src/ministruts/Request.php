@@ -153,7 +153,7 @@ class Request extends CObject {
      * @return string|null - value or NULL if no such $_REQUEST parameter has been transmitted
      */
     public function getParameter($name) {
-        if (isset($_REQUEST[$name])) {
+        if (\key_exists($name, $_REQUEST)) {
             $value = $_REQUEST[$name];
             if (!is_array($value))
                 return $value;
@@ -164,19 +164,22 @@ class Request extends CObject {
 
     /**
      * Return an array of $_REQUEST parameters with the specified name. A single transmitted $_REQUEST parameter with that
-     * name is ignored.
+     * name is ignored. Without a name all $_REQUEST parameters are returned.
      *
-     * @param  string $name - parameter name
+     * @param  string $name [optional] - parameter name (default: all $_REQUEST parameters)
      *
-     * @return string[] - values or an empty array if no such array of $_REQUEST parameters has been transmitted
+     * @return string[] - values or an empty array if no such array of parameters has been transmitted
      */
-    public function getParameters($name) {
-        if (\key_exists($name, $_REQUEST)) {
-            $value = $_REQUEST[$name];
-            if (is_array($value))
-                return $value;
+    public function getParameters($name = null) {
+        if (isset($name)) {
+            if (\key_exists($name, $_REQUEST)) {
+                $value = $_REQUEST[$name];
+                if (is_array($value))
+                    return $value;
+            }
+            return [];
         }
-        return [];
+        return $_REQUEST;
     }
 
 
@@ -189,7 +192,7 @@ class Request extends CObject {
      * @return string|null - value or NULL if no such $_GET parameter has been transmitted
      */
     public function getGetParameter($name) {
-        if (isset($_GET[$name])) {
+        if (\key_exists($name, $_GET)) {
             $value = $_GET[$name];
             if (!is_array($value))
                 return $value;
@@ -200,19 +203,24 @@ class Request extends CObject {
 
     /**
      * Return an array of $_GET parameters with the specified name. A single transmitted $_GET parameter with that name is
-     * ignored.
+     * ignored. Without a name all $_GET parameters are returned.
+     *
+     * @param  string $name [optional] - parameter name (default: all $_GET parameters)
      *
      * @param  string $name - parameter name
      *
      * @return string[] - values or an empty array if no such array of $_GET parameters has been transmitted
      */
-    public function getGetParameters($name) {
-        if (isset($_GET[$name])) {
-            $value = $_GET[$name];
-            if (is_array($value))
-                return $value;
+    public function getGetParameters($name = null) {
+        if (isset($name)) {
+            if (\key_exists($name, $_GET)) {
+                $value = $_GET[$name];
+                if (is_array($value))
+                    return $value;
+            }
+            return [];
         }
-        return [];
+        return $_GET;
     }
 
 
@@ -225,7 +233,7 @@ class Request extends CObject {
      * @return string|null - value or NULL if no such $_POST parameter has been transmitted
      */
     public function getPostParameter($name) {
-        if (isset($_POST[$name])) {
+        if (\key_exists($name, $_POST)) {
             $value = $_POST[$name];
             if (!is_array($value))
                 return $value;
@@ -236,19 +244,22 @@ class Request extends CObject {
 
     /**
      * Return an array of $_POST parameters with the specified name. A single transmitted $_POST parameter with that name
-     * is ignored.
+     * is ignored. Without a name all $_POST parameters are returned.
      *
-     * @param  string $name - parameter name
+     * @param  string $name [optional] - parameter name (default: all $_POST parameters)
      *
      * @return string[] - values or an empty array if no such array of $_POST parameters has been transmitted
      */
-    public function getPostParameters($name) {
-        if (isset($_POST[$name])) {
-            $value = $_POST[$name];
-            if (is_array($value))
-                return $value;
+    public function getPostParameters($name = null) {
+        if (isset($name)) {
+            if (\key_exists($name, $_POST)) {
+                $value = $_POST[$name];
+                if (is_array($value))
+                    return $value;
+            }
+            return [];
         }
-        return [];
+        return $_POST;
     }
 
 

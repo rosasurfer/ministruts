@@ -17,10 +17,8 @@ final class EmptyActionForm extends ActionForm {
      * This implementation does nothing.
      *
      * {@inheritdoc}
-     *
-     * @param  Request $request
      */
-    public function populate(Request $request) {
+    protected function populate() {
     }
 
 

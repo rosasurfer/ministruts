@@ -36,9 +36,6 @@ class ActionMapping extends CObject {
     /** @var string */
     protected $formClassName;
 
-    /** @var string */
-    protected $formScope = 'request';
-
     /** @var bool */
     protected $formValidateFirst;
 
@@ -296,58 +293,6 @@ class ActionMapping extends CObject {
      */
     public function getFormClassName() {
         return $this->formClassName;
-    }
-
-
-    /**
-     * Set the scope attribute of the mapping's {@link ActionForm}. The scope attribute identifies the storage location of
-     * the Actionform.
-     *
-     * @param  string $value - may be "request" or "session"
-     *
-     * @return $this
-     *
-     * @throws StrutsConfigException on configuration errors
-     */
-    public function setFormScope($value) {
-        if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-        $name = $this->name ? ' name="'.$this->name.'"':'';
-        $path = $this->path ? ' path="'.$this->path.'"':'';
-
-        if ($value!='request' && $value!='session') throw new StrutsConfigException('<mapping'.$name.$path.' form-scope="'.$value.'": Invalid form scope.');
-
-        $this->formScope = $value;
-        return $this;
-    }
-
-
-    /**
-     * Return the scope attribute of the mapping's {@link ActionForm}.
-     *
-     * @return string - scope attribute value
-     */
-    public function getFormScope() {
-        return $this->formScope;
-    }
-
-
-    /**
-     * Whether the mapping's {@link ActionForm} is stored in the {@link Request}.
-     *
-     * @return bool
-     */
-    public function isRequestScope() {
-        return ($this->formScope == 'request');
-    }
-
-
-    /**
-     * Whether the mapping's {@link ActionForm} is stored in the {@link HttpSession}.
-     *
-     * @return bool
-     */
-    public function isSessionScope() {
-        return ($this->formScope == 'session');
     }
 
 

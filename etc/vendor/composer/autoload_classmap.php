@@ -88,6 +88,7 @@ return array(
     'rosasurfer\\core\\exception\\error\\PHPWarning' => $baseDir . '/src/core/exception/error/PHPWarning.php',
     'rosasurfer\\core\\facade\\Facade' => $baseDir . '/src/core/facade/Facade.php',
     'rosasurfer\\core\\facade\\Form' => $baseDir . '/src/core/facade/Form.php',
+    'rosasurfer\\core\\facade\\Forms' => $baseDir . '/src/core/facade/Forms.php',
     'rosasurfer\\core\\loader\\ClassLoader' => $baseDir . '/src/core/loader/ClassLoader.php',
     'rosasurfer\\core\\lock\\BaseLock' => $baseDir . '/src/core/lock/BaseLock.php',
     'rosasurfer\\core\\lock\\FileLock' => $baseDir . '/src/core/lock/FileLock.php',

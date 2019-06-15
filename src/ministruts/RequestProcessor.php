@@ -3,6 +3,8 @@ namespace rosasurfer\ministruts;
 
 use rosasurfer\core\CObject;
 use rosasurfer\core\exception\RuntimeException;
+use rosasurfer\core\facade\Form;
+use rosasurfer\core\facade\Forms;
 use rosasurfer\net\http\HttpResponse;
 
 
@@ -39,11 +41,8 @@ class RequestProcessor extends CObject {
      * @param  Response $response
      */
     public function process(Request $request, Response $response) {
-        // ggf. Session starten oder fortsetzen
+        // Session starten oder fortsetzen
         $this->processSession($request);
-
-        // move ActionMessages stored in the session back to the Request
-        $this->restoreCachedActionMessages($request);
 
         // Mapping fuer den Request ermitteln: wird kein Mapping gefunden, generiert die Methode einen 404-Fehler
         $mapping = $this->processMapping($request, $response);
@@ -81,63 +80,13 @@ class RequestProcessor extends CObject {
 
 
     /**
-     * Session handling according to the configuration.
+     * Session handling according to the configuration. If a valid session id was transmitted the session is restarted.
      *
      * @param  Request $request
      */
     protected function processSession(Request $request) {
-        /*
-        // former behaviour: If a session id was transmitted the session was started automatically.
-        if (!$request->isSession() && $request->hasSessionId()) {
-            $request->getSession();
-        }
-        */
-    }
-
-
-    /**
-     * Moves all ActionMessages (including ActionErrors) from the current {@link Request} to the session.
-     * At the next request the messages are restored and moved back to the new request.
-     *
-     * @param  Request $request
-     */
-    protected function cacheActionMessages(Request $request) {
-        $errors = $request->removeActionErrors();
-        if ($errors && $request->getSession()) {
-            if (isset($_SESSION[ACTION_ERRORS_KEY]))
-                $errors = \array_merge($_SESSION[ACTION_ERRORS_KEY], $errors);
-            $_SESSION[ACTION_ERRORS_KEY] = $errors;
-        }
-
-        $messages = $request->removeActionMessages();
-        if ($messages && $request->getSession()) {
-            if (isset($_SESSION[ACTION_MESSAGES_KEY]))
-                $messages = \array_merge($_SESSION[ACTION_MESSAGES_KEY], $messages);
-            $_SESSION[ACTION_MESSAGES_KEY] = $messages;
-        }
-    }
-
-
-    /**
-     * Move all ActionMessages (including ActionErrors) stored in the session to the current {@link Request}.
-     * Found ActionErrors (from the previous request) are converted to ActionMessages of the current request.
-     *
-     * @param  Request $request
-     */
-    protected function restoreCachedActionMessages(Request $request) {
-        if ($request->hasSessionId() && $request->getSession()) {
-            $messages = $errors = [];
-
-            if (isset($_SESSION[ACTION_MESSAGES_KEY])) {
-                $messages = $_SESSION[ACTION_MESSAGES_KEY];
-                unset($_SESSION[ACTION_MESSAGES_KEY]);
-            }
-            if (isset($_SESSION[ACTION_ERRORS_KEY])) {
-                $errors = $_SESSION[ACTION_ERRORS_KEY];
-                unset($_SESSION[ACTION_ERRORS_KEY]);
-            }
-            $request->setAttribute(ACTION_MESSAGES_KEY, \array_merge($messages, $errors));
-        }
+        $this->restoreActionForm($request);
+        $this->restoreActionMessages($request);
     }
 
 
@@ -282,8 +231,8 @@ PROCESS_METHOD_ERROR_SC_405;
 
 
     /**
-     * Return the {@link ActionForm} instance assigned to the passed {@link ActionMapping}. If no ActionForm was configured an
-     * {@link EmptyActionForm} is instantiated and assigned.
+     * Return the {@link ActionForm} instance assigned to the passed {@link ActionMapping}. If no ActionForm was configured
+     * an {@link EmptyActionForm} is instantiated and assigned.
      *
      * @param  Request       $request
      * @param  ActionMapping $mapping
@@ -291,36 +240,13 @@ PROCESS_METHOD_ERROR_SC_405;
      * @return ActionForm
      */
     protected function processActionFormCreate(Request $request, ActionMapping $mapping) {
+        $formClass = $mapping->getFormClassName();
+
         /** @var ActionForm $form */
-        $form = null;
+        $form = $formClass ? new $formClass($request) : new EmptyActionForm($request);
 
-        if ($formClass = $mapping->getFormClassName()) {
-            // if the form has "session" scope try to find an existing form in the session
-            if ($mapping->isSessionScope())
-                $form = $request->getSession()->getAttribute($formClass);       // implicitely starts a session
-
-            // if none was found create a new instance
-            !$form && $form = new $formClass($request);
-
-            // if a DispatchAction is used read the action key
-            $actionClass = $mapping->getActionClassName();
-            if (is_subclass_of($actionClass, DispatchAction::class))
-                $form->initActionKey($request);
-
-            // populate the form
-            $form->populate($request);
-        }
-        else {
-            // create an empty default instance
-            $form = new EmptyActionForm($request);
-        }
-
-        // store the ActionForm in the request
+        // store the form in the request
         $request->setAttribute(ACTION_FORM_KEY, $form);
-
-        // if the form has "session" scope also store it in the session
-        if ($mapping->isSessionScope())
-            $request->getSession()->setAttribute($formClass, $form);
 
         return $form;
     }
@@ -353,9 +279,12 @@ PROCESS_METHOD_ERROR_SC_405;
         if (!$forward) {
             $key     = $success ? ActionForward::VALIDATION_SUCCESS_KEY : ActionForward::VALIDATION_ERROR_KEY;
             $forward = $mapping->findForward($key);
-        }
-        if (!$forward) throw new RuntimeException('<mapping path="'.$mapping->getPath().'" form-validate-first="true": ActionForward not found (module validation error?)');
 
+            if (!$forward) throw new RuntimeException(
+                '<mapping path="'.$mapping->getPath().'" form-validate-first="true": '
+               .'ActionForward "'.$key.'" not found (module validation error, should never happen)'
+            );
+        }
         $this->processActionForward($request, $response, $forward);
         return false;
     }
@@ -450,7 +379,9 @@ PROCESS_METHOD_ERROR_SC_405;
         $module = $this->module;
 
         if ($forward->isRedirect()) {
-            $this->cacheActionMessages($request);
+            $this->storeActionForm($request);                       // copy ActionForm and ActionMessages to the session
+            $this->storeActionMessages($request);
+
             $path = $forward->getPath();
 
             if (isset(parse_url($path)['host'])) {                  // an external URI
@@ -460,7 +391,7 @@ PROCESS_METHOD_ERROR_SC_405;
                 $appUri = $request->getApplicationBaseUri();
                 $url = $appUri.ltrim($path, '/');
             }
-            else {                                                  // a module-relative uri
+            else {                                                  // a module-relative URI
                 $moduleUri = $request->getApplicationBaseUri().$module->getPrefix();
                 $url = $moduleUri.$path;
             }
@@ -480,6 +411,87 @@ PROCESS_METHOD_ERROR_SC_405;
                      ->freeze();
             }
             $tile->render();
+        }
+    }
+
+
+    /**
+     * Copy the {@link ActionForm} configured for the current {@link ActionMapping} from the {@link Request} to the
+     * {@link HttpSession}. On the next HTML request the form will be made available via the facade {@link Form::old()} as
+     * form of the previous request. An {@link EmptyActionForm} can't be configured for a mapping, and will not be copied.
+     *
+     * @param  Request $request
+     */
+    protected function storeActionForm(Request $request) {
+        $form = $request->getAttribute(ACTION_FORM_KEY);
+        if (!$form || $form instanceof EmptyActionForm)
+            return;
+        $request->getSession()->setAttribute(ACTION_FORM_KEY.'.old', $form);
+    }
+
+
+    /**
+     * Move an old {@link ActionForm} stored in the session to the current {@link Request}. The form will be available
+     * via the facades {@link Forms} and {@link Form::old()} as form of the previous request.
+     *
+     * @param  Request $request
+     */
+    protected function restoreActionForm(Request $request) {
+        if ($request->hasSessionId() && $request->getSession()) {
+            $oldFormKey = ACTION_FORM_KEY.'.old';
+
+            if (isset($_SESSION[$oldFormKey])) {
+                $form = $_SESSION[$oldFormKey];
+                unset($_SESSION[$oldFormKey]);
+
+                $request->setAttribute($oldFormKey, $form);
+            }
+        }
+    }
+
+
+    /**
+     * Copy all ActionMessages (including ActionErrors) from the {@link Request} to the {@link HttpSession}.
+     * On the next HTML request the messages are restored and moved back to the new request.
+     *
+     * @param  Request $request
+     */
+    protected function storeActionMessages(Request $request) {
+        $errors = $request->getActionErrors();
+        if ($errors && $request->getSession()) {
+            if (isset($_SESSION[ACTION_ERRORS_KEY]))
+                $errors = \array_merge($_SESSION[ACTION_ERRORS_KEY], $errors);
+            $_SESSION[ACTION_ERRORS_KEY] = $errors;
+        }
+
+        $messages = $request->getActionMessages();
+        if ($messages && $request->getSession()) {
+            if (isset($_SESSION[ACTION_MESSAGES_KEY]))
+                $messages = \array_merge($_SESSION[ACTION_MESSAGES_KEY], $messages);
+            $_SESSION[ACTION_MESSAGES_KEY] = $messages;
+        }
+    }
+
+
+    /**
+     * Move all ActionMessages (including ActionErrors) stored in the session to the current {@link Request}.
+     * Found ActionErrors (from the previous request) are converted to ActionMessages of the current request.
+     *
+     * @param  Request $request
+     */
+    protected function restoreActionMessages(Request $request) {
+        if ($request->hasSessionId() && $request->getSession()) {
+            $messages = $errors = [];
+
+            if (isset($_SESSION[ACTION_MESSAGES_KEY])) {
+                $messages = $_SESSION[ACTION_MESSAGES_KEY];
+                unset($_SESSION[ACTION_MESSAGES_KEY]);
+            }
+            if (isset($_SESSION[ACTION_ERRORS_KEY])) {
+                $errors = $_SESSION[ACTION_ERRORS_KEY];
+                unset($_SESSION[ACTION_ERRORS_KEY]);
+            }
+            $request->setAttribute(ACTION_MESSAGES_KEY, \array_merge($messages, $errors));
         }
     }
 }
