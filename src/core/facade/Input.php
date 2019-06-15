@@ -1,8 +1,8 @@
 <?php
 namespace rosasurfer\core\facade;
 
+use rosasurfer\core\di\proxy\Request as RequestProxy;
 use rosasurfer\core\io\WebInput;
-use rosasurfer\core\proxy\Request as RequestProxy;
 use rosasurfer\ministruts\Request;
 
 

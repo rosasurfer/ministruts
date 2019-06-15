@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\core\facade;
 
-use rosasurfer\core\proxy\Request;
+use rosasurfer\core\di\proxy\Request;
 use rosasurfer\ministruts\ActionForm;
 
 

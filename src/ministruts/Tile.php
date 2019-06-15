@@ -3,8 +3,8 @@ namespace rosasurfer\ministruts;
 
 use rosasurfer\Application;
 use rosasurfer\core\CObject;
+use rosasurfer\core\di\proxy\Request as RequestProxy;
 use rosasurfer\core\exception\IllegalStateException;
-use rosasurfer\core\proxy\Request as RequestProxy;
 
 use function rosasurfer\strLeft;
 use function rosasurfer\strRightFrom;

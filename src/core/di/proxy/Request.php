@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\core\proxy;
+namespace rosasurfer\core\di\proxy;
 
 use rosasurfer\core\di\service\Service;
 use rosasurfer\ministruts\ActionMapping;

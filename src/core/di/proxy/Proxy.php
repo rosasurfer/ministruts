@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\core\proxy;
+namespace rosasurfer\core\di\proxy;
 
 use rosasurfer\core\StaticClass;
 use rosasurfer\core\exception\IllegalAccessException;

@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\core\proxy;
+namespace rosasurfer\core\di\proxy;
 
 use rosasurfer\console\docopt\DocoptResult;
 use rosasurfer\core\di\service\Service;
