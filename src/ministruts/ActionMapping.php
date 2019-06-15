@@ -16,7 +16,7 @@ use function rosasurfer\strLeftTo;
  * An ActionMapping encapsulates the processing instructions for a single route. For in-depth documentation of properties
  * and configuration see the following link:
  *
- * @link  https://github.com/rosasurfer/ministruts/blob/master/src/ministruts/dtd/struts-config.dtd#L137
+ * @link  https://github.com/rosasurfer/ministruts/blob/master/src/ministruts/dtd/struts-config.dtd#L141
  */
 class ActionMapping extends CObject {
 
