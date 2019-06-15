@@ -9,8 +9,9 @@ use rosasurfer\core\assert\Assert;
 use rosasurfer\core\exception\IllegalStateException;
 use rosasurfer\core\exception\InvalidArgumentException;
 use rosasurfer\core\exception\RuntimeException;
+use rosasurfer\core\io\CliInput as Input;
 use rosasurfer\core\io\Output;
-use rosasurfer\core\io\cli\Input;
+use rosasurfer\core\proxy\Input as InputProxy;
 use rosasurfer\di\Di;
 
 
@@ -76,7 +77,7 @@ class Command extends CObject {
      */
     public function run() {
         /** @var Input $input */
-        $input = $this->di('input');
+        $input = InputProxy::instance();
         $input->setDocoptResult($this->docoptResult);
 
         /** @var Output $output */

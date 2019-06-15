@@ -2,7 +2,6 @@
 namespace rosasurfer\di\defaultt;
 
 use rosasurfer\core\io\Output;
-use rosasurfer\core\io\cli\Input;
 use rosasurfer\di\Di;
 use rosasurfer\di\service\Service;
 use rosasurfer\ministruts\Request;
@@ -25,7 +24,6 @@ class WebServiceContainer extends Di {
      */
     public function __construct($configDir) {
         $services = [
-            (new Service('input',   Input::class  ))->addAlias(Input::class),
             (new Service('output',  Output::class ))->addAlias(Output::class),
             (new Service('request', Request::class))->addAlias(Request::class),
           //(new Service('requestProcessor', RequestProcessor::class))->addAlias(RequestProcessor::class),

@@ -1,6 +1,7 @@
 <?php
 namespace rosasurfer\core\proxy;
 
+use rosasurfer\di\service\Service;
 use rosasurfer\ministruts\ActionMapping;
 use rosasurfer\ministruts\HttpSession;
 use rosasurfer\ministruts\Module;
@@ -9,7 +10,7 @@ use rosasurfer\ministruts\Module;
 /**
  * Request
  *
- * Proxy for the "request" implementation currently registered in the service container.
+ * A {@link Proxy} for the "request" {@link Service} currently registered in the service container.
  *
  * Default implementation: {@link \rosasurfer\ministruts\Request}
  *
