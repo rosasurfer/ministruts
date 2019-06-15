@@ -1,8 +1,8 @@
 <?php
-namespace rosasurfer\di;
+namespace rosasurfer\core\di;
 
-use rosasurfer\di\service\ServiceInterface as IService;
-use rosasurfer\di\service\ServiceNotFoundException;
+use rosasurfer\core\di\service\ServiceInterface as IService;
+use rosasurfer\core\di\service\ServiceNotFoundException;
 
 use Psr\Container\ContainerInterface;
 

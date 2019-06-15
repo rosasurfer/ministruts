@@ -2,9 +2,9 @@
 namespace rosasurfer\file\xml;
 
 use rosasurfer\core\ObjectTrait;
+use rosasurfer\core\di\DiAwareTrait;
 use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\core\exception\RuntimeException;
-use rosasurfer\di\DiAwareTrait;
 
 use function rosasurfer\strRightFrom;
 

@@ -8,8 +8,8 @@ namespace rosasurfer;
 
 use rosasurfer\core\CObject;
 use rosasurfer\core\ObjectTrait;
+use rosasurfer\core\di\DiAwareTrait;
 use rosasurfer\core\loader\ClassLoader;
-use rosasurfer\di\DiAwareTrait;
 
 
 define('rosasurfer\_MINISTRUTS_ROOT', dirname(__DIR__));
@@ -37,7 +37,7 @@ function registerClassLoader() {
         switch ($class) {
             case CObject     ::class: require(MINISTRUTS_ROOT.'/src/core/CObject.php'           ); break;
             case ObjectTrait ::class: require(MINISTRUTS_ROOT.'/src/core/ObjectTrait.php'       ); break;
-            case DiAwareTrait::class: require(MINISTRUTS_ROOT.'/src/di/DiAwareTrait.php'        ); break;
+            case DiAwareTrait::class: require(MINISTRUTS_ROOT.'/src/core/di/DiAwareTrait.php'   ); break;
             case ClassLoader ::class: require(MINISTRUTS_ROOT.'/src/core/loader/ClassLoader.php'); break;
         }
     };

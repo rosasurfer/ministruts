@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\core\proxy;
 
-use rosasurfer\di\service\Service;
+use rosasurfer\core\di\service\Service;
 use rosasurfer\ministruts\ActionMapping;
 use rosasurfer\ministruts\HttpSession;
 use rosasurfer\ministruts\Module;

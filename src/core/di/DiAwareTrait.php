@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\di;
+namespace rosasurfer\core\di;
 
 use rosasurfer\Application;
 

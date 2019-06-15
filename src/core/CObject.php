@@ -3,7 +3,7 @@ namespace rosasurfer\core;
 
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\debug\ErrorHandler;
-use rosasurfer\di\DiAwareTrait;
+use rosasurfer\core\di\DiAwareTrait;
 
 
 /**

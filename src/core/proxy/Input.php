@@ -2,7 +2,7 @@
 namespace rosasurfer\core\proxy;
 
 use rosasurfer\console\docopt\DocoptResult;
-use rosasurfer\di\service\Service;
+use rosasurfer\core\di\service\Service;
 
 
 /**
