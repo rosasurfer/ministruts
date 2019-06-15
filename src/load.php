@@ -7,4 +7,4 @@ if (PHP_VERSION_ID < 50600) {
 }
 
 // include the framework
-require(__DIR__.'/framework.php');
+require(__DIR__.'/bootstrap.php');
