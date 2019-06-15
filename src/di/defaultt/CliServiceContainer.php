@@ -1,8 +1,8 @@
 <?php
 namespace rosasurfer\di\defaultt;
 
-use rosasurfer\core\io\Input;
 use rosasurfer\core\io\Output;
+use rosasurfer\core\io\cli\Input;
 use rosasurfer\di\Di;
 use rosasurfer\di\service\Service;
 

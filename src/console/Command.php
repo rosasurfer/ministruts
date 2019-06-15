@@ -9,8 +9,8 @@ use rosasurfer\core\assert\Assert;
 use rosasurfer\core\exception\IllegalStateException;
 use rosasurfer\core\exception\InvalidArgumentException;
 use rosasurfer\core\exception\RuntimeException;
-use rosasurfer\core\io\Input;
 use rosasurfer\core\io\Output;
+use rosasurfer\core\io\cli\Input;
 use rosasurfer\di\Di;
 
 

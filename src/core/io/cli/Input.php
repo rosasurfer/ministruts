@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\core\io;
+namespace rosasurfer\core\io\cli;
 
 use rosasurfer\console\docopt\DocoptResult;
 use rosasurfer\core\CObject;
@@ -9,7 +9,7 @@ use rosasurfer\core\assert\Assert;
 /**
  * Input
  *
- * An object providing access to command line input and parsed command line arguments.
+ * An object providing access to parsed command line arguments.
  */
 class Input extends CObject {
 
