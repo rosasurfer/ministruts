@@ -234,12 +234,4 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
         }
         return \array_keys($array);
     }
-
-
-    /**
-     * Re-initialize the instance after deserialization.
-     */
-    public function __wakeUp() {
-        // intentionally don't call the constructor as an awakened instance is always an old form
-    }
 }

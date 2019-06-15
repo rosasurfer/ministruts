@@ -1,6 +1,7 @@
 <?php
 namespace rosasurfer\core\facade;
 
+use rosasurfer\core\io\web\Input as WebInput;
 use rosasurfer\core\proxy\Request as RequestProxy;
 use rosasurfer\ministruts\Request;
 
@@ -44,6 +45,10 @@ class Input extends Facade {
      * @return \rosasurfer\core\io\web\Input
      */
     public static function old() {
-        return RequestProxy::getAttribute('input.old') ?: new \rosasurfer\core\io\web\Input();
+        $input = RequestProxy::getAttribute('input.old');
+        if ($input) return $input;
+
+        $class = new \ReflectionClass(WebInput::class);
+        return $class->newInstanceWithoutConstructor();
     }
 }
