@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\ministruts;
+namespace rosasurfer\core\io\web;
 
 use rosasurfer\core\CObject;
 
@@ -7,7 +7,7 @@ use rosasurfer\core\CObject;
 /**
  * Input
  *
- * An object-oriented wrapper around the HTTP request parameters.
+ * An object providing access to raw HTTP request parameters.
  */
 class Input extends CObject {
 

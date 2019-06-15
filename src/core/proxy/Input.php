@@ -2,12 +2,13 @@
 namespace rosasurfer\core\proxy;
 
 use rosasurfer\console\docopt\DocoptResult;
+use rosasurfer\di\service\Service;
 
 
 /**
  * Input
  *
- * Proxy for the "input" implementation currently registered in the service container.
+ * A {@link Proxy} for the CLI "input" {@link Service} currently registered in the service container.
  *
  * Default implementation: {@link \rosasurfer\core\io\cli\Input}
  *

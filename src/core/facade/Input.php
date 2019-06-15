@@ -2,10 +2,7 @@
 namespace rosasurfer\core\facade;
 
 use rosasurfer\core\proxy\Request as RequestProxy;
-use rosasurfer\ministruts\Input as InputInstance;
 use rosasurfer\ministruts\Request;
-
-use const rosasurfer\ministruts\ACTION_FORM_KEY;
 
 
 /**
@@ -33,20 +30,20 @@ class Input extends Facade {
     /**
      * Return the wrapper around the current HTTP request parameters.
      *
-     * @return \rosasurfer\ministruts\Input
+     * @return \rosasurfer\core\io\web\Input
      */
     public static function current() {
-        return RequestProxy::getAttribute(ACTION_FORM_KEY);
+        return RequestProxy::getAttribute('input');
     }
 
 
     /**
-     * If the current request is a result of an HTTP redirect return the wrapper around the previous HTTP request parameters.
-     * Otherwise return an empty input wrapper.
+     * If the current request is a result of an HTTP redirect return the input wrapper around the previous HTTP request
+     * parameters. Otherwise return an empty input wrapper.
      *
-     * @return \rosasurfer\ministruts\Input
+     * @return \rosasurfer\core\io\web\Input
      */
     public static function old() {
-        return RequestProxy::getAttribute(ACTION_FORM_KEY.'.old') ?: new InputInstance();
+        return RequestProxy::getAttribute('input.old') ?: new \rosasurfer\core\io\web\Input();
     }
 }
