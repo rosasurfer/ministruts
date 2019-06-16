@@ -32,7 +32,7 @@ function registerClassLoader() {
     static $done = false;
     if ($done) return;
 
-    // register a bootstrap loader for class rosasurfer\loader\ClassLoader
+    // register a bootstrap loader for class rosasurfer\core\loader\ClassLoader
     $bootstrap = function($class) {
         switch ($class) {
             case CObject     ::class: require(MINISTRUTS_ROOT.'/src/core/CObject.php'           ); break;
@@ -44,8 +44,7 @@ function registerClassLoader() {
     spl_autoload_register($bootstrap, $throw=true, $prepend=true);
 
     // instantiate and register the framework's class loader
-    $loader = new ClassLoader();
-    $loader->register();
+    (new ClassLoader())->register();
     spl_autoload_unregister($bootstrap);
 
     $done = true;
