@@ -171,45 +171,6 @@ class Request extends CObject {
 
 
     /**
-     * Return the single $_REQUEST parameter with the specified name. If multiple $_REQUEST parameters with that name have
-     * been transmitted, the last one is returned. A transmitted array of $_REQUEST parameters with that name is ignored.
-     *
-     * @param  string $name - parameter name
-     *
-     * @return string|null - value or NULL if no such $_REQUEST parameter has been transmitted
-     */
-    public function getParameter($name) {
-        if (\key_exists($name, $_REQUEST)) {
-            $value = $_REQUEST[$name];
-            if (!is_array($value))
-                return $value;
-        }
-        return null;
-    }
-
-
-    /**
-     * Return an array of $_REQUEST parameters with the specified name. A single transmitted $_REQUEST parameter with that
-     * name is ignored. Without a name all $_REQUEST parameters are returned.
-     *
-     * @param  string $name [optional] - parameter name (default: all $_REQUEST parameters)
-     *
-     * @return string[] - values or an empty array if no such array of parameters has been transmitted
-     */
-    public function getParameters($name = null) {
-        if (isset($name)) {
-            if (\key_exists($name, $_REQUEST)) {
-                $value = $_REQUEST[$name];
-                if (is_array($value))
-                    return $value;
-            }
-            return [];
-        }
-        return $_REQUEST;
-    }
-
-
-    /**
      * Return the single $_GET parameter with the specified name. If multiple $_GET parameters with that name have been
      * transmitted, the last one is returned. A transmitted array of $_GET parameters with that name is ignored.
      *
