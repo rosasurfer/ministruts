@@ -38,13 +38,25 @@ class Request extends CObject {
     private $method;
 
     /** @var string */
-    private $hostUrl;
-
-    /** @var string */
     private $path;
 
-    /** @var array - normalized structure of files uploaded with the request */
+    /** @var string */
+    private $hostUrl;
+
+    /** @var array */
+    private $_GET;
+
+    /** @var array */
+    private $_POST;
+
+    /** @var array */
+    private $_REQUEST;
+
+    /** @var array - normalized array of files uploaded with the request */
     private $files;
+
+    /** @var ActionInput */
+    private $input;
 
     /** @var array - additional variables context */
     private $attributes = [];
@@ -58,11 +70,14 @@ class Request extends CObject {
 
         // issue: if $_SERVER['QUERY_STRING'] is empty (e.g. at times in nginx) PHP will not parse
         //        query parameters and it has to be done manually
-        $query = $this->getQueryString();
-
-        if (!$_GET && strlen($query)) {
-            $this->parseQueryString($query);
+        if (!$_GET) {
+            $query = $this->getQueryString();
+            strlen($query) && $this->parseQueryString($query);
         }
+
+        $this->_GET     = $_GET     ?: [];
+        $this->_POST    = $_POST    ?: [];
+        $this->_REQUEST = $_REQUEST ?: [];
     }
 
 
@@ -77,7 +92,6 @@ class Request extends CObject {
         foreach ($params as $param) {
             $parts = explode('=', $param, 2);
             $name  = trim(urldecode($parts[0])); if (!strlen($name)) continue;
-            //$name  = str_replace(['.', ' '], '_', $name);                         // replace as the PHP implementation does
             $value = sizeof($parts)==1 ? '' : urldecode($parts[1]);
 
             // TODO: process multi-dimensional arrays
@@ -141,6 +155,18 @@ class Request extends CObject {
      */
     public function isSecure() {
         return !empty($_SERVER['HTTPS']) && !strCompareI($_SERVER['HTTPS'], 'off');
+    }
+
+
+    /**
+     * Return the {@link ActionInput} instance assigned to the request. It represents the request's raw input parameters.
+     *
+     * @return ActionInput
+     */
+    public function getInput() {
+        if (!$this->input)
+            $this->input = new ActionInput($this->_REQUEST);
+        return $this->input;
     }
 
 

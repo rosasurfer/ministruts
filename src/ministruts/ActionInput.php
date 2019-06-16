@@ -13,43 +13,65 @@ use rosasurfer\core\CObject;
 class ActionInput extends CObject {
 
 
-    /** @var Request [transient] - the request the instance belongs to */
-    protected $request;
+    /** @var array */
+    protected $parameters;
 
 
     /**
      * Constructor
      *
-     * @param  Request $request
+     * @param  string[] $parameters
      */
-    public function __construct(Request $request) {
-        $this->request = $request;
+    public function __construct(array $parameters) {
+        $this->parameters = $parameters;
     }
 
 
     /**
-     * @param  string $name
-     * @param  mixed  $default [optional]
+     * Return a single raw input parameter with the specified name, or the passed default value if no such input parameter
+     * was transmitted. If multiple parameters with that name have been transmitted the last one is returned. If an array
+     * of parameters with that name has been transmitted it is ignored. Use {@link ActionInput::getArray()} to access an
+     * array of raw input parameters.
      *
-     * @return mixed
+     * @param  string $name               - parameter name
+     * @param  string $default [optional] - value to return if the specified parameter was not transmitted
+     *                                      (default: none)
+     * @return string|null
      */
     public function get($name, $default = null) {
-        return null;
+        if (\key_exists($name, $this->parameters)) {
+            if (!is_array($this->parameters[$name]))
+                return $this->parameters[$name];
+        }
+        return $default;
     }
 
 
     /**
-     * Prevent serialization of transient properties.
+     * Return an array of raw input parameter with the specified name, or the passed default values if no such input
+     * parameter array was transmitted. If a single parameter with that name has been transmitted it is ignored.
+     * Use {@link ActionInput::get()} to access a single raw input parameter.
      *
-     * @return string[] - array of property names to serialize
+     * @param  string   $name               - parameter name
+     * @param  string[] $default [optional] - values to return if the specified parameter array was not transmitted
+     *                                        (default: empty array)
+     * @return string[]
      */
-    public function __sleep() {
-        $array = (array)$this;
-        foreach ($array as $name => $property) {
-            if (is_object($property) || is_resource($property)) {
-                unset($array[$name]);                               // drop object and resource references
-            }
+    public function getArray($name, array $default = []) {
+        if (\key_exists($name, $this->parameters)) {
+            if (is_array($this->parameters[$name]))
+                return $this->parameters[$name];
         }
-        return \array_keys($array);
+        return $default;
+    }
+
+
+    /**
+     * Return all raw input parameters.
+     *
+     * @return string[]
+     */
+    public function getAll() {
+        return $this->parameters;
     }
 }

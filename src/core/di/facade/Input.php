@@ -11,18 +11,21 @@ use const rosasurfer\ministruts\ACTION_INPUT_KEY;
 /**
  * Input
  *
- * A {@link Facade} for accessing the raw parameters of the current or the previous web {@link Request}.
+ * A {@link Facade} for accessing the raw input parameters of the current or the previous HTTP {@link Request}.
  */
 class Input extends Facade {
 
 
     /**
-     * Return the current HTTP request's raw parameter with the specified name.
+     * Return a single raw input parameter of the current HTTP request matching the specified name, or the passed default
+     * value if no such input parameter was transmitted. If multiple parameters with that name have been transmitted the
+     * last one is returned. If an array of parameters with that name has been transmitted it is ignored.
+     * Use {@link Input::getArray()} to access an array of raw input parameters.
      *
      * @param  string $name               - parameter name
-     * @param  mixed  $default [optional] - default value to return if the specified parameter was not transmitted
+     * @param  string $default [optional] - value to return if the specified parameter was not transmitted
      *                                      (default: none)
-     * @return mixed
+     * @return string|null
      */
     public static function get($name, $default = null) {
         $input = static::current();
@@ -31,21 +34,45 @@ class Input extends Facade {
 
 
     /**
-     * Return the {@link ActionInput} instance assigned to the current HTTP request. The instance represents the request's
-     * raw input parameters.
+     * Return an array of raw input parameter of the current HTTP request, matching the specified name, or the passed default
+     * values if no such input parameter array was transmitted. If a single parameter with that name has been transmitted it
+     * is ignored. Use {@link Input::get()} to access a single raw parameter.
+     *
+     * @param  string   $name               - parameter name
+     * @param  string[] $default [optional] - values to return if the specified parameter array was not transmitted
+     *                                        (default: empty array)
+     * @return string[]
+     */
+    public static function getArray($name, array $default = []) {
+        $input = static::current();
+        return $input->getArray($name, $default);
+    }
+
+
+    /**
+     * Return all raw input parameters of the current HTTP request.
+     *
+     * @return string[]
+     */
+    public static function getAll() {
+        $input = static::current();
+        return $input->getAll();
+    }
+
+
+    /**
+     * Return the {@link ActionInput} instance assigned to the current HTTP request.
      *
      * @return ActionInput
      */
     public static function current() {
-        return null;
-        //return RequestProxy::getInput();
+        return RequestProxy::getInput();
     }
 
 
     /**
      * If the current request is a result of an HTTP redirect return the {@link ActionInput} instance assigned to the
-     * previous HTTP request. The instance represents the previous request's raw input parameters. If the current request
-     * is not a result of an HTTP redirect return an empty instance.
+     * previous one. If the current request is not a result of an HTTP redirect return an empty instance.
      *
      * @return ActionInput
      */

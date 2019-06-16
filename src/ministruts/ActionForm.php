@@ -218,7 +218,7 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
      * $throws IllegalAccessException
      */
     final public function offsetUnset($name) {
-        throw new IllegalAccessException('Cannot unset ActionForm properties');
+        throw new IllegalAccessException('Cannot set/modify ActionForm properties');
     }
 
 
