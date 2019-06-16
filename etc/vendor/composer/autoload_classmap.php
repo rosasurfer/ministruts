@@ -61,6 +61,7 @@ return array(
     'rosasurfer\\core\\di\\facade\\Form' => $baseDir . '/src/core/di/facade/Form.php',
     'rosasurfer\\core\\di\\facade\\Forms' => $baseDir . '/src/core/di/facade/Forms.php',
     'rosasurfer\\core\\di\\facade\\Input' => $baseDir . '/src/core/di/facade/Input.php',
+    'rosasurfer\\core\\di\\facade\\Inputs' => $baseDir . '/src/core/di/facade/Inputs.php',
     'rosasurfer\\core\\di\\proxy\\Input' => $baseDir . '/src/core/di/proxy/Input.php',
     'rosasurfer\\core\\di\\proxy\\Output' => $baseDir . '/src/core/di/proxy/Output.php',
     'rosasurfer\\core\\di\\proxy\\Proxy' => $baseDir . '/src/core/di/proxy/Proxy.php',

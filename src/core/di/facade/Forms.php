@@ -18,12 +18,12 @@ class Forms extends Facade {
 
 
     /**
-     * Return the {@link ActionForm} property with the specified name from both the current and the previous
-     * {@link ActionForm}. If the property exists in both forms the most current value is returned.
+     * Return the {@link ActionForm} property with the specified name from any of the current or the previous
+     * {@link ActionForm}. If the property exists in both forms the current value is returned.
      *
      * @param  string $name               - property name
-     * @param  mixed  $default [optional] - default value to return if the specified property was not found (default: none)
-     *
+     * @param  mixed  $default [optional] - value to return if the specified property was not found
+     *                                      (default: none)
      * @return mixed
      */
     public static function get($name, $default = null) {
