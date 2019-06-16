@@ -61,6 +61,35 @@ class Input extends Facade {
 
 
     /**
+     * Whether a single raw input parameter with the specified name has been transmitted with the current HTTP request.
+     * A transmitted array of parameters with that name is ignored. Use {@link Input::hasArray()} to test for an array
+     * of parameters.
+     *
+     * @param  string $name - parameter name
+     *
+     * @return bool
+     */
+    public static function has($name) {
+        $input = static::current();
+        return $input->has($name);
+    }
+
+
+    /**
+     * Whether an array of raw input parameter with the specified name has been transmitted with the current HTTP request.
+     * A transmitted single parameter with that name is ignored. Use {@link Input::has()} to test for a single parameter.
+     *
+     * @param  string $name - parameter name
+     *
+     * @return bool
+     */
+    public static function hasArray($name) {
+        $input = static::current();
+        return $input->hasArray($name);
+    }
+
+
+    /**
      * Return the {@link ActionInput} instance assigned to the current HTTP request.
      *
      * @return ActionInput

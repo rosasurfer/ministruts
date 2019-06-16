@@ -74,4 +74,34 @@ class ActionInput extends CObject {
     public function getAll() {
         return $this->parameters;
     }
+
+
+    /**
+     * Whether a single raw input parameter with the specified name has been transmitted. A transmitted array of parameters
+     * with that name is ignored. Use {@link ActionInput::hasArray()} to test for an array of parameters.
+     *
+     * @param  string $name - parameter name
+     *
+     * @return bool
+     */
+    public function has($name) {
+        if (\key_exists($name, $this->parameters))
+            return !is_array($this->parameters[$name]);
+        return false;
+    }
+
+
+    /**
+     * Whether an array of raw input parameter with the specified name has been transmitted. A transmitted single parameter
+     * with that name is ignored. Use {@link ActionInput::has()} to test for a single parameter.
+     *
+     * @param  string $name - parameter name
+     *
+     * @return bool
+     */
+    public function hasArray($name) {
+        if (\key_exists($name, $this->parameters))
+            return is_array($this->parameters[$name]);
+        return false;
+    }
 }
