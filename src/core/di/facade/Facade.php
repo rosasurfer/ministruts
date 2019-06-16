@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\core\facade;
+namespace rosasurfer\core\di\facade;
 
 use rosasurfer\core\StaticClass;
 
