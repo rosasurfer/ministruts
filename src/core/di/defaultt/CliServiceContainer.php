@@ -1,10 +1,10 @@
 <?php
 namespace rosasurfer\core\di\defaultt;
 
+use rosasurfer\console\io\CliInput;
+use rosasurfer\console\io\Output;
 use rosasurfer\core\di\Di;
 use rosasurfer\core\di\service\Service;
-use rosasurfer\core\io\CliInput;
-use rosasurfer\core\io\Output;
 
 
 /**

@@ -9,11 +9,11 @@ use rosasurfer\core\di\service\Service;
  *
  * A {@link Proxy} for the "output" {@link Service} currently registered in the service container.
  *
- * Default implementation: {@link \rosasurfer\core\io\Output}
+ * Default implementation: {@link \rosasurfer\console\io\Output}
  *
- * @method static \rosasurfer\core\io\Output instance()            Get the object behind the proxy.
- * @method static                            out(mixed $message)   Write a message to STDOUT.
- * @method static                            error(mixed $message) Write a message to STDERR.
+ * @method static \rosasurfer\console\io\Output instance()            Get the object behind the proxy.
+ * @method static                               out(mixed $message)   Write a message to STDOUT.
+ * @method static                               error(mixed $message) Write a message to STDERR.
  */
 class Output extends Proxy {
 
@@ -25,6 +25,6 @@ class Output extends Proxy {
      */
     protected static function getServiceName() {
         return 'output';
-        return \rosasurfer\core\io\Output::class;
+        return \rosasurfer\console\io\Output::class;
     }
 }

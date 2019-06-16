@@ -10,10 +10,10 @@ use rosasurfer\core\di\service\Service;
  *
  * A {@link Proxy} for the CLI "input" {@link Service} currently registered in the service container.
  *
- * Default implementation: {@link \rosasurfer\core\io\CliInput}
+ * Default implementation: {@link \rosasurfer\console\io\CliInput}
  *
- * @method static \rosasurfer\core\io\CliInput            instance()                            Get the object behind the proxy.
- * @method static \rosasurfer\core\io\CliInput            setDocoptResult(DocoptResult $docopt) Set the internal docopt result.
+ * @method static \rosasurfer\console\io\CliInput         instance()                            Get the object behind the proxy.
+ * @method static \rosasurfer\console\io\CliInput         setDocoptResult(DocoptResult $docopt) Set the internal docopt result.
  * @method static \rosasurfer\console\docopt\DocoptResult getDocoptResult()                     Return the internal docopt result.
  * @method static bool                                    isCommand(string $name)               Whether the command with the given name is defined (not whether the command was specified).<br><br> Valid commands consists of only lower-case letters. The same command may be defined multiple times.
  * @method static bool|int                                hasCommand(string $name)              Whether the command with the given name was specified.<br><br> See {@link CliInput::isCommand()} for the definition of "command".
@@ -34,6 +34,6 @@ class Input extends Proxy {
      */
     protected static function getServiceName() {
         return 'input';
-        return \rosasurfer\core\io\CliInput::class;
+        return \rosasurfer\console\io\CliInput::class;
     }
 }
