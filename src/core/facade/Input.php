@@ -2,8 +2,10 @@
 namespace rosasurfer\core\facade;
 
 use rosasurfer\core\di\proxy\Request as RequestProxy;
-use rosasurfer\core\io\WebInput;
+use rosasurfer\ministruts\ActionInput;
 use rosasurfer\ministruts\Request;
+
+use const rosasurfer\ministruts\ACTION_INPUT_KEY;
 
 
 /**
@@ -29,26 +31,29 @@ class Input extends Facade {
 
 
     /**
-     * Return the wrapper around the current HTTP request parameters.
+     * Return the {@link ActionInput} instance assigned to the current HTTP request. The instance represents the request's
+     * raw input parameters.
      *
-     * @return WebInput
+     * @return ActionInput
      */
     public static function current() {
-        return RequestProxy::getAttribute('input');
+        return null;
+        //return RequestProxy::getInput();
     }
 
 
     /**
-     * If the current request is a result of an HTTP redirect return the input wrapper around the previous HTTP request
-     * parameters. Otherwise return an empty input wrapper.
+     * If the current request is a result of an HTTP redirect return the {@link ActionInput} instance assigned to the
+     * previous HTTP request. The instance represents the previous request's raw input parameters. If the current request
+     * is not a result of an HTTP redirect return an empty instance.
      *
-     * @return WebInput
+     * @return ActionInput
      */
     public static function old() {
-        $input = RequestProxy::getAttribute('input.old');
+        $input = RequestProxy::getAttribute(ACTION_INPUT_KEY.'.old');
         if ($input) return $input;
 
-        $class = new \ReflectionClass(WebInput::class);
+        $class = new \ReflectionClass(ActionInput::class);
         return $class->newInstanceWithoutConstructor();
     }
 }

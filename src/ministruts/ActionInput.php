@@ -1,16 +1,16 @@
 <?php
-namespace rosasurfer\core\io;
+namespace rosasurfer\ministruts;
 
 use rosasurfer\core\CObject;
-use rosasurfer\ministruts\Request;
 
 
 /**
- * WebInput
+ * ActionInput
  *
- * An object providing access to raw HTTP request parameters.
+ * An object providing access to the current HTTP request's raw user input parameters. Use the {@link ActionForm} to access
+ * the request's validated and interpreted input parameters.
  */
-class WebInput extends CObject {
+class ActionInput extends CObject {
 
 
     /** @var Request [transient] - the request the instance belongs to */

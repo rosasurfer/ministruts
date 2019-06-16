@@ -7,8 +7,10 @@ use rosasurfer\core\exception\IllegalAccessException;
 
 
 /**
- * An {@link ActionForm} encapsulates and represents the user input. It provides an interface for {@link Action}s and
- * business layer to access and validate this input.
+ * ActionForm
+ *
+ * An {@link ActionForm} encapsulates and represents interpreted user input. It provides an interface for {@link Action}s
+ * and business layer to access and validate this input. Use {@link ActionInput} to access the raw input parameters.
  */
 abstract class ActionForm extends CObject implements \ArrayAccess {
 

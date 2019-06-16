@@ -63,6 +63,11 @@ const ACTION_ERRORS_KEY = 'org.apache.struts.action.ERRORS';
 const ACTION_FORM_KEY = 'org.apache.struts.action.FORM';
 
 /**
+ * Request or session key under which the previous request's {@link ActionInput} is stored.
+ */
+const ACTION_INPUT_KEY = 'org.apache.struts.action.INPUT';
+
+/**
  * Request key under which the current request's {@link ActionMapping} is stored.
  */
 const ACTION_MAPPING_KEY = 'org.apache.struts.action.MAPPING';
