@@ -169,7 +169,7 @@ class Request extends CObject {
      *
      * @return ActionInput
      */
-    public function getInput() {
+    public function input() {
         if (!$this->allInput)
             $this->allInput = new ActionInput($this->_REQUEST);
         return $this->allInput;

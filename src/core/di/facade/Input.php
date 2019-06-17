@@ -95,7 +95,7 @@ class Input extends Facade {
      * @return ActionInput
      */
     public static function current() {
-        return RequestProxy::getInput();
+        return RequestProxy::input();
     }
 
 
