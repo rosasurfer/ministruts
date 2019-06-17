@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\core\proxy;
+namespace rosasurfer\core\di\proxy;
 
 use rosasurfer\core\StaticClass;
 use rosasurfer\core\exception\IllegalAccessException;
@@ -7,7 +7,7 @@ use rosasurfer\core\exception\UnimplementedFeatureException;
 
 
 /**
- * A {@link Proxy} forwards calls of one API to another one.
+ * A {@link Proxy} forwards API calls from one object to another. It doesn't modify the called API.
  *
  * In MiniStruts it forwards static method calls to actual instances. The standard behavior to resolve proxied instances is
  * a look-up in the application's default service container. Override {@link Proxy::instance()} to change that behavior.

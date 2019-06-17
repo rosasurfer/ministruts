@@ -8,10 +8,11 @@ use rosasurfer\console\io\Input;
 use rosasurfer\console\io\Output;
 use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
+use rosasurfer\core\di\proxy\CliInput as InputProxy;
+use rosasurfer\core\di\proxy\Output as OutputProxy;
 use rosasurfer\core\exception\IllegalStateException;
 use rosasurfer\core\exception\InvalidArgumentException;
 use rosasurfer\core\exception\RuntimeException;
-use rosasurfer\di\Di;
 
 
 /**
@@ -44,6 +45,12 @@ class Command extends CObject {
     /** @var bool - whether the command configuration is frozen */
     private $frozen = false;
 
+    /** @var Input */
+    protected $input;
+
+    /** @var Output */
+    protected $output;
+
     /** @var int - the command's error status */
     protected $status = 0;
 
@@ -54,6 +61,8 @@ class Command extends CObject {
      * Create a new command.
      */
     public function __construct() {
+        $this->input  = InputProxy::instance();
+        $this->output = OutputProxy::instance();
         $this->configure();
     }
 
@@ -75,12 +84,10 @@ class Command extends CObject {
      * @return int - execution status (0 for success)
      */
     public function run() {
-        /** @var Input $input */
-        $input = $this->di('input');
-        $input->setDocoptResult($this->docoptResult);
+        $input = $this->input;
+        $output = $this->output;
 
-        /** @var Output $output */
-        $output = $this->di('output');
+        $input->setDocoptResult($this->docoptResult);
 
         if ($this->validator) $error = $this->validator->__invoke($input, $output);
         else                  $error = $this->validate($input, $output);

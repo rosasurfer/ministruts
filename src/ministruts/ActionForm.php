@@ -7,8 +7,10 @@ use rosasurfer\core\exception\IllegalAccessException;
 
 
 /**
- * An {@link ActionForm} encapsulates and represents the user input. It provides an interface for {@link Action}s and
- * business layer to access and validate this input.
+ * ActionForm
+ *
+ * An {@link ActionForm} encapsulates and represents interpreted user input. It provides an interface for {@link Action}s
+ * and business layer to access and validate this input. Use {@link ActionInput} to access the raw input parameters.
  */
 abstract class ActionForm extends CObject implements \ArrayAccess {
 
@@ -101,9 +103,12 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
          *       )
          *   )
          */
-        $params = $this->request->getParameters();
+        $params = $this->request->input()->all();
         if (isset($params['submit']['action'])) {
-            $this->actionKey = $params['submit']['action'];
+            $key = $params['submit']['action'];
+            if (is_string($key)) {
+                $this->actionKey = $key;
+            }
         }
     }
 
@@ -196,7 +201,7 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
 
 
     /**
-     * Setting/modifying input parameters is not allowed.
+     * Setting/modifying form properties is not allowed.
      *
      * @param  string $name
      * @param  mixed  $value
@@ -209,14 +214,14 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
 
 
     /**
-     * Unsetting input parameters is not allowed.
+     * Unsetting form properties is not allowed.
      *
      * @param  string $name
      *
      * $throws IllegalAccessException
      */
     final public function offsetUnset($name) {
-        throw new IllegalAccessException('Cannot unset ActionForm properties');
+        throw new IllegalAccessException('Cannot set/modify ActionForm properties');
     }
 
 
@@ -233,13 +238,5 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
             }
         }
         return \array_keys($array);
-    }
-
-
-    /**
-     * Re-initialize the instance after deserialization.
-     */
-    public function __wakeUp() {
-        // intentionally don't call the constructor as an awakened instance is always an old form
     }
 }

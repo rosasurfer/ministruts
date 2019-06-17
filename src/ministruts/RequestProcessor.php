@@ -2,9 +2,9 @@
 namespace rosasurfer\ministruts;
 
 use rosasurfer\core\CObject;
+use rosasurfer\core\di\facade\Form;
+use rosasurfer\core\di\facade\Forms;
 use rosasurfer\core\exception\RuntimeException;
-use rosasurfer\core\facade\Form;
-use rosasurfer\core\facade\Forms;
 use rosasurfer\net\http\HttpResponse;
 
 

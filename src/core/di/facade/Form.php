@@ -1,7 +1,7 @@
 <?php
-namespace rosasurfer\core\facade;
+namespace rosasurfer\core\di\facade;
 
-use rosasurfer\core\proxy\Request;
+use rosasurfer\core\di\proxy\Request;
 use rosasurfer\ministruts\ActionForm;
 use rosasurfer\ministruts\EmptyActionForm;
 
@@ -55,8 +55,8 @@ class Form extends Facade {
 
     /**
      * If the current request is a result of an HTTP redirect return the {@link ActionForm} instance assigned to the
-     * previous HTTP request. Otherwise return an instance of {@link EmptyActionForm}. Use the optional $type parameter
-     * to distinguish between multiple different {@link ActionForm}s in the same page.
+     * previous HTTP request. Otherwise return an {@link EmptyActionForm}. Use the optional $type parameter to distinguish
+     * between multiple different {@link ActionForm}s in the same page.
      *
      * @param  string $type [optional] - ensure the returned instance matches the specified class name, or return an
      *                                   EmptyActionForm if this is not the case

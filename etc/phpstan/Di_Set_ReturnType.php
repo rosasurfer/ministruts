@@ -13,7 +13,7 @@ use PHPStan\Type\ObjectType;
 use PHPStan\Type\UnionType;
 use PHPStan\Type\Type;
 
-use rosasurfer\di\Di;
+use rosasurfer\core\di\Di;
 
 use function rosasurfer\echoPre;
 use function rosasurfer\simpleClassName;

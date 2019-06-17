@@ -3,7 +3,7 @@ namespace rosasurfer\core\exception;
 
 use rosasurfer\core\ObjectTrait;
 use rosasurfer\core\debug\DebugHelper;
-use rosasurfer\di\DiAwareTrait;
+use rosasurfer\core\di\DiAwareTrait;
 use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
 
 

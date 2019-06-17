@@ -13,7 +13,7 @@ abstract class Action extends CObject {
     /** @var ActionMapping - encapsulates a single routing configuration */
     protected $mapping;
 
-    /** @var ActionForm - holds user input of the current request */
+    /** @var ActionForm - holds interpreted user input of the current request */
     protected $form;
 
 

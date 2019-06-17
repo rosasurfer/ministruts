@@ -1,13 +1,14 @@
 <?php
-namespace rosasurfer\core\proxy;
+namespace rosasurfer\core\di\proxy;
 
 use rosasurfer\console\docopt\DocoptResult;
+use rosasurfer\core\di\service\Service;
 
 
 /**
- * Input
+ * CliInput
  *
- * Proxy for the "input" implementation currently registered in the service container.
+ * A {@link Proxy} for the CLI "input" {@link Service} which is registered in the service container.
  *
  * Default implementation: {@link \rosasurfer\console\io\Input}
  *
@@ -23,7 +24,7 @@ use rosasurfer\console\docopt\DocoptResult;
  * @method static bool|int|string                         getOption(string $name)               Return the value of the option with the given name.<br><br> If the option is not repetitive and has no arguments a boolean value is returned. If the option is repetitive and has no arguments an integer indicating the number of times the option was specified is returned. If the option has arguments the first argument is returned. The returned value may be the defined default value.<br> See {@link Input::isOption()} for the definition of "option".
  * @method static string[]                                getOptions(string $name)              Return the values of the options with the given name. The returned values may be the defined default values.<br><br> See {@link Input::isOption()} for the definition of "option".
  */
-class Input extends Proxy {
+class CliInput extends Proxy {
 
 
     /**

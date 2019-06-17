@@ -4,7 +4,7 @@ namespace rosasurfer\ministruts\url;
 use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\debug\ErrorHandler;
-use rosasurfer\core\proxy\Request;
+use rosasurfer\core\di\proxy\Request;
 use rosasurfer\ministruts\Module;
 
 use const rosasurfer\CLI;
