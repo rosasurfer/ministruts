@@ -52,11 +52,17 @@ class Request extends CObject {
     /** @var array */
     private $_REQUEST;
 
+    /** @var ActionInput - all input */
+    private $allInput;
+
+    /** @var ActionInput - GET input*/
+    private $getInput;
+
+    /** @var ActionInput - POST input */
+    private $postInput;
+
     /** @var array - normalized array of files uploaded with the request */
     private $files;
-
-    /** @var ActionInput */
-    private $input;
 
     /** @var array - additional variables context */
     private $attributes = [];
@@ -159,94 +165,38 @@ class Request extends CObject {
 
 
     /**
-     * Return the {@link ActionInput} instance assigned to the request. It represents the request's raw input parameters.
+     * Return an object wrapper for all raw input parameters of the request. This includes GET and POST parameters.
      *
      * @return ActionInput
      */
     public function getInput() {
-        if (!$this->input)
-            $this->input = new ActionInput($this->_REQUEST);
-        return $this->input;
+        if (!$this->allInput)
+            $this->allInput = new ActionInput($this->_REQUEST);
+        return $this->allInput;
     }
 
 
     /**
-     * Return the single $_GET parameter with the specified name. If multiple $_GET parameters with that name have been
-     * transmitted, the last one is returned. A transmitted array of $_GET parameters with that name is ignored.
+     * Return an object wrapper for all raw GET parameters of the request.
      *
-     * @param  string $name - parameter name
-     *
-     * @return string|null - value or NULL if no such $_GET parameter has been transmitted
+     * @return ActionInput
      */
-    public function getGetParameter($name) {
-        if (\key_exists($name, $_GET)) {
-            $value = $_GET[$name];
-            if (!is_array($value))
-                return $value;
-        }
-        return null;
+    public function get() {
+        if (!$this->getInput)
+            $this->getInput = new ActionInput($this->_GET);
+        return $this->getInput;
     }
 
 
     /**
-     * Return an array of $_GET parameters with the specified name. A single transmitted $_GET parameter with that name is
-     * ignored. Without a name all $_GET parameters are returned.
+     * Return an object wrapper for all raw POST parameters of the request.
      *
-     * @param  string $name [optional] - parameter name (default: all $_GET parameters)
-     *
-     * @param  string $name - parameter name
-     *
-     * @return string[] - values or an empty array if no such array of $_GET parameters has been transmitted
+     * @return ActionInput
      */
-    public function getGetParameters($name = null) {
-        if (isset($name)) {
-            if (\key_exists($name, $_GET)) {
-                $value = $_GET[$name];
-                if (is_array($value))
-                    return $value;
-            }
-            return [];
-        }
-        return $_GET;
-    }
-
-
-    /**
-     * Return the single $_POST parameter with the specified name. If multiple $_POST parameters with that name have been
-     * transmitted, the last one is returned. A transmitted array of $_POST parameters with that name is ignored.
-     *
-     * @param  string $name - parameter name
-     *
-     * @return string|null - value or NULL if no such $_POST parameter has been transmitted
-     */
-    public function getPostParameter($name) {
-        if (\key_exists($name, $_POST)) {
-            $value = $_POST[$name];
-            if (!is_array($value))
-                return $value;
-        }
-        return null;
-    }
-
-
-    /**
-     * Return an array of $_POST parameters with the specified name. A single transmitted $_POST parameter with that name
-     * is ignored. Without a name all $_POST parameters are returned.
-     *
-     * @param  string $name [optional] - parameter name (default: all $_POST parameters)
-     *
-     * @return string[] - values or an empty array if no such array of $_POST parameters has been transmitted
-     */
-    public function getPostParameters($name = null) {
-        if (isset($name)) {
-            if (\key_exists($name, $_POST)) {
-                $value = $_POST[$name];
-                if (is_array($value))
-                    return $value;
-            }
-            return [];
-        }
-        return $_POST;
+    public function post() {
+        if (!$this->postInput)
+            $this->postInput = new ActionInput($this->_POST);
+        return $this->postInput;
     }
 
 

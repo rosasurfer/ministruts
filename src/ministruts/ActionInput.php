@@ -28,6 +28,16 @@ class ActionInput extends CObject {
 
 
     /**
+     * Return all raw input parameters.
+     *
+     * @return string[]
+     */
+    public function all() {
+        return $this->parameters;
+    }
+
+
+    /**
      * Return a single raw input parameter with the specified name, or the passed default value if no such input parameter
      * was transmitted. If multiple parameters with that name have been transmitted the last one is returned. If an array
      * of parameters with that name has been transmitted it is ignored. Use {@link ActionInput::getArray()} to access an
@@ -63,16 +73,6 @@ class ActionInput extends CObject {
                 return $this->parameters[$name];
         }
         return $default;
-    }
-
-
-    /**
-     * Return all raw input parameters.
-     *
-     * @return string[]
-     */
-    public function getAll() {
-        return $this->parameters;
     }
 
 

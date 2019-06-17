@@ -17,6 +17,17 @@ class Input extends Facade {
 
 
     /**
+     * Return all raw input parameters of the current HTTP request.
+     *
+     * @return string[]
+     */
+    public static function all() {
+        $input = static::current();
+        return $input->all();
+    }
+
+
+    /**
      * Return a single raw input parameter of the current HTTP request matching the specified name, or the passed default
      * value if no such input parameter was transmitted. If multiple parameters with that name have been transmitted the
      * last one is returned. If an array of parameters with that name has been transmitted it is ignored.
@@ -46,17 +57,6 @@ class Input extends Facade {
     public static function getArray($name, array $default = []) {
         $input = static::current();
         return $input->getArray($name, $default);
-    }
-
-
-    /**
-     * Return all raw input parameters of the current HTTP request.
-     *
-     * @return string[]
-     */
-    public static function getAll() {
-        $input = static::current();
-        return $input->getAll();
     }
 
 

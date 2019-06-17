@@ -103,7 +103,7 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
          *       )
          *   )
          */
-        $params = $this->request->getInput()->getAll();
+        $params = $this->request->getInput()->all();
         if (isset($params['submit']['action'])) {
             $key = $params['submit']['action'];
             if (is_string($key)) {
