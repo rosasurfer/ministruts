@@ -165,7 +165,7 @@ class Request extends CObject {
 
 
     /**
-     * Return an object wrapper for all raw input parameters of the request. This includes GET and POST parameters.
+     * Return an object wrapper for all raw input parameters of the request. It includes GET and POST parameters.
      *
      * @return ActionInput
      */

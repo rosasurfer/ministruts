@@ -201,7 +201,7 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
 
 
     /**
-     * Setting/modifying input parameters is not allowed.
+     * Setting/modifying form properties is not allowed.
      *
      * @param  string $name
      * @param  mixed  $value
@@ -214,7 +214,7 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
 
 
     /**
-     * Unsetting input parameters is not allowed.
+     * Unsetting form properties is not allowed.
      *
      * @param  string $name
      *

@@ -2,6 +2,7 @@
 namespace rosasurfer\ministruts;
 
 use rosasurfer\core\CObject;
+use rosasurfer\core\exception\IllegalAccessException;
 
 
 /**
@@ -10,7 +11,7 @@ use rosasurfer\core\CObject;
  * An object providing access to the current HTTP request's raw user input parameters. Use the {@link ActionForm} to access
  * the request's validated and interpreted input parameters.
  */
-class ActionInput extends CObject {
+class ActionInput extends CObject implements \ArrayAccess {
 
 
     /** @var array */
@@ -103,5 +104,56 @@ class ActionInput extends CObject {
         if (\key_exists($name, $this->parameters))
             return is_array($this->parameters[$name]);
         return false;
+    }
+
+
+    /**
+     * Whether a single or an array parameter with the specified name exists.
+     *
+     * @param  string $name
+     *
+     * @return bool
+     */
+    public function offsetExists($name) {
+        return \key_exists($name, $this->parameters);
+    }
+
+
+    /**
+     * Return the single or array input parameter with the specified name.
+     *
+     * @param  string $name
+     *
+     * @return string|array|null - parameter or NULL if no such input parameter exists
+     */
+    public function offsetGet($name) {
+        if (\key_exists($name, $this->parameters))
+            return $this->parameters[$name];
+        return null;
+    }
+
+
+    /**
+     * Setting/modifying input parameters is not allowed.
+     *
+     * @param  string $name
+     * @param  mixed  $value
+     *
+     * $throws IllegalAccessException
+     */
+    final public function offsetSet($name, $value) {
+        throw new IllegalAccessException('Cannot set/modify ActionInput parameters');
+    }
+
+
+    /**
+     * Unsetting input parameters is not allowed.
+     *
+     * @param  string $name
+     *
+     * $throws IllegalAccessException
+     */
+    final public function offsetUnset($name) {
+        throw new IllegalAccessException('Cannot set/modify ActionInput parameters');
     }
 }

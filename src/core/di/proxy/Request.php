@@ -19,7 +19,7 @@ use rosasurfer\ministruts\Module;
  * @method static bool                                      isGet()                                                                   Whether the request is a GET request.
  * @method static bool                                      isPost()                                                                  Whether the request is a POST request.
  * @method static bool                                      isSecure()                                                                Whether the request was made over a secure connection (HTTPS).
- * @method static \rosasurfer\ministruts\ActionInput        input()                                                                   Return an object wrapper for all raw input parameters of the request. This includes GET and POST parameters.
+ * @method static \rosasurfer\ministruts\ActionInput        input()                                                                   Return an object wrapper for all raw input parameters of the request. It includes GET and POST parameters.
  * @method static \rosasurfer\ministruts\ActionInput        get()                                                                     Return an object wrapper for all raw GET parameters of the request.
  * @method static \rosasurfer\ministruts\ActionInput        post()                                                                    Return an object wrapper for all raw POST parameters of the request.
  * @method static array                                     getFiles()                                                                Return an object-oriented representation of the files uploaded with the request. The PHP array structure of $_FILES is converted to normalized arrays.
