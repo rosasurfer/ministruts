@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\core\di\defaultt;
 
-use rosasurfer\console\io\CliInput;
+use rosasurfer\console\io\Input;
 use rosasurfer\console\io\Output;
 use rosasurfer\core\di\Di;
 use rosasurfer\core\di\service\Service;
@@ -23,8 +23,8 @@ class CliServiceContainer extends Di {
      */
     public function __construct($configDir) {
         $services = [
-            (new Service('input',  CliInput::class))->addAlias(CliInput::class),
-            (new Service('output', Output::class  ))->addAlias(Output::class),
+            (new Service('input',  Input::class))->addAlias(Input::class),
+            (new Service('output', Output::class))->addAlias(Output::class),
         ];
         foreach ($services as $service) {
             $this->addService($service);

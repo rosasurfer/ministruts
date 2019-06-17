@@ -7,11 +7,11 @@ use rosasurfer\core\assert\Assert;
 
 
 /**
- * CliInput
+ * Input
  *
  * An object providing access to parsed command line arguments.
  */
-class CliInput extends CObject {
+class Input extends CObject {
 
 
     /** @var DocoptResult */
@@ -61,7 +61,7 @@ class CliInput extends CObject {
 
     /**
      * Whether the command with the given name was specified.
-     * See {@link CliInput::isCommand()} for the definition of "command".
+     * See {@link Input::isCommand()} for the definition of "command".
      *
      * @param  string $name
      *
@@ -107,7 +107,7 @@ class CliInput extends CObject {
 
     /**
      * Return the single-value argument or the first multi-value argument with the given name.
-     * See {@link CliInput::isArgument()} for the definition of "argument".
+     * See {@link Input::isArgument()} for the definition of "argument".
      *
      * @param  string $name
      *
@@ -130,7 +130,7 @@ class CliInput extends CObject {
 
     /**
      * Return the arguments with the given name.
-     * See {@link CliInput::isArgument()} for the definition of "argument".
+     * See {@link Input::isArgument()} for the definition of "argument".
      *
      * @param  string $name
      *
@@ -177,7 +177,7 @@ class CliInput extends CObject {
      * If the option is not repetitive and has no arguments a boolean value is returned. If the option is repetitive and has
      * no arguments an integer is returned indicating the number of times the option was specified. If the option has
      * arguments the first argument is returned. The returned value may be the defined default value.
-     * See {@link CliInput::isOption()} for the definition of "option".
+     * See {@link Input::isOption()} for the definition of "option".
      *
      * @param  string $name
      *
@@ -205,7 +205,7 @@ class CliInput extends CObject {
 
     /**
      * Return the values of the options with the given name. The returned values may be the defined default values.
-     * See {@link CliInput::isOption()} for the definition of "option".
+     * See {@link Input::isOption()} for the definition of "option".
      *
      * @param  string $name
      *
