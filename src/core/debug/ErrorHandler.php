@@ -175,13 +175,13 @@ class ErrorHandler extends StaticClass {
          * @see  http://stackoverflow.com/questions/25584494/php-set-exception-handler-not-working-for-error-thrown-in-set-error-handler-cal
          */
         $trace = $exception->getBetterTrace();
-        if ($trace) {                                                   // after a FATAL error the trace may be empty
+        if ($trace) {                                                           // after a FATAL error the trace may be empty
             $function = DebugHelper::getFQFunctionName($trace[0]);
             if ($function=='require' || $function=='require_once') {
                 $currentHandler = set_exception_handler(function() {});
                 restore_exception_handler();
-                $currentHandler && $currentHandler($exception);
-                return (bool)$currentHandler;                           // PHP will terminate the script anyway
+                $currentHandler && call_user_func($currentHandler, $exception); // We MUST use call_user_func() as a static handler cannot be invoked dynamically.
+                return (bool)$currentHandler;                                   // PHP will terminate the script anyway
             }
         }
 
@@ -288,10 +288,10 @@ class ErrorHandler extends StaticClass {
             restore_exception_handler();
 
             if ($currentHandler) {
-                $currentHandler($exception);        // Calling exit() is the only way to prevent the immediately following
-                exit(1);                            // non-catchable fatal error. However, calling exit() in a destructor will
-            }                                       // also prevent execution of any remaining shutdown routines.
-        }
+                call_user_func($currentHandler, $exception);    // We MUST use call_user_func() as a static handler cannot be invoked dynamically.
+                exit(1);                                        // Calling exit() is the only way to prevent the immediately following
+            }                                                   // non-catchable fatal error. However, calling exit() in a destructor will
+        }                                                       // also prevent execution of any remaining shutdown routines.
         return $exception;
     }
 
@@ -312,8 +312,8 @@ class ErrorHandler extends StaticClass {
         restore_exception_handler();
 
         if ($currentHandler) {
-            $currentHandler($exception);            // Calling exit() is the only way to prevent the immediately following
-            exit(1);                                // non-catchable fatal error.
-        }
+            call_user_func($currentHandler, $exception);        // We MUST use call_user_func() as a static handler cannot be invoked dynamically.
+            exit(1);                                            // Calling exit() is the only way to prevent the immediately following
+        }                                                       // non-catchable fatal error.
     }
 }
