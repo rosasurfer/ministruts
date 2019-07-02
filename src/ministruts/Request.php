@@ -135,6 +135,18 @@ class Request extends CObject {
 
 
     /**
+     * Whether the request is a result of an AJAX call.
+     *
+     * @return bool
+     */
+    public function isAjax() {
+        static $isAjax;
+        !isset($isAjax) && $isAjax = strCompareI($this->getHeader('X-Requested-With'), 'XMLHttpRequest');
+        return $isAjax;
+    }
+
+
+    /**
      * Whether the request was made over a secure connection (HTTPS).
      *
      * @return bool
