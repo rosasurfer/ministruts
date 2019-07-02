@@ -4,12 +4,21 @@ namespace rosasurfer\ministruts;
 use rosasurfer\core\CObject;
 use rosasurfer\core\di\facade\Form;
 use rosasurfer\core\di\facade\Forms;
+use rosasurfer\core\di\service\Service;
 use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\net\http\HttpResponse;
 
 
 /**
  * RequestProcessor
+ *
+ * The default {@link RequestProcessor} implementation used by the framework if no custom RequestProcessor was configured.
+ *
+ * A custom implementation can be configured for a single application {@link Module} by defining the module's Struts config
+ * attribute <tt>/struts-config/controller[@request-processor="%ClassName"]</tt>.
+ *
+ * A custom implementation can be configured for all application Modules by re-defining the DI {@link Service} named
+ * "requestProcessor".
  */
 class RequestProcessor extends CObject {
 
