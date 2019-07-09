@@ -878,7 +878,7 @@ class Request extends CObject {
      * Store a value in the request's variables context. May be used to transfer data from controllers or {@link Action}s
      * to views.
      *
-     * @param  string $name  - name under the which the variables is stored
+     * @param  string $name  - name under which the value is stored
      * @param  mixed  $value - value to store
      */
     public function setAttribute($name, $value) {
@@ -888,7 +888,7 @@ class Request extends CObject {
 
 
     /**
-     * Remove the variable(s) with the specified name(s) from the request's variables context.
+     * Remove the value(s) with the specified name(s) from the request's variables context.
      *
      * @param  string ...$names - names of the values to remove
      */
@@ -1008,11 +1008,11 @@ class Request extends CObject {
     /**
      * Store an ActionMessage for the specified key.
      *
-     * @param  string $key     - message key
-     * @param  string $message - message; if NULL is passed the message for the specified key is removed
+     * @param  string|int $key     - message key
+     * @param  string     $message - message; if NULL is passed the message for the specified key is removed
      */
     public function setActionMessage($key, $message) {
-        Assert::string($key, '$key');
+        if (!is_string($key) && !is_int($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.gettype($key));
         Assert::nullOrString($message, '$message');
 
         if (!isset($message)) {
@@ -1112,11 +1112,11 @@ class Request extends CObject {
     /**
      * Store an ActionError for the specified key.
      *
-     * @param  string $key     - error key
-     * @param  string $message - message; if NULL is passed the error for the specified key is removed
+     * @param  string|int $key     - error key
+     * @param  string     $message - message; if NULL is passed the error for the specified key is removed
      */
     public function setActionError($key, $message) {
-        Assert::string($key, '$key');
+        if (!is_string($key) && !is_int($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.gettype($key));
         Assert::nullOrString($message, '$message');
 
         if (!isset($message)) {
