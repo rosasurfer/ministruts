@@ -378,41 +378,6 @@ function isRelativePath($path) {
 
 
 /**
- * Decode a JSON value. Wrapper for the built-in method <tt>json_encode()</tt> with improved error handling.
- *
- * @param  mixed $value
- * @param  int   $options [optional] - default: 0
- * @param  int   $depth   [optional] - default: 512
- *
- * @return string - encoded value
- *
- * Note: Since version 7.3 PHP supports the flag JSON_THROW_ON_ERROR to change the default behaviour on errors.
- *       No need for additional helpers anymore.
- */
-function json_encode($value, $options=0, $depth=512) {
-    return \rosasurfer\json_encode(...func_get_args());
-}
-
-
-/**
- * Decode a JSON value. Wrapper for the built-in method <tt>json_decode()</tt> with improved error handling.
- *
- * @param  string $value
- * @param  bool   $assoc   [optional] - default: FALSE
- * @param  int    $depth   [optional] - default: 512
- * @param  int    $options [optional] - default: 0
- *
- * @return mixed - decoded value
- *
- * Note: Since version 7.3 PHP supports the flag JSON_THROW_ON_ERROR to change the default behaviour on errors.
- *       No need for additional helpers anymore.
- */
-function json_decode($value, $assoc=false, $depth=512, $options=0) {
-    return \rosasurfer\json_decode(...func_get_args());
-}
-
-
-/**
  * Functional replacement for ($stringA === $stringB).
  *
  * @param  string $stringA
