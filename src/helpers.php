@@ -708,6 +708,8 @@ function isRelativePath($path) {
  *
  * Note: Since version 7.3 PHP supports the flag JSON_THROW_ON_ERROR to change the default behaviour on errors.
  *       No need for additional helpers anymore.
+ *
+ * @see  https://github.com/alexeyshockov/php-json-wrapper
  */
 function json_encode($value, $options=0, $depth=512) {
     $result = \json_encode(...func_get_args());
@@ -728,6 +730,8 @@ function json_encode($value, $options=0, $depth=512) {
  *
  * Note: Since version 7.3 PHP supports the flag JSON_THROW_ON_ERROR to change the default behaviour on errors.
  *       No need for additional helpers anymore.
+ *
+ * @see  https://github.com/alexeyshockov/php-json-wrapper
  */
 function json_decode($value, $assoc=false, $depth=512, $options=0) {
     Assert::string($value);
