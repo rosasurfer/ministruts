@@ -698,6 +698,46 @@ function isRelativePath($path) {
 
 
 /**
+ * Decode a JSON value. Wrapper for the built-in method <tt>json_encode()</tt> with improved error handling.
+ *
+ * @param  mixed $value
+ * @param  int   $options [optional] - default: 0
+ * @param  int   $depth   [optional] - default: 512
+ *
+ * @return string - encoded value
+ *
+ * Note: Since version 7.3 PHP supports the flag JSON_THROW_ON_ERROR to change the default behaviour on errors.
+ *       No need for additional helpers anymore.
+ */
+function json_encode($value, $options=0, $depth=512) {
+    $result = \json_encode(...func_get_args());
+    if (json_last_error()) throw new InvalidArgumentException('Cannot convert value "'.$value.'" to JSON ('.json_last_error_msg().')', json_last_error());
+    return $result;
+}
+
+
+/**
+ * Decode a JSON value. Wrapper for the built-in method <tt>json_decode()</tt> with improved error handling.
+ *
+ * @param  string $value
+ * @param  bool   $assoc   [optional] - default: FALSE
+ * @param  int    $depth   [optional] - default: 512
+ * @param  int    $options [optional] - default: 0
+ *
+ * @return mixed - decoded value
+ *
+ * Note: Since version 7.3 PHP supports the flag JSON_THROW_ON_ERROR to change the default behaviour on errors.
+ *       No need for additional helpers anymore.
+ */
+function json_decode($value, $assoc=false, $depth=512, $options=0) {
+    Assert::string($value);
+    $result = \json_decode(...func_get_args());
+    if (json_last_error()) throw new InvalidArgumentException('Invalid JSON value in "'.$value.'" ('.json_last_error_msg().')', json_last_error());
+    return $result;
+}
+
+
+/**
  * Functional replacement for ($stringA === $stringB).
  *
  * @param  string $stringA
