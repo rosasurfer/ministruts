@@ -235,7 +235,6 @@ class ErrorHandler extends StaticClass {
      * @param  \Exception|\Throwable $exception - the unhandled exception (PHP5) or throwable (PHP7)
      */
     public static function handleException($exception) {
-        echoPre(__METHOD__.'()');
         $context = [
             'class'               => __CLASS__,
             'file'                => $exception->getFile(),   // If the location is not preset the logger will resolve this
