@@ -328,12 +328,15 @@ class Application extends CObject {
 
 
     /**
-     * Setup the application's error handling.
+     * Setup the way the application handles regular PHP errors.
      *
-     * @param  string $value - configuration value as passed to the framework loader
+     * @param  string $value - configuration value as passed to the framework loader:
+     *                         "strict": errors are converted to instances of PHP ErrorExceptions and thrown
+     *                         "weak":   errors are only logged
+     *                         "ignore": errors are ignored
      */
     protected function setupErrorHandling($value) {
-        $mode = ErrorHandler::THROW_EXCEPTIONS;                         // default
+        $mode = ErrorHandler::THROW_EXCEPTIONS;                     // strict (default if an invalid parameter was passed)
 
         if (is_string($value)) {
             $value = strtolower($value);
@@ -350,7 +353,7 @@ class Application extends CObject {
      * @param  bool|int|string $value - configuration value as passed to the framework loader
      */
     protected function setupExceptionHandling($value) {
-        $enabled = true;                                            // default
+        $enabled = true;                                            // TRUE (default if an invalid parameter was passed)
         if (is_bool($value) || is_int($value)) {
             $enabled = (bool) $value;
         }
