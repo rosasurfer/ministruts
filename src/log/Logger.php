@@ -601,7 +601,7 @@ class Logger extends StaticClass {
             $cliMessage = '['.strtoupper(self::$logLevels[$level]).'] '.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
 
             // if there was no exception append the internal stacktrace to "cliExtra"
-            if (!\key_exists('exception', $context)) {
+            if (!\key_exists('exception', $context) && \key_exists('trace', $context)) {
                 $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
                 $traceStr .= DebugHelper::formatTrace($context['trace'], $indent);
                 $cliExtra .= NL.$traceStr;
@@ -735,7 +735,7 @@ class Logger extends StaticClass {
             $html .= 'in <span style="font-weight:bold">'.$file.'</span> on line <span style="font-weight:bold">'.$line.'</span><br>';
 
             // attach the internal stacktrace if there was no exception
-            if (!\key_exists('exception', $context)) {
+            if (!\key_exists('exception', $context) && \key_exists('trace', $context)) {
                 $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
                 $traceStr .= DebugHelper::formatTrace($context['trace'], $indent);
                 $html     .= '<span style="clear:both"></span><br>'.printPretty($traceStr, true).'<br>';

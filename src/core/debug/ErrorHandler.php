@@ -32,6 +32,7 @@ use const rosasurfer\L_INFO;
 use const rosasurfer\L_NOTICE;
 use const rosasurfer\L_WARN;
 use const rosasurfer\NL;
+use const rosasurfer\MB;
 
 
 /**
@@ -47,21 +48,14 @@ class ErrorHandler extends StaticClass {
     const THROW_EXCEPTIONS = 2;
 
 
-    /** @var int - the mode the error handler is configured for, can be either self::LOG_ERRORS or self::THROW_EXCEPTIONS */
+    /** @var int - the mode the error handler is configured for, can be either LOG_ERRORS or THROW_EXCEPTIONS */
     private static $errorMode;
 
     /** @var bool - whether the script is in the shutdown phase */
-    private static $inShutdown;
+    private static $inShutdown = false;
 
-
-    /**
-     * Whether the script is in the shutdown phase.
-     *
-     * @return bool
-     */
-    public static function isInShutdown() {
-        return (bool) self::$inShutdown;
-    }
+    /** @var string - RegExp for detecting out-of-memory errors */
+    private static $oomRegExp = '/^Allowed memory size of ([0-9]+) bytes exhausted/';
 
 
     /**
@@ -73,7 +67,9 @@ class ErrorHandler extends StaticClass {
         if     ($mode === self::LOG_ERRORS      ) self::$errorMode = self::LOG_ERRORS;
         elseif ($mode === self::THROW_EXCEPTIONS) self::$errorMode = self::THROW_EXCEPTIONS;
         else                                      return;
+
         set_error_handler(__CLASS__.'::handleError', error_reporting());
+        self::setupShutdownHandler();                           // handle fatal runtime errors during script shutdown
     }
 
 
@@ -82,17 +78,50 @@ class ErrorHandler extends StaticClass {
      */
     public static function setupExceptionHandling() {
         set_exception_handler(__CLASS__.'::handleException');
+        self::setupShutdownHandler();                           // handle destructor exceptions during script shutdown
+    }
 
-        /**
-         * Detect entering of the script's shutdown phase to be capable of handling destructor exceptions during shutdown
-         * differently and avoid otherwise fatal errors. Should be the very first function on the shutdown function stack.
-         *
-         * @see  http://php.net/manual/en/language.oop5.decon.php
-         * @see  ErrorHandler::handleDestructorException()
-         */
-        register_shutdown_function(function() {
-            self::$inShutdown = true;
-        });
+
+    /**
+     * Setup a script shutdown handler.
+     */
+    private static function setupShutdownHandler() {
+        static $handlerRegistered = false;
+        static $oomEmergencyMemory;                                                 // memory block freed when handling out-of-memory errors
+
+        // The following function should be the very first function on the shutdown function stack.
+        if (!$handlerRegistered) {
+            register_shutdown_function(function() use (&$oomEmergencyMemory) {
+                /**
+                 * Flag to detect entering of the script's shutdown phase to be capable of handling destructor exceptions
+                 * during shutdown in a different way. Otherwise destructor exceptions will cause fatal errors.
+                 *
+                 * @link  http://php.net/manual/en/language.oop5.decon.php
+                 * @see   ErrorHandler::handleDestructorException()
+                 */
+                self::$inShutdown = true;
+
+                /**
+                 * If regular PHP error handling is enabled catch and handle fatal runtime errors.
+                 *
+                 * @link  https://github.com/bugsnag/bugsnag-laravel/issues/226
+                 * @link  https://gist.github.com/dominics/61c23f2ded720d039554d889d304afc9
+                 */
+                if (self::$errorMode) {
+                    $oomEmergencyMemory = null;                                 // release the reserved memory, meant to be used by preg_match()
+                    $error = error_get_last();
+                    if ($error && $error['type']==E_ERROR && preg_match(self::$oomRegExp, $error['message'], $match)) {
+                        ini_set('memory_limit', (int)$match[1] + 10*MB);        // allocate memory for the regular handler
+
+                        $currentHandler = set_error_handler(function() {});     // handle the error regularily
+                        restore_error_handler();
+                        $currentHandler && call_user_func($currentHandler, ...array_values($error));
+                    }
+                }
+            });
+            $oomEemergencyMemory = str_repeat('*', 1*MB);                       // reserve some extra memory to survive OOM errors
+            $handlerRegistered = true;
+        }
     }
 
 
@@ -158,13 +187,20 @@ class ErrorHandler extends StaticClass {
 
         // Handle the error according to the configuration.
         if (self::$errorMode == self::LOG_ERRORS) {
-            Logger::log($exception, L_ERROR, $logContext);
-            return true;
+            return true(Logger::log($exception, L_ERROR, $logContext));
         }
 
         /**
          * Handle cases where throwing an exception is not possible or not allowed.
          *
+         * Fatal out-of-memory errors:
+         * ---------------------------
+         */
+        if (self::$inShutdown && $level==E_ERROR && preg_match(self::$oomRegExp, $message)) {
+            return true(Logger::log($message, L_FATAL, $logContext));           // logging the error is sufficient as there is no stacktrace anyway
+        }
+
+        /**
          * Errors triggered by require() or require_once():
          * ------------------------------------------------
          * Problem:  PHP errors triggered by require() or require_once() are non-catchable errors and do not follow regular
@@ -175,7 +211,7 @@ class ErrorHandler extends StaticClass {
          * @see  http://stackoverflow.com/questions/25584494/php-set-exception-handler-not-working-for-error-thrown-in-set-error-handler-cal
          */
         $trace = $exception->getBetterTrace();
-        if ($trace) {                                                           // after a FATAL error the trace may be empty
+        if ($trace) {                                                           // after a fatal error the trace may be empty
             $function = DebugHelper::getFQFunctionName($trace[0]);
             if ($function=='require' || $function=='require_once') {
                 $currentHandler = set_exception_handler(function() {});
@@ -199,6 +235,7 @@ class ErrorHandler extends StaticClass {
      * @param  \Exception|\Throwable $exception - the unhandled exception (PHP5) or throwable (PHP7)
      */
     public static function handleException($exception) {
+        echoPre(__METHOD__.'()');
         $context = [
             'class'               => __CLASS__,
             'file'                => $exception->getFile(),   // If the location is not preset the logger will resolve this
@@ -283,7 +320,7 @@ class ErrorHandler extends StaticClass {
      * @link   http://php.net/manual/en/language.oop5.decon.php
      */
     public static function handleDestructorException($exception) {
-        if (self::isInShutdown()) {
+        if (self::$inShutdown) {
             $currentHandler = set_exception_handler(function() {});
             restore_exception_handler();
 
