@@ -182,6 +182,46 @@ function array_keys($array, $search=null, $strict=false) {
 
 
 /**
+ * Merges the elements of one or more array-like variables together so that the values of one are appended to the end of the
+ * previous one. Values with the same string keys will overwrite the previous one. Numeric keys will be renumbered and values
+ * with the same numeric keys will not overwrite the previous one.
+ *
+ * Complement of PHP's <tt>array_merge()</tt> function adding support for {@link \Traversable} parameters.
+ *
+ * @param  array|\Traversable           $array1
+ * @param  array<array|\Traversable> ...$arrays
+ *
+ * @return array
+ */
+function array_merge($array1, ...$arrays) {
+    $args = func_get_args();
+    foreach ($args as $key => $arg) {
+        if ($arg instanceof \Traversable)
+            $args[$key] = iterator_to_array($arg, $useKeys=true);
+    }
+    return \array_merge(...$args);
+}
+
+
+/**
+ * Checks if a value exists in an array-like variable.
+ *
+ * Complement of PHP's <tt>in_array()</tt> function adding support for {@link \Traversable} parameters.
+ *
+ * @param  mixed              $needle
+ * @param  array|\Traversable $haystack
+ * @param  bool               $strict [optional]
+ *
+ * @return bool
+ */
+function in_array($needle, $haystack, $strict = false) {
+    if ($haystack instanceof \Traversable)
+        $haystack = iterator_to_array($haystack, $useKeys=false);
+    return \in_array($needle, $haystack, $strict);
+}
+
+
+/**
  * Return the first element of an array-like variable without affecting the internal array pointer.
  *
  * @param  array|\Traversable $values
@@ -244,28 +284,6 @@ function lastKey($values) {
         return null;
     end($values);
     return key($values);
-}
-
-
-/**
- * Merges the elements of one or more array-like variables together so that the values of one are appended to the end of the
- * previous one. Values with the same string keys will overwrite the previous one. Numeric keys will be renumbered and values
- * with the same numeric keys will not overwrite the previous one.
- *
- * Complement of PHP's <tt>array_merge()</tt> function adding support for {@link \Traversable} parameters.
- *
- * @param  array|\Traversable           $array1
- * @param  array<array|\Traversable> ...$arrays
- *
- * @return array
- */
-function array_merge($array1, ...$arrays) {
-    $args = func_get_args();
-    foreach ($args as $key => $arg) {
-        if ($arg instanceof \Traversable)
-            $args[$key] = iterator_to_array($arg, $useKeys=true);
-    }
-    return \array_merge(...$args);
 }
 
 
