@@ -300,6 +300,18 @@ var rosasurfer = {
 
 
     /**
+     * Whether a variable is defined.
+     *
+     * @param  mixed arg
+     *
+     * @return bool
+     */
+    isSet: function isDefined(arg) {
+        return (typeof(arg) != 'undefined');
+    },
+
+    
+    /**
      * Show all accessible properties of the passed argument.
      *
      * @param  mixed arg
