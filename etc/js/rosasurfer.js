@@ -306,7 +306,7 @@ var rosasurfer = {
      *
      * @return bool
      */
-    isSet: function isDefined(arg) {
+    isDefined: function isDefined(arg) {
         return (typeof(arg) != 'undefined');
     },
 
