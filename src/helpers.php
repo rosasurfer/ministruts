@@ -404,7 +404,7 @@ function debugHeader($message) {
         $message = (string) $message;
 
     static $i = 0;
-    header('X-Debug-'.++$i.': '.$message);
+    header('X-Debug-'.++$i.': '.str_replace(["\r", "\n"], ['\r', '\n'], $message));
 }
 
 
