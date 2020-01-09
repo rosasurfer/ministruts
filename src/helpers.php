@@ -395,13 +395,15 @@ function stderr($message) {
 /**
  * Send an "X-Debug-???" header with a message. Each sent header name will end with a different and increasing number.
  *
- * @param  string $message
+ * @param  mixed $message
  */
 function debugHeader($message) {
     if (CLI) return;
 
-    if (!is_string($message))
-        $message = (string) $message;
+    if (!is_string($message)) {
+        if (is_array($message)) $message = print_r($message, true);
+        else                    $message = (string) $message;
+    }
 
     static $i = 0;
     header('X-Debug-'.++$i.': '.str_replace(["\r", "\n"], ['\r', '\n'], $message));

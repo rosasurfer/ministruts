@@ -201,7 +201,7 @@ function stderr($message) {
 /**
  * Send an "X-Debug-???" header with a message. Each sent header name will end with a different and increasing number.
  *
- * @param  string $message
+ * @param  mixed $message
  */
 function debugHeader($message) {
     \rosasurfer\debugHeader($message);
