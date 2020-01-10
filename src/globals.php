@@ -629,7 +629,7 @@ function strIsDoubleQuoted($value) {
 /**
  * Whether a string consists only of digits (0-9).
  *
- * @param  mixed $value
+ * @param  scalar $value
  *
  * @return bool
  */
@@ -639,11 +639,24 @@ function strIsDigits($value) {
 
 
 /**
- * Whether a string consists only of numerical characters and represents a valid numerical value.
- * Opposite to the PHP built-in function is_numeric() this function returns FALSE if the string
- * begins with non-numerical characters (e.g. white space).
+ * Whether a string represents a valid integer value, i.e. consists of only digits and optionally a leading "-" (minus)
+ * character.
  *
- * @param  string $value
+ * @param  scalar $value
+ *
+ * @return bool
+ */
+function strIsInteger($value) {
+    return \rosasurfer\strIsInteger($value);
+}
+
+
+/**
+ * Whether a string consists only of numerical characters and represents a valid numerical value. Opposite to the
+ * built-in PHP function is_numeric() this function returns FALSE if the string begins with non-numerical characters
+ * (e.g. white space).
+ *
+ * @param  scalar $value
  *
  * @return bool
  */
