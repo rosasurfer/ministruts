@@ -24,7 +24,13 @@ abstract class PersistableObject extends Object {
 
 
     /** @var bool - dirty checking status */
-    private $_modified;
+    private $__modified = false;
+
+    /** @var bool - flag to detect and handle recursive $this->save() calls */
+    private $__inSave = false;
+
+    /** @var bool - flag to detect and handle recursive $this->delete() calls */
+    private $__inDelete = false;
 
 
     /**
@@ -348,7 +354,7 @@ abstract class PersistableObject extends Object {
      * @return bool
      */
     final public function isModified() {
-        return (bool) $this->_modified;
+        return (bool) $this->__modified;
     }
 
 
@@ -359,7 +365,7 @@ abstract class PersistableObject extends Object {
      */
     final protected function modified() {
         $previous = $this->isModified();
-        $this->_modified = true;
+        $this->__modified = true;
         return $previous;
     }
 
@@ -370,24 +376,34 @@ abstract class PersistableObject extends Object {
      * @return $this
      */
     public function save() {
-        if (!$this->isPersistent()) {
-            $this->dao()->transaction(function() {
-                if ($this->beforeSave() !== true)               // pre-processing hook
-                    return $this;
-                $this->insert();
-                $this->afterSave();                             // post-processing hook
-            });
+        if ($this->__inSave)                                        // skip recursive calls from pre/post-processing hooks
+            return $this;
+
+        try {
+            $this->__inSave = true;
+
+            if (!$this->isPersistent()) {
+                $this->dao()->transaction(function() {
+                    if ($this->beforeSave() !== true)               // pre-processing hook
+                        return $this;
+                    $this->insert();
+                    $this->afterSave();                             // post-processing hook
+                });
+            }
+            elseif ($this->isModified()) {
+                $this->dao()->transaction(function() {
+                    if ($this->beforeSave() !== true)               // pre-processing hook
+                        return $this;
+                    $this->update();
+                    $this->afterSave();                             // post-processing hook
+                });
+            }
+            else {
+                // persistent but not modified
+            }
         }
-        elseif ($this->isModified()) {
-            $this->dao()->transaction(function() {
-                if ($this->beforeSave() !== true)               // pre-processing hook
-                    return $this;
-                $this->update();
-                $this->afterSave();                             // post-processing hook
-            });
-        }
-        else {
-            // persistent but not modified
+        finally {
+            $this->__inSave = false;
         }
         return $this;
     }
@@ -415,6 +431,7 @@ abstract class PersistableObject extends Object {
 
         // perform insertion
         $id = $this->doInsert($values);
+        $this->__modified = false;
 
         // assign the returned identity value
         $idName = $mapping['identity']['name'];
@@ -448,7 +465,7 @@ abstract class PersistableObject extends Object {
 
         // perform update
         if ($this->doUpdate($changes)) {
-            $this->_modified = false;
+            $this->__modified = false;
 
             // post-processing hook
             $this->afterUpdate();
@@ -463,20 +480,29 @@ abstract class PersistableObject extends Object {
      * @return $this
      */
     public function delete() {
-        if (!$this->isPersistent()) throw new IllegalStateException('Cannot delete non-persistent '.get_class($this));
+        if ($this->__inDelete)                                                  // skip recursive calls from pre/post-processing hooks
+            return $this;
 
-        $this->dao()->transaction(function() {
-            if ($this->beforeDelete() !== true)                             // pre-processing hook
-                return $this;
+        try {
+            $this->__inDelete = true;
+            if (!$this->isPersistent()) throw new IllegalStateException('Cannot delete non-persistent '.get_class($this));
 
-            if ($this->doDelete()) {                                        // perform deletion
-                // reset identity property
-                $idName = $this->dao()->getMapping()['identity']['name'];
-                $this->$idName = null;
+            $this->dao()->transaction(function() {
+                if ($this->beforeDelete() !== true)                             // pre-processing hook
+                    return $this;
 
-                $this->afterDelete();                                       // post-processing hook
-            }
-        });
+                if ($this->doDelete()) {                                        // perform deletion
+                    // reset identity property
+                    $idName = $this->dao()->getMapping()['identity']['name'];
+                    $this->$idName = null;
+
+                    $this->afterDelete();                                       // post-processing hook
+                }
+            });
+        }
+        finally {
+            $this->__inDelete = false;
+        }
         return $this;
     }
 
