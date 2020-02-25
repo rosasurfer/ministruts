@@ -237,16 +237,16 @@ var rosasurfer = {
      * @param string   url      - url to load
      * @param function callback - callback function
      */
-    getUrl: function getUrl(url, callback) {                   // request.readyState = returns the status of the XMLHttpRequest
-        var request = new XMLHttpRequest();                    //  0: request not initialized
-        request.url = url;                                     //  1: server connection established
-        request.onreadystatechange = function() {              //  2: request received
-            if (request.readyState == 4) {                     //  3: processing request
-                callback(request);                             //  4: request finished and response is ready
-            }                                                  //
-        };                                                     // request.status = returns the HTTP status-code
-        request.open('GET', url , true);                       //  200: "OK"
-        request.send(null);                                    //  404: "Not Found" etc.
+    getUrl: function getUrl(url, callback) {                        // request.readyState = returns the status of the XMLHttpRequest
+        var request = new XMLHttpRequest();                         //  0: request not initialized
+        request.url = url;                                          //  1: server connection established
+        request.onreadystatechange = function() {                   //  2: request received
+            if (request.readyState == 4) {                          //  3: processing request
+                callback(request);                                  //  4: request finished and response is ready
+            }                                                       //
+        };                                                          // request.status = returns the HTTP status-code
+        request.open('GET', url , true);                            //  200: "OK"
+        request.send(null);                                         //  404: "Not Found" etc.
     },
 
 
@@ -258,16 +258,16 @@ var rosasurfer = {
      * @param object   headers  - additional request header
      * @param function callback - callback function
      */
-    postUrl: function postUrl(url, data, headers, callback) {  // request.readyState = returns the status of the XMLHttpRequest
-        var request = new XMLHttpRequest();                    //  0: request not initialized
-        request.url = url;                                     //  1: server connection established
-        request.onreadystatechange = function() {              //  2: request received
-            if (request.readyState == 4) {                     //  3: processing request
-                callback(request);                             //  4: request finished and response is ready
-            }                                                  //
-        };                                                     // request.status = returns the HTTP status-code
-        request.open('POST', url , true);                      //  200: "OK"
-        for (var name in headers) {                            //  404: "Not Found" etc.
+    postUrl: function postUrl(url, data, headers, callback) {       // request.readyState = returns the status of the XMLHttpRequest
+        var request = new XMLHttpRequest();                         //  0: request not initialized
+        request.url = url;                                          //  1: server connection established
+        request.onreadystatechange = function() {                   //  2: request received
+            if (request.readyState == 4) {                          //  3: processing request
+                callback(request);                                  //  4: request finished and response is ready
+            }                                                       //
+        };                                                          // request.status = returns the HTTP status-code
+        request.open('POST', url , true);                           //  200: "OK"
+        for (var name in headers) {                                 //  404: "Not Found" etc.
             request.setRequestHeader(name, headers[name]);
         }
         request.send(data);
@@ -288,11 +288,12 @@ var rosasurfer = {
             else if (arg.constructor) type = arg.constructor.name || arg.constructor.toString();
             else                      type = ''+ arg;
 
-            if (type.startsWith('[object ')) {              // [object HTMLAnchorElement]
+            if (type.startsWith('[object ')) {                      // [object HTMLAnchorElement]
                 type = type.slice(8, -1);
             }
-            else if (type.startsWith('function ')) {        // function HTMLAnchorElement() { [native code] }
-                type = type.slice(9, type.indexOf('('));
+            else if (type.startsWith('function')) {                 // function HTMLAnchorElement() { [native code] }
+                var name = type.slice(8, type.indexOf('(')).trim(); // function( param1, param2... ) { <custom code> }
+                type = name.length ? name : 'function';
             }
         }
         return type;
