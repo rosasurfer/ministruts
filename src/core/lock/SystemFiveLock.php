@@ -152,7 +152,7 @@ class SystemFiveLock extends BaseLock {
 
 
     /**
-     * TODO: Replace by fTok()
+     * TODO: Replace with fTok()
      *
      * Convert a key (string) to a unique numerical value (int).
      *
