@@ -56,7 +56,7 @@ class PHP extends StaticClass {
      * @param  int      $exitCode [optional] - if present a variable the commands's exit code will be written to
      * @param  string   $dir      [optional] - if present the initial working directory for the command
      * @param  string[] $env      [optional] - if present the environment to *replace* the current one
-     * @param  array    $options  [optional] - additional options controlling runtime behaviour:                     <br>
+     * @param  array    $options  [optional] - additional options controlling runtime behavior:                      <br>
      *          "stdout-passthrough" => bool:  Whether to additionally pass-through (print) the contents of STDOUT.  <br>
      *                                         This option will not affect the return value.                         <br>
      *                                         (default: no)                                                         <br>

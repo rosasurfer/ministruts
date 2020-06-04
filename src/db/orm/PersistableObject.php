@@ -75,7 +75,7 @@ abstract class PersistableObject extends CObject {
 
 
     /**
-     * Prevent serialization of related objects (transient behaviour). Instead store the physical property value.
+     * Prevent serialization of related objects (transient behavior). Instead store the physical property value.
      * After __wakeup() relations will be re-fetched on access.
      *
      * @return string[] - array of property names to serialize

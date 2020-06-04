@@ -97,7 +97,7 @@ class RequestProcessor extends CObject {
      */
     protected function processSession(Request $request) {
         /*
-        // former behaviour: If a session id was transmitted the session was started automatically.
+        // former behavior: If a session id was transmitted the session was started automatically.
         if (!$request->isSession() && $request->hasSessionId()) {
             $request->getSession();
         }

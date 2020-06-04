@@ -205,7 +205,7 @@ class ErrorHandler extends StaticClass {
          * ------------------------------------------------
          * Problem:  PHP errors triggered by require() or require_once() are non-catchable errors and do not follow regular
          *           application flow. PHP terminates the script after leaving the error handler, thrown exceptions are
-         *           ignored. This termination is intended behaviour and the main difference to include() and include_once().
+         *           ignored. This termination is intended behavior and the main difference to include() and include_once().
          * Solution: Manually call the exception handler.
          *
          * @see  http://stackoverflow.com/questions/25584494/php-set-exception-handler-not-working-for-error-thrown-in-set-error-handler-cal
@@ -336,7 +336,7 @@ class ErrorHandler extends StaticClass {
      * Manually called handler for exceptions occurring in object::__toString() methods. This allows regular handling of
      * exceptions thrown from object::__toString() which otherwise is not possible due to an internal PHP design issue.
      *
-     * Current PHP behaviour:
+     * Current PHP behavior:
      * PHP Fatal error:  Method object::__toString() must not throw an exception in {file} on {line}.
      *
      * @param  \Exception|\Throwable $exception - exception (PHP5) or throwable (PHP7)
