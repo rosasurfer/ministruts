@@ -2,7 +2,7 @@
 
 
 /**
- * Polyfills and objects extensions.
+ * Polyfills and object extensions.
  */
 if (!Array.from) { Array.from = (function() {
     var toStr = Object.prototype.toString;
@@ -33,9 +33,9 @@ if (!Array.from) { Array.from = (function() {
         var mapFn = arguments.length > 1 ? arguments[1] : void undefined;
         var T;
         if (typeof(mapFn) !== 'undefined') {
-            // 5. a If IsCallable(mapfn) is false, throw a TypeError exception.
+            // 5.a. If IsCallable(mapfn) is false, throw a TypeError exception.
             if (!isCallable(mapFn)) throw new TypeError('Array.from: when provided, the second argument must be a function');
-            // 5. b. If thisArg was supplied, let T be thisArg; else let T be undefined.
+            // 5.b. If thisArg was supplied, let T be thisArg; else let T be undefined.
             if (arguments.length > 2)
                 T = arguments[2];
         }
@@ -43,9 +43,9 @@ if (!Array.from) { Array.from = (function() {
         // 11. Let len be ToLength(lenValue).
         var len = toLength(items.length);
         // 13. If IsConstructor(C) is true, then
-        // 13. a. Let A be the result of calling the [[Construct]] internal method
-        // of C with an argument list containing the single item len.
-        // 14. a. Else, Let A be ArrayCreate(len).
+        // 13.a. Let A be the result of calling the [[Construct]] internal method
+        //       of C with an argument list containing the single item len.
+        // 14.a. Else, Let A be ArrayCreate(len).
         var A = isCallable(C) ? Object(new C(len)) : new Array(len);
         // 16. Let k be 0.
         var k = 0, kValue;
@@ -163,7 +163,7 @@ var rosasurfer = {
      *
      * @param  string url [optional] - URL to get query parameters from (default: the current page location)
      *
-     * @return array - {key1: value1, key2: value2, ..., keyN: valueN}
+     * @return object - {key1: value1, key2: value2, ..., keyN: valueN}
      */
     getQueryParameters: function getQueryParameters(url) {
         var pos, query;
