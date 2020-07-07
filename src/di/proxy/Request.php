@@ -110,7 +110,7 @@ use rosasurfer\ministruts\Module;
  * @method static string[]                                  getHeaderValues(string|string[] $names)                                   Return the values of all specified header(s) as an array (in transmission order).
  * @method static mixed                                     getAttribute(string $name)                                                Return a value stored in the request's variables context under the specified name.
  * @method static array                                     getAttributes()                                                           Return all values stored in the request's variables context.
- * @method static                                           setAttribute(string $name, mixed $value)                                  Store a value in the request's variables context. May be used to transfer data from controllers or {@link Action}s * to views.
+ * @method static                                           setAttribute(string $name, mixed $value)                                  Store a value in the request's variables context. May be used to transfer data from controllers or Actions to views.
  * @method static                                           removeAttributes(string ...$names)                                        Remove the variable(s) with the specified name(s) from the request's variables context.
  * @method static                                           setCookie(string $name, string $value, int $expires=0, string $path=null) Send a cookie.
  * @method static bool                                      isUserInRole(string $role)                                                Whether the current web user owns the specified role.
@@ -124,8 +124,8 @@ use rosasurfer\ministruts\Module;
  * @method static bool                                      isActionError(string|string[] $keys=null)                                 Whether an ActionError exists for one of the specified keys, or for any key if no key was given.
  * @method static                                           setActionError(string $key, string $message)                              Store an ActionError for the specified key.
  * @method static string[]                                  removeActionErrors(string ...$keys)                                       Remove the ActionError(s) with the specified key(s).
- * @method static \rosasurfer\ministruts\ActionMapping|null getMapping()                                                              Return the MiniStruts {@link ActionMapping} responsible for processing the current request.
- * @method static \rosasurfer\ministruts\Module|null        getModule()                                                               Return the MiniStruts {@link Module} the current request is assigned to.
+ * @method static \rosasurfer\ministruts\ActionMapping|null getMapping()                                                              Return the MiniStruts ActionMapping responsible for processing the current request.
+ * @method static \rosasurfer\ministruts\Module|null        getModule()                                                               Return the MiniStruts Module the current request is assigned to.
  */
 class Request extends Proxy {
 
