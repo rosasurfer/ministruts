@@ -585,7 +585,7 @@ function strRight($string, $length) {
  *  strRightFrom('abc_abc', 'b', -2) => 'c_abc'
  * </pre>
  */
-function strRightFrom($string, $limiter, $count=1, $includeLimiter=false, $onNotFound=null) {
+function strRightFrom($string, $limiter, $count=1, $includeLimiter=false, $onNotFound='') {
     return \rosasurfer\strRightFrom(...func_get_args());
 }
 

@@ -53,7 +53,7 @@ class SimpleXMLElement extends \SimpleXMLElement {
 
         finally {
             restore_error_handler();
-            if (is_null($xml)) {
+            if (!$xml) {
                 $ex = $ex ?: new RuntimeException('PHP errors/warnings while parsing the XML');
                 foreach ($errors as $i => $error) {
                     $errors[$i] = strRightFrom($error[1], 'SimpleXMLElement::__construct(): ', 1, false, $error[1]);

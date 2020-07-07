@@ -1075,7 +1075,7 @@ function strRight($string, $length) {
  *  strRightFrom('abc_abc', 'b', -2) => 'c_abc'
  * </pre>
  */
-function strRightFrom($string, $limiter, $count=1, $includeLimiter=false, $onNotFound=null) {
+function strRightFrom($string, $limiter, $count=1, $includeLimiter=false, $onNotFound='') {
     Assert::string($string,         '$string');
     Assert::string($limiter,        '$limiter');
     Assert::int   ($count,          '$count');
