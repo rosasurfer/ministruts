@@ -231,7 +231,8 @@ function in_array($needle, $haystack, $strict = false) {
 function first($values) {
     if ($values instanceof \Traversable)
         $values = iterator_to_array($values, $useKeys=false);
-    return reset($values);
+
+    return $values ? reset($values) : null;
 }
 
 
@@ -245,6 +246,9 @@ function first($values) {
 function firstKey($values) {
     if ($values instanceof \Traversable)
         $values = iterator_to_array($values);
+
+    if (!$values)
+        return null;
     reset($values);
     return key($values);
 }
