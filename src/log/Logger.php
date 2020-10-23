@@ -318,7 +318,7 @@ class Logger extends StaticClass {
                     $loggable = (string) $loggable;
             }
             Assert::int($level, '$level');
-            if (!isset(self::$logLevels[$level])) throw new InvalidArgumentException('Invalid argument $level: '.$level.' (not a loglevel)');
+            if (!\key_exists($level, self::$logLevels)) throw new InvalidArgumentException('Invalid argument $level: '.$level.' (not a loglevel)');
 
             $filtered = false;
 
@@ -355,12 +355,14 @@ class Logger extends StaticClass {
         catch (\Exception $ex) {}
 
         if ($ex) {
-            // If the call comes from the internal exception handler failed logging is already handled. If the call comes
-            // from user-land make sure the message doesn't get lost and is logged to the PHP default error log.
+            // If the call comes from our framework's exception handler \rosasurfer\core\debug\ErrorHandler::handleException()
+            // a failed logging is already handled. If the call comes from user-land code make sure the message doesn't get
+            // lost and is logged to the PHP default error log.
             if (!\key_exists('unhandled-exception', $context)) {
-                $file = \key_exists('file', $context) ? $context['file'] : '';
-                $line = \key_exists('line', $context) ? $context['line'] : '';
-                $msg  = 'PHP ['.strtoupper(self::$logLevels[$level]).'] '.$loggable.NL.' in '.$file.' on line '.$line;
+                $file  = \key_exists('file', $context) ? $context['file'] : '';
+                $line  = \key_exists('line', $context) ? $context['line'] : '';
+                $level = \key_exists($level, self::$logLevels) ? strtoupper(self::$logLevels[$level]) : 'ERROR';
+                $msg   = 'PHP ['.$level.'] '.$loggable.NL.' in '.$file.' on line '.$line;
                 error_log(trim($msg), ERROR_LOG_DEFAULT);
             }
             throw $ex;
