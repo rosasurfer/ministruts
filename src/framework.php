@@ -32,7 +32,7 @@ function registerClassLoader() {
     static $done = false;
     if ($done) return;
 
-    // register a bootstrap loader for class rosasurfer\loader\ClassLoader
+    // register a bootstrap loader for the class rosasurfer\core\loader\ClassLoader
     $bootstrap = function($class) {
         switch ($class) {
             case CObject     ::class: require(MINISTRUTS_ROOT.'/src/core/CObject.php'           ); break;
