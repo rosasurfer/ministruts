@@ -46,7 +46,7 @@ class Lock extends BaseLock {
             $config = $this->di('config');
 
             // alternativ FileLock verwenden...
-            $directory = $config->get('app.dir.temp', null);
+            $directory = $config->get('app.dir.tmp', null);
             !$directory && $directory = ini_get('sys_temp_dir');
             !$directory && $directory = sys_get_temp_dir();
 
