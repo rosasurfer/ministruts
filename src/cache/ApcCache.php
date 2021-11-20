@@ -27,7 +27,7 @@ class ApcCache extends CachePeer {
 
 
     /**
-     * Whether a value with the specified key exists in the cache.
+     * Whether a value exists in the cache under the specified key.
      *
      * @param  string $key
      *
@@ -88,12 +88,12 @@ class ApcCache extends CachePeer {
 
 
     /**
-     * Return the cached value with the specified key or the default value if no such value exists in the cache.
+     * Retrieve a value from the cache or the specified default value if no such value exists in the cache.
      *
-     * @param  string $key                - key
+     * @param  string $key                - identifier of the stored value
      * @param  mixed  $default [optional] - default value
      *
-     * @return mixed - cached value (may be NULL) or NULL if no value with the specified key exists in the cache
+     * @return mixed - stored value (may be NULL itself) or the specified default value
      */
     public function get($key, $default = null) {
         if ($this->isCached($key))
@@ -107,8 +107,7 @@ class ApcCache extends CachePeer {
      *
      * @param  string $key - key
      *
-     * @return bool - TRUE on successful deletion;
-     *                FALSE if no such value exists in the cache
+     * @return bool - success status or FALSE if no such value exists in the cache
      */
     public function drop($key) {
         $this->getReferencePool()->drop($key);
@@ -118,16 +117,15 @@ class ApcCache extends CachePeer {
 
 
     /**
-     * Store a value under the specified key in the cache. An existing value already stored under the key is overwritten.
-     * If expiration time or dependency are provided and those conditions are met the value is automatically invalidated but
-     * not automatically removed from the cache.
+     * Store a value under the specified key in the cache and overwrite an existing value. The stored value is automatically
+     * invalidated after expiration of the specified time interval or on status change of the specified {@link Dependency}.
      *
      * @param  string     $key                   - key
      * @param  mixed      $value                 - value
-     * @param  int        $expires    [optional] - time in seconds after which the value becomes invalid (default: never)
-     * @param  Dependency $dependency [optional] - a dependency object monitoring validity of the value (default: none)
+     * @param  int        $expires    [optional] - time interval in seconds for automatic invalidation (default: never)
+     * @param  Dependency $dependency [optional] - dependency object monitoring validity of the value (default: none)
      *
-     * @return bool - TRUE on successful storage; FALSE otherwise
+     * @return bool - success status
      */
     public function set($key, &$value, $expires=Cache::EXPIRES_NEVER, Dependency $dependency=null) {
         Assert::string($key,  '$key');

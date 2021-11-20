@@ -15,22 +15,22 @@ use function rosasurfer\strEndsWith;
 /**
  * FileSystemCache
  *
- * Cacht Objekte im Dateisystem.
+ * A chache storing objects in the file system.
  *
- * @todo  Cache-Values in Wrapperobjekt speichern und CREATED, EXPIRES etc. verarbeiten
+ * @todo  store values in an additional wrapper object and process parameters, CREATED, EXPIRES, DEPENDENCY
  */
 final class FileSystemCache extends CachePeer {
 
 
-    /** @var string - Cache-Directory */
+    /** @var string - filepath of the chaching directory */
     private $directory;
 
 
     /**
      * Constructor.
      *
-     * @param  string $label              - Cache-Bezeichner
-     * @param  array  $options [optional] - zusaetzliche Optionen (default: none)
+     * @param  string $label              - cache identifier
+     * @param  array  $options [optional] - additional instantiation options (default: none)
      */
     public function __construct($label, array $options = []) {
         $this->label     = $label;
@@ -40,7 +40,7 @@ final class FileSystemCache extends CachePeer {
         /** @var ConfigInterface $config */
         $config = $this->di('config');
 
-        // Cache-Verzeichnis ermitteln
+        // resolve cache directory
         if (isset($options['directory'])) {
             $directory = $options['directory'];
             if (isRelativePath($directory)) {
@@ -52,7 +52,7 @@ final class FileSystemCache extends CachePeer {
             $directory = $config['app.dir.cache'];
         }
 
-        // Verzeichnis ggf. erzeugen
+        // make sure the cache directory exists
         FS::mkDir($directory);
 
         $this->directory = realpath($directory).DIRECTORY_SEPARATOR;
@@ -60,9 +60,9 @@ final class FileSystemCache extends CachePeer {
 
 
     /**
-     * Ob unter dem angegebenen Schluessel ein Wert im Cache gespeichert ist.
+     * Whether a value exists in the cache under the specified key.
      *
-     * @param  string $key - Schluessel
+     * @param  string $key - identifier
      *
      * @return bool
      */
