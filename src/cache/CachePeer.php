@@ -41,7 +41,7 @@ abstract class CachePeer extends CObject {
 
 
     /**
-     * Return the local {@link ReferencePool} instance.
+     * Return the {@link ReferencePool} instance of the cache (the identity manager).
      *
      * @return ReferencePool
      */
@@ -112,7 +112,6 @@ abstract class CachePeer extends CObject {
     final public function add($key, &$value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null) {
         if ($this->isCached($key))
             return false;
-
         return $this->set($key, $value, $expires, $dependency);
     }
 
@@ -132,7 +131,6 @@ abstract class CachePeer extends CObject {
     final public function replace($key, &$value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null) {
         if (!$this->isCached($key))
             return false;
-
         return $this->set($key, $value, $expires, $dependency);
     }
 }

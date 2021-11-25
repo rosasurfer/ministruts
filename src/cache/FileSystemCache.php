@@ -29,7 +29,7 @@ final class FileSystemCache extends CachePeer {
     /**
      * Constructor.
      *
-     * @param  string $label              - cache identifier
+     * @param  string $label              - cache identifier (namespace)
      * @param  array  $options [optional] - additional instantiation options (default: none)
      */
     public function __construct($label, array $options = []) {
@@ -60,92 +60,71 @@ final class FileSystemCache extends CachePeer {
 
 
     /**
-     * Whether a value exists in the cache under the specified key.
-     *
-     * @param  string $key - identifier
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function isCached($key) {
-        // Hier wird die eigentliche Arbeit gemacht. Die Methode prueft nicht nur, ob der Wert im Cache
-        // existiert, sondern speichert ihn auch im lokalen ReferencePool. Folgende Abfragen muessen so
-        // nicht ein weiteres Mal auf den Cache zugreifen, sondern koennen aus dem lokalen Pool bedient
-        // werden.
+        // The actual working horse. This method does not only check the key's existence, it also retrieves the value and
+        // stores it in the local reference pool. Thus following cache queries can use the local reference.
 
-        // ReferencePool abfragen
-        if ($this->getReferencePool()->isCached($key)) {
+        // check local reference pool
+        if ($this->getReferencePool()->isCached($key))
             return true;
+
+        // find and read a stored file
+        $file = $this->getFilePath($key);
+        $data = $this->readFile($file);
+        if (!$data) return false;           // cache miss
+
+        // cache hit
+        $created    = $data[0];             // data: [created, $expires, $value, $dependency]
+        $expires    = $data[1];
+        $value      = $data[2];
+        $dependency = $data[3];
+
+        // check expiration
+        if ($expires && $created+$expires < time()) {
+            $this->drop($key);
+            return false;
         }
-        else {
-            // Datei suchen und auslesen
-            $file = $this->getFilePath($key);
-            $data = $this->readFile($file);
-            if (!$data)       // Cache-Miss
-                return false;
 
-            // Cache-Hit, $data Format: array(created, $expires, $value, $dependency)
-            $created    = $data[0];
-            $expires    = $data[1];
-            $value      = $data[2];
-            $dependency = $data[3];
+        // check dependency
+        if ($dependency) {
+            $minValid = $dependency->getMinValidity();
 
-            // expires pruefen
-            if ($expires && $created+$expires < time()) {
+            if ($minValid) {
+                if (time() > $created+$minValid) {
+                    if (!$dependency->isValid()) {
+                        $this->drop($key);
+                        return false;
+                    }
+                    // reset creation time by writing back to the cache (resets $minValid period)
+                    return $this->set($key, $value, $expires, $dependency);
+                }
+            }
+            elseif (!$dependency->isValid()) {
                 $this->drop($key);
                 return false;
             }
-
-            // Dependency pruefen
-            if ($dependency) {
-                $minValid = $dependency->getMinValidity();
-
-                if ($minValid) {
-                    if (time() > $created+$minValid) {
-                        if (!$dependency->isValid()) {
-                            $this->drop($key);
-                            return false;
-                        }
-                        // created aktualisieren (Wert praktisch neu in den Cache schreiben)
-                        return $this->set($key, $value, $expires, $dependency);
-                    }
-                }
-                elseif (!$dependency->isValid()) {
-                    $this->drop($key);
-                    return false;
-                }
-            }
-
-            // ok, Wert im ReferencePool speichern
-            $this->getReferencePool()->set($key, $value, Cache::EXPIRES_NEVER, $dependency);
-            return true;
         }
+
+        // store the validated value in the local reference pool
+        $this->getReferencePool()->set($key, $value, Cache::EXPIRES_NEVER, $dependency);
+        return true;
     }
 
 
     /**
-     * Gibt einen Wert aus dem Cache zurueck.  Existiert der Wert nicht, wird der angegebene Defaultwert
-     * zurueckgegeben.
-     *
-     * @param  string $key                - Schluessel, unter dem der Wert gespeichert ist
-     * @param  mixed  $default [optional] - Defaultwert (kann selbst auch NULL sein)
-     *
-     * @return mixed - Der gespeicherte Wert oder NULL, falls kein solcher Schluessel existiert.
-     *                 Achtung: Ist im Cache ein NULL-Wert gespeichert, wird ebenfalls NULL zurueckgegeben.
+     * {@inheritdoc}
      */
     public function get($key, $default = null) {
         if ($this->isCached($key))
             return $this->getReferencePool()->get($key);
-
         return $default;
     }
 
 
     /**
-     * Loescht einen Wert aus dem Cache.
-     *
-     * @param  string $key - Schluessel, unter dem der Wert gespeichert ist
-     *
-     * @return bool - TRUE bei Erfolg, FALSE, falls kein solcher Schluessel existiert
+     * {@inheritdoc}
      */
     public function drop($key) {
         $fileName = $this->getFilePath($key);
@@ -153,51 +132,39 @@ final class FileSystemCache extends CachePeer {
         if (is_file($fileName)) {
             if (unlink($fileName)) {
                 clearstatcache();
-
                 $this->getReferencePool()->drop($key);
                 return true;
             }
             throw new RuntimeException('Cannot delete file: '.$fileName);
         }
-
         return false;
     }
 
 
     /**
-     * Speichert einen Wert im Cache.  Ein schon vorhandener Wert unter demselben Schluessel wird
-     * ueberschrieben.  Laeuft die angegebene Zeitspanne ab oder aendert sich der Status der angegebenen
-     * Abhaengigkeit, wird der Wert automatisch ungueltig.
-     *
-     * @param  string     $key                   - Schluessel, unter dem der Wert gespeichert wird
-     * @param  mixed      $value                 - der zu speichernde Wert
-     * @param  int        $expires    [optional] - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfaellt (default: nie)
-     * @param  Dependency $dependency [optional] - Abhaengigkeit der Gueltigkeit des gespeicherten Wertes
-     *
-     * @return bool - TRUE bei Erfolg, FALSE andererseits
+     * {@inheritdoc}
      */
     public function set($key, &$value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null) {
         Assert::string($key,  '$key');
         Assert::int($expires, '$expires');
 
-        // im Cache wird ein array(created, expires, value, dependency) gespeichert
+        // stored data: [created, expires, value, dependency]
         $created = time();
 
         $file = $this->getFilePath($key);
         $this->writeFile($file, [$created, $expires, $value, $dependency], $expires);
 
         $this->getReferencePool()->set($key, $value, $expires, $dependency);
-
         return true;
     }
 
 
     /**
-     * Gibt den vollstaendigen Pfad zur Cache-Datei fuer den angegebenen Schluessel zurueck.
+     * Return the filepath in the cache for the specified key.
      *
-     * @param  string $key - Schluessel des Wertes
+     * @param  string $key - key
      *
-     * @return string - Dateipfad
+     * @return string - filepath
      */
     private function getFilePath($key) {
         $key = md5($key);
@@ -206,11 +173,11 @@ final class FileSystemCache extends CachePeer {
 
 
     /**
-     * Liest die Datei mit dem angegebenen Namen ein und gibt den deserialisierten Inhalt zurueck.
+     * Read the specified file and return the deserialized content.
      *
-     * @param  string $fileName - vollstaendiger Dateiname
+     * @param  string $fileName - full filepath
      *
-     * @return mixed - Wert
+     * @return mixed - content
      */
     private function readFile($fileName) {
         try {
@@ -221,21 +188,18 @@ final class FileSystemCache extends CachePeer {
                 return null;
             throw $ex;
         }
-
-        if ($data === false)
-            throw new RuntimeException('file_get_contents() returned FALSE, $fileName: "'.$fileName);
-
+        if ($data === false) throw new RuntimeException('file_get_contents() returned FALSE, $fileName: "'.$fileName);
         return unserialize($data);
     }
 
 
     /**
-     * Schreibt den angegebenen Wert in die Datei mit dem angegebenen Namen.
+     * Write the given value to the specified file.
      *
-     * @param  string $fileName - vollstaendiger Dateiname
-     * @param  mixed  $value    - der in die Datei zu schreibende Wert
+     * @param  string $fileName - full filepath
+     * @param  mixed  $value    - value to store
      *
-     * @return bool - TRUE bei Erfolg, FALSE andererseits
+     * @return bool - success status
      */
     private function writeFile($fileName, $value, $expires) {
         FS::mkDir(dirname($fileName));
