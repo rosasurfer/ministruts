@@ -17,9 +17,10 @@ use rosasurfer\di\service\ServiceNotFoundException;
  * The design principle is determined at runtime from the called DI resolver method.
  *
  * <pre>
- *  $di = new Di();                                         // creating a new container
- *  $di = $this->di();                                      // getting the default container in a class context
- *  $di = Application::getDi();                             // getting the default container in a non-class context
+ *  &lt;?php
+ *  $di = new Di();                             // creating a new container
+ *  $di = $this->di();                          // getting the default container in a class context
+ *  $di = Application::getDi();                 // getting the default container in a non-class context
  *
  *  // defining a parameterless service using a string
  *  $di->set('request', 'rosasurfer\\ministruts\\Request');
@@ -29,8 +30,8 @@ use rosasurfer\di\service\ServiceNotFoundException;
  *      return new \rosasurfer\ministruts\Tile(...$args);
  *  });
  *
- *  $request = $di->get('request');                         // resolving a shared instance using the service locator pattern
- *  $tile    = $di->create('tile', ...$args);               // resolving a new instance using the factory pattern
+ *  $request = $di->get('request');             // resolving a shared instance using the service locator pattern
+ *  $tile = $di->create('tile', ...$args);      // resolving a new instance using the factory pattern
  * </pre>
  */
 class Di extends CObject implements DiInterface {

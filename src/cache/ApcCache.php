@@ -97,7 +97,6 @@ class ApcCache extends CachePeer {
      */
     public function drop($key) {
         $this->getReferencePool()->drop($key);
-
         return apc_delete($this->namespace.'::'.$key);
     }
 
