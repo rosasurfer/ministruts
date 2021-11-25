@@ -23,6 +23,10 @@ use const rosasurfer\NL;
 
 /**
  * TorHelper
+ *
+ * @todo  https://www.irongeek.com/i.php?page=security/detect-tor-exit-node-in-php
+ * @todo  https://stackoverflow.com/questions/37965753/what-is-the-modern-way-to-check-if-user-is-requesting-site-using-tor-php
+ * @todo  https://github.com/Gratusfr/PHP-script-to-detect-Tor
  */
 class TorHelper extends StaticClass {
 
@@ -137,4 +141,3 @@ class TorHelper extends StaticClass {
         return $nodes;
     }
 }
-
