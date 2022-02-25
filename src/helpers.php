@@ -1296,6 +1296,7 @@ function normalizeEOL($string, $mode = EOL_UNIX) {
     Assert::string($string, '$string');
     Assert::string($mode,   '$mode');
     $done = false;
+    $count1 = $count2 = 0;
 
     if (strContains($string, EOL_NETSCAPE)) {
         $tmp = str_replace(EOL_NETSCAPE, EOL_UNIX, $string, $count1);
