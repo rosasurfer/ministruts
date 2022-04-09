@@ -191,10 +191,11 @@ class Input extends CObject {
         if ($this->isOption($name)) {
             $value = $this->docoptResult[$name];
             if (is_array($value)) return $value ? $value[0] : false;    // repetitive option with arguments
-            if (is_int($value))   return $value;                        // repetitive option without arguments
-            if (is_bool($value))  return $value;                        // non-repetitive option, no arguments
-            if (!is_null($value)) return $value;                        // non-repetitive option with argument
-            return false;                                               // non-repetitive option not specified
+          //if (is_int($value))   return $value;                        // repetitive option without arguments
+          //if (is_bool($value))  return $value;                        // non-repetitive option, no arguments
+          //if (!is_null($value)) return $value;                        // non-repetitive option with argument
+          //return false;                                               // non-repetitive option not specified
+            if (!is_null($value)) return $value;
         }
         return false;                                                   // undefined option
     }
@@ -215,15 +216,13 @@ class Input extends CObject {
 
         if ($this->isOption($name)) {
             $value = $this->docoptResult[$name];
-            if (is_array($value))                                   // repetitive option with arguments
-                return $value;
-            /*
-            if (is_int($value))  return [$value];                   // repetitive option without arguments
-            if (is_bool($value)) return $value ? [$value] : [];     // non-repetitive option, no arguments
-            else                 return [$value];                   // non-repetitive option with argument
-            */
-            if ($value !== false) return [$value];
+            if (is_array($value)) return $value;                        // repetitive option with arguments
+          //if (is_int($value))   return [$value];                      // repetitive option without arguments
+          //if (is_bool($value))  return $value ? [$value] : [];        // non-repetitive option, no arguments
+          //if (!is_null($value)) return [$value];                      // non-repetitive option with argument
+          //return [];                                                  // non-repetitive option not specified
+            if ($value!==false && $value!==null) return [$value];
         }
-        return [];
+        return [];                                                      // undefined option
     }
 }
