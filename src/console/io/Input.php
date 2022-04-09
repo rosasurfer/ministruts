@@ -190,16 +190,13 @@ class Input extends CObject {
 
         if ($this->isOption($name)) {
             $value = $this->docoptResult[$name];
-            if (is_array($value))                                   // repetitive option with arguments
-                return $value ? $value[0] : false;
-            /*
-            if (is_int($value))  return $value;                     // repetitive option without arguments
-            if (is_bool($value)) return $value;                     // non-repetitive option, no arguments
-            else                 return $value;                     // non-repetitive option with argument
-            */
-            return $value;
+            if (is_array($value)) return $value ? $value[0] : false;    // repetitive option with arguments
+            if (is_int($value))   return $value;                        // repetitive option without arguments
+            if (is_bool($value))  return $value;                        // non-repetitive option, no arguments
+            if (!is_null($value)) return $value;                        // non-repetitive option with argument
+            return false;                                               // non-repetitive option not specified
         }
-        return false;
+        return false;                                                   // undefined option
     }
 
 
