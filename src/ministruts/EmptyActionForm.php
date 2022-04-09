@@ -15,8 +15,6 @@ final class EmptyActionForm extends ActionForm {
 
     /**
      * This implementation does nothing.
-     *
-     * {@inheritdoc}
      */
     protected function populate() {
     }
@@ -24,8 +22,6 @@ final class EmptyActionForm extends ActionForm {
 
     /**
      * This implementation always returns FALSE.
-     *
-     * {@inheritdoc}
      *
      * @return bool - whether the submitted parameters are valid
      */

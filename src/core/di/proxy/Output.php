@@ -19,8 +19,6 @@ class Output extends Proxy {
 
 
     /**
-     * {@inheritdoc}
-     *
      * @return string
      */
     protected static function getServiceName() {

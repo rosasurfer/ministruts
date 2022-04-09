@@ -42,7 +42,7 @@ abstract class Result extends CObject implements ResultInterface {
 
 
     /**
-     * {@inheritdoc}
+     *
      */
     public function fetchColumn($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
         if (!is_int($column) && !is_string($column))
@@ -73,7 +73,7 @@ abstract class Result extends CObject implements ResultInterface {
 
 
     /**
-     * {@inheritdoc}
+     *
      */
     public function fetchString($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
         if (func_num_args() < 4) $value = $this->fetchColumn($column, $row, null);
@@ -89,7 +89,7 @@ abstract class Result extends CObject implements ResultInterface {
 
 
     /**
-     * {@inheritdoc}
+     *
      */
     public function fetchBool($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
         if (func_num_args() < 4) $value = $this->fetchColumn($column, $row, null);
@@ -109,7 +109,7 @@ abstract class Result extends CObject implements ResultInterface {
 
 
     /**
-     * {@inheritdoc}
+     *
      */
     public function fetchInt($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
         if (func_num_args() < 4) $value = $this->fetchColumn($column, $row, null);
@@ -136,7 +136,7 @@ abstract class Result extends CObject implements ResultInterface {
 
 
     /**
-     * {@inheritdoc}
+     *
      */
     public function fetchFloat($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
         if (func_num_args() < 4) $value = $this->fetchColumn($column, $row, null);

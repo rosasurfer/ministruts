@@ -307,7 +307,7 @@ class MySQLConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     *
      */
     public function escapeIdentifier($name) {
         Assert::string($name);
@@ -326,7 +326,7 @@ class MySQLConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     *
      */
     public function escapeLiteral($value) {
         // bug or feature: mysql_real_escape_string(null) => empty string instead of NULL
@@ -343,7 +343,7 @@ class MySQLConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     *
      */
     public function escapeString($value) {
         // bug or or feature: mysql_real_escape_string(null) => empty string instead of NULL

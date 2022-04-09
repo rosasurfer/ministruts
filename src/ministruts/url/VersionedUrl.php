@@ -14,8 +14,6 @@ class VersionedUrl extends Url {
 
 
     /**
-     * {@inheritdoc}
-     *
      * @return string
      */
     public function __toString() {

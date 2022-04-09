@@ -92,8 +92,6 @@ class Di extends CObject implements DiInterface {
 
 
     /**
-     * {@inheritdoc}
-     *
      * @param  string $name - service identifier
      *
      * @return bool
@@ -104,8 +102,6 @@ class Di extends CObject implements DiInterface {
 
 
     /**
-     * {@inheritdoc}
-     *
      * @param  string   $name
      * @param  array ...$params - variable list of custom parameters
      *
@@ -122,8 +118,6 @@ class Di extends CObject implements DiInterface {
 
 
     /**
-     * {@inheritdoc}
-     *
      * @param  string $name
      *
      * @return object
@@ -139,8 +133,6 @@ class Di extends CObject implements DiInterface {
 
 
     /**
-     * {@inheritdoc}
-     *
      * @param  string        $name               - service identifier
      * @param  string|object $definition         - a class name, an instance or a Closure acting as an instance factory
      * @param  string[]      $aliases [optional] - service identifier aliases (default: none)
@@ -161,8 +153,6 @@ class Di extends CObject implements DiInterface {
 
 
     /**
-     * {@inheritdoc}
-     *
      * @param  string $name - service identifier
      *
      * @return IService|null - the removed service wrapper or NULL if no such service was found

@@ -77,8 +77,6 @@ class Command extends CObject {
      */
     protected function configure() {
         if (strlen($docopt = static::DOCOPT)) {
-            $self = basename($_SERVER['PHP_SELF']);
-            $docopt = str_replace('{:cmd:}', $self, $docopt);
             $this->setDocoptDefinition($docopt);
         }
         return $this;
@@ -224,6 +222,9 @@ class Command extends CObject {
     public function setDocoptDefinition($doc) {
         if ($this->frozen) throw new RuntimeException('Configuration of "'.get_class($this).'" is frozen');
         Assert::string($doc);
+
+        $self = basename($_SERVER['PHP_SELF']);
+        $doc = str_replace('{:cmd:}', $self, $doc);
 
         $parser = new DocoptParser();
         $this->docoptResult = $parser->parse($doc);
