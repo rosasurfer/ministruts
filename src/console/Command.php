@@ -23,6 +23,8 @@ use rosasurfer\core\exception\RuntimeException;
  */
 class Command extends CObject {
 
+    /** @var string */
+    const DOCOPT = '';
 
     /** @var string */
     private $name = '';
@@ -74,6 +76,11 @@ class Command extends CObject {
      * @return $this
      */
     protected function configure() {
+        if (strlen($docopt = static::DOCOPT)) {
+            $self = basename($_SERVER['PHP_SELF']);
+            $docopt = str_replace('{:cmd:}', $self, $docopt);
+            $this->setDocoptDefinition($docopt);
+        }
         return $this;
     }
 
@@ -92,8 +99,9 @@ class Command extends CObject {
         if ($this->validator) $error = $this->validator->__invoke($input, $output);
         else                  $error = $this->validate($input, $output);
 
-        if ($error)
+        if ($error) {
             return $this->status = (int) $error;
+        }
 
         if ($this->task) $status = $this->task->__invoke($input, $output);
         else             $status = $this->execute($input, $output);
