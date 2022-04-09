@@ -16,6 +16,9 @@ class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
     /** @var array */
     protected $args;
 
+    /** @var string */
+    protected $usage;
+
     /** @var int */
     protected $error;
 
@@ -29,11 +32,13 @@ class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
      * Create a new Docopt parser result.
      *
      * @param  array  $args                    - parsed arguments
-     * @param  int    $error        [optional] - the result's error status  (default: 0)
-     * @param  string $errorMessage [optional] - the result's error message (default: none)
+     * @param  string $usage                   - parsed usage block of the Docopt definition
+     * @param  int    $error        [optional] - the parsing result's error status (default: 0)
+     * @param  string $errorMessage [optional] - the parsing result's error message (default: none)
      */
-    public function __construct(array $args, $error=0, $errorMessage='') {
+    public function __construct(array $args, $usage, $error=0, $errorMessage='') {
         $this->args         = $args;
+        $this->usage        = $usage;
         $this->error        = $error;
         $this->errorMessage = $errorMessage;
     }
@@ -50,7 +55,17 @@ class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
 
 
     /**
-     * Return the parse result's error status. If parsing of the CLI arguments didn't cause a user-land syntax error the
+     * Return the parsed usage block of the Docopt definition.
+     *
+     * @return string
+     */
+    public function getUsage() {
+        return $this->usage;
+    }
+
+
+    /**
+     * Return the parsing result's error status. If parsing of the CLI arguments didn't cause a user-land syntax error the
      * error status will be 0 (zero).
      *
      * @return int
@@ -61,7 +76,7 @@ class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
 
 
     /**
-     * Return the parse result's error message.
+     * Return the parsing result's error message.
      *
      * @return string
      */

@@ -106,13 +106,13 @@ class DocoptParser extends CObject {
                         $result[$name] = $pattern->value;
                     }
                 }
-                return new DocoptResult($result);
+                return new DocoptResult($result, $usage);
             }
             throw new DocoptUserNotification();
         }
         catch (DocoptUserNotification $ex) {
             $this->handleExit($ex);
-            return new DocoptResult([], $ex->status, $ex->addMessage($this->autoHelp)->getMessage());
+            return new DocoptResult([], '', $ex->status, $ex->addMessage($this->autoHelp)->getMessage());
         }
     }
 
