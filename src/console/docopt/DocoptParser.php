@@ -20,6 +20,8 @@ use function rosasurfer\array_merge;
 use function rosasurfer\strEndsWith;
 use function rosasurfer\strStartsWith;
 
+use const rosasurfer\NL;
+
 
 /**
  * DocoptParser
@@ -111,7 +113,7 @@ class DocoptParser extends CObject {
         }
         catch (DocoptUserNotification $ex) {
             $this->handleExit($ex);
-            $msg = trim($exception->getMessage().NL.$this->autoHelp);
+            $msg = trim($ex->getMessage().NL.$this->autoHelp);
             return new DocoptResult([], '', $ex->status, $msg);
         }
     }
