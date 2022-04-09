@@ -53,7 +53,7 @@ class Input extends CObject {
         if (!$this->docoptResult)
             return false;
 
-        if (!($len=strlen($name)) || !isset($this->docoptResult[$name]))
+        if (!strlen($name) || !key_exists($name, $this->docoptResult->getArgs()))
             return false;
         return (bool) preg_match('/^[a-z]+$/', $name);
     }
@@ -95,7 +95,7 @@ class Input extends CObject {
         if (!$this->docoptResult)
             return false;
 
-        if (!($len=strlen($name)) || !isset($this->docoptResult[$name]))
+        if (!($len=strlen($name)) || !key_exists($name, $this->docoptResult->getArgs()))
             return false;
 
         $isBracketed = ('<'==$name[0] && $name[$len-1]=='>');
@@ -165,7 +165,7 @@ class Input extends CObject {
         if (!$this->docoptResult)
             return false;
 
-        if (!strlen($name) || !isset($this->docoptResult[$name]) || $name[0]!='-' || $name=='-' || $name=='--')
+        if (!strlen($name) || !key_exists($name, $this->docoptResult->getArgs()) || $name[0]!='-' || $name=='-' || $name=='--')
             return false;
         return true;
     }
