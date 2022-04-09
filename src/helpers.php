@@ -457,7 +457,7 @@ function printPretty($var, $return=false, $flushBuffers=true) {
         $str = (string) $var;
     }
 
-    if (!CLI)
+    if (!CLI) {
         $str = '<div align="left"
                      style="display:initial; visibility:initial; clear:both;
                      position:relative; z-index:4294967295; top:initial; left:initial;
@@ -468,6 +468,7 @@ function printPretty($var, $return=false, $flushBuffers=true) {
                                 color:inherit; background-color:inherit; white-space:pre; line-height:12px;
                                 font:normal normal 12px/normal \'Courier New\',courier,serif">'.hsc($str).'</pre>
                 </div>';
+    }
     if (!strEndsWith($str, NL))
         $str .= NL;
 

@@ -5,13 +5,11 @@ use function rosasurfer\docopt;
 
 require(dirname(realpath(__FILE__)).'/../../../../src/load.php');
 
-$self = basename($_SERVER['PHP_SELF']);
 $doc = <<<DOCOPT
-
 Process FILE and optionally apply correction to either left-hand or right-hand side.
 
-Usage: $self  [-vqrh] [FILE]...
-       $self  (--left | --right) CORRECTION FILE
+Usage: {:cmd:}  [-vqrh] [FILE]...
+       {:cmd:}  (--left | --right) CORRECTION FILE
 
 Arguments:
   FILE        optional input file

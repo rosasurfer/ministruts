@@ -5,12 +5,10 @@ use function rosasurfer\echoPre;
 
 require(dirname(realpath(__FILE__)).'/../../../../src/load.php');
 
-$self = basename($_SERVER['PHP_SELF']);
 $doc = <<<DOCOPT
+Usage: {:cmd:}  [-h | --help] (ODD EVEN)...
 
-Usage: $self  [-h | --help] (ODD EVEN)...
-
-Try:   $self  1 2 3 4
+Try:   {:cmd:}  1 2 3 4
 
 Options:
   -h, --help
