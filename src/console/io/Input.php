@@ -19,7 +19,7 @@ class Input extends CObject {
 
 
     /**
-     * Set the internal docopt result.
+     * Set the internal Docopt result.
      *
      * @param  DocoptResult $docopt
      *
@@ -31,7 +31,7 @@ class Input extends CObject {
 
 
     /**
-     * Return the internal docopt result.
+     * Return the internal Docopt result.
      *
      * @return DocoptResult
      */

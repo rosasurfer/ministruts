@@ -26,7 +26,7 @@ use const rosasurfer\NL;
 /**
  * DocoptParser
  *
- * A command line argument parser for the {@link http://docopt.org} language format.
+ * A command line argument parser for the {@link http://docopt.org/#} language format.
  */
 class DocoptParser extends CObject {
 
@@ -53,7 +53,7 @@ class DocoptParser extends CObject {
     /**
      * Constructor
      *
-     * Create a new docopt command line argument parser.
+     * Create a new Docopt command line argument parser.
      *
      * @param  array $options [optional]
      */
@@ -67,7 +67,7 @@ class DocoptParser extends CObject {
 
 
     /**
-     * Parse command line arguments and match them against the specified {@link http://docopt.org} syntax definition.
+     * Parse command line arguments and match them against the specified {@link http://docopt.org/#} syntax definition.
      *
      * @param  string         $doc
      * @param  string|mixed[] $args [optional]

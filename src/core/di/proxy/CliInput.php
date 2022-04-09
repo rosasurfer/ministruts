@@ -13,8 +13,8 @@ use rosasurfer\core\di\service\Service;
  * Default implementation: {@link \rosasurfer\console\io\Input}
  *
  * @method static \rosasurfer\console\io\Input            instance()                            Get the object behind the proxy.
- * @method static \rosasurfer\console\io\Input            setDocoptResult(DocoptResult $docopt) Set the internal docopt result.
- * @method static \rosasurfer\console\docopt\DocoptResult getDocoptResult()                     Return the internal docopt result.
+ * @method static \rosasurfer\console\io\Input            setDocoptResult(DocoptResult $docopt) Set the internal Docopt result.
+ * @method static \rosasurfer\console\docopt\DocoptResult getDocoptResult()                     Return the internal Docopt result.
  * @method static bool                                    isCommand(string $name)               Whether the command with the given name is defined (not whether the command was specified).<br><br> Valid commands consists of only lower-case letters. The same command may be defined multiple times.
  * @method static bool|int                                hasCommand(string $name)              Whether the command with the given name was specified.<br><br> See {@link Input::isCommand()} for the definition of "command".
  * @method static bool                                    isArgument(string $name)              Whether the argument with the given name is defined (not whether the argument was specified).<br><br> Arguments are command line parameters defined either in angular brackets or in all-uppercase characters.

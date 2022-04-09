@@ -32,10 +32,10 @@ class Command extends CObject {
     /** @var string[] */
     private $aliases = [];
 
-    /** @var string - syntax definition in docopt format */
+    /** @var string - syntax definition in Docopt format */
     private $docoptDefinition;
 
-    /** @var DocoptResult - parsed and matched docopt block */
+    /** @var DocoptResult - parsed and matched Docopt block */
     private $docoptResult;
 
     /** @var \Closure */
@@ -201,9 +201,9 @@ class Command extends CObject {
 
 
     /**
-     * Return the command's docopt definition.
+     * Return the command's Docopt definition.
      *
-     * @return string - syntax definition in docopt format
+     * @return string - syntax definition in Docopt format
      */
     public function getDocoptDefinition() {
         return $this->docoptDefinition;
@@ -211,13 +211,13 @@ class Command extends CObject {
 
 
     /**
-     * Set the command's docopt definition.
+     * Set the command's Docopt definition.
      *
-     * @param  string $doc - syntax definition in docopt format
+     * @param  string $doc - syntax definition in Docopt format
      *
      * @return $this
      *
-     * @link   http://docopt.org
+     * @link   http://docopt.org/
      */
     public function setDocoptDefinition($doc) {
         if ($this->frozen) throw new RuntimeException('Configuration of "'.get_class($this).'" is frozen');
@@ -291,7 +291,7 @@ class Command extends CObject {
     final public function freeze() {
         if (!$this->frozen) {
             if (!isset($this->name))         throw new IllegalStateException('Incomplete command configuration: no name');
-            if (!isset($this->docoptResult)) throw new IllegalStateException('Incomplete command configuration: no docopt definition');
+            if (!isset($this->docoptResult)) throw new IllegalStateException('Incomplete command configuration: no Docopt definition');
             $this->frozen = true;
         }
         return $this;
