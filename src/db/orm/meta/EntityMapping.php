@@ -116,7 +116,10 @@ class EntityMapping extends CObject implements \Iterator {
             }
             $this->version = false;
         }
-        return $this->version ?: null;
+
+        if (is_object($this->version))
+            return $this->version;
+        return null;
     }
 
 

@@ -16,12 +16,7 @@ parameters:
         - phtml
 
     excludes_analyse:
-        - .git/
-        - .settings/
-        - etc/httpd/
-        - etc/js/
-        - etc/phpstan/
-        - etc/vendor/
+        - etc/
         - src/globals.php
 
     universalObjectCratesClasses:
