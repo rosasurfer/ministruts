@@ -4,6 +4,8 @@ namespace rosasurfer\console\docopt;
 use rosasurfer\core\CObject;
 use rosasurfer\core\exception\IllegalAccessException;
 
+use const rosasurfer\NL;
+
 
 /**
  * DocoptResult
@@ -38,7 +40,7 @@ class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
      */
     public function __construct(array $args, $usage, $error=0, $errorMessage='') {
         $this->args         = $args;
-        $this->usage        = $usage;
+        $this->usage        = trim($usage).NL;
         $this->error        = $error;
         $this->errorMessage = $errorMessage;
     }
