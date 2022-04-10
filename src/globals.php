@@ -945,8 +945,8 @@ function ksort_r(array $values, $sort_flags = SORT_REGULAR) {
  * Return a pluralized string according to the specified number of items.
  *
  * @param  int    $count               - the number of items to determine the output from
- * @param  string $singular [optional] - singular form of string
- * @param  string $plural   [optional] - plural form of string
+ * @param  string $singular [optional] - singular form of string (default: empty string)
+ * @param  string $plural   [optional] - plural form of string (default: "s")
  *
  * @return string
  */
