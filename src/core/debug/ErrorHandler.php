@@ -237,9 +237,9 @@ class ErrorHandler extends StaticClass {
     public static function handleException($exception) {
         $context = [
             'class'               => __CLASS__,
-            'file'                => $exception->getFile(),   // If the location is not preset the logger will resolve this
-            'line'                => $exception->getLine(),   // exception handler as the originating location.
-            'unhandled-exception' => true,                    // flag to signal origin
+            'file'                => $exception->getFile(),     // If the location is not preset the logger will resolve this
+            'line'                => $exception->getLine(),     // exception handler as the originating location.
+            'unhandled-exception' => true,                      // flag to signal origin
         ];
 
         // Exceptions thrown from the exception handler itself will not be passed back to the handler again but instead
@@ -247,7 +247,7 @@ class ErrorHandler extends StaticClass {
         $second = null;
         try {
             Assert::throwable($exception);
-            Logger::log($exception, L_FATAL, $context);       // log with the highest level
+            Logger::log($exception, L_FATAL, $context);         // log with the highest level
         }
         catch (\Throwable $second) {}
         catch (\Exception $second) {}
@@ -280,17 +280,16 @@ class ErrorHandler extends StaticClass {
             $msg  = $msg2.NL;
             $msg .= $indent.'caused by'.NL;
             $msg .= $msg1;
-            $msg  = str_replace(chr(0), '\0', $msg);    // replace NUL bytes which mess up the logfile
+            $msg  = str_replace(chr(0), '\0', $msg);            // replace NUL bytes which mess up the logfile
 
-            if (CLI) echo $msg.NL;                      // full second exception
+            if (CLI) echo $msg.NL;                              // full second exception
             error_log(trim($msg), ERROR_LOG_DEFAULT);
         }
 
-        // web interface: prevent an empty page
-        if (!CLI) {
+        if (!CLI) {                                             // web interface: prevent an empty page
             try {
                 if (Application::isAdminIP() || ini_get_bool('display_errors')) {
-                    if ($second) {                          // full second exception, full log location
+                    if ($second) {                              // full second exception, full log location
                         echoPre($second);
                         echoPre('error log: '.(strlen($errorLog=ini_get('error_log')) ? $errorLog : 'web server'));
                     }
@@ -299,6 +298,9 @@ class ErrorHandler extends StaticClass {
             }
             catch (\Throwable $third) { echoPre('application error (see error log)'); }
             catch (\Exception $third) { echoPre('application error (see error log)'); }
+        }
+        else {                                                  // CLI: set a non-zero exit code
+            exit(1);
         }
     }
 
