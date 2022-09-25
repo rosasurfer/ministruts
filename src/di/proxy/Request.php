@@ -1,10 +1,6 @@
 <?php
 namespace rosasurfer\di\proxy;
 
-use rosasurfer\ministruts\ActionMapping;
-use rosasurfer\ministruts\HttpSession;
-use rosasurfer\ministruts\Module;
-
 
 /**
  * Request

@@ -2,7 +2,6 @@
 namespace rosasurfer\config\defaultt;
 
 use rosasurfer\Application;
-use rosasurfer\cache\monitor\FileDependency;
 use rosasurfer\config\Config;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\exception\InvalidArgumentException;

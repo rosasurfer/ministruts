@@ -8,7 +8,6 @@ use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\debug\ErrorHandler;
 use rosasurfer\core\exception\InvalidArgumentException;
-use rosasurfer\di\Di;
 use rosasurfer\di\DiInterface;
 use rosasurfer\di\defaultt\CliServiceContainer;
 use rosasurfer\di\defaultt\WebServiceContainer;

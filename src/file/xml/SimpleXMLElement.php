@@ -34,6 +34,7 @@ class SimpleXMLElement extends \SimpleXMLElement {
      */
     public static function from($data, $options=0, $dataIsUri=false, $ns='', $nsIsPrefix=false) {
         $errors = [];
+        $oldHandler = null;                                             // prevent Eclipse PDT validation error
         $oldHandler = set_error_handler(function($level, $message, $file, $line, $context=null) use (&$errors, &$oldHandler) {
             if ($oldHandler && in_array($level, [E_DEPRECATED, E_USER_DEPRECATED, E_USER_NOTICE, E_USER_WARNING])) {
                 return call_user_func($oldHandler, func_get_args());    // a possibly static handler can only be invoked by call_user_func()

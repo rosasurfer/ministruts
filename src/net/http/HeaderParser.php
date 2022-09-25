@@ -44,6 +44,7 @@ class HeaderParser extends CObject {
     public function parseLine($line) {
         $line = trim($line, "\r\n");
 
+        $matches = null;
         if (preg_match('/^([\w-]+):\s+(.+)/', $line, $matches)) {
             $name = strtolower($matches[1]);
             $value = $matches[2];

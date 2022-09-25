@@ -17,7 +17,6 @@ use rosasurfer\core\exception\error\PHPUnknownError;
 use rosasurfer\core\exception\error\PHPUserError;
 use rosasurfer\core\exception\error\PHPWarning;
 use rosasurfer\log\Logger;
-use rosasurfer\util\PHP;
 
 use function rosasurfer\echoPre;
 use function rosasurfer\ini_get_bool;
@@ -108,7 +107,7 @@ class ErrorHandler extends StaticClass {
                  * @link  https://gist.github.com/dominics/61c23f2ded720d039554d889d304afc9
                  */
                 if (self::$errorMode) {
-                    $oomEmergencyMemory = null;                                 // release the reserved memory, meant to be used by preg_match()
+                    $oomEmergencyMemory = $match = null;                        // release the reserved memory, meant to be used by preg_match()
                     $error = error_get_last();
                     if ($error && $error['type']==E_ERROR && preg_match(self::$oomRegExp, $error['message'], $match)) {
                         ini_set('memory_limit', (int)$match[1] + 10*MB);        // allocate memory for the regular handler

@@ -3,6 +3,7 @@ namespace rosasurfer\ministruts;
 
 use rosasurfer\core\Singleton;
 use rosasurfer\core\assert\Assert;
+use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\core\exception\error\PHPError;
 use rosasurfer\di\proxy\Request as RequestProxy;
 use rosasurfer\util\PHP;

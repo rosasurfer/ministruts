@@ -1,8 +1,6 @@
 <?php
 namespace rosasurfer\di\proxy;
 
-use rosasurfer\console\docopt\DocoptResult;
-
 
 /**
  * Input

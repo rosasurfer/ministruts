@@ -8,7 +8,6 @@ use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferExcepti
 use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\di\proxy\Request as RequestProxy;
 use rosasurfer\net\http\HttpResponse;
-use rosasurfer\util\PHP;
 
 use function rosasurfer\ini_get_bool;
 use function rosasurfer\strContains;

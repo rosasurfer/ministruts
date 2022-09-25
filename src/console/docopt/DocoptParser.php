@@ -268,6 +268,7 @@ class DocoptParser extends CObject {
      * @return string[]
      */
     protected static function parseSection($name, $source) {
+        $matches = null;
         $result = [];
         if (preg_match_all('/^([^\n]*'.$name.'[^\n]*\n?(?:[ \t].*?(?:\n|$))*)/im', $source, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
