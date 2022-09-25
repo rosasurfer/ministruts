@@ -2,7 +2,6 @@
 namespace rosasurfer\db\mysql;
 
 use rosasurfer\db\ConnectorInterface as IConnector;
-use rosasurfer\db\NoMoreRecordsException;
 use rosasurfer\db\Result;
 use rosasurfer\exception\IllegalTypeException;
 

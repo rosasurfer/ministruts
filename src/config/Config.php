@@ -1,13 +1,11 @@
 <?php
 namespace rosasurfer\config;
 
-use rosasurfer\cache\Cache;
 use rosasurfer\config\ConfigInterface as IConfig;
 use rosasurfer\core\Object;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
-use rosasurfer\util\PHP;
 
 use function rosasurfer\isRelativePath;
 use function rosasurfer\stderror;
@@ -355,6 +353,7 @@ class Config extends Object implements IConfig {
             }
             else {
                 // the last subkey: check for bracket notation
+                $match = null;
                 if (preg_match('/(.+)\b *\[ *\]$/', $subkey, $match)) {
                     // bracket notation
                     $subkey = $match[1];

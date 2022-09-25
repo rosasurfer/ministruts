@@ -8,7 +8,6 @@ use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\exception\RuntimeException;
 use rosasurfer\net\http\HttpResponse;
-use rosasurfer\util\PHP;
 
 use function rosasurfer\ini_get_bool;
 use function rosasurfer\strContains;

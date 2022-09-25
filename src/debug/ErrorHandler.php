@@ -16,7 +16,6 @@ use rosasurfer\exception\error\PHPUnknownError;
 use rosasurfer\exception\error\PHPUserError;
 use rosasurfer\exception\error\PHPWarning;
 use rosasurfer\log\Logger;
-use rosasurfer\util\PHP;
 
 use function rosasurfer\echoPre;
 use function rosasurfer\ini_get_bool;

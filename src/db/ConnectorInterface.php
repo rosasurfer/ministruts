@@ -1,8 +1,7 @@
 <?php
 namespace rosasurfer\db;
 
-use rosasurfer\db\ConnectorInterface as IConnector;
-use rosasurfer\db\ResultInterface    as IResult;
+use rosasurfer\db\ResultInterface as IResult;
 
 
 /**
@@ -89,7 +88,7 @@ interface ConnectorInterface {
 
     /**
      * Execute a SQL statement and skip potential result set processing. This method should be used for SQL statements not
-     * returning rows. If the database driver does not support it the statement is forwarded to IConnector::query().
+     * returning rows. If the database driver does not support it the statement is forwarded to ConnectorInterface::query().
      *
      * @param  string $sql - SQL statement
      *

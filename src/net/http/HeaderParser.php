@@ -44,6 +44,7 @@ class HeaderParser extends Object {
     public function parseLine($line) {
         $line = trim($line, "\r\n");
 
+        $matches = null;
         if (preg_match('/^([\w-]+):\s+(.+)/', $line, $matches)) {
             $name = strToLower($matches[1]);
             $value = $matches[2];
