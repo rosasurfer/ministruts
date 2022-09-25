@@ -28,5 +28,8 @@
         "branch-alias": {
             "dev-0.8": "0.8.x-dev"
         }
+    },
+    "scripts": {
+        "post-install-cmd": "bash bin/git-hooks/setup.sh post-checkout post-merge"
     }
 }
