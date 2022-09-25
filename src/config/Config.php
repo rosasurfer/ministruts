@@ -1,12 +1,10 @@
 <?php
 namespace rosasurfer\config;
 
-use rosasurfer\cache\Cache;
 use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\exception\InvalidArgumentException;
 use rosasurfer\core\exception\RuntimeException;
-use rosasurfer\util\PHP;
 
 use function rosasurfer\isRelativePath;
 use function rosasurfer\stderr;
@@ -349,6 +347,7 @@ class Config extends CObject implements ConfigInterface {
             }
             else {
                 // the last subkey: check for bracket notation
+                $match = null;
                 if (preg_match('/(.+)\b *\[ *\]$/', $subkey, $match)) {
                     // bracket notation
                     $subkey = $match[1];

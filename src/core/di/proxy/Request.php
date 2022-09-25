@@ -3,7 +3,6 @@ namespace rosasurfer\core\di\proxy;
 
 use rosasurfer\core\di\service\Service;
 use rosasurfer\ministruts\ActionMapping;
-use rosasurfer\ministruts\HttpSession;
 use rosasurfer\ministruts\Module;
 
 

@@ -10,7 +10,6 @@ use rosasurfer\core\exception\IllegalTypeException;
 use rosasurfer\core\exception\InvalidArgumentException;
 use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\net\NetTools;
-use rosasurfer\util\PHP;
 
 use function rosasurfer\first;
 use function rosasurfer\ini_get_bool;
@@ -222,6 +221,7 @@ class Request extends CObject {
      */
     public function getFiles() {
         if (!isset($this->files)) {
+            $normalizeLevel = null;                     // prevent Eclipse PDT validation error
             $normalizeLevel = function(array $file) use (&$normalizeLevel) {
                 if (isset($file['name']) && is_array($file['name'])) {
                     $properties = \array_keys($file);

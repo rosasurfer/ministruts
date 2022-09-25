@@ -31,8 +31,7 @@ class Argument extends LeafPattern {
      * @return Argument
      */
     public static function parse($source) {
-        $name = null;
-        $value = null;
+        $name = $value = $matches = null;
 
         if (preg_match_all('@(<\S*?'.'>)@', $source, $matches)) {
             $name = $matches[0][0];

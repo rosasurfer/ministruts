@@ -6,7 +6,6 @@ use rosasurfer\config\defaultt\DefaultConfig;
 use rosasurfer\console\Command;
 use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\core\di\Di;
 use rosasurfer\core\di\DiInterface;
 use rosasurfer\core\di\defaultt\CliServiceContainer;
 use rosasurfer\core\di\defaultt\WebServiceContainer;

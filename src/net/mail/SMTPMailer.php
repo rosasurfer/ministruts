@@ -95,6 +95,7 @@ class SMTPMailer extends Mailer {
      * Connect to the SMTP server.
      */
     private function connect() {
+        $errorCode = $errorMsg = null;
         $this->connection = fsockopen('tcp://'.$this->options['host'],
                                                $this->options['port'],
                                                $errorCode,
@@ -291,6 +292,7 @@ class SMTPMailer extends Mailer {
         // custom headers
         foreach ($headers as $i => $header) {
             $pattern = '/^([a-z]+(?:-[a-z]+)*): *(.*)/i';
+            $match = null;
             if (!preg_match($pattern, $header, $match)) throw new InvalidArgumentException('Invalid parameter $headers['.$i.']: "'.$header.'"');
             $name  = $match[1];
             $value = $this->encodeNonAsciiChars(trim($match[2]));

@@ -22,7 +22,7 @@ class Validator extends StaticClass {
      */
     public static function isIPAddress($string, $returnBytes = false) {
         static $pattern = '/^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/';
-
+        $bytes = null;
         $result = is_string($string) && strlen($string) && preg_match($pattern, $string, $bytes);
 
         if ($result) {
@@ -158,7 +158,7 @@ class Validator extends StaticClass {
             return ($data !== false && checkdate($data['tm_mon']+1, $data['tm_mday'], $data['tm_year']+1900) && $data['tm_sec'] <= 59 && $data['unparsed']=='');
         }
       */
-        $year = $month = $day = $hour = $minute = $second = null;
+        $year = $month = $day = $hour = $minute = $second = $m = null;
 
         if ($format == 'Y-m-d') {
             if (!preg_match('/^([0-9]{4})-([0-9]{2})-([0-9]{2})$/', $date, $m)) return false;

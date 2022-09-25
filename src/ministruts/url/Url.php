@@ -5,7 +5,6 @@ use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\debug\ErrorHandler;
 use rosasurfer\core\di\proxy\Request;
-use rosasurfer\ministruts\Module;
 
 use const rosasurfer\CLI;
 
@@ -32,8 +31,8 @@ class Url extends CObject {
      * Create a new Url instance.
      *
      * @param  string $uri - URI part of the URL to generate. If the URI starts with a slash "/" it is interpreted as
-     *                       relative to the application's base URI (the main Module). If the URI does not start with a
-     *                       slash it is interpreted as relative to the application's current Module.
+     *                       relative to the application's base URI (the main module). If the URI does not start with a
+     *                       slash it is interpreted as relative to the application's current module.
      */
     public function __construct($uri) {
         Assert::string($uri);
