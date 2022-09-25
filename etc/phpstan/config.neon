@@ -9,7 +9,7 @@
 
 parameters:
     autoload_files:
-        - etc/phpstan/function-stubs.php                            # stubs for PHP extensions and procedural code
+        - etc/phpstan/api-stubs.php                                 # stubs for PHP extensions and procedural code
 
     fileExtensions:                                                 # additional files to analyse
        #- html
@@ -32,8 +32,7 @@ parameters:
 
     ignoreErrors:
         # intentionally ignore the following issues
-        - '/Call to ((static )?method|function) [^ ]+\(\) with incorrect case:/'                                    # Ever heared of naming standards?
-        - '/Array \(([^ ]+)\[\]\) does not accept (\1\|)?null\b/'                                                   # NULL is a value (not a type) and always valid.
+        - '/Array \(([^ ]+)\[\]\) does not accept (\1\|)?null\b/'                                                   # NULL is a value and not a type. It should always be valid.
         - '/(Static )?property [^ ]+ \(([^ ]+)\) does not accept (\2\|)?null\b/i'                                   # - dito -
         - '/Property [^ ]+ \([^ ]+\[\]\) does not accept default value of type null\[\]/i'                          # - dito -
         - '/Parameter #[0-9]+ [^ ]+ of class [^ ]+ constructor expects ([^ ]+), (\1\|)?null given\b/'               # - dito -
