@@ -12,7 +12,6 @@
         "platform": {
             "php": "5.6.40"
         },
-        "vendor-dir":         "etc/vendor",
         "optimize-autoloader": true
     },
     "require": {
