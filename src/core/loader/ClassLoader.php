@@ -24,7 +24,7 @@ class ClassLoader extends CObject {
      */
     public function __construct() {
         // initialize a case-insensitive class map
-        $classMap = require(MINISTRUTS_ROOT.'/etc/vendor/composer/autoload_classmap.php');
+        $classMap = require(MINISTRUTS_ROOT.'/vendor/composer/autoload_classmap.php');
         $this->classMap = \array_change_key_case($classMap, CASE_LOWER);
     }
 
