@@ -8,7 +8,6 @@ use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
 use rosasurfer\net\NetTools;
-use rosasurfer\util\PHP;
 
 use function rosasurfer\ini_get_bool;
 use function rosasurfer\strCompareI;
@@ -272,6 +271,7 @@ class Request extends Singleton {
     public function getFiles() {
         static $files;
         if (!isset($files)) {
+            $normalizeLevel = null;
             $normalizeLevel = function(array $file) use (&$normalizeLevel) {
                 if (isset($file['name']) && is_array($file['name'])) {
                     $properties = \array_keys($file);

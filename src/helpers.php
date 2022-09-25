@@ -12,7 +12,6 @@ use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\IOException;
 use rosasurfer\exception\RuntimeException;
 use rosasurfer\lock\Lock;
-use rosasurfer\log\Logger;
 use rosasurfer\ministruts\ActionMapping;
 use rosasurfer\ministruts\Module;
 use rosasurfer\ministruts\Request;
@@ -525,6 +524,7 @@ function php_byte_value($value) {
     if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.gettype($value));
     if (!strlen($value))    return 0;
 
+    $match = null;
     if (!preg_match('/^([+-]?[0-9]+)([KMG]?)$/i', $value, $match)) {
         throw new InvalidArgumentException('Invalid argument $value: "'.$value.'" (not a PHP byte value)');
     }
@@ -1228,6 +1228,7 @@ function normalizeEOL($string, $mode = EOL_UNIX) {
     $done = false;
 
     if (strContains($string, EOL_NETSCAPE)) {
+        $count1 = $count2 = null;
         $tmp = str_replace(EOL_NETSCAPE, EOL_UNIX, $string, $count1);
         if (!strContains($tmp, EOL_MAC)) {
             str_replace(EOL_UNIX, '.', $tmp, $count2);
@@ -1485,7 +1486,7 @@ function metatypeOf($name) {
  *
  * @return int|bool - timestamp matching the string or FALSE if the string is not a valid date/datetime value
  *
- * @see    rosasurfer\util\Validator::isDateTime()
+ * @see \rosasurfer\util\Validator::isDateTime()
  */
 function is_datetime($string, $format = 'Y-m-d') {
     return Validator::isDateTime($string, $format);

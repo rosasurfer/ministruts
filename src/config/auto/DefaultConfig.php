@@ -5,7 +5,6 @@ use rosasurfer\Application;
 use rosasurfer\config\Config;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
-use rosasurfer\monitor\FileDependency;
 
 use const rosasurfer\CLI;
 

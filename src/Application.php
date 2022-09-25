@@ -6,7 +6,6 @@ use rosasurfer\config\auto\DefaultConfig;
 use rosasurfer\console\Command;
 use rosasurfer\core\Object;
 use rosasurfer\debug\ErrorHandler;
-use rosasurfer\di\Di;
 use rosasurfer\di\DiInterface;
 use rosasurfer\di\auto\DefaultCliDi;
 use rosasurfer\di\auto\DefaultDi;

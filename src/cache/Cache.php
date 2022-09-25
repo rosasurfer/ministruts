@@ -4,7 +4,6 @@ namespace rosasurfer\cache;
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\StaticClass;
 use rosasurfer\exception\IllegalTypeException;
-use rosasurfer\util\PHP;
 
 use function rosasurfer\ini_get_bool;
 

@@ -100,6 +100,7 @@ class PHPMailer extends Mailer {
         // encode remaining headers (must be ASCII chars only)
         foreach ($headers as $i => &$header) {
             $pattern = '/^([a-z]+(?:-[a-z]+)*): *(.*)/i';
+            $match = null;
             if (!preg_match($pattern, $header, $match)) throw new InvalidArgumentException('Invalid parameter $headers['.$i.']: "'.$header.'"');
             $name   = $match[1];
             $value  = $this->encodeNonAsciiChars(trim($match[2]));

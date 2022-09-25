@@ -1,13 +1,11 @@
 <?php
 namespace rosasurfer\config;
 
-use rosasurfer\cache\Cache;
 use rosasurfer\config\ConfigInterface as IConfig;
 use rosasurfer\core\Object;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\RuntimeException;
-use rosasurfer\util\PHP;
 
 use function rosasurfer\isRelativePath;
 use function rosasurfer\stderr;
@@ -245,7 +243,7 @@ class Config extends Object implements IConfig {
             if (!is_int($options['flags'])) throw new IllegalTypeException('Illegal type of option "flags": '.gettype($options['flags']));
             $flags = $options['flags'];
         }
-        if ($flags & FILTER_NULL_ON_FAILURE && ($value===null || $value===''))  // crap-PHP considers NULL and '' as valid strict booleans
+        if ($flags & FILTER_NULL_ON_FAILURE && ($value===null || $value===''))  // crap-php considers NULL and '' as valid strict booleans
             return null;
         return filter_var($value, FILTER_VALIDATE_BOOLEAN, $flags);
     }
@@ -352,6 +350,7 @@ class Config extends Object implements IConfig {
             }
             else {
                 // the last subkey: check for bracket notation
+                $match = null;
                 if (preg_match('/(.+)\b *\[ *\]$/', $subkey, $match)) {
                     // bracket notation
                     $subkey = $match[1];

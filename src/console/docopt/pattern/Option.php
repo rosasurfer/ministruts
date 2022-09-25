@@ -66,7 +66,7 @@ class Option extends LeafPattern {
         }
 
         if ($argcount) {
-            $value = null;
+            $value = $match = null;
             if (preg_match('@\[default: (.*)\]@i', $description, $match))
                 $value = $match[1];
         }

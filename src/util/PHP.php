@@ -91,6 +91,7 @@ class PHP extends StaticClass {
         }
         catch (\Exception $ex) {
             $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex);
+            $match = null;
             if (WINDOWS && preg_match('/proc_open\(\): CreateProcess failed, error code - ([0-9]+)/i', $ex->getMessage(), $match)) {
                 $error = Windows::errorToString((int) $match[1]);
                 if ($error != $match[1]) $ex->addMessage($match[1].': '.$error);

@@ -7,7 +7,6 @@ use rosasurfer\console\docopt\DocoptResult;
 use rosasurfer\console\io\Input;
 use rosasurfer\console\io\Output;
 use rosasurfer\core\Object;
-use rosasurfer\di\Di;
 use rosasurfer\exception\IllegalStateException;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;

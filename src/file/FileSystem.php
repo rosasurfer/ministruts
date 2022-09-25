@@ -35,6 +35,7 @@ class FileSystem extends StaticClass {
             $args = [$path, $mode, $recursive];
             func_num_args() > 3 && $args[] = $context;
 
+            $ex = null;
             try {
                 mkdir(...$args);                        // unpack new arguments as mkdir() will not accept $context = null
             }

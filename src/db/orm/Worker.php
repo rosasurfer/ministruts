@@ -115,6 +115,7 @@ class Worker extends Object {
     private function translateQuery($sql) {
         // model name pattern: ":User" => "t_user" (will also convert matching names in literals and comments)
         $pattern = '/[^:]:([a-z_]\w*)\b/i';
+        $matches = null;
         if (preg_match_all($pattern, $sql, $matches, PREG_OFFSET_CAPTURE)) {
             $namespace = strLeftTo($this->entityClass, '\\', -1, true, '');
 

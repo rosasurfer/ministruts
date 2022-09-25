@@ -652,6 +652,8 @@ class PostgresConnector extends Connector {
     public function getVersionNumber() {
         if ($this->versionNumber === null) {
             $version = $this->getVersionString();
+
+            $match = null;
             if (!preg_match('/^(\d+)\.(\d+).(\d+)/', $version, $match))
                 throw new \UnexpectedValueException('Unexpected version string "'.$version.'"');
 
