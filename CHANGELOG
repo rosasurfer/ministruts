@@ -1,4 +1,9 @@
 
+Newer changes are tracked in Github release notes. 
+
+   @see https://github.com/rosasurfer/ministruts/releases 
+
+
 2018-06-20
 
    - util: add array helper functions supporting the \ArrayAccess interface 
