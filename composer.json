@@ -2,7 +2,6 @@
     "name":        "rosasurfer/ministruts",
     "description": "Java Struts inspired MVC micro framework for PHP",
     "type":        "library",
-    "homepage":    "http://ministruts.rosasurfer.com/",
     "license":     "WTFPL",
     "authors": [{
         "name":  "Peter Walther",
@@ -21,8 +20,10 @@
         "ext-mbstring": "*"
     },
     "autoload": {
-        "classmap": ["src/"],
-        "files":    ["src/load.php"]
+        "psr-4": {
+            "rosasurfer\\": "src"
+        },
+        "files": ["src/load.php"]
     },
     "extra": {
         "branch-alias": {
