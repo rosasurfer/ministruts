@@ -24,8 +24,10 @@
         "psr/container": "^1.0"
     },
     "autoload": {
-        "classmap": ["src/"],
-        "files":    ["src/load.php"]
+        "psr-4": {
+            "rosasurfer\\": "src"
+        },
+        "files": ["src/load.php"]
     },
     "extra": {
         "branch-alias": {
