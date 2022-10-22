@@ -1,13 +1,10 @@
-#!/usr/bin/env php56
+#!/usr/bin/env php
 <?php
 /**
- * TEMPLATE: Copy this file to your project and point line 27 to your application's init script.
- * You may want to setup a CRON job for it (see logwatch.php -h for command line options).
+ * Scans the application's PHP error logfile for new entries and mails them to the configured receivers. If no receivers
+ * are configured mail is sent to the system user running the script. Processed entries are removed from the logfile.
  *
- *
- * Scans the application's PHP error logfile for entries and sends them by email to the configured log receivers.
- * If no receivers are configured mail is sent to the system user running the script. Processed log entries are
- * removed from the file.
+ * @see `logwatch.php -h` for command line options when integrating with CRON
  */
 namespace rosasurfer\bin\logwatch;
 
@@ -24,8 +21,8 @@ use const rosasurfer\CLI;
 use const rosasurfer\NL;
 use const rosasurfer\WINDOWS;
 
-require(dirName(realPath(__FILE__)).'/../app/init.php');
-!CLI && exit(1|stderror('error: This script must be executed in CLI mode.'));
+require(dirname(realpath(__FILE__)).'/../app/init.php');    // TODO: adjust to your project
+!CLI && exit(1|stderror('error: This script must be executed via CLI.'));
 
 
 // --- Configuration --------------------------------------------------------------------------------------------------------
