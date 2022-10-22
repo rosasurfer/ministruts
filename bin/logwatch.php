@@ -1,17 +1,10 @@
 #!/usr/bin/env php
 <?php
 /**
- * --- TEMPLATE -------------------------------------------------------------------------------------------------------------
+ * Scans the application's PHP error logfile for new entries and mails them to the configured receivers. If no receivers
+ * are configured mail is sent to the system user running the script. Processed entries are removed from the logfile.
  *
- * Copy this file to your project's "bin" directory and point line 30 to your application's real init script.
- *
- * --------------------------------------------------------------------------------------------------------------------------
- *
- *
- * Scans the application's PHP error log for new entries and mails them to the configured receivers. If no receivers are
- * configured mail is sent to the system user running the script. Processed log entries are removed from the file.
- *
- * You may want to setup a CRON job for this script (@see `logwatch.php -h` for command line options).
+ * @see `logwatch.php -h` for command line options when integrating with CRON
  */
 namespace rosasurfer\bin\logwatch;
 
@@ -29,8 +22,8 @@ use const rosasurfer\CLI;
 use const rosasurfer\NL;
 use const rosasurfer\WINDOWS;
 
-require(dirname(realpath(__FILE__)).'/../app/init.php');
-!CLI && exit(1|stderr('error: This script must be executed in CLI mode.'));
+require(dirname(realpath(__FILE__)).'/../app/init.php');    // TODO: adjust to your project
+!CLI && exit(1|stderr('error: This script must be executed via CLI.'));
 
 
 // --- configuration --------------------------------------------------------------------------------------------------------
