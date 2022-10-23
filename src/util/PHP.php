@@ -164,7 +164,7 @@ class PHP extends StaticClass {
      * PHP_INI_PERDIR - entry can be set in php.ini, httpd.conf, .htaccess and in .user.ini
      */
     public static function phpinfo() {
-        /** @var ConfigInterface $config */
+        /** @var ConfigInterface|null $config */
         $config = self::di('config');
         $issues = [];
 
@@ -178,18 +178,20 @@ class PHP extends StaticClass {
         /*PHP_INI_ALL   */ if (       ini_get_int ('max_execution_time'            ) > 30 && !CLI /*hardcoded*/)     $issues[] = 'Info:  max_execution_time is very high: '.ini_get('max_execution_time').'  [resources]';
         /*PHP_INI_ALL   */ if (       ini_get_int ('default_socket_timeout'        ) > 30   /*PHP default: 60*/)     $issues[] = 'Info:  default_socket_timeout is very high: '.ini_get('default_socket_timeout').'  [resources]';
         /*PHP_INI_ALL   */ $memoryLimit = ini_get_bytes('memory_limit');
-                           $sWarnLimit  = $config->get('log.warn.memory_limit', '');
-                           $warnLimit   = php_byte_value($sWarnLimit);
             if      ($memoryLimit ==    -1)                                                                          $issues[] = 'Warn:  memory_limit is unlimited  [resources]';
             else if ($memoryLimit <=     0)                                                                          $issues[] = 'Error: memory_limit is invalid: '.ini_get('memory_limit');
             else if ($memoryLimit <  32*MB)                                                                          $issues[] = 'Warn:  memory_limit is very low: '.ini_get('memory_limit').'  [resources]';
             else if ($memoryLimit > 128*MB)                                                                          $issues[] = 'Info:  memory_limit is very high: '.ini_get('memory_limit').'  [resources]';
-            if ($warnLimit) {
-                if      ($warnLimit <             0)                                                                 $issues[] = 'Error: log.warn.memory_limit is invalid: '.$sWarnLimit.'  [configuration]';
-                else if ($warnLimit >= $memoryLimit)                                                                 $issues[] = 'Error: log.warn.memory_limit ('.$sWarnLimit.') is not lower than memory_limit ('.ini_get('memory_limit').')  [configuration]';
-                else if ($warnLimit >        128*MB)                                                                 $issues[] = 'Info:  log.warn.memory_limit ('.$sWarnLimit.') is very high (memory_limit: '.ini_get('memory_limit').')  [configuration]';
+
+            if ($config) {
+                $sWarnLimit  = $config->get('log.warn.memory_limit', '');
+                $warnLimit   = php_byte_value($sWarnLimit);
+                if ($warnLimit) {
+                    if      ($warnLimit <             0)                                                             $issues[] = 'Error: log.warn.memory_limit is invalid: '.$sWarnLimit.'  [configuration]';
+                    else if ($warnLimit >= $memoryLimit)                                                             $issues[] = 'Error: log.warn.memory_limit ('.$sWarnLimit.') is not lower than memory_limit ('.ini_get('memory_limit').')  [configuration]';
+                    else if ($warnLimit >        128*MB)                                                             $issues[] = 'Info:  log.warn.memory_limit ('.$sWarnLimit.') is very high (memory_limit: '.ini_get('memory_limit').')  [configuration]';
+                }
             }
-            $memoryLimit_local = $memoryLimit;
         /*PHP_INI_PERDIR*/ if (       ini_get_bool('register_globals'              ) && PHP_VERSION_ID <  50400)     $issues[] = 'Error: register_globals is not Off  [security]';
         /*PHP_INI_PERDIR*/ if (       ini_get_bool('register_long_arrays'          ) && PHP_VERSION_ID <  50400)     $issues[] = 'Info:  register_long_arrays is not Off  [performance]';
         /*PHP_INI_PERDIR*/ if (       ini_get_bool('register_argc_argv'            ) && !CLI      /*hardcoded*/)     $issues[] = 'Info:  register_argc_argv is not Off  [performance]';
@@ -274,13 +276,14 @@ class PHP extends StaticClass {
         /*PHP_INI_ALL   */ if (       ini_get     ('arg_separator.output'          ) != '&')                         $issues[] = 'Warn:  arg_separator.output is not "&": "'.ini_get('arg_separator.output').'"  [standards]';
         /*PHP_INI_ALL   */ if (      !ini_get_bool('ignore_user_abort'             ) && !CLI)                        $issues[] = 'Error: ignore_user_abort is not On  [setup]';
         /*PHP_INI_PERDIR*/ $postMaxSize = ini_get_bytes('post_max_size');
-            $memoryLimit_global = php_byte_value(ini_get_all()['memory_limit']['global_value']);
+            $localMemoryLimit  = $memoryLimit;
+            $globalMemoryLimit = php_byte_value(ini_get_all()['memory_limit']['global_value']);
             // The memory_limit needs to be raised accordingly before script entry, not in the script.
             // If the memory_limit is too low on script entry PHP may crash for larger requests with "Out of memory" (e.g. file uploads).
-            if      ($memoryLimit_global < $postMaxSize      )                                                       $issues[] = 'Error: global memory_limit "'.ini_get_all()['memory_limit']['global_value'].'" is too low for post_max_size "'.ini_get('post_max_size').'"  [request handling]';
-            else if ($memoryLimit_global < $postMaxSize+20*MB) /*PHP needs about 20MB for the runtime*/              $issues[] = 'Info:  global memory_limit "'.ini_get_all()['memory_limit']['global_value'].'" is very low for post_max_size "'.ini_get('post_max_size').'"  [request handling]';
-            if      ($memoryLimit_local  < $postMaxSize)                                                             $issues[] = 'Error: local memory_limit "'.ini_get('memory_limit').'" is too low for post_max_size "'.ini_get('post_max_size').'"  [request handling]';
-            else if ($memoryLimit_local  < $postMaxSize+20*MB)                                                       $issues[] = 'Warn:  local memory_limit "'.ini_get('memory_limit').'" is very low for post_max_size "'.ini_get('post_max_size').'"  [request handling]';
+            if      ($globalMemoryLimit < $postMaxSize      )                                                        $issues[] = 'Error: global memory_limit "'.ini_get_all()['memory_limit']['global_value'].'" is too low for post_max_size "'.ini_get('post_max_size').'"  [request handling]';
+            else if ($globalMemoryLimit < $postMaxSize+20*MB) /*PHP needs about 20MB for the runtime*/               $issues[] = 'Info:  global memory_limit "'.ini_get_all()['memory_limit']['global_value'].'" is very low for post_max_size "'.ini_get('post_max_size').'"  [request handling]';
+            if      ($localMemoryLimit  < $postMaxSize)                                                              $issues[] = 'Error: local memory_limit "'.ini_get('memory_limit').'" is too low for post_max_size "'.ini_get('post_max_size').'"  [request handling]';
+            else if ($localMemoryLimit  < $postMaxSize+20*MB)                                                        $issues[] = 'Warn:  local memory_limit "'.ini_get('memory_limit').'" is very low for post_max_size "'.ini_get('post_max_size').'"  [request handling]';
         /*PHP_INI_SYSTEM*/ if (       ini_get_bool('file_uploads'                  ) && !CLI) {                      $issues[] = 'Info:  file_uploads is not Off  [security]';
         /*PHP_INI_PERDIR*/ if (       ini_get_bytes('upload_max_filesize') >= $postMaxSize)                          $issues[] = 'Error: post_max_size "'.ini_get('post_max_size').'" is not larger than upload_max_filesize "'.ini_get('upload_max_filesize').'"  [request handling]';
         /*PHP_INI_SYSTEM*/ $dir = ini_get($name = 'upload_tmp_dir');
@@ -351,15 +354,17 @@ class PHP extends StaticClass {
 
 
         // check Composer defined dependencies
-        $appRoot = $config['app.dir.root'];
-        if (is_file($file=$appRoot.'/composer.json') && extension_loaded('json')) {
-            $composer = json_decode(file_get_contents($file), true);
-            if (isset($composer['require']) && is_array($composer['require'])) {
-                foreach ($composer['require'] as $name => $version) {
-                    $name = trim(strtolower($name));
-                    if (in_array($name, ['php', 'php-64bit', 'hhvm']) || strContains($name, '/')) continue;
-                    if (strStartsWith($name, 'ext-')) $name = strRight($name, -4);
-                    if (!extension_loaded($name))                                                                    $issues[] = 'Error: '.$name.' extension is not loaded  [composer dependency]';
+        if ($config) {
+            $appRoot = $config['app.dir.root'];
+            if (is_file($file=$appRoot.'/composer.json') && extension_loaded('json')) {
+                $composer = json_decode(file_get_contents($file), true);
+                if (isset($composer['require']) && is_array($composer['require'])) {
+                    foreach ($composer['require'] as $name => $version) {
+                        $name = trim(strtolower($name));
+                        if (in_array($name, ['php', 'php-64bit', 'hhvm']) || strContains($name, '/')) continue;
+                        if (strStartsWith($name, 'ext-')) $name = strRight($name, -4);
+                        if (!extension_loaded($name))                                                                    $issues[] = 'Error: '.$name.' extension is not loaded  [composer dependency]';
+                    }
                 }
             }
         }

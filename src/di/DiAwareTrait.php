@@ -21,7 +21,7 @@ trait DiAwareTrait {
      */
     protected static function di($name = null) {
         $di = Application::getDi();
-        if (isset($name))
+        if ($di && isset($name))
             return $di->get($name);
         return $di;
     }
