@@ -214,7 +214,9 @@ class Application extends Object {
      */
     protected function configurePhp() {
         register_shutdown_function(function() {
-            $warnLimit = php_byte_value(self::$defaultConfig->get('log.warn.memory_limit', PHP_INT_MAX));
+            /** @var ConfigInterface */
+            $config = self::$defaultConfig;
+            $warnLimit = php_byte_value($config->get('log.warn.memory_limit', PHP_INT_MAX));
             $usedBytes = memory_get_peak_usage($real=true);
             if ($usedBytes > $warnLimit) {
                 Logger::log('Memory consumption exceeded '.prettyBytes($warnLimit).' (peak usage: '.prettyBytes($usedBytes).')', L_WARN, ['class' => __CLASS__]);
