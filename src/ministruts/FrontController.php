@@ -55,7 +55,11 @@ class FrontController extends Singleton {
 
                 if (!$controller) {
                     $controller = self::getInstance(static::class);
-                    $configDir  = self::di('config')['app.dir.config'];
+
+                    $config = self::di('config');
+                    if (!$config) throw new RuntimeException('Application configuration not found');
+
+                    $configDir  = $config['app.dir.config'];
                     $configFile = str_replace('\\', '/', $configDir.'/struts-config.xml');
                     $dependency = FileDependency::create($configFile);
                     if (!WINDOWS && !LOCALHOST)                             // distinction dev/production?  TODO: non-sense
