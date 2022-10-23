@@ -74,7 +74,6 @@ if (!rename($errorLog, $tempName)) {
 }
 
 // read the log file line by line
-PHP::ini_set('auto_detect_line_endings', 1);
 $hFile = fopen($tempName, 'rb');
 $line  = $entry = '';
 $i = 0;

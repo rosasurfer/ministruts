@@ -73,10 +73,8 @@ class Config extends CObject implements ConfigInterface {
         if (is_string($files)) $files = [$files];
         else Assert::isArray($files);
 
-        ini_set('auto_detect_line_endings', 1);
         ini_set('track_errors', 1);
         $this->files = [];
-
 
         // check and load existing files
         foreach ($files as $i => $file) {
