@@ -1182,6 +1182,8 @@ class Request extends CObject {
      * @deprecated
      */
     public static function me() {
-        return self::di(__CLASS__);
+        /** @var static $request */
+        $request = self::di(__CLASS__);
+        return $request;
     }
 }
