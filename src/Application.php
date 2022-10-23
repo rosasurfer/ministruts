@@ -23,10 +23,10 @@ use rosasurfer\util\PHP;
 class Application extends Object {
 
 
-    /** @var ConfigInterface - the application's current default configuration */
+    /** @var ConfigInterface|null - the application's current default configuration */
     protected static $defaultConfig;
 
-    /** @var DiInterface - the application's current default DI container */
+    /** @var DiInterface|null - the application's current default DI container */
     protected static $defaultDi;
 
     /** @var Command[] - registered CLI commands */
@@ -399,7 +399,7 @@ class Application extends Object {
      * Return the current default configuration of the {@link Application}. This is the configuration previously set
      * with {@link Application::setConfig()}.
      *
-     * @return ConfigInterface
+     * @return ConfigInterface|null
      */
     public static function getConfig() {
         return self::$defaultConfig;
@@ -426,7 +426,7 @@ class Application extends Object {
      * Return the default dependency injection container of the {@link Application}. This is the instance previously set
      * with {@link Application::setDi()}.
      *
-     * @return DiInterface
+     * @return DiInterface|null
      */
     public static function getDi() {
         return self::$defaultDi;
