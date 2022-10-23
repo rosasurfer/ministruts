@@ -23,10 +23,10 @@ use rosasurfer\util\PHP;
 class Application extends CObject {
 
 
-    /** @var ConfigInterface - the application's current default configuration */
+    /** @var ConfigInterface|null - the application's current default configuration */
     protected static $defaultConfig;
 
-    /** @var DiInterface - the application's current default DI container */
+    /** @var DiInterface|null - the application's current default DI container */
     protected static $defaultDi;
 
     /** @var Command[] - registered CLI commands */
@@ -214,7 +214,9 @@ class Application extends CObject {
      */
     protected function configurePhp() {
         register_shutdown_function(function() {
-            $warnLimit = php_byte_value(self::$defaultConfig->get('log.warn.memory_limit', PHP_INT_MAX));
+            /** @var ConfigInterface */
+            $config = self::$defaultConfig;
+            $warnLimit = php_byte_value($config->get('log.warn.memory_limit', PHP_INT_MAX));
             $usedBytes = memory_get_peak_usage($real=true);
             if ($usedBytes > $warnLimit) {
                 Logger::log('Memory consumption exceeded '.prettyBytes($warnLimit).' (peak usage: '.prettyBytes($usedBytes).')', L_WARN, ['class' => __CLASS__]);
