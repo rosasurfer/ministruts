@@ -169,7 +169,7 @@ class PHP extends StaticClass {
      * PHP_INI_PERDIR - entry can be set in php.ini, httpd.conf, .htaccess and in .user.ini
      */
     public static function phpinfo() {
-        /** @var ConfigInterface $config */
+        /** @var ConfigInterface|null $config */
         $config = self::di('config');
         $issues = [];
 
@@ -210,7 +210,6 @@ class PHP extends StaticClass {
              * With 'safe_mode'=On plenty of required function parameters are ignored: e.g. http://php.net/manual/en/function.mysql-connect.php
              */
         /*PHP_INI_ALL   */ if (!empty(ini_get     ('open_basedir'                  )))                               $issues[] = 'Info:  open_basedir is not empty: "'.ini_get('open_basedir').'"  [performance]';
-        /*PHP_INI_ALL   */ if (      !ini_get_bool('auto_detect_line_endings'      ))                                $issues[] = 'Info:  auto_detect_line_endings is not On  [funtionality]';
         /*PHP_INI_SYSTEM*/ if (      !ini_get_bool('allow_url_fopen'               ))                                $issues[] = 'Info:  allow_url_fopen is not On  [functionality]';
         /*PHP_INI_SYSTEM*/ if (       ini_get_bool('allow_url_include'))                                             $issues[] = 'Error: allow_url_include is not Off  [security]';
         /*PHP_INI_ALL   */ foreach (explode(PATH_SEPARATOR, ini_get('include_path' )) as $path) {
