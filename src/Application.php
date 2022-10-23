@@ -222,7 +222,6 @@ class Application extends Object {
         });
         /*
         ini_set('arg_separator.output'    , '&amp;'                );
-        ini_set('auto_detect_line_endings',  1                     );
         ini_set('default_mimetype'        , 'text/html'            );
         ini_set('default_charset'         , 'UTF-8'                );
         ini_set('ignore_repeated_errors'  ,  0                     );
