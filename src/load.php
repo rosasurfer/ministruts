@@ -2,8 +2,8 @@
 /**
  * Protective wrapper around the framework.
  */
-if (PHP_VERSION_ID < 50600 || PHP_VERSION_ID >= 80000) {
-    echo 'Error: unsupported PHP version '.PHP_VERSION.' (this "rosasurfer/ministruts" version requires PHP 5.6 or PHP 7.*)'.PHP_EOL;
+if (PHP_VERSION_ID < 50600 || PHP_VERSION_ID >= 90000) {
+    echo 'Error: unsupported PHP version '.PHP_VERSION.' (this "rosasurfer/ministruts" version requires PHP 5.6 to PHP 8.*)'.PHP_EOL;
     exit(1);
 }
 
