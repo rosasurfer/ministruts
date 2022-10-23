@@ -1,10 +1,11 @@
 #
-# PHPStan version: https://github.com/rosasurfer/phpstan, branch "0.8-pewa"
-# -------------------------------------------------------------------------
+# Requires:
+#  PHP 7.1
+#  https://github.com/rosasurfer/phpstan, branch "0.8-pewa"
 #
-# alias phpstan='php7 -d memory_limit=256M -d short_open_tag=On /path/to/phpstan/bin/phpstan --ansi'
-#
-# phpstan analyse -a etc/phpstan/autoload.php -c etc/phpstan/config.neon --level=0..7 [--] <path>
+# Usage:
+#  alias phpstan08='php71 -d memory_limit=-1 -d short_open_tag=On /path/to/phpstan/bin/phpstan --ansi'
+#  phpstan08 analyse -a etc/phpstan/autoload.php -c etc/phpstan/config.neon --level=0..7 [--] <path>
 #
 
 parameters:
@@ -12,16 +13,14 @@ parameters:
         - etc/phpstan/api-stubs.php                                 # stubs for PHP extensions and procedural code
 
     fileExtensions:                                                 # additional files to analyse
-       #- html
-       #- phtml                                                     # TODO: Tile default vars trigger errors
+        #- html
+        #- phtml                                                    # TODO: Tile default vars trigger errors
 
     excludes_analyse:
-        - .git/
-        - .settings/
-        - etc/httpd/
-        - etc/js/
-        - etc/vendor/
+        - doc/
+        - etc/
         - src/globals.php
+        - vendor/
 
     universalObjectCratesClasses:
         - rosasurfer\ministruts\Page
