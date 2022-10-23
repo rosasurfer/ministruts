@@ -263,9 +263,9 @@ class PostgresConnector extends Connector {
         $ex = null;
 
         try {
-            $php_errormsg = '';
+            error_clear_last();
             $this->hConnection = pg_connect($connStr, PGSQL_CONNECT_FORCE_NEW);
-            if (!$this->hConnection) throw new DatabaseException($php_errormsg);
+            if (!$this->hConnection) throw new DatabaseException(error_get_last()['message']);
         }
         catch (IRosasurferException $ex) {}
         catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
