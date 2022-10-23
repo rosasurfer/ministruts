@@ -327,7 +327,7 @@ class Application extends Object {
      * @param  string $value - configuration value as passed to the framework loader
      */
     protected function setupErrorHandling($value) {
-        $mode = ErrorHandler::THROW_EXCEPTIONS;                         // default
+        $mode = ErrorHandler::THROW_EXCEPTIONS;                     // default
 
         if (is_string($value)) {
             $value = strtolower($value);
@@ -412,7 +412,7 @@ class Application extends Object {
      *
      * @param  ConfigInterface $configuration
      *
-     * @return ConfigInterface - the previously registered default configuration
+     * @return ConfigInterface|null - the previously registered default configuration
      */
     final public static function setConfig(ConfigInterface $configuration) {
         $previous = self::$defaultConfig;
@@ -439,7 +439,7 @@ class Application extends Object {
      *
      * @param  DiInterface $di
      *
-     * @return DiInterface - the previously registered default container
+     * @return DiInterface|null - the previously registered default container
      */
     final public static function setDi(DiInterface $di) {
         $previous = self::$defaultDi;
