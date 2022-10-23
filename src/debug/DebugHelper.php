@@ -113,7 +113,7 @@ class DebugHelper extends StaticClass {
      */
     public static function formatTrace(array $trace, $indent = '') {
         $config  = Config::getDefault();
-        $appRoot = $config ? $config->get('app.dir.root') : false;
+        $appRoot = $config ? $config->get('app.dir.root') : null;
         $result  = '';
 
         $size = sizeOf($trace);
