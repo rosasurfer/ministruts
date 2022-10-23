@@ -54,7 +54,7 @@ use const rosasurfer\NL;
 class Config extends Object implements IConfig {
 
 
-    /** @var IConfig - the application's current default configuration */
+    /** @var IConfig|null - the application's current default configuration */
     private static $defaultInstance;
 
     /** @var bool[] - config file names and their existence status */
@@ -438,7 +438,7 @@ class Config extends Object implements IConfig {
     /**
      * Get the current default configuration. This is the configuration set by Config::setDefault().
      *
-     * @return IConfig
+     * @return IConfig|null
      */
     public static function getDefault() {
         // intentionally accept an error if $defaultInstance was not yet set
