@@ -228,7 +228,6 @@ class PHP extends StaticClass {
         }
         /*PHP_INI_ALL   */ if ( ini_get_bool('ignore_repeated_errors'))                                              $issues[] = 'Info:  ignore_repeated_errors is not Off  [resources]';
         /*PHP_INI_ALL   */ if ( ini_get_bool('ignore_repeated_source'))                                              $issues[] = 'Info:  ignore_repeated_source is not Off  [resources]';
-        /*PHP_INI_ALL   */ if (!ini_get_bool('track_errors'          ))                                              $issues[] = 'Info:  track_errors is not On  [functionality]';
         /*PHP_INI_ALL   */ if ( ini_get_bool('html_errors'           ))                                              $issues[] = 'Warn:  html_errors is not Off  [functionality]';
         /*PHP_INI_ALL   */ if (!ini_get_bool('log_errors'            ))                                              $issues[] = 'Error: log_errors is not On  [setup]';
         /*PHP_INI_ALL   */ $bytes = ini_get_bytes('log_errors_max_len');

@@ -233,7 +233,6 @@ class Application extends CObject {
         ini_set('display_startup_errors'  , (int)(CLI || LOCALHOST));
         ini_set('log_errors'              ,  1                     );
         ini_set('log_errors_max_len'      ,  0                     );
-        ini_set('track_errors'            ,  1                     );
         ini_set('html_errors'             ,  0                     );
         ini_set('session.use_cookies'     ,  1                     );
         ini_set('session.use_trans_sid'   ,  0                     );

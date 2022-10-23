@@ -73,7 +73,6 @@ class Config extends CObject implements ConfigInterface {
         if (is_string($files)) $files = [$files];
         else Assert::isArray($files);
 
-        ini_set('track_errors', 1);
         $this->files = [];
 
         // check and load existing files
@@ -142,12 +141,14 @@ class Config extends CObject implements ConfigInterface {
      * @return string - line comment or an empty string if the line has no comment
      */
     private function getLineComment($value) {
-        $php_errormsg = '';
+        error_clear_last();
         $tokens = token_get_all('<?php '.$value);
+        $error  = error_get_last();
 
         // Don't use trigger_error() as it will enter an infinite loop if the same config is accessed again.
-        if (strlen($php_errormsg) && !strStartsWith($php_errormsg, 'Unterminated comment starting line'))       // that's /*...
+        if ($error && !strStartsWith($error['message'], 'Unterminated comment starting line')) {                // that's /*...
             error_log(__METHOD__.'()  Unexpected token_get_all() error for $value: '.$value, ERROR_LOG_DEFAULT);
+        }
 
         $lastToken = end($tokens);
 
