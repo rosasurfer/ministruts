@@ -111,7 +111,8 @@ class DebugHelper extends StaticClass {
      * @return string
      */
     public static function formatTrace(array $trace, $indent = '') {
-        $appRoot = self::di('config')['app.dir.root'];
+        $config  = self::di('config');
+        $appRoot = $config ? $config['app.dir.root'] : null;
         $result  = '';
 
         $size = sizeof($trace);
