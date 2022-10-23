@@ -215,7 +215,7 @@ class Application extends CObject {
      * Update the PHP configuration with user defined settings.
      */
     protected function configurePhp() {
-        /** @var ConfigInterface */
+        /** @var ConfigInterface $config */
         $config = self::$defaultConfig;
         $memoryWarnLimit = php_byte_value($config->get('log.warn.memory_limit', 0));
         if ($memoryWarnLimit > 0) {
