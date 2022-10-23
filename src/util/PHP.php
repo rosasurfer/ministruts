@@ -169,13 +169,12 @@ class PHP extends StaticClass {
      * PHP_INI_PERDIR - entry can be set in php.ini, httpd.conf, .htaccess and in .user.ini
      */
     public static function phpinfo() {
-        /** @var ConfigInterface $config */
+        /** @var ConfigInterface|null $config */
         $config = self::di('config');
         $issues = [];
 
-
-        // (1) core configuration
-        // ----------------------
+        // core configuration
+        // ------------------
         if (!php_ini_loaded_file())                                                                                  $issues[] = 'Error: no "php.ini" configuration file loaded  [setup]';
         /*PHP_INI_PERDIR*/ if (      !ini_get_bool('short_open_tag'                ))                                $issues[] = 'Error: short_open_tag is not On  [security]';
         /*PHP_INI_PERDIR*/ if (       ini_get_bool('asp_tags'                      ) && PHP_VERSION_ID <  70000)     $issues[] = 'Info:  asp_tags is not Off  [standards]';
@@ -211,7 +210,6 @@ class PHP extends StaticClass {
              * With 'safe_mode'=On plenty of required function parameters are ignored: e.g. http://php.net/manual/en/function.mysql-connect.php
              */
         /*PHP_INI_ALL   */ if (!empty(ini_get     ('open_basedir'                  )))                               $issues[] = 'Info:  open_basedir is not empty: "'.ini_get('open_basedir').'"  [performance]';
-        /*PHP_INI_ALL   */ if (      !ini_get_bool('auto_detect_line_endings'      ))                                $issues[] = 'Info:  auto_detect_line_endings is not On  [funtionality]';
         /*PHP_INI_SYSTEM*/ if (      !ini_get_bool('allow_url_fopen'               ))                                $issues[] = 'Info:  allow_url_fopen is not On  [functionality]';
         /*PHP_INI_SYSTEM*/ if (       ini_get_bool('allow_url_include'))                                             $issues[] = 'Error: allow_url_include is not Off  [security]';
         /*PHP_INI_ALL   */ foreach (explode(PATH_SEPARATOR, ini_get('include_path' )) as $path) {
@@ -219,9 +217,8 @@ class PHP extends StaticClass {
                 break;
         }}
 
-
-        // (2) error handling
-        // ------------------
+        // error handling
+        // --------------
         /*PHP_INI_ALL   */ $current = ini_get_int('error_reporting');
             $target = E_ALL & ~E_DEPRECATED;
             if ($notCovered=($target ^ $current) & $target)                                                          $issues[] = 'Warn:  error_reporting does not cover '.DebugHelper::errorLevelToStr($notCovered).'  [standards]';
@@ -252,9 +249,8 @@ class PHP extends StaticClass {
                 }
             }
 
-
-        // (3) input sanitizing
-        // --------------------
+        // input sanitizing
+        // ----------------
         if (PHP_VERSION_ID < 50400) {
             /*PHP_INI_ALL   */ if      (ini_get_bool('magic_quotes_sybase' )) /*overrides 'magic_quotes_gpc'*/       $issues[] = 'Error: magic_quotes_sybase is not Off  [standards]';
             /*PHP_INI_PERDIR*/ else if (ini_get_bool('magic_quotes_gpc'    ))                                        $issues[] = 'Error: magic_quotes_gpc is not Off  [standards]';
@@ -262,9 +258,8 @@ class PHP extends StaticClass {
         }
         /*PHP_INI_SYSTEM*/     if      (ini_get_bool('sql.safe_mode'       ))                                        $issues[] = 'Warn:  sql.safe_mode is not Off  [setup]';
 
-
-        // (4) request & HTML handling
-        // ---------------------------
+        // request & HTML handling
+        // -----------------------
         /*PHP_INI_PERDIR*/ $order = ini_get('request_order'); /*if empty automatic fall-back to GPC order in "variables_order"*/
             if (empty($order)) {
                 /*PHP_INI_PERDIR*/ $order = ini_get('variables_order');
@@ -310,9 +305,8 @@ class PHP extends StaticClass {
             }
         // TODO: /*PHP_INI_ALL*/ "zlib.output_compression"
 
-
-        // (5) session related settings
-        // ----------------------------
+        // session related settings
+        // ------------------------
         /*PHP_INI_ALL   */ if (ini_get     ('session.save_handler') != 'files')                                      $issues[] = 'Info:  session.save_handler is not "files": "'.ini_get('session.save_handler').'"';
         // TODO: check "session.save_path"
         /*PHP_INI_ALL   */ if (ini_get     ('session.serialize_handler') != 'php')                                   $issues[] = 'Info:  session.serialize_handler is not "php": "'.ini_get('session.serialize_handler').'"';
@@ -335,20 +329,15 @@ class PHP extends StaticClass {
                            else                                                                                      $issues[] = 'Info:  session.use_trans_sid is On';
         }
 
-
-
-
-
-        // (6) mail related settings
-        // -------------------------
+        // mail related settings
+        // ---------------------
         /*PHP_INI_ALL   */ //sendmail_from
         if (WINDOWS && !ini_get('sendmail_path') && !ini_get('sendmail_from') && !isset($_SERVER['SERVER_ADMIN']))   $issues[] = 'Warn:  On Windows and neither sendmail_path nor sendmail_from are set';
         /*PHP_INI_SYSTEM*/ if (!WINDOWS && !ini_get('sendmail_path'))                                                $issues[] = 'Warn:  sendmail_path is not set';
         /*PHP_INI_PERDIR*/ if (ini_get('mail.add_x_header'))                                                         $issues[] = 'Warn:  mail.add_x_header is not Off';
 
-
-        // (7) extensions
-        // --------------
+        // extensions
+        // ----------
         /*PHP_INI_SYSTEM*/ if (ini_get('enable_dl'))                                                                 $issues[] = 'Warn:  enable_dl is not Off';
         if (!extension_loaded('ctype'))                                                                              $issues[] = 'Warn:  ctype extension is not loaded  [functionality]';
         if (!extension_loaded('iconv'))                                                                              $issues[] = 'Warn:  iconv extension is not loaded  [functionality]';
@@ -372,9 +361,8 @@ class PHP extends StaticClass {
             }
         }
 
-
-        // (8) Opcode cache
-        // ----------------
+        // opcode cache
+        // ------------
         if (extension_loaded('apc')) {
             //if (phpVersion('apc') >= '3.1.3' && phpVersion('apc') < '3.1.7')                                       $issues[] = 'Warn:  You are running a buggy APC version (a version < 3.1.3 or >= 3.1.7 is recommended): '.phpVersion('apc');
             ///*PHP_INI_SYSTEM*/ if (!ini_get('apc.enabled'))                                                        $issues[] = 'Warn:  apc.enabled is not On [performance]';      // warning "Potential cache slam averted for key '...'" http://bugs.php.net/bug.php?id=58832
@@ -400,8 +388,7 @@ class PHP extends StaticClass {
         }
         else                                                                                                         $issues[] = 'Warn:  No opcode cache found [performance]';
 
-
-        // (9) show results followed by phpinfo()
+        // show results followed by phpinfo()
         if (!CLI) {
             ?>
             <div align="left" style="display:initial; visibility:initial; clear:both;
