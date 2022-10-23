@@ -23,10 +23,10 @@ use rosasurfer\util\PHP;
 class Application extends CObject {
 
 
-    /** @var ConfigInterface - the application's current default configuration */
+    /** @var ConfigInterface|null - the application's current default configuration */
     protected static $defaultConfig;
 
-    /** @var DiInterface - the application's current default DI container */
+    /** @var DiInterface|null - the application's current default DI container */
     protected static $defaultDi;
 
     /** @var Command[] - registered CLI commands */
@@ -215,7 +215,9 @@ class Application extends CObject {
      * Update the PHP configuration with user defined settings.
      */
     protected function configurePhp() {
-        $memoryWarnLimit = php_byte_value(self::$defaultConfig->get('log.warn.memory_limit', 0));
+        /** @var ConfigInterface */
+        $config = self::$defaultConfig;
+        $memoryWarnLimit = php_byte_value($config->get('log.warn.memory_limit', 0));
         if ($memoryWarnLimit > 0) {
             register_shutdown_function(function() use ($memoryWarnLimit) {
                 $usedBytes = memory_get_peak_usage($real=true);
@@ -407,7 +409,7 @@ class Application extends CObject {
      * Return the current default configuration of the {@link Application}. This is the configuration previously set
      * with {@link Application::setConfig()}.
      *
-     * @return ConfigInterface
+     * @return ConfigInterface|null
      */
     public static function getConfig() {
         return self::$defaultConfig;
@@ -419,7 +421,7 @@ class Application extends CObject {
      *
      * @param  ConfigInterface $configuration
      *
-     * @return ConfigInterface - the previously registered default configuration
+     * @return ConfigInterface|null - the previously registered default configuration
      */
     final public static function setConfig(ConfigInterface $configuration) {
         $previous = self::$defaultConfig;
@@ -434,7 +436,7 @@ class Application extends CObject {
      * Return the default dependency injection container of the {@link Application}. This is the instance previously set
      * with {@link Application::setDi()}.
      *
-     * @return DiInterface
+     * @return DiInterface|null
      */
     public static function getDi() {
         return self::$defaultDi;
@@ -446,7 +448,7 @@ class Application extends CObject {
      *
      * @param  DiInterface $di
      *
-     * @return DiInterface - the previously registered default container
+     * @return DiInterface|null - the previously registered default container
      */
     final public static function setDi(DiInterface $di) {
         $previous = self::$defaultDi;
