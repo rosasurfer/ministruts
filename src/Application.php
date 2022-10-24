@@ -404,7 +404,7 @@ class Application extends CObject {
      * Return the current default configuration of the {@link Application}. This is the configuration previously set
      * with {@link Application::setConfig()}.
      *
-     * @return ConfigInterface
+     * @return ConfigInterface|null
      */
     public static function getConfig() {
         return self::$defaultConfig;
@@ -416,7 +416,7 @@ class Application extends CObject {
      *
      * @param  ConfigInterface $configuration
      *
-     * @return ConfigInterface - the previously registered default configuration
+     * @return ConfigInterface|null - the previously registered default configuration
      */
     final public static function setConfig(ConfigInterface $configuration) {
         $previous = self::$defaultConfig;
@@ -431,7 +431,7 @@ class Application extends CObject {
      * Return the default dependency injection container of the {@link Application}. This is the instance previously set
      * with {@link Application::setDi()}.
      *
-     * @return DiInterface
+     * @return DiInterface|null
      */
     public static function getDi() {
         return self::$defaultDi;
@@ -443,7 +443,7 @@ class Application extends CObject {
      *
      * @param  DiInterface $di
      *
-     * @return DiInterface - the previously registered default container
+     * @return DiInterface|null - the previously registered default container
      */
     final public static function setDi(DiInterface $di) {
         $previous = self::$defaultDi;

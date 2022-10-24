@@ -12,10 +12,6 @@ parameters:
     autoload_files:
         - etc/phpstan/api-stubs.php                                         # stubs for PHP extensions and procedural code
 
-    fileExtensions:                                                         # additional files to analyse
-        #- html
-        #- phtml                                                            # TODO: Tile default vars trigger errors
-
     excludes_analyse:
         - doc/
         - etc/
