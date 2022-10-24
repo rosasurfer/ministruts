@@ -57,15 +57,15 @@ class SMTPMailer extends Mailer {
         }
         else {
             $host = $this->options['host'];
-            if (!is_string($host)) throw new IllegalTypeException('Illegal type of option "host": '.getType($this->options['host']));
+            if (!is_string($host)) throw new IllegalTypeException('Illegal type of option "host": '.gettype($this->options['host']));
             $parts = explode(':', $host);
 
-            if (sizeOf($parts) == 1) {
+            if (sizeof($parts) == 1) {
                 if (trim($parts[0]) == '') throw new InvalidArgumentException('Invalid option "host": '.$this->options['host']);
                 if (!isSet($this->options['port']))
                     $this->options['port'] = ini_get('smtp_port');  // TODO: validate host and port
             }
-            elseif (sizeOf($parts) == 2) {
+            elseif (sizeof($parts) == 2) {
                 if (trim($parts[0])=='' || trim($parts[1])=='') throw new InvalidArgumentException('Invalid option "host": '.$this->options['host']);
                 $this->options['host'] = $parts[0];                 // TODO: validate host and port
                 $this->options['port'] = $parts[1];
@@ -97,7 +97,7 @@ class SMTPMailer extends Mailer {
      */
     private function connect() {
         $errorCode = $errorMsg = null;
-        $connection = fSockOpen('tcp://'.$this->options['host'],
+        $connection = fsockopen('tcp://'.$this->options['host'],
                                          $this->options['port'],
                                          $errorCode,
                                          $errorMsg,
@@ -183,26 +183,26 @@ class SMTPMailer extends Mailer {
 
         // first validate the additional headers
         foreach ($headers as $i => $header) {
-            if (!is_string($header))       throw new IllegalTypeException('Illegal type of parameter $headers['.$i.']: '.getType($header));
+            if (!is_string($header))       throw new IllegalTypeException('Illegal type of parameter $headers['.$i.']: '.gettype($header));
             if (!preg_match('/^[a-z]+(-[a-z]+)*:/i', $header))
                                            throw new InvalidArgumentException('Invalid parameter $headers['.$i.']: "'.$header.'"');
         }
 
         // auto-complete sender if not specified
         if (is_null($sender)) {
-            if (!$config=Config::getDefault()) throw new RuntimeException('Service locator returned empty default config: '.getType($config));
+            if (!$config=Config::getDefault()) throw new RuntimeException('Service locator returned empty default config: '.gettype($config));
             $sender = $config->get('mail.from', ini_get('sendmail_from'));
-            if (!strLen($sender)) {
-                $sender = strToLower(get_current_user().'@'.$this->hostName);
+            if (!strlen($sender)) {
+                $sender = strtolower(get_current_user().'@'.$this->hostName);
             }
         }
 
         // Return-Path: (invisible sender)
-        if (!is_string($sender))           throw new IllegalTypeException('Illegal type of parameter $sender: '.getType($sender));
+        if (!is_string($sender))           throw new IllegalTypeException('Illegal type of parameter $sender: '.gettype($sender));
         $returnPath = self::parseAddress($sender);
         if (!$returnPath)                  throw new InvalidArgumentException('Invalid parameter $sender: '.$sender);
         $value = $this->removeHeader($headers, 'Return-Path');
-        if (strLen($value)) {
+        if (strlen($value)) {
             $returnPath = self::parseAddress($value);
             if (!$returnPath)              throw new InvalidArgumentException('Invalid header "Return-Path: '.$value.'"');
         }
@@ -211,19 +211,19 @@ class SMTPMailer extends Mailer {
         $from  = self::parseAddress($sender);
         if (!$from)                        throw new InvalidArgumentException('Invalid parameter $sender: '.$sender);
         $value = $this->removeHeader($headers, 'From');
-        if (strLen($value)) {
+        if (strlen($value)) {
             $from = self::parseAddress($value);
             if (!$from)                    throw new InvalidArgumentException('Invalid header "From: '.$value.'"');
         }
 
         // RCPT: (invisible receiver)
-        if (!is_string($receiver))         throw new IllegalTypeException('Illegal type of parameter $receiver: '.getType($receiver));
+        if (!is_string($receiver))         throw new IllegalTypeException('Illegal type of parameter $receiver: '.gettype($receiver));
         $rcpt = self::parseAddress($receiver);
         if (!$rcpt)                        throw new InvalidArgumentException('Invalid parameter $receiver: '.$receiver);
-        if (!$config=Config::getDefault()) throw new RuntimeException('Service locator returned empty default config: '.getType($config));
+        if (!$config=Config::getDefault()) throw new RuntimeException('Service locator returned empty default config: '.gettype($config));
         $forced = $config->get('mail.forced-receiver', '');
-        if (!is_string($forced))           throw new IllegalTypeException('Illegal type of config value "mail.forced-receiver": '.getType($forced).' (not string)');
-        if (strLen($forced)) {
+        if (!is_string($forced))           throw new IllegalTypeException('Illegal type of config value "mail.forced-receiver": '.gettype($forced).' (not string)');
+        if (strlen($forced)) {
             $rcpt = self::parseAddress($forced);
             if (!$rcpt)                    throw new InvalidArgumentException('Invalid config value "mail.forced-receiver": '.$forced);
         }
@@ -232,14 +232,14 @@ class SMTPMailer extends Mailer {
         $to = self::parseAddress($receiver);
         if (!$to)                          throw new InvalidArgumentException('Invalid parameter $sender: '.$sender);
         $value = $this->removeHeader($headers, 'To');
-        if (strLen($value)) {
+        if (strlen($value)) {
             $to = self::parseAddress($value);
             if (!$to)                      throw new InvalidArgumentException('Invalid header "To: '.$value.'"');
         }
 
         // Subject: subject and body
-        if (!is_string($subject))          throw new IllegalTypeException('Illegal type of parameter $subject: '.getType($subject));
-        if (!is_string($message))          throw new IllegalTypeException('Illegal type of parameter $message: '.getType($message));
+        if (!is_string($subject))          throw new IllegalTypeException('Illegal type of parameter $subject: '.gettype($subject));
+        if (!is_string($message))          throw new IllegalTypeException('Illegal type of parameter $message: '.gettype($message));
 
 
         // start SMTP communication
@@ -288,7 +288,7 @@ class SMTPMailer extends Mailer {
         $this->writeData('To: '.$to['name'].' <'.$to['address'].'>');
 
         $encSubject = $this->encodeNonAsciiChars($subject);
-        if (strLen($encSubject) > 76) throw new RuntimeException('The encoded mail subject exceeds the maximum number of characters per line: "'.$subject.'"');
+        if (strlen($encSubject) > 76) throw new RuntimeException('The encoded mail subject exceeds the maximum number of characters per line: "'.$subject.'"');
         $this->writeData('Subject: '.$encSubject);
         $this->writeData('X-Mailer: Microsoft Office Outlook 11');  // save us from Hotmail junk folder
         $this->writeData('X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2900.2180');
@@ -315,18 +315,18 @@ class SMTPMailer extends Mailer {
 
             // wrap long lines into several shorter ones
             $pieces = null;
-            while (strLen($line) > $maxLineLength) {
-                $pos = strRPos(subStr($line, 0, $maxLineLength), ' ');
+            while (strlen($line) > $maxLineLength) {
+                $pos = strrpos(substr($line, 0, $maxLineLength), ' ');
                 if (!$pos)
                     $pos = $maxLineLength - 1;          // patch to fix DoS attack; good old times :-)
 
-                $pieces[] = subStr($line, 0, $pos);
-                $line = subStr($line, $pos + 1);
+                $pieces[] = substr($line, 0, $pos);
+                $line = substr($line, $pos + 1);
             }
             $pieces[] = $line;
 
             foreach ($pieces as $line) {
-                if (subStr($line, 0, 1) == '.')
+                if (substr($line, 0, 1) == '.')
                     $line = '.'.$line;                  // escape leading dots to avoid mail end marker confusion
                 $this->writeData($line);
             }
@@ -377,7 +377,7 @@ class SMTPMailer extends Mailer {
                 throw new RuntimeException('QUIT command not accepted: '.$this->responseStatus.' '.$this->response.NL.NL.'SMTP transfer log:'.NL.'------------------'.NL.$this->logBuffer);
         }
 
-        fClose($this->connection);
+        fclose($this->connection);
         $this->connection = null;
     }
 
@@ -387,9 +387,9 @@ class SMTPMailer extends Mailer {
      */
     private function readResponse() {
         $lines = null;
-        while (trim($line = fGets($this->connection)) != '') {
+        while (trim($line = fgets($this->connection)) != '') {
             $lines .= $line;
-            if (subStr($line, 3, 1) == ' ')
+            if (substr($line, 3, 1) == ' ')
                 break;
         }
         $data = stream_get_meta_data($this->connection);
@@ -407,10 +407,10 @@ class SMTPMailer extends Mailer {
      * @param string $data
      */
     private function writeData($data) {
-        $count = fWrite($this->connection, $data.EOL_WINDOWS, strLen($data)+2);
+        $count = fwrite($this->connection, $data.EOL_WINDOWS, strlen($data)+2);
 
-        if ($count != strLen($data)+2)
-            throw new RuntimeException('Error writing to socket, length of data: '.(strLen($data)+2).', bytes written: '.$count.NL.'data: '.$data.NL.NL.'SMTP transfer log:'.NL.'------------------'.NL.$this->logBuffer);
+        if ($count != strlen($data)+2)
+            throw new RuntimeException('Error writing to socket, length of data: '.(strlen($data)+2).', bytes written: '.$count.NL.'data: '.$data.NL.NL.'SMTP transfer log:'.NL.'------------------'.NL.$this->logBuffer);
 
         $this->logSentData($data);
     }
@@ -423,8 +423,8 @@ class SMTPMailer extends Mailer {
      */
     private function parseResponse($response) {
         $response = trim($response);
-        $this->responseStatus = (int) subStr($response, 0, 3);
-        $this->response = subStr($response, 4);
+        $this->responseStatus = (int) substr($response, 0, 3);
+        $this->response = substr($response, 4);
     }
 
 

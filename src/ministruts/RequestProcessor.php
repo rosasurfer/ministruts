@@ -175,7 +175,7 @@ class RequestProcessor extends Object {
         // /module/
         // /app/module/
 
-        $mappingPath = '/'.subStr($requestPath, strLen($moduleUri));
+        $mappingPath = '/'.substr($requestPath, strlen($moduleUri));
         // /
         // /controller/action/
 
@@ -473,7 +473,7 @@ PROCESS_METHOD_ERROR_SC_405;
             }
             else {
                 $moduleUri = $request->getApplicationBaseUri().$module->getPrefix();
-                $url = $moduleUri.lTrim($path, '/');
+                $url = $moduleUri.ltrim($path, '/');
             }
             $response->redirect($url, $forward->getRedirectType());
         }

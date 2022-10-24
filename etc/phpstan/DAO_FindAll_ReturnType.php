@@ -41,7 +41,7 @@ class DAO_FindAll_ReturnType extends DynamicReturnType implements DynamicMethodR
      *
      * @return Type
      */
-    public function getTypeFromMethodCall(MethodReflection $methodReflection, MethodCall $methodCall, Scope $scope) : Type {
+    public function getTypeFromMethodCall(MethodReflection $methodReflection, MethodCall $methodCall, Scope $scope): Type {
         /** @var ArrayType $returnType */
         $returnType  = $methodReflection->getReturnType();
         $returnClass = $origReturnClass = $returnType->getItemType()->getClass().'[]';

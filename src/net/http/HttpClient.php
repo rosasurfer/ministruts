@@ -36,7 +36,7 @@ abstract class HttpClient extends Object {
      * @return $this
      */
     public function setTimeout($timeout) {
-        if (!is_int($timeout)) throw new IllegalTypeException('Illegal type of parameter $timeout: '.getType($timeout));
+        if (!is_int($timeout)) throw new IllegalTypeException('Illegal type of parameter $timeout: '.gettype($timeout));
         if ($timeout < 1)      throw new InvalidArgumentException('Invalid argument $timeout: '.$timeout);
 
         $this->timeout = $timeout;
@@ -62,7 +62,7 @@ abstract class HttpClient extends Object {
      * @return $this
      */
     public function setFollowRedirects($follow) {
-        if (!is_bool($follow)) throw new IllegalTypeException('Illegal type of parameter $follow: '.getType($follow));
+        if (!is_bool($follow)) throw new IllegalTypeException('Illegal type of parameter $follow: '.gettype($follow));
 
         $this->followRedirects = $follow;
         return $this;
@@ -87,7 +87,7 @@ abstract class HttpClient extends Object {
      * @return $this
      */
     public function setMaxRedirects($maxRedirects) {
-        if (!is_int($maxRedirects)) throw new IllegalTypeException('Illegal type of parameter $maxRedirects: '.getType($maxRedirects));
+        if (!is_int($maxRedirects)) throw new IllegalTypeException('Illegal type of parameter $maxRedirects: '.gettype($maxRedirects));
 
         $this->maxRedirects = $maxRedirects;
         return $this;

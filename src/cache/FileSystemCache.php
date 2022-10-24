@@ -51,7 +51,7 @@ final class FileSystemCache extends CachePeer {
         // Verzeichnis ggf. erzeugen
         mkDirWritable($directory);
 
-        $this->directory = realPath($directory).DIRECTORY_SEPARATOR;
+        $this->directory = realpath($directory).DIRECTORY_SEPARATOR;
     }
 
 
@@ -147,8 +147,8 @@ final class FileSystemCache extends CachePeer {
         $fileName = $this->getFilePath($key);
 
         if (is_file($fileName)) {
-            if (unLink($fileName)) {
-                clearStatCache();
+            if (unlink($fileName)) {
+                clearstatcache();
 
                 $this->getReferencePool()->drop($key);
                 return true;
@@ -173,8 +173,8 @@ final class FileSystemCache extends CachePeer {
      * @return bool - TRUE bei Erfolg, FALSE andererseits
      */
     public function set($key, &$value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null) {
-        if (!is_string($key))  throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
-        if (!is_int($expires)) throw new IllegalTypeException('Illegal type of parameter $expires: '.getType($expires));
+        if (!is_string($key))  throw new IllegalTypeException('Illegal type of parameter $key: '.gettype($key));
+        if (!is_int($expires)) throw new IllegalTypeException('Illegal type of parameter $expires: '.gettype($expires));
 
         // im Cache wird ein array(created, expires, value, dependency) gespeichert
         $created = time();
@@ -197,7 +197,7 @@ final class FileSystemCache extends CachePeer {
      */
     private function getFilePath($key) {
         $key = md5($key);
-        return $this->directory.$key[0].DIRECTORY_SEPARATOR.$key[1].DIRECTORY_SEPARATOR.subStr($key, 2);
+        return $this->directory.$key[0].DIRECTORY_SEPARATOR.$key[1].DIRECTORY_SEPARATOR.substr($key, 2);
     }
 
 
@@ -234,13 +234,13 @@ final class FileSystemCache extends CachePeer {
      * @return bool - TRUE bei Erfolg, FALSE andererseits
      */
     private function writeFile($fileName, $value, $expires) {
-        mkDirWritable(dirName($fileName));
+        mkDirWritable(dirname($fileName));
 
         // TODO: http://phpdevblog.niknovo.com/2009/11/serialize-vs-var-export-vs-json-encode.html
 
-        $fH = fOpen($fileName, 'wb');
-        fWrite($fH, serialize($value));
-        fClose($fH);
+        $fH = fopen($fileName, 'wb');
+        fwrite($fH, serialize($value));
+        fclose($fH);
 
         return true;
     }

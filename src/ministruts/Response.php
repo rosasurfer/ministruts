@@ -57,7 +57,7 @@ class Response extends Singleton {
      * @return $this
      */
     public function setStatus($status) {
-        if (!is_int($status)) throw new IllegalTypeException('Illegal type of parameter $status: '.getType($status));
+        if (!is_int($status)) throw new IllegalTypeException('Illegal type of parameter $status: '.gettype($status));
         if ($status < 1)      throw new InvalidArgumentException('Invalid argument $status: '.$status);
 
         $this->status = $status;
@@ -117,29 +117,29 @@ class Response extends Singleton {
         $url = self::relativeToAbsoluteUrl($uri, $currentUrl);
 
         // append session id if a session is active and URL rewriting is not disabled (strongly discouraged)
-        if (defined('SID') && strLen(SID)) {                        // empty string if the session id was submitted in a cookie
+        if (defined('SID') && strlen(SID)) {                        // empty string if the session id was submitted in a cookie
             if (!ini_get_bool('session.use_only_cookies')) {        // TODO: check if session_destroy() resets SID
                 $cookie       = session_get_cookie_params();
-                $cookieDomain = strToLower(empty($cookie['domain']) ? $request->getHostname() : $cookie['domain']);
+                $cookieDomain = strtolower(empty($cookie['domain']) ? $request->getHostname() : $cookie['domain']);
                 $cookiePath   =            empty($cookie['path'  ]) ? '/'                     : $cookie['path'  ];
                 $cookieSecure =                  $cookie['secure'];
 
                 $target       = parse_url($url);
-                $targetDomain = strToLower($target['host'  ]);
+                $targetDomain = strtolower($target['host'  ]);
                 $targetPath   =      empty($target['path'  ]) ? '/' : $target['path'];
-                $targetSecure = strToLower($target['scheme']) == 'https';
+                $targetSecure = strtolower($target['scheme']) == 'https';
 
                 $subdomains = false;
                 if ($cookieDomain[0] == '.') {                      // TODO: check if the leading dot is still required
                     $subdomains = true;                             //       (@see http://bayou.io/draft/cookie.domain.html)
-                    $cookieDomain = subStr($cookieDomain, 1);
+                    $cookieDomain = substr($cookieDomain, 1);
                 }
 
                 if ($domainMatch = (preg_match('/\b'.$cookieDomain.'$/', $targetDomain) && ($cookieDomain==$targetDomain || $subdomains))) {
                     if ($pathMatch = strStartsWith($targetPath, $cookiePath)) {
                         if ($secureMatch = !$cookieSecure || $targetSecure) {
-                            if (isSet($target['fragment']))  $url  = strLeft($url, strLen($hash = '#'.$target['fragment']));
-                            else if (strEndsWith($url, '#')) $url  = strLeft($url, strLen($hash = '#'));
+                            if (isSet($target['fragment']))  $url  = strLeft($url, strlen($hash = '#'.$target['fragment']));
+                            else if (strEndsWith($url, '#')) $url  = strLeft($url, strlen($hash = '#'));
                             else                             $hash = '';
 
                             $separator = !strContains($url, '?') ? '?' : '&';
@@ -171,26 +171,26 @@ class Response extends Singleton {
      */
     public static function relativeToAbsoluteUrl($rel, $base) {
         $relFragment = strRightFrom($rel, '#');
-        strLen($relFragment) && $rel = strLeft($rel, -strLen($relFragment)-1);
+        strlen($relFragment) && $rel = strLeft($rel, -strlen($relFragment)-1);
 
         $relQuery = strRightFrom($rel, '?');
-        strLen($relQuery) && $rel = strLeft($rel, -strLen($relQuery)-1);
+        strlen($relQuery) && $rel = strLeft($rel, -strlen($relQuery)-1);
 
         if (($relParts =parse_url($rel )) === false) throw new InvalidArgumentException('Invalid argument $rel: '.$rel);
         if (($baseParts=parse_url($base)) === false) throw new InvalidArgumentException('Invalid argument $base: '.$base);
 
-        if (strLen($relQuery)) {
+        if (strlen($relQuery)) {
             $relParts['query'] = $relQuery;
             $rel .= '?'.$relQuery;
         }
-        if (strLen($relFragment)) {
+        if (strlen($relFragment)) {
             $relParts['fragment'] = $relFragment;
             $rel .= '#'.$relFragment;
         }
 
         try {
             // if $rel is empty return $base
-            if (!strLen($rel)) return $base;
+            if (!strlen($rel)) return $base;
 
             // if already an absolute URL return $rel
             if (isSet($relParts['scheme'])) return $rel;
@@ -219,7 +219,7 @@ class Response extends Singleton {
             $port  = isSet($baseParts['port']) ? ':'.$baseParts['port'] : '';
             $user  = isSet($baseParts['user']) ?     $baseParts['user'] : '';
             $pass  = isSet($baseParts['pass']) ? ':'.$baseParts['pass'] : '';
-            $at    = strLen($user) ? '@' : '';
+            $at    = strlen($user) ? '@' : '';
             $path .= $rel;                              // includes $rel query and/or fragment
 
             // resulting absolute URL

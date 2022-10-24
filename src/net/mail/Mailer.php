@@ -42,7 +42,7 @@ abstract class Mailer extends Object implements MailerInterface {
             $hostName  = 'localhost';
         if (!strContains($hostName, '.'))
             $hostName .= '.localdomain';            // hostname must contain more than one part (see RFC 2821)
-        $this->hostName = strToLower($hostName);
+        $this->hostName = strtolower($hostName);
     }
 
 
@@ -101,7 +101,7 @@ abstract class Mailer extends Object implements MailerInterface {
      * @return string[]|null - aray with name and address part or NULL if the specified address is invalid
      */
     public static function parseAddress($value) {
-        if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
+        if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.gettype($value));
 
         $value = trim($value);
 
@@ -117,7 +117,7 @@ abstract class Mailer extends Object implements MailerInterface {
             $address = $value;
         }
 
-        if (strLen($address) && filter_var($address, FILTER_VALIDATE_EMAIL)) {
+        if (strlen($address) && filter_var($address, FILTER_VALIDATE_EMAIL)) {
             return [
                 'name'    => $name,
                 'address' => $address
@@ -137,14 +137,14 @@ abstract class Mailer extends Object implements MailerInterface {
      * @return string|null - value of the last found header or NULL if the header was not found
      */
     protected function getHeader(array $headers, $name) {
-        if (!is_string($name))                           throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
+        if (!is_string($name))                           throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
         if (!preg_match('/^[a-z]+(-[a-z]+)*$/i', $name)) throw new InvalidArgumentException('Invalid parameter $name: "'.$name.'"');
 
         // reversely iterate over the array to find the last of duplicate headers
         for (end($headers); key($headers)!==null; prev($headers)){
             $header = current($headers);
             if (strStartsWithI($header, $name.':'))
-                return trim(subStr($header, strLen($name)+1));
+                return trim(substr($header, strlen($name)+1));
         }
         return null;
     }
@@ -160,14 +160,14 @@ abstract class Mailer extends Object implements MailerInterface {
      * @return string|null - value of the last removed header or NULL if the header was not found
      */
     protected function removeHeader(array &$headers, $name) {
-        if (!is_string($name))                           throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
+        if (!is_string($name))                           throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
         if (!preg_match('/^[a-z]+(-[a-z]+)*$/i', $name)) throw new InvalidArgumentException('Invalid parameter $name: "'.$name.'"');
 
         $result = null;
 
         foreach ($headers as $i => $header) {
             if (strStartsWithI($header, $name.':')) {
-                $result = trim(subStr($header, strLen($name)+1));
+                $result = trim(substr($header, strlen($name)+1));
                 unset($headers[$i]);
             }
         }

@@ -80,7 +80,7 @@ class CurlHttpClient extends HttpClient {
         CURLE_UNKNOWN_TELNET_OPTION   => 'CURLE_UNKNOWN_TELNET_OPTION'   ,
         CURLE_TELNET_OPTION_SYNTAX    => 'CURLE_TELNET_OPTION_SYNTAX'    ,
      // 50
-        CURLE_SSL_PEER_CERTIFICATE    => 'CURLE_SSL_PEER_CERTIFICATE'    ,
+        51                            => 'CURLE_SSL_PEER_CERTIFICATE'    ,  // since libcurl-7.62.0 (PHP 7.1) unified with CURLE_SSL_CACERT (60)
         CURLE_GOT_NOTHING             => 'CURLE_GOT_NOTHING'             ,
         CURLE_SSL_ENGINE_NOTFOUND     => 'CURLE_SSL_ENGINE_NOTFOUND'     ,
         CURLE_SSL_ENGINE_SETFAILED    => 'CURLE_SSL_ENGINE_SETFAILED'    ,
@@ -194,8 +194,8 @@ class CurlHttpClient extends HttpClient {
 
         if ($request->getMethod() == 'POST') {
             $options[CURLOPT_POST      ] = true;
-            $options[CURLOPT_URL       ] = subStr($request->getUrl(), 0, strPos($request->getUrl(), '?'));
-            $options[CURLOPT_POSTFIELDS] = strStr($request->getUrl(), '?');
+            $options[CURLOPT_URL       ] = substr($request->getUrl(), 0, strpos($request->getUrl(), '?'));
+            $options[CURLOPT_POSTFIELDS] = strstr($request->getUrl(), '?');
         }
         curl_setopt_array($this->hCurl, $options);
 

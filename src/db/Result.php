@@ -64,10 +64,10 @@ abstract class Result extends Object implements ResultInterface {
         else {
             if (!\key_exists($column, $row)) {
                 if (is_int($column))     throw new InvalidArgumentException('Invalid $column: '.$column.' (no such column)');
-                if (!is_string($column)) throw new IllegalTypeException('Illegal type of parameter $column: '.getType($column));
+                if (!is_string($column)) throw new IllegalTypeException('Illegal type of parameter $column: '.gettype($column));
 
                 $row    = \array_change_key_case($row, CASE_LOWER);
-                $column = strToLower($column);
+                $column = strtolower($column);
                 if (!\key_exists($column, $row)) throw new InvalidArgumentException('Invalid $column: "'.$column.'" (no such column)');
             }
             $value = $row[$column];
@@ -172,8 +172,8 @@ abstract class Result extends Object implements ResultInterface {
      *
      * @return string
      */
-    public function getType() {
-        return $this->connector->getType();
+    public function gettype() {
+        return $this->connector->gettype();
     }
 
 

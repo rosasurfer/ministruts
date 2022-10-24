@@ -102,8 +102,8 @@ class SQLiteConnector extends Connector {
      * @return $this
      */
     protected function setFile($file) {
-        if (!is_string($file)) throw new IllegalTypeException('Illegal type of parameter $file: '.getType($file));
-        if (!strLen($file))    throw new InvalidArgumentException('Invalid parameter $file: "'.$file.'" (empty)');
+        if (!is_string($file)) throw new IllegalTypeException('Illegal type of parameter $file: '.gettype($file));
+        if (!strlen($file))    throw new InvalidArgumentException('Invalid parameter $file: "'.$file.'" (empty)');
 
         if ($file == ':memory:' || !isRelativePath($file)) {
             $this->file = $file;
@@ -156,12 +156,12 @@ class SQLiteConnector extends Connector {
             $what = $where = null;
             if (file_exists($file)) {
                 $what = 'open';
-                if (is_dir($file=realPath($file)))
+                if (is_dir($file=realpath($file)))
                     $where = ' (directory)';
             }
             else {
                 $what = ($flags & SQLITE3_OPEN_CREATE) ? 'create':'find';
-                isRelativePath($file) && $where=' in "'.getCwd().'"';
+                isRelativePath($file) && $where=' in "'.getcwd().'"';
             }
             throw $ex->addMessage('Cannot '.$what.' database file "'.$file.'"'.$where);
         }
@@ -219,7 +219,7 @@ class SQLiteConnector extends Connector {
      * {@inheritdoc}
      */
     public function escapeIdentifier($name) {
-        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
+        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
 
         return '"'.str_replace('"', '""', $name).'"';
     }
@@ -232,7 +232,7 @@ class SQLiteConnector extends Connector {
         // bug or feature: SQLite3::escapeString(null) => empty string instead of NULL
         if ($value === null)  return 'null';
 
-        if (!is_scalar($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
+        if (!is_scalar($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.gettype($value));
 
         if (is_bool ($value)) return (string)(int) $value;
         if (is_int  ($value)) return (string)      $value;
@@ -250,7 +250,7 @@ class SQLiteConnector extends Connector {
         // bug or feature: SQLite3::escapeString(null) => empty string instead of NULL
         if ($value === null)
             return null;
-        if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
+        if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.gettype($value));
 
         if (!$this->isConnected())
             $this->connect();
@@ -316,7 +316,7 @@ class SQLiteConnector extends Connector {
      * @throws DatabaseException on errors
      */
     public function executeRaw($sql) {
-        if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
+        if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.gettype($sql));
         if (!$this->isConnected())
             $this->connect();
 
@@ -463,7 +463,7 @@ class SQLiteConnector extends Connector {
      *
      * @return string
      */
-    public function getType() {
+    public function gettype() {
         return $this->type;
     }
 

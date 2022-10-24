@@ -34,7 +34,7 @@ class PersistableObject_PopulateNew_ReturnType extends DynamicReturnType impleme
      *
      * @return Type
      */
-    public function getTypeFromMethodCall(MethodReflection $methodReflection, MethodCall $methodCall, Scope $scope) : Type {
+    public function getTypeFromMethodCall(MethodReflection $methodReflection, MethodCall $methodCall, Scope $scope): Type {
         $returnType  = $methodReflection->getReturnType();
         $returnClass = $origReturnClass = $returnType->getClass();
         $error = false;
@@ -49,7 +49,7 @@ class PersistableObject_PopulateNew_ReturnType extends DynamicReturnType impleme
      *
      * @return Type
      */
-    public function getTypeFromStaticMethodCall(MethodReflection $methodReflection, StaticCall $methodCall, Scope $scope) : Type {
+    public function getTypeFromStaticMethodCall(MethodReflection $methodReflection, StaticCall $methodCall, Scope $scope): Type {
         $returnType  = $methodReflection->getReturnType();
         $returnClass = $origReturnClass = $returnType->getClass();
         $error = false;

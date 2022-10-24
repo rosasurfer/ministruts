@@ -18,14 +18,15 @@ parameters:
 
     excludes_analyse:
         - doc/
-        - etc/
+        - etc/httpd/
+        - etc/js
         - src/globals.php
         - vendor/
 
     universalObjectCratesClasses:
         - rosasurfer\ministruts\Page
 
-    reportUnmatchedIgnoredErrors:           false
+    #reportUnmatchedIgnoredErrors:           false
     polluteScopeWithLoopInitialAssignments: true
     polluteCatchScopeWithTryAssignments:    true
 
@@ -33,7 +34,6 @@ parameters:
         # intentionally ignore the following issues
         - '/Array \(([^ ]+)\[\]\) does not accept (\1\|)?null\b/'                                                   # NULL is a value and not a type. It should always be valid.
         - '/(Static )?property [^ ]+ \(([^ ]+)\) does not accept (\2\|)?null\b/i'                                   # - dito -
-        - '/Property [^ ]+ \([^ ]+\[\]\) does not accept default value of type null\[\]/i'                          # - dito -
         - '/Parameter #[0-9]+ [^ ]+ of class [^ ]+ constructor expects ([^ ]+), (\1\|)?null given\b/'               # - dito -
         - '/Parameter #[0-9]+ [^ ]+ of (static )?(function|method) [^ ]+ expects ([^ ]+), (\3\|)?null given\b/'     # - dito -
         - '/Calling method [^ ]+\(\) on possibly null value of type [^ ]+\|null\b/'

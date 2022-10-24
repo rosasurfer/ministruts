@@ -103,16 +103,16 @@ class MySQLConnector extends Connector {
      * @return $this
      */
     protected function setHost($hostname) {
-        if (!is_string($hostname)) throw new IllegalTypeException('Illegal type of parameter $hostname: '.getType($hostname));
-        if (!strLen($hostname))    throw new InvalidArgumentException('Invalid parameter $hostname: "'.$hostname.'" (empty)');
+        if (!is_string($hostname)) throw new IllegalTypeException('Illegal type of parameter $hostname: '.gettype($hostname));
+        if (!strlen($hostname))    throw new InvalidArgumentException('Invalid parameter $hostname: "'.$hostname.'" (empty)');
 
         $host = $hostname;
         $port = null;
 
-        if (strPos($host, ':') !== false) {
+        if (strpos($host, ':') !== false) {
             list($host, $port) = explode(':', $host, 2);
             $host = trim($host);
-            if (!strLen($host)) throw new InvalidArgumentException('Invalid parameter $hostname: "'.$hostname.'" (empty host name)');
+            if (!strlen($host)) throw new InvalidArgumentException('Invalid parameter $hostname: "'.$hostname.'" (empty host name)');
 
             $port = trim($port);
             if (!ctype_digit($port)) throw new InvalidArgumentException('Invalid parameter $hostname: "'.$hostname.'" (not a port)');
@@ -134,8 +134,8 @@ class MySQLConnector extends Connector {
      * @return $this
      */
     protected function setUsername($name) {
-        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
-        if (!strLen($name))    throw new InvalidArgumentException('Invalid parameter $name: "'.$name.'" (empty)');
+        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
+        if (!strlen($name))    throw new InvalidArgumentException('Invalid parameter $name: "'.$name.'" (empty)');
 
         $this->username = $name;
         return $this;
@@ -151,7 +151,7 @@ class MySQLConnector extends Connector {
      */
     protected function setPassword($password) {
         if (is_null($password)) $password = '';
-        else if (!is_string($password)) throw new IllegalTypeException('Illegal type of parameter $password: '.getType($password));
+        else if (!is_string($password)) throw new IllegalTypeException('Illegal type of parameter $password: '.gettype($password));
 
         $this->password = $password;
         return $this;
@@ -166,8 +166,8 @@ class MySQLConnector extends Connector {
      * @return $this
      */
     protected function setDatabase($name) {
-        if (isSet($name) && !is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
-        if (!strLen($name))
+        if (isSet($name) && !is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
+        if (!strlen($name))
             $name = null;
 
         $this->database = $name;
@@ -242,8 +242,8 @@ class MySQLConnector extends Connector {
         $options['time_zone'] = date_default_timezone_get();    // synchronize connection timezone with PHP timezone
 
         foreach ($options as $option => $value) {
-            if (strLen($value)) {
-                if (strToLower($option) == 'charset') {
+            if (strlen($value)) {
+                if (strtolower($option) == 'charset') {
                     // We use the built-in MySQL function mysql_set_charset() instead of the plain SQL "set character set {$value}".
                     // This makes mysql_real_escape_string() aware of the char set.
                     mysql_set_charset($value, $this->hConnection) || trigger_error(mysql_error($this->hConnection), E_USER_ERROR);
@@ -309,7 +309,7 @@ class MySQLConnector extends Connector {
      * {@inheritdoc}
      */
     public function escapeIdentifier($name) {
-        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
+        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
 
         if (strContains($name, '.')) {
             $names = explode('.', $name);
@@ -331,7 +331,7 @@ class MySQLConnector extends Connector {
         // bug or feature: mysql_real_escape_string(null) => empty string instead of NULL
         if ($value === null)  return 'null';
 
-        if (!is_scalar($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
+        if (!is_scalar($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.gettype($value));
 
         if (is_bool ($value)) return (string)(int) $value;
         if (is_int  ($value)) return (string)      $value;
@@ -349,7 +349,7 @@ class MySQLConnector extends Connector {
         // bug or or feature: mysql_real_escape_string(null) => empty string instead of NULL
         if ($value === null)
             return null;
-        if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
+        if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.gettype($value));
 
         if (!$this->isConnected())
             $this->connect();
@@ -407,7 +407,7 @@ class MySQLConnector extends Connector {
      * @throws DatabaseException on errors
      */
     public function executeRaw($sql) {
-        if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
+        if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.gettype($sql));
         if (!$this->isConnected())
             $this->connect();
 
@@ -564,7 +564,7 @@ class MySQLConnector extends Connector {
      *
      * @return string
      */
-    public function getType() {
+    public function gettype() {
         return $this->type;
     }
 

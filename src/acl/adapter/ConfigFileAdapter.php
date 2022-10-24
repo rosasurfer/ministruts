@@ -22,11 +22,11 @@ class ConfigFileAdapter extends Object implements AdapterInterface {
      */
     public function __construct($file = null) {
         if (func_num_args()) {
-            if (!is_string($file)) throw new IllegalTypeException('Illegal type of parameter $file: '.getType($file));
+            if (!is_string($file)) throw new IllegalTypeException('Illegal type of parameter $file: '.gettype($file));
             throw new UnimplementedFeatureException('Support for custom config files not yet implemented');
         }
         if (!$config=Config::getDefault())
-            throw new RuntimeException('Service locator returned empty default config: '.getType($config));
+            throw new RuntimeException('Service locator returned empty default config: '.gettype($config));
 
         $config = $config->get('acl.config', null);
     }

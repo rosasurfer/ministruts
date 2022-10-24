@@ -284,7 +284,7 @@ class ErrorHandler extends StaticClass {
                 if (Application::isAdminIP() || ini_get_bool('display_errors')) {
                     if ($second) {                          // full second exception, full log location
                         echoPre($second);
-                        echoPre('error log: '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : 'web server'));
+                        echoPre('error log: '.(strlen($errorLog=ini_get('error_log')) ? $errorLog : 'web server'));
                     }
                 }
                 else echoPre('application error (see error log)');

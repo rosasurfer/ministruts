@@ -124,8 +124,8 @@ final class ReferencePool extends CachePeer {
      * @return bool - TRUE bei Erfolg, FALSE andererseits
      */
     public function set($key, &$value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null) {
-        if (!is_string($key))  throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
-        if (!is_int($expires)) throw new IllegalTypeException('Illegal type of parameter $expires: '.getType($expires));
+        if (!is_string($key))  throw new IllegalTypeException('Illegal type of parameter $key: '.gettype($key));
+        if (!is_int($expires)) throw new IllegalTypeException('Illegal type of parameter $expires: '.gettype($expires));
 
         // im Cache wird ein Array[creation_timestamp, value, expires, dependency] gespeichert
         $this->pool[$key] = array($timestamp=null, $value, $expires=null, $dependency);

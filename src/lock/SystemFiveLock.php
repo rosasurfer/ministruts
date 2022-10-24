@@ -56,7 +56,7 @@ class SystemFiveLock extends BaseLock {
      *                          existiert
      */
     public function __construct($key) {
-        if (!is_string($key))                     throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
+        if (!is_string($key))                     throw new IllegalTypeException('Illegal type of parameter $key: '.gettype($key));
         if (key_exists($key, self::$hSemaphores)) throw new RuntimeException('Dead-lock detected: already holding a lock for key "'.$key.'"');
         self::$hSemaphores[$key] = null;
 
@@ -81,7 +81,7 @@ class SystemFiveLock extends BaseLock {
             catch (PHPError $ex) {
                 // TODO: Quellcode umschreiben (ext/sysvsem/sysvsem.c) und Fehler lokalisieren (vermutlich wird ein File-Limit ueberschritten)
                 $message  = $ex->getMessage();
-                $hexId    = decHex($integer);
+                $hexId    = dechex($integer);
                 $prefixes = [
                     'sem_get(): failed for key 0x'.$hexId.': Invalid argument',
                     'sem_get(): failed for key 0x'.$hexId.': Identifier removed',
@@ -95,7 +95,7 @@ class SystemFiveLock extends BaseLock {
                 if (++$i < $trials && strStartsWith($message, $prefixes)) {
                     self::$logDebug && Logger::log($message.', trying again ... ('.($i+1).')', L_DEBUG);
                     $messages[] = $message;
-                    uSleep(200000); // 200 msec. warten
+                    usleep(200000); // 200 msec. warten
                     continue;
                 }
                 // Endlosschleife verhindern
@@ -157,6 +157,6 @@ class SystemFiveLock extends BaseLock {
      * @return int - numerical value
      */
     private function keyToId($key) {
-        return (int) hexDec(subStr(md5($key), 0, 7)) + strLen($key);
-    }                                         // 7: strLen(decHex(PHP_INT_MAX)) - 1 (x86)
+        return (int) hexdec(substr(md5($key), 0, 7)) + strlen($key);
+    }                                         // 7: strlen(dechex(PHP_INT_MAX)) - 1 (x86)
 }

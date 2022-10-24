@@ -55,7 +55,7 @@ abstract class PersistableObject extends Object {
     public function __call($method, array $args) {
         $dao     = $this->dao();
         $mapping = $dao->getMapping();
-        $methodL = strToLower($method);
+        $methodL = strtolower($method);
 
         // calls to getters of mapped properties are intercepted
         if (isSet($mapping['getters'][$methodL])) {
@@ -255,7 +255,7 @@ abstract class PersistableObject extends Object {
      */
     private function getPhysicalValue($column, $type = null) {
         $mapping = $this->dao()->getMapping();
-        $column  = strToLower($column);
+        $column  = strtolower($column);
         if (!isSet($mapping['columns'][$column])) throw new RuntimeException('Not a mapped column "'.func_get_arg(0).'"');
 
         $property      = &$mapping['columns'][$column];
@@ -637,7 +637,7 @@ abstract class PersistableObject extends Object {
     private function populate(array $row) {
         $row     = \array_change_key_case($row, CASE_LOWER);
         $mapping = $this->dao()->getMapping();
-        $dbType  = $this->dao()->db()->getType();
+        $dbType  = $this->dao()->db()->gettype();
 
         foreach ($mapping['columns'] as $column => &$property) {
             $propertyName = $property['name'];
@@ -675,7 +675,7 @@ abstract class PersistableObject extends Object {
                     case 'float'  :
                     case 'double' : $this->$propertyName =     (float) $row[$column]; break;
                     case 'string' : $this->$propertyName =    (string) $row[$column]; break;
-                  //case 'array'  : $this->$propertyName =   strLen($row[$column]) ? explode(',', $row[$column]):[]; break;
+                  //case 'array'  : $this->$propertyName =   strlen($row[$column]) ? explode(',', $row[$column]):[]; break;
                   //case DateTime::class: $this->$propertyName = new DateTime($row[$column]); break;
 
                     default:

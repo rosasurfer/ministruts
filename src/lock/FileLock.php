@@ -29,15 +29,15 @@ final class FileLock extends BaseLock {
      * @param  string $filename
      */
     public function __construct($filename) {
-        if (!is_string($filename))                throw new IllegalTypeException('Illegal type of parameter $filename: '.getType($filename));
+        if (!is_string($filename))                throw new IllegalTypeException('Illegal type of parameter $filename: '.gettype($filename));
 
         if (key_exists($filename, self::$hFiles)) throw new RuntimeException('Dead-lock: re-entry detected for lock file "'.$filename.'"');
         self::$hFiles[$filename] = null;                // pre-define the index and handle re-entry if the constructor crashes
 
         $this->filename = $filename;
-        $hFile = fOpen($filename, 'c');                 // 'c' will never fail
+        $hFile = fopen($filename, 'c');                 // 'c' will never fail
 
-        if (!fLock($hFile, LOCK_EX)) throw new RuntimeException('Can not aquire exclusive lock on file "'.$filename.'"');
+        if (!flock($hFile, LOCK_EX)) throw new RuntimeException('Can not aquire exclusive lock on file "'.$filename.'"');
 
         self::$hFiles[$filename] = $hFile;              // lock is aquired
     }
@@ -61,9 +61,9 @@ final class FileLock extends BaseLock {
     public function release() {
         if ($this->isAquired()) {
             $hFile = self::$hFiles[$this->filename];
-            if (!fLock($hFile, LOCK_UN)) throw new RuntimeException('Can not release lock on file "'.$this->filename.'"');
+            if (!flock($hFile, LOCK_UN)) throw new RuntimeException('Can not release lock on file "'.$this->filename.'"');
             unset(self::$hFiles[$this->filename]);
-            fClose($hFile);
+            fclose($hFile);
         }
     }
 

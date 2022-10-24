@@ -73,7 +73,7 @@ class Application extends Object {
 
         // (2) check "app.id"
         $appId = $config->get('app.id', null);
-        if (!$appId) $config->set('app.id', subStr(md5($config->get('app.dir.root')), 0, 16));
+        if (!$appId) $config->set('app.id', substr(md5($config->get('app.dir.root')), 0, 16));
 
         // (3) check for PHP admin tasks if the remote IP has allowance
         // __phpinfo__             : show PHP config at start of script
@@ -145,7 +145,7 @@ class Application extends Object {
 
         // (6) execute "phpinfo" after-config task if enabled
         if ($phpInfoTask || $phpInfoAfterConfigTask) {
-            PHP::phpInfo();
+            PHP::phpinfo();
             exit(0);
         }
 
@@ -155,9 +155,9 @@ class Application extends Object {
         }
 
         // (8) enforce mission-critical PHP requirements (after processing any admin tasks)
-        !php_ini_loaded_file()                   && exit(1|echoPre('application error (see error log'.(self::isAdminIP() ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: No "php.ini" configuration file was loaded.'));
-        !CLI && !ini_get_bool('short_open_tag')  && exit(1|echoPre('application error (see error log'.(self::isAdminIP() ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: The PHP configuration value "short_open_tag" must be enabled (security).'));
-        !CLI && ini_get('request_order') != 'GP' && exit(1|echoPre('application error (see error log'.(self::isAdminIP() ? ': '.(strLen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: The PHP configuration value "request_order" must be "GP" (current value "'.ini_get('request_order').'").'));
+        !php_ini_loaded_file()                   && exit(1|echoPre('application error (see error log'.(self::isAdminIP() ? ': '.(strlen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: No "php.ini" configuration file was loaded.'));
+        !CLI && !ini_get_bool('short_open_tag')  && exit(1|echoPre('application error (see error log'.(self::isAdminIP() ? ': '.(strlen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: The PHP configuration value "short_open_tag" must be enabled (security).'));
+        !CLI && ini_get('request_order') != 'GP' && exit(1|echoPre('application error (see error log'.(self::isAdminIP() ? ': '.(strlen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: The PHP configuration value "request_order" must be "GP" (current value "'.ini_get('request_order').'").'));
     }
 
 
@@ -219,23 +219,23 @@ class Application extends Object {
             throw new RuntimeException('Only one of the application options "app.config" or "app.dir.config" can be provided.');
 
         if (!isSet($options['app.config'])) {
-            $location = isSet($options['app.dir.config']) ? $options['app.dir.config'] : getCwd();
+            $location = isSet($options['app.dir.config']) ? $options['app.dir.config'] : getcwd();
             $config = new AutoConfig($location);
             unset($options['app.dir.config']);
         }
         else {
             $config = $options['app.config'];
-            if (!$config instanceof IConfig) throw new IllegalTypeException('Illegal type of application option["app.config"]: '.getType($config));
+            if (!$config instanceof IConfig) throw new IllegalTypeException('Illegal type of application option["app.config"]: '.gettype($config));
             if (!$config->get('app.dir.config', false)) {
                 $files = $config->getMonitoredFiles();
                 end($files);
                 list($file, $exists) = each($files);
-                $config->set('app.dir.config', dirName($file));
+                $config->set('app.dir.config', dirname($file));
             }
             unset($options['app.config']);
         }
 
-        $rootDir = isSet($options['app.dir.root']) ? $options['app.dir.root'] : getCwd();
+        $rootDir = isSet($options['app.dir.root']) ? $options['app.dir.root'] : getcwd();
         unset($options['app.dir.root']);
 
         // copy all remaining options
@@ -260,10 +260,10 @@ class Application extends Object {
      * @param  string  $rootDir - application root directory
      */
     private function expandAppDirs(IConfig $config, $rootDir) {
-        if (!is_string($rootDir))                          throw new IllegalTypeException('Illegal type of config option "app.dir.root": '.getType($rootDir));
-        if (!strLen($rootDir) || isRelativePath($rootDir)) throw new InvalidArgumentException('Invalid config option "app.dir.root": "'.$rootDir.'" (not an absolute path)');
+        if (!is_string($rootDir))                          throw new IllegalTypeException('Illegal type of config option "app.dir.root": '.gettype($rootDir));
+        if (!strlen($rootDir) || isRelativePath($rootDir)) throw new InvalidArgumentException('Invalid config option "app.dir.root": "'.$rootDir.'" (not an absolute path)');
 
-        $rootDir = rTrim(str_replace('\\', '/', $rootDir), '/');
+        $rootDir = rtrim(str_replace('\\', '/', $rootDir), '/');
         $dirs = $config->get('app.dir', []);
         $this->expandDirsRecursive($dirs, $rootDir);
         $config->set('app.dir', $dirs);                     // store everything back
@@ -284,7 +284,7 @@ class Application extends Object {
             }
             if (isRelativePath($dir))
                 $dir = $rootDir.'/'.$dir;
-            if (is_dir($dir)) $dir = realPath($dir);
+            if (is_dir($dir)) $dir = realpath($dir);
         }; unset($dir);
     }
 
@@ -297,7 +297,7 @@ class Application extends Object {
     private function setupErrorHandling($value) {
         $flag = self::THROW_EXCEPTIONS;
         if (is_string($value)) {
-            $value = trim(strToLower($value));
+            $value = trim(strtolower($value));
             if      ($value == 'weak'  ) $flag = self::LOG_ERRORS;  // default: THROW_EXCEPTIONS
             else if ($value == 'ignore') $flag = null;
         }
@@ -318,7 +318,7 @@ class Application extends Object {
             $enabled = (bool) $value;
         }
         elseif (is_string($value)) {
-            $value = trim(strToLower($value));
+            $value = trim(strtolower($value));
             if ($value=='0' || $value=='off' || $value=='false')
                 $enabled = false;                                   // default: true
         }
@@ -340,7 +340,7 @@ class Application extends Object {
             $enabled = (bool) $value;
         }
         elseif (is_string($value)) {
-            $value   = trim(strToLower($value));
+            $value   = trim(strtolower($value));
             $enabled = ($value=='1' || $value=='on' || $value=='true');
         }
 
@@ -361,7 +361,7 @@ class Application extends Object {
             $enabled = (bool) $value;
         }
         elseif (is_string($value)) {
-            $value   = trim(strToLower($value));
+            $value   = trim(strtolower($value));
             $enabled = ($value=='1' || $value=='on' || $value=='true');
         }
 

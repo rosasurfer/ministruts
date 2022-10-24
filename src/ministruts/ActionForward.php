@@ -119,8 +119,8 @@ class ActionForward extends Object {
      * @return $this
      */
     public function setName($name) {
-        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
-        if (!strLen($name))    throw new InvalidArgumentException('Invalid argument $name: '.$name);
+        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
+        if (!strlen($name))    throw new InvalidArgumentException('Invalid argument $name: '.$name);
 
         $this->name = $name;
         return $this;
@@ -135,8 +135,8 @@ class ActionForward extends Object {
      * @return $this
      */
     public function setPath($path) {
-        if (!is_string($path)) throw new IllegalTypeException('Illegal type of parameter $path: '.getType($path));
-        if (!strLen($path))    throw new InvalidArgumentException('Invalid argument $path: '.$path);
+        if (!is_string($path)) throw new IllegalTypeException('Illegal type of parameter $path: '.gettype($path));
+        if (!strlen($path))    throw new InvalidArgumentException('Invalid argument $path: '.$path);
 
         $this->path = $path;
         return $this;
@@ -151,8 +151,8 @@ class ActionForward extends Object {
      * @return $this
      */
     public function setLabel($label) {
-        if (!is_string($label)) throw new IllegalTypeException('Illegal type of parameter $label: '.getType($label));
-        if (!strLen($label))    throw new InvalidArgumentException('Invalid argument $label: '.$label);
+        if (!is_string($label)) throw new IllegalTypeException('Illegal type of parameter $label: '.gettype($label));
+        if (!strlen($label))    throw new InvalidArgumentException('Invalid argument $label: '.$label);
 
         $this->label = $label;
         return $this;
@@ -167,7 +167,7 @@ class ActionForward extends Object {
      * @return $this
      */
     public function setRedirect($redirect) {
-        if (!is_bool($redirect)) throw new IllegalTypeException('Illegal type of parameter $redirect: '.getType($redirect));
+        if (!is_bool($redirect)) throw new IllegalTypeException('Illegal type of parameter $redirect: '.gettype($redirect));
 
         $this->redirect = $redirect;
         return $this;
@@ -182,7 +182,7 @@ class ActionForward extends Object {
      * @return $this
      */
     public function setRedirectType($type) {
-        if (!is_int($type)) throw new IllegalTypeException('Illegal type of parameter $type: '.getType($type));
+        if (!is_int($type)) throw new IllegalTypeException('Illegal type of parameter $type: '.gettype($type));
 
         $this->redirectType = $type;
         return $this;
@@ -201,16 +201,16 @@ class ActionForward extends Object {
 
         // TODO: freeze the instance after configuration and automatically call copy()
 
-        if (!is_string($key))       throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
+        if (!is_string($key))       throw new IllegalTypeException('Illegal type of parameter $key: '.gettype($key));
         if (is_null($value))        $value = '';
         elseif (is_bool($value))    $value = (int) $value;
-        elseif (!is_scalar($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
+        elseif (!is_scalar($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.gettype($value));
 
         $value = (string) $value;
 
         // TODO: extend to process multiple parameters at once
         $path      = $this->getPath();
-        $separator = (strPos($path, '?')!==false) ? '&' : '?';
+        $separator = (strpos($path, '?')!==false) ? '&' : '?';
         $this->setPath($path.$separator.$key.'='.str_replace([' ','#','&'], ['%20','%23','%26'], $value));
 
         return $this;
@@ -230,7 +230,7 @@ class ActionForward extends Object {
 
         if (isSet($value)) {
             if     (is_bool($value))    $value = (int) $value;
-            elseif (!is_scalar($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
+            elseif (!is_scalar($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.gettype($value));
         }
         $value = (string) $value;
         $path = $this->getPath();

@@ -96,8 +96,8 @@ class FrontController extends Singleton {
         $file = null;
         try {
             foreach ($configs as $file) {
-                $baseName = baseName($file, '.xml');
-                $prefix = (strStartsWith($baseName, 'struts-config-')) ? subStr($baseName, 14).'/' : '';
+                $basename = basename($file, '.xml');
+                $prefix = (strStartsWith($basename, 'struts-config-')) ? substr($basename, 14).'/' : '';
 
                 $module = new Module($file, $prefix);
                 $module->freeze();
@@ -156,8 +156,8 @@ class FrontController extends Singleton {
             throw new RuntimeException('Can not resolve module prefix from request path "'.$requestPath.'" (base URI: "'.$baseUri.'")');
         }
 
-        $value = subStr($requestPath, strLen($baseUri));        // baseUri ends with and prefix doesn't start with a slash
-        if (strLen($value)) {
+        $value = substr($requestPath, strlen($baseUri));        // baseUri ends with and prefix doesn't start with a slash
+        if (strlen($value)) {
             $value = strLeftTo($value, '/').'/';                // the prefix ends with a slash only for non-root modules
         }
 

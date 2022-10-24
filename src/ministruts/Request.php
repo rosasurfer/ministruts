@@ -66,7 +66,7 @@ class Request extends Singleton {
         // If $_SERVER['QUERY_STRING'] is empty (e.g. at times in nginx) PHP will not parse URL parameters
         // and it needs to be done manually.
         $query = $this->getQueryString();
-        if (strLen($query) && !$_GET)
+        if (strlen($query) && !$_GET)
             $this->parseQueryString($query);
     }
 
@@ -81,18 +81,18 @@ class Request extends Singleton {
 
         foreach ($params as $param) {
             $parts = explode('=', $param, 2);
-            $name  = trim(urlDecode($parts[0])); if (!strLen($name)) continue;
+            $name  = trim(urldecode($parts[0])); if (!strlen($name)) continue;
             //$name  = str_replace(['.', ' '], '_', $name);                             // replace as the PHP implementation does
-            $value = sizeOf($parts)==1 ? '' : urlDecode($parts[1]);
+            $value = sizeof($parts)==1 ? '' : urldecode($parts[1]);
 
             // TODO: process multi-dimensional arrays
 
-            if (($open=strPos($name, '[')) && ($close=strPos($name, ']')) && strLen($name)==$close+1) {
+            if (($open=strpos($name, '[')) && ($close=strpos($name, ']')) && strlen($name)==$close+1) {
                 // name is an array index
-                $name = trim(subStr($name, 0, $open));
-                $key  = trim(subStr($name, $open+1, $close-$open-1));
+                $name = trim(substr($name, 0, $open));
+                $key  = trim(substr($name, $open+1, $close-$open-1));
 
-                if (!strLen($key)) {
+                if (!strlen($key)) {
                     $_GET[$name][] = $_REQUEST[$name][] = $value;
                 }
                 else {
@@ -310,8 +310,8 @@ class Request extends Singleton {
      */
     public function getHostname() {
         if (!empty($_SERVER['HTTP_HOST'])) {
-            $httpHost = strToLower(trim($_SERVER['HTTP_HOST']));    // nginx doesn't set $_SERVER[SERVER_NAME]
-            if (strLen($httpHost))                                  // automatically to $_SERVER[HTTP_HOST]
+            $httpHost = strtolower(trim($_SERVER['HTTP_HOST']));    // nginx doesn't set $_SERVER[SERVER_NAME]
+            if (strlen($httpHost))                                  // automatically to $_SERVER[HTTP_HOST]
                 return $httpHost;
         }
         return $_SERVER['SERVER_NAME'];
@@ -493,7 +493,7 @@ class Request extends Singleton {
         // The variable $_SERVER['QUERY_STRING'] is set by the server and can differ from the transmitted query string.
         // It might hold additional parameters added by the server or it might be empty (e.g. on a mis-configured nginx).
 
-        if (isSet($_SERVER['QUERY_STRING']) && strLen($_SERVER['QUERY_STRING'])) {
+        if (isSet($_SERVER['QUERY_STRING']) && strlen($_SERVER['QUERY_STRING'])) {
             $query = $_SERVER['QUERY_STRING'];
         }
         else {
@@ -675,7 +675,7 @@ class Request extends Singleton {
             // delete the session cookie
             if (ini_get_bool('session.use_cookies')) {
                 $params = session_get_cookie_params();
-                setCookie($name=session_name(), $value='', $expire=time()-1*DAY, $params['path'    ],
+                setcookie($name=session_name(), $value='', $expire=time()-1*DAY, $params['path'    ],
                                                                                  $params['domain'  ],
                                                                                  $params['secure'  ],
                                                                                  $params['httponly']);
@@ -694,7 +694,7 @@ class Request extends Singleton {
      * @return string|null - Wert oder NULL, wenn kein Header dieses Namens uebertragen wurde
      */
     public function getHeader($name) {
-        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
+        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
 
         $headers = $this->getHeaders($name);
         return \array_shift($headers);
@@ -714,10 +714,10 @@ class Request extends Singleton {
         }
         elseif (is_array($names)) {
             foreach ($names as $name) {
-                if (!is_string($name)) throw new IllegalTypeException('Illegal argument type in argument $names: '.getType($name));
+                if (!is_string($name)) throw new IllegalTypeException('Illegal argument type in argument $names: '.gettype($name));
             }
         }
-        else throw new IllegalTypeException('Illegal type of parameter $names: '.getType($names));
+        else throw new IllegalTypeException('Illegal type of parameter $names: '.gettype($names));
 
         // read all headers once
         static $headers = null; if ($headers === null) {
@@ -729,15 +729,15 @@ class Request extends Singleton {
                 static $fixHeaderNames = ['CDN'=>1, 'DNT'=>2, 'X-CDN'=>3];
                 $headers = [];
                 foreach ($_SERVER as $name => $value) {
-                    while (subStr($name, 0, 9) == 'REDIRECT_') {
-                        $name = subStr($name, 9);
+                    while (substr($name, 0, 9) == 'REDIRECT_') {
+                        $name = substr($name, 9);
                         if (isSet($_SERVER[$name]))
                             continue 2;
                     }
-                    if (subStr($name, 0, 5) == 'HTTP_') {
-                        $name = subStr($name, 5);
+                    if (substr($name, 0, 5) == 'HTTP_') {
+                        $name = substr($name, 5);
                         if (!isSet($fixHeaderNames[$name]))
-                            $name = str_replace(' ', '-', ucWords(str_replace('_', ' ', strToLower($name))));
+                            $name = str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower($name))));
                         $headers[$name] = $value;
                     }
                 }
@@ -774,9 +774,9 @@ class Request extends Singleton {
             $names = array($names);
         elseif (is_array($names)) {
             foreach ($names as $name)
-                if (!is_string($name)) throw new IllegalTypeException('Illegal argument type in argument $names: '.getType($name));
+                if (!is_string($name)) throw new IllegalTypeException('Illegal argument type in argument $names: '.gettype($name));
         }
-        else                         throw new IllegalTypeException('Illegal type of parameter $names: '.getType($names));
+        else                         throw new IllegalTypeException('Illegal type of parameter $names: '.gettype($names));
 
         $headers = $this->getHeaders($names);
         if ($headers)
@@ -798,9 +798,9 @@ class Request extends Singleton {
             $names = array($names);
         elseif (is_array($names)) {
             foreach ($names as $name)
-                if (!is_string($name)) throw new IllegalTypeException('Illegal argument type in argument $names: '.getType($name));
+                if (!is_string($name)) throw new IllegalTypeException('Illegal argument type in argument $names: '.gettype($name));
         }
-        else                         throw new IllegalTypeException('Illegal type of parameter $names: '.getType($names));
+        else                         throw new IllegalTypeException('Illegal type of parameter $names: '.gettype($names));
 
         $headers = $this->getHeaders($names);
         if ($headers)
@@ -868,8 +868,8 @@ class Request extends Singleton {
      * @param  string $path [optional] - Pfad, fuer den der Cookie gueltig sein soll (default: whole domain)
      */
     public function setCookie($name, $value, $expires = 0, $path = null) {
-        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
-        if (!is_int($expires)) throw new IllegalTypeException('Illegal type of parameter $expires: '.getType($expires));
+        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
+        if (!is_int($expires)) throw new IllegalTypeException('Illegal type of parameter $expires: '.gettype($expires));
         if ($expires < 0)      throw new InvalidArgumentException('Invalid argument $expires: '.$expires);
 
         $value = (string)$value;
@@ -877,9 +877,9 @@ class Request extends Singleton {
         if ($path === null)
             $path = $this->getApplicationBaseUri();
 
-        if (!is_string($path)) throw new IllegalTypeException('Illegal type of parameter $path: '.getType($path));
+        if (!is_string($path)) throw new IllegalTypeException('Illegal type of parameter $path: '.gettype($path));
 
-        setCookie($name, $value, $expires, $path);
+        setcookie($name, $value, $expires, $path);
     }
 
 
@@ -891,7 +891,7 @@ class Request extends Singleton {
      * @return bool
      */
     public function isUserInRole($roles) {
-        if (!is_string($roles)) throw new IllegalTypeException('Illegal type of parameter $roles: '.getType($roles));
+        if (!is_string($roles)) throw new IllegalTypeException('Illegal type of parameter $roles: '.gettype($roles));
 
         // Module holen
         $module = $this->getAttribute(MODULE_KEY);
@@ -969,7 +969,7 @@ class Request extends Singleton {
 
         if (is_null($keys))
             return true;
-        throw new IllegalTypeException('Illegal type of parameter $keys: '.getType($keys));
+        throw new IllegalTypeException('Illegal type of parameter $keys: '.gettype($keys));
     }
 
 
@@ -987,7 +987,7 @@ class Request extends Singleton {
         elseif (is_string($message)) {
             $this->attributes[ACTION_MESSAGES_KEY][$key] = $message;
         }
-        else throw new IllegalTypeException('Illegal type of parameter $message: '.getType($message));
+        else throw new IllegalTypeException('Illegal type of parameter $message: '.gettype($message));
     }
 
 
@@ -1078,7 +1078,7 @@ class Request extends Singleton {
 
         if (is_null($keys))
             return true;
-        throw new IllegalTypeException('Illegal type of parameter $keys: '.getType($keys));
+        throw new IllegalTypeException('Illegal type of parameter $keys: '.gettype($keys));
     }
 
 
@@ -1095,7 +1095,7 @@ class Request extends Singleton {
         elseif (is_string($message)) {
             $this->attributes[ACTION_ERRORS_KEY][$key] = $message;
         }
-        else throw new IllegalTypeException('Illegal type of parameter $message: '.getType($message));
+        else throw new IllegalTypeException('Illegal type of parameter $message: '.gettype($message));
     }
 
 
@@ -1174,7 +1174,7 @@ class Request extends Singleton {
 
         $maxLen = 0;
         foreach ($headers as $key => $value) {
-            $maxLen = max(strLen($key), $maxLen);
+            $maxLen = max(strlen($key), $maxLen);
         }
 
         $maxLen++; // add a char for ':'
@@ -1184,8 +1184,8 @@ class Request extends Singleton {
 
         // content (request body)
         $content = $this->getContent();
-        if (strLen($content)) {
-            $string .= NL.subStr($content, 0, 1024).NL;             // limit the request body to 1024 bytes
+        if (strlen($content)) {
+            $string .= NL.substr($content, 0, 1024).NL;             // limit the request body to 1024 bytes
         }
         return $string;
     }

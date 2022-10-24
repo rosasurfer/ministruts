@@ -18,15 +18,15 @@ class VersionedUrl extends Url {
         $uri = parent::__toString();
 
         $relativeUri = $this->appRelativeUri;
-        if (($pos=strPos($relativeUri, '?')) === false) $name = $relativeUri;
-        else                                            $name = subStr($relativeUri, 0, $pos);
+        if (($pos=strpos($relativeUri, '?')) === false) $name = $relativeUri;
+        else                                            $name = substr($relativeUri, 0, $pos);
 
         $webDir = Config::getDefault()->get('app.dir.web', null);
 
         if ($webDir && file_exists($fileName=$webDir.'/'.$name)) {
             if ($pos === false) $uri .= '?';
             else                $uri .= '&';
-            $uri .= decHex(crc32(fileSize($fileName).'|'.fileMtime($fileName)));
+            $uri .= dechex(crc32(filesize($fileName).'|'.filemtime($fileName)));
         }
         return $uri;
     }

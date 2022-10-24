@@ -144,7 +144,7 @@ class PostgresConnector extends Connector {
         $connStr = '';
 
         foreach ($this->options as $key => $value) {
-            $keyL = trim(strToLower($key));
+            $keyL = trim(strtolower($key));
 
             if (!isSet($paramKeywords[$keyL])) continue;    // unknown keyword
 
@@ -165,7 +165,7 @@ class PostgresConnector extends Connector {
                 }
             }
 
-            if (!strLen($value)) {
+            if (!strlen($value)) {
                 $value = "''";
             }
             else {
@@ -282,7 +282,7 @@ class PostgresConnector extends Connector {
         //$options['time_zone'] = date_default_timezone_get();      // synchronize connection timezone with PHP timezone
 
         foreach ($options as $option => $value) {
-            if (strLen($value)) {
+            if (strlen($value)) {
                 $this->execute('set '.$option.' to '.$value);       // as is (no quoting)
             }
         }
@@ -323,7 +323,7 @@ class PostgresConnector extends Connector {
      * {@inheritdoc}
      */
     public function escapeIdentifier($name) {
-        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
+        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
 
         if (!$this->isConnected())
             $this->connect();
@@ -348,7 +348,7 @@ class PostgresConnector extends Connector {
         // bug or feature: pg_escape_literal(null) => '' quoted empty string instead of 'null'
         if ($value === null)  return 'null';
 
-        if (!is_scalar($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
+        if (!is_scalar($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.gettype($value));
 
         if (is_bool ($value)) return $value ? 'true':'false';
         if (is_int  ($value)) return (string) $value;
@@ -370,7 +370,7 @@ class PostgresConnector extends Connector {
         // bug or feature: pg_escape_string(null) => empty string instead of NULL
         if ($value === null)
             return null;
-        if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
+        if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.gettype($value));
 
         if (!$this->isConnected())
             $this->connect();
@@ -441,7 +441,7 @@ class PostgresConnector extends Connector {
      * @throws DatabaseException on errors
      */
     public function executeRaw($sql) {
-        if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.getType($sql));
+        if (!is_string($sql)) throw new IllegalTypeException('Illegal type of parameter $sql: '.gettype($sql));
         if (!$this->isConnected())
             $this->connect();
 
@@ -564,7 +564,7 @@ class PostgresConnector extends Connector {
                     $this->lastInsertId = $this->query('select lastVal()')->fetchInt();
                 }
                 catch (\Exception $ex) {
-                    if (striPos($ex->getMessage(), 'ERROR:  lastval is not yet defined in this session') === false)
+                    if (stripos($ex->getMessage(), 'ERROR:  lastval is not yet defined in this session') === false)
                         throw $ex;
                     $this->lastInsertId = 0;
                 }
@@ -623,7 +623,7 @@ class PostgresConnector extends Connector {
      *
      * @return string
      */
-    public function getType() {
+    public function gettype() {
         return $this->type;
     }
 

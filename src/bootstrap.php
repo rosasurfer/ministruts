@@ -12,7 +12,7 @@ use rosasurfer\di\DiAwareTrait;
 use rosasurfer\loader\ClassLoader;
 
 
-define(__NAMESPACE__.'\_MINISTRUTS_ROOT', dirName(__DIR__));
+define(__NAMESPACE__.'\_MINISTRUTS_ROOT', dirname(__DIR__));
 const MINISTRUTS_ROOT = _MINISTRUTS_ROOT;                       // local constants improve IDE code completion
 
 
@@ -37,7 +37,7 @@ function registerClassLoader() {
     if ($legacyAutoLoad) {
         $splLoaders = spl_autoload_functions();
         if ($splLoaders) {
-            $legacyAutoLoad = (sizeOf($splLoaders)==1 && $splLoaders[0]=='__autoload');
+            $legacyAutoLoad = (sizeof($splLoaders)==1 && $splLoaders[0]=='__autoload');
         }
     }
 

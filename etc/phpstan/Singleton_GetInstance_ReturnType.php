@@ -44,7 +44,7 @@ class Singleton_GetInstance_ReturnType extends DynamicReturnType implements Dyna
      *
      * @return Type
      */
-    public function getTypeFromMethodCall(MethodReflection $methodReflection, MethodCall $methodCall, Scope $scope) : Type {
+    public function getTypeFromMethodCall(MethodReflection $methodReflection, MethodCall $methodCall, Scope $scope): Type {
         $returnType  = $methodReflection->getReturnType();
         $returnClass = $origReturnClass = $returnType->getClass();
         $error = false;
@@ -59,12 +59,12 @@ class Singleton_GetInstance_ReturnType extends DynamicReturnType implements Dyna
      *
      * @return Type
      */
-    public function getTypeFromStaticMethodCall(MethodReflection $methodReflection, StaticCall $methodCall, Scope $scope) : Type {
+    public function getTypeFromStaticMethodCall(MethodReflection $methodReflection, StaticCall $methodCall, Scope $scope): Type {
         $returnType  = $methodReflection->getReturnType();
         $returnClass = $origReturnClass = $returnType->getClass();
         $error = false;
 
-        if (sizeOf($methodCall->args)) {
+        if (sizeof($methodCall->args)) {
             $arg = $methodCall->args[0]->value;
 
             if ($arg instanceof String_) {

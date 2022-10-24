@@ -67,7 +67,7 @@ class DebugHelper extends StaticClass {
         $trace[] = ['function' => '{main}'];
 
         // Move FILE and LINE fields down (to the end) by one position.
-        for ($i=sizeOf($trace); $i--;) {
+        for ($i=sizeof($trace); $i--;) {
             if (isSet($trace[$i-1]['file'])) $trace[$i]['file'] = $trace[$i-1]['file'];
             else                       unset($trace[$i]['file']);
 
@@ -87,7 +87,7 @@ class DebugHelper extends StaticClass {
         }
 
         // Remove the last frame (the one we added for the main script) if it now points to an unknown location (PHP core).
-        $size = sizeOf($trace);
+        $size = sizeof($trace);
         if (!isSet($trace[$size-1]['file'])) {
             \array_pop($trace);
         }
@@ -116,7 +116,7 @@ class DebugHelper extends StaticClass {
         $appRoot = $config ? $config->get('app.dir.root') : null;
         $result  = '';
 
-        $size = sizeOf($trace);
+        $size = sizeof($trace);
         $callLen = $lineLen = 0;
 
         for ($i=0; $i < $size; $i++) {               // align FILE and LINE
@@ -126,11 +126,11 @@ class DebugHelper extends StaticClass {
 
             if ($call!='{main}' && !strEndsWith($call, '{closure}'))
                 $call.='()';
-            $callLen = max($callLen, strLen($call));
+            $callLen = max($callLen, strlen($call));
             $frame['call'] = $call;
 
             $frame['line'] = isSet($frame['line']) ? ' # line '.$frame['line'].',' : '';
-            $lineLen = max($lineLen, strLen($frame['line']));
+            $lineLen = max($lineLen, strlen($frame['line']));
 
             if (isSet($frame['file']))                 $frame['file'] = ' file: '.(!$appRoot ? $frame['file'] : strRightFrom($frame['file'], $appRoot.DIRECTORY_SEPARATOR, 1, false, $frame['file']));
             elseif (strStartsWith($call, 'phalcon\\')) $frame['file'] = ' [php-phalcon]';
@@ -165,12 +165,12 @@ class DebugHelper extends StaticClass {
 
             if (isSet($frame['class'])) {
                 $class = $frame['class'];
-                if ($nsLowerCase && is_int($pos=strRPos($class, '\\')))
-                    $class = strToLower(subStr($class, 0, $pos)).subStr($class, $pos);
+                if ($nsLowerCase && is_int($pos=strrpos($class, '\\')))
+                    $class = strtolower(substr($class, 0, $pos)).substr($class, $pos);
                 $class = $class.$frame['type'];
             }
-            elseif ($nsLowerCase && is_int($pos=strRPos($function, '\\'))) {
-                $function = strToLower(subStr($function, 0, $pos)).subStr($function, $pos);
+            elseif ($nsLowerCase && is_int($pos=strrpos($function, '\\'))) {
+                $function = strtolower(substr($function, 0, $pos)).substr($function, $pos);
             }
         }
         return $class.$function;
@@ -191,16 +191,16 @@ class DebugHelper extends StaticClass {
         }
         else {
             $class     = get_class($exception);
-            $namespace = strToLower(strLeftTo($class, '\\', -1, true, ''));
-            $baseName  = simpleClassName($class);
-            $result    = $indent.$namespace.$baseName;
+            $namespace = strtolower(strLeftTo($class, '\\', -1, true, ''));
+            $basename  = simpleClassName($class);
+            $result    = $indent.$namespace.$basename;
 
             if ($exception instanceof \ErrorException)                                  // A PHP error exception not created
                 $result .= '('.self::errorLevelToStr($exception->getSeverity()).')';    // by the framework.
         }
         $message = $exception->getMessage();
 
-        if (strLen($indent)) {
+        if (strlen($indent)) {
             $lines = explode(NL, normalizeEOL($message));                               // indent multiline messages
             $eom = '';
             if (strEndsWith($message, NL)) {
@@ -210,7 +210,7 @@ class DebugHelper extends StaticClass {
             $message = join(NL.$indent, $lines).$eom;
         }
 
-        $result .= (strLen($message) ? ': ':'').$message;
+        $result .= (strlen($message) ? ': ':'').$message;
         return $result;
     }
 
@@ -247,7 +247,7 @@ class DebugHelper extends StaticClass {
      * @return string
      */
     public static function errorLevelToStr($level) {
-        if (!is_int($level)) throw new IllegalTypeException('Illegal type of parameter $level: '.getType($level));
+        if (!is_int($level)) throw new IllegalTypeException('Illegal type of parameter $level: '.gettype($level));
 
         $levels = [
             E_ERROR             => 'E_ERROR',                   //     1

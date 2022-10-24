@@ -75,7 +75,7 @@ class TorHelper extends StaticClass {
      */
     public static function isExitNode($ip) {
         self::init();
-        if (!is_string($ip)) throw new IllegalTypeException('Illegal type of parameter $ip: '.getType($ip));
+        if (!is_string($ip)) throw new IllegalTypeException('Illegal type of parameter $ip: '.gettype($ip));
 
         // TODO: mit Filter-Extension lokale Netze abfangen
         if ($ip == '127.0.0.1')
@@ -103,7 +103,7 @@ class TorHelper extends StaticClass {
 
                 if ($nodes == null) {
                     $content = '';
-                    $size = sizeOf(self::$torMirrors);
+                    $size = sizeof(self::$torMirrors);
 
                     for ($i=0; $i < $size; ++$i) {
                         $request = HttpRequest::create()->setUrl('http://'.self::$torMirrors[$i].'/ip_list_exit.php/Tor_ip_list_EXIT.csv');
@@ -126,7 +126,7 @@ class TorHelper extends StaticClass {
                         break;
                     }
 
-                    $nodes = strLen($content) ? \array_flip(explode(NL, normalizeEOL($content))) : [];
+                    $nodes = strlen($content) ? \array_flip(explode(NL, normalizeEOL($content))) : [];
 
                     if (!$nodes) Logger::log('Could not get TOR exit nodes from any server', L_ERROR);
 

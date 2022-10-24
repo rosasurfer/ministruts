@@ -282,7 +282,7 @@ function ini_get_bytes($option, $strict = true) {
 /**
  * Convert special characters to HTML entities.
  *
- * Inline replacement and shortcut for htmlSpecialChars() using different default flags.
+ * Inline replacement and shortcut for htmlspecialchars() using different default flags.
  *
  * @param  string $string
  * @param  int    $flags        [optional] - default: ENT_QUOTES|ENT_SUBSTITUTE|ENT_HTML5
@@ -291,7 +291,7 @@ function ini_get_bytes($option, $strict = true) {
  *
  * @return string - converted string
  *
- * @see   \htmlSpecialChars()
+ * @see   \htmlspecialchars()
  */
 function hsc($string, $flags=null, $encoding=null, $doubleEncode=true) {
     return \rosasurfer\hsc($string, $flags, $encoding, $doubleEncode);
@@ -656,7 +656,7 @@ function objectToArray($object, $access = ACCESS_PUBLIC) {
 
 
 /**
- * Alias of getType() for C/C++ enthusiasts.
+ * Alias of gettype() for C/C++ enthusiasts.
  *
  * @param  mixed $var
  *
@@ -670,8 +670,8 @@ function typeOf($var) {
 /**
  * Check whether a directory exists. If not try to create it. Check further if write permission is granted.
  *
- * @param  string $path            - same as mkDir(): directory name
- * @param  int    $mode [optional] - same as mkDir(): permission mode to set if the directory is created<br>
+ * @param  string $path            - same as mkdir(): directory name
+ * @param  int    $mode [optional] - same as mkdir(): permission mode to set if the directory is created<br>
  *                                                    (default: 0755 = rwxr-xr-x)
  */
 function mkDirWritable($path, $mode = 0755) {

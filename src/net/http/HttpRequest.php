@@ -42,7 +42,7 @@ class HttpRequest extends Object {
      * @return $this
      */
     public function setMethod($method) {
-        if (!is_string($method))                 throw new IllegalTypeException('Illegal type of parameter $method: '.getType($method));
+        if (!is_string($method))                 throw new IllegalTypeException('Illegal type of parameter $method: '.gettype($method));
         if ($method!=='GET' && $method!=='POST') throw new InvalidArgumentException('Invalid argument $method: '.$method);
 
         $this->method = $method;
@@ -68,11 +68,11 @@ class HttpRequest extends Object {
      * @return $this
      */
     public function setUrl($url) {
-        if (!is_string($url)) throw new IllegalTypeException('Illegal type of parameter $url: '.getType($url));
+        if (!is_string($url)) throw new IllegalTypeException('Illegal type of parameter $url: '.gettype($url));
 
         // TODO: URL genauer validieren
 
-        if (strPos($url, ' ') !== false)
+        if (strpos($url, ' ') !== false)
             throw new InvalidArgumentException('Invalid argument $url: '.$url);
 
         $this->url = $url;
@@ -99,11 +99,11 @@ class HttpRequest extends Object {
      * @return $this
      */
     public function setHeader($name, $value) {
-        if (!is_string($name))                   throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
-        if (!strLen($name))                      throw new InvalidArgumentException('Invalid argument $name: '.$name);
+        if (!is_string($name))                   throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
+        if (!strlen($name))                      throw new InvalidArgumentException('Invalid argument $name: '.$name);
 
-        if (isSet($value) && !is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
-        if (!strLen($value))
+        if (isSet($value) && !is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.gettype($value));
+        if (!strlen($value))
             $value = null;
 
         $name  = trim($name);
@@ -135,11 +135,11 @@ class HttpRequest extends Object {
      * @see http://stackoverflow.com/questions/3241326/set-more-than-one-http-header-with-the-same-name
      */
     public function addHeader($name, $value) {
-        if (!is_string($name))  throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
-        if (!strLen($name))     throw new InvalidArgumentException('Invalid argument $name: '.$name);
+        if (!is_string($name))  throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
+        if (!strlen($name))     throw new InvalidArgumentException('Invalid argument $name: '.$name);
 
-        if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.getType($value));
-        if (!strLen($value))    throw new InvalidArgumentException('Invalid argument $value: '.$value);
+        if (!is_string($value)) throw new IllegalTypeException('Illegal type of parameter $value: '.gettype($value));
+        if (!strlen($value))    throw new InvalidArgumentException('Invalid argument $value: '.$value);
 
         $name  = trim($name);
         $value = trim($value);
@@ -170,10 +170,10 @@ class HttpRequest extends Object {
         elseif (is_string($names)) $names = [$names];
         elseif (is_array($names)) {
             foreach ($names as $name) {
-                if (!is_string($name)) throw new IllegalTypeException('Illegal parameter type in argument $names: '.getType($name));
+                if (!is_string($name)) throw new IllegalTypeException('Illegal parameter type in argument $names: '.gettype($name));
             }
         }
-        else                           throw new IllegalTypeException('Illegal type of parameter $names: '.getType($names));
+        else                           throw new IllegalTypeException('Illegal type of parameter $names: '.gettype($names));
 
         // alle oder nur die gewuenschten Header zurueckgeben
         if (!$names)
@@ -190,8 +190,8 @@ class HttpRequest extends Object {
      * @return string|null - Wert des Headers oder NULL, wenn kein Header dieses Namens konfiguriert wurde
      */
     public function getHeader($name) {
-        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.getType($name));
-        if (!strLen($name))    throw new InvalidArgumentException('Invalid argument $name: '.$name);
+        if (!is_string($name)) throw new IllegalTypeException('Illegal type of parameter $name: '.gettype($name));
+        if (!strlen($name))    throw new InvalidArgumentException('Invalid argument $name: '.$name);
 
         $headers = $this->getHeaders($name);
         if ($headers)

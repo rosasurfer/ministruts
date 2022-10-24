@@ -85,7 +85,7 @@ class HttpSession extends Singleton {
 
         // Inhalt der Session pruefen
         // TODO: Session verwerfen, wenn der User zwischen Cookie- und URL-Uebertragung wechselt
-        if (sizeOf($_SESSION) == 0) {           // 0 bedeutet, die Session ist (fuer diese Methode) neu
+        if (sizeof($_SESSION) == 0) {           // 0 bedeutet, die Session ist (fuer diese Methode) neu
             $sessionName = session_name();
             $sessionId   = session_id();        // pruefen, woher die ID kommt ...
 
@@ -108,7 +108,7 @@ class HttpSession extends Singleton {
      * @param  bool $regenerateId - whether or not to generate a new session id and to delete an old session file
      */
     public function reset($regenerateId) {
-        if (!is_bool($regenerateId)) throw new IllegalTypeException('Illegal type of parameter $regenerateId: '.getType($regenerateId));
+        if (!is_bool($regenerateId)) throw new IllegalTypeException('Illegal type of parameter $regenerateId: '.gettype($regenerateId));
 
         if ($regenerateId) {
             // assign new id, delete old file
@@ -120,7 +120,7 @@ class HttpSession extends Singleton {
 
         // initialize the session
         $request = $this->request;                                              // TODO: $request->getHeader() einbauen
-        $_SESSION['__SESSION_CREATED__'  ] = microTime(true);
+        $_SESSION['__SESSION_CREATED__'  ] = microtime(true);
         $_SESSION['__SESSION_IP__'       ] = $request->getRemoteAddress();      // TODO: forwarded remote IP einbauen
         $_SESSION['__SESSION_USERAGENT__'] = $request->getHeaderValue('User-Agent');
 
@@ -185,7 +185,7 @@ class HttpSession extends Singleton {
      * @param  mixed  $value - der zu speichernde Wert
      */
     public function setAttribute($key, $value) {
-        if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.getType($key));
+        if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.gettype($key));
 
         if ($value !== null) {
             $_SESSION[$key] = $value;
@@ -206,12 +206,12 @@ class HttpSession extends Singleton {
         foreach (func_get_args() as $i => $key) {
             if (is_array($key)) {
                 foreach ($key as $n => $arrayKey) {
-                    if (!is_string($arrayKey)) throw new IllegalTypeException('Illegal type of parameter '.$i.'['.$n.']: '.getType($arrayKey));
+                    if (!is_string($arrayKey)) throw new IllegalTypeException('Illegal type of parameter '.$i.'['.$n.']: '.gettype($arrayKey));
                     unset($_SESSION[$arrayKey]);
                 }
             }
             else {
-                if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter '.$i.': '.getType($key));
+                if (!is_string($key)) throw new IllegalTypeException('Illegal type of parameter '.$i.': '.gettype($key));
                 unset($_SESSION[$key]);
             }
         }

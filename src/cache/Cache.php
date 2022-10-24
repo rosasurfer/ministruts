@@ -59,12 +59,12 @@ final class Cache extends StaticClass {
         }
 
         // spezifischer Cache
-        if (!is_string($label)) throw new IllegalTypeException('Illegal type of parameter $label: '.getType($label));
+        if (!is_string($label)) throw new IllegalTypeException('Illegal type of parameter $label: '.gettype($label));
 
 
         if (!isSet(self::$caches[$label])) {
             if (!$config=Config::getDefault())
-                throw new RuntimeException('Service locator returned empty default config: '.getType($config));
+                throw new RuntimeException('Service locator returned empty default config: '.gettype($config));
 
             // Cache-Konfiguration auslesen und Cache instantiieren
             $class   = $config->get('cache.'.$label.'.class');

@@ -34,15 +34,15 @@ class Url extends Object {
      *                       slash it is interpreted as relative to the application's current Module.
      */
     public function __construct($uri) {
-        if (!is_string($uri)) throw new IllegalTypeException('Illegal type of parameter $uri: '.getType($uri));
+        if (!is_string($uri)) throw new IllegalTypeException('Illegal type of parameter $uri: '.gettype($uri));
         $this->uri = $uri;
 
         // TODO: If called from a non-MiniStruts context (i.e. CLI) this method will fail.
         // TODO: If a full URL is passed (http://...) this method will fail.
 
-        if (strPos($uri, '/') === 0) {
+        if (strpos($uri, '/') === 0) {
             // the resulting URI is relative to the application base URI
-            $this->appRelativeUri = subStr($uri, 1);
+            $this->appRelativeUri = substr($uri, 1);
         }
         else {
             // the resulting URI is relative to the application's current module (can be the root module, too)
@@ -62,7 +62,7 @@ class Url extends Object {
     public function __toString() {
         $uri = $this->appRelativeUri;
         if ($this->parameters) {
-            if (strPos($uri, '?') === false) $uri .= '?';
+            if (strpos($uri, '?') === false) $uri .= '?';
             else                             $uri .= '&';
             $uri .= http_build_query($this->parameters, null, '&');
         }
