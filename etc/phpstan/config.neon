@@ -18,15 +18,13 @@ parameters:
 
     excludes_analyse:
         - doc/
-        - etc/httpd/
-        - etc/js
+        - etc/
         - src/globals.php
         - vendor/
 
     universalObjectCratesClasses:
         - rosasurfer\ministruts\Page
 
-    #reportUnmatchedIgnoredErrors:           false
     polluteScopeWithLoopInitialAssignments: true
     polluteCatchScopeWithTryAssignments:    true
 
