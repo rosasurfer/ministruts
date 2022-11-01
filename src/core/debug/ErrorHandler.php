@@ -35,7 +35,7 @@ use const rosasurfer\MB;
 
 
 /**
- * Gobal error handling
+ * A global error handler.
  */
 class ErrorHandler extends StaticClass {
 
