@@ -10,7 +10,7 @@ by an installed error handler.
 To catch and handle such exceptions the destructor must be wrapped. It's recommended to wrap any destructor regardless of the task.
 
 ```php
-use rosasurfer\core\debug\ErrorHandler;
+use rosasurfer\core\error\ErrorHandler;
 
 class Foo {
     public function __destruct() {

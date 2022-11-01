@@ -9,7 +9,7 @@ use rosasurfer\core\assert\Assert;
 use rosasurfer\core\di\DiInterface;
 use rosasurfer\core\di\defaultt\CliServiceContainer;
 use rosasurfer\core\di\defaultt\WebServiceContainer;
-use rosasurfer\core\debug\ErrorHandler;
+use rosasurfer\core\error\ErrorHandler;
 use rosasurfer\core\exception\InvalidArgumentException;
 use rosasurfer\log\Logger;
 use rosasurfer\ministruts\FrontController;

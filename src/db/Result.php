@@ -2,7 +2,7 @@
 namespace rosasurfer\db;
 
 use rosasurfer\core\CObject;
-use rosasurfer\core\debug\ErrorHandler;
+use rosasurfer\core\error\ErrorHandler;
 use rosasurfer\core\exception\IllegalTypeException;
 use rosasurfer\core\exception\InvalidArgumentException;
 use rosasurfer\core\exception\UnimplementedFeatureException;

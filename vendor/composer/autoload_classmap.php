@@ -6,10 +6,6 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
-    'Psr\\Container\\ContainerExceptionInterface' => $vendorDir . '/psr/container/src/ContainerExceptionInterface.php',
-    'Psr\\Container\\ContainerInterface' => $vendorDir . '/psr/container/src/ContainerInterface.php',
-    'Psr\\Container\\NotFoundExceptionInterface' => $vendorDir . '/psr/container/src/NotFoundExceptionInterface.php',
     'rosasurfer\\Application' => $baseDir . '/src/Application.php',
     'rosasurfer\\cache\\ApcCache' => $baseDir . '/src/cache/ApcCache.php',
     'rosasurfer\\cache\\Cache' => $baseDir . '/src/cache/Cache.php',
@@ -50,8 +46,6 @@ return array(
     'rosasurfer\\core\\assert\\FailedAssertionTrait' => $baseDir . '/src/core/assert/FailedAssertionTrait.php',
     'rosasurfer\\core\\assert\\IllegalTypeException' => $baseDir . '/src/core/assert/IllegalTypeException.php',
     'rosasurfer\\core\\assert\\InvalidArgumentException' => $baseDir . '/src/core/assert/InvalidArgumentException.php',
-    'rosasurfer\\core\\debug\\DebugHelper' => $baseDir . '/src/core/debug/DebugHelper.php',
-    'rosasurfer\\core\\debug\\ErrorHandler' => $baseDir . '/src/core/debug/ErrorHandler.php',
     'rosasurfer\\core\\di\\ContainerException' => $baseDir . '/src/core/di/ContainerException.php',
     'rosasurfer\\core\\di\\Di' => $baseDir . '/src/core/di/Di.php',
     'rosasurfer\\core\\di\\DiAwareTrait' => $baseDir . '/src/core/di/DiAwareTrait.php',
@@ -70,6 +64,8 @@ return array(
     'rosasurfer\\core\\di\\service\\Service' => $baseDir . '/src/core/di/service/Service.php',
     'rosasurfer\\core\\di\\service\\ServiceInterface' => $baseDir . '/src/core/di/service/ServiceInterface.php',
     'rosasurfer\\core\\di\\service\\ServiceNotFoundException' => $baseDir . '/src/core/di/service/ServiceNotFoundException.php',
+    'rosasurfer\\core\\error\\DebugHelper' => $baseDir . '/src/core/error/DebugHelper.php',
+    'rosasurfer\\core\\error\\ErrorHandler' => $baseDir . '/src/core/error/ErrorHandler.php',
     'rosasurfer\\core\\exception\\BusinessRuleException' => $baseDir . '/src/core/exception/BusinessRuleException.php',
     'rosasurfer\\core\\exception\\ClassNotFoundException' => $baseDir . '/src/core/exception/ClassNotFoundException.php',
     'rosasurfer\\core\\exception\\ConcurrentModificationException' => $baseDir . '/src/core/exception/ConcurrentModificationException.php',

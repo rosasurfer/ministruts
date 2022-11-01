@@ -4,7 +4,7 @@ namespace rosasurfer\ministruts;
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\core\debug\ErrorHandler;
+use rosasurfer\core\error\ErrorHandler;
 use rosasurfer\core\exception\IllegalStateException;
 use rosasurfer\core\exception\IllegalTypeException;
 use rosasurfer\core\exception\InvalidArgumentException;

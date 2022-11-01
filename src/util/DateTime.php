@@ -3,8 +3,8 @@ namespace rosasurfer\util;
 
 use rosasurfer\core\ObjectTrait;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\core\debug\ErrorHandler;
 use rosasurfer\core\di\DiAwareTrait;
+use rosasurfer\core\error\ErrorHandler;
 
 
 /**

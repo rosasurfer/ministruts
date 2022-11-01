@@ -3,7 +3,7 @@ namespace rosasurfer\console\docopt\pattern;
 
 use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\core\debug\ErrorHandler;
+use rosasurfer\core\error\ErrorHandler;
 
 use function rosasurfer\array_merge;
 

@@ -2,7 +2,7 @@
 namespace rosasurfer\core\lock;
 
 use rosasurfer\core\assert\Assert;
-use rosasurfer\core\debug\ErrorHandler;
+use rosasurfer\core\error\ErrorHandler;
 use rosasurfer\core\exception\RuntimeException;
 
 

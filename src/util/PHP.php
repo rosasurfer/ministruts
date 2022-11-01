@@ -4,7 +4,7 @@ namespace rosasurfer\util;
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\StaticClass;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\core\debug\DebugHelper;
+use rosasurfer\core\error\DebugHelper;
 use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\core\exception\RuntimeException;
 

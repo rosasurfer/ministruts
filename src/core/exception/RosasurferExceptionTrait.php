@@ -2,8 +2,8 @@
 namespace rosasurfer\core\exception;
 
 use rosasurfer\core\assert\Assert;
-use rosasurfer\core\debug\DebugHelper;
-use rosasurfer\core\debug\ErrorHandler;
+use rosasurfer\core\error\DebugHelper;
+use rosasurfer\core\error\ErrorHandler;
 
 use const rosasurfer\NL;
 

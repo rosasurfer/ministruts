@@ -3,8 +3,8 @@ namespace rosasurfer\ministruts\url;
 
 use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\core\debug\ErrorHandler;
 use rosasurfer\core\di\proxy\Request;
+use rosasurfer\core\error\ErrorHandler;
 
 use const rosasurfer\CLI;
 
