@@ -18,7 +18,7 @@ use rosasurfer\util\PHP;
 
 
 /**
- * An object representing a running application.
+ * A class representing application instances.
  */
 class Application extends CObject {
 
@@ -327,7 +327,7 @@ class Application extends CObject {
 
 
     /**
-     * Setup the way the application handles regular PHP errors.
+     * Setup the application's handling of PHP errors.
      *
      * @param  string $value - configuration value as passed to the framework loader:
      *                         "strict": errors are converted to instances of PHP ErrorExceptions and thrown
@@ -347,7 +347,7 @@ class Application extends CObject {
 
 
     /**
-     * Setup the application's exception handling.
+     * Setup the application's handling of uncatched exceptions.
      *
      * @param  bool|int|string $value - configuration value as passed to the framework loader
      */
