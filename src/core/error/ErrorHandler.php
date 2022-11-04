@@ -153,25 +153,23 @@ class ErrorHandler extends StaticClass {
     /**
      * A handler for internal PHP errors.
      *
-     * Errors are handled only if covered by the currently configured error reporting level. Errors of the levels
-     * E_DEPRECATED, E_USER_DEPRECATED, E_USER_NOTICE and E_USER_WARNING are always logged and script execution continues
-     * normally. All other errors are logged according to the configured error handling mode. Either they are logged and
-     * script exceution continues normally, or they are wrapped in a PHPError exception and thrown back.
+     * Errors are handled if covered by the currently active error reporting level. Errors of levels E_DEPRECATED, E_USER_DEPRECATED,
+     * E_USER_NOTICE and E_USER_WARNING are never converted to PHP exceptions and script execution continues normally.
      *
-     * @param  int    $level              - PHP error severity level
-     * @param  string $message            - error message
-     * @param  string $file               - name of file where the error occurred
-     * @param  int    $line               - line of file where the error occurred
-     * @param  array  $context [optional] - symbols of the point where the error occurred (variable scope at error trigger time)
+     * All other errors are handled according to the configured error handling mode (either logged or converted to PHP exceptions and
+     * thrown back).
+     *
+     * @param  int                  $level              - error severity level
+     * @param  string               $message            - error message
+     * @param  string               $file               - name of file where the error occurred
+     * @param  int                  $line               - line of file where the error occurred
+     * @param  array<string, mixed> $context [optional] - symbol table at the point of the error
      *
      * @return bool - TRUE,  if the error was successfully handled.
      *                FALSE, if the error shall be processed as if no error handler was installed.
-     *                The error handler must return FALSE to populate the internal PHP variable <tt>$php_errormsg</tt>.
-     *
-     * @throws PHPError
      */
     public static function handleError($level, $message, $file, $line, array $context = null) {
-        //echoPre(static::errorLevelToStr($level).': $message='.$message.', $file='.$file.', $line='.$line);
+        //echoPre(static::errorLevelToStr($level).': '.$message.', in '.$file.', line '.$line);
 
         // Ignore suppressed errors and errors not covered by the current reporting level.
         $reportingLevel = error_reporting();
