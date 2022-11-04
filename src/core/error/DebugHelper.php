@@ -196,8 +196,8 @@ class DebugHelper extends StaticClass {
             $basename  = simpleClassName($class);
             $result    = $indent.$namespace.$basename;
 
-            if ($exception instanceof \ErrorException)                                  // A PHP error exception not created
-                $result .= '('.self::errorLevelToStr($exception->getSeverity()).')';    // by the framework.
+            if ($exception instanceof \ErrorException)                                  // A PHP error exception not created by the framework.
+                $result .= '('.ErrorHandler::errorLevelToStr($exception->getSeverity()).')';
         }
         $message = $exception->getMessage();
 
@@ -239,46 +239,5 @@ class DebugHelper extends StaticClass {
             $result .= self::{__FUNCTION__}($cause, $indent);                 // recursion
         }
         return $result;
-    }
-
-
-    /**
-     * Return a human-readable form of the specified error reporting level.
-     *
-     * @param  int $level - error reporting level
-     *
-     * @return string
-     */
-    public static function errorLevelToStr($level) {
-        Assert::int($level);
-
-        $levels = [
-            E_ERROR             => 'E_ERROR',                   //     1
-            E_WARNING           => 'E_WARNING',                 //     2
-            E_PARSE             => 'E_PARSE',                   //     4
-            E_NOTICE            => 'E_NOTICE',                  //     8
-            E_CORE_ERROR        => 'E_CORE_ERROR',              //    16
-            E_CORE_WARNING      => 'E_CORE_WARNING',            //    32
-            E_COMPILE_ERROR     => 'E_COMPILE_ERROR',           //    64
-            E_COMPILE_WARNING   => 'E_COMPILE_WARNING',         //   128
-            E_USER_ERROR        => 'E_USER_ERROR',              //   256
-            E_USER_WARNING      => 'E_USER_WARNING',            //   512
-            E_USER_NOTICE       => 'E_USER_NOTICE',             //  1024
-            E_STRICT            => 'E_STRICT',                  //  2048
-            E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',       //  4096
-            E_DEPRECATED        => 'E_DEPRECATED',              //  8192
-            E_USER_DEPRECATED   => 'E_USER_DEPRECATED',         // 16384
-        ];
-
-        if      (!$level)                                                       $levels = ['0'];                        //     0
-        else if (($level &  E_ALL)                  ==  E_ALL)                  $levels = ['E_ALL'];                    // 32767
-        else if (($level & (E_ALL & ~E_DEPRECATED)) == (E_ALL & ~E_DEPRECATED)) $levels = ['E_ALL & ~E_DEPRECATED'];    // 24575
-        else {
-            foreach ($levels as $key => $value) {
-                if ($level & $key) continue;
-                unset($levels[$key]);
-            }
-        }
-        return join('|', $levels);
     }
 }

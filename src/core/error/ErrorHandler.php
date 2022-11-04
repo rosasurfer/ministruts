@@ -35,49 +35,75 @@ use const rosasurfer\MB;
 
 
 /**
- * A global error handler.
+ * A global handler for internal PHP errors and uncatched exceptions.
  */
 class ErrorHandler extends StaticClass {
 
 
-    /** @var int - error handling mode in which regular PHP errors are logged */
-    const LOG_ERRORS = 1;
+    /** @var int - ignore internal PHP errors */
+    const ERRORS_IGNORE = 1;
 
-    /** @var int - error handling mode in which regular PHP errors are converted to exceptions and thrown back */
-    const THROW_EXCEPTIONS = 2;
+    /** @var int - log internal PHP errors */
+    const ERRORS_LOG = 2;
+
+    /** @var int - convert internal PHP errors to ErrorExceptions and throw them back */
+    const ERRORS_EXCEPTION = 4;
+
+    /** @var int - ignore exceptions */
+    const EXCEPTIONS_IGNORE = 8;
+
+    /** @var int - catch and log exceptions */
+    const EXCEPTIONS_CATCH = 16;
 
 
-    /** @var int - the mode the error handler is configured for, can be either LOG_ERRORS or THROW_EXCEPTIONS */
-    private static $errorMode;
+    /** @var int - the configured error handling mode */
+    protected static $errorHandlingMode = self::ERRORS_IGNORE;
+
+    /** @var callable - a previously active error handler (if any) */
+    protected static $prevErrorHandler;
+
+    /** @var bool - the configured exception handling status */
+    protected static $exceptionHandling = false;
+
+    /** @var callable - a previously active exception handler (if any) */
+    protected static $prevExceptionHandler;
 
     /** @var bool - whether the script is in the shutdown phase */
-    private static $inShutdown = false;
+    protected static $inShutdown = false;
 
     /** @var string - RegExp for detecting out-of-memory errors */
-    private static $oomRegExp = '/^Allowed memory size of ([0-9]+) bytes exhausted/';
+    protected static $oomRegExp = '/^Allowed memory size of ([0-9]+) bytes exhausted/';
 
 
     /**
      * Setup error handling.
      *
-     * @param  int $mode - type of error handling: self::LOG_ERRORS | self::THROW_EXCEPTIONS
+     * @param  int $mode - error handling mode: [ERRORS_IGNORE | ERRORS_LOG | ERRORS_EXCEPTION]
      */
     public static function setupErrorHandling($mode) {
-        if     ($mode === self::LOG_ERRORS      ) self::$errorMode = self::LOG_ERRORS;
-        elseif ($mode === self::THROW_EXCEPTIONS) self::$errorMode = self::THROW_EXCEPTIONS;
-        else                                      return;
+        if (!in_array($mode, [self::ERRORS_IGNORE, self::ERRORS_LOG, self::ERRORS_EXCEPTION])) return;
+        static::$errorHandlingMode = $mode;
 
-        set_error_handler(__CLASS__.'::handleError', error_reporting());
-        self::setupShutdownHandler();                           // handle fatal runtime errors during script shutdown
+        if ($mode != self::ERRORS_IGNORE) {
+            static::$prevErrorHandler = set_error_handler(__CLASS__ . '::handleError');
+            static::setupShutdownHandler();                     // handle fatal runtime errors during script shutdown
+        }
     }
 
 
     /**
      * Setup exception handling.
+     *
+     * @param  int $mode - exception handling mode: [EXCEPTIONS_IGNORE | EXCEPTIONS_CATCH]
      */
-    public static function setupExceptionHandling() {
-        set_exception_handler(__CLASS__.'::handleException');
-        self::setupShutdownHandler();                           // handle destructor exceptions during script shutdown
+    public static function setupExceptionHandling($mode) {
+        if (!in_array($mode, [self::EXCEPTIONS_IGNORE, self::EXCEPTIONS_CATCH])) return;
+        static::$exceptionHandling = ($mode != self::EXCEPTIONS_IGNORE);
+
+        if (static::$exceptionHandling) {
+            static::$prevExceptionHandler = set_exception_handler(__CLASS__ . '::handleException');
+            static::setupShutdownHandler();                     // setup handling of exceptions during script shutdown
+        }
     }
 
 
@@ -125,7 +151,7 @@ class ErrorHandler extends StaticClass {
 
 
     /**
-     * Global handler for traditional PHP errors.
+     * A handler for internal PHP errors.
      *
      * Errors are handled only if covered by the currently configured error reporting level. Errors of the levels
      * E_DEPRECATED, E_USER_DEPRECATED, E_USER_NOTICE and E_USER_WARNING are always logged and script execution continues
@@ -145,7 +171,7 @@ class ErrorHandler extends StaticClass {
      * @throws PHPError
      */
     public static function handleError($level, $message, $file, $line, array $context = null) {
-        //echoPre(DebugHelper::errorLevelToStr($level).': $message='.$message.', $file='.$file.', $line='.$line);
+        //echoPre(static::errorLevelToStr($level).': $message='.$message.', $file='.$file.', $line='.$line);
 
         // Ignore suppressed errors and errors not covered by the current reporting level.
         $reportingLevel = error_reporting();
@@ -226,10 +252,8 @@ class ErrorHandler extends StaticClass {
 
 
     /**
-     * Global handler for otherwise unhandled exceptions.
-     *
-     * The exception is sent to the default logger with loglevel L_FATAL. After the handler returns PHP will terminate
-     * the script.
+     * A handler for uncatched exceptions. The exception is sent to the default logger with loglevel L_FATAL.
+     * After the handler returns PHP terminates the script.
      *
      * @param  \Exception|\Throwable $exception - the unhandled exception (PHP5) or throwable (PHP7)
      */
@@ -352,5 +376,46 @@ class ErrorHandler extends StaticClass {
             call_user_func($currentHandler, $exception);        // We MUST use call_user_func() as a static handler cannot be invoked dynamically.
             exit(1);                                            // Calling exit() is the only way to prevent the immediately following
         }                                                       // non-catchable fatal error.
+    }
+
+
+    /**
+     * Return a readable representation of an error reporting level.
+     *
+     * @param  int $level - error reporting level
+     *
+     * @return string
+     */
+    public static function errorLevelToStr($level) {
+        Assert::int($level);
+
+        $levels = [
+            E_ERROR             => 'E_ERROR',                   //     1
+            E_WARNING           => 'E_WARNING',                 //     2
+            E_PARSE             => 'E_PARSE',                   //     4
+            E_NOTICE            => 'E_NOTICE',                  //     8
+            E_CORE_ERROR        => 'E_CORE_ERROR',              //    16
+            E_CORE_WARNING      => 'E_CORE_WARNING',            //    32
+            E_COMPILE_ERROR     => 'E_COMPILE_ERROR',           //    64
+            E_COMPILE_WARNING   => 'E_COMPILE_WARNING',         //   128
+            E_USER_ERROR        => 'E_USER_ERROR',              //   256
+            E_USER_WARNING      => 'E_USER_WARNING',            //   512
+            E_USER_NOTICE       => 'E_USER_NOTICE',             //  1024
+            E_STRICT            => 'E_STRICT',                  //  2048
+            E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',       //  4096
+            E_DEPRECATED        => 'E_DEPRECATED',              //  8192
+            E_USER_DEPRECATED   => 'E_USER_DEPRECATED',         // 16384
+        ];
+
+        if      (!$level)                                                       $levels = ['0'];                        //     0
+        else if (($level &  E_ALL)                  ==  E_ALL)                  $levels = ['E_ALL'];                    // 32767
+        else if (($level & (E_ALL & ~E_DEPRECATED)) == (E_ALL & ~E_DEPRECATED)) $levels = ['E_ALL & ~E_DEPRECATED'];    // 24575
+        else {
+            foreach ($levels as $key => $value) {
+                if ($level & $key) continue;
+                unset($levels[$key]);
+            }
+        }
+        return join('|', $levels);
     }
 }

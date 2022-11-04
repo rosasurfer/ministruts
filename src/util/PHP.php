@@ -4,7 +4,7 @@ namespace rosasurfer\util;
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\StaticClass;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\core\error\DebugHelper;
+use rosasurfer\core\error\ErrorHandler;
 use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\core\exception\RuntimeException;
 
@@ -221,7 +221,7 @@ class PHP extends StaticClass {
         // --------------
         /*PHP_INI_ALL   */ $current = ini_get_int('error_reporting');
             $target = E_ALL & ~E_DEPRECATED;
-            if ($notCovered=($target ^ $current) & $target)                                                          $issues[] = 'Warn:  error_reporting does not cover '.DebugHelper::errorLevelToStr($notCovered).'  [standards]';
+            if ($notCovered=($target ^ $current) & $target)                                                          $issues[] = 'Warn:  error_reporting does not cover '.ErrorHandler::errorLevelToStr($notCovered).'  [standards]';
         if (!WINDOWS) { /* Windows is always development */
             /*PHP_INI_ALL*/ if (ini_get_bool('display_errors'        )) /*bool|string:stderr*/                       $issues[] = 'Warn:  display_errors is not Off  [security]';
             /*PHP_INI_ALL*/ if (ini_get_bool('display_startup_errors'))                                              $issues[] = 'Warn:  display_startup_errors is not Off  [security]';
