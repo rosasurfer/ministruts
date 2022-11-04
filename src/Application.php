@@ -70,8 +70,8 @@ class Application extends CObject {
         if (!isset($options['app.globals'          ])) $options['app.globals'          ] = false;
 
         // setup the configuration
-        $this->setupErrorHandling    ($options['app.handle-errors'    ]);
-        $this->setupExceptionHandling($options['app.handle-exceptions']);
+        $this->initErrorHandling    ($options['app.handle-errors'    ]);
+        $this->initExceptionHandling($options['app.handle-exceptions']);
         $this->loadGlobals           ($options['app.globals'          ]);
 
         /** @var DefaultConfig $config */
@@ -327,14 +327,14 @@ class Application extends CObject {
 
 
     /**
-     * Setup the application's handling of PHP errors.
+     * Initialize the application's handling of PHP errors.
      *
-     * @param  string $value - configuration value as passed to the framework loader:
-     *                         "strict": errors are converted to instances of PHP ErrorExceptions and thrown
+     * @param  string $value - configuration value:
+     *                         "strict": errors are converted to instances of PHP's ErrorException and thrown
      *                         "weak":   errors are only logged
      *                         "ignore": errors are ignored
      */
-    protected function setupErrorHandling($value) {
+    protected function initErrorHandling($value) {
         $mode = ErrorHandler::THROW_EXCEPTIONS;                     // strict (default if an invalid parameter was passed)
 
         if (is_string($value)) {
@@ -347,11 +347,11 @@ class Application extends CObject {
 
 
     /**
-     * Setup the application's handling of uncatched exceptions.
+     * Initialize the application's handling of uncatched exceptions.
      *
-     * @param  bool|int|string $value - configuration value as passed to the framework loader
+     * @param  bool|int|string $value - whether to catch and handle otherwise uncatched exceptions
      */
-    protected function setupExceptionHandling($value) {
+    protected function initExceptionHandling($value) {
         $enabled = true;                                            // TRUE (default if an invalid parameter was passed)
         if (is_bool($value) || is_int($value)) {
             $enabled = (bool) $value;

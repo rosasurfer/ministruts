@@ -58,7 +58,7 @@ class ErrorHandler extends StaticClass {
 
 
     /**
-     * Setup global error handling.
+     * Setup error handling.
      *
      * @param  int $mode - type of error handling: self::LOG_ERRORS | self::THROW_EXCEPTIONS
      */
@@ -73,7 +73,7 @@ class ErrorHandler extends StaticClass {
 
 
     /**
-     * Setup global exception handling.
+     * Setup exception handling.
      */
     public static function setupExceptionHandling() {
         set_exception_handler(__CLASS__.'::handleException');
