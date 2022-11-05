@@ -174,7 +174,7 @@ class ErrorHandler extends StaticClass {
         // Ignore suppressed errors and errors not covered by the current reporting level.
         $reportingLevel = error_reporting();
         if (!$reportingLevel)            return false;     // the @ operator was specified
-        if (!($reportingLevel & $level)) return true;      // the error is not covered by current reporting level
+        if (!($reportingLevel & $level)) return true;      // the error is not covered by the active reporting level
 
         $message = strLeftTo($message, ' (this will throw an Error in a future version of PHP)', -1);
 

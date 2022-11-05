@@ -18,7 +18,7 @@ use rosasurfer\util\PHP;
 
 
 /**
- * A class representing application instances.
+ * A class representing the application instance.
  */
 class Application extends CObject {
 
@@ -72,7 +72,7 @@ class Application extends CObject {
         // setup the configuration
         $this->initErrorHandling    ($options['app.handle-errors'    ]);
         $this->initExceptionHandling($options['app.handle-exceptions']);
-        $this->loadGlobals           ($options['app.globals'          ]);
+        $this->loadGlobals          ($options['app.globals'          ]);
 
         /** @var DefaultConfig $config */
         $config = $this->initDefaultConfig($options);
@@ -327,32 +327,32 @@ class Application extends CObject {
 
 
     /**
-     * Initialize the application's handling of PHP errors.
+     * Initialize handling of internal PHP errors. Controls whether errors are ignored, logged or converted to exceptions.
      *
-     * @param  string $value - configuration value:
-     *                         "strict": errors are converted to instances of PHP's ErrorException and thrown
-     *                         "weak":   errors are only logged
-     *                         "ignore": errors are ignored
+     * @param  string $value - case-insensitive string representation of an error handling configuration value:
+     *                         "ignore":    errors are ignored
+     *                         "log":       errors are logged
+     *                         "exception": errors are converted to exceptions and thrown back (default)
      */
     protected function initErrorHandling($value) {
-        $mode = ErrorHandler::THROW_EXCEPTIONS;                     // strict (default if an invalid parameter was passed)
+        $mode = ErrorHandler::ERRORS_EXCEPTION;                     // strict (default if an invalid parameter was passed)
 
         if (is_string($value)) {
             $value = strtolower($value);
-            if      ($value == 'weak'  ) $mode = ErrorHandler::LOG_ERRORS;
+            if      ($value == 'log'   ) $mode = ErrorHandler::ERRORS_LOG;
             else if ($value == 'ignore') $mode = 0;
         }
-        $mode && ErrorHandler::setupErrorHandling($mode);
+        ErrorHandler::setupErrorHandling($mode);
     }
 
 
     /**
-     * Initialize the application's handling of uncatched exceptions.
+     * Initialize handling of uncatched exceptions. Controls whether exceptions are ignored or catched.
      *
      * @param  bool|int|string $value - whether to catch and handle otherwise uncatched exceptions
      */
     protected function initExceptionHandling($value) {
-        $enabled = true;                                            // TRUE (default if an invalid parameter was passed)
+        $enabled = true;                                            // default if an invalid parameter was passed
         if (is_bool($value) || is_int($value)) {
             $enabled = (bool) $value;
         }
@@ -360,7 +360,8 @@ class Application extends CObject {
             $value   = trim(strtolower($value));
             $enabled = ($value=='0' || $value=='off' || $value=='false');
         }
-        $enabled && ErrorHandler::setupExceptionHandling();
+        $mode = $enabled ? ErrorHandler::EXCEPTIONS_CATCH : ErrorHandler::EXCEPTIONS_IGNORE;
+        ErrorHandler::setupExceptionHandling($mode);
     }
 
 
