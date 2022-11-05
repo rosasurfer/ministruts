@@ -1,0 +1,46 @@
+#
+# Usage:
+#  See the PHPStan wrapper "bin/phpstan".
+#
+# File format:
+#  @see https://phpstan.org/config-reference
+#
+parameters:
+  phpVersion: 70400                                 # assume PHP 7.4 if running under a different PHP version
+  level:      6                                     # a rule level on the command line overrides this hardcoded value
+
+  bootstrapFiles:                                   # API stubs of unloaded PHP extensions
+    #- api.php
+
+  scanFiles:                                        # additional non-autoloaded files to scan for symbols
+    #- helpers.php
+
+  paths:                                            # paths on the command line override these hardcoded values
+    - ../../bin
+    - ../../src
+
+  excludePaths:
+    - ../../doc
+    - ../../etc
+    - ../../vendor
+
+  dynamicConstantNames:                             # changing constants depending on the environment
+    - rosasurfer\_CLI        
+    - rosasurfer\_LOCALHOST  
+    - rosasurfer\_MACOS      
+    - rosasurfer\_WINDOWS    
+    - rosasurfer\_NUL_DEVICE 
+
+    - rosasurfer\CLI        
+    - rosasurfer\LOCALHOST  
+    - rosasurfer\MACOS      
+    - rosasurfer\WINDOWS    
+    - rosasurfer\NUL_DEVICE 
+
+  reportUnmatchedIgnoredErrors: false
+
+  parallel:
+    maximumNumberOfProcesses: 4
+
+  tmpDir:       .tmp
+  tipsOfTheDay: false
