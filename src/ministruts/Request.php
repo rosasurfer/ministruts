@@ -1143,6 +1143,8 @@ class Request extends CObject {
      * @return string
      */
     public function __toString() {
+        $string = '';
+
         try {
             // request
             $string = $_SERVER['REQUEST_METHOD'].' '.$_SERVER['REQUEST_URI'].' '.$_SERVER['SERVER_PROTOCOL'].NL;
@@ -1167,10 +1169,11 @@ class Request extends CObject {
             }
 
             Assert::string($string);                            // Ensure __toString() returns a string as otherwise...
-            return $string;                                     // PHP will trigger a non-catchable fatal error.
-        }
+        }                                                       // PHP will trigger a non-catchable fatal error.
         catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }
         catch (\Exception $ex) { ErrorHandler::handleToStringException($ex); }
+
+        return $string;
     }
 
 

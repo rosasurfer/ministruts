@@ -17,6 +17,8 @@ class VersionedUrl extends Url {
      * @return string
      */
     public function __toString() {
+        $uri = '';
+
         try {
             $uri = parent::__toString();
             $relativeUri = $this->appRelativeUri;
@@ -34,9 +36,10 @@ class VersionedUrl extends Url {
             }
 
             Assert::string($uri);                               // Ensure __toString() returns a string as otherwise...
-            return $uri;                                        // PHP will trigger a non-catchable fatal error.
-        }
+        }                                                       // PHP will trigger a non-catchable fatal error.
         catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }
         catch (\Exception $ex) { ErrorHandler::handleToStringException($ex); }
+
+        return $uri;
     }
 }
