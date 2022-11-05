@@ -132,7 +132,7 @@ class ErrorHandler extends StaticClass {
                  * @link  https://github.com/bugsnag/bugsnag-laravel/issues/226
                  * @link  https://gist.github.com/dominics/61c23f2ded720d039554d889d304afc9
                  */
-                if (self::$errorMode) {
+                if (self::$errorHandlingMode != self::ERRORS_IGNORE) {
                     $oomEmergencyMemory = $match = null;                        // release the reserved memory, meant to be used by preg_match()
                     $error = error_get_last();
                     if ($error && $error['type']==E_ERROR && preg_match(self::$oomRegExp, $error['message'], $match)) {
@@ -209,7 +209,7 @@ class ErrorHandler extends StaticClass {
         }
 
         // Handle the error according to the configuration.
-        if (self::$errorMode == self::LOG_ERRORS) {
+        if (self::$errorHandlingMode == self::ERRORS_LOG) {
             return true(Logger::log($exception, L_ERROR, $logContext));
         }
 
