@@ -5,12 +5,12 @@
 #
 # Usage:
 #  alias phpstan09='php71 -d memory_limit=-1 -d short_open_tag=On /path/to/rosasurfer-phpstan/bin/phpstan'
-#  phpstan09 analyse -a etc/phpstan/old/autoload.php -c etc/phpstan/old/config.neon --level=0..7 [--] <path>
+#  phpstan09 analyse -a etc/phpstan/0.9/autoload.php -c etc/phpstan/0.9/config.neon --level=0..7 [--] <path>
 #
 
 parameters:
     autoload_files:
-        - etc/phpstan/old/api-stubs.php                                     # stubs for PHP extensions and procedural code
+        - etc/phpstan/0.9/api.php                                                                                   # stubs for PHP extensions and procedural code
 
     excludes_analyse:
         - doc/
