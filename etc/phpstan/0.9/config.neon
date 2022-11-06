@@ -9,54 +9,54 @@
 #
 
 parameters:
-    autoload_files:
-        - etc/phpstan/0.9/api.php                                                                                   # stubs for PHP extensions and procedural code
+  autoload_files:
+    - etc/phpstan/0.9/api.php                                                                                       # stubs for PHP extensions and procedural code
 
-    excludes_analyse:
-        - doc/
-        - etc/
-        - src/globals.php
-        - vendor/
+  excludes_analyse:
+    - doc/
+    - etc/
+    - src/globals.php
+    - vendor/
 
-    universalObjectCratesClasses:
-        - rosasurfer\ministruts\Page
+  universalObjectCratesClasses:
+    - rosasurfer\ministruts\Page
 
-    polluteScopeWithLoopInitialAssignments: true
-    polluteCatchScopeWithTryAssignments:    true
+  polluteScopeWithLoopInitialAssignments: true
+  polluteCatchScopeWithTryAssignments:    true
 
-    ignoreErrors:
-        # intentionally ignore the following issues
-        - '/Array \(array<([^ ]+)>\) does not accept (\1\|)?null\b/'                                                # NULL is a value and not a type. It should always be valid.
-        - '/(Static )?property [^ ]+ \(([^ ]+)\) does not accept (\2\|)?null\b/i'                                   # - dito -
-        - '/Parameter #[0-9]+ [^ ]+ of class [^ ]+ constructor expects ([^ ]+), (\1\|)?null given\b/'               # - dito -
-        - '/Parameter #[0-9]+ [^ ]+ of (static )?(function|method) [^ ]+ expects ([^ ]+), (\3\|)?null given\b/'     # - dito -
-        - '/Calling method [^ ]+\(\) on possibly null value of type [^ ]+\|null\b/'
-        - "/Casting to (bool|int|float|string) something that's already (bool|int|float|string)/"                   # PHPStan contradicts itself by treating NULL as a value.
-        - '/Strict comparison using [=!]== between (int|string) and null will always evaluate to (true|false)\b/'
+  ignoreErrors:
+    # intentionally ignore the following issues
+    - '/Array \(array<([^ ]+)>\) does not accept (\1\|)?null\b/'                                                # NULL is a value and not a type. It should always be valid.
+    - '/(Static )?property [^ ]+ \(([^ ]+)\) does not accept (\2\|)?null\b/i'                                   # - dito -
+    - '/Parameter #[0-9]+ [^ ]+ of class [^ ]+ constructor expects ([^ ]+), (\1\|)?null given\b/'               # - dito -
+    - '/Parameter #[0-9]+ [^ ]+ of (static )?(function|method) [^ ]+ expects ([^ ]+), (\3\|)?null given\b/'     # - dito -
+    - '/Calling method [^ ]+\(\) on possibly null value of type [^ ]+\|null\b/'
+    - "/Casting to (bool|int|float|string) something that's already (bool|int|float|string)/"                   # PHPStan contradicts itself by treating NULL as a value.
+    - '/Strict comparison using [=!]== between (int|string) and null will always evaluate to (true|false)\b/'
 
 
-services: # Services must be loaded via cmd line option --autoload-file as they are
-          # instantiated before execution of block "parameters/autoload_files".
-    -
-        class: rosasurfer\phpstan\DAO_Find_ReturnType
-        tags:
-            - phpstan.broker.dynamicMethodReturnTypeExtension
-            - phpstan.broker.dynamicStaticMethodReturnTypeExtension
-    -
-        class: rosasurfer\phpstan\DAO_FindAll_ReturnType
-        tags:
-            - phpstan.broker.dynamicMethodReturnTypeExtension
-            - phpstan.broker.dynamicStaticMethodReturnTypeExtension
-    -
-        class: rosasurfer\phpstan\Di_Set_ReturnType
-        tags:
-            - phpstan.broker.dynamicMethodReturnTypeExtension
-    -
-        class: rosasurfer\phpstan\PersistableObject_Dao_ReturnType
-        tags:
-            - phpstan.broker.dynamicMethodReturnTypeExtension
-            - phpstan.broker.dynamicStaticMethodReturnTypeExtension
-    -
-        class: rosasurfer\phpstan\Singleton_GetInstance_ReturnType
-        tags:
-            - phpstan.broker.dynamicStaticMethodReturnTypeExtension
+# Services must be loaded via cmd line option --autoload-file as they are instantiated before execution of block "parameters/autoload_files".
+services: 
+  -
+    class: rosasurfer\phpstan\DAO_Find_ReturnType
+    tags:
+      - phpstan.broker.dynamicMethodReturnTypeExtension
+      - phpstan.broker.dynamicStaticMethodReturnTypeExtension
+  -
+    class: rosasurfer\phpstan\DAO_FindAll_ReturnType
+    tags:
+      - phpstan.broker.dynamicMethodReturnTypeExtension
+      - phpstan.broker.dynamicStaticMethodReturnTypeExtension
+  -
+    class: rosasurfer\phpstan\Di_Set_ReturnType
+    tags:
+      - phpstan.broker.dynamicMethodReturnTypeExtension
+  -
+    class: rosasurfer\phpstan\PersistableObject_Dao_ReturnType
+    tags:
+      - phpstan.broker.dynamicMethodReturnTypeExtension
+      - phpstan.broker.dynamicStaticMethodReturnTypeExtension
+  -
+    class: rosasurfer\phpstan\Singleton_GetInstance_ReturnType
+    tags:
+      - phpstan.broker.dynamicStaticMethodReturnTypeExtension
