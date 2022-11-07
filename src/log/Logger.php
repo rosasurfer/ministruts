@@ -298,6 +298,8 @@ class Logger extends StaticClass {
      * @param  string|object $loggable           - a message or an object implementing <tt>__toString()</tt>
      * @param  int           $level              - loglevel
      * @param  array         $context [optional] - logging context with additional data
+     *
+     * @return bool - success status
      */
     public static function log($loggable, $level, array $context = []) {
         self::init();
@@ -365,6 +367,7 @@ class Logger extends StaticClass {
             }
             throw $ex;
         }
+        return true;
     }
 
 
