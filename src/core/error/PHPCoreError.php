@@ -1,11 +1,11 @@
 <?php
-namespace rosasurfer\core\exception\error;
+namespace rosasurfer\core\error;
 
 
 /**
- * "rosasurfer" exception for a PHP strict message.
+ * "rosasurfer" exception for a PHP core error.
  */
-class PHPStrict extends PHPError {
+class PHPCoreError extends PHPError {
 
 
     /**
@@ -14,6 +14,6 @@ class PHPStrict extends PHPError {
      * @return string
      */
     public function getSimpleType() {
-        return 'PHP Strict';
+        return 'PHP Core Error';
     }
 }

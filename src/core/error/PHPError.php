@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\core\exception\error;
+namespace rosasurfer\core\error;
 
 use rosasurfer\core\ObjectTrait;
 use rosasurfer\core\di\DiAwareTrait;
