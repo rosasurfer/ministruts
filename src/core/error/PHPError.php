@@ -3,8 +3,6 @@ namespace rosasurfer\core\error;
 
 use rosasurfer\core\ObjectTrait;
 use rosasurfer\core\di\DiAwareTrait;
-use rosasurfer\core\error\DebugHelper;
-use rosasurfer\core\error\ErrorHandler;
 use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\core\exception\RosasurferExceptionTrait;
 

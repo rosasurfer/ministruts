@@ -3,7 +3,6 @@ namespace rosasurfer\core\error;
 
 use rosasurfer\core\StaticClass;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\core\error\PHPError;
 use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
 
 use function rosasurfer\normalizeEOL;

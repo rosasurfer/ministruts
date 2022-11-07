@@ -4,18 +4,6 @@ namespace rosasurfer\core\error;
 use rosasurfer\Application;
 use rosasurfer\core\StaticClass;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\core\error\PHPCompileError;
-use rosasurfer\core\error\PHPCompileWarning;
-use rosasurfer\core\error\PHPCoreError;
-use rosasurfer\core\error\PHPCoreWarning;
-use rosasurfer\core\error\PHPError;
-use rosasurfer\core\error\PHPNotice;
-use rosasurfer\core\error\PHPParseError;
-use rosasurfer\core\error\PHPRecoverableError;
-use rosasurfer\core\error\PHPStrict;
-use rosasurfer\core\error\PHPUnknownError;
-use rosasurfer\core\error\PHPUserError;
-use rosasurfer\core\error\PHPWarning;
 use rosasurfer\log\Logger;
 
 use function rosasurfer\echoPre;
@@ -172,7 +160,7 @@ class ErrorHandler extends StaticClass {
         //echoPre(__METHOD__.'()');
         //echoPre(static::errorLevelToStr($level).': '.$message.', in '.$file.', line '.$line);
 
-        // Ignore suppressed errors and errors not covered by the current reporting level.
+        // ignore suppressed errors and errors not covered by the current reporting level
         $reportingLevel = error_reporting();
         if (!$reportingLevel)            return false;     // the @ operator was specified
         if (!($reportingLevel & $level)) return true;      // the error is not covered by the active reporting level
@@ -183,7 +171,7 @@ class ErrorHandler extends StaticClass {
         $context['file'] = $file;
         $context['line'] = $line;
 
-        // Process errors according to their severity level.
+        // process errors according to their severity level
         switch ($level) {
             // log non-critical errors and continue normally
             case E_DEPRECATED     : return true(Logger::log($message, L_INFO,   $context));
@@ -192,7 +180,7 @@ class ErrorHandler extends StaticClass {
             case E_USER_WARNING   : return true(Logger::log($message, L_WARN,   $context));
         }
 
-        // Wrap everything else in the matching PHPError exception.
+        // wrap everything else in the matching PHPError exception
         switch ($level) {
             case E_PARSE            : $exception = new PHPParseError      ($message, $code=null, $severity=$level, $file, $line); break;
             case E_COMPILE_WARNING  : $exception = new PHPCompileWarning  ($message, $code=null, $severity=$level, $file, $line); break;
