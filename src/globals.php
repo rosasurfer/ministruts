@@ -520,7 +520,7 @@ function strLeft($string, $length) {
  *                                             (default: 1 = the first occurrence)
  * @param  bool   $includeLimiter [optional] - whether to include the limiting substring in the returned result
  *                                             (default: FALSE)
- * @param  mixed  $onNotFound     [optional] - value to return if the specified occurrence of the limiting substring is not found
+ * @param  string $onNotFound     [optional] - string to return if the specified occurrence of the limiter is not found
  *                                             (default: the initial string)
  *
  * @return string - left part of the initial string or the $onNotFound value
@@ -531,10 +531,10 @@ function strLeft($string, $length) {
  *  strLeftTo('abcde', 'x')      => 'abcde'   // limiter not found
  *  strLeftTo('abccc', 'c',   3) => 'abcc'
  *  strLeftTo('abccc', 'c',  -3) => 'ab'
- *  strLeftTo('abccc', 'c', -99) => 'abccc'   // number of occurrences not found
+ *  strLeftTo('abccc', 'c', -99) => 'abccc'   // number of occurrences doesn't exist
  * </pre>
  */
-function strLeftTo($string, $limiter, $count=1, $includeLimiter=false, $onNotFound=null) {
+function strLeftTo($string, $limiter, $count=1, $includeLimiter=false, $onNotFound='') {
     return \rosasurfer\strLeftTo(...func_get_args());
 }
 

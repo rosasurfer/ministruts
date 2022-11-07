@@ -169,6 +169,7 @@ class ErrorHandler extends StaticClass {
      *                FALSE, if the error shall be processed as if no error handler was installed.
      */
     public static function handleError($level, $message, $file, $line, array $context = null) {
+        //echoPre(__METHOD__.'()');
         //echoPre(static::errorLevelToStr($level).': '.$message.', in '.$file.', line '.$line);
 
         // Ignore suppressed errors and errors not covered by the current reporting level.
@@ -178,17 +179,17 @@ class ErrorHandler extends StaticClass {
 
         $message = strLeftTo($message, ' (this will throw an Error in a future version of PHP)', -1);
 
-        $logContext         = [];
-        $logContext['file'] = $file;
-        $logContext['line'] = $line;
+        $context         = [];
+        $context['file'] = $file;
+        $context['line'] = $line;
 
         // Process errors according to their severity level.
         switch ($level) {
             // log non-critical errors and continue normally
-            case E_DEPRECATED     : return true(Logger::log($message, L_INFO,   $logContext));
-            case E_USER_DEPRECATED: return true(Logger::log($message, L_INFO,   $logContext));
-            case E_USER_NOTICE    : return true(Logger::log($message, L_NOTICE, $logContext));
-            case E_USER_WARNING   : return true(Logger::log($message, L_WARN,   $logContext));
+            case E_DEPRECATED     : return true(Logger::log($message, L_INFO,   $context));
+            case E_USER_DEPRECATED: return true(Logger::log($message, L_INFO,   $context));
+            case E_USER_NOTICE    : return true(Logger::log($message, L_NOTICE, $context));
+            case E_USER_WARNING   : return true(Logger::log($message, L_WARN,   $context));
         }
 
         // Wrap everything else in the matching PHPError exception.
@@ -210,7 +211,7 @@ class ErrorHandler extends StaticClass {
 
         // Handle the error according to the configuration.
         if (self::$errorHandlingMode == self::ERRORS_LOG) {
-            return true(Logger::log($exception, L_ERROR, $logContext));
+            return true(Logger::log($exception, L_ERROR, $context));
         }
 
         /**
@@ -220,7 +221,7 @@ class ErrorHandler extends StaticClass {
          * ---------------------------
          */
         if (self::$inShutdown && $level==E_ERROR && preg_match(self::$oomRegExp, $message)) {
-            return true(Logger::log($message, L_FATAL, $logContext));           // logging the error is sufficient as there is no stacktrace anyway
+            return true(Logger::log($message, L_FATAL, $context));              // logging the error is sufficient as there is no stacktrace anyway
         }
 
         /**
