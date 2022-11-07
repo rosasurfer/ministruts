@@ -159,6 +159,7 @@ class ErrorHandler extends StaticClass {
     public static function handleError($level, $message, $file, $line, array $context = null) {
         //echoPre(__METHOD__.'()');
         //echoPre(static::errorLevelToStr($level).': '.$message.', in '.$file.', line '.$line);
+        if (static::$errorHandlingMode == self::ERRORS_IGNORE) return false;
 
         // ignore suppressed errors and errors not covered by the current reporting level
         $reportingLevel = error_reporting();
@@ -197,8 +198,8 @@ class ErrorHandler extends StaticClass {
             default                 : $exception = new PHPUnknownError    ($message, $code=0, $severity=$level, $file, $line);
         }
 
-        // Handle the error according to the configuration.
-        if (self::$errorHandlingMode == self::ERRORS_LOG) {
+        // handle the error according to the error handling mode
+        if (static::$errorHandlingMode == self::ERRORS_LOG) {
             return true(Logger::log($exception, L_ERROR, $context));
         }
 
@@ -245,6 +246,8 @@ class ErrorHandler extends StaticClass {
      * @param  \Exception|\Throwable $exception - the unhandled exception (PHP5) or throwable (PHP7)
      */
     public static function handleException($exception) {
+        if (static::$exceptionHandling == self::EXCEPTIONS_IGNORE) return;
+
         $context = [
             'class'               => __CLASS__,
             'file'                => $exception->getFile(),     // If the location is not preset the logger will resolve this
