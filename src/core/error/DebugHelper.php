@@ -187,7 +187,7 @@ class DebugHelper extends StaticClass {
         Assert::throwable($exception, '$exception');
 
         if ($exception instanceof PHPError) {
-            $result = $exception->getSimpleType();
+            $result = $exception->getErrorType();
         }
         else {
             $class     = get_class($exception);

@@ -3,17 +3,17 @@ namespace rosasurfer\core\error;
 
 
 /**
- * "rosasurfer" exception for a PHP compile warning.
+ * An exception representing a PHP compile warning.
  */
 class PHPCompileWarning extends PHPError {
 
 
     /**
-     * Return the simple PHP type description of this PHPError.
+     * Return the error type of this PHP error.
      *
      * @return string
      */
-    public function getSimpleType() {
+    public function getErrorType() {
         return 'PHP Compile Warning';
     }
 }

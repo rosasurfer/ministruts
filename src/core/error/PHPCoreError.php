@@ -3,17 +3,17 @@ namespace rosasurfer\core\error;
 
 
 /**
- * "rosasurfer" exception for a PHP core error.
+ * An exception representing a PHP core error.
  */
 class PHPCoreError extends PHPError {
 
 
     /**
-     * Return the simple PHP type description of this PHPError.
+     * Return the error type of this PHP error.
      *
      * @return string
      */
-    public function getSimpleType() {
+    public function getErrorType() {
         return 'PHP Core Error';
     }
 }

@@ -8,7 +8,7 @@ use rosasurfer\core\exception\RosasurferExceptionTrait;
 
 
 /**
- * "rosasurfer" exception for PHP errors converted to an {@link \ErrorException}.
+ * An exception representing a PHP error.
  */
 class PHPError extends \ErrorException implements IRosasurferException {
 
@@ -67,11 +67,11 @@ class PHPError extends \ErrorException implements IRosasurferException {
 
 
     /**
-     * Return the PHP type description of this PHPError.
+     * Return the error type of this PHP error.
      *
      * @return string
      */
-    public function getSimpleType() {
+    public function getErrorType() {
         return 'PHP Error';
     }
 }

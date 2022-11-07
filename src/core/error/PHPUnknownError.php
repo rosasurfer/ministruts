@@ -3,17 +3,17 @@ namespace rosasurfer\core\error;
 
 
 /**
- * "rosasurfer" exception for an unknown PHP error (error levels to be implemented in the future).
+ * An exception representing an unknown PHP error (if any in the future).
  */
 class PHPUnknownError extends PHPError {
 
 
     /**
-     * Return the simple PHP type description of this PHPError.
+     * Return the error type of this PHP error.
      *
      * @return string
      */
-    public function getSimpleType() {
+    public function getErrorType() {
         return 'PHP Unknown Error';
     }
 }
