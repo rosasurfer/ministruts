@@ -274,26 +274,19 @@ class ErrorHandler extends StaticClass {
             // secondary exception: the exception handler is crashing, last try to log
             $indent = ' ';
             $msg2  = '[FATAL] Unhandled '.trim(DebugHelper::composeBetterMessage($secondEx)).NL;
-            $file  = $secondEx->getFile();
-            $line  = $secondEx->getLine();
-            $msg2 .= $indent.'in '.$file.' on line '.$line.NL.NL;
+            $file2 = $secondEx->getFile();
+            $line2 = $secondEx->getLine();
+            $msg2 .= $indent.'in '.$file2.' on line '.$line2.NL.NL;
             $msg2 .= $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
             $msg2 .= DebugHelper::getBetterTraceAsString($secondEx, $indent);
 
             // primary (the causing) exception
-            if (isset($context['cliMessage'])) {
-                $msg1 = $context['cliMessage'];
-                if (isset($context['cliExtra']))
-                    $msg1 .= $context['cliExtra'];
-            }
-            else {
-                $msg1  = $indent.'Unhandled '.trim(DebugHelper::composeBetterMessage($exception)).NL;
-                $file  = $exception->getFile();
-                $line  = $exception->getLine();
-                $msg1 .= $indent.'in '.$file.' on line '.$line.NL.NL;
-                $msg1 .= $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
-                $msg1 .= DebugHelper::getBetterTraceAsString($exception, $indent);
-            }
+            $msg1  = $indent.'Unhandled '.trim(DebugHelper::composeBetterMessage($exception)).NL;
+            $file1 = $exception->getFile();
+            $line1 = $exception->getLine();
+            $msg1 .= $indent.'in '.$file1.' on line '.$line1.NL.NL;
+            $msg1 .= $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
+            $msg1 .= DebugHelper::getBetterTraceAsString($exception, $indent);
 
             $msg  = $msg2.NL;
             $msg .= $indent.'caused by'.NL;
