@@ -72,12 +72,12 @@ class ErrorHandler extends StaticClass {
         if (!in_array($mode, [self::ERRORS_IGNORE, self::ERRORS_LOG, self::ERRORS_EXCEPTION])) return;
 
         if ($mode == self::ERRORS_IGNORE) {
-            static::$errorHandlingMode = 0;
+            self::$errorHandlingMode = 0;
         }
         else {
-            static::$errorHandlingMode = $mode;
-            static::$prevErrorHandler  = set_error_handler(__CLASS__ . '::handleError');
-            static::setupShutdownHandler();                     // handle fatal runtime errors during script shutdown
+            self::$errorHandlingMode = $mode;
+            self::$prevErrorHandler  = set_error_handler(__CLASS__ . '::handleError');
+            self::setupShutdownHandler();                       // handle fatal runtime errors during script shutdown
         }
     }
 
@@ -89,11 +89,11 @@ class ErrorHandler extends StaticClass {
      */
     public static function setupExceptionHandling($mode) {
         if (!in_array($mode, [self::EXCEPTIONS_IGNORE, self::EXCEPTIONS_CATCH])) return;
-        static::$exceptionHandling = ($mode != self::EXCEPTIONS_IGNORE);
+        self::$exceptionHandling = ($mode != self::EXCEPTIONS_IGNORE);
 
-        if (static::$exceptionHandling) {
-            static::$prevExceptionHandler = set_exception_handler(__CLASS__ . '::handleException');
-            static::setupShutdownHandler();                     // setup handling of exceptions during script shutdown
+        if (self::$exceptionHandling) {
+            self::$prevExceptionHandler = set_exception_handler(__CLASS__ . '::handleException');
+            self::setupShutdownHandler();                       // setup handling of exceptions during script shutdown
         }
     }
 
@@ -161,12 +161,12 @@ class ErrorHandler extends StaticClass {
      *                FALSE, if the error shall be processed as if no error handler was installed.
      */
     public static function handleError($level, $message, $file, $line, array $symbols = null) {
-        echoPre('ErrorHandler::handleError()  '.static::errorLevelToStr($level).': '.$message);
-        //echoPre('ErrorHandler::handleError()  '.static::errorLevelToStr($level).': '.$message.', in '.$file.', line '.$line);
+        echoPre('ErrorHandler::handleError()  '.self::errorLevelToStr($level).': '.$message);
+        //echoPre('ErrorHandler::handleError()  '.self::errorLevelToStr($level).': '.$message.', in '.$file.', line '.$line);
 
         // ignore suppressed errors and errors not covered by the current reporting level
         $reportingLevel = error_reporting();
-        if (!static::$errorHandlingMode) return false;
+        if (!self::$errorHandlingMode)   return false;
         if (!$reportingLevel)            return false;                          // the @ operator was specified
         if (!($reportingLevel & $level)) return true;                           // the error is not covered by the active reporting level
 
@@ -198,11 +198,11 @@ class ErrorHandler extends StaticClass {
         }
 
         // handle it according to the error handling mode
-        if (static::$errorHandlingMode == self::ERRORS_LOG) {
+        if (self::$errorHandlingMode == self::ERRORS_LOG) {
             Logger::log($exception, L_ERROR, $context);
 
-            if (static::$prevErrorHandler) {                                    // chain a previous error handler
-                call_user_func(static::$prevErrorHandler, ...func_get_args());  // a possibly static handler must be invoked by call_user_func()
+            if (self::$prevErrorHandler) {                                      // chain a previous error handler
+                call_user_func(self::$prevErrorHandler, ...func_get_args());    // a possibly static handler must be invoked by call_user_func()
             }
             return true;
         }
@@ -251,7 +251,7 @@ class ErrorHandler extends StaticClass {
      */
     public static function handleException($exception) {
         echoPre('ErrorHandler::handleException');
-        if (!static::$exceptionHandling) return;
+        if (!self::$exceptionHandling) return;
 
         $context = [
             'class'               => __CLASS__,
