@@ -261,24 +261,24 @@ class ErrorHandler extends StaticClass {
         ];
 
         // Exceptions thrown from the exception handler itself will not be passed back to the handler again but instead
-        // terminate the script with an uncatchable fatal error. To prevent this they are handled explicitely.
-        $second = null;
+        // terminate the script with an uncatchable fatal error. To prevent this they are handled explicitly.
+        $secondEx = null;
         try {
             Assert::throwable($exception);
             Logger::log($exception, L_FATAL, $context);         // log with the highest level
         }
-        catch (\Throwable $second) {}
-        catch (\Exception $second) {}
+        catch (\Throwable $secondEx) {}
+        catch (\Exception $secondEx) {}
 
-        if ($second)  {
-            // secondary exception: the application is crashing, last try to log
+        if ($secondEx)  {
+            // secondary exception: the exception handler is crashing, last try to log
             $indent = ' ';
-            $msg2  = '[FATAL] Unhandled '.trim(DebugHelper::composeBetterMessage($second)).NL;
-            $file  = $second->getFile();
-            $line  = $second->getLine();
+            $msg2  = '[FATAL] Unhandled '.trim(DebugHelper::composeBetterMessage($secondEx)).NL;
+            $file  = $secondEx->getFile();
+            $line  = $secondEx->getLine();
             $msg2 .= $indent.'in '.$file.' on line '.$line.NL.NL;
             $msg2 .= $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
-            $msg2 .= DebugHelper::getBetterTraceAsString($second, $indent);
+            $msg2 .= DebugHelper::getBetterTraceAsString($secondEx, $indent);
 
             // primary (the causing) exception
             if (isset($context['cliMessage'])) {
@@ -307,15 +307,15 @@ class ErrorHandler extends StaticClass {
         if (!CLI) {                                             // web interface: prevent an empty page
             try {
                 if (Application::isAdminIP() || ini_get_bool('display_errors')) {
-                    if ($second) {                              // full second exception, full log location
-                        echoPre($second);
+                    if ($secondEx) {                            // full second exception, full log location
+                        echoPre($secondEx);
                         echoPre('error log: '.(strlen($errorLog=ini_get('error_log')) ? $errorLog : 'web server'));
                     }
                 }
                 else echoPre('application error (see error log)');
             }
-            catch (\Throwable $third) { echoPre('application error (see error log)'); }
-            catch (\Exception $third) { echoPre('application error (see error log)'); }
+            catch (\Throwable $thirdEx) { echoPre('application error (see error log)'); }
+            catch (\Exception $thirdEx) { echoPre('application error (see error log)'); }
         }
         else {                                                  // CLI: set a non-zero exit code
             exit(1);

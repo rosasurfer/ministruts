@@ -176,11 +176,11 @@ class Logger extends StaticClass {
         self::$mailReceivers =        $receivers;
 
 
-        // (3) L_FATAL print handler: enabled on local/white-listed access or if explicitely enabled
+        // (3) L_FATAL print handler: enabled on local/white-listed access or if explicitly enabled
         self::$printFatalHandler = CLI || Application::isAdminIP() || ini_get_bool('display_errors');
 
 
-        // (4) non L_FATAL print handler: enabled on local access, if explicitely enabled or if the mail handler is disabled
+        // (4) non L_FATAL print handler: enabled on local access, if explicitly enabled or if the mail handler is disabled
         self::$printNonfatalHandler = CLI || in_array($_SERVER['REMOTE_ADDR'], ['127.0.0.1', $_SERVER['SERVER_ADDR']])
                                           || ini_get_bool('display_errors')
                                           || (self::$printFatalHandler && !self::$mailHandler);

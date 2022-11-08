@@ -21,8 +21,8 @@ use const rosasurfer\CLI;
  *  - The project config files:  "config.dist.properties"
  *                               "config.cli.properties" (if applicable)
  *
- *  - An explicitely defined user config file, e.g. "config.production.properties" or the default user config file
- *    "config.properties" if no explicite definition is given.
+ *  - An explicitly defined user config file, e.g. "config.production.properties" or the default user config file
+ *    "config.properties" if no explicit definition is given.
  */
 class DefaultConfig extends Config {
 
