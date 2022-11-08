@@ -45,7 +45,7 @@ class ErrorHandler extends StaticClass {
 
 
     /** @var int - the configured error handling mode */
-    protected static $errorHandlingMode = self::ERRORS_IGNORE;
+    protected static $errorHandlingMode = 0;
 
     /** @var callable - a previously active error handler (if any) */
     protected static $prevErrorHandler;
@@ -70,10 +70,13 @@ class ErrorHandler extends StaticClass {
      */
     public static function setupErrorHandling($mode) {
         if (!in_array($mode, [self::ERRORS_IGNORE, self::ERRORS_LOG, self::ERRORS_EXCEPTION])) return;
-        static::$errorHandlingMode = $mode;
 
-        if ($mode != self::ERRORS_IGNORE) {
-            static::$prevErrorHandler = set_error_handler(__CLASS__ . '::handleError');
+        if ($mode == self::ERRORS_IGNORE) {
+            static::$errorHandlingMode = 0;
+        }
+        else {
+            static::$errorHandlingMode = $mode;
+            static::$prevErrorHandler  = set_error_handler(__CLASS__ . '::handleError');
             static::setupShutdownHandler();                     // handle fatal runtime errors during script shutdown
         }
     }
@@ -100,7 +103,7 @@ class ErrorHandler extends StaticClass {
      */
     private static function setupShutdownHandler() {
         static $handlerRegistered = false;
-        static $oomEmergencyMemory;                                                 // memory block freed when handling out-of-memory errors
+        static $oomEmergencyMemory;                             // memory block freed when handling out-of-memory errors
 
         // The following function should be the very first function on the shutdown function stack.
         if (!$handlerRegistered) {
@@ -120,7 +123,7 @@ class ErrorHandler extends StaticClass {
                  * @link  https://github.com/bugsnag/bugsnag-laravel/issues/226
                  * @link  https://gist.github.com/dominics/61c23f2ded720d039554d889d304afc9
                  */
-                if (self::$errorHandlingMode != self::ERRORS_IGNORE) {
+                if (self::$errorHandlingMode) {
                     $oomEmergencyMemory = $match = null;                        // release the reserved memory, meant to be used by preg_match()
                     $error = error_get_last();
                     if ($error && $error['type']==E_ERROR && preg_match(self::$oomRegExp, $error['message'], $match)) {
@@ -157,12 +160,11 @@ class ErrorHandler extends StaticClass {
      *                FALSE, if the error shall be processed as if no error handler was installed.
      */
     public static function handleError($level, $message, $file, $line, array $context = null) {
-        //echoPre(__METHOD__.'()');
-        //echoPre(static::errorLevelToStr($level).': '.$message.', in '.$file.', line '.$line);
-        if (static::$errorHandlingMode == self::ERRORS_IGNORE) return false;
+        //echoPre('ErrorHandler::handleError()  '.static::errorLevelToStr($level).': '.$message.', in '.$file.', line '.$line);
 
         // ignore suppressed errors and errors not covered by the current reporting level
         $reportingLevel = error_reporting();
+        if (!static::$errorHandlingMode) return false;
         if (!$reportingLevel)            return false;     // the @ operator was specified
         if (!($reportingLevel & $level)) return true;      // the error is not covered by the active reporting level
 
@@ -246,7 +248,7 @@ class ErrorHandler extends StaticClass {
      * @param  \Exception|\Throwable $exception - the unhandled exception (PHP5) or throwable (PHP7)
      */
     public static function handleException($exception) {
-        if (static::$exceptionHandling == self::EXCEPTIONS_IGNORE) return;
+        if (!static::$exceptionHandling) return;
 
         $context = [
             'class'               => __CLASS__,

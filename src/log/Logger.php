@@ -438,7 +438,7 @@ class Logger extends StaticClass {
      * @param  int                          $level    - loglevel of the loggable
      * @param  array                        $context  - reference to the log context with additional data
      *
-     * @TODO   replace CURL dependency with internal PHP functions
+     * @todo   replace CURL dependency with internal PHP functions
      */
     private static function invokeSmsHandler($loggable, $level, array &$context) {
         if (!\key_exists('cliMessage', $context))
