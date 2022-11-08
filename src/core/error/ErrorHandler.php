@@ -116,6 +116,7 @@ class ErrorHandler extends StaticClass {
                  * @see   ErrorHandler::handleDestructorException()
                  */
                 self::$inShutdown = true;
+                echoPre('shutdown: '.__METHOD__);
 
                 /**
                  * If regular PHP error handling is enabled catch and handle fatal runtime errors.
@@ -154,36 +155,28 @@ class ErrorHandler extends StaticClass {
      * @param  string               $message            - error message
      * @param  string               $file               - name of file where the error occurred
      * @param  int                  $line               - line of file where the error occurred
-     * @param  array<string, mixed> $context [optional] - symbol table at the point of the error
+     * @param  array<string, mixed> $symbols [optional] - symbol table at the point of the error
      *
      * @return bool - TRUE,  if the error was successfully handled.
      *                FALSE, if the error shall be processed as if no error handler was installed.
      */
-    public static function handleError($level, $message, $file, $line, array $context = null) {
+    public static function handleError($level, $message, $file, $line, array $symbols = null) {
+        echoPre('ErrorHandler::handleError()  '.static::errorLevelToStr($level).': '.$message);
         //echoPre('ErrorHandler::handleError()  '.static::errorLevelToStr($level).': '.$message.', in '.$file.', line '.$line);
 
         // ignore suppressed errors and errors not covered by the current reporting level
         $reportingLevel = error_reporting();
         if (!static::$errorHandlingMode) return false;
-        if (!$reportingLevel)            return false;     // the @ operator was specified
-        if (!($reportingLevel & $level)) return true;      // the error is not covered by the active reporting level
+        if (!$reportingLevel)            return false;                          // the @ operator was specified
+        if (!($reportingLevel & $level)) return true;                           // the error is not covered by the active reporting level
 
         $message = strLeftTo($message, ' (this will throw an Error in a future version of PHP)', -1);
 
-        $context         = [];
+        $context = [];
         $context['file'] = $file;
         $context['line'] = $line;
 
-        // process errors according to their severity level
-        switch ($level) {
-            // log non-critical errors and continue normally
-            case E_DEPRECATED     : return true(Logger::log($message, L_INFO,   $context));
-            case E_USER_DEPRECATED: return true(Logger::log($message, L_INFO,   $context));
-            case E_USER_NOTICE    : return true(Logger::log($message, L_NOTICE, $context));
-            case E_USER_WARNING   : return true(Logger::log($message, L_WARN,   $context));
-        }
-
-        // wrap everything else in the matching PHPError exception
+        // wrap all errors in the matching PHPError exception
         switch ($level) {
             case E_PARSE            : $exception = new PHPParseError      ($message, $code=0, $severity=$level, $file, $line); break;
             case E_COMPILE_WARNING  : $exception = new PHPCompileWarning  ($message, $code=0, $severity=$level, $file, $line); break;
@@ -191,18 +184,27 @@ class ErrorHandler extends StaticClass {
             case E_CORE_WARNING     : $exception = new PHPCoreWarning     ($message, $code=0, $severity=$level, $file, $line); break;
             case E_CORE_ERROR       : $exception = new PHPCoreError       ($message, $code=0, $severity=$level, $file, $line); break;
             case E_STRICT           : $exception = new PHPStrict          ($message, $code=0, $severity=$level, $file, $line); break;
+            case E_DEPRECATED       : $exception = new PHPDeprecated      ($message, $code=0, $severity=$level, $file, $line); break;
             case E_NOTICE           : $exception = new PHPNotice          ($message, $code=0, $severity=$level, $file, $line); break;
             case E_WARNING          : $exception = new PHPWarning         ($message, $code=0, $severity=$level, $file, $line); break;
             case E_ERROR            : $exception = new PHPError           ($message, $code=0, $severity=$level, $file, $line); break;
             case E_RECOVERABLE_ERROR: $exception = new PHPRecoverableError($message, $code=0, $severity=$level, $file, $line); break;
+            case E_USER_DEPRECATED  : $exception = new PHPUserDeprecated  ($message, $code=0, $severity=$level, $file, $line); break;
+            case E_USER_NOTICE      : $exception = new PHPUserNotice      ($message, $code=0, $severity=$level, $file, $line); break;
+            case E_USER_WARNING     : $exception = new PHPUserWarning     ($message, $code=0, $severity=$level, $file, $line); break;
             case E_USER_ERROR       : $exception = new PHPUserError       ($message, $code=0, $severity=$level, $file, $line); break;
 
             default                 : $exception = new PHPUnknownError    ($message, $code=0, $severity=$level, $file, $line);
         }
 
-        // handle the error according to the error handling mode
+        // handle it according to the error handling mode
         if (static::$errorHandlingMode == self::ERRORS_LOG) {
-            return true(Logger::log($exception, L_ERROR, $context));
+            Logger::log($exception, L_ERROR, $context);
+
+            if (static::$prevErrorHandler) {                                    // chain a previous error handler
+                call_user_func(static::$prevErrorHandler, ...func_get_args());  // a possibly static handler must be invoked by call_user_func()
+            }
+            return true;
         }
 
         /**
@@ -248,6 +250,7 @@ class ErrorHandler extends StaticClass {
      * @param  \Exception|\Throwable $exception - the unhandled exception (PHP5) or throwable (PHP7)
      */
     public static function handleException($exception) {
+        echoPre('ErrorHandler::handleException');
         if (!static::$exceptionHandling) return;
 
         $context = [
@@ -363,6 +366,7 @@ class ErrorHandler extends StaticClass {
      * @see  https://github.com/symfony/symfony/blob/1c110fa1f7e3e9f5daba73ad52d9f7e843a7b3ff/src/Symfony/Component/Debug/ErrorHandler.php#L457-L489
      */
     public static function handleToStringException($exception) {
+        echoPre('ErrorHandler::handleToStringException');
         $currentHandler = set_exception_handler(function() {});
         restore_exception_handler();
 

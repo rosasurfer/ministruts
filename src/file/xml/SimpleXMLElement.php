@@ -34,10 +34,11 @@ class SimpleXMLElement extends \SimpleXMLElement {
      */
     public static function from($data, $options=0, $dataIsUri=false, $ns='', $nsIsPrefix=false) {
         $errors = [];
-        $oldHandler = null;                                             // prevent Eclipse PDT validation error
-        $oldHandler = set_error_handler(function($level, $message, $file, $line, $context=null) use (&$errors, &$oldHandler) {
-            if ($oldHandler && in_array($level, [E_DEPRECATED, E_USER_DEPRECATED, E_USER_NOTICE, E_USER_WARNING]))
-                return $oldHandler(...func_get_args());
+        $origHandler = null;                                                // prevent Eclipse PDT validation error
+        $origHandler = set_error_handler(function($level, $message, $file, $line, $context=null) use (&$errors, &$origHandler) {
+            if ($origHandler && in_array($level, [E_DEPRECATED, E_USER_DEPRECATED, E_USER_NOTICE, E_USER_WARNING])) {
+                return call_user_func($origHandler, ...func_get_args());    // a possibly static handler must be invoked by call_user_func()
+            }
             $errors[] = func_get_args();
             return true;
         });
@@ -60,9 +61,10 @@ class SimpleXMLElement extends \SimpleXMLElement {
                 }
                 throw $ex->addMessage(join(NL, $errors));
             }
-
-            foreach ($errors as $error) {
-                $oldHandler && $oldHandler(...$error);      // pass on errors to the original handler
+            if ($origHandler) {
+                foreach ($errors as $error) {
+                    call_user_func($origHandler, ...$error);                // pass errors on to the original handler
+                }
             }
         }
         return $xml;
