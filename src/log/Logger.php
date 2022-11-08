@@ -293,7 +293,7 @@ class Logger extends StaticClass {
 
 
     /**
-     * Log a message.
+     * Log a message or an exception.
      *
      * @param  string|object $loggable           - a message or an object implementing <tt>__toString()</tt>
      * @param  int           $level              - loglevel
@@ -316,8 +316,9 @@ class Logger extends StaticClass {
             // validate parameters
             if (!is_string($loggable)) {
                 Assert::hasMethod($loggable, '__toString', '$loggable');
-                if (!$loggable instanceof \Throwable && !$loggable instanceof \Exception)
+                if (!$loggable instanceof \Throwable && !$loggable instanceof \Exception) {
                     $loggable = (string) $loggable;
+                }
             }
             Assert::int($level, '$level');
             if (!isset(self::$logLevels[$level])) throw new InvalidArgumentException('Invalid argument $level: '.$level.' (not a loglevel)');
