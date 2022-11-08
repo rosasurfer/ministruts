@@ -178,23 +178,23 @@ class ErrorHandler extends StaticClass {
 
         // wrap all errors in the matching PHPError exception
         switch ($level) {
-            case E_PARSE            : $exception = new PHPParseError      ($message, $code=0, $severity=$level, $file, $line); break;
-            case E_COMPILE_WARNING  : $exception = new PHPCompileWarning  ($message, $code=0, $severity=$level, $file, $line); break;
-            case E_COMPILE_ERROR    : $exception = new PHPCompileError    ($message, $code=0, $severity=$level, $file, $line); break;
-            case E_CORE_WARNING     : $exception = new PHPCoreWarning     ($message, $code=0, $severity=$level, $file, $line); break;
-            case E_CORE_ERROR       : $exception = new PHPCoreError       ($message, $code=0, $severity=$level, $file, $line); break;
-            case E_STRICT           : $exception = new PHPStrict          ($message, $code=0, $severity=$level, $file, $line); break;
-            case E_DEPRECATED       : $exception = new PHPDeprecated      ($message, $code=0, $severity=$level, $file, $line); break;
-            case E_NOTICE           : $exception = new PHPNotice          ($message, $code=0, $severity=$level, $file, $line); break;
-            case E_WARNING          : $exception = new PHPWarning         ($message, $code=0, $severity=$level, $file, $line); break;
-            case E_ERROR            : $exception = new PHPError           ($message, $code=0, $severity=$level, $file, $line); break;
-            case E_RECOVERABLE_ERROR: $exception = new PHPRecoverableError($message, $code=0, $severity=$level, $file, $line); break;
-            case E_USER_DEPRECATED  : $exception = new PHPUserDeprecated  ($message, $code=0, $severity=$level, $file, $line); break;
-            case E_USER_NOTICE      : $exception = new PHPUserNotice      ($message, $code=0, $severity=$level, $file, $line); break;
-            case E_USER_WARNING     : $exception = new PHPUserWarning     ($message, $code=0, $severity=$level, $file, $line); break;
-            case E_USER_ERROR       : $exception = new PHPUserError       ($message, $code=0, $severity=$level, $file, $line); break;
+            case E_PARSE            : $exception = new PHPParseError      ($message, 0, $level, $file, $line); break;
+            case E_COMPILE_WARNING  : $exception = new PHPCompileWarning  ($message, 0, $level, $file, $line); break;
+            case E_COMPILE_ERROR    : $exception = new PHPCompileError    ($message, 0, $level, $file, $line); break;
+            case E_CORE_WARNING     : $exception = new PHPCoreWarning     ($message, 0, $level, $file, $line); break;
+            case E_CORE_ERROR       : $exception = new PHPCoreError       ($message, 0, $level, $file, $line); break;
+            case E_STRICT           : $exception = new PHPStrict          ($message, 0, $level, $file, $line); break;
+            case E_DEPRECATED       : $exception = new PHPDeprecated      ($message, 0, $level, $file, $line); break;
+            case E_NOTICE           : $exception = new PHPNotice          ($message, 0, $level, $file, $line); break;
+            case E_WARNING          : $exception = new PHPWarning         ($message, 0, $level, $file, $line); break;
+            case E_ERROR            : $exception = new PHPError           ($message, 0, $level, $file, $line); break;
+            case E_RECOVERABLE_ERROR: $exception = new PHPRecoverableError($message, 0, $level, $file, $line); break;
+            case E_USER_DEPRECATED  : $exception = new PHPUserDeprecated  ($message, 0, $level, $file, $line); break;
+            case E_USER_NOTICE      : $exception = new PHPUserNotice      ($message, 0, $level, $file, $line); break;
+            case E_USER_WARNING     : $exception = new PHPUserWarning     ($message, 0, $level, $file, $line); break;
+            case E_USER_ERROR       : $exception = new PHPUserError       ($message, 0, $level, $file, $line); break;
 
-            default                 : $exception = new PHPUnknownError    ($message, $code=0, $severity=$level, $file, $line);
+            default                 : $exception = new PHPUnknownError    ($message, 0, $level, $file, $line);
         }
 
         // handle it according to the error handling mode
