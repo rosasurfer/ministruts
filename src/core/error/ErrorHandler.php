@@ -172,9 +172,10 @@ class ErrorHandler extends StaticClass {
 
         $message = strLeftTo($message, ' (this will throw an Error in a future version of PHP)', -1);
 
-        $context = [];
-        $context['file'] = $file;
-        $context['line'] = $line;
+        $context = [
+            'file' => $file,
+            'line' => $line,
+        ];
 
         // wrap all errors in the matching PHPError exception
         switch ($level) {
@@ -193,7 +194,6 @@ class ErrorHandler extends StaticClass {
             case E_USER_NOTICE      : $exception = new PHPUserNotice      ($message, 0, $level, $file, $line); break;
             case E_USER_WARNING     : $exception = new PHPUserWarning     ($message, 0, $level, $file, $line); break;
             case E_USER_ERROR       : $exception = new PHPUserError       ($message, 0, $level, $file, $line); break;
-
             default                 : $exception = new PHPUnknownError    ($message, 0, $level, $file, $line);
         }
 
@@ -201,8 +201,8 @@ class ErrorHandler extends StaticClass {
         if (self::$errorHandlingMode == self::ERRORS_LOG) {
             Logger::log($exception, L_ERROR, $context);
 
-            if (self::$prevErrorHandler) {                                      // chain a previous error handler
-                call_user_func(self::$prevErrorHandler, ...func_get_args());    // a possibly static handler must be invoked by call_user_func()
+            if (self::$prevErrorHandler) {                                      // chain a previously active error handler
+                call_user_func(self::$prevErrorHandler, ...func_get_args());    // a possibly static handler must be invoked with call_user_func()
             }
             return true;
         }
@@ -255,23 +255,23 @@ class ErrorHandler extends StaticClass {
 
         $context = [
             'class'               => __CLASS__,
-            'file'                => $exception->getFile(),     // If the location is not preset the logger will resolve this
-            'line'                => $exception->getLine(),     // exception handler as the originating location.
-            'unhandled-exception' => true,                      // flag to signal origin
+            'file'                => $exception->getFile(),             // If the location is not preset the logger will resolve this
+            'line'                => $exception->getLine(),             // exception handler as the originating location.
+            'unhandled-exception' => true,                              // flag to signal origin
         ];
 
-        // Exceptions thrown from the exception handler itself will not be passed back to the handler again but instead
+        // Exceptions thrown from the exception handler itself will not be passed back to the handler but instead
         // terminate the script with an uncatchable fatal error. To prevent this they are handled explicitly.
         $secondEx = null;
         try {
             Assert::throwable($exception);
-            Logger::log($exception, L_FATAL, $context);         // log with the highest level
+            Logger::log($exception, L_FATAL, $context);                 // log with the highest level
         }
         catch (\Throwable $secondEx) {}
         catch (\Exception $secondEx) {}
 
         if ($secondEx)  {
-            // secondary exception: the exception handler is crashing, last try to log
+            // secondary exception: the logger itself crashed, last chance to log something
             $indent = ' ';
             $msg2  = '[FATAL] Unhandled '.trim(DebugHelper::composeBetterMessage($secondEx)).NL;
             $file2 = $secondEx->getFile();
@@ -291,16 +291,16 @@ class ErrorHandler extends StaticClass {
             $msg  = $msg2.NL;
             $msg .= $indent.'caused by'.NL;
             $msg .= $msg1;
-            $msg  = str_replace(chr(0), '\0', $msg);            // replace NUL bytes which mess up the logfile
+            $msg  = str_replace(chr(0), '\0', $msg);                    // replace NUL bytes which mess up the logfile
 
-            if (CLI) echo $msg.NL;                              // full second exception
+            if (CLI) echo $msg.NL;                                      // full second exception
             error_log(trim($msg), ERROR_LOG_DEFAULT);
         }
 
-        if (!CLI) {                                             // web interface: prevent an empty page
+        if (!CLI) {                                                     // web interface: prevent an empty page
             try {
                 if (Application::isAdminIP() || ini_get_bool('display_errors')) {
-                    if ($secondEx) {                            // full second exception, full log location
+                    if ($secondEx) {                                    // full second exception, full log location
                         echoPre($secondEx);
                         echoPre('error log: '.(strlen($errorLog=ini_get('error_log')) ? $errorLog : 'web server'));
                     }
@@ -310,8 +310,10 @@ class ErrorHandler extends StaticClass {
             catch (\Throwable $thirdEx) { echoPre('application error (see error log)'); }
             catch (\Exception $thirdEx) { echoPre('application error (see error log)'); }
         }
-        else {                                                  // CLI: set a non-zero exit code
-            exit(1);
+
+        // chain a previously active exception handler
+        if (self::$prevExceptionHandler) {
+            call_user_func(self::$prevExceptionHandler, $exception);    // a possibly static handler must be invoked with call_user_func()
         }
     }
 

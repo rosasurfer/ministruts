@@ -155,15 +155,14 @@ class Logger extends StaticClass {
         /** @var ConfigInterface $config */
         $config = self::di('config');
 
-        // (1) Get the application's default loglevel configuration (fall back to the built-in default).
+        // Get the application's default loglevel configuration (fall back to the built-in default).
         $logLevel = $config->get('log.level', '');
         if (is_array($logLevel))
             $logLevel = isset($logLevel['']) ? $logLevel[''] : '';
         $logLevel = self::logLevelToId($logLevel) ?: self::DEFAULT_LOGLEVEL;
         self::$appLogLevel = $logLevel;
 
-
-        // (2) mail handler: enabled if mail receivers are configured
+        // mail handler: enabled if mail receivers are configured
         $receivers = [];
         foreach (explode(',', $config->get('log.mail.receiver', '')) as $receiver) {
             if ($receiver = trim($receiver)) {
@@ -175,17 +174,15 @@ class Logger extends StaticClass {
         self::$mailHandler   = (bool) $receivers;
         self::$mailReceivers =        $receivers;
 
-
-        // (3) L_FATAL print handler: enabled on local/white-listed access or if explicitly enabled
+        // L_FATAL print handler: enabled on local/white-listed access or if explicitly enabled
         self::$printFatalHandler = CLI || Application::isAdminIP() || ini_get_bool('display_errors');
 
-
-        // (4) non L_FATAL print handler: enabled on local access, if explicitly enabled or if the mail handler is disabled
+        // non L_FATAL print handler: enabled on local access, if explicitly enabled or if the mail handler is disabled
         self::$printNonfatalHandler = CLI || in_array($_SERVER['REMOTE_ADDR'], ['127.0.0.1', $_SERVER['SERVER_ADDR']])
                                           || ini_get_bool('display_errors')
                                           || (self::$printFatalHandler && !self::$mailHandler);
 
-        // (5) SMS handler: enabled if SMS receivers are configured (operator settings are checked at log time)
+        // SMS handler: enabled if SMS receivers are configured (operator settings are checked at log time)
         self::$smsReceivers = [];
         foreach (explode(',', $config->get('log.sms.receiver', '')) as $receiver) {
             if ($receiver=trim($receiver)) {
@@ -206,11 +203,9 @@ class Logger extends StaticClass {
         $options = $config->get('sms', []);
         Assert::isArray($options, 'config value "sms"');
         self::$smsOptions = $options;
-
         self::$smsHandler = self::$smsReceivers && self::$smsOptions;
 
-
-        // (6) PHP error_log handler: enabled if the mail handler is disabled
+        // PHP error_log handler: enabled if the mail handler is disabled
         self::$errorLogHandler = !self::$mailHandler;
 
         $initialized = true;
@@ -295,11 +290,9 @@ class Logger extends StaticClass {
     /**
      * Log a message or an exception.
      *
-     * @param  string|object $loggable           - a message or an object implementing <tt>__toString()</tt>
+     * @param  string|object $loggable           - a string or an object implementing <tt>__toString()</tt>
      * @param  int           $level              - loglevel
      * @param  array         $context [optional] - logging context with additional data
-     *
-     * @return bool - success status
      */
     public static function log($loggable, $level, array $context = []) {
         self::init();
@@ -368,7 +361,6 @@ class Logger extends StaticClass {
             }
             throw $ex;
         }
-        return true;
     }
 
 

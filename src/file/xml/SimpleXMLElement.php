@@ -37,7 +37,7 @@ class SimpleXMLElement extends \SimpleXMLElement {
         $origHandler = null;                                                // prevent Eclipse PDT validation error
         $origHandler = set_error_handler(function($level, $message, $file, $line, $context=null) use (&$errors, &$origHandler) {
             if ($origHandler && in_array($level, [E_DEPRECATED, E_USER_DEPRECATED, E_USER_NOTICE, E_USER_WARNING])) {
-                return call_user_func($origHandler, ...func_get_args());    // a possibly static handler must be invoked by call_user_func()
+                return call_user_func($origHandler, ...func_get_args());    // a possibly static handler must be invoked with call_user_func()
             }
             $errors[] = func_get_args();
             return true;
