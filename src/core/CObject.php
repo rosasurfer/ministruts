@@ -1,7 +1,6 @@
 <?php
 namespace rosasurfer\core;
 
-use rosasurfer\core\assert\Assert;
 use rosasurfer\core\di\DiAwareTrait;
 use rosasurfer\core\error\ErrorHandler;
 
@@ -18,17 +17,11 @@ class CObject {
 
 
     /**
-     * Return a human-readable version of the instance.
+     * Return a readable version of the instance.
      *
      * @return string
      */
     public function __toString() {
-        try {
-            $value = print_r($this, true);
-            Assert::string($value);                             // Ensure __toString() returns a string as otherwise...
-            return $value;                                      // PHP will trigger a non-catchable fatal error.
-        }
-        catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }
-        catch (\Exception $ex) { ErrorHandler::handleToStringException($ex); }
+        return print_r($this, true);
     }
 }

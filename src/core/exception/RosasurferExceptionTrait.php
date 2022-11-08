@@ -97,12 +97,14 @@ trait RosasurferExceptionTrait {
      * @return string
      */
     public function __toString() {
+        $value = '';
         try {
             $value = $this->getBetterMessage();
-            Assert::string($value);                             // Ensure __toString() returns a string as otherwise...
-            return $value;                                      // PHP will trigger a non-catchable fatal error.
-        }
-        catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }
-        catch (\Exception $ex) { ErrorHandler::handleToStringException($ex); }
+            Assert::string($value);                                             
+        }                                                                       // Ensure __toString() doesn't throw an exception as otherwise
+        catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }  // PHP < 7.4 will trigger a non-catchable fatal error.
+        catch (\Exception $ex) { ErrorHandler::handleToStringException($ex); }  // @see  https://bugs.php.net/bug.php?id=53648
+
+        return $value;
     }
 }

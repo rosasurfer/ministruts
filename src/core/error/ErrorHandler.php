@@ -101,7 +101,7 @@ class ErrorHandler extends StaticClass {
     /**
      * Setup a script shutdown handler.
      */
-    private static function setupShutdownHandler() {
+    protected static function setupShutdownHandler() {
         static $handlerRegistered = false;
         static $oomEmergencyMemory;                             // memory block freed when handling out-of-memory errors
 
@@ -350,15 +350,17 @@ class ErrorHandler extends StaticClass {
 
 
     /**
-     * Manually called handler for exceptions occurring in object::__toString() methods. This allows regular handling of
-     * exceptions thrown from object::__toString() which otherwise is not possible due to an internal PHP design issue.
+     * Explicitly called handler for exceptions raised in object::__toString() methods. This allows regular handling of
+     * exceptions thrown from object::__toString() which in PHP < 7.4 is not possible due to an internal PHP design issue.
      *
-     * Current PHP behaviour:
-     * PHP Fatal error:  Method object::__toString() must not throw an exception in {file} on {line}.
+     * PHP < 7.4 behaviour:
+     *  PHP Fatal error:  Method object::__toString() must not throw an exception in {file} on {line}.
      *
      * @param  \Exception|\Throwable $exception - exception (PHP5) or throwable (PHP7)
      *
-     * @link   https://bugs.php.net/bug.php?id=53648
+     * @see  https://bugs.php.net/bug.php?id=53648
+     * @see  https://wiki.php.net/rfc/tostring_exceptions
+     * @see  https://github.com/symfony/symfony/blob/1c110fa1f7e3e9f5daba73ad52d9f7e843a7b3ff/src/Symfony/Component/Debug/ErrorHandler.php#L457-L489
      */
     public static function handleToStringException($exception) {
         $currentHandler = set_exception_handler(function() {});

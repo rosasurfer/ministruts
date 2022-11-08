@@ -61,7 +61,6 @@ class Url extends CObject {
      */
     public function __toString() {
         $uri = '';
-
         try {
             $uri = $this->appRelativeUri;
             if ($this->parameters) {
@@ -70,11 +69,10 @@ class Url extends CObject {
                 $uri .= http_build_query($this->parameters, null, '&');
             }
             $uri = Request::getApplicationBaseUri().$uri;
-
-            Assert::string($uri);                               // Ensure __toString() returns a string as otherwise...
-        }                                                       // PHP will trigger a non-catchable fatal error.
-        catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }
-        catch (\Exception $ex) { ErrorHandler::handleToStringException($ex); }
+            Assert::string($uri);                                               
+        }                                                                       // Ensure __toString() doesn't throw an exception as otherwise
+        catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }  // PHP < 7.4 will trigger a non-catchable fatal error.
+        catch (\Exception $ex) { ErrorHandler::handleToStringException($ex); }  // @see  https://bugs.php.net/bug.php?id=53648
 
         return $uri;
     }

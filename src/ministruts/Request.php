@@ -1144,7 +1144,6 @@ class Request extends CObject {
      */
     public function __toString() {
         $string = '';
-
         try {
             // request
             $string = $_SERVER['REQUEST_METHOD'].' '.$_SERVER['REQUEST_URI'].' '.$_SERVER['SERVER_PROTOCOL'].NL;
@@ -1157,7 +1156,7 @@ class Request extends CObject {
                 $maxLen = max(strlen($key), $maxLen);
             }
 
-            $maxLen++;                                          // add one char for ':'
+            $maxLen++;                                                          // add one char for ':'
             foreach ($headers as $key => $value) {
                 $string .= str_pad($key.':', $maxLen).' '.$value.NL;
             }
@@ -1165,13 +1164,12 @@ class Request extends CObject {
             // content (request body)
             $content = $this->getContent();
             if (strlen($content)) {
-                $string .= NL.substr($content, 0, 1024).NL;     // limit the request body to 1024 bytes
+                $string .= NL.substr($content, 0, 1024).NL;                     // limit the request body to 1024 bytes
             }
-
-            Assert::string($string);                            // Ensure __toString() returns a string as otherwise...
-        }                                                       // PHP will trigger a non-catchable fatal error.
-        catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }
-        catch (\Exception $ex) { ErrorHandler::handleToStringException($ex); }
+            Assert::string($string);                                            
+        }                                                                       // Ensure __toString() doesn't throw an exception as otherwise
+        catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }  // PHP < 7.4 will trigger a non-catchable fatal error.
+        catch (\Exception $ex) { ErrorHandler::handleToStringException($ex); }  // @see  https://bugs.php.net/bug.php?id=53648
 
         return $string;
     }
