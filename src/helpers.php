@@ -562,26 +562,22 @@ function numf($number, $decimals=0, $decimalSeparator='.', $thousandsSeparator='
 
 
 /**
- * Return the value of a php.ini option as a boolean.
+ * Return the value of a "php.ini" option as a boolean.
  *
- * NOTE: Never use ini_get() to read boolean php.ini values as it will return the plain string passed to ini_set().
+ * Note: Don't use ini_get() to read boolean "php.ini" values as it will return the plain string as passed to ini_set().
  *
  * @param  string $option            - option name
- * @param  bool   $strict [optional] - Whether to enable strict checking of the found value:
- *                                     TRUE:  invalid values cause a runtime exception
- *                                     FALSE: invalid values are converted to the target type (i.e. boolean)
- *                                     (default: TRUE)
+ * @param  bool   $strict [optional] - whether to enable strict checking of the found value:
+ *                                     TRUE:  invalid values cause an UnexpectedValueException (default)
+ *                                     FALSE: invalid values are converted to a boolean
  *
  * @return bool|null - boolean value or NULL if the setting doesn't exist
  */
 function ini_get_bool($option, $strict = true) {
     $value = ini_get($option);
 
-    if ($value === false)                   // setting doesn't exist
-        return null;
-
-    if ($value === '')                      // setting is NULL (unset)
-        return (bool)null;
+    if ($value === false) return null;      // setting doesn't exist
+    if ($value === '')    return false;     // setting is NULL (unset)
 
     switch (strtolower($value)) {
         case '1'    :
@@ -596,7 +592,7 @@ function ini_get_bool($option, $strict = true) {
         case 'none' : return false;
     }
 
-    if ($strict) throw new RuntimeException('Invalid php.ini setting for type boolean: "'.$option.'" = "'.$value.'"');
+    if ($strict) throw new \UnexpectedValueException('Invalid "php.ini" setting for type boolean: "'.$option.'" = "'.$value.'"');
 
     return (bool)(int)$value;
 }

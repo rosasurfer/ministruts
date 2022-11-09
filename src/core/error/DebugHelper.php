@@ -195,13 +195,13 @@ class DebugHelper extends StaticClass {
             $basename  = simpleClassName($class);
             $result    = $indent.$namespace.$basename;
 
-            if ($exception instanceof \ErrorException)                                  // A PHP error exception not created by the framework.
+            if ($exception instanceof \ErrorException)                              // a PHP error exception not created by the framework
                 $result .= '('.ErrorHandler::errorLevelToStr($exception->getSeverity()).')';
         }
         $message = $exception->getMessage();
 
         if (strlen($indent)) {
-            $lines = explode(NL, normalizeEOL($message));                               // indent multiline messages
+            $lines = explode(NL, normalizeEOL($message));                           // indent multiline messages
             $eom = '';
             if (strEndsWith($message, NL)) {
                 \array_pop($lines);

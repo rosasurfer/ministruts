@@ -9,8 +9,8 @@ interface RosasurferExceptionInterface {
 
 
     /**
-     * Add a message to the exception's existing message. Used during up-bubbling to add additional infos to an exception's
-     * original message.
+     * Add a message to the exception's existing message. Used during up-bubbling to add additional infos
+     * to an exception's original message.
      *
      * @param  string $message
      *
@@ -20,7 +20,7 @@ interface RosasurferExceptionInterface {
 
 
     /**
-     * Return the message of the {@link \Exception} or {@link \Throwable}.
+     * Return the message of the exception.
      *
      * @return string
      */
@@ -28,7 +28,7 @@ interface RosasurferExceptionInterface {
 
 
     /**
-     * Return the message of the {@link \Exception} or {@link \Throwable} in a more readable way.
+     * Return the message of the exception in a more readable way.
      *
      * @return string
      */
@@ -36,10 +36,18 @@ interface RosasurferExceptionInterface {
 
 
     /**
-     * Set the error code of an {@link \Exception} or {@link \Throwable}. Used during up-bubbling to add additional infos
-     * to an existing exception. Ignored if the exception's error code is already set.
+     * Return the error code of the exception.
      *
-     * @param  int|string $code
+     * @return int
+     */
+    public function getCode();
+
+
+    /**
+     * Set the error code of an exception. Used during up-bubbling to add additional infos to an exception.
+     * Ignored if the exception's error code is already set.
+     *
+     * @param  int $code
      *
      * @return $this
      */
@@ -47,15 +55,7 @@ interface RosasurferExceptionInterface {
 
 
     /**
-     * Return the error code of the {@link \Exception} or {@link \Throwable}.
-     *
-     * @return int|string
-     */
-    public function getCode();
-
-
-    /**
-     * Return the filename where the {@link \Exception} or {@link \Throwable} was created.
+     * Return the name of the file where the exception was created.
      *
      * @return string
      */
@@ -63,7 +63,7 @@ interface RosasurferExceptionInterface {
 
 
     /**
-     * Return the line number of the file where the {@link \Exception} or {@link \Throwable} was created.
+     * Return the line of the file where the exception was created.
      *
      * @return int
      */
@@ -71,7 +71,7 @@ interface RosasurferExceptionInterface {
 
 
     /**
-     * Return the name of the function or method (if any) where the {@link \Exception} or {@link \Throwable} was created.
+     * Return the name of the function or method where the exception was created (if any).
      *
      * @return string
      */
@@ -79,7 +79,7 @@ interface RosasurferExceptionInterface {
 
 
     /**
-     * Return the stack trace of the {@link \Exception} or {@link \Throwable}.
+     * Return the stack trace of the exception.
      *
      * @return array
      */
@@ -87,7 +87,7 @@ interface RosasurferExceptionInterface {
 
 
     /**
-     * Return the stack trace of the {@link \Exception} or {@link \Throwable} as a string.
+     * Return the stack trace of the exception as a string.
      *
      * @return string
      */
@@ -95,7 +95,7 @@ interface RosasurferExceptionInterface {
 
 
 	/**
-     * Return the stack trace of the {@link \Exception} or {@link \Throwable} in a more readable way (Java-like).
+     * Return the stack trace of the exception in a more readable way.
      *
      * @return array
      */
@@ -103,8 +103,7 @@ interface RosasurferExceptionInterface {
 
 
     /**
-     * Return a string representation of the stack trace of the {@link \Exception} or {@link \Throwable} in a more readable
-     * way (Java-like).
+     * Return the more readable stack trace of the exception as a string.
      *
      * @return string
      */
@@ -112,7 +111,7 @@ interface RosasurferExceptionInterface {
 
 
     /**
-     * Return the {@link \Exception} or {@link \Throwable} (if any) causing this exception.
+     * Return the exception causing this exception (if any).
      *
      * @return \Exception|\Throwable|null
      */
@@ -120,7 +119,7 @@ interface RosasurferExceptionInterface {
 
 
     /**
-     * Return a string representation of the {@link \Exception} or {@link \Throwable}.
+     * Return a string representation of the (if any).
      *
      * @return string
      */

@@ -161,8 +161,7 @@ class ErrorHandler extends StaticClass {
      *                FALSE, if the error shall be processed as if no error handler was installed.
      */
     public static function handleError($level, $message, $file, $line, array $symbols = null) {
-        echoPre('ErrorHandler::handleError()  '.self::errorLevelToStr($level).': '.$message);
-        //echoPre('ErrorHandler::handleError()  '.self::errorLevelToStr($level).': '.$message.', in '.$file.', line '.$line);
+        echoPre('ErrorHandler::handleError()  '/*.self::errorLevelToStr($level).': '.$message.', in '.$file.', line '.$line*/);
 
         // ignore suppressed errors and errors not covered by the current reporting level
         $reportingLevel = error_reporting();
@@ -250,7 +249,7 @@ class ErrorHandler extends StaticClass {
      * @param  \Exception|\Throwable $exception - the unhandled exception (PHP5) or throwable (PHP7)
      */
     public static function handleException($exception) {
-        echoPre('ErrorHandler::handleException');
+        echoPre('ErrorHandler::handleException()  '/*.$exception->getMessage()*/);
         if (!self::$exceptionHandling) return;
 
         $context = [
@@ -259,6 +258,8 @@ class ErrorHandler extends StaticClass {
             'line'                => $exception->getLine(),             // exception handler as the originating location.
             'unhandled-exception' => true,                              // flag to signal origin
         ];
+
+        echoPre($exception->getTrace());
 
         // Exceptions thrown from the exception handler itself will not be passed back to the handler but instead
         // terminate the script with an uncatchable fatal error. To prevent this they are handled explicitly.
@@ -361,7 +362,7 @@ class ErrorHandler extends StaticClass {
      * @see  https://github.com/symfony/symfony/blob/1c110fa1f7e3e9f5daba73ad52d9f7e843a7b3ff/src/Symfony/Component/Debug/ErrorHandler.php#L457-L489
      */
     public static function handleToStringException($exception) {
-        echoPre('ErrorHandler::handleToStringException');
+        echoPre('ErrorHandler::handleToStringException()  '/*.$exception->getMessage()*/);
         $currentHandler = set_exception_handler(function() {});
         restore_exception_handler();
 

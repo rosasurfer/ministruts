@@ -37,80 +37,78 @@ use const rosasurfer\L_NOTICE;
 use const rosasurfer\L_WARN;
 use const rosasurfer\NL;
 use const rosasurfer\WINDOWS;
+use rosasurfer\core\exception\IllegalStateException;
 
 
 /**
  * Log a message through a chain of standard log handlers.
  *
- * This is the framework's default logger implementation which is used if no other logger is registered. The logger
- * passes the message to a chain of handlers. Each handler is invoked depending on the application's runtime environment
- * (CLI vs. web server, local vs. remote access) and the application configuration.
+ * This is a default logger implementation which is used if no other logger is registered. The logger passes every log message to a chain
+ * of handlers. Each handler is enabled/disabled depending on the application environment and the application configuration.
  *
- *  - PrintHandler:    Display the message on the standard output device (STDOUT in CLI mode, HTTP response in a web context).
- *                     If the script runs in CLI mode the handler is always invoked. If the script runs in a web context the
- *                     handler is always invoked for local requests (i.e. from localhost). For remote requests the handler
- *                     is invoked only if the remote IP address has admin access or if the PHP configuration option
- *                     "display_errors" is set to TRUE.
+ *  - ErrorLogHandler: Passes a log message to the PHP system logger as configured by the PHP setting "error_log".
  *
- *  - MailHandler:     Send the message to the configured mail receivers (email addresses). The handler is invoked if
- *                     the application configuration contains one or more mail receivers for log messages.
+ *  - PrintHandler:    Displays a log message on STDOUT/STDERR in CLI mode and as part of the HTTP response in a web context. In CLI mode
+ *                     the print handler is always enabled. In a web context the print handler is enabled only for requests from localhost
+ *                     and from explicitly white-listed (aka admin) IP addresses. The handler is also enabled if the PHP setting
+ *                     "display_errors" is switched on.
  *
- *                     Example:
- *                     --------
- *                     log.mail.receiver = address-1@domain.tld, address-2@another-domain.tld
+ *  - MailHandler:     Sends a log message to the configured mail receivers (email addresses). The handler is enabled if the application
+ *                     configuration contains mail receivers for log messages.
  *
- *  - SMSHandler:      Send the message to the configured SMS receivers (phone numbers). The handler is invoked if the
- *                     application configuration contains one or more phone numbers for log messages and a valid SMS
- *                     operator configuration (at log time). For text messages an additional loglevel constraint can be
- *                     specified (on top of the default loglevel constraint). At the moment the message providers
- *                     Clickatell and Nexmo are supported.
+ *  - SMSHandler:      Sends a log message to the configured SMS receivers (phone numbers). The handler is enabled if the application
+ *                     configuration contains phone numbers for log messages and a valid SMS operator configuration. Supported text message
+ *                     providers are "Clickatell" and "Nexmo".
  *
- *                     Example:
- *                     --------
- *                     log.sms.level    = error                           # additional loglevel constraint for SMS
- *                     log.sms.receiver = +3591234567, +441234567         # international number format
+ * Loglevel configuration
+ * ----------------------
+ * Loglevels can be configured for the whole application and per single class. For classes without specific configuration the general
+ * application loglevel applies. The default application loglevel is L_NOTICE.
  *
- *  - ErrorLogHandler: The last resort log handler. Passes the message to the PHP default error log mechanism as defined
- *                     by the PHP configuration value "error_log". The handler is invoked if the MailHandler was not
- *                     invoked or if a circular or similar fatal error occurred. Typically this handler writes into the
- *                     PHP error log file which again should be monitored by a logwatch script.
+ * @example
+ * <pre>
+ *  log.level                  = warn                                   # set general application loglevel to L_WARN
+ *  log.level.MyClassA         = debug                                  # set loglevel for "MyClassA" to L_DEBUG
+ *  log.level.foo\bar\MyClassB = notice                                 # set loglevel for "foo\bar\MyClassB" to L_NOTICE
  *
+ *  log.mail.receiver          = user1@domain.tld, user2@domain.tld     # set mail receivers for the MailHandler
  *
- * Loglevel configuration:
- * -----------------------
- * The loglevel can be configured per class. For a class without a specific configuration the specified application
- * loglevel applies. Without a specified application loglevel the built-in default loglevel of L_NOTICE is used.
- *
- * Example:
- *  log.level                  = warn              # the general application loglevel is set to L_WARN
- *  log.level.MyClassA         = debug             # the loglevel for "MyClassA" is set to L_DEBUG
- *  log.level.foo\bar\MyClassB = notice            # the loglevel for "foo\bar\MyClassB" is set to L_NOTICE
- *  log.sms.level              = error             # the loglevel for text messages is set a bit higher to L_ERROR
+ *  log.sms.level              = error                                  # set min. loglevel for text messages to L_ERROR
+ *  log.sms.receiver           = +3591234567, +441234567                # set text message receivers in international number format
+ * </pre>
  *
  *
  * @todo   Logger::resolveLogCaller() - test with Closure and internal PHP functions
- * @todo   refactor and separate handlers into single classes
+ * @todo   refactor into separate appenders (classes)
  * @todo   implement \Psr\Log\LoggerInterface and remove static crap
- * @todo   implement full mail address support as in "Joe Blow <address@domain.tld>"
+ * @todo   support full email addresses as in "Joe Blow <address@domain.tld>"
  */
 class Logger extends StaticClass {
 
 
-    /** @var int - built-in default loglevel if no application loglevel is configured */
+    /** @var int - default loglevel if no application loglevel is configured */
     const DEFAULT_LOGLEVEL = L_NOTICE;
 
+    /** @var string[] - valid loglevels and string representations for the message formatters */
+    private static $logLevels = [
+        L_DEBUG  => 'Debug' ,
+        L_INFO   => 'Info'  ,
+        L_NOTICE => 'Notice',
+        L_WARN   => 'Warn'  ,
+        L_ERROR  => 'Error' ,
+        L_FATAL  => 'Fatal' ,
+    ];
 
-    /** @var int - application loglevel */
+    /** @var int - configured application loglevel */
     private static $appLogLevel = self::DEFAULT_LOGLEVEL;
 
+    /** @var bool - whether the print handler for L_FATAL log messages is enabled */
+    private static $printHandlerFatal = false;
 
-    /** @var bool - whether the print handler for L_FATAL messages is enabled */
-    private static $printFatalHandler = false;
+    /** @var bool - whether the print handler for non L_FATAL log messages is enabled */
+    private static $printHandlerNonFatal = false;
 
-    /** @var bool - whether the print handler for non L_FATAL messages is enabled */
-    private static $printNonfatalHandler = false;
-
-    /** @var int - counter for messages handled by the print handler */
+    /** @var int - counter for messages processed by the print handler */
     private static $printCounter = 0;
 
     /** @var bool - whether the mail handler is enabled */
@@ -134,19 +132,9 @@ class Logger extends StaticClass {
     /** @var bool - whether the PHP error_log handler is enabled */
     private static $errorLogHandler = true;
 
-    /** @var string[] - loglevel descriptions for message formatter */
-    private static $logLevels = [
-        L_DEBUG  => 'Debug' ,
-        L_INFO   => 'Info'  ,
-        L_NOTICE => 'Notice',
-        L_WARN   => 'Warn'  ,
-        L_ERROR  => 'Error' ,
-        L_FATAL  => 'Fatal' ,
-    ];
-
 
     /**
-     * Initialize the Logger configuration.
+     * Initialize the Logger.
      */
     private static function init() {
         static $initialized = false;
@@ -171,16 +159,16 @@ class Logger extends StaticClass {
                 }
             }
         }
-        self::$mailHandler   = (bool) $receivers;
-        self::$mailReceivers =        $receivers;
+        self::$mailHandler = (bool) $receivers;
+        self::$mailReceivers = $receivers;
 
-        // L_FATAL print handler: enabled on local/white-listed access or if explicitly enabled
-        self::$printFatalHandler = CLI || Application::isAdminIP() || ini_get_bool('display_errors');
+        // print handler for L_FATAL log messages: enabled on CLI, local/white-listed web access or if explicitly enabled
+        self::$printHandlerFatal = CLI || Application::isAdminIP() || ini_get_bool('display_errors');
 
-        // non L_FATAL print handler: enabled on local access, if explicitly enabled or if the mail handler is disabled
-        self::$printNonfatalHandler = CLI || in_array($_SERVER['REMOTE_ADDR'], ['127.0.0.1', $_SERVER['SERVER_ADDR']])
+        // print handler for non L_FATAL log messages: enabled on CLI, local web access, if explicitly enabled or if the mail handler is disabled
+        self::$printHandlerNonFatal = CLI || in_array($_SERVER['REMOTE_ADDR'], ['127.0.0.1', $_SERVER['SERVER_ADDR']])
                                           || ini_get_bool('display_errors')
-                                          || (self::$printFatalHandler && !self::$mailHandler);
+                                          || (self::$printHandlerFatal && !self::$mailHandler);
 
         // SMS handler: enabled if SMS receivers are configured (operator settings are checked at log time)
         self::$smsReceivers = [];
@@ -293,18 +281,19 @@ class Logger extends StaticClass {
      * @param  string|object $loggable           - a string or an object implementing <tt>__toString()</tt>
      * @param  int           $level              - loglevel
      * @param  array         $context [optional] - logging context with additional data
+     *
+     * @return bool - success status
      */
     public static function log($loggable, $level, array $context = []) {
         self::init();
 
-        // wrap everything in try-catch to handle the case when logging fails
-        $ex = null;
+        // detect and handle a failing logger
+        $logException = null;
         try {
-            // block recursive calls
-            // TODO: instead of recursive calls block duplicate messages
+            // detect and block recursive calls (should we instead block duplicate messages?)
             static $isActive = false;
-            if ($isActive) throw new RuntimeException('Detected recursive call of '.__METHOD__.'(), aborting...');
-            $isActive = true;                                           // lock the method
+            if ($isActive) throw new IllegalStateException('Detected recursive call of '.__METHOD__.'(), aborting...');
+            $isActive = true;
 
             // validate parameters
             if (!is_string($loggable)) {
@@ -316,41 +305,37 @@ class Logger extends StaticClass {
             Assert::int($level, '$level');
             if (!isset(self::$logLevels[$level])) throw new InvalidArgumentException('Invalid argument $level: '.$level.' (not a loglevel)');
 
-            $filtered = false;
-
             // filter messages below the active loglevel
-            if (!$filtered && $level!=L_FATAL) {                                // L_FATAL (highest) can't be below
+            $filtered = false;
+            if (!$filtered && $level!=L_FATAL) {                                // L_FATAL is never filtered
                 if (!\key_exists('class', $context))                            // resolve the calling class and check its loglevel
                     self::resolveLogCaller($context);
                 $filtered = $level < self::getLogLevel($context['class']);      // message is below the active loglevel
             }
 
-            // filter "headers already sent" errors triggered by a previously printed HTML log message
+            // filter "headers already sent" errors triggered by a previously printed message
             if (!$filtered && !CLI && self::$printCounter && is_object($loggable)) {
-                if (preg_match('/- headers already sent (by )?\(output started at /', $loggable->getMessage())) {
-                    $filtered = true;
-                }
+                $filtered = (bool)preg_match('/- headers already sent (by )?\(output started at /', $loggable->getMessage());
             }
 
             // invoke all active log handlers
             if (!$filtered) {
-                if ($level == L_FATAL) $printHandler = 'printFatalHandler';
-                else                   $printHandler = 'printNonfatalHandler';
+                if ($level == L_FATAL) $printHandler = 'printHandlerFatal';
+                else                   $printHandler = 'printHandlerNonFatal';
 
+                self::$errorLogHandler && self::invokeErrorLogHandler($loggable, $level, $context);
                 self::${$printHandler} && self::invokePrintHandler   ($loggable, $level, $context);
                 self::$mailHandler     && self::invokeMailHandler    ($loggable, $level, $context);
                 self::$smsHandler      && self::invokeSmsHandler     ($loggable, $level, $context);
-                self::$errorLogHandler && self::invokeErrorLogHandler($loggable, $level, $context);
             }
 
-            // unlock the method
+            // unlock the section
             $isActive = false;
-
         }
-        catch (\Throwable $ex) {}
-        catch (\Exception $ex) {}
+        catch (\Throwable $logException) {}
+        catch (\Exception $logException) {}
 
-        if ($ex) {
+        if ($logException) {
             // If the call comes from the internal exception handler failed logging is already handled. If the call comes
             // from user-land make sure the message doesn't get lost and is logged to the PHP default error log.
             if (!\key_exists('unhandled-exception', $context)) {
@@ -359,16 +344,54 @@ class Logger extends StaticClass {
                 $msg  = 'PHP ['.strtoupper(self::$logLevels[$level]).'] '.$loggable.NL.' in '.$file.' on line '.$line;
                 error_log(trim($msg), ERROR_LOG_DEFAULT);
             }
-            throw $ex;
+            throw $logException;
+        }
+        return true;
+    }
+
+
+    /**
+     * Pass a log message to the PHP system logger via "error_log()".
+     * This handler must be called before the "PrintHandler" to prevent duplicated output on STDOUT and STDERR.
+     *
+     * ini_get('error_log')
+     * --------------------
+     * Name of a file where script errors should be logged. If the special value "syslog" is used, errors are sent to the system logger
+     * instead. On Unix this means syslog(3), and on Windows it means the event log. If this directive is not set, errors are sent to
+     * the SAPI error logger. For example, it's the Appache error log or STDERR in CLI mode.
+     *
+     * @param  string|\Exception|\Throwable $loggable - message or exception
+     * @param  int                          $level    - loglevel
+     * @param  array                        $context  - reference to the log context with additional data
+     */
+    private static function invokeErrorLogHandler($loggable, $level, array &$context) {
+        if (!\key_exists('cliMessage', $context))
+            self::composeCliMessage($loggable, $level, $context);
+
+        $msg = 'PHP '.$context['cliMessage'];
+        if (\key_exists('cliExtra', $context))
+            $msg .= $context['cliExtra'];
+        $msg = str_replace(chr(0), '\0', $msg);                 // replace NUL bytes which mess up the logfile
+
+        if (CLI && empty(ini_get('error_log'))) {
+            // Suppress duplicated output to STDERR, the PrintHandler already wrote to STDOUT.
+
+            // TODO: Instead of messing around here the PrintHandler must not print to STDOUT if the ErrorLogHandler
+            //       is active and prints to STDERR.
+            // TODO: Suppress output to STDERR in interactive terminals only (i.e. not in CRON).
+        }
+        else {
+            error_log(trim($msg), ERROR_LOG_DEFAULT);
         }
     }
 
 
     /**
-     * Display the message on the standard output device (STDOUT in CLI mode, HTTP response in a web context).
+     * Display a log message on STDOUT, STDERR or as part of the HTTP response.
+     * This handler must be called after the "ErrorLogHandler" to prevent duplicated output on STDOUT and STDERR.
      *
-     * @param  string|\Exception|\Throwable $loggable - message or exception to log
-     * @param  int                          $level    - loglevel of the loggable
+     * @param  string|\Exception|\Throwable $loggable - message or exception
+     * @param  int                          $level    - loglevel
      * @param  array                        $context  - reference to the log context with additional data
      */
     private static function invokePrintHandler($loggable, $level, array &$context) {
@@ -524,41 +547,6 @@ class Logger extends StaticClass {
                 }
                 return;
             }
-        }
-    }
-
-
-    /**
-     * Pass the message to the PHP default error log mechanism as defined by the PHP configuration value "error_log".
-     *
-     * ini_get('error_log')
-     *
-     * Name of the file where script errors should be logged. If the special value "syslog" is used, errors are sent to the
-     * system logger instead. On Unix, this means syslog(3) and on Windows it means the event log. If this directive is not
-     * set, errors are sent to the SAPI error logger. For example, it is an error log in Apache or STDERR in CLI mode.
-     *
-     * @param  string|\Exception|\Throwable $loggable - message or exception to log
-     * @param  int                          $level    - loglevel of the loggable
-     * @param  array                        $context  - reference to the log context with additional data
-     */
-    private static function invokeErrorLogHandler($loggable, $level, array &$context) {
-        if (!\key_exists('cliMessage', $context))
-            self::composeCliMessage($loggable, $level, $context);
-
-        $msg = 'PHP '.$context['cliMessage'];
-        if (\key_exists('cliExtra', $context))
-            $msg .= $context['cliExtra'];
-        $msg = str_replace(chr(0), '\0', $msg);                 // replace NUL bytes which mess up the logfile
-
-        if (CLI && empty(ini_get('error_log'))) {
-            // Suppress duplicated output to STDERR, the PrintHandler already wrote to STDOUT.
-
-            // TODO: Instead of messing around here the PrintHandler must not print to STDOUT if the ErrorLogHandler
-            //       is active and prints to STDERR.
-            // TODO: Suppress output to STDERR in interactive terminals only (i.e. not in CRON).
-        }
-        else {
-            error_log(trim($msg), ERROR_LOG_DEFAULT);
         }
     }
 

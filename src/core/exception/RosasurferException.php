@@ -4,25 +4,24 @@ namespace rosasurfer\core\exception;
 use rosasurfer\core\ObjectTrait;
 use rosasurfer\core\di\DiAwareTrait;
 use rosasurfer\core\error\DebugHelper;
-use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
 
 
 /**
  * Base class for all "rosasurfer" exceptions.
  */
-class RosasurferException extends \Exception implements IRosasurferException {
+class RosasurferException extends \Exception implements RosasurferExceptionInterface {
 
     use RosasurferExceptionTrait, ObjectTrait, DiAwareTrait;
 
 
     /**
-     * Create a new instance. Parameters are identical to the built-in PHP {@link \Exception} and passed on.
+     * Create a new instance. Parameters are identical to the built-in PHP {@link \Exception} but stronger typed.
      *
      * @param  string                $message [optional] - exception description
-     * @param  int                   $code    [optional] - exception identifier, typically an application id
+     * @param  int                   $code    [optional] - exception identifier (typically an application error id)
      * @param  \Exception|\Throwable $cause   [optional] - another exception (PHP5) or throwable (PHP7) causing this exception
      */
-    public function __construct($message=null, $code=null, $cause = null) {
+    public function __construct($message='', $code=0, $cause=null) {
         parent::__construct($message, $code, $cause);
     }
 

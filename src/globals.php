@@ -283,15 +283,14 @@ function numf($number, $decimals=0, $decimalSeparator='.', $thousandsSeparator='
 
 
 /**
- * Return the value of a php.ini option as a boolean.
+ * Return the value of a "php.ini" option as a boolean.
  *
- * NOTE: Never use ini_get() to read boolean php.ini values as it will return the plain string passed to ini_set().
+ * Note: Don't use ini_get() to read boolean "php.ini" values as it will return the plain string as passed to ini_set().
  *
  * @param  string $option            - option name
- * @param  bool   $strict [optional] - Whether to enable strict checking of the found value:
- *                                     TRUE:  invalid values cause a runtime exception
- *                                     FALSE: invalid values are converted to the target type (i.e. boolean)
- *                                     (default: TRUE)
+ * @param  bool   $strict [optional] - whether to enable strict checking of the found value:
+ *                                     TRUE:  invalid values cause an UnexpectedValueException (default)
+ *                                     FALSE: invalid values are converted to a boolean
  *
  * @return bool|null - boolean value or NULL if the setting doesn't exist
  */

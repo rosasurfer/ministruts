@@ -16,7 +16,7 @@ class PHPError extends \ErrorException implements IRosasurferException {
 
 
     /**
-     * Create a new instance. Parameters are identical to the built-in PHP {@link \ErrorException} and passed on.
+     * Create a new instance. Parameters are identical to the built-in PHP {@link \ErrorException} but stronger typed.
      *
      * @param  string $message  - error description
      * @param  int    $code     - error identifier, usually an application id

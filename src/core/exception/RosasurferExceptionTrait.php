@@ -9,7 +9,7 @@ use const rosasurfer\NL;
 
 
 /**
- * A trait capable of adding the behaviour of {@link RosasurferException} to any {@link \Exception} or {@link \Throwable}.
+ * A trait adding the behavior of a {@link RosasurferException} to any custom {@link \Exception} or {@link \Throwable}.
  */
 trait RosasurferExceptionTrait {
 
@@ -44,11 +44,13 @@ trait RosasurferExceptionTrait {
      * Set the error code of an {@link \Exception} or {@link \Throwable}. Used during up-bubbling to add additional infos
      * to an existing exception. Ignored if the exception's error code is already set.
      *
-     * @param  int|string $code
+     * @param  int $code
      *
      * @return $this
      */
     public function setCode($code) {
+        Assert::int($code);
+
         if (!isset($this->code)) {
             $this->code = $code;
         }
@@ -57,7 +59,7 @@ trait RosasurferExceptionTrait {
 
 
     /**
-     * Return the message of the {@link \Exception} or {@link \Throwable} in a more readable way.
+     * Return the message of the exception in a more readable way.
      *
      * @return string
      */
@@ -92,7 +94,7 @@ trait RosasurferExceptionTrait {
 
 
     /**
-     * Return a string representation of the {@link \Exception} or {@link \Throwable}.
+     * Return a string representation of the exception.
      *
      * @return string
      */
@@ -100,7 +102,7 @@ trait RosasurferExceptionTrait {
         $value = '';
         try {
             $value = $this->getBetterMessage();
-            Assert::string($value);                                             
+            Assert::string($value);
         }                                                                       // Ensure __toString() doesn't throw an exception as otherwise
         catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }  // PHP < 7.4 will trigger a non-catchable fatal error.
         catch (\Exception $ex) { ErrorHandler::handleToStringException($ex); }  // @see  https://bugs.php.net/bug.php?id=53648
