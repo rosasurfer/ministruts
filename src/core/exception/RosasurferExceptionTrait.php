@@ -65,7 +65,7 @@ trait RosasurferExceptionTrait {
      */
     public function getBetterMessage() {
         if (!$this->betterMessage)
-            $this->betterMessage = DebugHelper::composeBetterMessage($this);
+            $this->betterMessage = ErrorHandler::composeBetterMessage($this);
         return $this->betterMessage;
     }
 

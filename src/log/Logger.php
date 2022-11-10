@@ -38,6 +38,7 @@ use const rosasurfer\L_WARN;
 use const rosasurfer\NL;
 use const rosasurfer\WINDOWS;
 use rosasurfer\core\exception\IllegalStateException;
+use rosasurfer\core\error\ErrorHandler;
 
 
 /**
@@ -395,16 +396,15 @@ class Logger extends StaticClass {
      * @param  array                        $context  - reference to the log context with additional data
      */
     private static function invokePrintHandler($loggable, $level, array &$context) {
-        $message = null;
+        $message = '';
 
         if (CLI) {
-            !\key_exists('cliMessage', $context) && self::composeCliMessage($loggable, $level, $context);
+            !isset($context['cliMessage']) && self::composeCliMessage($loggable, $level, $context);
             $message .= $context['cliMessage'];
-            if (\key_exists('cliExtra', $context))
-                $message .= $context['cliExtra'];
+            isset($context['cliExtra']) && $message .= $context['cliExtra'];
         }
         else {
-            !\key_exists('htmlMessage', $context) && self::composeHtmlMessage($loggable, $level, $context);
+            !isset($context['htmlMessage']) && self::composeHtmlMessage($loggable, $level, $context);
             $message = $context['htmlMessage'];
         }
 
@@ -553,10 +553,10 @@ class Logger extends StaticClass {
 
     /**
      * Compose a CLI log message and store it in the passed log context under the keys "cliMessage" and "cliExtra".
-     * The separation is used by the SMS handler which only sends the main message ("cliMessage").
+     * The separation is used by the SMS handler which processes only the main "cliMessage".
      *
-     * @param  string|\Exception|\Throwable $loggable - message or exception to log
-     * @param  int                          $level    - loglevel of the loggable
+     * @param  string|\Exception|\Throwable $loggable - message or exception
+     * @param  int                          $level    - loglevel
      * @param  array                        $context  - reference to the log context
      */
     private static function composeCliMessage($loggable, $level, array &$context) {
@@ -594,7 +594,7 @@ class Logger extends StaticClass {
         else {
             // $loggable is an exception
             $type = null;
-            $msg  = trim(DebugHelper::composeBetterMessage($loggable, $indent));
+            $msg  = trim(ErrorHandler::composeBetterMessage($loggable, $indent));
             if (\key_exists('unhandled-exception', $context)) {
                 $type = 'Unhandled ';
                 if ($loggable instanceof PHPError) {
@@ -613,7 +613,7 @@ class Logger extends StaticClass {
         // append an existing context exception to "cliExtra"
         if (\key_exists('exception', $context)) {
             $exception = $context['exception'];
-            $msg       = $indent.trim(DebugHelper::composeBetterMessage($exception, $indent));
+            $msg       = $indent.trim(ErrorHandler::composeBetterMessage($exception, $indent));
             $cliExtra .= NL.$msg.NL.NL;
             $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
             $traceStr .= DebugHelper::getBetterTraceAsString($exception, $indent);
@@ -622,8 +622,91 @@ class Logger extends StaticClass {
 
         // store main and extra message
         $context['cliMessage'] = $cliMessage;
-        if ($cliExtra)
-            $context['cliExtra'] = $cliExtra;
+        $cliExtra && $context['cliExtra'] = $cliExtra;
+    }
+
+
+    /**
+     * Compose a HTML log message and store it in the passed log context under the key "htmlMessage".
+     *
+     * @param  string|\Exception|\Throwable $loggable - message or exception
+     * @param  int                          $level    - loglevel
+     * @param  array                        $context  - reference to the log context
+     */
+    private static function composeHtmlMessage($loggable, $level, array &$context) {
+        if (!\key_exists('file', $context) || !\key_exists('line', $context))
+            self::resolveLogLocation($context);
+        $file = $context['file'];
+        $line = $context['line'];
+
+        // break out of unfortunate HTML tags              // id = md5('ministruts')
+        $html  = '<a attr1="" attr2=\'\'></a></meta></title></head></script></img></input></select></textarea></label></li></ul></font></pre></tt></code></small></i></b></span></div>';
+        $html .= '<div id="99a05cf355861c76747b7176c778eed2'.self::$printCounter.'"
+                        align="left"
+                        style="display:initial; visibility:initial; clear:both;
+                        position:relative; z-index:4294967295; top:initial; left:initial;
+                        float:left; width:initial; height:initial
+                        margin:0; padding:4px; border-width:0;
+                        font:normal normal 12px/normal arial,helvetica,sans-serif; line-height:12px;
+                        color:black; background-color:#ccc">';
+        $indent = ' ';
+
+        // compose message
+        if (is_string($loggable)) {
+            // $loggable is a simple message
+            $msg   = $loggable;
+            $html .= '<span style="white-space:nowrap"><span style="font-weight:bold">['.strtoupper(self::$logLevels[$level]).']</span> <span style="white-space:pre; line-height:8px">'.nl2br(hsc($msg)).'</span></span><br><br>';
+            $html .= 'in <span style="font-weight:bold">'.$file.'</span> on line <span style="font-weight:bold">'.$line.'</span><br>';
+
+            // attach the internal stacktrace if there was no exception
+            if (!\key_exists('exception', $context) && \key_exists('trace', $context)) {
+                $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
+                $traceStr .= DebugHelper::formatTrace($context['trace'], $indent);
+                $html     .= '<span style="clear:both"></span><br>'.printPretty($traceStr, true).'<br>';
+            }
+        }
+        else {
+            // $loggable is an exception
+            $type = null;
+            $msg  = trim(ErrorHandler::composeBetterMessage($loggable));
+            if (\key_exists('unhandled-exception', $context)) {
+                $type = 'Unhandled ';
+                if ($loggable instanceof PHPError) {
+                    $msg   = strRightFrom($msg, ':');
+                    $type .= 'PHP Error:';
+                }
+            }
+            $html     .= '<span style="white-space:nowrap"><span style="font-weight:bold">['.strtoupper(self::$logLevels[$level]).']</span> <span style="white-space:pre; line-height:8px">'.nl2br(hsc($type.$msg)).'</span></span><br><br>';
+            $html     .= 'in <span style="font-weight:bold">'.$file.'</span> on line <span style="font-weight:bold">'.$line.'</span><br>';
+            $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
+            $traceStr .= DebugHelper::getBetterTraceAsString($loggable, $indent);
+            $html     .= '<span style="clear:both"></span><br>'.printPretty($traceStr, true).'<br>';
+        }
+
+        // append an existing context exception
+        if (\key_exists('exception', $context)) {
+            $exception = $context['exception'];
+            $msg       = ErrorHandler::composeBetterMessage($exception);
+            $html     .= '<br>'.nl2br(hsc($msg)).'<br><br>';
+            $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
+            $traceStr .= DebugHelper::getBetterTraceAsString($exception, $indent);
+            $html     .= printPretty($traceStr, true);
+        }
+
+        // append the current HTTP request
+        if (!CLI) {
+            $html .= '<br style="clear:both"><br>'.printPretty('Request:'.NL.'--------'.NL.Request::instance(), true).'<br>';
+        }
+
+        // close the HTML tag and add some JavaScript to ensure it becomes visible                      // id = md5('ministruts')
+        $html .= '</div>
+                  <script>
+                      var bodies = document.getElementsByTagName("body");
+                      if (bodies && bodies.length)
+                         bodies[0].appendChild(document.getElementById("99a05cf355861c76747b7176c778eed2'.self::$printCounter.'"));
+                  </script>';
+        // store the HTML tag
+        $context['htmlMessage'] = $html;
     }
 
 
@@ -683,90 +766,6 @@ class Logger extends StaticClass {
         // store subject and message
         $context['mailSubject'] = 'PHP ['.self::$logLevels[$level].'] '.$type.(CLI ? 'in ':'at ').$location;
         $context['mailMessage'] = $msg;
-    }
-
-
-    /**
-     * Compose a HTML log message and store it in the passed log context under the key "htmlMessage".
-     *
-     * @param  string|\Exception|\Throwable $loggable - message or exception to log
-     * @param  int                          $level    - loglevel of the loggable
-     * @param  array                        $context  - reference to the log context
-     */
-    private static function composeHtmlMessage($loggable, $level, array &$context) {
-        if (!\key_exists('file', $context) || !\key_exists('line', $context))
-            self::resolveLogLocation($context);
-        $file = $context['file'];
-        $line = $context['line'];
-
-        // break out of unfortunate HTML tags              // id = md5('ministruts')
-        $html  = '<a attr1="" attr2=\'\'></a></meta></title></head></script></img></input></select></textarea></label></li></ul></font></pre></tt></code></small></i></b></span></div>';
-        $html .= '<div id="99a05cf355861c76747b7176c778eed2'.self::$printCounter.'"
-                        align="left"
-                        style="display:initial; visibility:initial; clear:both;
-                        position:relative; z-index:4294967295; top:initial; left:initial;
-                        float:left; width:initial; height:initial
-                        margin:0; padding:4px; border-width:0;
-                        font:normal normal 12px/normal arial,helvetica,sans-serif; line-height:12px;
-                        color:black; background-color:#ccc">';
-        $indent = ' ';
-
-        // compose message
-        if (is_string($loggable)) {
-            // $loggable is a simple message
-            $msg   = $loggable;
-            $html .= '<span style="white-space:nowrap"><span style="font-weight:bold">['.strtoupper(self::$logLevels[$level]).']</span> <span style="white-space:pre; line-height:8px">'.nl2br(hsc($msg)).'</span></span><br><br>';
-            $html .= 'in <span style="font-weight:bold">'.$file.'</span> on line <span style="font-weight:bold">'.$line.'</span><br>';
-
-            // attach the internal stacktrace if there was no exception
-            if (!\key_exists('exception', $context) && \key_exists('trace', $context)) {
-                $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
-                $traceStr .= DebugHelper::formatTrace($context['trace'], $indent);
-                $html     .= '<span style="clear:both"></span><br>'.printPretty($traceStr, true).'<br>';
-            }
-        }
-        else {
-            // $loggable is an exception
-            $type = null;
-            $msg  = trim(DebugHelper::composeBetterMessage($loggable));
-            if (\key_exists('unhandled-exception', $context)) {
-                $type = 'Unhandled ';
-                if ($loggable instanceof PHPError) {
-                    $msg   = strRightFrom($msg, ':');
-                    $type .= 'PHP Error:';
-                }
-            }
-            $html     .= '<span style="white-space:nowrap"><span style="font-weight:bold">['.strtoupper(self::$logLevels[$level]).']</span> <span style="white-space:pre; line-height:8px">'.nl2br(hsc($type.$msg)).'</span></span><br><br>';
-            $html     .= 'in <span style="font-weight:bold">'.$file.'</span> on line <span style="font-weight:bold">'.$line.'</span><br>';
-            $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
-            $traceStr .= DebugHelper::getBetterTraceAsString($loggable, $indent);
-            $html     .= '<span style="clear:both"></span><br>'.printPretty($traceStr, true).'<br>';
-        }
-
-        // append an existing context exception
-        if (\key_exists('exception', $context)) {
-            $exception = $context['exception'];
-            $msg       = DebugHelper::composeBetterMessage($exception);
-            $html     .= '<br>'.nl2br(hsc($msg)).'<br><br>';
-            $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
-            $traceStr .= DebugHelper::getBetterTraceAsString($exception, $indent);
-            $html     .= printPretty($traceStr, true);
-        }
-
-        // append the current HTTP request
-        if (!CLI) {
-            $html .= '<br style="clear:both"><br>'.printPretty('Request:'.NL.'--------'.NL.Request::instance(), true).'<br>';
-        }
-
-        // close the HTML tag and add some JavaScript to ensure it becomes visible                      // id = md5('ministruts')
-        $html .= '</div>
-                  <script>
-                      var bodies = document.getElementsByTagName("body");
-                      if (bodies && bodies.length)
-                         bodies[0].appendChild(document.getElementById("99a05cf355861c76747b7176c778eed2'.self::$printCounter.'"));
-                  </script>';
-        // store the HTML tag
-        $context['htmlMessage'] = $html;
     }
 
 

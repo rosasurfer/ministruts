@@ -8,6 +8,9 @@ use rosasurfer\log\Logger;
 
 use function rosasurfer\echoPre;
 use function rosasurfer\ini_get_bool;
+use function rosasurfer\normalizeEOL;
+use function rosasurfer\simpleClassName;
+use function rosasurfer\strEndsWith;
 use function rosasurfer\strLeftTo;
 use function rosasurfer\true;
 
@@ -18,8 +21,8 @@ use const rosasurfer\L_FATAL;
 use const rosasurfer\L_INFO;
 use const rosasurfer\L_NOTICE;
 use const rosasurfer\L_WARN;
-use const rosasurfer\NL;
 use const rosasurfer\MB;
+use const rosasurfer\NL;
 
 
 /**
@@ -259,8 +262,6 @@ class ErrorHandler extends StaticClass {
             'unhandled-exception' => true,                              // flag to signal origin
         ];
 
-        echoPre($exception->getTrace());
-
         // Exceptions thrown from the exception handler itself will not be passed back to the handler but instead
         // terminate the script with an uncatchable fatal error. To prevent this they are handled explicitly.
         $secondEx = null;
@@ -274,7 +275,7 @@ class ErrorHandler extends StaticClass {
         if ($secondEx)  {
             // secondary exception: the logger itself crashed, last chance to log something
             $indent = ' ';
-            $msg2  = '[FATAL] Unhandled '.trim(DebugHelper::composeBetterMessage($secondEx)).NL;
+            $msg2  = '[FATAL] Unhandled '.trim(self::composeBetterMessage($secondEx)).NL;
             $file2 = $secondEx->getFile();
             $line2 = $secondEx->getLine();
             $msg2 .= $indent.'in '.$file2.' on line '.$line2.NL.NL;
@@ -282,7 +283,7 @@ class ErrorHandler extends StaticClass {
             $msg2 .= DebugHelper::getBetterTraceAsString($secondEx, $indent);
 
             // primary (the causing) exception
-            $msg1  = $indent.'Unhandled '.trim(DebugHelper::composeBetterMessage($exception)).NL;
+            $msg1  = $indent.'Unhandled '.trim(self::composeBetterMessage($exception)).NL;
             $file1 = $exception->getFile();
             $line1 = $exception->getLine();
             $msg1 .= $indent.'in '.$file1.' on line '.$line1.NL.NL;
@@ -411,5 +412,46 @@ class ErrorHandler extends StaticClass {
             }
         }
         return join('|', $levels);
+    }
+
+
+    /**
+     * Return a more readable version of an exception's message.
+     *
+     * @param  \Exception|\Throwable $exception         - any exception
+     * @param  string                $indent [optional] - indent lines by the specified value (default: no indentation)
+     *
+     * @return string - message
+     */
+    public static function composeBetterMessage($exception, $indent = '') {
+        Assert::throwable($exception, '$exception');
+
+        if ($exception instanceof PHPError) {
+            $result = $exception->getErrorType();
+        }
+        else {
+            $class     = get_class($exception);
+            $namespace = strtolower(strLeftTo($class, '\\', -1, true, ''));
+            $basename  = simpleClassName($class);
+            $result    = $indent.$namespace.$basename;
+
+            if ($exception instanceof \ErrorException) {            // a PHP error exception not created by the framework
+                $result .= '('.self::errorLevelToStr($exception->getSeverity()).')';
+            }
+        }
+        $message = $exception->getMessage();
+
+        if (strlen($indent)) {
+            $lines = explode(NL, normalizeEOL($message));           // indent multiline messages
+            $eoMsg = '';
+            if (strEndsWith($message, NL)) {
+                \array_pop($lines);
+                $eoMsg = NL;
+            }
+            $message = join(NL.$indent, $lines).$eoMsg;
+        }
+
+        $result .= (strlen($message) ? ': ':'').$message;
+        return $result;
     }
 }

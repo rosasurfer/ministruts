@@ -5,10 +5,7 @@ use rosasurfer\core\StaticClass;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
 
-use function rosasurfer\normalizeEOL;
-use function rosasurfer\simpleClassName;
 use function rosasurfer\strEndsWith;
-use function rosasurfer\strLeftTo;
 use function rosasurfer\strRightFrom;
 use function rosasurfer\strStartsWith;
 
@@ -19,7 +16,6 @@ use const rosasurfer\NL;
  * Debug helper.
  */
 class DebugHelper extends StaticClass {
-
 
     /**
      * Take a regular PHP stacktrace and create a fixed and more readable Java-like one.
@@ -176,46 +172,6 @@ class DebugHelper extends StaticClass {
 
 
     /**
-     * Return a more readable version of an exception's message.
-     *
-     * @param  \Exception|\Throwable $exception         - any exception (PHP5) or throwable (PHP7)
-     * @param  string                $indent [optional] - indent lines by the specified value (default: no indentation)
-     *
-     * @return string - message
-     */
-    public static function composeBetterMessage($exception, $indent = '') {
-        Assert::throwable($exception, '$exception');
-
-        if ($exception instanceof PHPError) {
-            $result = $exception->getErrorType();
-        }
-        else {
-            $class     = get_class($exception);
-            $namespace = strtolower(strLeftTo($class, '\\', -1, true, ''));
-            $basename  = simpleClassName($class);
-            $result    = $indent.$namespace.$basename;
-
-            if ($exception instanceof \ErrorException)                              // a PHP error exception not created by the framework
-                $result .= '('.ErrorHandler::errorLevelToStr($exception->getSeverity()).')';
-        }
-        $message = $exception->getMessage();
-
-        if (strlen($indent)) {
-            $lines = explode(NL, normalizeEOL($message));                           // indent multiline messages
-            $eom = '';
-            if (strEndsWith($message, NL)) {
-                \array_pop($lines);
-                $eom = NL;
-            }
-            $message = join(NL.$indent, $lines).$eom;
-        }
-
-        $result .= (strlen($message) ? ': ':'').$message;
-        return $result;
-    }
-
-
-    /**
      * Return a more readable version of an exception's stacktrace. The representation also contains information about
      * nested exceptions.
      *
@@ -233,7 +189,7 @@ class DebugHelper extends StaticClass {
 
         if ($cause = $exception->getPrevious()) {
             // recursively add stacktraces of nested exceptions
-            $message = trim(self::composeBetterMessage($cause, $indent));
+            $message = trim(ErrorHandler::composeBetterMessage($cause, $indent));
             $result .= NL.$indent.'caused by'.NL.$indent.$message.NL.NL;
             $result .= self::{__FUNCTION__}($cause, $indent);                 // recursion
         }
