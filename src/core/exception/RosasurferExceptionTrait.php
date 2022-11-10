@@ -84,16 +84,6 @@ trait RosasurferExceptionTrait {
 
 
     /**
-     * Return the name of the function or method (if any) where the {@link \Exception} or {@link \Throwable} was created.
-     *
-     * @return string
-     */
-    public function getFunction() {
-        return ErrorHandler::getFrameMethod($this->getBetterTrace()[0]);
-    }
-
-
-    /**
      * Return a string representation of the exception.
      *
      * @return string

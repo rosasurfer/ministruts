@@ -377,6 +377,47 @@ class ErrorHandler extends StaticClass {
 
 
     /**
+     * Return a readable representation of an error reporting level.
+     *
+     * @param  int $level - error reporting level
+     *
+     * @return string
+     */
+    public static function errorLevelToStr($level) {
+        Assert::int($level);
+
+        $levels = [
+            E_ERROR             => 'E_ERROR',                   //     1
+            E_WARNING           => 'E_WARNING',                 //     2
+            E_PARSE             => 'E_PARSE',                   //     4
+            E_NOTICE            => 'E_NOTICE',                  //     8
+            E_CORE_ERROR        => 'E_CORE_ERROR',              //    16
+            E_CORE_WARNING      => 'E_CORE_WARNING',            //    32
+            E_COMPILE_ERROR     => 'E_COMPILE_ERROR',           //    64
+            E_COMPILE_WARNING   => 'E_COMPILE_WARNING',         //   128
+            E_USER_ERROR        => 'E_USER_ERROR',              //   256
+            E_USER_WARNING      => 'E_USER_WARNING',            //   512
+            E_USER_NOTICE       => 'E_USER_NOTICE',             //  1024
+            E_STRICT            => 'E_STRICT',                  //  2048
+            E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',       //  4096
+            E_DEPRECATED        => 'E_DEPRECATED',              //  8192
+            E_USER_DEPRECATED   => 'E_USER_DEPRECATED',         // 16384
+        ];
+
+        if      (!$level)                                                       $levels = ['0'];                        //     0
+        else if (($level &  E_ALL)                  ==  E_ALL)                  $levels = ['E_ALL'];                    // 32767
+        else if (($level & (E_ALL & ~E_DEPRECATED)) == (E_ALL & ~E_DEPRECATED)) $levels = ['E_ALL & ~E_DEPRECATED'];    // 24575
+        else {
+            foreach ($levels as $key => $value) {
+                if ($level & $key) continue;
+                unset($levels[$key]);
+            }
+        }
+        return join('|', $levels);
+    }
+
+
+    /**
      * Take a regular PHP stacktrace and adjust it to be more readable.
      *
      * @param  array  $trace           - regular PHP stacktrace
@@ -543,7 +584,7 @@ class ErrorHandler extends StaticClass {
      * Return a stack frame's full method name similar to the constant __METHOD__. Used for generating a formatted stacktrace.
      *
      * @param  array $frame                - frame
-     * @param  bool  $nsToLower [optional] - whether to return the namespace part in lower case (default: no)
+     * @param  bool  $nsToLower [optional] - whether to return the namespace part in lower case (default: unmodified)
      *
      * @return string - method name (without trailing parentheses)
      */
@@ -565,46 +606,5 @@ class ErrorHandler extends StaticClass {
             }
         }
         return $class.$function;
-    }
-
-
-    /**
-     * Return a readable representation of an error reporting level.
-     *
-     * @param  int $level - error reporting level
-     *
-     * @return string
-     */
-    public static function errorLevelToStr($level) {
-        Assert::int($level);
-
-        $levels = [
-            E_ERROR             => 'E_ERROR',                   //     1
-            E_WARNING           => 'E_WARNING',                 //     2
-            E_PARSE             => 'E_PARSE',                   //     4
-            E_NOTICE            => 'E_NOTICE',                  //     8
-            E_CORE_ERROR        => 'E_CORE_ERROR',              //    16
-            E_CORE_WARNING      => 'E_CORE_WARNING',            //    32
-            E_COMPILE_ERROR     => 'E_COMPILE_ERROR',           //    64
-            E_COMPILE_WARNING   => 'E_COMPILE_WARNING',         //   128
-            E_USER_ERROR        => 'E_USER_ERROR',              //   256
-            E_USER_WARNING      => 'E_USER_WARNING',            //   512
-            E_USER_NOTICE       => 'E_USER_NOTICE',             //  1024
-            E_STRICT            => 'E_STRICT',                  //  2048
-            E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',       //  4096
-            E_DEPRECATED        => 'E_DEPRECATED',              //  8192
-            E_USER_DEPRECATED   => 'E_USER_DEPRECATED',         // 16384
-        ];
-
-        if      (!$level)                                                       $levels = ['0'];                        //     0
-        else if (($level &  E_ALL)                  ==  E_ALL)                  $levels = ['E_ALL'];                    // 32767
-        else if (($level & (E_ALL & ~E_DEPRECATED)) == (E_ALL & ~E_DEPRECATED)) $levels = ['E_ALL & ~E_DEPRECATED'];    // 24575
-        else {
-            foreach ($levels as $key => $value) {
-                if ($level & $key) continue;
-                unset($levels[$key]);
-            }
-        }
-        return join('|', $levels);
     }
 }

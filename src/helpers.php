@@ -1015,7 +1015,7 @@ function strRight($string, $length) {
  *                                             (default: 1 = the first occurrence)
  * @param  bool   $includeLimiter [optional] - whether to include the limiting substring in the returned result
  *                                             (default: FALSE)
- * @param  mixed  $onNotFound     [optional] - value to return if the specified occurrence of the limiting substring is not found
+ * @param  string $onNotFound     [optional] - value to return if the specified occurrence of the limiting substring is not found
  *                                             (default: empty string)
  *
  * @return string - right part of the initial string or the $onNotFound value
@@ -1028,7 +1028,7 @@ function strRight($string, $length) {
  *  strRightFrom('abc_abc', 'b', -2) => 'c_abc'
  * </pre>
  */
-function strRightFrom($string, $limiter, $count=1, $includeLimiter=false, $onNotFound=null) {
+function strRightFrom($string, $limiter, $count=1, $includeLimiter=false, $onNotFound='') {
     Assert::string($string,         '$string');
     Assert::string($limiter,        '$limiter');
     Assert::int   ($count,          '$count');

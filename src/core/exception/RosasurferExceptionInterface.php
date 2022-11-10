@@ -71,14 +71,6 @@ interface RosasurferExceptionInterface {
 
 
     /**
-     * Return the name of the function or method where the exception was created (if any).
-     *
-     * @return string
-     */
-    public function getFunction();
-
-
-    /**
      * Return the stack trace of the exception.
      *
      * @return array
