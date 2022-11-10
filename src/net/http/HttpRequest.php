@@ -3,8 +3,8 @@ namespace rosasurfer\net\http;
 
 use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\core\exception\IllegalTypeException;
 use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\InvalidTypeException;
 
 
 /**
@@ -186,7 +186,7 @@ class HttpRequest extends CObject {
                 Assert::string($name, '$names['.$i.']');
             }
         }
-        else throw new IllegalTypeException('Illegal type of parameter $names: '.gettype($names));
+        else throw new InvalidTypeException('Illegal type of parameter $names: '.gettype($names));
 
         // without a name return all headers
         if (!$names) {

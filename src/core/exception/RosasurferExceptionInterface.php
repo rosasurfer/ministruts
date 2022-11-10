@@ -119,7 +119,7 @@ interface RosasurferExceptionInterface {
 
 
     /**
-     * Return a string representation of the (if any).
+     * Return a string representation of the exception.
      *
      * @return string
      */

@@ -2,7 +2,7 @@
 namespace rosasurfer\core\di\service;
 
 use rosasurfer\core\exception\ClassNotFoundException;
-use rosasurfer\core\exception\IllegalTypeException;
+use rosasurfer\core\exception\InvalidTypeException;
 
 use function rosasurfer\is_class;
 
@@ -107,7 +107,7 @@ class Service implements ServiceInterface {
         else if (is_object($definition)) {                  // objects may be a \Closure or an already resolved instance
             $instance = $definition instanceof \Closure ? $definition(...$parameters) : $definition;
         }
-        else throw new IllegalTypeException('Cannot resolve service "'.$this->name.'" (illegal definition type: '.gettype($definition).')');
+        else throw new InvalidTypeException('Cannot resolve service "'.$this->name.'" (illegal definition type: '.gettype($definition).')');
 
         if (!$factory)
             $this->instance = $instance;

@@ -6,8 +6,8 @@ use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\error\ErrorHandler;
 use rosasurfer\core\exception\IllegalStateException;
-use rosasurfer\core\exception\IllegalTypeException;
 use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\InvalidTypeException;
 use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\net\NetTools;
 
@@ -704,7 +704,7 @@ class Request extends CObject {
                 Assert::string($name, '$names['.$i.']');
             }
         }
-        else throw new IllegalTypeException('Illegal type of parameter $names: '.gettype($names));
+        else throw new InvalidTypeException('Illegal type of parameter $names: '.gettype($names));
 
         // read all headers once
         static $headers = null; if ($headers === null) {
@@ -764,7 +764,7 @@ class Request extends CObject {
                 Assert::string($name, '$names['.$i.']');
             }
         }
-        else throw new IllegalTypeException('Illegal type of parameter $names: '.gettype($names));
+        else throw new InvalidTypeException('Illegal type of parameter $names: '.gettype($names));
 
         $headers = $this->getHeaders($names);
         if ($headers)
@@ -788,7 +788,7 @@ class Request extends CObject {
                 Assert::string($name, '$names['.$i.']');
             }
         }
-        else throw new IllegalTypeException('Illegal type of parameter $names: '.gettype($names));
+        else throw new InvalidTypeException('Illegal type of parameter $names: '.gettype($names));
 
         $headers = $this->getHeaders($names);
         if (!$headers)
@@ -960,7 +960,7 @@ class Request extends CObject {
      * @param  string     $message - message; if NULL is passed the message for the specified key is removed
      */
     public function setActionMessage($key, $message) {
-        if (!is_string($key) && !is_int($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.gettype($key));
+        if (!is_string($key) && !is_int($key)) throw new InvalidTypeException('Illegal type of parameter $key: '.gettype($key));
         Assert::nullOrString($message, '$message');
 
         if (!isset($message)) {
@@ -1064,7 +1064,7 @@ class Request extends CObject {
      * @param  string     $message - message; if NULL is passed the error for the specified key is removed
      */
     public function setActionError($key, $message) {
-        if (!is_string($key) && !is_int($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.gettype($key));
+        if (!is_string($key) && !is_int($key)) throw new InvalidTypeException('Illegal type of parameter $key: '.gettype($key));
         Assert::nullOrString($message, '$message');
 
         if (!isset($message)) {
@@ -1166,7 +1166,7 @@ class Request extends CObject {
             if (strlen($content)) {
                 $string .= NL.substr($content, 0, 1024).NL;                     // limit the request body to 1024 bytes
             }
-            Assert::string($string);                                            
+            Assert::string($string);
         }                                                                       // Ensure __toString() doesn't throw an exception as otherwise
         catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }  // PHP < 7.4 will trigger a non-catchable fatal error.
         catch (\Exception $ex) { ErrorHandler::handleToStringException($ex); }  // @see  https://bugs.php.net/bug.php?id=53648
