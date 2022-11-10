@@ -645,7 +645,7 @@ class Logger extends StaticClass {
      * @param  array $context - reference to the log context
      */
     private static function generateTrace(array &$context) {
-        $trace = ErrorHandler::adjustTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), __FILE__, __LINE__);
+        $trace = ErrorHandler::getBetterTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), __FILE__, __LINE__);
         $LoggerLog = strtolower(__CLASS__.'::log');
 
         foreach ($trace as $i => $frame) {

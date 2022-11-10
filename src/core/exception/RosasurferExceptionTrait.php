@@ -12,7 +12,6 @@ use const rosasurfer\NL;
  */
 trait RosasurferExceptionTrait {
 
-
     /** @var string - better message */
     private $betterMessage;
 

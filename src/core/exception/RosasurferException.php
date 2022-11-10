@@ -26,7 +26,9 @@ class RosasurferException extends \Exception implements RosasurferExceptionInter
     }
 
 
-    /**
+	/**
+     * Return the stack trace of the exception in a more readable way.
+     *
      * @return array
      */
     public function getBetterTrace() {
@@ -34,7 +36,7 @@ class RosasurferException extends \Exception implements RosasurferExceptionInter
 
         if (!$betterTrace) {
             // transform the original stacktrace into a better one
-            $betterTrace = ErrorHandler::adjustTrace($this->getTrace(), $this->getFile(), $this->getLine());
+            $betterTrace = ErrorHandler::getBetterTrace($this->getTrace(), $this->getFile(), $this->getLine());
 
             /*
             // if the exception was thrown in a magic "__set()" shift frames until we reach the erroneous assignment

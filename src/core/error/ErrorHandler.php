@@ -460,33 +460,8 @@ class ErrorHandler extends StaticClass {
 
 
     /**
-     * Return the stacktrace of an exception in a more readable way as a string. The returned string contains nested exceptions.
-     * Same as {@link IRosasurferException::getBetterTraceAsString()} except that this method can be used with all PHP exceptions.
-     *
-     * @param  \Exception|\Throwable $exception         - any exception (PHP5) or throwable (PHP7)
-     * @param  string                $indent [optional] - indent the resulting lines by the specified value
-     *                                                    (default: no indentation)
-     * @return string - readable stacktrace
-     */
-    public static function getBetterTraceAsString($exception, $indent = '') {
-        Assert::throwable($exception, '$exception');
-
-        if ($exception instanceof IRosasurferException) $trace = $exception->getBetterTrace();
-        else                                            $trace = self::adjustTrace($exception->getTrace(), $exception->getFile(), $exception->getLine());
-        $result = self::formatTrace($trace, $indent);
-
-        if ($cause = $exception->getPrevious()) {
-            // recursively add stacktraces of nested exceptions
-            $message = trim(self::getBetterMessage($cause, $indent));
-            $result .= NL.$indent.'caused by'.NL.$indent.$message.NL.NL;
-            $result .= self::{__FUNCTION__}($cause, $indent);                 // recursion
-        }
-        return $result;
-    }
-
-
-    /**
-     * Take a regular PHP stacktrace and adjust it to be more readable.
+     * Takes a regular PHP stacktrace and adjusts it to be more readable. Same as {@link IRosasurferException::getBetterTrace()} except
+     * that this method can be used with all PHP exceptions.
      *
      * @param  array  $trace           - regular PHP stacktrace
      * @param  string $file [optional] - name of the file where the stacktrace was generated
@@ -495,7 +470,7 @@ class ErrorHandler extends StaticClass {
      * @return array - adjusted stacktrace
      *
      * @example
-     * before:
+     * before: frame locations point to the called statement
      * <pre>
      *  require_once()  # line 5,  file: /var/www/phalcon/vokuro/vendor/autoload.php
      *  include_once()  # line 21, file: /var/www/phalcon/vokuro/app/config/loader.php
@@ -503,7 +478,7 @@ class ErrorHandler extends StaticClass {
      *  {main}
      * </pre>
      *
-     * after:
+     * after: frame locations point to the calling statement
      * <pre>
      *  require_once()             [php]
      *  include_once()  # line 5,  file: /var/www/phalcon/vokuro/vendor/autoload.php
@@ -511,7 +486,7 @@ class ErrorHandler extends StaticClass {
      *  {main}          # line 26, file: /var/www/phalcon/vokuro/public/index.php
      * </pre>
      */
-    public static function adjustTrace(array $trace, $file='unknown', $line=0) {
+    public static function getBetterTrace(array $trace, $file='unknown', $line=0) {
         // check if the stacktrace is already adjusted
         if ($trace && isset($trace[0]['__ministruts_adjusted__']))
             return $trace;
@@ -548,7 +523,7 @@ class ErrorHandler extends StaticClass {
             unset($trace[0]['file'], $trace[0]['line']);        // otherwise delete them
         }
 
-        // remove the last frame (the one appended for the main script) if it now points to an unknown location (PHP core).
+        // remove the last frame (the one appended for the main script) if it now points to an unknown location (the PHP core)
         $size = sizeof($trace);
         !isset($trace[$size-1]['file']) && \array_pop($trace);
 
@@ -557,8 +532,34 @@ class ErrorHandler extends StaticClass {
         // TODO: fix wrong stack frames originating from calls to virtual static functions
         //
         // phalcon\mvc\Model::__callStatic()                  [php-phalcon]
-        // vokuro\models\Users::findFirstByEmail() # line 27, file: F:\Projekte\phalcon\sample-apps\vokuro\app\library\Auth\Auth.php
-        // vokuro\auth\Auth->check()               # line 27, file: F:\Projekte\phalcon\sample-apps\vokuro\app\library\Auth\Auth.php
+        // vokuro\models\Users::findFirstByEmail() # line 27, file: F:\Projects\phalcon\sample-apps\vokuro\app\library\Auth\Auth.php
+        // vokuro\auth\Auth->check()               # line 27, file: F:\Projects\phalcon\sample-apps\vokuro\app\library\Auth\Auth.php
+    }
+
+
+    /**
+     * Return the stacktrace of an exception in a more readable way as a string. The returned string contains nested exceptions.
+     * Same as {@link IRosasurferException::getBetterTraceAsString()} except that this method can be used with all PHP exceptions.
+     *
+     * @param  \Exception|\Throwable $exception         - any exception (PHP5) or throwable (PHP7)
+     * @param  string                $indent [optional] - indent the resulting lines by the specified value
+     *                                                    (default: no indentation)
+     * @return string - readable stacktrace
+     */
+    public static function getBetterTraceAsString($exception, $indent = '') {
+        Assert::throwable($exception, '$exception');
+
+        if ($exception instanceof IRosasurferException) $trace = $exception->getBetterTrace();
+        else                                            $trace = self::getBetterTrace($exception->getTrace(), $exception->getFile(), $exception->getLine());
+        $result = self::formatTrace($trace, $indent);
+
+        if ($cause = $exception->getPrevious()) {
+            // recursively add stacktraces of nested exceptions
+            $message = trim(self::getBetterMessage($cause, $indent));
+            $result .= NL.$indent.'caused by'.NL.$indent.$message.NL.NL;
+            $result .= self::{__FUNCTION__}($cause, $indent);                 // recursion
+        }
+        return $result;
     }
 
 
