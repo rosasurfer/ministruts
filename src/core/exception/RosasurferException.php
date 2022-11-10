@@ -34,7 +34,7 @@ class RosasurferException extends \Exception implements RosasurferExceptionInter
 
         if (!$betterTrace) {
             // transform the original stacktrace into a better one
-            $betterTrace = DebugHelper::fixTrace($this->getTrace(), $this->getFile(), $this->getLine());
+            $betterTrace = DebugHelper::adjustTrace($this->getTrace(), $this->getFile(), $this->getLine());
 
             /*
             // if the exception was thrown in a magic "__set()" shift frames until we reach the erroneous assignment

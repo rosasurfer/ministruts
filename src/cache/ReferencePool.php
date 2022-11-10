@@ -13,7 +13,7 @@ use rosasurfer\core\assert\Assert;
  * sicher, dass mehrere Zugriffe auf ein gespeichertes Object immer ein und dieselbe Instanz zurueckliefern
  * und wird deshalb intern von jedem Cache als Reference-Pool verwendet.
  *
- * @todo  ReferencePool muss ein Singleton sein
+ * TODO: ReferencePool muss ein Singleton sein
  */
 final class ReferencePool extends CachePeer {
 

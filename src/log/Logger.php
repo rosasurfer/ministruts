@@ -72,10 +72,10 @@ use rosasurfer\core\error\ErrorHandler;
  * </pre>
  *
  *
- * @todo   Logger::resolveLogCaller() - test with Closure and internal PHP functions
- * @todo   refactor into separate appenders (classes)
- * @todo   implement \Psr\Log\LoggerInterface and remove static crap
- * @todo   support full email addresses as in "Joe Blow <address@domain.tld>"
+ * TODO: Logger::resolveCaller() - test with Closure and internal PHP functions
+ * TODO: refactor into separate appender classes
+ * TODO: implement \Psr\Log\LoggerInterface and remove static crap
+ * TODO: support full email addresses as in "Joe Blow <address@domain.tld>"
  */
 class Logger extends StaticClass {
 
@@ -405,7 +405,7 @@ class Logger extends StaticClass {
      * @param  array                        $context  - reference to the log context
      */
     private static function composeCliMessage($loggable, $level, array &$context) {
-        !isset($context['file'], $context['line']) && self::resolveLogLocation($context);
+        !isset($context['file'], $context['line']) && self::resolveCallLocation($context);
         $file = $context['file'];
         $line = $context['line'];
 
@@ -478,7 +478,7 @@ class Logger extends StaticClass {
      * @param  array                        $context  - reference to the log context
      */
     private static function composeHtmlMessage($loggable, $level, array &$context) {
-        !isset($context['file'], $context['line']) && self::resolveLogLocation($context);
+        !isset($context['file'], $context['line']) && self::resolveCallLocation($context);
         $file = $context['file'];
         $line = $context['line'];
 
@@ -610,11 +610,26 @@ class Logger extends StaticClass {
 
 
     /**
-     * Resolve the location the logger was called from and store it in the log context under the keys "file" and "line".
+     * Resolve the class scope the logger was called from and store it under $context['class']. For log messages from the ErrorHandler
+     * this context field will be pre-populated. For log messages from user-land the field may be empty and is resolved here.
+     *
+     * @param  array $context - reference to the log context
+     *
+     * TODO: test with Closure and internal PHP functions
+     */
+    private static function resolveCaller(array &$context) {
+        !isset($context['trace']) && self::generateStackTrace($context);
+        $trace = $context['trace'];
+        $context['class'] = isset($trace[0]['class']) ? $trace[0]['class'] : '';
+    }
+
+
+    /**
+     * Resolve the file location the logger was called from and store it under $context['file'] and $context['line'].
      *
      * @param  array $context - reference to the log context
      */
-    private static function resolveLogLocation(array &$context) {
+    private static function resolveCallLocation(array &$context) {
         !isset($context['trace']) && self::generateStackTrace($context);
         $trace = $context['trace'];
 
@@ -633,27 +648,13 @@ class Logger extends StaticClass {
 
 
     /**
-     * Resolve the class the logger was called from and store it under $context['class'].
-     *
-     * @param  array $context - reference to the log context
-     *
-     * TODO:  test with Closure and internal PHP functions
-     */
-    private static function resolveCaller(array &$context) {
-        !isset($context['trace']) && self::generateStackTrace($context);
-        $trace = $context['trace'];
-        $context['class'] = isset($trace[0]['class']) ? $trace[0]['class'] : '';
-    }
-
-
-    /**
      * Generate an internal stacktrace and store it under $context['trace'].
      *
      * @param  array $context - reference to the log context
      */
     private static function generateStackTrace(array &$context) {
         if (!isset($context['trace'])) {
-            $trace = DebugHelper::fixTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), __FILE__, __LINE__);
+            $trace = DebugHelper::adjustTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), __FILE__, __LINE__);
 
             foreach ($trace as $i => $frame) {
                 if (!isset($frame['class']) || $frame['class']!=__CLASS__)      // remove non-logger frames

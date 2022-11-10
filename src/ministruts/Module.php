@@ -112,7 +112,7 @@ class Module extends CObject {
      *
      * @throws StrutsConfigException on configuration errors
      *
-     * @todo   check/handle different config file encodings
+     * TODO: check/handle different config file encodings
      */
     public function __construct($fileName, $prefix) {
         Assert::string($fileName, '$fileName');

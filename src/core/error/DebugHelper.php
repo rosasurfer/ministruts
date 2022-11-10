@@ -18,16 +18,16 @@ use const rosasurfer\NL;
 class DebugHelper extends StaticClass {
 
     /**
-     * Take a regular PHP stacktrace and create a fixed and more readable Java-like one.
+     * Take a regular PHP stacktrace and adjust it to be more readable.
      *
      * @param  array  $trace           - regular PHP stacktrace
      * @param  string $file [optional] - name of the file where the stacktrace was generated
      * @param  int    $line [optional] - line of the file where the stacktrace was generated
      *
-     * @return array - new fixed stacktrace
+     * @return array - adjusted stacktrace
      *
      * @example
-     * original stacktrace:
+     * before:
      * <pre>
      *  require_once()  # line 5,  file: /var/www/phalcon/vokuro/vendor/autoload.php
      *  include_once()  # line 21, file: /var/www/phalcon/vokuro/app/config/loader.php
@@ -35,7 +35,7 @@ class DebugHelper extends StaticClass {
      *  {main}
      * </pre>
      *
-     * new stacktrace:
+     * after:
      * <pre>
      *  require_once()             [php]
      *  include_once()  # line 5,  file: /var/www/phalcon/vokuro/vendor/autoload.php
@@ -43,12 +43,12 @@ class DebugHelper extends StaticClass {
      *  {main}          # line 26, file: /var/www/phalcon/vokuro/public/index.php
      * </pre>
      */
-    public static function fixTrace(array $trace, $file='unknown', $line=0) {
-        // check if the stacktrace is already fixed
-        if ($trace && isset($trace[0]['fixed']))
+    public static function adjustTrace(array $trace, $file='unknown', $line=0) {
+        // check if the stacktrace is already adjusted
+        if ($trace && isset($trace[0]['__ministruts_adjusted__']))
             return $trace;
 
-        // Fix an incomplete frame[0][line] if parameters are provided and $file matches (e.g. with \SimpleXMLElement).
+        // fix an incomplete frame[0][line] if parameters are provided and $file matches (e.g. with \SimpleXMLElement)
         if ($file!='unknown' && $line) {
             if (isset($trace[0]['file']) && $trace[0]['file']==$file) {
                 if (isset($trace[0]['line']) && $trace[0]['line']===0) {
@@ -57,10 +57,10 @@ class DebugHelper extends StaticClass {
             }
         }
 
-        // Add a frame for the main script to the bottom (end of array).
+        // append a frame for the main script
         $trace[] = ['function' => '{main}'];
 
-        // Move FILE and LINE fields down (to the end) by one position.
+        // move fields FILE and LINE to the end by one position
         for ($i=sizeof($trace); $i--;) {
             if (isset($trace[$i-1]['file'])) $trace[$i]['file'] = $trace[$i-1]['file'];
             else                       unset($trace[$i]['file']);
@@ -68,10 +68,10 @@ class DebugHelper extends StaticClass {
             if (isset($trace[$i-1]['line'])) $trace[$i]['line'] = $trace[$i-1]['line'];
             else                       unset($trace[$i]['line']);
 
-            $trace[$i]['fixed'] = true;
+            $trace[$i]['__ministruts_adjusted__'] = true;
         }
 
-        // Add location details from parameters to frame[0] only if they differ from the old values (now in frame[1])
+        // add location details from parameters to frame[0] only if they differ from the old values (now in frame[1])
         if (!isset($trace[1]['file']) || !isset($trace[1]['line']) || $trace[1]['file']!=$file || $trace[1]['line']!=$line) {
             $trace[0]['file'] = $file;                          // test with:
             $trace[0]['line'] = $line;                          // \SQLite3::enableExceptions(true|false);
@@ -80,20 +80,17 @@ class DebugHelper extends StaticClass {
             unset($trace[0]['file'], $trace[0]['line']);        // otherwise delete them
         }
 
-        // Remove the last frame (the one we added for the main script) if it now points to an unknown location (PHP core).
+        // remove the last frame (the one appended for the main script) if it now points to an unknown location (PHP core).
         $size = sizeof($trace);
-        if (!isset($trace[$size-1]['file'])) {
-            \array_pop($trace);
-        }
+        !isset($trace[$size-1]['file']) && \array_pop($trace);
+
         return $trace;
 
-        /**
-         * TODO: fix wrong stack frames originating from calls to virtual static functions
-         *
-         * phalcon\mvc\Model::__callStatic()                  [php-phalcon]
-         * vokuro\models\Users::findFirstByEmail() # line 27, file: F:\Projekte\phalcon\sample-apps\vokuro\app\library\Auth\Auth.php
-         * vokuro\auth\Auth->check()               # line 27, file: F:\Projekte\phalcon\sample-apps\vokuro\app\library\Auth\Auth.php
-         */
+        // TODO: fix wrong stack frames originating from calls to virtual static functions
+        //
+        // phalcon\mvc\Model::__callStatic()                  [php-phalcon]
+        // vokuro\models\Users::findFirstByEmail() # line 27, file: F:\Projekte\phalcon\sample-apps\vokuro\app\library\Auth\Auth.php
+        // vokuro\auth\Auth->check()               # line 27, file: F:\Projekte\phalcon\sample-apps\vokuro\app\library\Auth\Auth.php
     }
 
 
@@ -184,7 +181,7 @@ class DebugHelper extends StaticClass {
         Assert::throwable($exception, '$exception');
 
         if ($exception instanceof IRosasurferException) $trace = $exception->getBetterTrace();
-        else                                            $trace = self::fixTrace($exception->getTrace(), $exception->getFile(), $exception->getLine());
+        else                                            $trace = self::adjustTrace($exception->getTrace(), $exception->getFile(), $exception->getLine());
         $result = self::formatTrace($trace, $indent);
 
         if ($cause = $exception->getPrevious()) {

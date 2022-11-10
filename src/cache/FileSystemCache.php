@@ -17,7 +17,7 @@ use function rosasurfer\strEndsWith;
  *
  * Cacht Objekte im Dateisystem.
  *
- * @todo  Cache-Values in Wrapperobjekt speichern und CREATED, EXPIRES etc. verarbeiten
+ * TODO: Cache-Values in Wrapperobjekt speichern und CREATED, EXPIRES etc. verarbeiten
  */
 final class FileSystemCache extends CachePeer {
 

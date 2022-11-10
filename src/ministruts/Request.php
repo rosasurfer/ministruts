@@ -217,7 +217,7 @@ class Request extends CObject {
      *
      * @return array - associative array of files
      *
-     * @todo   Convert the returned arrays to instances of {@link UploadedFile}.
+     * TODO: Convert the returned arrays to instances of {@link UploadedFile}.
      */
     public function getFiles() {
         if (!isset($this->files)) {
@@ -254,7 +254,7 @@ class Request extends CObject {
      *
      * @return array|null - array or NULL if no such file was uploaded
      *
-     * @todo   Convert the returned array to an instance of {@link UploadedFile}.
+     * TODO: Convert the returned array to an instance of {@link UploadedFile}.
      */
     public function getFile($name) {
         Assert::string($name);

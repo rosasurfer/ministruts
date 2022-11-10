@@ -181,27 +181,27 @@ class ErrorHandler extends StaticClass {
 
         // wrap all errors in the matching PHPError exception
         switch ($level) {
-            case E_PARSE            : $exception = new PHPParseError      ($message, 0, $level, $file, $line); break;
-            case E_COMPILE_WARNING  : $exception = new PHPCompileWarning  ($message, 0, $level, $file, $line); break;
-            case E_COMPILE_ERROR    : $exception = new PHPCompileError    ($message, 0, $level, $file, $line); break;
-            case E_CORE_WARNING     : $exception = new PHPCoreWarning     ($message, 0, $level, $file, $line); break;
-            case E_CORE_ERROR       : $exception = new PHPCoreError       ($message, 0, $level, $file, $line); break;
-            case E_STRICT           : $exception = new PHPStrict          ($message, 0, $level, $file, $line); break;
-            case E_DEPRECATED       : $exception = new PHPDeprecated      ($message, 0, $level, $file, $line); break;
-            case E_NOTICE           : $exception = new PHPNotice          ($message, 0, $level, $file, $line); break;
-            case E_WARNING          : $exception = new PHPWarning         ($message, 0, $level, $file, $line); break;
-            case E_ERROR            : $exception = new PHPError           ($message, 0, $level, $file, $line); break;
-            case E_RECOVERABLE_ERROR: $exception = new PHPRecoverableError($message, 0, $level, $file, $line); break;
-            case E_USER_DEPRECATED  : $exception = new PHPUserDeprecated  ($message, 0, $level, $file, $line); break;
-            case E_USER_NOTICE      : $exception = new PHPUserNotice      ($message, 0, $level, $file, $line); break;
-            case E_USER_WARNING     : $exception = new PHPUserWarning     ($message, 0, $level, $file, $line); break;
-            case E_USER_ERROR       : $exception = new PHPUserError       ($message, 0, $level, $file, $line); break;
-            default                 : $exception = new PHPUnknownError    ($message, 0, $level, $file, $line);
+            case E_PARSE            : $error = new PHPParseError      ($message, 0, $level, $file, $line); break;
+            case E_COMPILE_WARNING  : $error = new PHPCompileWarning  ($message, 0, $level, $file, $line); break;
+            case E_COMPILE_ERROR    : $error = new PHPCompileError    ($message, 0, $level, $file, $line); break;
+            case E_CORE_WARNING     : $error = new PHPCoreWarning     ($message, 0, $level, $file, $line); break;
+            case E_CORE_ERROR       : $error = new PHPCoreError       ($message, 0, $level, $file, $line); break;
+            case E_STRICT           : $error = new PHPStrict          ($message, 0, $level, $file, $line); break;
+            case E_DEPRECATED       : $error = new PHPDeprecated      ($message, 0, $level, $file, $line); break;
+            case E_NOTICE           : $error = new PHPNotice          ($message, 0, $level, $file, $line); break;
+            case E_WARNING          : $error = new PHPWarning         ($message, 0, $level, $file, $line); break;
+            case E_ERROR            : $error = new PHPError           ($message, 0, $level, $file, $line); break;
+            case E_RECOVERABLE_ERROR: $error = new PHPRecoverableError($message, 0, $level, $file, $line); break;
+            case E_USER_DEPRECATED  : $error = new PHPUserDeprecated  ($message, 0, $level, $file, $line); break;
+            case E_USER_NOTICE      : $error = new PHPUserNotice      ($message, 0, $level, $file, $line); break;
+            case E_USER_WARNING     : $error = new PHPUserWarning     ($message, 0, $level, $file, $line); break;
+            case E_USER_ERROR       : $error = new PHPUserError       ($message, 0, $level, $file, $line); break;
+            default                 : $error = new PHPUnknownError    ($message, 0, $level, $file, $line);
         }
 
         // handle it according to the error handling mode
         if (self::$errorHandlingMode == self::ERRORS_LOG) {
-            Logger::log($exception, L_ERROR, $context);
+            Logger::log($error, L_ERROR, $context);
 
             if (self::$prevErrorHandler) {                                      // chain a previously active error handler
                 call_user_func(self::$prevErrorHandler, ...func_get_args());    // a possibly static handler must be invoked with call_user_func()
@@ -216,7 +216,7 @@ class ErrorHandler extends StaticClass {
          * ---------------------------
          */
         if (self::$inShutdown && $level==E_ERROR && preg_match(self::$oomRegExp, $message)) {
-            return true(Logger::log($message, L_FATAL, $context));              // logging the error is sufficient as there is no stacktrace anyway
+            return true(Logger::log($message, L_FATAL, $context));              // logging the message is sufficient as there is no stacktrace anyway
         }
 
         /**
@@ -229,19 +229,19 @@ class ErrorHandler extends StaticClass {
          *
          * @see  http://stackoverflow.com/questions/25584494/php-set-exception-handler-not-working-for-error-thrown-in-set-error-handler-cal
          */
-        $trace = $exception->getBetterTrace();
+        $trace = $error->getBetterTrace();
         if ($trace) {                                                           // after a fatal error the trace may be empty
             $function = DebugHelper::getFQFunctionName($trace[0]);
             if ($function=='require' || $function=='require_once') {
                 $currentHandler = set_exception_handler(function() {});
                 restore_exception_handler();
-                $currentHandler && call_user_func($currentHandler, $exception); // We MUST use call_user_func() as a static handler cannot be invoked dynamically.
+                $currentHandler && call_user_func($currentHandler, $error);     // We MUST use call_user_func() as a static handler cannot be invoked dynamically.
                 return (bool)$currentHandler;                                   // PHP will terminate the script anyway
             }
         }
 
         // throw back everything else
-        throw $exception;
+        throw $error;
     }
 
 

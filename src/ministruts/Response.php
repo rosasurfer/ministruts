@@ -166,7 +166,7 @@ class Response extends Singleton {
      * @return string - absolute URL
      *
      *
-     * @todo   Rewrite as parse_url() fails at query parameters with colons, e.g. "/beanstalk-console?server=vm-centos:11300".
+     * TODO: Rewrite as parse_url() fails at query parameters with colons, e.g. "/beanstalk-console?server=vm-centos:11300".
      */
     public static function relativeToAbsoluteUrl($rel, $base) {
         $relFragment = strRightFrom($rel, '#');
