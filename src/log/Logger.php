@@ -57,10 +57,6 @@ use rosasurfer\core\error\ErrorHandler;
  *  - MailHandler:     Sends a log message to the configured mail receivers (email addresses). The handler is enabled if the application
  *                     configuration contains mail receivers for log messages.
  *
- *  - SMSHandler:      Sends a log message to the configured SMS receivers (phone numbers). The handler is enabled if the application
- *                     configuration contains phone numbers for log messages and a valid SMS operator configuration. Supported text message
- *                     providers are "Clickatell" and "Nexmo".
- *
  * Loglevel configuration
  * ----------------------
  * Loglevels can be configured for the whole application and per single class. For classes without specific configuration the general
@@ -73,9 +69,6 @@ use rosasurfer\core\error\ErrorHandler;
  *  log.level.foo\bar\MyClassB = notice                                 # set loglevel for "foo\bar\MyClassB" to L_NOTICE
  *
  *  log.mail.receiver          = user1@domain.tld, user2@domain.tld     # set mail receivers for the MailHandler
- *
- *  log.sms.level              = error                                  # set min. loglevel for text messages to L_ERROR
- *  log.sms.receiver           = +3591234567, +441234567                # set text message receivers in international number format
  * </pre>
  *
  *
@@ -118,18 +111,6 @@ class Logger extends StaticClass {
     /** @var string[] - mail receivers */
     private static $mailReceivers = [];
 
-    /** @var bool - whether the SMS handler is enabled */
-    private static $smsHandler = false;
-
-    /** @var string[] - SMS receivers */
-    private static $smsReceivers = [];
-
-    /** @var int - additional SMS loglevel constraint */
-    private static $smsLogLevel = null;
-
-    /** @var array - SMS options; resolved at log message time */
-    private static $smsOptions = [];
-
     /** @var bool - whether the PHP error_log handler is enabled */
     private static $errorLogHandler = true;
 
@@ -144,7 +125,7 @@ class Logger extends StaticClass {
         /** @var ConfigInterface $config */
         $config = self::di('config');
 
-        // Get the application's default loglevel configuration (fall back to the built-in default).
+        // resolve application default loglevel (fall-back to the built-in default)
         $logLevel = $config->get('log.level', '');
         if (is_array($logLevel))
             $logLevel = isset($logLevel['']) ? $logLevel[''] : '';
@@ -170,29 +151,6 @@ class Logger extends StaticClass {
         self::$printHandlerNonFatal = CLI || in_array($_SERVER['REMOTE_ADDR'], ['127.0.0.1', $_SERVER['SERVER_ADDR']])
                                           || ini_get_bool('display_errors')
                                           || (self::$printHandlerFatal && !self::$mailHandler);
-
-        // SMS handler: enabled if SMS receivers are configured (operator settings are checked at log time)
-        self::$smsReceivers = [];
-        foreach (explode(',', $config->get('log.sms.receiver', '')) as $receiver) {
-            if ($receiver=trim($receiver)) {
-                if (strStartsWith($receiver, '+' )) $receiver = substr($receiver, 1);
-                if (strStartsWith($receiver, '00')) $receiver = substr($receiver, 2);
-                if (!ctype_digit($receiver)) {
-                    self::log('Invalid SMS receiver configuration: "'.$receiver.'"', L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
-                    continue;
-                }
-                self::$smsReceivers[] = $receiver;
-            }
-        }
-        $logLevel = $config->get('log.sms.level', self::$appLogLevel);
-        if (is_string($logLevel))                                   // a string if configured
-            $logLevel = self::logLevelToId($logLevel) ?: self::$appLogLevel;
-        self::$smsLogLevel = $logLevel;
-
-        $options = $config->get('sms', []);
-        Assert::isArray($options, 'config value "sms"');
-        self::$smsOptions = $options;
-        self::$smsHandler = self::$smsReceivers && self::$smsOptions;
 
         // PHP error_log handler: enabled if the mail handler is disabled
         self::$errorLogHandler = !self::$mailHandler;
@@ -327,11 +285,8 @@ class Logger extends StaticClass {
                 self::$errorLogHandler && self::invokeErrorLogHandler($loggable, $level, $context);
                 self::${$printHandler} && self::invokePrintHandler   ($loggable, $level, $context);
                 self::$mailHandler     && self::invokeMailHandler    ($loggable, $level, $context);
-                self::$smsHandler      && self::invokeSmsHandler     ($loggable, $level, $context);
             }
-
-            // unlock the section
-            $isActive = false;
+            $isActive = false;                                                  // unlock the section
         }
         catch (\Throwable $logException) {}
         catch (\Exception $logException) {}
@@ -418,8 +373,8 @@ class Logger extends StaticClass {
     /**
      * Send the message to the configured mail receivers.
      *
-     * @param  string|\Exception|\Throwable $loggable - message or exception to log
-     * @param  int                          $level    - loglevel of the loggable
+     * @param  string|\Exception|\Throwable $loggable - message or exception
+     * @param  int                          $level    - loglevel
      * @param  array                        $context  - reference to the log context with additional data
      */
     private static function invokeMailHandler($loggable, $level, array &$context) {
@@ -448,112 +403,7 @@ class Logger extends StaticClass {
 
 
     /**
-     * Send the message to the configured SMS receivers (phone numbers).
-     *
-     * @param  string|\Exception|\Throwable $loggable - message or exception to log
-     * @param  int                          $level    - loglevel of the loggable
-     * @param  array                        $context  - reference to the log context with additional data
-     *
-     * @todo   replace CURL dependency with internal PHP functions
-     */
-    private static function invokeSmsHandler($loggable, $level, array &$context) {
-        if (!\key_exists('cliMessage', $context))
-            self::composeCliMessage($loggable, $level, $context);
-
-        // (1) CURL options (all service providers)
-        $curlOptions = [];
-        $curlOptions[CURLOPT_SSL_VERIFYPEER] = false;                  // the SSL certifikat may be self-signed or invalid
-      //$curlOptions[CURLOPT_VERBOSE       ] = true;                   // enable debugging
-
-
-        // (2) clean-up message
-        $message = trim($context['cliMessage']);
-        $message = normalizeEOL($message);                             // enforce Unix line-breaks
-        $message = substr($message, 0, 150);                           // limit length to about one text message
-
-
-        // (3) check availability and use Clickatell
-        if (isset(self::$smsOptions['clickatell'])) {
-            $smsOptions = self::$smsOptions['clickatell'];
-            if (!empty($smsOptions['user']) && !empty($smsOptions['password']) && !empty($smsOptions['api_id'])) {
-                $params = [];
-                $params['user'    ] = $smsOptions['user'    ];
-                $params['password'] = $smsOptions['password'];
-                $params['api_id'  ] = $smsOptions['api_id'  ];
-                $params['text'    ] = $message;
-
-                foreach (self::$smsReceivers as $receiver) {
-                    $params['to'] = $receiver;
-                    $url      = 'https://api.clickatell.com/http/sendmsg?'.http_build_query($params, null, '&');
-                    $request  = new HttpRequest($url);
-                    $client   = new CurlHttpClient($curlOptions);
-                    $response = $client->send($request);
-                    $status   = $response->getStatus();
-                    $content  = $response->getContent();
-
-                    if ($status != 200) {
-                        try {
-                            self::log('Unexpected HTTP status code '.$status.' ('.HttpResponse::$sc[$status].') for URL: '.$request->getUrl(), L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
-                        }
-                        catch (\Throwable $ex) {}   // intentionally eat it
-                        catch (\Exception $ex) {}
-                        continue;
-                    }
-                    if (strStartsWithI($content, 'ERR: 113')) {
-                        // TODO: 'ERR: 113' => max message parts exceeded, repeat with shortened message
-                        // TODO:               consider to send concatenated messages
-                    }
-                }
-                return;
-            }
-        }
-
-
-        // (4) check availability and use Nexmo
-        // TODO encoding issues when sending to Bulgarian receivers (some chars are auto-converted to ciryllic crap)
-        if (isset(self::$smsOptions['nexmo'])) {
-            $smsOptions = self::$smsOptions['nexmo'];
-            if (!empty($smsOptions['api_key']) && !empty($smsOptions['api_secret'])) {
-                $params = [];
-                $params['api_key'   ] =        $smsOptions['api_key'   ];
-                $params['api_secret'] =        $smsOptions['api_secret'];
-                $params['from'      ] = !empty($smsOptions['from'      ]) ? $smsOptions['from'] : 'PHP Logger';
-                $params['text'      ] =        $message;
-
-                foreach (self::$smsReceivers as $receiver) {
-                    $params['to'] = $receiver;
-                    $url      = 'https://rest.nexmo.com/sms/json?'.http_build_query($params, null, '&');
-                    $request  = new HttpRequest($url);
-                    $client   = new CurlHttpClient($curlOptions);
-                    $response = $client->send($request);
-                    $status   = $response->getStatus();
-                    $content  = $response->getContent();
-                    if ($status != 200) {
-                        try {
-                            self::log('Unexpected HTTP status code '.$status.' ('.HttpResponse::$sc[$status].') for URL: '.$request->getUrl(), L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
-                        }
-                        catch (\Throwable $ex) {}   // intentionally eat it
-                        catch (\Exception $ex) {}
-                        continue;
-                    }
-                    if (!isset($content)) {
-                        try {
-                            self::log('Empty reply from server, URL: '.$request->getUrl(), L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
-                        }
-                        catch (\Throwable $ex) {}   // intentionally eat it
-                        catch (\Exception $ex) {}
-                        continue;
-                    }
-                }
-                return;
-            }
-        }
-    }
-
-
-    /**
      * Compose a CLI log message and store it in the passed log context under the keys "cliMessage" and "cliExtra".
-     * The separation is used by the SMS handler which processes only the main "cliMessage".
      *
      * @param  string|\Exception|\Throwable $loggable - message or exception
      * @param  int                          $level    - loglevel
