@@ -3,7 +3,7 @@ namespace rosasurfer\db\sqlite;
 
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\InvalidValueException;
 use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\db\Connector;
@@ -103,7 +103,7 @@ class SQLiteConnector extends Connector {
      */
     protected function setFile($file) {
         Assert::string($file);
-        if (!strlen($file)) throw new InvalidArgumentException('Invalid parameter $file: "'.$file.'" (empty)');
+        if (!strlen($file)) throw new InvalidValueException('Invalid parameter $file: "'.$file.'" (empty)');
 
         if ($file == ':memory:' || !isRelativePath($file)) {
             $this->file = $file;

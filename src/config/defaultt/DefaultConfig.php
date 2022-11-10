@@ -4,7 +4,7 @@ namespace rosasurfer\config\defaultt;
 use rosasurfer\Application;
 use rosasurfer\config\Config;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\InvalidValueException;
 
 use const rosasurfer\CLI;
 
@@ -53,7 +53,7 @@ class DefaultConfig extends Config {
         else if (is_dir($location)) {
             $configDir = realpath($location);
         }
-        else throw new InvalidArgumentException('Location not found: "'.$location.'"');
+        else throw new InvalidValueException('Location not found: "'.$location.'"');
 
         // distributable config file
         $files[] = $configDir.'/config.dist.properties';

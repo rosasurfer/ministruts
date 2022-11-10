@@ -3,7 +3,7 @@ namespace rosasurfer\net\mail;
 
 use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\InvalidValueException;
 
 use function rosasurfer\strContains;
 use function rosasurfer\strEndsWith;
@@ -137,7 +137,7 @@ abstract class Mailer extends CObject implements MailerInterface {
      */
     protected function getHeader(array $headers, $name) {
         Assert::string($name, '$name');
-        if (!preg_match('/^[a-z]+(-[a-z]+)*$/i', $name)) throw new InvalidArgumentException('Invalid parameter $name: "'.$name.'"');
+        if (!preg_match('/^[a-z]+(-[a-z]+)*$/i', $name)) throw new InvalidValueException('Invalid parameter $name: "'.$name.'"');
 
         // reversely iterate over the array to find the last of duplicate headers
         for (end($headers); key($headers)!==null; prev($headers)){
@@ -160,7 +160,7 @@ abstract class Mailer extends CObject implements MailerInterface {
      */
     protected function removeHeader(array &$headers, $name) {
         Assert::string($name, '$name');
-        if (!preg_match('/^[a-z]+(-[a-z]+)*$/i', $name)) throw new InvalidArgumentException('Invalid parameter $name: "'.$name.'"');
+        if (!preg_match('/^[a-z]+(-[a-z]+)*$/i', $name)) throw new InvalidValueException('Invalid parameter $name: "'.$name.'"');
 
         $result = null;
 

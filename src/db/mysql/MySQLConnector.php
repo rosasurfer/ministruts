@@ -2,7 +2,7 @@
 namespace rosasurfer\db\mysql;
 
 use rosasurfer\core\assert\Assert;
-use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\InvalidValueException;
 use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\db\Connector;
@@ -104,7 +104,7 @@ class MySQLConnector extends Connector {
      */
     protected function setHost($hostname) {
         Assert::string($hostname);
-        if (!strlen($hostname)) throw new InvalidArgumentException('Invalid parameter $hostname: "'.$hostname.'" (empty)');
+        if (!strlen($hostname)) throw new InvalidValueException('Invalid parameter $hostname: "'.$hostname.'" (empty)');
 
         $host = $hostname;
         $port = null;
@@ -112,12 +112,12 @@ class MySQLConnector extends Connector {
         if (strpos($host, ':') !== false) {
             list($host, $port) = explode(':', $host, 2);
             $host = trim($host);
-            if (!strlen($host)) throw new InvalidArgumentException('Invalid parameter $hostname: "'.$hostname.'" (empty host name)');
+            if (!strlen($host)) throw new InvalidValueException('Invalid parameter $hostname: "'.$hostname.'" (empty host name)');
 
             $port = trim($port);
-            if (!ctype_digit($port)) throw new InvalidArgumentException('Invalid parameter $hostname: "'.$hostname.'" (not a port)');
+            if (!ctype_digit($port)) throw new InvalidValueException('Invalid parameter $hostname: "'.$hostname.'" (not a port)');
             $port = (int) $port;
-            if (!$port || $port > 65535) throw new InvalidArgumentException('Invalid parameter $hostname: "'.$hostname.'" (illegal port)');
+            if (!$port || $port > 65535) throw new InvalidValueException('Invalid parameter $hostname: "'.$hostname.'" (illegal port)');
         }
 
         $this->host = $host;
@@ -135,7 +135,7 @@ class MySQLConnector extends Connector {
      */
     protected function setUsername($name) {
         Assert::string($name);
-        if (!strlen($name)) throw new InvalidArgumentException('Invalid parameter $name: "'.$name.'" (empty)');
+        if (!strlen($name)) throw new InvalidValueException('Invalid parameter $name: "'.$name.'" (empty)');
 
         $this->username = $name;
         return $this;

@@ -6,8 +6,8 @@ use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\error\ErrorHandler;
 use rosasurfer\core\exception\IllegalStateException;
-use rosasurfer\core\exception\InvalidArgumentException;
 use rosasurfer\core\exception\InvalidTypeException;
+use rosasurfer\core\exception\InvalidValueException;
 use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\net\NetTools;
 
@@ -861,7 +861,7 @@ class Request extends CObject {
         Assert::int($expires, '$expires');
         Assert::nullOrString($path, '$path');
 
-        if ($expires < 0) throw new InvalidArgumentException('Invalid argument $expires: '.$expires);
+        if ($expires < 0) throw new InvalidValueException('Invalid parameter $expires: '.$expires);
 
         if (!isset($path)) {
             $path = $this->getApplicationBaseUri();

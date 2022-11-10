@@ -4,7 +4,7 @@ namespace rosasurfer\ministruts;
 use rosasurfer\core\Singleton;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\di\proxy\Request as RequestProxy;
-use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\InvalidValueException;
 use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\net\http\HttpResponse;
@@ -58,7 +58,7 @@ class Response extends Singleton {
      */
     public function setStatus($status) {
         Assert::int($status);
-        if ($status < 1) throw new InvalidArgumentException('Invalid argument $status: '.$status);
+        if ($status < 1) throw new InvalidValueException('Invalid parameter $status: '.$status);
 
         $this->status = $status;
         return $this;
@@ -175,8 +175,8 @@ class Response extends Singleton {
         $relQuery = strRightFrom($rel, '?');
         strlen($relQuery) && $rel = strLeft($rel, -strlen($relQuery)-1);
 
-        if (($relParts =parse_url($rel )) === false) throw new InvalidArgumentException('Invalid argument $rel: '.$rel);
-        if (($baseParts=parse_url($base)) === false) throw new InvalidArgumentException('Invalid argument $base: '.$base);
+        if (($relParts =parse_url($rel )) === false) throw new InvalidValueException('Invalid parameter $rel: '.$rel);
+        if (($baseParts=parse_url($base)) === false) throw new InvalidValueException('Invalid parameter $base: '.$base);
 
         if (strlen($relQuery)) {
             $relParts['query'] = $relQuery;

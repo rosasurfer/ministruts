@@ -10,7 +10,7 @@ use rosasurfer\core\di\DiInterface;
 use rosasurfer\core\di\defaultt\CliServiceContainer;
 use rosasurfer\core\di\defaultt\WebServiceContainer;
 use rosasurfer\core\error\ErrorHandler;
-use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\InvalidValueException;
 use rosasurfer\log\Logger;
 use rosasurfer\ministruts\FrontController;
 use rosasurfer\ministruts\Response;
@@ -284,7 +284,7 @@ class Application extends CObject {
      */
     protected function expandAppDirs(ConfigInterface $config, $rootDir) {
         Assert::string($rootDir, '$rootDir');
-        if (!strlen($rootDir) || isRelativePath($rootDir)) throw new InvalidArgumentException('Invalid config option "app.dir.root": "'.$rootDir.'" (not an absolute path)');
+        if (!strlen($rootDir) || isRelativePath($rootDir)) throw new InvalidValueException('Invalid config option "app.dir.root": "'.$rootDir.'" (not an absolute path)');
 
         $rootDir = rtrim(str_replace('\\', '/', $rootDir), '/');
         $dirs = $config->get('app.dir', []);

@@ -3,7 +3,7 @@ namespace rosasurfer\ministruts;
 
 use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\InvalidValueException;
 use rosasurfer\net\http\HttpResponse;
 
 use function rosasurfer\strLeftTo;
@@ -78,7 +78,7 @@ class ActionForward extends CObject {
      */
     public function setName($name) {
         Assert::string($name);
-        if (!strlen($name)) throw new InvalidArgumentException('Invalid argument $name: '.$name);
+        if (!strlen($name)) throw new InvalidValueException('Invalid parameter $name: '.$name);
 
         $this->name = $name;
         return $this;
@@ -104,7 +104,7 @@ class ActionForward extends CObject {
      */
     public function setPath($path) {
         Assert::string($path);
-        if (!strlen($path)) throw new InvalidArgumentException('Invalid argument $path: '.$path);
+        if (!strlen($path)) throw new InvalidValueException('Invalid parameter $path: '.$path);
 
         $this->path = $path;
         return $this;

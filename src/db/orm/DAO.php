@@ -3,7 +3,7 @@ namespace rosasurfer\db\orm;
 
 use rosasurfer\core\Singleton;
 use rosasurfer\core\exception\ClassNotFoundException;
-use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\InvalidTypeException;
 use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\db\ConnectorInterface as IConnector;
 use rosasurfer\db\MultipleRecordsException;
@@ -45,7 +45,7 @@ abstract class DAO extends Singleton {
     final public static function getImplementation($class) {
         if (!is_a($class, __CLASS__, $allowString=true)) {
             if (!is_class($class)) throw new ClassNotFoundException('Class not found: '.$class );
-            throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
+            throw new InvalidTypeException('Not a '.__CLASS__.' subclass: '.$class);
         }
         /** @var self $dao */
         $dao = self::getInstance($class);

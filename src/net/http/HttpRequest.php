@@ -3,8 +3,8 @@ namespace rosasurfer\net\http;
 
 use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\core\exception\InvalidArgumentException;
 use rosasurfer\core\exception\InvalidTypeException;
+use rosasurfer\core\exception\InvalidValueException;
 
 
 /**
@@ -56,7 +56,7 @@ class HttpRequest extends CObject {
      */
     public function setMethod($method) {
         Assert::string($method);
-        if ($method!=='GET' && $method!=='POST') throw new InvalidArgumentException('Invalid argument $method: '.$method);
+        if ($method!=='GET' && $method!=='POST') throw new InvalidValueException('Invalid parameter $method: '.$method);
 
         $this->method = $method;
         return $this;
@@ -83,7 +83,7 @@ class HttpRequest extends CObject {
     public function setUrl($url) {
         Assert::string($url);
         // TODO: validate URL
-        if (strpos($url, ' ') !== false)throw new InvalidArgumentException('Invalid argument $url: '.$url);
+        if (strpos($url, ' ') !== false)throw new InvalidValueException('Invalid parameter $url: '.$url);
         $this->url = $url;
         return $this;
     }
@@ -99,7 +99,7 @@ class HttpRequest extends CObject {
      */
     public function setHeader($name, $value) {
         Assert::string($name, '$name');
-        if (!strlen($name)) throw new InvalidArgumentException('Invalid argument $name: '.$name);
+        if (!strlen($name)) throw new InvalidValueException('Invalid parameter $name: '.$name);
         Assert::nullOrString($value, '$value');
 
         $name  = trim($name);
@@ -132,8 +132,8 @@ class HttpRequest extends CObject {
     public function addHeader($name, $value) {
         Assert::string($name,  '$name');
         Assert::string($value, '$value');
-        if (!strlen($name))     throw new InvalidArgumentException('Invalid argument $name: '.$name);
-        if (!strlen($value))    throw new InvalidArgumentException('Invalid argument $value: '.$value);
+        if (!strlen($name))     throw new InvalidValueException('Invalid parameter $name: '.$name);
+        if (!strlen($value))    throw new InvalidValueException('Invalid parameter $value: '.$value);
 
         $name  = trim($name);
         $value = trim($value);
@@ -161,7 +161,7 @@ class HttpRequest extends CObject {
      */
     public function getHeader($name) {
         Assert::string($name);
-        if (!strlen($name)) throw new InvalidArgumentException('Invalid argument $name: '.$name);
+        if (!strlen($name)) throw new InvalidValueException('Invalid parameter $name: '.$name);
 
         $headers = $this->getHeaders($name);
         if ($headers)

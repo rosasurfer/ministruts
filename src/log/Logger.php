@@ -8,7 +8,7 @@ use rosasurfer\core\assert\Assert;
 use rosasurfer\core\di\proxy\Request;
 use rosasurfer\core\error\DebugHelper;
 use rosasurfer\core\error\PHPError;
-use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\InvalidValueException;
 use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\net\NetTools;
 use rosasurfer\net\http\CurlHttpClient;
@@ -253,7 +253,7 @@ class Logger extends StaticClass {
                 }
                 else {
                     $logLevel = self::logLevelToId($level);
-                    if (!$logLevel) throw new InvalidArgumentException('Invalid configuration value for "log.level.'.$className.'" = '.$level);
+                    if (!$logLevel) throw new InvalidValueException('Invalid configuration value for "log.level.'.$className.'" = '.$level);
                     $logLevels[$className] = $logLevel;
 
                     if (strStartsWith($className, '\\')) {                  // normalize class names: remove leading back slash
@@ -304,7 +304,7 @@ class Logger extends StaticClass {
                 }
             }
             Assert::int($level, '$level');
-            if (!isset(self::$logLevels[$level])) throw new InvalidArgumentException('Invalid argument $level: '.$level.' (not a loglevel)');
+            if (!isset(self::$logLevels[$level])) throw new InvalidValueException('Invalid parameter $level: '.$level.' (not a loglevel)');
 
             // filter messages below the active loglevel
             $filtered = false;

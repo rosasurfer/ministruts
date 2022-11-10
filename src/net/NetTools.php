@@ -4,7 +4,7 @@ namespace rosasurfer\net;
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\StaticClass;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\InvalidValueException;
 
 use function rosasurfer\strEndsWithI;
 use function rosasurfer\strStartsWith;
@@ -26,7 +26,7 @@ final class NetTools extends StaticClass {
      */
     public static function getHostByAddress($ipAddress) {
         Assert::string($ipAddress);
-        if ($ipAddress == '') throw new InvalidArgumentException('Invalid argument $ipAddress: "'.$ipAddress.'"');
+        if ($ipAddress == '') throw new InvalidValueException('Invalid parameter $ipAddress: "'.$ipAddress.'"');
 
         $result = gethostbyaddr($ipAddress);
 
@@ -46,7 +46,7 @@ final class NetTools extends StaticClass {
      */
     public static function getHostByName($name) {
         Assert::string($name);
-        if ($name == '') throw new InvalidArgumentException('Invalid argument $name: "'.$name.'"');
+        if ($name == '') throw new InvalidValueException('Invalid parameter $name: "'.$name.'"');
 
         return \gethostbyname($name);
     }
@@ -62,7 +62,7 @@ final class NetTools extends StaticClass {
      */
     public static function isProxyAddress($address, $reverseResolve = false) {
         Assert::string($address,      '$address');
-        if (!strlen($address))         throw new InvalidArgumentException('Invalid argument $address: '.$address);
+        if (!strlen($address))         throw new InvalidValueException('Invalid parameter $address: '.$address);
         Assert::bool($reverseResolve, '$reverseResolve');
 
         static $proxys = null;

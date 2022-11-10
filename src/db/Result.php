@@ -3,8 +3,8 @@ namespace rosasurfer\db;
 
 use rosasurfer\core\CObject;
 use rosasurfer\core\error\ErrorHandler;
-use rosasurfer\core\exception\InvalidArgumentException;
 use rosasurfer\core\exception\InvalidTypeException;
+use rosasurfer\core\exception\InvalidValueException;
 use rosasurfer\core\exception\UnimplementedFeatureException;
 
 use function rosasurfer\strIsNumeric;
@@ -59,11 +59,11 @@ abstract class Result extends CObject implements ResultInterface {
         }
 
         if (!\key_exists($column, $row)) {
-            if (is_int($column)) throw new InvalidArgumentException('Invalid parameter $column: '.$column.' (no such column)');
+            if (is_int($column)) throw new InvalidValueException('Invalid parameter $column: '.$column.' (no such column)');
 
             $row    = \array_change_key_case($row, CASE_LOWER);
             $column = strtolower($column);
-            if (!\key_exists($column, $row)) throw new InvalidArgumentException('Invalid parameter $column: "'.$column.'" (no such column)');
+            if (!\key_exists($column, $row)) throw new InvalidValueException('Invalid parameter $column: "'.$column.'" (no such column)');
         }
         $value = $row[$column];
 

@@ -9,7 +9,7 @@ use rosasurfer\console\docopt\DocoptResult;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\di\proxy\Request;
 use rosasurfer\core\exception\IllegalArgumentException;
-use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\InvalidValueException;
 use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\core\lock\Lock;
 use rosasurfer\ministruts\ActionMapping;
@@ -493,7 +493,7 @@ function printPretty($var, $return=false, $flushBuffers=true) {
 function prettyBytes($value, $decimals = 1) {
     if (!is_int($value)) {
         if (is_string($value)) {
-            if (!strIsNumeric($value)) throw new InvalidArgumentException('Invalid parameter $value: "'.$value.'" (non-numeric)');
+            if (!strIsNumeric($value)) throw new InvalidValueException('Invalid parameter $value: "'.$value.'" (non-numeric)');
             $value = (float) $value;
         }
         else Assert::float($value, '$value');
@@ -532,7 +532,7 @@ function php_byte_value($value) {
 
     $match = null;
     if (!preg_match('/^([+-]?[0-9]+)([KMG]?)$/i', $value, $match)) {
-        throw new InvalidArgumentException('Invalid argument $value: "'.$value.'" (not a PHP byte value)');
+        throw new InvalidValueException('Invalid parameter $value: "'.$value.'" (not a PHP byte value)');
     }
 
     $iValue = (int)$match[1];
@@ -1244,7 +1244,7 @@ function normalizeEOL($string, $mode = EOL_UNIX) {
         $string = str_replace(EOL_UNIX, $mode, $string);
     }
     else if ($mode !== EOL_UNIX) {
-        throw new InvalidArgumentException('Invalid parameter $mode: "'.$mode.'"');
+        throw new InvalidValueException('Invalid parameter $mode: "'.$mode.'"');
     }
     return $string;
 }
@@ -1445,7 +1445,7 @@ function simpleClassName($class) {
  */
 function metatypeOf($name) {
     Assert::string($name);
-    if ($name == '') throw new InvalidArgumentException('Invalid argument $name: ""');
+    if ($name == '') throw new InvalidValueException('Invalid parameter $name: ""');
 
     if (is_class    ($name)) return 'class';
     if (is_interface($name)) return 'interface';

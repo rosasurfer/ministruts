@@ -5,7 +5,7 @@ use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\error\ErrorHandler;
 use rosasurfer\core\exception\InfrastructureException;
-use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\InvalidValueException;
 use rosasurfer\core\exception\RuntimeException;
 
 use function rosasurfer\normalizeEOL;
@@ -61,17 +61,17 @@ class SMTPMailer extends Mailer {
             $parts = explode(':', $host);
 
             if (sizeof($parts) == 1) {
-                if (trim($parts[0]) == '') throw new InvalidArgumentException('Invalid option "host": '.$this->options['host']);
+                if (trim($parts[0]) == '') throw new InvalidValueException('Invalid option "host": '.$this->options['host']);
                 if (!isset($this->options['port']))
                     $this->options['port'] = ini_get('smtp_port');  // TODO: validate host and port
             }
             elseif (sizeof($parts) == 2) {
-                if (trim($parts[0])=='' || trim($parts[1])=='') throw new InvalidArgumentException('Invalid option "host": '.$this->options['host']);
+                if (trim($parts[0])=='' || trim($parts[1])=='') throw new InvalidValueException('Invalid option "host": '.$this->options['host']);
                 $this->options['host'] = $parts[0];                 // TODO: validate host and port
                 $this->options['port'] = $parts[1];
             }
             else {
-                throw new InvalidArgumentException('Invalid option "host": '.$this->options['host']);
+                throw new InvalidValueException('Invalid option "host": '.$this->options['host']);
             }
         }
     }
@@ -182,7 +182,7 @@ class SMTPMailer extends Mailer {
         // first validate the additional headers
         foreach ($headers as $i => $header) {
             Assert::string($header, '$headers['.$i.']');
-            if (!preg_match('/^[a-z]+(-[a-z]+)*:/i', $header)) throw new InvalidArgumentException('Invalid parameter $headers['.$i.']: "'.$header.'"');
+            if (!preg_match('/^[a-z]+(-[a-z]+)*:/i', $header)) throw new InvalidValueException('Invalid parameter $headers['.$i.']: "'.$header.'"');
         }
 
         // auto-complete sender if not specified
@@ -196,40 +196,40 @@ class SMTPMailer extends Mailer {
         // Return-Path: (invisible sender)
         Assert::string($sender, '$sender');
         $returnPath = self::parseAddress($sender);
-        if (!$returnPath)                      throw new InvalidArgumentException('Invalid parameter $sender: '.$sender);
+        if (!$returnPath)                      throw new InvalidValueException('Invalid parameter $sender: '.$sender);
         $value = $this->removeHeader($headers, 'Return-Path');
         if (strlen($value)) {
             $returnPath = self::parseAddress($value);
-            if (!$returnPath)                  throw new InvalidArgumentException('Invalid header "Return-Path: '.$value.'"');
+            if (!$returnPath)                  throw new InvalidValueException('Invalid header "Return-Path: '.$value.'"');
         }
 
         // From: (visible sender)
         $from  = self::parseAddress($sender);
-        if (!$from)                            throw new InvalidArgumentException('Invalid parameter $sender: '.$sender);
+        if (!$from)                            throw new InvalidValueException('Invalid parameter $sender: '.$sender);
         $value = $this->removeHeader($headers, 'From');
         if (strlen($value)) {
             $from = self::parseAddress($value);
-            if (!$from)                        throw new InvalidArgumentException('Invalid header "From: '.$value.'"');
+            if (!$from)                        throw new InvalidValueException('Invalid header "From: '.$value.'"');
         }
 
         // RCPT: (invisible receiver)
         Assert::string($receiver, '$receiver');
         $rcpt = self::parseAddress($receiver);
-        if (!$rcpt)                            throw new InvalidArgumentException('Invalid parameter $receiver: '.$receiver);
+        if (!$rcpt)                            throw new InvalidValueException('Invalid parameter $receiver: '.$receiver);
         $forced = $config->get('mail.forced-receiver', '');
         Assert::string($forced, 'config value "mail.forced-receiver"');
         if (strlen($forced)) {
             $rcpt = self::parseAddress($forced);
-            if (!$rcpt)                        throw new InvalidArgumentException('Invalid config value "mail.forced-receiver": '.$forced);
+            if (!$rcpt)                        throw new InvalidValueException('Invalid config value "mail.forced-receiver": '.$forced);
         }
 
         // To: (visible receiver)
         $to = self::parseAddress($receiver);
-        if (!$to)                              throw new InvalidArgumentException('Invalid parameter $sender: '.$sender);
+        if (!$to)                              throw new InvalidValueException('Invalid parameter $sender: '.$sender);
         $value = $this->removeHeader($headers, 'To');
         if (strlen($value)) {
             $to = self::parseAddress($value);
-            if (!$to)                          throw new InvalidArgumentException('Invalid header "To: '.$value.'"');
+            if (!$to)                          throw new InvalidValueException('Invalid header "To: '.$value.'"');
         }
 
         // Subject: subject and body
@@ -293,7 +293,7 @@ class SMTPMailer extends Mailer {
         foreach ($headers as $i => $header) {
             $pattern = '/^([a-z]+(?:-[a-z]+)*): *(.*)/i';
             $match = null;
-            if (!preg_match($pattern, $header, $match)) throw new InvalidArgumentException('Invalid parameter $headers['.$i.']: "'.$header.'"');
+            if (!preg_match($pattern, $header, $match)) throw new InvalidValueException('Invalid parameter $headers['.$i.']: "'.$header.'"');
             $name  = $match[1];
             $value = $this->encodeNonAsciiChars(trim($match[2]));
             $this->writeData($name.': '.$value);
