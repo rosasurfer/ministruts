@@ -89,7 +89,7 @@ trait RosasurferExceptionTrait {
      * @return string
      */
     public function getFunction() {
-        return DebugHelper::getFQFunctionName($this->getBetterTrace()[0]);
+        return ErrorHandler::getFrameMethod($this->getBetterTrace()[0]);
     }
 
 

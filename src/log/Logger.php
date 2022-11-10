@@ -323,7 +323,6 @@ class Logger extends StaticClass {
         !isset($context['cliMessage']) && self::composeCliMessage($loggable, $level, $context);
 
         $msg = 'PHP '.$context['cliMessage'];
-        isset($context['cliExtra']) && $msg .= $context['cliExtra'];
         $msg = str_replace(chr(0), '\0', $msg);                 // replace NUL bytes which mess up the logfile
 
         if (CLI && empty(ini_get('error_log'))) {
@@ -353,7 +352,6 @@ class Logger extends StaticClass {
         if (CLI) {
             !isset($context['cliMessage']) && self::composeCliMessage($loggable, $level, $context);
             $message .= $context['cliMessage'];
-            isset($context['cliExtra']) && $message .= $context['cliExtra'];
         }
         else {
             !isset($context['htmlMessage']) && self::composeHtmlMessage($loggable, $level, $context);
@@ -398,7 +396,7 @@ class Logger extends StaticClass {
 
 
     /**
-     * Compose a CLI log message and store it in the passed log context under the keys "cliMessage" and "cliExtra".
+     * Compose a CLI log message and store it under $context['cliMessage'].
      *
      * @param  string|\Exception|\Throwable $loggable - message or exception
      * @param  int                          $level    - loglevel
@@ -414,24 +412,21 @@ class Logger extends StaticClass {
 
         // compose message
         if (is_string($loggable)) {
-            // $loggable is a simple message
+            // $loggable is a string
             $msg = $loggable;
-
-            if (strlen($indent)) {                      // indent multiline messages
-                $lines = explode(NL, normalizeEOL($msg));
-                $eom = '';
-                if (strEndsWith($msg, NL)) {
-                    \array_pop($lines);
-                    $eom = NL;
-                }
-                $msg = join(NL.$indent, $lines).$eom;
+            $lines = explode(NL, normalizeEOL($msg));   // indent multiline messages
+            $eoMsg = '';
+            if (strEndsWith($msg, NL)) {
+                \array_pop($lines);
+                $eoMsg = NL;
             }
+            $msg = join(NL.$indent, $lines).$eoMsg;
             $cliMessage = '['.strtoupper(self::$logLevels[$level]).'] '.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
 
             // if there was no exception append the internal stacktrace to 'cliExtra'
             if (!isset($context['exception']) && isset($context['trace'])) {
                 $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
-                $traceStr .= DebugHelper::formatTrace($context['trace'], $indent);
+                $traceStr .= ErrorHandler::formatTrace($context['trace'], $indent);
                 $cliExtra .= NL.$traceStr;
             }
         }
@@ -448,13 +443,13 @@ class Logger extends StaticClass {
             }
             $cliMessage = '['.strtoupper(self::$logLevels[$level]).'] '.$type.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
 
-            // the stack trace will go into "cliExtra"
+            // the stack trace will go into 'cliExtra'
             $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
             $traceStr .= DebugHelper::getBetterTraceAsString($loggable, $indent);
             $cliExtra .= NL.$traceStr;
         }
 
-        // append an existing context exception to "cliExtra"
+        // append an existing context exception to 'cliExtra'
         if (isset($context['exception'])) {
             $exception = $context['exception'];
             $msg       = $indent.trim(ErrorHandler::composeBetterMessage($exception, $indent));
@@ -464,9 +459,8 @@ class Logger extends StaticClass {
             $cliExtra .= NL.$traceStr;
         }
 
-        // store main and extra message
-        $context['cliMessage'] = $cliMessage;
-        $cliExtra && $context['cliExtra'] = $cliExtra;
+        // store the message
+        $context['cliMessage'] = $cliMessage.$cliExtra;
     }
 
 
@@ -504,7 +498,7 @@ class Logger extends StaticClass {
             // attach the internal stacktrace if there was no exception
             if (!isset($context['exception']) && isset($context['trace'])) {
                 $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
-                $traceStr .= DebugHelper::formatTrace($context['trace'], $indent);
+                $traceStr .= ErrorHandler::formatTrace($context['trace'], $indent);
                 $html     .= '<span style="clear:both"></span><br>'.printPretty($traceStr, true).'<br>';
             }
         }
@@ -618,32 +612,31 @@ class Logger extends StaticClass {
      * TODO: test with Closure and internal PHP functions
      */
     private static function resolveCaller(array &$context) {
-        !isset($context['trace']) && self::generateStackTrace($context);
+        !isset($context['trace']) && self::generateTrace($context);
         $trace = $context['trace'];
         $context['class'] = isset($trace[0]['class']) ? $trace[0]['class'] : '';
     }
 
 
     /**
-     * Resolve the file location the logger was called from and store it under $context['file'] and $context['line'].
+     * Resolve the file location the logger was called from and store it under $context['file'] and $context['line']. For log messages
+     * from the ErrorHandler these context fields will be pre-populated. For log messages from user-land the fields may be empty and are
+     * resolved here.
      *
      * @param  array $context - reference to the log context
      */
     private static function resolveCallLocation(array &$context) {
-        !isset($context['trace']) && self::generateStackTrace($context);
-        $trace = $context['trace'];
+        !isset($context['trace']) && self::generateTrace($context);
 
-        foreach ($trace as $i => $frame) {                  // find the first frame with "file"
-            if (isset($frame['file'])) {                    // skip internal PHP functions
+        foreach ($context['trace'] as $i => $frame) {
+            if (isset($frame['file'])) {                // find the first frame with 'file' (skips internal PHP functions)
                 $context['file'] = $frame['file'];
                 $context['line'] = $frame['line'];
-                break;
+                return;
             }
         }
-        if (!isset($context['file'])) {
-            $context['file'] = '(unknown)';
-            $context['line'] = '(?)';
-        }
+        $context['file'] = '(unknown)';
+        $context['line'] = '(?)';
     }
 
 
@@ -652,16 +645,19 @@ class Logger extends StaticClass {
      *
      * @param  array $context - reference to the log context
      */
-    private static function generateStackTrace(array &$context) {
-        if (!isset($context['trace'])) {
-            $trace = ErrorHandler::adjustTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), __FILE__, __LINE__);
+    private static function generateTrace(array &$context) {
+        $trace = ErrorHandler::adjustTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), __FILE__, __LINE__);
+        $LoggerLog = strtolower(__CLASS__.'::log');
 
-            foreach ($trace as $i => $frame) {
-                if (!isset($frame['class']) || $frame['class']!=__CLASS__)      // remove non-logger frames
-                    break;
-                unset($trace[$i]);
+        foreach ($trace as $i => $frame) {
+            if (!isset($frame['class'], $frame['function'])) break;
+            unset($trace[$i]);                                                  // remove all frames from/after Logger::log()
+
+            $frameFunction = strtolower($frame['class'].'::'.$frame['function']);
+            if ($frameFunction == $LoggerLog) {
+                break;
             }
-            $context['trace'] = \array_values($trace);
         }
+        $context['trace'] = \array_values($trace);
     }
 }

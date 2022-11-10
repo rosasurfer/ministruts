@@ -12,6 +12,8 @@ use function rosasurfer\normalizeEOL;
 use function rosasurfer\simpleClassName;
 use function rosasurfer\strEndsWith;
 use function rosasurfer\strLeftTo;
+use function rosasurfer\strRightFrom;
+use function rosasurfer\strStartsWith;
 use function rosasurfer\true;
 
 use const rosasurfer\CLI;
@@ -231,7 +233,7 @@ class ErrorHandler extends StaticClass {
          */
         $trace = $error->getBetterTrace();
         if ($trace) {                                                           // after a fatal error the trace may be empty
-            $function = DebugHelper::getFQFunctionName($trace[0]);
+            $function = self::getFrameMethod($trace[0]);
             if ($function=='require' || $function=='require_once') {
                 $currentHandler = set_exception_handler(function() {});
                 restore_exception_handler();
@@ -489,6 +491,80 @@ class ErrorHandler extends StaticClass {
 
         $result .= (strlen($message) ? ': ':'').$message;
         return $result;
+    }
+
+
+    /**
+     * Return a formatted and more readable version of a stacktrace.
+     *
+     * @param  array  $trace             - stacktrace
+     * @param  string $indent [optional] - indent formatted lines by this value (default: no indenting)
+     *
+     * @return string
+     */
+    public static function formatTrace(array $trace, $indent = '') {
+        $config  = self::di('config');
+        $appRoot = $config ? $config['app.dir.root'] : null;
+        $result  = '';
+
+        $size = sizeof($trace);
+        $callLen = $lineLen = 0;
+
+        for ($i=0; $i < $size; $i++) {               // align FILE and LINE
+            $frame = &$trace[$i];
+
+            $call = self::getFrameMethod($frame, $nsToLower=true);
+
+            if ($call!='{main}' && !strEndsWith($call, '{closure}'))
+                $call.='()';
+            $callLen = max($callLen, strlen($call));
+            $frame['call'] = $call;
+
+            $frame['line'] = isset($frame['line']) ? ' # line '.$frame['line'].',' : '';
+            $lineLen = max($lineLen, strlen($frame['line']));
+
+            if (isset($frame['file']))                 $frame['file'] = ' file: '.(!$appRoot ? $frame['file'] : strRightFrom($frame['file'], $appRoot.DIRECTORY_SEPARATOR, 1, false, $frame['file']));
+            elseif (strStartsWith($call, 'phalcon\\')) $frame['file'] = ' [php-phalcon]';
+            else                                       $frame['file'] = ' [php]';
+        }
+        if ($appRoot) {
+            $trace[] = ['call'=>'', 'line'=>'', 'file'=>' file base: '.$appRoot];
+            $i++;
+        }
+
+        for ($i=0; $i < $size; $i++) {
+            $result .= $indent.str_pad($trace[$i]['call'], $callLen).' '.str_pad($trace[$i]['line'], $lineLen).$trace[$i]['file'].NL;
+        }
+        return $result;
+    }
+
+
+    /**
+     * Return a stack frame's full method name similar to the constant __METHOD__. Used for generating a formatted stacktrace.
+     *
+     * @param  array $frame                - frame
+     * @param  bool  $nsToLower [optional] - whether to return the namespace part in lower case (default: no)
+     *
+     * @return string - method name (without trailing parentheses)
+     */
+    public static function getFrameMethod(array $frame, $nsToLower = false) {
+        $class = $function = '';
+
+        if (isset($frame['function'])) {
+            $function = $frame['function'];
+
+            if (isset($frame['class'])) {
+                $class = $frame['class'];
+                if ($nsToLower && is_int($pos=strrpos($class, '\\'))) {
+                    $class = strtolower(substr($class, 0, $pos)).substr($class, $pos);
+                }
+                $class = $class.$frame['type'];
+            }
+            elseif ($nsToLower && is_int($pos=strrpos($function, '\\'))) {
+                $function = strtolower(substr($function, 0, $pos)).substr($function, $pos);
+            }
+        }
+        return $class.$function;
     }
 
 
