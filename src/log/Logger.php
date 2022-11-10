@@ -64,11 +64,11 @@ use rosasurfer\core\error\ErrorHandler;
  *
  * @example
  * <pre>
- *  log.level                  = warn                                   # set general application loglevel to L_WARN
- *  log.level.MyClassA         = debug                                  # set loglevel for "MyClassA" to L_DEBUG
- *  log.level.foo\bar\MyClassB = notice                                 # set loglevel for "foo\bar\MyClassB" to L_NOTICE
+ *  log.level                = warn                             # set general application loglevel to L_WARN
+ *  log.level.ClassA         = debug                            # set loglevel for "ClassA" to L_DEBUG
+ *  log.level.foo\bar\ClassB = error                            # set loglevel for "foo\bar\ClassB" to L_ERROR
  *
- *  log.mail.receiver          = user1@domain.tld, user2@domain.tld     # set mail receivers for the MailHandler
+ *  log.mail.receiver = user1@domain.tld, user2@domain.tld      # set mail receivers for the MailHandler
  * </pre>
  *
  *
