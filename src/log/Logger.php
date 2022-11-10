@@ -267,8 +267,7 @@ class Logger extends StaticClass {
             // filter messages below the active loglevel
             $filtered = false;
             if (!$filtered && $level!=L_FATAL) {                                // L_FATAL is never filtered
-                if (!\key_exists('class', $context))                            // resolve the calling class and check its loglevel
-                    self::resolveLogCaller($context);
+                !isset($context['class']) && self::resolveCaller($context);     // resolve the calling class and check its loglevel
                 $filtered = $level < self::getLogLevel($context['class']);      // message is below the active loglevel
             }
 
@@ -294,9 +293,9 @@ class Logger extends StaticClass {
         if ($logException) {
             // If the call comes from the internal exception handler failed logging is already handled. If the call comes
             // from user-land make sure the message doesn't get lost and is logged to the PHP default error log.
-            if (!\key_exists('unhandled-exception', $context)) {
-                $file = \key_exists('file', $context) ? $context['file'] : '';
-                $line = \key_exists('line', $context) ? $context['line'] : '';
+            if (!isset($context['unhandled-exception'])) {
+                $file = isset($context['file']) ? $context['file'] : '';
+                $line = isset($context['line']) ? $context['line'] : '';
                 $msg  = 'PHP ['.strtoupper(self::$logLevels[$level]).'] '.$loggable.NL.' in '.$file.' on line '.$line;
                 error_log(trim($msg), ERROR_LOG_DEFAULT);
             }
@@ -321,12 +320,10 @@ class Logger extends StaticClass {
      * @param  array                        $context  - reference to the log context with additional data
      */
     private static function invokeErrorLogHandler($loggable, $level, array &$context) {
-        if (!\key_exists('cliMessage', $context))
-            self::composeCliMessage($loggable, $level, $context);
+        !isset($context['cliMessage']) && self::composeCliMessage($loggable, $level, $context);
 
         $msg = 'PHP '.$context['cliMessage'];
-        if (\key_exists('cliExtra', $context))
-            $msg .= $context['cliExtra'];
+        isset($context['cliExtra']) && $msg .= $context['cliExtra'];
         $msg = str_replace(chr(0), '\0', $msg);                 // replace NUL bytes which mess up the logfile
 
         if (CLI && empty(ini_get('error_log'))) {
@@ -378,9 +375,7 @@ class Logger extends StaticClass {
      * @param  array                        $context  - reference to the log context with additional data
      */
     private static function invokeMailHandler($loggable, $level, array &$context) {
-        if (!\key_exists('mailSubject', $context) || !\key_exists('mailMessage', $context))
-            self::composeMailMessage($loggable, $level, $context);
-
+        !isset($context['mailSubject'], $context['mailMessage']) && self::composeMailMessage($loggable, $level, $context);
         $subject = $context['mailSubject'];
         $message = $context['mailMessage'];
 
@@ -410,8 +405,7 @@ class Logger extends StaticClass {
      * @param  array                        $context  - reference to the log context
      */
     private static function composeCliMessage($loggable, $level, array &$context) {
-        if (!\key_exists('file', $context) || !\key_exists('line', $context))
-            self::resolveLogLocation($context);
+        !isset($context['file'], $context['line']) && self::resolveLogLocation($context);
         $file = $context['file'];
         $line = $context['line'];
 
@@ -434,8 +428,8 @@ class Logger extends StaticClass {
             }
             $cliMessage = '['.strtoupper(self::$logLevels[$level]).'] '.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
 
-            // if there was no exception append the internal stacktrace to "cliExtra"
-            if (!\key_exists('exception', $context) && \key_exists('trace', $context)) {
+            // if there was no exception append the internal stacktrace to 'cliExtra'
+            if (!isset($context['exception']) && isset($context['trace'])) {
                 $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
                 $traceStr .= DebugHelper::formatTrace($context['trace'], $indent);
                 $cliExtra .= NL.$traceStr;
@@ -445,7 +439,7 @@ class Logger extends StaticClass {
             // $loggable is an exception
             $type = null;
             $msg  = trim(ErrorHandler::composeBetterMessage($loggable, $indent));
-            if (\key_exists('unhandled-exception', $context)) {
+            if (isset($context['unhandled-exception'])) {
                 $type = 'Unhandled ';
                 if ($loggable instanceof PHPError) {
                     $msg   = strRightFrom($msg, ':');
@@ -461,7 +455,7 @@ class Logger extends StaticClass {
         }
 
         // append an existing context exception to "cliExtra"
-        if (\key_exists('exception', $context)) {
+        if (isset($context['exception'])) {
             $exception = $context['exception'];
             $msg       = $indent.trim(ErrorHandler::composeBetterMessage($exception, $indent));
             $cliExtra .= NL.$msg.NL.NL;
@@ -484,8 +478,7 @@ class Logger extends StaticClass {
      * @param  array                        $context  - reference to the log context
      */
     private static function composeHtmlMessage($loggable, $level, array &$context) {
-        if (!\key_exists('file', $context) || !\key_exists('line', $context))
-            self::resolveLogLocation($context);
+        !isset($context['file'], $context['line']) && self::resolveLogLocation($context);
         $file = $context['file'];
         $line = $context['line'];
 
@@ -509,7 +502,7 @@ class Logger extends StaticClass {
             $html .= 'in <span style="font-weight:bold">'.$file.'</span> on line <span style="font-weight:bold">'.$line.'</span><br>';
 
             // attach the internal stacktrace if there was no exception
-            if (!\key_exists('exception', $context) && \key_exists('trace', $context)) {
+            if (!isset($context['exception']) && isset($context['trace'])) {
                 $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
                 $traceStr .= DebugHelper::formatTrace($context['trace'], $indent);
                 $html     .= '<span style="clear:both"></span><br>'.printPretty($traceStr, true).'<br>';
@@ -519,7 +512,7 @@ class Logger extends StaticClass {
             // $loggable is an exception
             $type = null;
             $msg  = trim(ErrorHandler::composeBetterMessage($loggable));
-            if (\key_exists('unhandled-exception', $context)) {
+            if (isset($context['unhandled-exception'])) {
                 $type = 'Unhandled ';
                 if ($loggable instanceof PHPError) {
                     $msg   = strRightFrom($msg, ':');
@@ -534,7 +527,7 @@ class Logger extends StaticClass {
         }
 
         // append an existing context exception
-        if (\key_exists('exception', $context)) {
+        if (isset($context['exception'])) {
             $exception = $context['exception'];
             $msg       = ErrorHandler::composeBetterMessage($exception);
             $html     .= '<br>'.nl2br(hsc($msg)).'<br><br>';
@@ -568,12 +561,9 @@ class Logger extends StaticClass {
      * @param  array                        $context  - reference to the log context
      */
     private static function composeMailMessage($loggable, $level, array &$context) {
-        if (!\key_exists('cliMessage', $context))
-            self::composeCliMessage($loggable, $level, $context);
-
+        !isset($context['cliMessage']) && self::composeCliMessage($loggable, $level, $context);
         $msg = $context['cliMessage'];
-        if (\key_exists('cliExtra', $context))
-            $msg .= $context['cliExtra'];
+        isset($context['cliExtra']) && $msg .= $context['cliExtra'];
         $location = null;
 
         // compose message
@@ -611,7 +601,7 @@ class Logger extends StaticClass {
               . 'IP:   '.$ip.NL
               . 'Time: '.date('Y-m-d H:i:s').NL;
         }
-        $type = (\key_exists('unhandled-exception', $context)) ? 'Unhandled Exception ':'';
+        $type = isset($context['unhandled-exception']) ? 'Unhandled Exception ':'';
 
         // store subject and message
         $context['mailSubject'] = 'PHP ['.self::$logLevels[$level].'] '.$type.(CLI ? 'in ':'at ').$location;
@@ -625,8 +615,7 @@ class Logger extends StaticClass {
      * @param  array $context - reference to the log context
      */
     private static function resolveLogLocation(array &$context) {
-        if (!\key_exists('trace', $context))
-            self::generateStackTrace($context);
+        !isset($context['trace']) && self::generateStackTrace($context);
         $trace = $context['trace'];
 
         foreach ($trace as $i => $frame) {                  // find the first frame with "file"
@@ -636,8 +625,7 @@ class Logger extends StaticClass {
                 break;
             }
         }
-
-        if (!\key_exists('file', $context)) {
+        if (!isset($context['file'])) {
             $context['file'] = '(unknown)';
             $context['line'] = '(?)';
         }
@@ -645,29 +633,26 @@ class Logger extends StaticClass {
 
 
     /**
-     * Resolve the class the logger was called from and store it in the log context under the key "class".
+     * Resolve the class the logger was called from and store it under $context['class'].
      *
      * @param  array $context - reference to the log context
      *
-     *
      * TODO:  test with Closure and internal PHP functions
      */
-    private static function resolveLogCaller(array &$context) {
-        if (!\key_exists('trace', $context))
-            self::generateStackTrace($context);
+    private static function resolveCaller(array &$context) {
+        !isset($context['trace']) && self::generateStackTrace($context);
         $trace = $context['trace'];
-
         $context['class'] = isset($trace[0]['class']) ? $trace[0]['class'] : '';
     }
 
 
     /**
-     * Generate an internal stacktrace and store it in the log context under the key "trace".
+     * Generate an internal stacktrace and store it under $context['trace'].
      *
      * @param  array $context - reference to the log context
      */
     private static function generateStackTrace(array &$context) {
-        if (!\key_exists('trace', $context)) {
+        if (!isset($context['trace'])) {
             $trace = DebugHelper::fixTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), __FILE__, __LINE__);
 
             foreach ($trace as $i => $frame) {
