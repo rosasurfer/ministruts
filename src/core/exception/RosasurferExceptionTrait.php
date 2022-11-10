@@ -2,7 +2,6 @@
 namespace rosasurfer\core\exception;
 
 use rosasurfer\core\assert\Assert;
-use rosasurfer\core\error\DebugHelper;
 use rosasurfer\core\error\ErrorHandler;
 
 use const rosasurfer\NL;
@@ -25,14 +24,13 @@ trait RosasurferExceptionTrait {
 
 
     /**
-     * Add a message to the exception's existing message. Used during up-bubbling to add additional infos to an exception's
-     * original message.
+     * Add a message to the exception's existing message. Used to enrich the exception with additional data.
      *
      * @param  string $message
      *
      * @return $this
      */
-    public function addMessage($message) {
+    public function appendMessage($message) {
         if (strlen($message)) {
             $this->message = trim(trim($this->message).NL.$message);
         }
@@ -41,8 +39,8 @@ trait RosasurferExceptionTrait {
 
 
     /**
-     * Set the error code of an {@link \Exception} or {@link \Throwable}. Used during up-bubbling to add additional infos
-     * to an existing exception. Ignored if the exception's error code is already set.
+     * Set the error code of an exception. Used to enrich the exception with additional data.
+     * Ignored if the error code is already set.
      *
      * @param  int $code
      *
@@ -78,7 +76,7 @@ trait RosasurferExceptionTrait {
      */
     public function getBetterTraceAsString() {
         if (!$this->betterTraceAsString)
-            $this->betterTraceAsString = DebugHelper::getBetterTraceAsString($this);
+            $this->betterTraceAsString = ErrorHandler::getBetterTraceAsString($this);
         return $this->betterTraceAsString;
     }
 

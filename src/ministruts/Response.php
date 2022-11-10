@@ -225,7 +225,7 @@ class Response extends Singleton {
             return $scheme.'://'.$user.$pass.$at.$host.$port.$path;
         }
         catch (IRosasurferException $ex) {
-            throw $ex->addMessage('Illegal parameter $base: "'.$base.'"');
+            throw $ex->appendMessage('Illegal parameter $base: "'.$base.'"');
         }
     }
 }

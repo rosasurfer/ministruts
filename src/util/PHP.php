@@ -99,9 +99,9 @@ class PHP extends StaticClass {
             $match = null;
             if (WINDOWS && preg_match('/proc_open\(\): CreateProcess failed, error code - ([0-9]+)/i', $ex->getMessage(), $match)) {
                 $error = Windows::errorToString((int) $match[1]);
-                if ($error != $match[1]) $ex->addMessage($match[1].': '.$error);
+                if ($error != $match[1]) $ex->appendMessage($match[1].': '.$error);
             }
-            throw $ex->addMessage('CMD: "'.$cmd.'"');
+            throw $ex->appendMessage('CMD: "'.$cmd.'"');
         }
 
         // if the process doesn't need asynchronous watching

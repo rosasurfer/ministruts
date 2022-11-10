@@ -64,7 +64,6 @@ return array(
     'rosasurfer\\core\\di\\service\\Service' => $baseDir . '/src/core/di/service/Service.php',
     'rosasurfer\\core\\di\\service\\ServiceInterface' => $baseDir . '/src/core/di/service/ServiceInterface.php',
     'rosasurfer\\core\\di\\service\\ServiceNotFoundException' => $baseDir . '/src/core/di/service/ServiceNotFoundException.php',
-    'rosasurfer\\core\\error\\DebugHelper' => $baseDir . '/src/core/error/DebugHelper.php',
     'rosasurfer\\core\\error\\ErrorHandler' => $baseDir . '/src/core/error/ErrorHandler.php',
     'rosasurfer\\core\\error\\PHPCompileError' => $baseDir . '/src/core/error/PHPCompileError.php',
     'rosasurfer\\core\\error\\PHPCompileWarning' => $baseDir . '/src/core/error/PHPCompileWarning.php',

@@ -224,7 +224,7 @@ class MySQLConnector extends Connector {
         catch (IRosasurferException $ex) {}
         catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
         catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
-        if ($ex) throw $ex->addMessage('Can not connect to MySQL server on "'.$host.'"');
+        if ($ex) throw $ex->appendMessage('Can not connect to MySQL server on "'.$host.'"');
 
         $this->setConnectionOptions();
         $this->selectDatabase();
@@ -275,7 +275,7 @@ class MySQLConnector extends Connector {
             catch (IRosasurferException $ex) {}
             catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), mysql_errno($this->hConnection), $ex); }
             catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), mysql_errno($this->hConnection), $ex); }
-            if ($ex) throw $ex->addMessage('Can not select database "'.$this->database.'"');
+            if ($ex) throw $ex->appendMessage('Can not select database "'.$this->database.'"');
         }
         return $this;
     }
@@ -420,7 +420,7 @@ class MySQLConnector extends Connector {
         catch (IRosasurferException $ex) {}
         catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), mysql_errno($this->hConnection), $ex); }
         catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), mysql_errno($this->hConnection), $ex); }
-        if ($ex) throw $ex->addMessage('Database: '.$this->getConnectionDescription().NL.'SQL: "'.$sql.'"');
+        if ($ex) throw $ex->appendMessage('Database: '.$this->getConnectionDescription().NL.'SQL: "'.$sql.'"');
 
         // track last_insert_id
         $affected = 0;

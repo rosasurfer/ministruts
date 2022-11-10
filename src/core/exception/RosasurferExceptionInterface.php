@@ -7,18 +7,6 @@ namespace rosasurfer\core\exception;
  */
 interface RosasurferExceptionInterface {
 
-
-    /**
-     * Add a message to the exception's existing message. Used during up-bubbling to add additional infos
-     * to an exception's original message.
-     *
-     * @param  string $message
-     *
-     * @return $this
-     */
-    public function addMessage($message);
-
-
     /**
      * Return the message of the exception.
      *
@@ -36,6 +24,16 @@ interface RosasurferExceptionInterface {
 
 
     /**
+     * Add a message to the exception's existing message. Used to enrich the exception with additional data.
+     *
+     * @param  string $message
+     *
+     * @return $this
+     */
+    public function appendMessage($message);
+
+
+    /**
      * Return the error code of the exception.
      *
      * @return int
@@ -44,8 +42,8 @@ interface RosasurferExceptionInterface {
 
 
     /**
-     * Set the error code of an exception. Used during up-bubbling to add additional infos to an exception.
-     * Ignored if the exception's error code is already set.
+     * Set the error code of an exception. Used to enrich the exception with additional data.
+     * Ignored if the error code is already set.
      *
      * @param  int $code
      *

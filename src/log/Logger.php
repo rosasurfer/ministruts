@@ -6,7 +6,6 @@ use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\StaticClass;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\di\proxy\Request;
-use rosasurfer\core\error\DebugHelper;
 use rosasurfer\core\error\ErrorHandler;
 use rosasurfer\core\error\PHPError;
 use rosasurfer\core\exception\IllegalStateException;
@@ -445,7 +444,7 @@ class Logger extends StaticClass {
 
             // the stack trace will go into 'cliExtra'
             $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
-            $traceStr .= DebugHelper::getBetterTraceAsString($loggable, $indent);
+            $traceStr .= ErrorHandler::getBetterTraceAsString($loggable, $indent);
             $cliExtra .= NL.$traceStr;
         }
 
@@ -455,7 +454,7 @@ class Logger extends StaticClass {
             $msg       = $indent.trim(ErrorHandler::composeBetterMessage($exception, $indent));
             $cliExtra .= NL.$msg.NL.NL;
             $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
-            $traceStr .= DebugHelper::getBetterTraceAsString($exception, $indent);
+            $traceStr .= ErrorHandler::getBetterTraceAsString($exception, $indent);
             $cliExtra .= NL.$traceStr;
         }
 
@@ -516,7 +515,7 @@ class Logger extends StaticClass {
             $html     .= '<span style="white-space:nowrap"><span style="font-weight:bold">['.strtoupper(self::$logLevels[$level]).']</span> <span style="white-space:pre; line-height:8px">'.nl2br(hsc($type.$msg)).'</span></span><br><br>';
             $html     .= 'in <span style="font-weight:bold">'.$file.'</span> on line <span style="font-weight:bold">'.$line.'</span><br>';
             $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
-            $traceStr .= DebugHelper::getBetterTraceAsString($loggable, $indent);
+            $traceStr .= ErrorHandler::getBetterTraceAsString($loggable, $indent);
             $html     .= '<span style="clear:both"></span><br>'.printPretty($traceStr, true).'<br>';
         }
 
@@ -526,7 +525,7 @@ class Logger extends StaticClass {
             $msg       = ErrorHandler::composeBetterMessage($exception);
             $html     .= '<br>'.nl2br(hsc($msg)).'<br><br>';
             $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
-            $traceStr .= DebugHelper::getBetterTraceAsString($exception, $indent);
+            $traceStr .= ErrorHandler::getBetterTraceAsString($exception, $indent);
             $html     .= printPretty($traceStr, true);
         }
 

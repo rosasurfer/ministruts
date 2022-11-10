@@ -4,6 +4,7 @@ namespace rosasurfer\core\error;
 use rosasurfer\Application;
 use rosasurfer\core\StaticClass;
 use rosasurfer\core\assert\Assert;
+use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\log\Logger;
 
 use function rosasurfer\echoPre;
@@ -118,7 +119,7 @@ class ErrorHandler extends StaticClass {
                  * during shutdown in a different way. Otherwise destructor exceptions will cause fatal errors.
                  *
                  * @link  http://php.net/manual/en/language.oop5.decon.php
-                 * @see   ErrorHandler::handleDestructorException()
+                 * @see   self::handleDestructorException()
                  */
                 self::$inShutdown = true;
                 echoPre('shutdown: '.__METHOD__);
@@ -282,7 +283,7 @@ class ErrorHandler extends StaticClass {
             $line2 = $secondEx->getLine();
             $msg2 .= $indent.'in '.$file2.' on line '.$line2.NL.NL;
             $msg2 .= $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
-            $msg2 .= DebugHelper::getBetterTraceAsString($secondEx, $indent);
+            $msg2 .= self::getBetterTraceAsString($secondEx, $indent);
 
             // primary (the causing) exception
             $msg1  = $indent.'Unhandled '.trim(self::composeBetterMessage($exception)).NL;
@@ -290,7 +291,7 @@ class ErrorHandler extends StaticClass {
             $line1 = $exception->getLine();
             $msg1 .= $indent.'in '.$file1.' on line '.$line1.NL.NL;
             $msg1 .= $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
-            $msg1 .= DebugHelper::getBetterTraceAsString($exception, $indent);
+            $msg1 .= self::getBetterTraceAsString($exception, $indent);
 
             $msg  = $msg2.NL;
             $msg .= $indent.'caused by'.NL;
@@ -531,6 +532,32 @@ class ErrorHandler extends StaticClass {
         }
 
         $result .= (strlen($message) ? ': ':'').$message;
+        return $result;
+    }
+
+
+    /**
+     * Return a more readable version of an exception's stacktrace. The representation also contains information about
+     * nested exceptions.
+     *
+     * @param  \Exception|\Throwable $exception         - any exception (PHP5) or throwable (PHP7)
+     * @param  string                $indent [optional] - indent the resulting lines by the specified value
+     *                                                    (default: no indentation)
+     * @return string - readable stacktrace
+     */
+    public static function getBetterTraceAsString($exception, $indent = '') {
+        Assert::throwable($exception, '$exception');
+
+        if ($exception instanceof IRosasurferException) $trace = $exception->getBetterTrace();
+        else                                            $trace = self::adjustTrace($exception->getTrace(), $exception->getFile(), $exception->getLine());
+        $result = self::formatTrace($trace, $indent);
+
+        if ($cause = $exception->getPrevious()) {
+            // recursively add stacktraces of nested exceptions
+            $message = trim(self::composeBetterMessage($cause, $indent));
+            $result .= NL.$indent.'caused by'.NL.$indent.$message.NL.NL;
+            $result .= self::{__FUNCTION__}($cause, $indent);                 // recursion
+        }
         return $result;
     }
 

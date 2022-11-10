@@ -270,7 +270,7 @@ class PostgresConnector extends Connector {
         catch (IRosasurferException $ex) {}
         catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
         catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
-        if ($ex) throw $ex->addMessage('Cannot connect to PostgreSQL server with connection string: "'.$connStr.'"');
+        if ($ex) throw $ex->appendMessage('Cannot connect to PostgreSQL server with connection string: "'.$connStr.'"');
 
         $this->setConnectionOptions();
         return $this;
@@ -461,7 +461,7 @@ class PostgresConnector extends Connector {
         catch (IRosasurferException $ex) {}
         catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
         catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
-        if ($ex) throw $ex->addMessage('Database: '.$this->getConnectionDescription().NL.'SQL: "'.$sql.'"');
+        if ($ex) throw $ex->appendMessage('Database: '.$this->getConnectionDescription().NL.'SQL: "'.$sql.'"');
 
         /** @var string $status */
         $status = pg_result_status($result, PGSQL_STATUS_STRING);
