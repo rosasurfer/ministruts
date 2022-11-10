@@ -278,7 +278,7 @@ class ErrorHandler extends StaticClass {
         if ($secondEx)  {
             // secondary exception: the logger itself crashed, last chance to log something
             $indent = ' ';
-            $msg2  = '[FATAL] Unhandled '.trim(self::composeBetterMessage($secondEx)).NL;
+            $msg2  = '[FATAL] Unhandled '.trim(self::getBetterMessage($secondEx)).NL;
             $file2 = $secondEx->getFile();
             $line2 = $secondEx->getLine();
             $msg2 .= $indent.'in '.$file2.' on line '.$line2.NL.NL;
@@ -286,7 +286,7 @@ class ErrorHandler extends StaticClass {
             $msg2 .= self::getBetterTraceAsString($secondEx, $indent);
 
             // primary (the causing) exception
-            $msg1  = $indent.'Unhandled '.trim(self::composeBetterMessage($exception)).NL;
+            $msg1  = $indent.'Unhandled '.trim(self::getBetterMessage($exception)).NL;
             $file1 = $exception->getFile();
             $line1 = $exception->getLine();
             $msg1 .= $indent.'in '.$file1.' on line '.$line1.NL.NL;
@@ -419,6 +419,73 @@ class ErrorHandler extends StaticClass {
 
 
     /**
+     * Return the message of an exception in a more readable way. Same as {@link IRosasurferException::getBetterMessage()} except that this
+     * method can be used with all PHP exceptions.
+     *
+     * @param  \Exception|\Throwable $exception         - any exception
+     * @param  string                $indent [optional] - indent lines by the specified value (default: no indentation)
+     *
+     * @return string - message
+     */
+    public static function getBetterMessage($exception, $indent = '') {
+        Assert::throwable($exception, '$exception');
+
+        if ($exception instanceof PHPError) {
+            $result = $exception->getErrorType();
+        }
+        else {
+            $class     = get_class($exception);
+            $namespace = strtolower(strLeftTo($class, '\\', -1, true, ''));
+            $basename  = simpleClassName($class);
+            $result    = $indent.$namespace.$basename;
+
+            if ($exception instanceof \ErrorException) {            // a PHP error exception not created by the framework
+                $result .= '('.self::errorLevelToStr($exception->getSeverity()).')';
+            }
+        }
+        $message = $exception->getMessage();
+
+        if (strlen($indent)) {
+            $lines = explode(NL, normalizeEOL($message));           // indent multiline messages
+            $eoMsg = '';
+            if (strEndsWith($message, NL)) {
+                \array_pop($lines);
+                $eoMsg = NL;
+            }
+            $message = join(NL.$indent, $lines).$eoMsg;
+        }
+
+        return $result.(strlen($message) ? ': ':'').$message;
+    }
+
+
+    /**
+     * Return the stacktrace of an exception in a more readable way as a string. The returned string contains nested exceptions.
+     * Same as {@link IRosasurferException::getBetterTraceAsString()} except that this method can be used with all PHP exceptions.
+     *
+     * @param  \Exception|\Throwable $exception         - any exception (PHP5) or throwable (PHP7)
+     * @param  string                $indent [optional] - indent the resulting lines by the specified value
+     *                                                    (default: no indentation)
+     * @return string - readable stacktrace
+     */
+    public static function getBetterTraceAsString($exception, $indent = '') {
+        Assert::throwable($exception, '$exception');
+
+        if ($exception instanceof IRosasurferException) $trace = $exception->getBetterTrace();
+        else                                            $trace = self::adjustTrace($exception->getTrace(), $exception->getFile(), $exception->getLine());
+        $result = self::formatTrace($trace, $indent);
+
+        if ($cause = $exception->getPrevious()) {
+            // recursively add stacktraces of nested exceptions
+            $message = trim(self::getBetterMessage($cause, $indent));
+            $result .= NL.$indent.'caused by'.NL.$indent.$message.NL.NL;
+            $result .= self::{__FUNCTION__}($cause, $indent);                 // recursion
+        }
+        return $result;
+    }
+
+
+    /**
      * Take a regular PHP stacktrace and adjust it to be more readable.
      *
      * @param  array  $trace           - regular PHP stacktrace
@@ -492,73 +559,6 @@ class ErrorHandler extends StaticClass {
         // phalcon\mvc\Model::__callStatic()                  [php-phalcon]
         // vokuro\models\Users::findFirstByEmail() # line 27, file: F:\Projekte\phalcon\sample-apps\vokuro\app\library\Auth\Auth.php
         // vokuro\auth\Auth->check()               # line 27, file: F:\Projekte\phalcon\sample-apps\vokuro\app\library\Auth\Auth.php
-    }
-
-
-    /**
-     * Return a more readable version of an exception's message.
-     *
-     * @param  \Exception|\Throwable $exception         - any exception
-     * @param  string                $indent [optional] - indent lines by the specified value (default: no indentation)
-     *
-     * @return string - message
-     */
-    public static function composeBetterMessage($exception, $indent = '') {
-        Assert::throwable($exception, '$exception');
-
-        if ($exception instanceof PHPError) {
-            $result = $exception->getErrorType();
-        }
-        else {
-            $class     = get_class($exception);
-            $namespace = strtolower(strLeftTo($class, '\\', -1, true, ''));
-            $basename  = simpleClassName($class);
-            $result    = $indent.$namespace.$basename;
-
-            if ($exception instanceof \ErrorException) {            // a PHP error exception not created by the framework
-                $result .= '('.self::errorLevelToStr($exception->getSeverity()).')';
-            }
-        }
-        $message = $exception->getMessage();
-
-        if (strlen($indent)) {
-            $lines = explode(NL, normalizeEOL($message));           // indent multiline messages
-            $eoMsg = '';
-            if (strEndsWith($message, NL)) {
-                \array_pop($lines);
-                $eoMsg = NL;
-            }
-            $message = join(NL.$indent, $lines).$eoMsg;
-        }
-
-        $result .= (strlen($message) ? ': ':'').$message;
-        return $result;
-    }
-
-
-    /**
-     * Return a more readable version of an exception's stacktrace. The representation also contains information about
-     * nested exceptions.
-     *
-     * @param  \Exception|\Throwable $exception         - any exception (PHP5) or throwable (PHP7)
-     * @param  string                $indent [optional] - indent the resulting lines by the specified value
-     *                                                    (default: no indentation)
-     * @return string - readable stacktrace
-     */
-    public static function getBetterTraceAsString($exception, $indent = '') {
-        Assert::throwable($exception, '$exception');
-
-        if ($exception instanceof IRosasurferException) $trace = $exception->getBetterTrace();
-        else                                            $trace = self::adjustTrace($exception->getTrace(), $exception->getFile(), $exception->getLine());
-        $result = self::formatTrace($trace, $indent);
-
-        if ($cause = $exception->getPrevious()) {
-            // recursively add stacktraces of nested exceptions
-            $message = trim(self::composeBetterMessage($cause, $indent));
-            $result .= NL.$indent.'caused by'.NL.$indent.$message.NL.NL;
-            $result .= self::{__FUNCTION__}($cause, $indent);                 // recursion
-        }
-        return $result;
     }
 
 

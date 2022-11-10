@@ -93,7 +93,7 @@ interface RosasurferExceptionInterface {
 
 
     /**
-     * Return the more readable stack trace of the exception as a string.
+     * Return the stacktrace of the exception in a more readable way as a string. The returned string contains nested exceptions.
      *
      * @return string
      */

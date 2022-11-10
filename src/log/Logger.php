@@ -432,7 +432,7 @@ class Logger extends StaticClass {
         else {
             // $loggable is an exception
             $type = null;
-            $msg  = trim(ErrorHandler::composeBetterMessage($loggable, $indent));
+            $msg  = trim(ErrorHandler::getBetterMessage($loggable, $indent));
             if (isset($context['unhandled-exception'])) {
                 $type = 'Unhandled ';
                 if ($loggable instanceof PHPError) {
@@ -451,7 +451,7 @@ class Logger extends StaticClass {
         // append an existing context exception to 'cliExtra'
         if (isset($context['exception'])) {
             $exception = $context['exception'];
-            $msg       = $indent.trim(ErrorHandler::composeBetterMessage($exception, $indent));
+            $msg       = $indent.trim(ErrorHandler::getBetterMessage($exception, $indent));
             $cliExtra .= NL.$msg.NL.NL;
             $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
             $traceStr .= ErrorHandler::getBetterTraceAsString($exception, $indent);
@@ -504,7 +504,7 @@ class Logger extends StaticClass {
         else {
             // $loggable is an exception
             $type = null;
-            $msg  = trim(ErrorHandler::composeBetterMessage($loggable));
+            $msg  = trim(ErrorHandler::getBetterMessage($loggable));
             if (isset($context['unhandled-exception'])) {
                 $type = 'Unhandled ';
                 if ($loggable instanceof PHPError) {
@@ -522,7 +522,7 @@ class Logger extends StaticClass {
         // append an existing context exception
         if (isset($context['exception'])) {
             $exception = $context['exception'];
-            $msg       = ErrorHandler::composeBetterMessage($exception);
+            $msg       = ErrorHandler::getBetterMessage($exception);
             $html     .= '<br>'.nl2br(hsc($msg)).'<br><br>';
             $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
             $traceStr .= ErrorHandler::getBetterTraceAsString($exception, $indent);

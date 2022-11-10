@@ -63,14 +63,13 @@ trait RosasurferExceptionTrait {
      */
     public function getBetterMessage() {
         if (!$this->betterMessage)
-            $this->betterMessage = ErrorHandler::composeBetterMessage($this);
+            $this->betterMessage = ErrorHandler::getBetterMessage($this);
         return $this->betterMessage;
     }
 
 
     /**
-     * Return a string representation of the stack trace of the {@link \Exception} or {@link \Throwable} in a more readable
-     * way (Java-like).
+     * Return the stacktrace of the exception in a more readable way as a string. The returned string contains nested exceptions.
      *
      * @return string
      */
