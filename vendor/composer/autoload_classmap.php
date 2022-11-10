@@ -88,7 +88,6 @@ return array(
     'rosasurfer\\core\\exception\\FileNotFoundException' => $baseDir . '/src/core/exception/FileNotFoundException.php',
     'rosasurfer\\core\\exception\\IOException' => $baseDir . '/src/core/exception/IOException.php',
     'rosasurfer\\core\\exception\\IllegalAccessException' => $baseDir . '/src/core/exception/IllegalAccessException.php',
-    'rosasurfer\\core\\exception\\IllegalArgumentException' => $baseDir . '/src/core/exception/IllegalArgumentException.php',
     'rosasurfer\\core\\exception\\IllegalStateException' => $baseDir . '/src/core/exception/IllegalStateException.php',
     'rosasurfer\\core\\exception\\InfrastructureException' => $baseDir . '/src/core/exception/InfrastructureException.php',
     'rosasurfer\\core\\exception\\InvalidTypeException' => $baseDir . '/src/core/exception/InvalidTypeException.php',

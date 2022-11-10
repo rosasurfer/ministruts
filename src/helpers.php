@@ -8,7 +8,6 @@ use rosasurfer\console\docopt\DocoptParser;
 use rosasurfer\console\docopt\DocoptResult;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\di\proxy\Request;
-use rosasurfer\core\exception\IllegalArgumentException;
 use rosasurfer\core\exception\InvalidValueException;
 use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\core\lock\Lock;
@@ -498,8 +497,8 @@ function prettyBytes($value, $decimals = 1) {
         }
         else Assert::float($value, '$value');
 
-        if ($value < PHP_INT_MIN) throw new IllegalArgumentException('Illegal parameter $value: '.$value.' (out of range)');
-        if ($value > PHP_INT_MAX) throw new IllegalArgumentException('Illegal parameter $value: '.$value.' (out of range)');
+        if ($value < PHP_INT_MIN) throw new InvalidValueException('Invalid parameter $value: '.$value.' (out of range)');
+        if ($value > PHP_INT_MAX) throw new InvalidValueException('Invalid parameter $value: '.$value.' (out of range)');
         $value = (int) round($value);
     }
     Assert::int($decimals, '$decimals');
@@ -935,7 +934,7 @@ function strLeftTo($string, $limiter, $count=1, $includeLimiter=false, $onNotFou
     Assert::string($limiter,        '$limiter');
     Assert::int   ($count,          '$count');
     Assert::bool  ($includeLimiter, '$includeLimiter');
-    if (!strlen($limiter)) throw new IllegalArgumentException('Illegal limiting substring: "" (empty)');
+    if (!strlen($limiter)) throw new InvalidValueException('Invalid limiting substring: "" (empty)');
 
     if ($count > 0) {
         $pos = -1;
@@ -1034,7 +1033,7 @@ function strRightFrom($string, $limiter, $count=1, $includeLimiter=false, $onNot
     Assert::string($limiter,        '$limiter');
     Assert::int   ($count,          '$count');
     Assert::bool  ($includeLimiter, '$includeLimiter');
-    if (!strlen($limiter)) throw new IllegalArgumentException('Illegal limiting substring: "" (empty)');
+    if (!strlen($limiter)) throw new InvalidValueException('Illegal limiting substring: "" (empty)');
 
     if ($count > 0) {
         $pos = -1;
