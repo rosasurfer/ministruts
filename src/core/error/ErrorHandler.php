@@ -375,43 +375,79 @@ class ErrorHandler extends StaticClass {
 
 
     /**
-     * Return a readable representation of an error reporting level.
+     * Take a regular PHP stacktrace and adjust it to be more readable.
      *
-     * @param  int $level - error reporting level
+     * @param  array  $trace           - regular PHP stacktrace
+     * @param  string $file [optional] - name of the file where the stacktrace was generated
+     * @param  int    $line [optional] - line of the file where the stacktrace was generated
      *
-     * @return string
+     * @return array - adjusted stacktrace
+     *
+     * @example
+     * before:
+     * <pre>
+     *  require_once()  # line 5,  file: /var/www/phalcon/vokuro/vendor/autoload.php
+     *  include_once()  # line 21, file: /var/www/phalcon/vokuro/app/config/loader.php
+     *  include()       # line 26, file: /var/www/phalcon/vokuro/public/index.php
+     *  {main}
+     * </pre>
+     *
+     * after:
+     * <pre>
+     *  require_once()             [php]
+     *  include_once()  # line 5,  file: /var/www/phalcon/vokuro/vendor/autoload.php
+     *  include()       # line 21, file: /var/www/phalcon/vokuro/app/config/loader.php
+     *  {main}          # line 26, file: /var/www/phalcon/vokuro/public/index.php
+     * </pre>
      */
-    public static function errorLevelToStr($level) {
-        Assert::int($level);
+    public static function adjustTrace(array $trace, $file='unknown', $line=0) {
+        // check if the stacktrace is already adjusted
+        if ($trace && isset($trace[0]['__ministruts_adjusted__']))
+            return $trace;
 
-        $levels = [
-            E_ERROR             => 'E_ERROR',                   //     1
-            E_WARNING           => 'E_WARNING',                 //     2
-            E_PARSE             => 'E_PARSE',                   //     4
-            E_NOTICE            => 'E_NOTICE',                  //     8
-            E_CORE_ERROR        => 'E_CORE_ERROR',              //    16
-            E_CORE_WARNING      => 'E_CORE_WARNING',            //    32
-            E_COMPILE_ERROR     => 'E_COMPILE_ERROR',           //    64
-            E_COMPILE_WARNING   => 'E_COMPILE_WARNING',         //   128
-            E_USER_ERROR        => 'E_USER_ERROR',              //   256
-            E_USER_WARNING      => 'E_USER_WARNING',            //   512
-            E_USER_NOTICE       => 'E_USER_NOTICE',             //  1024
-            E_STRICT            => 'E_STRICT',                  //  2048
-            E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',       //  4096
-            E_DEPRECATED        => 'E_DEPRECATED',              //  8192
-            E_USER_DEPRECATED   => 'E_USER_DEPRECATED',         // 16384
-        ];
-
-        if      (!$level)                                                       $levels = ['0'];                        //     0
-        else if (($level &  E_ALL)                  ==  E_ALL)                  $levels = ['E_ALL'];                    // 32767
-        else if (($level & (E_ALL & ~E_DEPRECATED)) == (E_ALL & ~E_DEPRECATED)) $levels = ['E_ALL & ~E_DEPRECATED'];    // 24575
-        else {
-            foreach ($levels as $key => $value) {
-                if ($level & $key) continue;
-                unset($levels[$key]);
+        // fix an incomplete frame[0][line] if parameters are provided and $file matches (e.g. with \SimpleXMLElement)
+        if ($file!='unknown' && $line) {
+            if (isset($trace[0]['file']) && $trace[0]['file']==$file) {
+                if (isset($trace[0]['line']) && $trace[0]['line']===0) {
+                    $trace[0]['line'] = $line;
+                }
             }
         }
-        return join('|', $levels);
+
+        // append a frame for the main script
+        $trace[] = ['function' => '{main}'];
+
+        // move fields FILE and LINE to the end by one position
+        for ($i=sizeof($trace); $i--;) {
+            if (isset($trace[$i-1]['file'])) $trace[$i]['file'] = $trace[$i-1]['file'];
+            else                       unset($trace[$i]['file']);
+
+            if (isset($trace[$i-1]['line'])) $trace[$i]['line'] = $trace[$i-1]['line'];
+            else                       unset($trace[$i]['line']);
+
+            $trace[$i]['__ministruts_adjusted__'] = true;
+        }
+
+        // add location details from parameters to frame[0] only if they differ from the old values (now in frame[1])
+        if (!isset($trace[1]['file']) || !isset($trace[1]['line']) || $trace[1]['file']!=$file || $trace[1]['line']!=$line) {
+            $trace[0]['file'] = $file;                          // test with:
+            $trace[0]['line'] = $line;                          // \SQLite3::enableExceptions(true|false);
+        }                                                       // \SQLite3::exec($invalid_sql);
+        else {
+            unset($trace[0]['file'], $trace[0]['line']);        // otherwise delete them
+        }
+
+        // remove the last frame (the one appended for the main script) if it now points to an unknown location (PHP core).
+        $size = sizeof($trace);
+        !isset($trace[$size-1]['file']) && \array_pop($trace);
+
+        return $trace;
+
+        // TODO: fix wrong stack frames originating from calls to virtual static functions
+        //
+        // phalcon\mvc\Model::__callStatic()                  [php-phalcon]
+        // vokuro\models\Users::findFirstByEmail() # line 27, file: F:\Projekte\phalcon\sample-apps\vokuro\app\library\Auth\Auth.php
+        // vokuro\auth\Auth->check()               # line 27, file: F:\Projekte\phalcon\sample-apps\vokuro\app\library\Auth\Auth.php
     }
 
 
@@ -453,5 +489,46 @@ class ErrorHandler extends StaticClass {
 
         $result .= (strlen($message) ? ': ':'').$message;
         return $result;
+    }
+
+
+    /**
+     * Return a readable representation of an error reporting level.
+     *
+     * @param  int $level - error reporting level
+     *
+     * @return string
+     */
+    public static function errorLevelToStr($level) {
+        Assert::int($level);
+
+        $levels = [
+            E_ERROR             => 'E_ERROR',                   //     1
+            E_WARNING           => 'E_WARNING',                 //     2
+            E_PARSE             => 'E_PARSE',                   //     4
+            E_NOTICE            => 'E_NOTICE',                  //     8
+            E_CORE_ERROR        => 'E_CORE_ERROR',              //    16
+            E_CORE_WARNING      => 'E_CORE_WARNING',            //    32
+            E_COMPILE_ERROR     => 'E_COMPILE_ERROR',           //    64
+            E_COMPILE_WARNING   => 'E_COMPILE_WARNING',         //   128
+            E_USER_ERROR        => 'E_USER_ERROR',              //   256
+            E_USER_WARNING      => 'E_USER_WARNING',            //   512
+            E_USER_NOTICE       => 'E_USER_NOTICE',             //  1024
+            E_STRICT            => 'E_STRICT',                  //  2048
+            E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',       //  4096
+            E_DEPRECATED        => 'E_DEPRECATED',              //  8192
+            E_USER_DEPRECATED   => 'E_USER_DEPRECATED',         // 16384
+        ];
+
+        if      (!$level)                                                       $levels = ['0'];                        //     0
+        else if (($level &  E_ALL)                  ==  E_ALL)                  $levels = ['E_ALL'];                    // 32767
+        else if (($level & (E_ALL & ~E_DEPRECATED)) == (E_ALL & ~E_DEPRECATED)) $levels = ['E_ALL & ~E_DEPRECATED'];    // 24575
+        else {
+            foreach ($levels as $key => $value) {
+                if ($level & $key) continue;
+                unset($levels[$key]);
+            }
+        }
+        return join('|', $levels);
     }
 }

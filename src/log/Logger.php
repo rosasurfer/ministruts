@@ -7,7 +7,9 @@ use rosasurfer\core\StaticClass;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\di\proxy\Request;
 use rosasurfer\core\error\DebugHelper;
+use rosasurfer\core\error\ErrorHandler;
 use rosasurfer\core\error\PHPError;
+use rosasurfer\core\exception\IllegalStateException;
 use rosasurfer\core\exception\InvalidValueException;
 use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\net\NetTools;
@@ -37,8 +39,6 @@ use const rosasurfer\L_NOTICE;
 use const rosasurfer\L_WARN;
 use const rosasurfer\NL;
 use const rosasurfer\WINDOWS;
-use rosasurfer\core\exception\IllegalStateException;
-use rosasurfer\core\error\ErrorHandler;
 
 
 /**
@@ -654,7 +654,7 @@ class Logger extends StaticClass {
      */
     private static function generateStackTrace(array &$context) {
         if (!isset($context['trace'])) {
-            $trace = DebugHelper::adjustTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), __FILE__, __LINE__);
+            $trace = ErrorHandler::adjustTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), __FILE__, __LINE__);
 
             foreach ($trace as $i => $frame) {
                 if (!isset($frame['class']) || $frame['class']!=__CLASS__)      // remove non-logger frames

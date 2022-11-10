@@ -37,7 +37,7 @@ class PHPError extends \ErrorException implements IRosasurferException {
 
         if (!$trace) {
             // transform the original stacktrace into a better one
-            $trace = DebugHelper::adjustTrace($this->getTrace(), $this->getFile(), $this->getLine());
+            $trace = ErrorHandler::adjustTrace($this->getTrace(), $this->getFile(), $this->getLine());
 
             // drop the first frame if the exception was created in the registered error handler
             if (DebugHelper::getFQFunctionName($trace[0]) == ErrorHandler::class.'::handleError') {

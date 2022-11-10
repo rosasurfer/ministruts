@@ -3,7 +3,7 @@ namespace rosasurfer\core\exception;
 
 use rosasurfer\core\ObjectTrait;
 use rosasurfer\core\di\DiAwareTrait;
-use rosasurfer\core\error\DebugHelper;
+use rosasurfer\core\error\ErrorHandler;
 
 
 /**
@@ -34,7 +34,7 @@ class RosasurferException extends \Exception implements RosasurferExceptionInter
 
         if (!$betterTrace) {
             // transform the original stacktrace into a better one
-            $betterTrace = DebugHelper::adjustTrace($this->getTrace(), $this->getFile(), $this->getLine());
+            $betterTrace = ErrorHandler::adjustTrace($this->getTrace(), $this->getFile(), $this->getLine());
 
             /*
             // if the exception was thrown in a magic "__set()" shift frames until we reach the erroneous assignment
