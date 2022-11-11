@@ -23,6 +23,8 @@ use function rosasurfer\ini_get_bool;
 use function rosasurfer\ksort_r;
 use function rosasurfer\normalizeEOL;
 use function rosasurfer\printPretty;
+use function rosasurfer\stderr;
+use function rosasurfer\stdout;
 use function rosasurfer\strEndsWith;
 use function rosasurfer\strLeftTo;
 use function rosasurfer\strRightFrom;
@@ -348,25 +350,17 @@ class Logger extends StaticClass {
      * @param  array                        $context  - reference to the log context with additional data
      */
     private static function invokeErrorLogHandler($loggable, $level, array &$context) {
+        echoPre('Logger::invokeErrorLogHandler()  error_log="'.ini_get('error_log').'"');
         !isset($context['cliMessage']) && self::composeCliMessage($loggable, $level, $context);
 
-        echoPre('Logger::invokeErrorLogHandler()  error_log="'.ini_get('error_log').'"');
-
         $msg = ' '.$context['cliMessage'];
-        $msg = str_replace(chr(0), '\0', $msg);                 // replace NUL bytes which mess up the logfile
+        $msg = str_replace(chr(0), '\0', $msg);     // replace NUL bytes which mess up the logfile
         $msg = rtrim($msg).PHP_EOL.PHP_EOL.str_repeat('-', 140);
 
-        if (CLI && empty(ini_get('error_log'))) {
-            // Suppress duplicated output to STDERR, the PrintHandler already wrote to STDOUT.
+        error_log($msg, ERROR_LOG_DEFAULT);
 
-            // TODO: Instead of messing around here the PrintHandler must not print to STDOUT if the ErrorLogHandler prints to STDERR.
-            // TODO: Suppress output to STDERR in interactive terminals only (i.e. not in CRON).
-        }
-
-        error_log($msg, ERROR_LOG_DEFAULT);     // message is sent to syslog, a file or the SAPI logger, depending on php.ini setting "error_log"
-
-        // ini_get('error_log')
-        // --------------------
+        // ini_get('error_log') controls whether a message is sent to syslog, a file or the SAPI logger
+        // --------------------------------------------------------------------------------------------
         // (empty)     : Errors are sent to the SAPI logger, e.g. the Appache error log or STDERR in CLI mode (default).
         // "syslog"    : Errors are sent to the system logger. On Unix this means syslog(3), and on Windows it means the event log.
         // "<filepath>": Name of a file where errors should be logged.
@@ -383,17 +377,20 @@ class Logger extends StaticClass {
      */
     private static function invokePrintHandler($loggable, $level, array &$context) {
         if (CLI) {
-            !isset($context['cliMessage']) && self::composeCliMessage($loggable, $level, $context);
-            $message = $context['cliMessage'];
+            if (!self::$errorLogHandler || !empty(ini_get('error_log'))) {  // only if the errorLogHandler doesn't print to STDERR
+                !isset($context['cliMessage']) && self::composeCliMessage($loggable, $level, $context);
+                $message = $context['cliMessage'];
+
+                if (isset($context['php-error']) || isset($context['unhandled-exception'])) stderr($message.PHP_EOL);
+                else                                                                        stdout($message.PHP_EOL);
+            }
         }
         else {
             !isset($context['htmlMessage']) && self::composeHtmlMessage($loggable, $level, $context);
-            $message = $context['htmlMessage'];
+            echo $context['htmlMessage'].NL;
+            self::$printCounter++;
         }
-
-        echo $message.PHP_EOL;
         ob_get_level() && ob_flush();
-        self::$printCounter++;
     }
 
 
