@@ -644,7 +644,7 @@ class ErrorHandler extends StaticClass {
      * Remove all frames from a stacktrace following the specified file and line (used to remove frames of this error handler from a PHP
      * error converted to an exception).
      *
-     * @param array  $trace - stack trace to process
+     * @param array  $trace - stacktrace to process
      * @param string $file  - filename where the error was triggered
      * @param int    $line  - line number where the error was triggered
      *
@@ -669,8 +669,6 @@ class ErrorHandler extends StaticClass {
      *
      * @param  \Exception $exception - exception to modify
      * @param  array      $trace     - new stacktrace
-     *
-     * @throws \ReflectionException if hooking into the \Exception class to make the 'trace' property accessible fails
      */
     private static function setNewTrace(\Exception $exception, array $trace) {
         static $property = null;
