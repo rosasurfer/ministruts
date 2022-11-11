@@ -167,11 +167,11 @@ class ErrorHandler extends StaticClass {
      *                FALSE, if the error shall be processed as if no error handler was installed.
      */
     public static function handleError($level, $message, $file, $line, array $symbols = null) {
-        echoPre('ErrorHandler::handleError()  '/*.self::errorLevelToStr($level).': '.$message.', in '.$file.', line '.$line*/);
+        //echoPre('ErrorHandler::handleError()  '/*.self::errorLevelToStr($level).': '.$message.', in '.$file.', line '.$line*/);
+        if (!self::$errorHandlingMode) return false;
 
         // ignore suppressed errors and errors not covered by the current reporting level
         $reportingLevel = error_reporting();
-        if (!self::$errorHandlingMode)   return false;
         if (!$reportingLevel)            return false;                          // the @ operator was specified
         if (!($reportingLevel & $level)) return true;                           // the error is not covered by the active reporting level
 
@@ -257,7 +257,7 @@ class ErrorHandler extends StaticClass {
      * @param  \Exception|\Throwable $exception - the unhandled exception (PHP5) or throwable (PHP7)
      */
     public static function handleException($exception) {
-        echoPre('ErrorHandler::handleException()  '/*.$exception->getMessage()*/);
+        //echoPre('ErrorHandler::handleException()  '/*.$exception->getMessage()*/);
         if (!self::$exceptionHandling) return;
 
         // Exceptions thrown from the exception handler itself will not be passed back to the handler but instead

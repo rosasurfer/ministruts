@@ -45,11 +45,11 @@ const L_ERROR           = 16;
 const L_FATAL           = 32;
 
 // log destinations for the built-in function error_log()
-const ERROR_LOG_DEFAULT =  0;                                       // message is sent to the configured log or the system logger
-const ERROR_LOG_MAIL    =  1;                                       // message is sent by email
-const ERROR_LOG_DEBUG   =  2;                                       // message is sent through the PHP debugging connection
-const ERROR_LOG_FILE    =  3;                                       // message is appended to a file destination
-const ERROR_LOG_SAPI    =  4;                                       // message is sent directly to the SAPI logging handler
+const ERROR_LOG_DEFAULT =  0;                                       // message is sent to syslog, a file or the SAPI logger, depending on php.ini setting "error_log" (default)
+const ERROR_LOG_MAIL    =  1;                                       // message is sent by e-mail
+const ERROR_LOG_DEBUG   =  2;                                       // message is sent through the PHP debugging connection (no longer available)
+const ERROR_LOG_FILE    =  3;                                       // message is appended to the file in parameter 'destination'
+const ERROR_LOG_SAPI    =  4;                                       // message is sent directly to the SAPI logger (e.g. Apache or STDERR)
 
 // time periods
 const SECOND            =   1;           const SECONDS = SECOND;

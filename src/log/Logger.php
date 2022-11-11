@@ -343,12 +343,6 @@ class Logger extends StaticClass {
      * Pass a log message to the PHP system logger via "error_log()".
      * This handler must be called before the "PrintHandler" to prevent duplicated output on STDOUT and STDERR.
      *
-     * ini_get('error_log')
-     * --------------------
-     * Name of a file where script errors should be logged. If the special value "syslog" is used, errors are sent to the system logger
-     * instead. On Unix this means syslog(3), and on Windows it means the event log. If this directive is not set, errors are sent to
-     * the SAPI error logger. For example, it's the Appache error log or STDERR in CLI mode.
-     *
      * @param  string|\Exception|\Throwable $loggable - message or exception
      * @param  int                          $level    - loglevel
      * @param  array                        $context  - reference to the log context with additional data
@@ -356,19 +350,26 @@ class Logger extends StaticClass {
     private static function invokeErrorLogHandler($loggable, $level, array &$context) {
         !isset($context['cliMessage']) && self::composeCliMessage($loggable, $level, $context);
 
-        $msg = 'PHP '.$context['cliMessage'];
+        echoPre('Logger::invokeErrorLogHandler()  error_log="'.ini_get('error_log').'"');
+
+        $msg = ' '.$context['cliMessage'];
         $msg = str_replace(chr(0), '\0', $msg);                 // replace NUL bytes which mess up the logfile
+        $msg = rtrim($msg).NL.NL.str_repeat('-', 140);
 
         if (CLI && empty(ini_get('error_log'))) {
             // Suppress duplicated output to STDERR, the PrintHandler already wrote to STDOUT.
 
-            // TODO: Instead of messing around here the PrintHandler must not print to STDOUT if the ErrorLogHandler
-            //       is active and prints to STDERR.
+            // TODO: Instead of messing around here the PrintHandler must not print to STDOUT if the ErrorLogHandler prints to STDERR.
             // TODO: Suppress output to STDERR in interactive terminals only (i.e. not in CRON).
         }
-        else {
-            error_log(trim($msg), ERROR_LOG_DEFAULT);
-        }
+
+        error_log($msg, ERROR_LOG_DEFAULT);     // message is sent to syslog, a file or the SAPI logger, depending on php.ini setting "error_log"
+
+        // ini_get('error_log')
+        // --------------------
+        // (empty)     : Errors are sent to the SAPI logger, e.g. the Appache error log or STDERR in CLI mode (default).
+        // "syslog"    : Errors are sent to the system logger. On Unix this means syslog(3), and on Windows it means the event log.
+        // "<filepath>": Name of a file where errors should be logged.
     }
 
 
@@ -381,11 +382,9 @@ class Logger extends StaticClass {
      * @param  array                        $context  - reference to the log context with additional data
      */
     private static function invokePrintHandler($loggable, $level, array &$context) {
-        $message = '';
-
         if (CLI) {
             !isset($context['cliMessage']) && self::composeCliMessage($loggable, $level, $context);
-            $message .= $context['cliMessage'];
+            $message = $context['cliMessage'];
         }
         else {
             !isset($context['htmlMessage']) && self::composeHtmlMessage($loggable, $level, $context);
@@ -394,7 +393,6 @@ class Logger extends StaticClass {
 
         echo $message.NL;
         ob_get_level() && ob_flush();
-
         self::$printCounter++;
     }
 
