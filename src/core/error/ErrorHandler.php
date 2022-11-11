@@ -650,7 +650,7 @@ class ErrorHandler extends StaticClass {
      *
      * @return array
      */
-    private static function removeFrames(array $trace, string $file, int $line) {
+    private static function removeFrames(array $trace, $file, $line) {
         $result = $trace;
         $size = sizeof($trace);
 
