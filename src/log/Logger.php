@@ -406,13 +406,13 @@ class Logger extends StaticClass {
         $file = $context['file'];
         $line = $context['line'];
 
-        $cliMessage = $cliExtra = null;
+        $cliMessage = null;
         $indent = ' ';
 
         // compose message
         if (is_string($loggable)) {
             // $loggable is a string
-            $msg = $loggable;
+            $msg   = $loggable;
             $lines = explode(NL, normalizeEOL($msg));   // indent multiline messages
             $eoMsg = '';
             if (strEndsWith($msg, NL)) {
@@ -422,11 +422,20 @@ class Logger extends StaticClass {
             $msg = join(NL.$indent, $lines).$eoMsg;
             $cliMessage = '['.strtoupper(self::$logLevels[$level]).'] '.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
 
-            // if there was no exception append the internal stacktrace to 'cliExtra'
-            if (!isset($context['exception']) && isset($context['trace'])) {
-                $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
-                $traceStr .= ErrorHandler::formatTrace($context['trace'], $indent);
-                $cliExtra .= NL.$traceStr;
+            // append an existing context exception
+            if (isset($context['exception'])) {
+                $exception   = $context['exception'];
+                $msg         = $indent.trim(ErrorHandler::getBetterMessage($exception, $indent));
+                $cliMessage .= NL.$msg.NL.NL;
+                $traceStr    = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
+                $traceStr   .= ErrorHandler::getBetterTraceAsString($exception, $indent);
+                $cliMessage .= NL.$traceStr;
+            }
+            elseif (isset($context['trace'])) {
+                // otherwise append the internal stacktrace
+                $traceStr    = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
+                $traceStr   .= ErrorHandler::formatTrace($context['trace'], $indent);
+                $cliMessage .= NL.$traceStr;
             }
         }
         else {
@@ -440,26 +449,13 @@ class Logger extends StaticClass {
                     $type .= 'PHP Error:';
                 }
             }
-            $cliMessage = '['.strtoupper(self::$logLevels[$level]).'] '.$type.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
-
-            // the stack trace will go into 'cliExtra'
-            $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
-            $traceStr .= ErrorHandler::getBetterTraceAsString($loggable, $indent);
-            $cliExtra .= NL.$traceStr;
+            $cliMessage  = '['.strtoupper(self::$logLevels[$level]).'] '.$type.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
+            $traceStr    = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
+            $traceStr   .= ErrorHandler::getBetterTraceAsString($loggable, $indent);
+            $cliMessage .= NL.$traceStr;
         }
 
-        // append an existing context exception to 'cliExtra'
-        if (isset($context['exception'])) {
-            $exception = $context['exception'];
-            $msg       = $indent.trim(ErrorHandler::getBetterMessage($exception, $indent));
-            $cliExtra .= NL.$msg.NL.NL;
-            $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
-            $traceStr .= ErrorHandler::getBetterTraceAsString($exception, $indent);
-            $cliExtra .= NL.$traceStr;
-        }
-
-        // store the message
-        $context['cliMessage'] = $cliMessage.$cliExtra;
+        $context['cliMessage'] = $cliMessage;
     }
 
 

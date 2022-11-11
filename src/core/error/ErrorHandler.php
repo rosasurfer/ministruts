@@ -488,10 +488,9 @@ class ErrorHandler extends StaticClass {
      */
     public static function getBetterTrace(array $trace, $file='unknown', $line=0) {
         // check if the stacktrace is already adjusted
-        if ($trace && isset($trace[0]['__ministruts_adjusted__']))
-            return $trace;
+        if (isset($trace[0]['__ministruts_adjusted__'])) return $trace;
 
-        // fix an incomplete frame[0][line] if parameters are provided and $file matches (e.g. with \SimpleXMLElement)
+        // fix a missing first line if $file matches (e.g. with \SimpleXMLElement)
         if ($file!='unknown' && $line) {
             if (isset($trace[0]['file']) && $trace[0]['file']==$file) {
                 if (isset($trace[0]['line']) && $trace[0]['line']===0) {
@@ -515,7 +514,7 @@ class ErrorHandler extends StaticClass {
         }
 
         // add location details from parameters to frame[0] only if they differ from the old values (now in frame[1])
-        if (!isset($trace[1]['file']) || !isset($trace[1]['line']) || $trace[1]['file']!=$file || $trace[1]['line']!=$line) {
+        if (!isset($trace[1]['file'], $trace[1]['line']) || $trace[1]['file']!=$file || $trace[1]['line']!=$line) {
             $trace[0]['file'] = $file;                          // test with:
             $trace[0]['line'] = $line;                          // \SQLite3::enableExceptions(true|false);
         }                                                       // \SQLite3::exec($invalid_sql);
