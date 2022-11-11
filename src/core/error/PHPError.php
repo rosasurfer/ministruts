@@ -40,6 +40,7 @@ class PHPError extends \ErrorException implements IRosasurferException {
             $trace = ErrorHandler::getBetterTrace($this->getTrace(), $this->getFile(), $this->getLine());
 
             // drop the first frame if the exception was created in the registered error handler
+            /*
             if (ErrorHandler::getFrameMethod($trace[0]) == ErrorHandler::class.'::handleError') {
                 \array_shift($trace);
 
@@ -59,6 +60,8 @@ class PHPError extends \ErrorException implements IRosasurferException {
                     }
                 }
             }
+            */
+
             // store the new stacktrace
             $this->betterTrace = $trace;
         }

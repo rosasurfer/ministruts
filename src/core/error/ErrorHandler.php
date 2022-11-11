@@ -202,7 +202,11 @@ class ErrorHandler extends StaticClass {
             default                 : $error = new PHPUnknownError    ($message, 0, $level, $file, $line);
         }
 
-        // handle it according to the error handling mode
+        // modify the stacktrace to point to the trigger statement (removes frames after $file/$line = this error handler)
+        $trace = self::removeFrames($error->getTrace(), $file, $line);
+        self::setNewTrace($error, $trace);
+
+        // handle the PHPError according to the error handling mode
         if (self::$errorHandlingMode == self::ERRORS_LOG) {
             Logger::log($error, L_ERROR, $context);
 
@@ -633,5 +637,47 @@ class ErrorHandler extends StaticClass {
             }
         }
         return $class.$function;
+    }
+
+
+    /**
+     * Remove all frames from a stacktrace following the specified file and line (used to remove frames of this error handler from a PHP
+     * error converted to an exception).
+     *
+     * @param array  $trace - stack trace to process
+     * @param string $file  - filename where the error was triggered
+     * @param int    $line  - line number where the error was triggered
+     *
+     * @return array
+     */
+    private static function removeFrames(array $trace, string $file, int $line) {
+        $result = $trace;
+        $size = sizeof($trace);
+
+        for ($i=0; $i < $size; $i++) {
+            if (isset($trace[$i]['file'], $trace[$i]['line']) && $trace[$i]['file']===$file && $trace[$i]['line']===$line) {
+                $result = array_slice($trace, $i+1);
+                break;
+            }
+        }
+        return $result;
+    }
+
+
+    /**
+     * Set the stacktrace of an {@link \Exception}.
+     *
+     * @param  \Exception $exception - exception to modify
+     * @param  array      $trace     - new stacktrace
+     *
+     * @throws \ReflectionException if hooking into the \Exception class to make the 'trace' property accessible fails
+     */
+    private static function setNewTrace(\Exception $exception, array $trace) {
+        static $property = null;
+        if (!$property) {
+            $property = new \ReflectionProperty(\Exception::class, 'trace');
+            $property->setAccessible(true);
+        }
+        $property->setValue($exception, $trace);
     }
 }
