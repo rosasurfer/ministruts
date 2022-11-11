@@ -343,7 +343,6 @@ class Logger extends StaticClass {
 
     /**
      * Pass a log message to the PHP system logger via "error_log()".
-     * This handler must be called before the "PrintHandler" to prevent duplicated output on STDOUT and STDERR.
      *
      * @param  string|\Exception|\Throwable $loggable - message or exception
      * @param  int                          $level    - loglevel
@@ -354,7 +353,7 @@ class Logger extends StaticClass {
         !isset($context['cliMessage']) && self::composeCliMessage($loggable, $level, $context);
 
         $msg = ' '.$context['cliMessage'];
-        $msg = str_replace(chr(0), '\0', $msg);     // replace NUL bytes which mess up the logfile
+        $msg = str_replace(chr(0), '\0', $msg);                             // replace NUL bytes which mess up the logfile
         $msg = rtrim($msg).PHP_EOL.PHP_EOL.str_repeat('-', 140);
 
         error_log($msg, ERROR_LOG_DEFAULT);
@@ -369,7 +368,6 @@ class Logger extends StaticClass {
 
     /**
      * Display a log message on STDOUT, STDERR or as part of the HTTP response.
-     * This handler must be called after the "ErrorLogHandler" to prevent duplicated output on STDOUT and STDERR.
      *
      * @param  string|\Exception|\Throwable $loggable - message or exception
      * @param  int                          $level    - loglevel
