@@ -444,11 +444,10 @@ class ErrorHandler extends StaticClass {
             $eoMsg = '';
             if (strEndsWith($message, NL)) {
                 \array_pop($lines);
-                $eoMsg = NL;
+                $eoMsg = PHP_EOL;
             }
-            $message = join(NL.$indent, $lines).$eoMsg;
+            $message = join(PHP_EOL.$indent, $lines).$eoMsg;
         }
-
         return $result.(strlen($message) ? ': ':'').$message;
     }
 
@@ -549,7 +548,7 @@ class ErrorHandler extends StaticClass {
         if ($cause = $exception->getPrevious()) {
             // recursively add stacktraces of nested exceptions
             $message = trim(self::getBetterMessage($cause, $indent));
-            $result .= NL.$indent.'caused by'.NL.$indent.$message.NL.NL;
+            $result .= PHP_EOL.$indent.'caused by'.PHP_EOL.$indent.$message.PHP_EOL.PHP_EOL;
             $result .= self::{__FUNCTION__}($cause, $indent);                 // recursion
         }
         return $result;
@@ -595,7 +594,7 @@ class ErrorHandler extends StaticClass {
         }
 
         for ($i=0; $i < $size; $i++) {
-            $result .= $indent.str_pad($trace[$i]['call'], $callLen).' '.str_pad($trace[$i]['line'], $lineLen).$trace[$i]['file'].NL;
+            $result .= $indent.str_pad($trace[$i]['call'], $callLen).' '.str_pad($trace[$i]['line'], $lineLen).$trace[$i]['file'].PHP_EOL;
         }
         return $result;
     }
