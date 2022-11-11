@@ -17,6 +17,7 @@ use rosasurfer\net\http\HttpRequest;
 use rosasurfer\net\http\HttpResponse;
 use rosasurfer\net\mail\Mailer;
 
+use function rosasurfer\echoPre;
 use function rosasurfer\hsc;
 use function rosasurfer\ini_get_bool;
 use function rosasurfer\ksort_r;
@@ -234,6 +235,40 @@ class Logger extends StaticClass {
 
 
     /**
+     * Log a PHPError.
+     *
+     * @param PHPError $error
+     */
+    public static function logPHPError(PHPError $error) {
+        echoPre('Logger::logPHPError()');
+
+        $context = [
+            'file'      => $error->getFile(),
+            'line'      => $error->getLine(),
+            'php-error' => $error,
+        ];
+        self::log($error, L_ERROR, $context);
+    }
+
+
+    /**
+     * Log an unhandled exception.
+     *
+     * @param  \Exception|\Throwable $exception - exception (PHP5) or throwable (PHP7)
+     */
+    public static function logUnhandledException($exception) {
+        echoPre('Logger::logUnhandledException()');
+
+        $context = [
+            'file'                => $exception->getFile(),
+            'line'                => $exception->getLine(),
+            'unhandled-exception' => $exception,
+        ];
+        self::log($exception, L_FATAL, $context);                           // log with the highest level
+    }
+
+
+    /**
      * Log a message or an exception.
      *
      * @param  string|object $loggable           - a string or an object implementing <tt>__toString()</tt>
@@ -265,7 +300,7 @@ class Logger extends StaticClass {
 
             // filter messages below the active loglevel
             $filtered = false;
-            if (!$filtered && $level!=L_FATAL) {                                // L_FATAL is never filtered
+            if ($level != L_FATAL) {                                            // L_FATAL is never filtered
                 !isset($context['class']) && self::resolveCaller($context);     // resolve the calling class and check its loglevel
                 $filtered = $level < self::getLogLevel($context['class']);      // message is below the active loglevel
             }
@@ -646,7 +681,7 @@ class Logger extends StaticClass {
 
         foreach ($trace as $i => $frame) {
             if (!isset($frame['class'], $frame['function'])) break;
-            unset($trace[$i]);                                                  // remove all frames from/after Logger::log()
+            unset($trace[$i]);                                                  // remove all frames starting at Logger::log()
 
             $frameFunction = strtolower($frame['class'].'::'.$frame['function']);
             if ($frameFunction == $LoggerLog) {

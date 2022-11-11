@@ -177,11 +177,6 @@ class ErrorHandler extends StaticClass {
 
         $message = strLeftTo($message, ' (this will throw an Error in a future version of PHP)', -1);
 
-        $context = [
-            'file' => $file,
-            'line' => $line,
-        ];
-
         // wrap all errors in the matching PHPError exception
         switch ($level) {
             case E_PARSE            : $error = new PHPParseError      ($message, 0, $level, $file, $line); break;
@@ -208,7 +203,7 @@ class ErrorHandler extends StaticClass {
 
         // handle the PHPError according to the error handling mode
         if (self::$errorHandlingMode == self::ERRORS_LOG) {
-            Logger::log($error, L_ERROR, $context);
+            Logger::logPHPError($error);
 
             if (self::$prevErrorHandler) {                                      // chain a previously active error handler
                 call_user_func(self::$prevErrorHandler, ...func_get_args());    // a possibly static handler must be invoked with call_user_func()
@@ -223,6 +218,10 @@ class ErrorHandler extends StaticClass {
          * ---------------------------
          */
         if (self::$inShutdown && $level==E_ERROR && preg_match(self::$oomRegExp, $message)) {
+            $context = [
+                'file' => $file,
+                'line' => $line,
+            ];
             return true(Logger::log($message, L_FATAL, $context));              // logging the message is sufficient as there is no stacktrace anyway
         }
 
@@ -253,8 +252,7 @@ class ErrorHandler extends StaticClass {
 
 
     /**
-     * A handler for uncatched exceptions. The exception is sent to the default logger with loglevel L_FATAL.
-     * After the handler returns PHP terminates the script.
+     * A handler for uncatched exceptions. After the handler returns PHP terminates the script.
      *
      * @param  \Exception|\Throwable $exception - the unhandled exception (PHP5) or throwable (PHP7)
      */
@@ -262,25 +260,17 @@ class ErrorHandler extends StaticClass {
         echoPre('ErrorHandler::handleException()  '/*.$exception->getMessage()*/);
         if (!self::$exceptionHandling) return;
 
-        $context = [
-            'class'               => __CLASS__,
-            'file'                => $exception->getFile(),             // If the location is not preset the logger will resolve this
-            'line'                => $exception->getLine(),             // exception handler as the originating location.
-            'unhandled-exception' => true,                              // flag to signal origin
-        ];
-
         // Exceptions thrown from the exception handler itself will not be passed back to the handler but instead
         // terminate the script with an uncatchable fatal error. To prevent this they are handled explicitly.
         $secondEx = null;
         try {
-            Assert::throwable($exception);
-            Logger::log($exception, L_FATAL, $context);                 // log with the highest level
+            Logger::logUnhandledException($exception);
         }
         catch (\Throwable $secondEx) {}
         catch (\Exception $secondEx) {}
 
         if ($secondEx)  {
-            // secondary exception: the logger itself crashed, last chance to log something
+            // secondary exception: the logger itself crashed, last chance to log
             $indent = ' ';
             $msg2  = '[FATAL] Unhandled '.trim(self::getBetterMessage($secondEx)).NL;
             $file2 = $secondEx->getFile();
