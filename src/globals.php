@@ -138,7 +138,7 @@ function boolToStr($value) {
 
 
 /**
- * Dumps a variable to the standard output device or into a string.
+ * Dumps a variable to the screen or into a string.
  *
  * @param  mixed $var                     - variable
  * @param  bool  $return       [optional] - TRUE,  if the variable is to be dumped into a string <br>
@@ -153,28 +153,15 @@ function dump($var, $return=false, $flushBuffers=true) {
 
 
 /**
- * Functional replacement for <tt>"echo($var)"</tt> which is a language construct and can't be used as a regular function.
+ * Alias of printPretty($var, false, $flushBuffers)
+ *
+ * Outputs a variable in a formatted and pretty way. Output always ends with a line feed.
  *
  * @param  mixed $var
- * @param  bool  $flushBuffers [optional] - whether to flush output buffers (default: TRUE)
+ * @param  bool  $flushBuffers [optional] - whether to flush output buffers (default: yes)
  */
 function echof($var, $flushBuffers = true) {
     \rosasurfer\echof($var, $flushBuffers);
-}
-
-
-/**
- * Alias of printPretty($var, false, $flushBuffers)
- *
- * Prints a variable in a pretty way. Output always ends with a line feed.
- *
- * @param  mixed $var
- * @param  bool  $flushBuffers [optional] - whether to flush output buffers (default: TRUE)
- *
- * @see    printPretty()
- */
-function echoPre($var, $flushBuffers = true) {
-    \rosasurfer\echoPre($var, $flushBuffers);
 }
 
 
@@ -342,7 +329,7 @@ function ini_get_bytes($option, $strict = true) {
  *
  * @param  string $string
  * @param  int    $flags        [optional] - default: ENT_QUOTES|ENT_SUBSTITUTE|ENT_HTML5
- * @param  string $encoding     [optional] - default: ini_get("default_charset")
+ * @param  string $encoding     [optional] - default: 'UTF-8'
  * @param  bool   $doubleEncode [optional] - default: TRUE
  *
  * @return string - converted string

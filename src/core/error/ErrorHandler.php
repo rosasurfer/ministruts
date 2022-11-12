@@ -7,7 +7,7 @@ use rosasurfer\core\assert\Assert;
 use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\log\Logger;
 
-use function rosasurfer\echoPre;
+use function rosasurfer\echof;
 use function rosasurfer\ini_get_bool;
 use function rosasurfer\normalizeEOL;
 use function rosasurfer\simpleClassName;
@@ -122,7 +122,7 @@ class ErrorHandler extends StaticClass {
                  * @see   self::handleDestructorException()
                  */
                 self::$inShutdown = true;
-                echoPre('shutdown: '.__METHOD__);
+                echof('shutdown: '.__METHOD__);
 
                 /**
                  * If regular PHP error handling is enabled catch and handle fatal runtime errors.
@@ -167,7 +167,7 @@ class ErrorHandler extends StaticClass {
      *                FALSE, if the error shall be processed as if no error handler was installed.
      */
     public static function handleError($level, $message, $file, $line, array $symbols = null) {
-        //echoPre('ErrorHandler::handleError()  '/*.self::errorLevelToStr($level).': '.$message.', in '.$file.', line '.$line*/);
+        //echof('ErrorHandler::handleError()  '/*.self::errorLevelToStr($level).': '.$message.', in '.$file.', line '.$line*/);
         if (!self::$errorHandlingMode) return false;
 
         // ignore suppressed errors and errors not covered by the current reporting level
@@ -257,7 +257,7 @@ class ErrorHandler extends StaticClass {
      * @param  \Exception|\Throwable $exception - the unhandled exception (PHP5) or throwable (PHP7)
      */
     public static function handleException($exception) {
-        //echoPre('ErrorHandler::handleException()  '/*.$exception->getMessage()*/);
+        //echof('ErrorHandler::handleException()  '/*.$exception->getMessage()*/);
         if (!self::$exceptionHandling) return;
 
         // Exceptions thrown from the exception handler itself will not be passed back to the handler but instead
@@ -300,14 +300,14 @@ class ErrorHandler extends StaticClass {
             try {
                 if (Application::isAdminIP() || ini_get_bool('display_errors')) {
                     if ($secondEx) {                                    // full second exception, full log location
-                        echoPre($secondEx);
-                        echoPre('error log: '.(strlen($errorLog=ini_get('error_log')) ? $errorLog : 'web server'));
+                        echof($secondEx);
+                        echof('error log: '.(strlen($errorLog=ini_get('error_log')) ? $errorLog : 'web server'));
                     }
                 }
-                else echoPre('application error (see error log)');
+                else echof('application error (see error log)');
             }
-            catch (\Throwable $thirdEx) { echoPre('application error (see error log)'); }
-            catch (\Exception $thirdEx) { echoPre('application error (see error log)'); }
+            catch (\Throwable $thirdEx) { echof('application error (see error log)'); }
+            catch (\Exception $thirdEx) { echof('application error (see error log)'); }
         }
 
         // chain a previously active exception handler
@@ -360,7 +360,7 @@ class ErrorHandler extends StaticClass {
      * @see  https://github.com/symfony/symfony/blob/1c110fa1f7e3e9f5daba73ad52d9f7e843a7b3ff/src/Symfony/Component/Debug/ErrorHandler.php#L457-L489
      */
     public static function handleToStringException($exception) {
-        echoPre('ErrorHandler::handleToStringException()  '/*.$exception->getMessage()*/);
+        echof('ErrorHandler::handleToStringException()  '/*.$exception->getMessage()*/);
         $currentHandler = set_exception_handler(function() {});
         restore_exception_handler();
 

@@ -18,7 +18,7 @@ use PHPStan\Type\Type;
 
 use rosasurfer\core\Singleton;
 
-use function rosasurfer\echoPre;
+use function rosasurfer\echof;
 use function rosasurfer\simpleClassName;
 use function rosasurfer\true;
 
@@ -56,21 +56,21 @@ class Singleton_GetInstance_ReturnType extends DynamicReturnType implements Dyna
                 else if ($arg instanceof ClassConstFetch) {                         // constant
                     if ($class = $this->classConstFetchToStr($arg, $scope)) {
                         $returnType = new ObjectType($class);
-                    } else $error = true(echoPre('(1) '.simpleClassName(static::$className).'::'.$methodCall->name.'() cannot resolve class constant "'.$arg->class.'::'.$arg->name.'"'));
+                    } else $error = true(echof('(1) '.simpleClassName(static::$className).'::'.$methodCall->name.'() cannot resolve class constant "'.$arg->class.'::'.$arg->name.'"'));
                 }
                 else if ($arg instanceof BinaryOp) {                                // constant
                     if ($class = $this->binaryOpToStr($arg, $scope)) {
                         $returnType = new ObjectType($class);
-                    } else $error = true(echoPre('(2) '.simpleClassName(static::$className).'::'.$methodCall->name.'() cannot convert binary operator argument to string: '.get_class($arg)));
+                    } else $error = true(echof('(2) '.simpleClassName(static::$className).'::'.$methodCall->name.'() cannot convert binary operator argument to string: '.get_class($arg)));
                 }
                 else if ($arg instanceof Variable) {                                // variables can only be resolved at runtime:
-                } else $error = true(echoPre('(3) '.simpleClassName(static::$className).'::'.$methodCall->name.'() cannot resolve argument type: '.get_class($arg)));
-            } else     $error = true(echoPre('(4) '.simpleClassName(static::$className).'::'.$methodCall->name.'() cannot find class name argument: sizeof($args) = 0'));
-        } else         $error = true(echoPre('(5) '.simpleClassName(static::$className).'::'.$methodCall->name.'() encountered unexpected return type: '.get_class($returnType).' => '.$returnType->describe()));
+                } else $error = true(echof('(3) '.simpleClassName(static::$className).'::'.$methodCall->name.'() cannot resolve argument type: '.get_class($arg)));
+            } else     $error = true(echof('(4) '.simpleClassName(static::$className).'::'.$methodCall->name.'() cannot find class name argument: sizeof($args) = 0'));
+        } else         $error = true(echof('(5) '.simpleClassName(static::$className).'::'.$methodCall->name.'() encountered unexpected return type: '.get_class($returnType).' => '.$returnType->describe()));
 
         $returnDescribe = $returnType->describe();
 
-        if (0 || $error) echoPre('call of: '.simpleClassName(static::$className).'::'.$methodCall->name.'()  in: '.$this->getScopeDescription($scope).'  shall return: '.$returnDescribe.($returnDescribe==$origReturnDescribe ? ' (pass through)' : ' (was '.$origReturnDescribe.')'));
+        if (0 || $error) echof('call of: '.simpleClassName(static::$className).'::'.$methodCall->name.'()  in: '.$this->getScopeDescription($scope).'  shall return: '.$returnDescribe.($returnDescribe==$origReturnDescribe ? ' (pass through)' : ' (was '.$origReturnDescribe.')'));
         return $returnType;
     }
 

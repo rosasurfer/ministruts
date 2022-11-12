@@ -17,7 +17,7 @@ use rosasurfer\net\http\HttpRequest;
 use rosasurfer\net\http\HttpResponse;
 use rosasurfer\net\mail\Mailer;
 
-use function rosasurfer\echoPre;
+use function rosasurfer\echof;
 use function rosasurfer\hsc;
 use function rosasurfer\ini_get_bool;
 use function rosasurfer\ksort_r;
@@ -104,8 +104,8 @@ class Logger extends StaticClass {
     /** @var bool - whether the print handler for non L_FATAL log messages is enabled */
     private static $printHandlerNonFatal = false;
 
-    /** @var int - counter for messages processed by the print handler */
-    private static $printCounter = 0;
+    /** @var int - counter for printed HTML messages */
+    private static $printHtmlCounter = 0;
 
     /** @var bool - whether the mail handler is enabled */
     private static $mailHandler = false;
@@ -242,7 +242,7 @@ class Logger extends StaticClass {
      * @param PHPError $error
      */
     public static function logPHPError(PHPError $error) {
-        echoPre('Logger::logPHPError()');
+        echof('Logger::logPHPError()');
 
         $context = [
             'file'      => $error->getFile(),
@@ -259,7 +259,7 @@ class Logger extends StaticClass {
      * @param  \Exception|\Throwable $exception - exception (PHP5) or throwable (PHP7)
      */
     public static function logUnhandledException($exception) {
-        echoPre('Logger::logUnhandledException()');
+        echof('Logger::logUnhandledException()');
 
         $context = [
             'file'                => $exception->getFile(),
@@ -308,7 +308,7 @@ class Logger extends StaticClass {
             }
 
             // filter "headers already sent" errors triggered by a previously printed message
-            if (!$filtered && !CLI && self::$printCounter && is_object($loggable)) {
+            if (!$filtered && !CLI && self::$printHtmlCounter && is_object($loggable)) {
                 $filtered = (bool)preg_match('/- headers already sent (by )?\(output started at /', $loggable->getMessage());
             }
 
@@ -349,7 +349,7 @@ class Logger extends StaticClass {
      * @param  array                        $context  - reference to the log context with additional data
      */
     private static function invokeErrorLogHandler($loggable, $level, array &$context) {
-        echoPre('Logger::invokeErrorLogHandler()  error_log="'.ini_get('error_log').'"');
+        echof('Logger::invokeErrorLogHandler()  error_log="'.ini_get('error_log').'"');
         !isset($context['cliMessage']) && self::composeCliMessage($loggable, $level, $context);
 
         $msg = ' '.$context['cliMessage'];
@@ -385,8 +385,8 @@ class Logger extends StaticClass {
         }
         else {
             !isset($context['htmlMessage']) && self::composeHtmlMessage($loggable, $level, $context);
-            echo $context['htmlMessage'].NL;
-            self::$printCounter++;
+            echo $context['htmlMessage'].PHP_EOL;
+            self::$printHtmlCounter++;
         }
         ob_get_level() && ob_flush();
     }
@@ -488,7 +488,7 @@ class Logger extends StaticClass {
 
 
     /**
-     * Compose a HTML log message and store it in the passed log context under the key "htmlMessage".
+     * Compose an HTML log message and store it under $context['htmlMessage'].
      *
      * @param  string|\Exception|\Throwable $loggable - message or exception
      * @param  int                          $level    - loglevel
@@ -499,9 +499,10 @@ class Logger extends StaticClass {
         $file = $context['file'];
         $line = $context['line'];
 
-        // break out of unfortunate HTML tags              // id = md5('ministruts')
+        // break out of unfortunate HTML tags
+        $divId = md5('ministruts');
         $html  = '<a attr1="" attr2=\'\'></a></meta></title></head></script></img></input></select></textarea></label></li></ul></font></pre></tt></code></small></i></b></span></div>';
-        $html .= '<div id="99a05cf355861c76747b7176c778eed2'.self::$printCounter.'"
+        $html .= '<div id="'.$divId.'-'.self::$printHtmlCounter.'"
                         align="left"
                         style="display:initial; visibility:initial; clear:both;
                         position:relative; z-index:4294967295; top:initial; left:initial;
@@ -513,16 +514,25 @@ class Logger extends StaticClass {
 
         // compose message
         if (is_string($loggable)) {
-            // $loggable is a simple message
+            // $loggable is a string
             $msg   = $loggable;
             $html .= '<span style="white-space:nowrap"><span style="font-weight:bold">['.strtoupper(self::$logLevels[$level]).']</span> <span style="white-space:pre; line-height:8px">'.nl2br(hsc($msg)).'</span></span><br><br>';
             $html .= 'in <span style="font-weight:bold">'.$file.'</span> on line <span style="font-weight:bold">'.$line.'</span><br>';
 
-            // attach the internal stacktrace if there was no exception
-            if (!isset($context['exception']) && isset($context['trace'])) {
+            // append an existing context exception
+            if (isset($context['exception'])) {
+                $exception = $context['exception'];
+                $msg       = ErrorHandler::getBetterMessage($exception);
+                $html     .= '<br>'.nl2br(hsc($msg)).'<br><br>';
+                $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
+                $traceStr .= ErrorHandler::getBetterTraceAsString($exception, $indent);
+                $html     .= printPretty($traceStr, true, false);
+            }
+            elseif (isset($context['trace'])) {
+                // otherwise append the internal stacktrace
                 $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
                 $traceStr .= ErrorHandler::formatTrace($context['trace'], $indent);
-                $html     .= '<span style="clear:both"></span><br>'.printPretty($traceStr, true).'<br>';
+                $html     .= '<span style="clear:both"></span><br>'.printPretty($traceStr, true, false).'<br>';
             }
         }
         else {
@@ -540,22 +550,12 @@ class Logger extends StaticClass {
             $html     .= 'in <span style="font-weight:bold">'.$file.'</span> on line <span style="font-weight:bold">'.$line.'</span><br>';
             $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
             $traceStr .= ErrorHandler::getBetterTraceAsString($loggable, $indent);
-            $html     .= '<span style="clear:both"></span><br>'.printPretty($traceStr, true).'<br>';
-        }
-
-        // append an existing context exception
-        if (isset($context['exception'])) {
-            $exception = $context['exception'];
-            $msg       = ErrorHandler::getBetterMessage($exception);
-            $html     .= '<br>'.nl2br(hsc($msg)).'<br><br>';
-            $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
-            $traceStr .= ErrorHandler::getBetterTraceAsString($exception, $indent);
-            $html     .= printPretty($traceStr, true);
+            $html     .= '<span style="clear:both"></span><br>'.printPretty($traceStr, true, false).'<br>';
         }
 
         // append the current HTTP request
         if (!CLI) {
-            $html .= '<br style="clear:both"><br>'.printPretty('Request:'.NL.'--------'.NL.Request::instance(), true).'<br>';
+            $html .= '<br style="clear:both"><br>'.printPretty('Request:'.NL.'--------'.NL.Request::instance(), true, false).'<br>';
         }
 
         // close the HTML tag and add some JavaScript to ensure it becomes visible                      // id = md5('ministruts')
@@ -563,7 +563,7 @@ class Logger extends StaticClass {
                   <script>
                       var bodies = document.getElementsByTagName("body");
                       if (bodies && bodies.length)
-                         bodies[0].appendChild(document.getElementById("99a05cf355861c76747b7176c778eed2'.self::$printCounter.'"));
+                         bodies[0].appendChild(document.getElementById("'.$divId.'-'.self::$printHtmlCounter.'"));
                   </script>';
         // store the HTML tag
         $context['htmlMessage'] = $html;

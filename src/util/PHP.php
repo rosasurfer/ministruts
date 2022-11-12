@@ -8,7 +8,7 @@ use rosasurfer\core\error\ErrorHandler;
 use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\core\exception\RuntimeException;
 
-use function rosasurfer\echoPre;
+use function rosasurfer\echof;
 use function rosasurfer\ini_get_bool;
 use function rosasurfer\ini_get_bytes;
 use function rosasurfer\ini_get_int;
@@ -400,8 +400,8 @@ class PHP extends StaticClass {
         }
 
         // show issues or confirm if none are found
-        if ($issues) echoPre('PHP configuration issues:'.NL.'-------------------------'.NL.join(NL, $issues));
-        else         echoPre('PHP configuration OK');
+        if ($issues) echof('PHP configuration issues:'.NL.'-------------------------'.NL.join(NL, $issues));
+        else         echof('PHP configuration OK');
 
         // call phpinfo() if on a web server
         if (!CLI) {

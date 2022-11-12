@@ -15,7 +15,7 @@ use PHPStan\Type\Type;
 
 use rosasurfer\core\di\Di;
 
-use function rosasurfer\echoPre;
+use function rosasurfer\echof;
 use function rosasurfer\simpleClassName;
 
 
@@ -47,14 +47,14 @@ class Di_Set_ReturnType extends DynamicReturnType implements DynamicMethodReturn
                 if (($definition = $args[1]->value) instanceof New_) {
                     if (($type = $definition->class) instanceof FullyQualified) {
                         $returnType = new ObjectType($type->toString());
-                    } else $error = true(echoPre('(1) '.simpleClassName(static::$className).'->'.$methodCall->name.'() encountered non FullyQualified service definition: '.get_class($class)));
-                } else     $error = true(echoPre('(2) '.simpleClassName(static::$className).'->'.$methodCall->name.'() encountered unexpected service definition type: '.get_class($definition)));
+                    } else $error = true(echof('(1) '.simpleClassName(static::$className).'->'.$methodCall->name.'() encountered non FullyQualified service definition: '.get_class($class)));
+                } else     $error = true(echof('(2) '.simpleClassName(static::$className).'->'.$methodCall->name.'() encountered unexpected service definition type: '.get_class($definition)));
             }
-        } else             $error = true(echoPre('(3) '.simpleClassName(static::$className).'->'.$methodCall->name.'() encountered unexpected return type: '.get_class($returnType).' => '.$returnType->describe()));
+        } else             $error = true(echof('(3) '.simpleClassName(static::$className).'->'.$methodCall->name.'() encountered unexpected return type: '.get_class($returnType).' => '.$returnType->describe()));
 
         $returnDescribe = $returnType->describe();
 
-        if (0 || $error) echoPre('call of: '.simpleClassName(static::$className).'->'.$methodCall->name.'()  in: '.$this->getScopeDescription($scope).'  shall return: '.$returnDescribe.($returnDescribe==$origReturnDescribe ? ' (pass through)' : ' (was '.$origReturnDescribe.')'));
+        if (0 || $error) echof('call of: '.simpleClassName(static::$className).'->'.$methodCall->name.'()  in: '.$this->getScopeDescription($scope).'  shall return: '.$returnDescribe.($returnDescribe==$origReturnDescribe ? ' (pass through)' : ' (was '.$origReturnDescribe.')'));
         return $returnType;
     }
 }
