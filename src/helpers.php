@@ -377,7 +377,7 @@ function dump($var, $return=false, $flushBuffers=true) {
 
 
 /**
- * Alias of printPretty($var, false, $flushBuffers)
+ * Alias of pp($var, false, $flushBuffers)
  *
  * Outputs a variable in a formatted and pretty way. Output always ends with a line feed.
  *
@@ -385,7 +385,7 @@ function dump($var, $return=false, $flushBuffers=true) {
  * @param  bool  $flushBuffers [optional] - whether to flush output buffers (default: yes)
  */
 function echof($var, $flushBuffers = true) {
-    pp($var, $return=false, $flushBuffers);
+    pp($var, false, $flushBuffers);
 }
 
 
@@ -477,7 +477,7 @@ function prettyBytes($value, $decimals = 1) {
 
 
 /**
- * Convert a byte value to an integer supporting php.ini shorthand notation ("K", "M", "G").
+ * Convert a byte value to an integer supporting "php.ini" shorthand notation ("K", "M", "G").
  *
  * @param  string|int $value - byte value
  *
@@ -522,11 +522,11 @@ function numf($number, $decimals=0, $decimalSeparator='.', $thousandsSeparator='
 /**
  * Return the value of a "php.ini" option as a boolean.
  *
- * Note: Don't use ini_get() to read boolean "php.ini" values as it will return the plain string as passed to ini_set().
+ * NOTE: Don't use ini_get() to read boolean "php.ini" values as it will return the plain string as passed to ini_set().
  *
  * @param  string $option            - option name
  * @param  bool   $strict [optional] - whether to enable strict checking of the found value:
- *                                     TRUE:  invalid values cause an UnexpectedValueException (default)
+ *                                     TRUE:  invalid values cause a runtime exception (default)
  *                                     FALSE: invalid values are converted to a boolean
  *
  * @return bool|null - boolean value or NULL if the setting doesn't exist
@@ -549,72 +549,63 @@ function ini_get_bool($option, $strict = true) {
         case 'no'   :
         case 'none' : return false;
     }
-
-    if ($strict) throw new \UnexpectedValueException('Invalid "php.ini" setting for type boolean: "'.$option.'" = "'.$value.'"');
+    if ($strict) throw new InvalidValueException('Invalid "php.ini" setting for type boolean: "'.$option.'" = "'.$value.'"');
 
     return (bool)(int)$value;
 }
 
 
 /**
- * Return the value of a php.ini option as an integer.
+ * Return the value of a "php.ini" option as an integer.
  *
- * NOTE: Never use ini_get() to read php.ini integer values as it will return the plain string passed to ini_set().
+ * NOTE: Don't use ini_get() to read "php.ini" integer values as it will return the plain string as passed to ini_set().
  *
  * @param  string $option            - option name
- * @param  bool   $strict [optional] - Whether to enable strict checking of the found value:
- *                                     TRUE:  invalid values cause a runtime exception
- *                                     FALSE: invalid values are converted to the target type (i.e. integer)
- *                                     (default: TRUE)
+ * @param  bool   $strict [optional] - whether to enable strict checking of the found value:
+ *                                     TRUE:  invalid values cause a runtime exception (default)
+ *                                     FALSE: invalid values are converted to an integer
  *
  * @return int|null - integer value or NULL if the setting doesn't exist
  */
 function ini_get_int($option, $strict = true) {
     $value = ini_get($option);
 
-    if ($value === false)                   // setting doesn't exist
-        return null;
-
-    if ($value === '')                      // setting is NULL (unset)
-        return (int)null;
+    if ($value === false) return null;      // setting doesn't exist
+    if ($value === '')    return 0;         // setting is NULL (unset)
 
     $iValue = (int)$value;
 
     if ($strict && $value!==(string)$iValue)
-        throw new RuntimeException('Invalid php.ini setting for type integer: "'.$option.'" = "'.$value.'"');
+        throw new InvalidValueException('Invalid "php.ini" setting for type integer: "'.$option.'" = "'.$value.'"');
 
     return $iValue;
 }
 
 
 /**
- * Return the value of a php.ini option as a byte value supporting PHP shorthand notation ("K", "M", "G").
+ * Return the value of a "php.ini" option as a byte value supporting PHP shorthand notation ("K", "M", "G").
  *
- * NOTE: Never use ini_get() to read php.ini byte values as it will return the plain string passed to ini_set().
+ * NOTE: Don't use ini_get() to read "php.ini" byte values as it will return the plain string as passed to ini_set().
  *
  * @param  string $option            - option name
- * @param  bool   $strict [optional] - Whether to enable strict checking of the found value:
- *                                     TRUE:  invalid values cause a runtime exception
- *                                     FALSE: invalid values are converted to the target type (i.e. integer)
- *                                     (default: TRUE)
+ * @param  bool   $strict [optional] - whether to enable strict checking of the found value:
+ *                                     TRUE:  invalid values cause a runtime exception (default)
+ *                                     FALSE: invalid values are converted to an integer
  *
  * @return int|null - integer value or NULL if the setting doesn't exist
  */
 function ini_get_bytes($option, $strict = true) {
     $value = ini_get($option);
 
-    if ($value === false)                   // setting doesn't exist
-        return null;
-
-    if ($value === '')                      // setting is NULL (unset)
-        return (int)null;
+    if ($value === false) return null;      // setting doesn't exist
+    if ($value === '')    return 0;         // setting is NULL (unset)
 
     $result = 0;
     try {
         $result = php_byte_value($value);
     }
-    catch (RuntimeException $ex) {
-        if ($strict) throw new RuntimeException('Invalid php.ini setting for PHP byte value: "'.$option.'" = "'.$value.'"', null, $ex);
+    catch (InvalidValueException $ex) {
+        if ($strict) throw new InvalidValueException('Invalid "php.ini" setting for PHP byte value: "'.$option.'" = "'.$value.'"', 0, $ex);
         $result = (int)$value;
     }
     return $result;

@@ -183,7 +183,7 @@ function dump($var, $return=false, $flushBuffers=true) {
 
 
 /**
- * Alias of printPretty($var, false, $flushBuffers)
+ * Alias of pp($var, false, $flushBuffers)
  *
  * Outputs a variable in a formatted and pretty way. Output always ends with a line feed.
  *
@@ -224,7 +224,7 @@ function prettyBytes($value, $decimals = 1) {
 
 
 /**
- * Convert a byte value to an integer supporting php.ini shorthand notation ("K", "M", "G").
+ * Convert a byte value to an integer supporting "php.ini" shorthand notation ("K", "M", "G").
  *
  * @param  string|int $value - byte value
  *
@@ -253,11 +253,11 @@ function numf($number, $decimals=0, $decimalSeparator='.', $thousandsSeparator='
 /**
  * Return the value of a "php.ini" option as a boolean.
  *
- * Note: Don't use ini_get() to read boolean "php.ini" values as it will return the plain string as passed to ini_set().
+ * NOTE: Don't use ini_get() to read boolean "php.ini" values as it will return the plain string as passed to ini_set().
  *
  * @param  string $option            - option name
  * @param  bool   $strict [optional] - whether to enable strict checking of the found value:
- *                                     TRUE:  invalid values cause an UnexpectedValueException (default)
+ *                                     TRUE:  invalid values cause a runtime exception (default)
  *                                     FALSE: invalid values are converted to a boolean
  *
  * @return bool|null - boolean value or NULL if the setting doesn't exist
@@ -268,15 +268,14 @@ function ini_get_bool($option, $strict = true) {
 
 
 /**
- * Return the value of a php.ini option as an integer.
+ * Return the value of a "php.ini" option as an integer.
  *
- * NOTE: Never use ini_get() to read php.ini integer values as it will return the plain string passed to ini_set().
+ * NOTE: Don't use ini_get() to read "php.ini" integer values as it will return the plain string as passed to ini_set().
  *
  * @param  string $option            - option name
- * @param  bool   $strict [optional] - Whether to enable strict checking of the found value:
- *                                     TRUE:  invalid values cause a runtime exception
- *                                     FALSE: invalid values are converted to the target type (i.e. integer)
- *                                     (default: TRUE)
+ * @param  bool   $strict [optional] - whether to enable strict checking of the found value:
+ *                                     TRUE:  invalid values cause a runtime exception (default)
+ *                                     FALSE: invalid values are converted to an integer
  *
  * @return int|null - integer value or NULL if the setting doesn't exist
  */
@@ -286,15 +285,14 @@ function ini_get_int($option, $strict = true) {
 
 
 /**
- * Return the value of a php.ini option as a byte value supporting PHP shorthand notation ("K", "M", "G").
+ * Return the value of a "php.ini" option as a byte value supporting PHP shorthand notation ("K", "M", "G").
  *
- * NOTE: Never use ini_get() to read php.ini byte values as it will return the plain string passed to ini_set().
+ * NOTE: Don't use ini_get() to read "php.ini" byte values as it will return the plain string as passed to ini_set().
  *
  * @param  string $option            - option name
- * @param  bool   $strict [optional] - Whether to enable strict checking of the found value:
- *                                     TRUE:  invalid values cause a runtime exception
- *                                     FALSE: invalid values are converted to the target type (i.e. integer)
- *                                     (default: TRUE)
+ * @param  bool   $strict [optional] - whether to enable strict checking of the found value:
+ *                                     TRUE:  invalid values cause a runtime exception (default)
+ *                                     FALSE: invalid values are converted to an integer
  *
  * @return int|null - integer value or NULL if the setting doesn't exist
  */
