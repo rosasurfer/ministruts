@@ -3,7 +3,7 @@ namespace rosasurfer\console\io;
 
 use rosasurfer\core\CObject;
 
-use function rosasurfer\pp;
+use function rosasurfer\print_p;
 use function rosasurfer\stderr;
 use function rosasurfer\stdout;
 
@@ -20,7 +20,7 @@ class Output extends CObject {
      * @param  mixed $message
      */
     public function out($message) {
-        stdout(pp($message, $return=true));
+        stdout(print_p($message, true));
     }
 
 
@@ -30,6 +30,6 @@ class Output extends CObject {
      * @param  mixed $message
      */
     public function error($message) {
-        stderr(pp($message, $return=true));
+        stderr(print_p($message, true));
     }
 }

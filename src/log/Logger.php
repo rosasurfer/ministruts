@@ -22,7 +22,7 @@ use function rosasurfer\hsc;
 use function rosasurfer\ini_get_bool;
 use function rosasurfer\ksort_r;
 use function rosasurfer\normalizeEOL;
-use function rosasurfer\pp;
+use function rosasurfer\print_p;
 use function rosasurfer\stderr;
 use function rosasurfer\stdout;
 use function rosasurfer\strEndsWith;
@@ -528,13 +528,13 @@ class Logger extends StaticClass {
                 $html     .= '<br>'.nl2br(hsc($msg)).'<br><br>';
                 $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
                 $traceStr .= ErrorHandler::getBetterTraceAsString($exception, $indent);
-                $html     .= pp($traceStr, true, false);
+                $html     .= print_p($traceStr, true, false);
             }
             elseif (isset($context['trace'])) {
                 // otherwise append the internal stacktrace
                 $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
                 $traceStr .= ErrorHandler::formatTrace($context['trace'], $indent);
-                $html     .= '<span style="clear:both"></span><br>'.pp($traceStr, true, false).'<br>';
+                $html     .= '<span style="clear:both"></span><br>'.print_p($traceStr, true, false).'<br>';
             }
         }
         else {
@@ -552,12 +552,12 @@ class Logger extends StaticClass {
             $html     .= 'in <span style="font-weight:bold">'.$file.'</span> on line <span style="font-weight:bold">'.$line.'</span><br>';
             $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
             $traceStr .= ErrorHandler::getBetterTraceAsString($loggable, $indent);
-            $html     .= '<span style="clear:both"></span><br>'.pp($traceStr, true, false).'<br>';
+            $html     .= '<span style="clear:both"></span><br>'.print_p($traceStr, true, false).'<br>';
         }
 
         // append the current HTTP request
         if (!CLI) {
-            $html .= '<br style="clear:both"><br>'.pp('Request:'.NL.'--------'.NL.Request::instance(), true, false).'<br>';
+            $html .= '<br style="clear:both"><br>'.print_p('Request:'.NL.'--------'.NL.Request::instance(), true, false).'<br>';
         }
 
         // close the HTML tag and add some JavaScript to ensure it becomes visible

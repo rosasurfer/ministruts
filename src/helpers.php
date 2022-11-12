@@ -385,7 +385,7 @@ function dump($var, $return=false, $flushBuffers=true) {
  * @param  bool  $flushBuffers [optional] - whether to flush output buffers (default: yes)
  */
 function echof($var, $flushBuffers = true) {
-    pp($var, false, $flushBuffers);
+    print_p($var, false, $flushBuffers);
 }
 
 
@@ -399,7 +399,7 @@ function echof($var, $flushBuffers = true) {
  *
  * @return string|null - string if the result is to be returned, NULL otherwise
  */
-function pp($var, $return=false, $flushBuffers=true) {
+function print_p($var, $return=false, $flushBuffers=true) {
     if (is_object($var) && method_exists($var, '__toString') && !$var instanceof \SimpleXMLElement) {
         $str = (string) $var;
     }

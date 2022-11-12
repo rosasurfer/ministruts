@@ -205,8 +205,8 @@ function echof($var, $flushBuffers = true) {
  *
  * @return string|null - string if the result is to be returned, NULL otherwise
  */
-function pp($var, $return=false, $flushBuffers=true) {
-    return \rosasurfer\pp($var, $return, $flushBuffers);
+function print_p($var, $return=false, $flushBuffers=true) {
+    return \rosasurfer\print_p($var, $return, $flushBuffers);
 }
 
 
