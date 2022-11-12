@@ -71,55 +71,10 @@ class Request extends CObject {
      * Constructor
      */
     public function __construct() {
-        $this->method = $_SERVER['REQUEST_METHOD'];
-
-        // issue: if $_SERVER['QUERY_STRING'] is empty (e.g. at times in nginx) PHP will not parse
-        //        query parameters and it has to be done manually
-        if (!$_GET) {
-            $query = $this->getQueryString();
-            strlen($query) && $this->parseQueryString($query);
-        }
-
-        $this->_GET     = $_GET     ?: [];
-        $this->_POST    = $_POST    ?: [];
-        $this->_REQUEST = $_REQUEST ?: [];
-    }
-
-
-    /**
-     * Parse the specified query string and store parameters in $GET and $_REQUEST.
-     *
-     * @param  string $data - raw query string
-     */
-    protected function parseQueryString($data) {
-        $params = explode('&', $data);
-
-        foreach ($params as $param) {
-            $parts = explode('=', $param, 2);
-            $name  = trim(urldecode($parts[0])); if (!strlen($name)) continue;
-            $value = sizeof($parts)==1 ? '' : urldecode($parts[1]);
-
-            // TODO: process multi-dimensional arrays
-
-            if (($open=strpos($name, '[')) && ($close=strpos($name, ']')) && strlen($name)==$close+1) {
-                // name is an array index
-                $name = trim(substr($name, 0, $open));
-                $key  = trim(substr($name, $open+1, $close-$open-1));
-
-                if (!strlen($key)) {
-                    $_GET[$name][] = $_REQUEST[$name][] = $value;
-                }
-                else {
-                    $_GET[$name][$key]                                    = $value;
-                    !isset($_POST[$name][$key]) && $_REQUEST[$name][$key] = $value; // GET must not over-write POST
-                }
-            }
-            else {
-                // name is not an array index
-                $_GET[$name]                              = $value;
-                !isset($_POST[$name]) && $_REQUEST[$name] = $value;                 // GET must not over-write POST
-            }
-        }
+        $this->method   = $_SERVER['REQUEST_METHOD'];
+        $this->_GET     = $_GET;
+        $this->_POST    = $_POST;
+        $this->_REQUEST = $_REQUEST;
     }
 
 
@@ -221,7 +176,7 @@ class Request extends CObject {
      */
     public function getFiles() {
         if (!isset($this->files)) {
-            $normalizeLevel = null;                     // prevent Eclipse PDT validation error
+            $normalizeLevel = null;
             $normalizeLevel = function(array $file) use (&$normalizeLevel) {
                 if (isset($file['name']) && is_array($file['name'])) {
                     $properties = \array_keys($file);
@@ -237,10 +192,8 @@ class Request extends CObject {
                 return $file;
             };
             $this->files = [];
-            if (isset($_FILES)) {
-                foreach ($_FILES as $key => $file) {
-                    $this->files[$key] = $normalizeLevel($file);
-                }
+            foreach ($_FILES as $key => $file) {
+                $this->files[$key] = $normalizeLevel($file);
             }
         }
         return $this->files;
@@ -482,7 +435,7 @@ class Request extends CObject {
      */
     public function getQueryString() {
         // The variable $_SERVER['QUERY_STRING'] is set by the server and can differ from the transmitted query string.
-        // It might hold additional parameters added by the server or it might be empty (e.g. on a mis-configured nginx).
+        // The server variable may hold additional parameters, or it may be empty (e.g. on a mis-configured Nginx).
 
         if (isset($_SERVER['QUERY_STRING']) && strlen($_SERVER['QUERY_STRING'])) {
             $query = $_SERVER['QUERY_STRING'];
@@ -542,9 +495,8 @@ class Request extends CObject {
         if (!$isRead) {
             if ($this->getContentType() == 'multipart/form-data') {
                 // file upload
-                if ($_POST) {                                                   // php://input is not available with
-                    $content = '$_POST => '.print_r($_POST, true).NL;           // enctype="multipart/form-data"
-                    // TODO: we should limit excessive variable values to 1KB
+                if ($_POST) {                                           // php://input is not available with enctype="multipart/form-data"
+                    $content = '$_POST => '.print_r($_POST, true).NL;
                 }
                 $content .= '$_FILES => '.print_r($this->getFiles(), true);
             }
@@ -704,22 +656,22 @@ class Request extends CObject {
                 Assert::string($name, '$names['.$i.']');
             }
         }
-        else throw new InvalidTypeException('Illegal type of parameter $names: '.gettype($names));
+        else throw new InvalidTypeException('Invalid type of parameter $names: '.gettype($names));
 
-        // read all headers once
-        static $headers = null; if ($headers === null) {
+        static $headers = null;
+        static $fixHeaderNames = ['CDN'=>1, 'DNT'=>2, 'X-CDN'=>3];
+
+        // read headers only once
+        if ($headers === null) {
             if (function_exists('apache_request_headers')) {
-                $headers = apache_request_headers();
-                // TODO: Apache skips REDIRECT_* headers
+                $headers = apache_request_headers();                // TODO: Apache skips REDIRECT_* headers
             }
             else {
-                static $fixHeaderNames = ['CDN'=>1, 'DNT'=>2, 'X-CDN'=>3];
                 $headers = [];
                 foreach ($_SERVER as $name => $value) {
                     while (substr($name, 0, 9) == 'REDIRECT_') {
                         $name = substr($name, 9);
-                        if (isset($_SERVER[$name]))
-                            continue 2;
+                        if (isset($_SERVER[$name])) continue 2;
                     }
                     if (substr($name, 0, 5) == 'HTTP_') {
                         $name = substr($name, 5);
@@ -744,12 +696,12 @@ class Request extends CObject {
         // return all or just the specified headers
         if (!$names)
             return $headers;
-        return \array_intersect_ukey($headers, \array_flip($names), 'strCaseCmp');
+        return \array_intersect_ukey($headers, \array_flip($names), 'strcasecmp');
     }
 
 
     /**
-     * Return a single value of all specified header(s). If multiple headers are specified or multiple headers have been
+     * Return a single value of the specified header/s. If multiple headers are specified or multiple headers have been
      * transmitted, return all values as one comma-separated value (in transmission order).
      *
      * @param  string|string[] $names - one or multiple header names
@@ -757,14 +709,15 @@ class Request extends CObject {
      * @return string|null - value or NULL if no such headers have been transmitted
      */
     public function getHeaderValue($names) {
-        if (is_string($names))
+        if (is_string($names)) {
             $names = [$names];
+        }
         elseif (is_array($names)) {
             foreach ($names as $i => $name) {
                 Assert::string($name, '$names['.$i.']');
             }
         }
-        else throw new InvalidTypeException('Illegal type of parameter $names: '.gettype($names));
+        else throw new InvalidTypeException('Invalid type of parameter $names: '.gettype($names));
 
         $headers = $this->getHeaders($names);
         if ($headers)
@@ -1149,13 +1102,11 @@ class Request extends CObject {
             $string = $_SERVER['REQUEST_METHOD'].' '.$_SERVER['REQUEST_URI'].' '.$_SERVER['SERVER_PROTOCOL'].NL;
 
             // headers
-            $headers = $this->getHeaders() ?: [];
-
+            $headers = $this->getHeaders();
             $maxLen = 0;
             foreach ($headers as $key => $value) {
                 $maxLen = max(strlen($key), $maxLen);
             }
-
             $maxLen++;                                                          // add one char for ':'
             foreach ($headers as $key => $value) {
                 $string .= str_pad($key.':', $maxLen).' '.$value.NL;
@@ -1164,7 +1115,7 @@ class Request extends CObject {
             // content (request body)
             $content = $this->getContent();
             if (strlen($content)) {
-                $string .= NL.substr($content, 0, 1024).NL;                     // limit the request body to 1024 bytes
+                $string .= NL.substr($content, 0, 2048).NL;                     // limit the request body to 2048 bytes
             }
             Assert::string($string);
         }                                                                       // Ensure __toString() doesn't throw an exception as otherwise

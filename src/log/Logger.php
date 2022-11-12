@@ -32,6 +32,7 @@ use function rosasurfer\strStartsWith;
 use function rosasurfer\strStartsWithI;
 
 use const rosasurfer\CLI;
+use const rosasurfer\EOL_WINDOWS;
 use const rosasurfer\ERROR_LOG_DEFAULT;
 use const rosasurfer\L_DEBUG;
 use const rosasurfer\L_ERROR;
@@ -332,7 +333,7 @@ class Logger extends StaticClass {
             if (!isset($context['unhandled-exception'])) {
                 $file = isset($context['file']) ? $context['file'] : '';
                 $line = isset($context['line']) ? $context['line'] : '';
-                $msg  = 'PHP ['.strtoupper(self::$logLevels[$level]).'] '.$loggable.PHP_EOL.' in '.$file.' on line '.$line;
+                $msg  = 'PHP ['.strtoupper(self::$logLevels[$level]).'] '.$loggable.NL.' in '.$file.' on line '.$line;
                 error_log(trim($msg), ERROR_LOG_DEFAULT);
             }
             throw $logException;
@@ -354,7 +355,8 @@ class Logger extends StaticClass {
 
         $msg = ' '.$context['cliMessage'];
         $msg = str_replace(chr(0), '\0', $msg);                             // replace NUL bytes which mess up the logfile
-        $msg = rtrim($msg).PHP_EOL.PHP_EOL.str_repeat('-', 140);
+        $msg = rtrim($msg).NL.NL.str_repeat('-', 140);
+        WINDOWS && $msg = str_replace(NL, EOL_WINDOWS, $msg);
 
         error_log($msg, ERROR_LOG_DEFAULT);
 
@@ -385,7 +387,7 @@ class Logger extends StaticClass {
         }
         else {
             !isset($context['htmlMessage']) && self::composeHtmlMessage($loggable, $level, $context);
-            echo $context['htmlMessage'].PHP_EOL;
+            echo $context['htmlMessage'].NL;
             self::$printHtmlCounter++;
         }
         ob_get_level() && ob_flush();
@@ -445,25 +447,25 @@ class Logger extends StaticClass {
             $eoMsg = '';
             if (strEndsWith($msg, NL)) {
                 \array_pop($lines);
-                $eoMsg = PHP_EOL;
+                $eoMsg = NL;
             }
-            $msg = join(PHP_EOL.$indent, $lines).$eoMsg;
-            $cliMessage = '['.strtoupper(self::$logLevels[$level]).'] '.$msg.PHP_EOL.$indent.'in '.$file.' on line '.$line.PHP_EOL;
+            $msg = join(NL.$indent, $lines).$eoMsg;
+            $cliMessage = '['.strtoupper(self::$logLevels[$level]).'] '.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
 
             // append an existing context exception
             if (isset($context['exception'])) {
                 $exception   = $context['exception'];
                 $msg         = $indent.trim(ErrorHandler::getBetterMessage($exception, $indent));
-                $cliMessage .= PHP_EOL.$msg.PHP_EOL.PHP_EOL;
-                $traceStr    = $indent.'Stacktrace:'.PHP_EOL.$indent.'-----------'.PHP_EOL;
+                $cliMessage .= NL.$msg.NL.NL;
+                $traceStr    = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
                 $traceStr   .= ErrorHandler::getBetterTraceAsString($exception, $indent);
-                $cliMessage .= PHP_EOL.$traceStr;
+                $cliMessage .= NL.$traceStr;
             }
             elseif (isset($context['trace'])) {
                 // otherwise append the internal stacktrace
-                $traceStr    = $indent.'Stacktrace:'.PHP_EOL.$indent.'-----------'.PHP_EOL;
+                $traceStr    = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
                 $traceStr   .= ErrorHandler::formatTrace($context['trace'], $indent);
-                $cliMessage .= PHP_EOL.$traceStr;
+                $cliMessage .= NL.$traceStr;
             }
         }
         else {
@@ -477,10 +479,10 @@ class Logger extends StaticClass {
                     $type .= 'PHP Error:';
                 }
             }
-            $cliMessage  = '['.strtoupper(self::$logLevels[$level]).'] '.$type.$msg.PHP_EOL.$indent.'in '.$file.' on line '.$line.PHP_EOL;
-            $traceStr    = $indent.'Stacktrace:'.PHP_EOL.$indent.'-----------'.PHP_EOL;
+            $cliMessage  = '['.strtoupper(self::$logLevels[$level]).'] '.$type.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
+            $traceStr    = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
             $traceStr   .= ErrorHandler::getBetterTraceAsString($loggable, $indent);
-            $cliMessage .= PHP_EOL.$traceStr;
+            $cliMessage .= NL.$traceStr;
         }
 
         $context['cliMessage'] = $cliMessage;
@@ -537,7 +539,7 @@ class Logger extends StaticClass {
         }
         else {
             // $loggable is an exception
-            $type = null;
+            $type = '';
             $msg  = trim(ErrorHandler::getBetterMessage($loggable));
             if (isset($context['unhandled-exception'])) {
                 $type = 'Unhandled ';
@@ -565,7 +567,6 @@ class Logger extends StaticClass {
                       if (bodies && bodies.length)
                          bodies[0].appendChild(document.getElementById("'.$divId.'-'.self::$printHtmlCounter.'"));
                   </script>';
-        // store the HTML tag
         $context['htmlMessage'] = $html;
     }
 

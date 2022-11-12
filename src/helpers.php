@@ -407,7 +407,7 @@ function pp($var, $return=false, $flushBuffers=true) {
         $str = print_r($var, true);
     }
     elseif ($var === null) {
-        $str = '(null)';                            // analogous to typeof(null) = 'NULL';
+        $str = '(null)';                            // analogous to typeof(null) = 'NULL'
     }
     elseif (is_bool($var)) {
         $str = ($var ? 'true':'false').' (bool)';
