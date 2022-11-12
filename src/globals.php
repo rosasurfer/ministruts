@@ -138,34 +138,6 @@ function boolToStr($value) {
 
 
 /**
- * Dumps a variable to the screen or into a string.
- *
- * @param  mixed $var                     - variable
- * @param  bool  $return       [optional] - TRUE,  if the variable is to be dumped into a string <br>
- *                                          FALSE, if the variable is to be dumped to the standard output device (default)
- * @param  bool  $flushBuffers [optional] - whether to flush output buffers on output (default: TRUE)
- *
- * @return string|null - string if the result is to be returned, NULL otherwise
- */
-function dump($var, $return=false, $flushBuffers=true) {
-    return \rosasurfer\dump($var, $return, $flushBuffers);
-}
-
-
-/**
- * Alias of printPretty($var, false, $flushBuffers)
- *
- * Outputs a variable in a formatted and pretty way. Output always ends with a line feed.
- *
- * @param  mixed $var
- * @param  bool  $flushBuffers [optional] - whether to flush output buffers (default: yes)
- */
-function echof($var, $flushBuffers = true) {
-    \rosasurfer\echof($var, $flushBuffers);
-}
-
-
-/**
  * Print a message to STDOUT.
  *
  * @param  string $message
@@ -196,21 +168,30 @@ function debugHeader($message) {
 
 
 /**
- * Alias of {@link printPretty()}
- *
- * Prints a variable in a pretty way. Output always ends with a line feed.
+ * Dumps a variable to the screen or into a string.
  *
  * @param  mixed $var                     - variable
- * @param  bool  $return       [optional] - TRUE,  if the result is to be returned as a string <br>
- *                                          FALSE, if the result is to be printed to the standard output device (default)
+ * @param  bool  $return       [optional] - TRUE,  if the variable is to be dumped into a string <br>
+ *                                          FALSE, if the variable is to be dumped to the standard output device (default)
  * @param  bool  $flushBuffers [optional] - whether to flush output buffers on output (default: TRUE)
  *
  * @return string|null - string if the result is to be returned, NULL otherwise
- *
- * @see    printPretty()
  */
-function pp($var, $return=false, $flushBuffers=true) {
-    return \rosasurfer\pp($var, $return, $flushBuffers);
+function dump($var, $return=false, $flushBuffers=true) {
+    return \rosasurfer\dump($var, $return, $flushBuffers);
+}
+
+
+/**
+ * Alias of printPretty($var, false, $flushBuffers)
+ *
+ * Outputs a variable in a formatted and pretty way. Output always ends with a line feed.
+ *
+ * @param  mixed $var
+ * @param  bool  $flushBuffers [optional] - whether to flush output buffers (default: yes)
+ */
+function echof($var, $flushBuffers = true) {
+    \rosasurfer\echof($var, $flushBuffers);
 }
 
 
@@ -219,13 +200,13 @@ function pp($var, $return=false, $flushBuffers=true) {
  *
  * @param  mixed $var                     - variable
  * @param  bool  $return       [optional] - TRUE,  if the result is to be returned as a string <br>
- *                                          FALSE, if the result is to be printed to the standard output device (default)
+ *                                          FALSE, if the result is to be printed to the screen (default)
  * @param  bool  $flushBuffers [optional] - whether to flush output buffers on output (default: TRUE)
  *
  * @return string|null - string if the result is to be returned, NULL otherwise
  */
-function printPretty($var, $return=false, $flushBuffers=true) {
-    return \rosasurfer\printPretty($var, $return, $flushBuffers);
+function pp($var, $return=false, $flushBuffers=true) {
+    return \rosasurfer\pp($var, $return, $flushBuffers);
 }
 
 

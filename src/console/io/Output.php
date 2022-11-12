@@ -3,9 +3,9 @@ namespace rosasurfer\console\io;
 
 use rosasurfer\core\CObject;
 
-use function rosasurfer\printPretty;
-
-use const rosasurfer\CLI;
+use function rosasurfer\pp;
+use function rosasurfer\stderr;
+use function rosasurfer\stdout;
 
 
 /**
@@ -20,11 +20,7 @@ class Output extends CObject {
      * @param  mixed $message
      */
     public function out($message) {
-        $message = printPretty($message, $return=true);
-
-        $hStream = CLI ? \STDOUT : fopen('php://stdout', 'a');
-        fwrite($hStream, $message);
-        if (!CLI) fclose($hStream);
+        stdout(pp($message, $return=true));
     }
 
 
@@ -34,10 +30,6 @@ class Output extends CObject {
      * @param  mixed $message
      */
     public function error($message) {
-        $message = printPretty($message, $return=true);
-
-        $hStream = CLI ? \STDERR : fopen('php://stderr', 'a');
-        fwrite($hStream, $message);
-        if (!CLI) fclose($hStream);
+        stderr(pp($message, $return=true));
     }
 }

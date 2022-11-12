@@ -23,7 +23,7 @@ use const rosasurfer\NL;
 use const rosasurfer\WINDOWS;
 
 require(dirname(realpath(__FILE__)).'/../app/init.php');    // TODO: adjust to your project
-!CLI && exit(1|stderr('error: This script must be executed via CLI.'));
+!CLI && exit(1|stderr('error: This script must be executed via CLI.'.NL));
 
 
 // --- configuration --------------------------------------------------------------------------------------------------------
@@ -43,7 +43,7 @@ foreach ($args as $i => $arg) {
     if ($arg == '-h') { help(); exit(0);                           }    // help
     if ($arg == '-q') { $quiet = true; unset($args[$i]); continue; }    // quiet mode
 
-    stderr('invalid argument: '.$arg);
+    stderr('invalid argument: '.$arg.NL);
     !$quiet && help();
     exit(1);
 }
@@ -62,14 +62,14 @@ if (empty($errorLog) || $errorLog=='syslog') {              // errors are logged
 
 
 // (2) check log file for existence and process it
-if (!is_file    ($errorLog)) { $quiet || echof('error log empty: '       .$errorLog); exit(0); }
-if (!is_writable($errorLog)) {            stderr('cannot access log file: '.$errorLog); exit(1); }
+if (!is_file    ($errorLog)) { $quiet || echof('error log empty: '       .$errorLog);    exit(0); }
+if (!is_writable($errorLog)) {          stderr('cannot access log file: '.$errorLog.NL); exit(1); }
 $errorLog = realpath($errorLog);
 
 // rename the file; we don't want to lock it as doing so could block the main app
 $tempName = tempnam(dirname($errorLog), basename($errorLog).'.');
 if (!rename($errorLog, $tempName)) {
-    stderr('cannot rename log file: '  .$errorLog);
+    stderr('cannot rename log file: '  .$errorLog.NL);
     exit(1);
 }
 

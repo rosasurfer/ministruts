@@ -310,6 +310,53 @@ function boolToStr($value) {
 
 
 /**
+ * Print a message to STDOUT.
+ *
+ * @param  string $message
+ */
+function stdout($message) {
+    Assert::string($message);
+
+    $hStream = CLI ? \STDOUT : fopen('php://stdout', 'a');
+    fwrite($hStream, $message);
+    if (!CLI) fclose($hStream);
+}
+
+
+/**
+ * Print a message to STDERR.
+ *
+ * @param  string $message
+ */
+function stderr($message) {
+    Assert::string($message);
+
+    $hStream = CLI ? \STDERR : fopen('php://stderr', 'a');
+    fwrite($hStream, $message);
+    if (!CLI) fclose($hStream);
+}
+
+
+/**
+ * Send an "X-Debug-{id}" header with a message. Each sent header will have a different and increasing id.
+ *
+ * @param  string $message
+ */
+function debugHeader($message) {
+    if (CLI) return;
+
+    if (!is_string($message))
+        $message = (string) $message;
+    $message = str_replace(chr(0), '\0', $message);         // headers must not contain NUL bytes
+    $message = normalizeEOL($message);
+    $message = str_replace(NL, '\n ', $message);            // header() does not accept multi-line headers
+
+    static $i = 0;
+    header('X-Debug-'.++$i.': '.$message);
+}
+
+
+/**
  * Dumps a variable to the screen or into a string.
  *
  * @param  mixed $var                     - variable
@@ -338,91 +385,21 @@ function dump($var, $return=false, $flushBuffers=true) {
  * @param  bool  $flushBuffers [optional] - whether to flush output buffers (default: yes)
  */
 function echof($var, $flushBuffers = true) {
-    printPretty($var, $return=false, $flushBuffers);
+    pp($var, $return=false, $flushBuffers);
 }
 
 
 /**
- * Print a message to STDOUT.
- *
- * @param  string $message
- */
-function stdout($message) {
-    Assert::string($message);
-    if (!strEndsWith($message, NL))
-        $message .= NL;
-
-    $hStream = CLI ? \STDOUT : fopen('php://stdout', 'a');
-    fwrite($hStream, $message);
-    if (!CLI) fclose($hStream);
-}
-
-
-/**
- * Print a message to STDERR.
- *
- * @param  string $message
- */
-function stderr($message) {
-    Assert::string($message);
-    if (!strEndsWith($message, NL))
-        $message .= NL;
-
-    $hStream = CLI ? \STDERR : fopen('php://stderr', 'a');
-    fwrite($hStream, $message);
-    if (!CLI) fclose($hStream);
-}
-
-
-/**
- * Send an "X-Debug-{id}" header with a message. Each sent header will have a different and increasing id.
- *
- * @param  string $message
- */
-function debugHeader($message) {
-    if (CLI) return;
-
-    if (!is_string($message))
-        $message = (string) $message;
-    $message = str_replace(chr(0), '\0', $message);         // headers must not contain NUL bytes
-    $message = normalizeEOL($message);
-    $message = str_replace(NL, '\n ', $message);            // header() does not accept multi-line headers
-
-    static $i = 0;
-    header('X-Debug-'.++$i.': '.$message);
-}
-
-
-/**
- * Alias of {@link printPretty()}
- *
  * Prints a variable in a pretty way. Output always ends with a line feed.
  *
  * @param  mixed $var                     - variable
  * @param  bool  $return       [optional] - TRUE,  if the result is to be returned as a string <br>
- *                                          FALSE, if the result is to be printed to the standard output device (default)
+ *                                          FALSE, if the result is to be printed to the screen (default)
  * @param  bool  $flushBuffers [optional] - whether to flush output buffers on output (default: TRUE)
  *
  * @return string|null - string if the result is to be returned, NULL otherwise
- *
- * @see    printPretty()
  */
 function pp($var, $return=false, $flushBuffers=true) {
-    return printPretty($var, $return, $flushBuffers);
-}
-
-
-/**
- * Prints a variable in a pretty way. Output always ends with a line feed.
- *
- * @param  mixed $var                     - variable
- * @param  bool  $return       [optional] - TRUE,  if the result is to be returned as a string <br>
- *                                          FALSE, if the result is to be printed to the standard output device (default)
- * @param  bool  $flushBuffers [optional] - whether to flush output buffers on output (default: TRUE)
- *
- * @return string|null - string if the result is to be returned, NULL otherwise
- */
-function printPretty($var, $return=false, $flushBuffers=true) {
     if (is_object($var) && method_exists($var, '__toString') && !$var instanceof \SimpleXMLElement) {
         $str = (string) $var;
     }
@@ -458,9 +435,7 @@ function printPretty($var, $return=false, $flushBuffers=true) {
         return $str;
 
     echo $str;
-
-    if ($flushBuffers)
-        ob_get_level() && ob_flush();
+    $flushBuffers && ob_get_level() && ob_flush();
     return null;
 }
 

@@ -111,7 +111,7 @@ class Config extends CObject implements ConfigInterface {
             if (sizeof($parts) < 2) {
                 // Don't trigger a regular error as it will cause an infinite loop if the same config is used by the error handler.
                 $msg = __METHOD__.'()  Skipping syntax error in "'.$filename.'", line '.($i+1).': missing key-value separator';
-                stderr($msg);
+                stderr($msg.NL);
                 error_log($msg, ERROR_LOG_DEFAULT);
                 continue;
             }
