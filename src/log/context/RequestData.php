@@ -68,6 +68,7 @@ final class RequestData extends CObject {
                     $headers[$name] = $value;
                 }
             }
+
             if (!isset($headers['Authorization'])) {
                 if (isset($_SERVER['PHP_AUTH_USER'])) {
                     $passwd = $_SERVER['PHP_AUTH_PW'] ?? '';

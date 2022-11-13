@@ -663,22 +663,17 @@ class Request extends CObject {
 
         // read headers only once
         if ($headers === null) {
-            if (function_exists('apache_request_headers')) {
-                $headers = apache_request_headers();                // TODO: Apache skips REDIRECT_* headers
-            }
-            else {
-                $headers = [];
-                foreach ($_SERVER as $name => $value) {
-                    while (substr($name, 0, 9) == 'REDIRECT_') {
-                        $name = substr($name, 9);
-                        if (isset($_SERVER[$name])) continue 2;
-                    }
-                    if (substr($name, 0, 5) == 'HTTP_') {
-                        $name = substr($name, 5);
-                        if (!isset($fixHeaderNames[$name]))
-                            $name = str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower($name))));
-                        $headers[$name] = $value;
-                    }
+            $headers = [];
+            foreach ($_SERVER as $name => $value) {
+                while (substr($name, 0, 9) == 'REDIRECT_') {
+                    $name = substr($name, 9);
+                    if (isset($_SERVER[$name])) continue 2;
+                }
+                if (substr($name, 0, 5) == 'HTTP_') {
+                    $name = substr($name, 5);
+                    if (!isset($fixHeaderNames[$name]))
+                        $name = str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower($name))));
+                    $headers[$name] = $value;
                 }
             }
 

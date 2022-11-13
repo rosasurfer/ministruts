@@ -130,6 +130,7 @@ return array(
     'rosasurfer\\file\\xml\\SimpleXMLElement' => $baseDir . '/src/file/xml/SimpleXMLElement.php',
     'rosasurfer\\file\\zip\\ZipArchive' => $baseDir . '/src/file/zip/ZipArchive.php',
     'rosasurfer\\log\\Logger' => $baseDir . '/src/log/Logger.php',
+    'rosasurfer\\log\\context\\RequestData' => $baseDir . '/src/log/context/RequestData.php',
     'rosasurfer\\ministruts\\Action' => $baseDir . '/src/ministruts/Action.php',
     'rosasurfer\\ministruts\\ActionForm' => $baseDir . '/src/ministruts/ActionForm.php',
     'rosasurfer\\ministruts\\ActionForward' => $baseDir . '/src/ministruts/ActionForward.php',
