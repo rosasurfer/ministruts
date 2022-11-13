@@ -377,15 +377,18 @@ function dump($var, $return=false, $flushBuffers=true) {
 
 
 /**
- * Alias of pp($var, false, $flushBuffers)
+ * Alias of print_p($var, false, $flushBuffers)
  *
  * Outputs a variable in a formatted and pretty way. Output always ends with a line feed.
  *
  * @param  mixed $var
  * @param  bool  $flushBuffers [optional] - whether to flush output buffers (default: yes)
+ *
+ * @return bool - always TRUE
  */
 function echof($var, $flushBuffers = true) {
     print_p($var, false, $flushBuffers);
+    return true;
 }
 
 

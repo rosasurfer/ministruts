@@ -356,7 +356,6 @@ class Logger extends StaticClass {
         $context['print.request'] = true;
         $context['print.session'] = false;
         $context['print.server' ] = false;
-        $context['print.remote' ] = false;
 
         if (CLI) {
             !isset($context['cliMessage']) && self::composeCliMessage($loggable, $level, $context);
@@ -388,7 +387,6 @@ class Logger extends StaticClass {
         $context['errorLog.request'] = true;
         $context['errorLog.session'] = true;
         $context['errorLog.server' ] = true;
-        $context['errorLog.remote' ] = true;
 
         !isset($context['cliMessage']) && self::composeCliMessage($loggable, $level, $context);
         $msg = ' '.$context['cliMessage'];
@@ -790,19 +788,6 @@ class Logger extends StaticClass {
         $html && $data = '<br style="clear:both"/><br/>'.print_p($data, true, false).'<br/>'.NL;
 
         return $context[$key] = $data;
-    }
-
-
-    /**
-     * @param  string|\Exception|\Throwable $loggable - message or exception to log
-     * @param  int                          $level    - loglevel of the loggable
-     * @param  array                        $context  - reference to the log context
-     * @param  bool                         $html     - whether to get an HTML (true) or a CLI (false) representation
-     *
-     * @return string - remote user details (ending with a line break) or an empty string if not applicable
-     */
-    private static function getRemoteDetails($loggable, $level, array &$context, $html) {
-        return '';
     }
 
 
