@@ -1527,7 +1527,7 @@ function ifEmpty($value, $altValue) {
  *
  * @return array
  */
-function ksort_r(array $values, $sort_flags = SORT_REGULAR) {
+function ksortc(array $values, $sort_flags = SORT_REGULAR) {
     ksort($values, $sort_flags);
     return $values;
 }

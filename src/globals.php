@@ -899,8 +899,8 @@ function ifEmpty($value, $altValue) {
  *
  * @return array
  */
-function ksort_r(array $values, $sort_flags = SORT_REGULAR) {
-    return \rosasurfer\ksort_r($values, $sort_flags);
+function ksortc(array $values, $sort_flags = SORT_REGULAR) {
+    return \rosasurfer\ksortc($values, $sort_flags);
 }
 
 

@@ -21,7 +21,7 @@ use rosasurfer\net\mail\Mailer;
 use function rosasurfer\echof;
 use function rosasurfer\hsc;
 use function rosasurfer\ini_get_bool;
-use function rosasurfer\ksort_r;
+use function rosasurfer\ksortc;
 use function rosasurfer\normalizeEOL;
 use function rosasurfer\print_p;
 use function rosasurfer\stderr;
@@ -604,7 +604,7 @@ class Logger extends StaticClass {
 
         // compose message
         if (CLI) {
-            $msg     .= NL.NL.'Shell:'.NL.'------'.NL.print_r(ksort_r($_SERVER), true).NL;
+            $msg     .= NL.NL.'Shell:'.NL.'------'.NL.print_r(ksortc($_SERVER), true).NL;
             $location = realpath($_SERVER['PHP_SELF']);
         }
         else {
@@ -613,7 +613,7 @@ class Logger extends StaticClass {
             $session  = '';
 
             if (isset($_SESSION)) {
-                $session = print_r(ksort_r($_SESSION), true);
+                $session = print_r(ksortc($_SESSION), true);
             }
             $ip      = $_SERVER['REMOTE_ADDR'];
             $host    = NetTools::getHostByAddress($ip);
@@ -621,7 +621,7 @@ class Logger extends StaticClass {
                 $ip .= ' ('.$host.')';
             $msg .= NL.NL.'Request:'.NL.'--------'.NL.$request.NL.NL
               . 'Session: '.($session ? NL.'--------'.NL.$session : '(none)'.NL.'--------'.NL).NL.NL
-              . 'Server:'.NL.'-------'.NL.print_r(ksort_r($_SERVER), true).NL.NL
+              . 'Server:'.NL.'-------'.NL.print_r(ksortc($_SERVER), true).NL.NL
               . 'IP:   '.$ip.NL
               . 'Time: '.date('Y-m-d H:i:s').NL;
         }
@@ -763,7 +763,7 @@ class Logger extends StaticClass {
         if (!CLI) {
             if (isset($_SESSION)) {
                 $indent = ' ';
-                $data = 'Session:'.NL.'--------'.NL.print_r(ksort_r($_SESSION), true);
+                $data = 'Session:'.NL.'--------'.NL.print_r(ksortc($_SESSION), true);
                 $data = $indent.str_replace(NL, NL.$indent, normalizeEOL(trim($data))).NL;
                 $html && $data = '<br style="clear:both"/><br/>'.print_p($data, true, false).'<br/>'.NL;
             }
@@ -785,7 +785,7 @@ class Logger extends StaticClass {
         if (isset($context[$key])) return $context[$key].'';
 
         $indent = ' ';
-        $data = 'Server:'.NL.'-------'.NL.print_r(ksort_r($_SERVER), true);
+        $data = 'Server:'.NL.'-------'.NL.print_p(ksortc($_SERVER), true);
         $data = $indent.str_replace(NL, NL.$indent, normalizeEOL(trim($data))).NL;
         $html && $data = '<br style="clear:both"/><br/>'.print_p($data, true, false).'<br/>'.NL;
 

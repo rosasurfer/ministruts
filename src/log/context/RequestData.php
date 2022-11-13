@@ -18,7 +18,7 @@ use const rosasurfer\NL;
 final class RequestData extends CObject {
 
 
-    /** @var array<string, string[]> - request headers */
+    /** @var array<string, string> - request headers */
     private $headers;
 
     /** @var array<string, string[]> - normalized metadata of uploaded files */
