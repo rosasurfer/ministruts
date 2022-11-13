@@ -417,7 +417,7 @@ class ErrorHandler extends StaticClass {
      * method can be used with all PHP exceptions.
      *
      * @param  \Exception|\Throwable $exception         - any exception
-     * @param  string                $indent [optional] - indent lines by the specified value (default: no indentation)
+     * @param  string                $indent [optional] - indent all lines by the specified value (default: no indentation)
      *
      * @return string - message
      */
@@ -425,30 +425,24 @@ class ErrorHandler extends StaticClass {
         Assert::throwable($exception, '$exception');
 
         if ($exception instanceof PHPError) {
-            $result = $exception->getErrorType();
+            $type = $exception->getErrorType();
         }
         else {
             $class     = get_class($exception);
             $namespace = strtolower(strLeftTo($class, '\\', -1, true, ''));
             $basename  = simpleClassName($class);
-            $result    = $indent.$namespace.$basename;
+            $type      = $namespace.$basename;
 
             if ($exception instanceof \ErrorException) {            // a PHP error exception not created by the framework
-                $result .= '('.self::errorLevelToStr($exception->getSeverity()).')';
+                $type .= '('.self::errorLevelToStr($exception->getSeverity()).')';
             }
         }
-        $message = $exception->getMessage();
+        $message = trim($exception->getMessage());
 
         if (strlen($indent)) {
-            $lines = explode(NL, normalizeEOL($message));           // indent multiline messages
-            $eoMsg = '';
-            if (strEndsWith($message, NL)) {
-                \array_pop($lines);
-                $eoMsg = NL;
-            }
-            $message = join(NL.$indent, $lines).$eoMsg;
+            $message = str_replace(NL, NL.$indent, normalizeEOL($message));
         }
-        return $result.(strlen($message) ? ': ':'').$message;
+        return $indent.$type.(strlen($message) ? ': ':'').$message;
     }
 
 

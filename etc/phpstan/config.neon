@@ -38,7 +38,7 @@ parameters:
     - rosasurfer\NUL_DEVICE 
 
   ignoreErrors:
-    -  # PHPStan bug: the constructor is already final, see https://github.com/phpstan/phpstan/issues/8298
+    -  # false-positive: the constructor is already final, see https://github.com/phpstan/phpstan/issues/8298
       message: "#^Unsafe usage of new static\\(\\)\\.$#"
       path: ../../src/file/xml/SimpleXMLElement.php
 

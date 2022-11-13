@@ -108,14 +108,14 @@ class Logger extends StaticClass {
     /** @var int - counter for printed HTML messages */
     private static $printHtmlCounter = 0;
 
+    /** @var bool - whether the PHP error_log handler is enabled */
+    private static $errorLogHandler = true;
+
     /** @var bool - whether the mail handler is enabled */
     private static $mailHandler = false;
 
     /** @var string[] - mail receivers */
     private static $mailReceivers = [];
-
-    /** @var bool - whether the PHP error_log handler is enabled */
-    private static $errorLogHandler = true;
 
 
     /**
@@ -139,7 +139,7 @@ class Logger extends StaticClass {
         $receivers = [];
         foreach (explode(',', $config->get('log.mail.receiver', '')) as $receiver) {
             if ($receiver = trim($receiver)) {
-                if (filter_var($receiver, FILTER_VALIDATE_EMAIL)) {         // silently skip invalid addresses
+                if (filter_var($receiver, FILTER_VALIDATE_EMAIL)) {         // skip invalid addresses
                     $receivers[] = $receiver;
                 }
             }
@@ -318,8 +318,8 @@ class Logger extends StaticClass {
                 if ($level == L_FATAL) $printHandler = 'printHandlerFatal';
                 else                   $printHandler = 'printHandlerNonFatal';
 
-                self::$errorLogHandler && self::invokeErrorLogHandler($loggable, $level, $context);
                 self::${$printHandler} && self::invokePrintHandler   ($loggable, $level, $context);
+                self::$errorLogHandler && self::invokeErrorLogHandler($loggable, $level, $context);
                 self::$mailHandler     && self::invokeMailHandler    ($loggable, $level, $context);
             }
             $isActive = false;                                                  // unlock the section
@@ -343,6 +343,36 @@ class Logger extends StaticClass {
 
 
     /**
+     * Display a log message on STDOUT, STDERR or as part of the HTTP response.
+     *
+     * @param  string|\Exception|\Throwable $loggable - message or exception
+     * @param  int                          $level    - loglevel
+     * @param  array                        $context  - reference to the log context with additional data
+     */
+    private static function invokePrintHandler($loggable, $level, array &$context) {
+        $context['print.message'] = true;
+        $context['print.trace'  ] = true;
+        $context['print.request'] = true;
+        $context['print.session'] = false;
+        $context['print.remote' ] = false;
+
+        if (CLI) {
+            !isset($context['cliMessage']) && self::composeCliMessage($loggable, $level, $context);
+            $message = $context['cliMessage'];
+
+            if (isset($context['php-error']) || isset($context['unhandled-exception'])) stderr($message.NL);
+            else                                                                        stdout($message.NL);
+        }
+        else {
+            !isset($context['htmlMessage']) && self::composeHtmlMessage($loggable, $level, $context);
+            echo $context['htmlMessage'].NL;
+            self::$printHtmlCounter++;
+        }
+        ob_get_level() && ob_flush();
+    }
+
+
+    /**
      * Pass a log message to the PHP system logger via "error_log()".
      *
      * @param  string|\Exception|\Throwable $loggable - message or exception
@@ -350,12 +380,18 @@ class Logger extends StaticClass {
      * @param  array                        $context  - reference to the log context with additional data
      */
     private static function invokeErrorLogHandler($loggable, $level, array &$context) {
-        echof('Logger::invokeErrorLogHandler()  error_log="'.ini_get('error_log').'"');
-        !isset($context['cliMessage']) && self::composeCliMessage($loggable, $level, $context);
+        echof('Logger::invokeErrorLogHandler()');
+        $context['errorLog.message'] = true;
+        $context['errorLog.trace'  ] = true;
+        $context['errorLog.request'] = true;
+        $context['errorLog.session'] = true;
+        $context['errorLog.remote' ] = true;
 
+        !isset($context['cliMessage']) && self::composeCliMessage($loggable, $level, $context);
         $msg = ' '.$context['cliMessage'];
-        $msg = str_replace(chr(0), '\0', $msg);                             // replace NUL bytes which mess up the logfile
+
         $msg = rtrim($msg).NL.NL.str_repeat('-', 140);
+        $msg = str_replace(chr(0), '\0', $msg);                             // replace NUL bytes which mess up the logfile
         WINDOWS && $msg = str_replace(NL, EOL_WINDOWS, $msg);
 
         error_log($msg, ERROR_LOG_DEFAULT);
@@ -369,32 +405,6 @@ class Logger extends StaticClass {
 
 
     /**
-     * Display a log message on STDOUT, STDERR or as part of the HTTP response.
-     *
-     * @param  string|\Exception|\Throwable $loggable - message or exception
-     * @param  int                          $level    - loglevel
-     * @param  array                        $context  - reference to the log context with additional data
-     */
-    private static function invokePrintHandler($loggable, $level, array &$context) {
-        if (CLI) {
-            if (!self::$errorLogHandler || !empty(ini_get('error_log'))) {  // only if the errorLogHandler doesn't print to STDERR
-                !isset($context['cliMessage']) && self::composeCliMessage($loggable, $level, $context);
-                $message = $context['cliMessage'];
-
-                if (isset($context['php-error']) || isset($context['unhandled-exception'])) stderr($message.NL);
-                else                                                                        stdout($message.NL);
-            }
-        }
-        else {
-            !isset($context['htmlMessage']) && self::composeHtmlMessage($loggable, $level, $context);
-            echo $context['htmlMessage'].NL;
-            self::$printHtmlCounter++;
-        }
-        ob_get_level() && ob_flush();
-    }
-
-
-    /**
      * Send the message to the configured mail receivers.
      *
      * @param  string|\Exception|\Throwable $loggable - message or exception
@@ -402,9 +412,15 @@ class Logger extends StaticClass {
      * @param  array                        $context  - reference to the log context with additional data
      */
     private static function invokeMailHandler($loggable, $level, array &$context) {
-        !isset($context['mailSubject'], $context['mailMessage']) && self::composeMailMessage($loggable, $level, $context);
+        $context['mail.message'] = true;
+        $context['mail.trace'  ] = true;
+        $context['mail.request'] = true;
+        $context['mail.session'] = true;
+        $context['mail.remote' ] = true;
+
+        !isset($context['mailSubject'], $context['mailBody']) && self::composeMailMessage($loggable, $level, $context);
         $subject = $context['mailSubject'];
-        $message = $context['mailMessage'];
+        $message = $context['mailBody'];
 
         /** @var ConfigInterface $config */
         $config  = self::di('config');
@@ -432,7 +448,7 @@ class Logger extends StaticClass {
      * @param  array                        $context  - reference to the log context
      */
     private static function composeCliMessage($loggable, $level, array &$context) {
-        !isset($context['file'], $context['line']) && self::resolveCallLocation($context);
+        !isset($context['file'], $context['line']) && self::resolveCallerLocation($context);
         $file = $context['file'];
         $line = $context['line'];
 
@@ -497,7 +513,7 @@ class Logger extends StaticClass {
      * @param  array                        $context  - reference to the log context
      */
     private static function composeHtmlMessage($loggable, $level, array &$context) {
-        !isset($context['file'], $context['line']) && self::resolveCallLocation($context);
+        !isset($context['file'], $context['line']) && self::resolveCallerLocation($context);
         $file = $context['file'];
         $line = $context['line'];
 
@@ -518,14 +534,14 @@ class Logger extends StaticClass {
         if (is_string($loggable)) {
             // $loggable is a string
             $msg   = $loggable;
-            $html .= '<span style="white-space:nowrap"><span style="font-weight:bold">['.strtoupper(self::$logLevels[$level]).']</span> <span style="white-space:pre; line-height:8px">'.nl2br(hsc($msg)).'</span></span><br><br>';
-            $html .= 'in <span style="font-weight:bold">'.$file.'</span> on line <span style="font-weight:bold">'.$line.'</span><br>';
+            $html .= '<span style="white-space:nowrap"><span style="font-weight:bold">['.strtoupper(self::$logLevels[$level]).']</span> <span style="white-space:pre; line-height:8px">'.nl2br(hsc($msg)).'</span></span><br/><br/>';
+            $html .= 'in <span style="font-weight:bold">'.$file.'</span> on line <span style="font-weight:bold">'.$line.'</span><br/>';
 
             // append an existing context exception
             if (isset($context['exception'])) {
                 $exception = $context['exception'];
                 $msg       = ErrorHandler::getBetterMessage($exception);
-                $html     .= '<br>'.nl2br(hsc($msg)).'<br><br>';
+                $html     .= '<br/>'.nl2br(hsc($msg)).'<br/><br/>';
                 $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
                 $traceStr .= ErrorHandler::getBetterTraceAsString($exception, $indent);
                 $html     .= print_p($traceStr, true, false);
@@ -534,7 +550,7 @@ class Logger extends StaticClass {
                 // otherwise append the internal stacktrace
                 $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
                 $traceStr .= ErrorHandler::formatTrace($context['trace'], $indent);
-                $html     .= '<span style="clear:both"></span><br>'.print_p($traceStr, true, false).'<br>';
+                $html     .= '<br style="clear:both"/><br/>'.print_p($traceStr, true, false).'<br/>';
             }
         }
         else {
@@ -548,16 +564,16 @@ class Logger extends StaticClass {
                     $type .= 'PHP Error:';
                 }
             }
-            $html     .= '<span style="white-space:nowrap"><span style="font-weight:bold">['.strtoupper(self::$logLevels[$level]).']</span> <span style="white-space:pre; line-height:8px">'.nl2br(hsc($type.$msg)).'</span></span><br><br>';
-            $html     .= 'in <span style="font-weight:bold">'.$file.'</span> on line <span style="font-weight:bold">'.$line.'</span><br>';
+            $html     .= '<span style="white-space:nowrap"><span style="font-weight:bold">['.strtoupper(self::$logLevels[$level]).']</span> <span style="white-space:pre; line-height:8px">'.nl2br(hsc($type.$msg)).'</span></span><br/><br/>';
+            $html     .= 'in <span style="font-weight:bold">'.$file.'</span> on line <span style="font-weight:bold">'.$line.'</span><br/>';
             $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
             $traceStr .= ErrorHandler::getBetterTraceAsString($loggable, $indent);
-            $html     .= '<span style="clear:both"></span><br>'.print_p($traceStr, true, false).'<br>';
+            $html     .= '<br style="clear:both"/><br/>'.print_p($traceStr, true, false).'<br/>';
         }
 
         // append the current HTTP request
         if (!CLI) {
-            $html .= '<br style="clear:both"><br>'.print_p('Request:'.NL.'--------'.NL.Request::instance(), true, false).'<br>';
+            $html .= '<br style="clear:both"><br/>'.print_p('Request:'.NL.'--------'.NL.Request::instance(), true, false).'<br/>';
         }
 
         // close the HTML tag and add some JavaScript to ensure it becomes visible
@@ -572,7 +588,7 @@ class Logger extends StaticClass {
 
 
     /**
-     * Compose a mail log message and store it in the passed log context under the keys "mailSubject" and "mailMessage".
+     * Compose a mail log message and store it in the passed log context under the keys "mailSubject" and "mailBody".
      *
      * @param  string|\Exception|\Throwable $loggable - message or exception to log
      * @param  int                          $level    - loglevel of the loggable
@@ -622,8 +638,141 @@ class Logger extends StaticClass {
 
         // store subject and message
         $context['mailSubject'] = 'PHP ['.self::$logLevels[$level].'] '.$type.(CLI ? 'in ':'at ').$location;
-        $context['mailMessage'] = $msg;
+        $context['mailBody'   ] = $msg;
     }
+
+
+    /**
+     * Return a string representation of the message details.
+     *
+     * @param  string|\Exception|\Throwable $loggable - message or exception to log
+     * @param  int                          $level    - loglevel of the loggable
+     * @param  array                        $context  - reference to the log context
+     * @param  bool                         $html     - whether to get an HTML (true) or a CLI (false) representation
+     *
+     * @return string - message details (ending with a line break) or an empty string if not applicable
+     */
+    private static function getMessageDetails($loggable, $level, array &$context, $html) {
+        $key = 'messageDetails.'.($html ? 'web':'cli');
+        if (isset($context[$key])) return $context[$key].'';
+
+        !isset($context['file'], $context['line']) && self::resolveCallerLocation($context);
+        $file = $context['file'];
+        $line = $context['line'];
+        $indent = ' ';
+
+        if (is_string($loggable)) {
+            $msg = trim($loggable);
+            $msg = str_replace(NL, NL.$indent, normalizeEOL($msg));
+        }
+        else {
+            $msg = trim(ErrorHandler::getBetterMessage($loggable, $indent));
+            if (isset($context['unhandled-exception'])) {
+                if ($loggable instanceof PHPError) $msg = 'Unhandled PHP Error:'.strRightFrom($msg, ':');
+                else                               $msg = 'Unhandled '.$msg;
+            }
+        }
+
+        if ($html) {
+            $msg  = '<span style="white-space:nowrap"><span style="font-weight:bold">['.strtoupper(self::$logLevels[$level]).']</span> <span style="white-space:pre; line-height:8px">'.nl2br(hsc($msg)).'</span></span><br/><br/>';
+            $msg .= 'in <span style="font-weight:bold">'.$file.'</span> on line <span style="font-weight:bold">'.$line.'</span><br/>'.NL;
+        }
+        else {
+            $msg = $indent.'['.strtoupper(self::$logLevels[$level]).'] '.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
+        }
+        return $context[$key] = $msg;
+    }
+
+
+    /**
+     * @param  string|\Exception|\Throwable $loggable - message or exception to log
+     * @param  int                          $level    - loglevel of the loggable
+     * @param  array                        $context  - reference to the log context
+     * @param  bool                         $html     - whether to get an HTML (true) or a CLI (false) representation
+     *
+     * @return string - trace details (ending with a line break) or an empty string if not applicable
+     */
+    private static function getTraceDetails($loggable, $level, array &$context, $html) {
+        $key = 'traceDetails.'.($html ? 'web':'cli');
+        if (isset($context[$key])) return $context[$key].'';
+
+        $indent = ' ';
+
+        if (is_string($loggable)) {
+            // process an existing context exception
+            if (isset($context['exception'])) {
+                /** @var \Exception|\Throwable $exception */
+                $exception = $context['exception'];
+                $msg       = $indent.trim(ErrorHandler::getBetterMessage($exception, $indent)).NL.NL;
+                $html && $msg ='<br/>'.nl2br(hsc($msg));
+
+                $trace  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
+                $trace .= ErrorHandler::getBetterTraceAsString($exception, $indent);
+                $html && $trace = '<br style="clear:both"/><br/>'.print_p($trace, true, false).'<br/>';
+                $trace  = $msg.$trace;
+            }
+            else {
+                // otherwise process the internal stacktrace
+                !isset($context['trace']) && self::generateTrace($context);
+                $trace  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
+                $trace .= ErrorHandler::formatTrace($context['trace'], $indent);
+                $html && $trace = '<br style="clear:both"/><br/>'.print_p($trace, true, false).'<br/>';
+            }
+        }
+        else {
+            // process the exception's stacktrace
+            $exception = $loggable;
+            $trace  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
+            $trace .= ErrorHandler::getBetterTraceAsString($exception, $indent);
+            $html && $trace = '<br style="clear:both"/><br/>'.print_p($trace, true, false).'<br/>';
+        }
+        return $context[$key] = $trace;
+    }
+
+
+    /**
+     * @param  string|\Exception|\Throwable $loggable - message or exception to log
+     * @param  int                          $level    - loglevel of the loggable
+     * @param  array                        $context  - reference to the log context
+     * @param  bool                         $html     - whether to get an HTML (true) or a CLI (false) representation
+     *
+     * @return string - request details (ending with a line break) or an empty string if not applicable
+     */
+    private static function getRequestDetails($loggable, $level, array &$context, $html) {
+        return '';
+    }
+
+
+    /**
+     * @param  string|\Exception|\Throwable $loggable - message or exception to log
+     * @param  int                          $level    - loglevel of the loggable
+     * @param  array                        $context  - reference to the log context
+     * @param  bool                         $html     - whether to get an HTML (true) or a CLI (false) representation
+     *
+     * @return string - session details (ending with a line break) or an empty string if not applicable
+     */
+    private static function getSessionDetails($loggable, $level, array &$context, $html) {
+        return '';
+    }
+
+
+    /**
+     * @param  string|\Exception|\Throwable $loggable - message or exception to log
+     * @param  int                          $level    - loglevel of the loggable
+     * @param  array                        $context  - reference to the log context
+     * @param  bool                         $html     - whether to get an HTML (true) or a CLI (false) representation
+     *
+     * @return string - remote user details (ending with a line break) or an empty string if not applicable
+     */
+    private static function getRemoteDetails($loggable, $level, array &$context, $html) {
+        return '';
+    }
+
+
+
+
+
+
 
 
     /**
@@ -643,12 +792,12 @@ class Logger extends StaticClass {
 
     /**
      * Resolve the file location the logger was called from and store it under $context['file'] and $context['line']. For log messages
-     * from the ErrorHandler these context fields will be pre-populated. For log messages from user-land the fields may be empty and are
+     * from the ErrorHandler these context fields are pre-populated. For log messages from user-land the fields may be empty and are
      * resolved here.
      *
      * @param  array $context - reference to the log context
      */
-    private static function resolveCallLocation(array &$context) {
+    private static function resolveCallerLocation(array &$context) {
         !isset($context['trace']) && self::generateTrace($context);
 
         foreach ($context['trace'] as $i => $frame) {
