@@ -11,6 +11,7 @@ use rosasurfer\core\error\PHPError;
 use rosasurfer\core\exception\IllegalStateException;
 use rosasurfer\core\exception\InvalidValueException;
 use rosasurfer\core\exception\RuntimeException;
+use rosasurfer\log\context\RequestData;
 use rosasurfer\net\NetTools;
 use rosasurfer\net\http\CurlHttpClient;
 use rosasurfer\net\http\HttpRequest;
@@ -607,23 +608,11 @@ class Logger extends StaticClass {
         else {
             $request  = Request::instance();
             $location = strLeftTo($request->getUrl(), '?');
-            $session  = null;
+            $session  = '';
 
             if (isset($_SESSION)) {
-                $session = $_SESSION;
+                $session = print_r(ksort_r($_SESSION), true);
             }
-            else if ($request->hasSessionId()) {
-                try {
-                    $request->getSession();                         // Make sure the session was restarted.
-                }                                                   // A session may exist but content was delivered before
-                catch (PHPError $error) {                           // the session was restarted.
-                    if (!preg_match('/- headers already sent (by )?\(output started at /', $error->getMessage())) throw $error;
-                }
-                if (session_id() == $request->getSessionId()) {     // if both differ the id was regenerated and
-                    $session = $_SESSION;                           // the session is considered empty (except markers)
-                }
-            }
-            $session = isset($session) ? print_r(ksort_r($session), true) : null;
             $ip      = $_SERVER['REMOTE_ADDR'];
             $host    = NetTools::getHostByAddress($ip);
             if ($host != $ip)
@@ -708,7 +697,7 @@ class Logger extends StaticClass {
 
                 $trace  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
                 $trace .= ErrorHandler::getBetterTraceAsString($exception, $indent);
-                $html && $trace = '<br style="clear:both"/><br/>'.print_p($trace, true, false).'<br/>';
+                $html && $trace = '<br style="clear:both"/><br/>'.print_p($trace, true, false).'<br/>'.NL;
                 $trace  = $msg.$trace;
             }
             else {
@@ -716,7 +705,7 @@ class Logger extends StaticClass {
                 !isset($context['trace']) && self::generateTrace($context);
                 $trace  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
                 $trace .= ErrorHandler::formatTrace($context['trace'], $indent);
-                $html && $trace = '<br style="clear:both"/><br/>'.print_p($trace, true, false).'<br/>';
+                $html && $trace = '<br style="clear:both"/><br/>'.print_p($trace, true, false).'<br/>'.NL;
             }
         }
         else {
@@ -724,7 +713,7 @@ class Logger extends StaticClass {
             $exception = $loggable;
             $trace  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
             $trace .= ErrorHandler::getBetterTraceAsString($exception, $indent);
-            $html && $trace = '<br style="clear:both"/><br/>'.print_p($trace, true, false).'<br/>';
+            $html && $trace = '<br style="clear:both"/><br/>'.print_p($trace, true, false).'<br/>'.NL;
         }
         return $context[$key] = $trace;
     }
@@ -739,7 +728,19 @@ class Logger extends StaticClass {
      * @return string - request details (ending with a line break) or an empty string if not applicable
      */
     private static function getRequestDetails($loggable, $level, array &$context, $html) {
-        return '';
+        $key = 'requestDetails.'.($html ? 'web':'cli');
+        if (isset($context[$key])) return $context[$key].'';
+
+        $data = '';
+
+        if (!CLI) {
+            $indent  = ' ';
+            $data = 'Request:'.NL.'--------'.NL.trim(RequestData::current());
+            $data = $indent.str_replace(NL, NL.$indent, normalizeEOL($data)).NL;
+
+            $html && $data = '<br style="clear:both"/><br/>'.print_p($data, true, false).'<br/>'.NL;
+        }
+        return $context[$key] = $data;
     }
 
 
@@ -752,7 +753,20 @@ class Logger extends StaticClass {
      * @return string - session details (ending with a line break) or an empty string if not applicable
      */
     private static function getSessionDetails($loggable, $level, array &$context, $html) {
-        return '';
+        $key = 'sessionDetails.'.($html ? 'web':'cli');
+        if (isset($context[$key])) return $context[$key].'';
+
+        $data = '';
+
+        if (!CLI) {
+            if (isset($_SESSION)) {
+                $indent = ' ';
+                $data = 'Session:'.NL.'--------'.NL.print_r(ksort_r($_SESSION), true);
+                $data = $indent.str_replace(NL, NL.$indent, normalizeEOL(trim($data))).NL;
+                $html && $data = '<br style="clear:both"/><br/>'.print_p($data, true, false).'<br/>'.NL;
+            }
+        }
+        return $context[$key] = $data;
     }
 
 

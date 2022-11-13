@@ -585,8 +585,8 @@ class Request extends CObject {
 
 
     /**
-     * Whether a valid session id was transmitted with the request. An invalid id is a URL based session id when the php.ini
-     * setting "session.use_only_cookies" is enabled.
+     * Whether a valid session id was transmitted with the current request. For example, a URL based session id is invalid
+     * if the "php.ini" setting "session.use_only_cookies" is enabled.
      *
      * @return bool
      */

@@ -1519,14 +1519,13 @@ function ifEmpty($value, $altValue) {
 
 
 /**
- * Return a sorted copy of the specified array using the algorythm and parameters of ksort().
+ * Return a sorted copy of the specified array using the algorythm and parameters of {@link \ksort()}.
+ * Opposite to ksort() this function will not modify the passed array.
  *
  * @param  array $values
  * @param  int   $sort_flags [optional]
  *
  * @return array
- *
- * @see    ksort()
  */
 function ksort_r(array $values, $sort_flags = SORT_REGULAR) {
     ksort($values, $sort_flags);
