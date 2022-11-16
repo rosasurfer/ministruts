@@ -239,40 +239,6 @@ class Logger extends StaticClass {
 
 
     /**
-     * Log a PHPError.
-     *
-     * @param PHPError $error
-     */
-    public static function logPHPError(PHPError $error) {
-        echof('Logger::logPHPError()');
-
-        $context = [
-            'file'      => $error->getFile(),
-            'line'      => $error->getLine(),
-            'php-error' => $error,
-        ];
-        self::log($error, L_ERROR, $context);
-    }
-
-
-    /**
-     * Log an unhandled exception.
-     *
-     * @param  \Exception|\Throwable $exception - exception (PHP5) or throwable (PHP7)
-     */
-    public static function logUnhandledException($exception) {
-        echof('Logger::logUnhandledException()');
-
-        $context = [
-            'file'                => $exception->getFile(),
-            'line'                => $exception->getLine(),
-            'unhandled-exception' => $exception,
-        ];
-        self::log($exception, L_FATAL, $context);                           // log with the highest level
-    }
-
-
-    /**
      * Log a message or an exception.
      *
      * @param  string|object $loggable           - a string or an object implementing <tt>__toString()</tt>
@@ -361,8 +327,8 @@ class Logger extends StaticClass {
             !isset($context['cliMessage']) && self::composeCliMessage($loggable, $level, $context);
             $message = $context['cliMessage'];
 
-            if (isset($context['php-error']) || isset($context['unhandled-exception'])) stderr($message.NL);
-            else                                                                        stdout($message.NL);
+            if (isset($context['stderr'])) stderr($message.NL);
+            else                           stdout($message.NL);
         }
         else {
             !isset($context['htmlMessage']) && self::composeHtmlMessage($loggable, $level, $context);

@@ -203,8 +203,11 @@ class ErrorHandler extends StaticClass {
 
         // handle the PHPError according to the error handling mode
         if (self::$errorHandlingMode == self::ERRORS_LOG) {
-            Logger::logPHPError($error);
-
+            Logger::log($error, L_ERROR, [
+                'file'   => $error->getFile(),
+                'line'   => $error->getLine(),
+                'stderr' => $error,
+            ]);
             if (self::$prevErrorHandler) {                                      // chain a previously active error handler
                 call_user_func(self::$prevErrorHandler, ...func_get_args());    // a possibly static handler must be invoked with call_user_func()
             }
@@ -257,14 +260,18 @@ class ErrorHandler extends StaticClass {
      * @param  \Exception|\Throwable $exception - the unhandled exception (PHP5) or throwable (PHP7)
      */
     public static function handleException($exception) {
-        //echof('ErrorHandler::handleException()  '/*.$exception->getMessage()*/);
+        //echof('ErrorHandler::handleException()  '.$exception->getMessage());
         if (!self::$exceptionHandling) return;
 
-        // Exceptions thrown from the exception handler itself will not be passed back to the handler but instead
-        // terminate the script with an uncatchable fatal error. To prevent this they are handled explicitly.
+        // Exceptions thrown from the exception handler itself will not be passed back to the handler but
+        // cause an uncatchable fatal error. To prevent this they are handled explicitly.
         $secondEx = null;
         try {
-            Logger::logUnhandledException($exception);
+            Logger::log($exception, L_FATAL, [
+                'file'   => $exception->getFile(),
+                'line'   => $exception->getLine(),
+                'stderr' => $exception,
+            ]);
         }
         catch (\Throwable $secondEx) {}
         catch (\Exception $secondEx) {}
