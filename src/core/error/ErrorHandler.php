@@ -167,7 +167,7 @@ class ErrorHandler extends StaticClass {
      *                FALSE, if the error shall be processed as if no error handler was installed.
      */
     public static function handleError($level, $message, $file, $line, array $symbols = null) {
-        //echof('ErrorHandler::handleError()  '/*.self::errorLevelToStr($level).': '.$message.', in '.$file.', line '.$line*/);
+        //echof('ErrorHandler::handleError()  '.self::errorLevelToStr($level).': '.$message.', in '.$file.', line '.$line);
         if (!self::$errorHandlingMode) return false;
 
         // ignore suppressed errors and errors not covered by the current reporting level
@@ -204,9 +204,8 @@ class ErrorHandler extends StaticClass {
         // handle the PHPError according to the error handling mode
         if (self::$errorHandlingMode == self::ERRORS_LOG) {
             Logger::log($error, L_ERROR, [
-                'file'   => $error->getFile(),
-                'line'   => $error->getLine(),
-                'stderr' => $error,
+                'file' => $error->getFile(),
+                'line' => $error->getLine(),
             ]);
             if (self::$prevErrorHandler) {                                      // chain a previously active error handler
                 call_user_func(self::$prevErrorHandler, ...func_get_args());    // a possibly static handler must be invoked with call_user_func()
@@ -222,8 +221,9 @@ class ErrorHandler extends StaticClass {
          */
         if (self::$inShutdown && $level==E_ERROR && preg_match(self::$oomRegExp, $message)) {
             $context = [
-                'file' => $file,
-                'line' => $line,
+                'file'            => $file,
+                'line'            => $line,
+                'unhandled-error' => true,
             ];
             return true(Logger::log($message, L_FATAL, $context));              // logging the message is sufficient as there is no stacktrace anyway
         }
@@ -268,9 +268,9 @@ class ErrorHandler extends StaticClass {
         $secondEx = null;
         try {
             Logger::log($exception, L_FATAL, [
-                'file'   => $exception->getFile(),
-                'line'   => $exception->getLine(),
-                'stderr' => $exception,
+                'file'            => $exception->getFile(),
+                'line'            => $exception->getLine(),
+                'unhandled-error' => true,
             ]);
         }
         catch (\Throwable $secondEx) {}

@@ -329,39 +329,42 @@ class Application extends CObject {
     /**
      * Initialize handling of internal PHP errors. Controls whether errors are ignored, logged or converted to exceptions.
      *
-     * @param  string $value - case-insensitive string representation of an error handling configuration value:
-     *                         "ignore":    errors are ignored
-     *                         "log":       errors are logged
-     *                         "exception": errors are converted to exceptions and thrown back (default)
+     * @param  string $mode - string representation of an error handling mode:
+     *                        "ignore":    errors are ignored
+     *                        "log":       errors are logged
+     *                        "exception": errors are converted to exceptions and thrown back (default)
      */
-    protected function initErrorHandling($value) {
-        $mode = ErrorHandler::ERRORS_EXCEPTION;                     // strict (default if an invalid parameter was passed)
+    protected function initErrorHandling($mode) {
+        Assert::string($mode);
 
-        if (is_string($value)) {
-            $value = strtolower($value);
-            if      ($value == 'log'   ) $mode = ErrorHandler::ERRORS_LOG;
-            else if ($value == 'ignore') $mode = 0;
+        switch ($mode) {
+            case 'ignore':    $iMode = ErrorHandler::ERRORS_IGNORE;    break;
+            case 'log':       $iMode = ErrorHandler::ERRORS_LOG;       break;
+            case 'exception': $iMode = ErrorHandler::ERRORS_EXCEPTION; break;
+            default:
+                throw new InvalidValueException('Invalid error handling mode: "'.$mode.'"');
         }
-        ErrorHandler::setupErrorHandling($mode);
+        ErrorHandler::setupErrorHandling($iMode);
     }
 
 
     /**
      * Initialize handling of uncatched exceptions. Controls whether exceptions are ignored or catched.
      *
-     * @param  bool|int|string $value - whether to catch and handle otherwise uncatched exceptions
+     * @param  string $mode - string representation of an exception handling mode:
+     *                        "ignore": exceptions are ignored
+     *                        "catch":  exceptions are catched and logged
      */
-    protected function initExceptionHandling($value) {
-        $enabled = true;                                            // default if an invalid parameter was passed
-        if (is_bool($value) || is_int($value)) {
-            $enabled = (bool) $value;
+    protected function initExceptionHandling($mode) {
+        Assert::string($mode);
+
+        switch ($mode) {
+            case 'ignore': $iMode = ErrorHandler::EXCEPTIONS_IGNORE; break;
+            case 'catch':  $iMode = ErrorHandler::EXCEPTIONS_CATCH;  break;
+            default:
+                throw new InvalidValueException('Invalid exception handling mode: "'.$mode.'"');
         }
-        elseif (is_string($value)) {
-            $value   = trim(strtolower($value));
-            $enabled = ($value=='0' || $value=='off' || $value=='false');
-        }
-        $mode = $enabled ? ErrorHandler::EXCEPTIONS_CATCH : ErrorHandler::EXCEPTIONS_IGNORE;
-        ErrorHandler::setupExceptionHandling($mode);
+        ErrorHandler::setupExceptionHandling($iMode);
     }
 
 

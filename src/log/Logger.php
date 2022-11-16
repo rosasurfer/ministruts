@@ -249,13 +249,12 @@ class Logger extends StaticClass {
      */
     public static function log($loggable, $level, array $context = []) {
         self::init();
-
-        // detect and handle a failing logger
         $logException = null;
+
         try {
-            // detect and block recursive calls (should we instead block duplicate messages?)
+            // detect and block recursive calls
             static $isActive = false;
-            if ($isActive) throw new IllegalStateException('Detected recursive call of '.__METHOD__.'(), aborting...');
+            if ($isActive) throw new IllegalStateException('Recursive call detected, aborting...');
             $isActive = true;
 
             // validate parameters
@@ -276,11 +275,11 @@ class Logger extends StaticClass {
             }
 
             // filter "headers already sent" errors triggered by a previously printed message
-            if (!$filtered && !CLI && self::$printHtmlCounter && is_object($loggable)) {
+            if (!$filtered && self::$printHtmlCounter && is_object($loggable) && isset($context['unhandled-error'])) {
                 $filtered = (bool)preg_match('/- headers already sent (by )?\(output started at /', $loggable->getMessage());
             }
 
-            // invoke all active log handlers
+            // invoke active handlers
             if (!$filtered) {
                 if ($level == L_FATAL) $printHandler = 'printHandlerFatal';
                 else                   $printHandler = 'printHandlerNonFatal';
