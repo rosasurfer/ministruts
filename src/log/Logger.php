@@ -10,12 +10,8 @@ use rosasurfer\core\error\ErrorHandler;
 use rosasurfer\core\error\PHPError;
 use rosasurfer\core\exception\IllegalStateException;
 use rosasurfer\core\exception\InvalidValueException;
-use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\log\context\RequestData;
 use rosasurfer\net\NetTools;
-use rosasurfer\net\http\CurlHttpClient;
-use rosasurfer\net\http\HttpRequest;
-use rosasurfer\net\http\HttpResponse;
 use rosasurfer\net\mail\Mailer;
 
 use function rosasurfer\echof;

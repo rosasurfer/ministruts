@@ -26,6 +26,7 @@ use const rosasurfer\L_NOTICE;
 use const rosasurfer\L_WARN;
 use const rosasurfer\MB;
 use const rosasurfer\NL;
+use rosasurfer\core\exception\RuntimeException;
 
 
 /**
@@ -149,13 +150,10 @@ class ErrorHandler extends StaticClass {
 
 
     /**
-     * A handler for internal PHP errors.
+     * A handler for internal PHP errors. Errors are handled if covered by the currently active error reporting level. They are either
+     * logged or converted to {@link PHPError} exceptions and thrown back.
      *
-     * Errors are handled if covered by the currently active error reporting level. Errors of levels E_DEPRECATED, E_USER_DEPRECATED,
-     * E_USER_NOTICE and E_USER_WARNING are never converted to PHP exceptions and script execution continues normally.
-     *
-     * All other errors are handled according to the configured error handling mode (either logged or converted to PHP exceptions and
-     * thrown back).
+     * Errors of level E_DEPRECATED, E_USER_DEPRECATED, E_USER_NOTICE or E_USER_WARNING are never thrown back as exceptions.
      *
      * @param  int                  $level              - error severity level
      * @param  string               $message            - error message
@@ -164,43 +162,50 @@ class ErrorHandler extends StaticClass {
      * @param  array<string, mixed> $symbols [optional] - symbol table at the point of the error
      *
      * @return bool - TRUE,  if the error was successfully handled.
-     *                FALSE, if the error shall be processed as if no error handler was installed.
+     *                FALSE, if the error shall be processed as if the handler was not installed.
+     *
+     * @throws PHPError
      */
     public static function handleError($level, $message, $file, $line, array $symbols = null) {
         //echof('ErrorHandler::handleError()  '.self::errorLevelToStr($level).': '.$message.', in '.$file.', line '.$line);
         if (!self::$errorHandlingMode) return false;
+        $args = func_get_args();
 
         // ignore suppressed errors and errors not covered by the current reporting level
         $reportingLevel = error_reporting();
-        if (!$reportingLevel)            return false;                          // the @ operator was specified
-        if (!($reportingLevel & $level)) return true;                           // the error is not covered by the active reporting level
+        if (!$reportingLevel)            return false;                  // the @ operator was specified
+        if (!($reportingLevel & $level)) return true;                   // the error is not covered by the active reporting level
 
-        // wrap all errors in the matching PHPError exception
+        // convert error to a PHPError exception
         $message = 'PHP '.self::errorLevelDescr($level).': '.strLeftTo($message, ' (this will throw an Error in a future version of PHP)', -1);
         $error = new PHPError($message, 0, $level, $file, $line);
-
-        // modify the stacktrace to point to the trigger statement (not to this error handler)
         $trace = self::removeFrames($error->getTrace(), $file, $line);
-        self::setNewTrace($error, $trace);
+        self::setNewTrace($error, $trace);                              // let the stacktrace point to the trigger statement
 
         // handle the error accordingly
-        if (self::$errorHandlingMode == self::ERRORS_LOG) {
-            Logger::log($error, L_ERROR, [
+        if (self::$errorHandlingMode == self::ERRORS_LOG) {             // only log everything
+            switch ($level) {
+                case E_DEPRECATED:
+                case E_USER_DEPRECATED: $logLevel = L_INFO;   break;
+                case E_USER_NOTICE:     $logLevel = L_NOTICE; break;
+                case E_USER_WARNING:    $logLevel = L_WARN;   break;
+                default:                $logLevel = L_ERROR;
+            }
+            Logger::log($message, $logLevel, [
                 'file' => $error->getFile(),
                 'line' => $error->getLine(),
             ]);
-            if (self::$prevErrorHandler) {                                      // chain a previously active error handler
-                call_user_func(self::$prevErrorHandler, ...func_get_args());    // a possibly static handler must be invoked with call_user_func()
+
+            if (self::$prevErrorHandler) {                              // chain a previously active error handler
+                call_user_func(self::$prevErrorHandler, ...$args);      // a possibly static handler must be invoked with call_user_func()
             }
             return true;
         }
 
-        /**
-         * Handle cases where throwing an exception is not possible or not allowed.
-         *
-         * Fatal out-of-memory errors:
-         * ---------------------------
-         */
+        // throw back everything as an exception
+        // There are rare cases were throwing an exception from the error handler causes even more errors.
+
+        // fatal out-of-memory errors
         if (self::$inShutdown && $level==E_ERROR && preg_match(self::$oomRegExp, $message)) {
             $context = [
                 'file'            => $file,
@@ -231,7 +236,7 @@ class ErrorHandler extends StaticClass {
             }
         }
 
-        // throw back everything else
+        // now throw back everything else
         throw $error;
     }
 
