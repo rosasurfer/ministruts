@@ -175,33 +175,15 @@ class ErrorHandler extends StaticClass {
         if (!$reportingLevel)            return false;                          // the @ operator was specified
         if (!($reportingLevel & $level)) return true;                           // the error is not covered by the active reporting level
 
-        $message = strLeftTo($message, ' (this will throw an Error in a future version of PHP)', -1);
-
         // wrap all errors in the matching PHPError exception
-        switch ($level) {
-            case E_PARSE            : $error = new PHPParseError      ($message, 0, $level, $file, $line); break;
-            case E_COMPILE_WARNING  : $error = new PHPCompileWarning  ($message, 0, $level, $file, $line); break;
-            case E_COMPILE_ERROR    : $error = new PHPCompileError    ($message, 0, $level, $file, $line); break;
-            case E_CORE_WARNING     : $error = new PHPCoreWarning     ($message, 0, $level, $file, $line); break;
-            case E_CORE_ERROR       : $error = new PHPCoreError       ($message, 0, $level, $file, $line); break;
-            case E_STRICT           : $error = new PHPStrict          ($message, 0, $level, $file, $line); break;
-            case E_DEPRECATED       : $error = new PHPDeprecated      ($message, 0, $level, $file, $line); break;
-            case E_NOTICE           : $error = new PHPNotice          ($message, 0, $level, $file, $line); break;
-            case E_WARNING          : $error = new PHPWarning         ($message, 0, $level, $file, $line); break;
-            case E_ERROR            : $error = new PHPError           ($message, 0, $level, $file, $line); break;
-            case E_RECOVERABLE_ERROR: $error = new PHPRecoverableError($message, 0, $level, $file, $line); break;
-            case E_USER_DEPRECATED  : $error = new PHPUserDeprecated  ($message, 0, $level, $file, $line); break;
-            case E_USER_NOTICE      : $error = new PHPUserNotice      ($message, 0, $level, $file, $line); break;
-            case E_USER_WARNING     : $error = new PHPUserWarning     ($message, 0, $level, $file, $line); break;
-            case E_USER_ERROR       : $error = new PHPUserError       ($message, 0, $level, $file, $line); break;
-            default                 : $error = new PHPUnknownError    ($message, 0, $level, $file, $line);
-        }
+        $message = 'PHP '.self::errorLevelDescr($level).': '.strLeftTo($message, ' (this will throw an Error in a future version of PHP)', -1);
+        $error = new PHPError($message, 0, $level, $file, $line);
 
-        // modify the stacktrace to point to the trigger statement (removes frames after $file/$line = this error handler)
+        // modify the stacktrace to point to the trigger statement (not to this error handler)
         $trace = self::removeFrames($error->getTrace(), $file, $line);
         self::setNewTrace($error, $trace);
 
-        // handle the PHPError according to the error handling mode
+        // handle the error according to the error handling mode
         if (self::$errorHandlingMode == self::ERRORS_LOG) {
             Logger::log($error, L_ERROR, [
                 'file' => $error->getFile(),
@@ -379,14 +361,45 @@ class ErrorHandler extends StaticClass {
 
 
     /**
-     * Return a readable representation of an error reporting level.
+     * Return the description of an error reporting level.
      *
-     * @param  int $level - error reporting level
+     * @param  int $level - single error reporting level
      *
      * @return string
      */
-    public static function errorLevelToStr($level) {
+    public static function errorLevelDescr(int $level) {
         Assert::int($level);
+
+        static $levels = [
+            E_ERROR             => 'Error',                     //     1
+            E_WARNING           => 'Warning',                   //     2
+            E_PARSE             => 'Parse Error',               //     4
+            E_NOTICE            => 'Notice',                    //     8
+            E_CORE_ERROR        => 'Core Error',                //    16
+            E_CORE_WARNING      => 'Core Warning',              //    32
+            E_COMPILE_ERROR     => 'Compile Error',             //    64
+            E_COMPILE_WARNING   => 'Compile Warning',           //   128
+            E_USER_ERROR        => 'User Error',                //   256
+            E_USER_WARNING      => 'User Warning',              //   512
+            E_USER_NOTICE       => 'User Notice',               //  1024
+            E_STRICT            => 'Strict',                    //  2048
+            E_RECOVERABLE_ERROR => 'Recoverable Error',         //  4096
+            E_DEPRECATED        => 'Deprecated',                //  8192
+            E_USER_DEPRECATED   => 'User Deprecated',           // 16384
+        ];
+        return isset($levels[$level]) ? $levels[$level] : '(unknown)';
+    }
+
+
+    /**
+     * Return a readable representation of an error reporting flag.
+     *
+     * @param  int $flag - combination of error reporting levels
+     *
+     * @return string
+     */
+    public static function errorLevelToStr($flag) {
+        Assert::int($flag);
 
         $levels = [
             E_ERROR             => 'E_ERROR',                   //     1
@@ -406,12 +419,12 @@ class ErrorHandler extends StaticClass {
             E_USER_DEPRECATED   => 'E_USER_DEPRECATED',         // 16384
         ];
 
-        if      (!$level)                                                       $levels = ['0'];                        //     0
-        else if (($level &  E_ALL)                  ==  E_ALL)                  $levels = ['E_ALL'];                    // 32767
-        else if (($level & (E_ALL & ~E_DEPRECATED)) == (E_ALL & ~E_DEPRECATED)) $levels = ['E_ALL & ~E_DEPRECATED'];    // 24575
+        if      (!$flag)                                                       $levels = ['0'];                         //     0
+        else if (($flag &  E_ALL)                  ==  E_ALL)                  $levels = ['E_ALL'];                     // 32767
+        else if (($flag & (E_ALL & ~E_DEPRECATED)) == (E_ALL & ~E_DEPRECATED)) $levels = ['E_ALL & ~E_DEPRECATED'];     // 24575
         else {
             foreach ($levels as $key => $value) {
-                if ($level & $key) continue;
+                if ($flag & $key) continue;
                 unset($levels[$key]);
             }
         }
@@ -431,25 +444,28 @@ class ErrorHandler extends StaticClass {
     public static function getBetterMessage($exception, $indent = '') {
         Assert::throwable($exception, '$exception');
 
+        $message = trim($exception->getMessage());
+
         if ($exception instanceof PHPError) {
-            $type = $exception->getErrorType();
+            $type = '';
         }
         else {
             $class     = get_class($exception);
             $namespace = strtolower(strLeftTo($class, '\\', -1, true, ''));
             $basename  = simpleClassName($class);
             $type      = $namespace.$basename;
+            $message   = strlen($message) ? ': ':''.$message;
 
             if ($exception instanceof \ErrorException) {            // a PHP error exception not created by the framework
-                $type .= '('.self::errorLevelToStr($exception->getSeverity()).')';
+                $type .= '('.self::errorLevelDescr($exception->getSeverity()).')';
             }
         }
-        $message = trim($exception->getMessage());
+        $message = $type.$message;
 
         if (strlen($indent)) {
             $message = str_replace(NL, NL.$indent, normalizeEOL($message));
         }
-        return $indent.$type.(strlen($message) ? ': ':'').$message;
+        return $indent.$message;
     }
 
 

@@ -67,14 +67,4 @@ class PHPError extends \ErrorException implements IRosasurferException {
         }
         return $trace;
     }
-
-
-    /**
-     * Return the error type of this PHP error.
-     *
-     * @return string
-     */
-    public function getErrorType() {
-        return 'PHP Error';
-    }
 }
