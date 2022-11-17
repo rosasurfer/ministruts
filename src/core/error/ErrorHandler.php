@@ -183,7 +183,7 @@ class ErrorHandler extends StaticClass {
         $trace = self::removeFrames($error->getTrace(), $file, $line);
         self::setNewTrace($error, $trace);
 
-        // handle the error according to the error handling mode
+        // handle the error accordingly
         if (self::$errorHandlingMode == self::ERRORS_LOG) {
             Logger::log($error, L_ERROR, [
                 'file' => $error->getFile(),
@@ -454,7 +454,7 @@ class ErrorHandler extends StaticClass {
             $namespace = strtolower(strLeftTo($class, '\\', -1, true, ''));
             $basename  = simpleClassName($class);
             $type      = $namespace.$basename;
-            $message   = strlen($message) ? ': ':''.$message;
+            $message   = (strlen($message) ? ': ':'').$message;
 
             if ($exception instanceof \ErrorException) {            // a PHP error exception not created by the framework
                 $type .= '('.self::errorLevelDescr($exception->getSeverity()).')';
