@@ -26,7 +26,6 @@ use const rosasurfer\L_NOTICE;
 use const rosasurfer\L_WARN;
 use const rosasurfer\MB;
 use const rosasurfer\NL;
-use rosasurfer\core\exception\RuntimeException;
 
 
 /**
@@ -64,10 +63,13 @@ class ErrorHandler extends StaticClass {
     protected static $prevExceptionHandler;
 
     /** @var bool - whether the script is in the shutdown phase */
-    protected static $inShutdown = false;
+    protected static $inScriptShutdown = false;
 
     /** @var string - RegExp for detecting out-of-memory errors */
     protected static $oomRegExp = '/^Allowed memory size of ([0-9]+) bytes exhausted/';
+
+    /** @var string - memory block reserved for handling out-of-memory errors */
+    protected static $oomEmergencyMemory;
 
 
     /**
@@ -83,8 +85,8 @@ class ErrorHandler extends StaticClass {
         }
         else {
             self::$errorHandlingMode = $mode;
-            self::$prevErrorHandler  = set_error_handler(__CLASS__ . '::handleError');
-            self::setupShutdownHandler();                       // handle fatal runtime errors during script shutdown
+            self::$prevErrorHandler  = set_error_handler(__CLASS__.'::handleError');
+            self::setupShutdownHandler();
         }
     }
 
@@ -99,50 +101,22 @@ class ErrorHandler extends StaticClass {
         self::$exceptionHandling = ($mode != self::EXCEPTIONS_IGNORE);
 
         if (self::$exceptionHandling) {
-            self::$prevExceptionHandler = set_exception_handler(__CLASS__ . '::handleException');
-            self::setupShutdownHandler();                       // setup handling of exceptions during script shutdown
+            self::$prevExceptionHandler = set_exception_handler(__CLASS__.'::handleException');
+            self::setupShutdownHandler();
         }
     }
 
 
     /**
-     * Setup a script shutdown handler.
+     * Setup a script shutdown handler to handle fatal errors during shutdown. The callback should be
+     * first on the shutdown function stack.
      */
     protected static function setupShutdownHandler() {
         static $handlerRegistered = false;
-        static $oomEmergencyMemory;                             // memory block freed when handling out-of-memory errors
 
-        // The following function should be the very first function on the shutdown function stack.
         if (!$handlerRegistered) {
-            register_shutdown_function(function() use (&$oomEmergencyMemory) {
-                /**
-                 * Flag to detect entering of the script's shutdown phase to be capable of handling destructor exceptions
-                 * during shutdown in a different way. Otherwise destructor exceptions will cause fatal errors.
-                 *
-                 * @link  http://php.net/manual/en/language.oop5.decon.php
-                 * @see   self::handleDestructorException()
-                 */
-                self::$inShutdown = true;
-
-                /**
-                 * If regular PHP error handling is enabled catch and handle fatal runtime errors.
-                 *
-                 * @link  https://github.com/bugsnag/bugsnag-laravel/issues/226
-                 * @link  https://gist.github.com/dominics/61c23f2ded720d039554d889d304afc9
-                 */
-                if (self::$errorHandlingMode) {
-                    $oomEmergencyMemory = $match = null;                        // release the reserved memory, meant to be used by preg_match()
-                    $error = error_get_last();
-                    if ($error && $error['type']==E_ERROR && preg_match(self::$oomRegExp, $error['message'], $match)) {
-                        ini_set('memory_limit', (int)$match[1] + 10*MB);        // allocate memory for the regular handler
-
-                        $currentHandler = set_error_handler(function() {});     // handle the error regularily
-                        restore_error_handler();
-                        $currentHandler && call_user_func($currentHandler, ...array_values($error));
-                    }
-                }
-            });
-            $oomEemergencyMemory = str_repeat('*', 1*MB);                       // reserve some extra memory to survive OOM errors
+            register_shutdown_function(__CLASS__.'::onScriptShutdown');
+            self::$oomEmergencyMemory = str_repeat('*', 1*MB);          // allocate some memory for OOM errors
             $handlerRegistered = true;
         }
     }
@@ -208,7 +182,7 @@ class ErrorHandler extends StaticClass {
         // There are rare cases were throwing an exception from the error handler causes even more errors.
 
         // fatal out-of-memory errors
-        if (self::$inShutdown && $level==E_ERROR && preg_match(self::$oomRegExp, $message)) {
+        if (self::$inScriptShutdown && $level==E_ERROR && preg_match(self::$oomRegExp, $message)) {
             $context = [
                 'file'            => $file,
                 'line'            => $line,
@@ -329,7 +303,7 @@ class ErrorHandler extends StaticClass {
      * @link   http://php.net/manual/en/language.oop5.decon.php
      */
     public static function handleDestructorException($exception) {
-        if (self::$inShutdown) {
+        if (self::$inScriptShutdown) {
             $currentHandler = set_exception_handler(function() {});
             restore_exception_handler();
 
@@ -356,7 +330,7 @@ class ErrorHandler extends StaticClass {
      * @see  https://github.com/symfony/symfony/blob/1c110fa1f7e3e9f5daba73ad52d9f7e843a7b3ff/src/Symfony/Component/Debug/ErrorHandler.php#L457-L489
      */
     public static function handleToStringException($exception) {
-        echof('ErrorHandler::handleToStringException()  '/*.$exception->getMessage()*/);
+        echof('ErrorHandler::handleToStringException()  '.$exception->getMessage());
         $currentHandler = set_exception_handler(function() {});
         restore_exception_handler();
 
@@ -364,6 +338,38 @@ class ErrorHandler extends StaticClass {
             call_user_func($currentHandler, $exception);        // We MUST use call_user_func() as a static handler cannot be invoked dynamically.
             exit(1);                                            // Calling exit() is the only way to prevent the immediately following
         }                                                       // non-catchable fatal error.
+    }
+
+
+    /**
+     * A handler executed when the script shuts down.
+     *
+     * @return mixed
+     */
+    public static function onScriptShutdown() {
+        echof('ErrorHandler::onScriptShutdown()');
+        self::$inScriptShutdown = true;
+
+        // Handle destructor exceptions during shutdown differently. Otherwise such exceptions will cause fatal errors.
+        //
+        // @link  http://php.net/manual/en/language.oop5.decon.php
+        // @see   self::handleDestructorException()
+
+        // If regular PHP error handling is enabled catch and handle fatal runtime errors.
+        //
+        // @link  https://github.com/bugsnag/bugsnag-laravel/issues/226
+        // @link  https://gist.github.com/dominics/61c23f2ded720d039554d889d304afc9
+        if (self::$errorHandlingMode) {
+            self::$oomEmergencyMemory = $match = null;                  // release the reserved memory, meant to be used by preg_match()
+            $error = error_get_last();
+            if ($error && $error['type']==E_ERROR && preg_match(self::$oomRegExp, $error['message'], $match)) {
+                ini_set('memory_limit', (int)$match[1] + 10*MB);        // try to allocate some more memory for the regular handler
+
+                $currentHandler = set_error_handler(function() {});     // handle the error regularily
+                restore_error_handler();
+                $currentHandler && call_user_func($currentHandler, ...array_values($error));
+            }
+        }
     }
 
 
