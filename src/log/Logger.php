@@ -342,7 +342,6 @@ class Logger extends StaticClass {
      * @param  array                        $context  - reference to the log context with additional data
      */
     private static function invokeErrorLogHandler($loggable, $level, array &$context) {
-        echof('Logger::invokeErrorLogHandler()');
         $context['errorLog.message'] = true;
         $context['errorLog.trace'  ] = true;
         $context['errorLog.request'] = true;
@@ -419,6 +418,7 @@ class Logger extends StaticClass {
 
         // compose message
         if (is_string($loggable)) {
+            echof(__METHOD__.'()  string');
             // $loggable is a string
             $msg   = $loggable;
             $lines = explode(NL, normalizeEOL($msg));   // indent multiline messages

@@ -50,8 +50,8 @@ class Application extends CObject {
      *                                           developers using editors with limited code completion capabilities.            <br>
      *                                           (default: disabled)                                                            <br>
      *
-     *        "app.handle-errors"     - string:  How to handle regular PHP errors: If set to "strict" errors are converted to   <br>
-     *                                           ErrorExceptions and thrown. If set to "weak" errors are only logged and        <br>
+     *        "app.handle-errors"     - string:  How to handle regular PHP errors: If set to "exception" errors are converted   <br>
+     *                                           to ErrorExceptions and thrown. If set to "log" errors are only logged and     <br>
      *                                           execution continues. If set to "ignore" the application must implement its     <br>
      *                                           own error handling mechanism.                                                  <br>
      *                                           (default: "strict")                                                            <br>
@@ -65,8 +65,8 @@ class Application extends CObject {
      */
     public function __construct(array $options = []) {
         // set default values
-        if (!isset($options['app.handle-errors'    ])) $options['app.handle-errors'    ] = 'strict';
-        if (!isset($options['app.handle-exceptions'])) $options['app.handle-exceptions'] = true;
+        if (!isset($options['app.handle-errors'    ])) $options['app.handle-errors'    ] = 'exception';
+        if (!isset($options['app.handle-exceptions'])) $options['app.handle-exceptions'] = 'catch';
         if (!isset($options['app.globals'          ])) $options['app.globals'          ] = false;
 
         // setup the configuration

@@ -123,7 +123,6 @@ class ErrorHandler extends StaticClass {
                  * @see   self::handleDestructorException()
                  */
                 self::$inShutdown = true;
-                echof('shutdown: '.__METHOD__);
 
                 /**
                  * If regular PHP error handling is enabled catch and handle fatal runtime errors.
@@ -173,31 +172,34 @@ class ErrorHandler extends StaticClass {
 
         // ignore suppressed errors and errors not covered by the current reporting level
         $reportingLevel = error_reporting();
-        if (!$reportingLevel)            return false;                  // the @ operator was specified
-        if (!($reportingLevel & $level)) return true;                   // the error is not covered by the active reporting level
+        if (!$reportingLevel)            return false;                      // the @ operator was specified
+        if (!($reportingLevel & $level)) return true;                       // the error is not covered by the active reporting level
 
         // convert error to a PHPError exception
         $message = 'PHP '.self::errorLevelDescr($level).': '.strLeftTo($message, ' (this will throw an Error in a future version of PHP)', -1);
         $error = new PHPError($message, 0, $level, $file, $line);
         $trace = self::removeFrames($error->getTrace(), $file, $line);
-        self::setNewTrace($error, $trace);                              // let the stacktrace point to the trigger statement
+        self::setNewTrace($error, $trace);                                  // let the stacktrace point to the trigger statement
 
         // handle the error accordingly
-        if (self::$errorHandlingMode == self::ERRORS_LOG) {             // only log everything
-            switch ($level) {
+        $alwaysLog = ($level & (E_DEPRECATED|E_USER_DEPRECATED|E_USER_NOTICE|E_USER_WARNING));
+
+        if (self::$errorHandlingMode == self::ERRORS_LOG || $alwaysLog) {   // only log the error
+        switch ($level) {
                 case E_DEPRECATED:
                 case E_USER_DEPRECATED: $logLevel = L_INFO;   break;
                 case E_USER_NOTICE:     $logLevel = L_NOTICE; break;
                 case E_USER_WARNING:    $logLevel = L_WARN;   break;
                 default:                $logLevel = L_ERROR;
             }
-            Logger::log($message, $logLevel, [
-                'file' => $error->getFile(),
-                'line' => $error->getLine(),
+            Logger::log($error, $logLevel, [
+                'class' => isset($trace[0]['class']) ? $trace[0]['class'] : '',
+                'file'  => $error->getFile(),
+                'line'  => $error->getLine(),
             ]);
 
-            if (self::$prevErrorHandler) {                              // chain a previously active error handler
-                call_user_func(self::$prevErrorHandler, ...$args);      // a possibly static handler must be invoked with call_user_func()
+            if (self::$prevErrorHandler) {                                  // chain a previously active error handler
+                call_user_func(self::$prevErrorHandler, ...$args);          // a possibly static handler must be invoked with call_user_func()
             }
             return true;
         }
@@ -212,7 +214,7 @@ class ErrorHandler extends StaticClass {
                 'line'            => $line,
                 'unhandled-error' => true,
             ];
-            return true(Logger::log($message, L_FATAL, $context));              // logging the message is sufficient as there is no stacktrace anyway
+            return true(Logger::log($message, L_FATAL, $context));          // logging the message is sufficient as there is no stacktrace anyway
         }
 
         /**
