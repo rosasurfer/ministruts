@@ -53,7 +53,6 @@ class RosasurferException extends \Exception implements RosasurferExceptionInter
             }
             */
 
-            // store the new stacktrace
             $this->betterTrace = $betterTrace;
         }
         return $betterTrace;

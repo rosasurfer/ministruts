@@ -317,11 +317,10 @@ class ErrorHandler extends StaticClass {
 
 
     /**
-     * Explicitly called handler for exceptions raised in object::__toString() methods. This allows regular handling of
-     * exceptions thrown from object::__toString() which in PHP < 7.4 is not possible due to an internal PHP design issue.
+     * A manually called handler for exceptions raised in object::__toString(). It allows regular handling of exceptions thrown
+     * from object::__toString() in PHP < 7.4, which is not possible in those versions due to an internal PHP design issue.
      *
-     * PHP < 7.4 behaviour:
-     *  PHP Fatal error:  Method object::__toString() must not throw an exception in {file} on {line}.
+     * Behaviour PHP < 7.4: Fatal error:  Method object::__toString() must not throw an exception in {file} on {line}.
      *
      * @param  \Exception|\Throwable $exception - exception (PHP5) or throwable (PHP7)
      *
@@ -330,7 +329,7 @@ class ErrorHandler extends StaticClass {
      * @see  https://github.com/symfony/symfony/blob/1c110fa1f7e3e9f5daba73ad52d9f7e843a7b3ff/src/Symfony/Component/Debug/ErrorHandler.php#L457-L489
      */
     public static function handleToStringException($exception) {
-        echof('ErrorHandler::handleToStringException()  '.$exception->getMessage());
+        //echof('ErrorHandler::handleToStringException()  '.$exception->getMessage());
         $currentHandler = set_exception_handler(function() {});
         restore_exception_handler();
 
