@@ -218,7 +218,7 @@ class MySQLConnector extends Connector {
         $ex = null;
         try {                                                                      // flags: CLIENT_FOUND_ROWS = 2
             error_clear_last();
-            $this->hConnection = mysql_connect($host, $user, $pass, $newLink=true/*, $flags=2*/);
+            $this->hConnection = mysql_connect($host, $user, $pass, true/*, $flags=2*/);
             if (!$this->hConnection) throw new DatabaseException(error_get_last()['message']);
         }
         catch (IRosasurferException $ex) {}

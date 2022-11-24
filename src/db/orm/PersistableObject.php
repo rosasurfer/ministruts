@@ -6,7 +6,6 @@ use rosasurfer\core\exception\ConcurrentModificationException;
 use rosasurfer\core\exception\IllegalAccessException;
 use rosasurfer\core\exception\IllegalStateException;
 use rosasurfer\core\exception\InvalidTypeException;
-use rosasurfer\core\exception\InvalidValueException;
 use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\db\ConnectorInterface as IConnector;
 
@@ -676,8 +675,8 @@ abstract class PersistableObject extends CObject {
      * @return PersistableObject
      */
     public static function populateNew($class, array $row) {
-        if (static::class != __CLASS__)                  throw new IllegalAccessException('Cannot access method '.__METHOD__.'() on a derived class.');
-        if (!is_a($class, __CLASS__, $allowString=true)) throw new InvalidTypeException('Not a '.__CLASS__.' subclass: '.$class);
+        if (static::class != __CLASS__)     throw new IllegalAccessException('Cannot access method '.__METHOD__.'() on a derived class.');
+        if (!is_a($class, __CLASS__, true)) throw new InvalidTypeException('Not a '.__CLASS__.' subclass: '.$class);
 
         /** @var self $object */
         $object = new $class();

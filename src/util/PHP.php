@@ -77,13 +77,13 @@ class PHP extends StaticClass {
         $stderrPassthrough = isset($options['stderr-passthrough']) && $options['stderr-passthrough'];
 
         if (!$needStderr && !$needExitCode && !WINDOWS)
-            return \shell_exec($cmd);                       // the process doesn't need watching and we can go with shell_exec()
+            return \shell_exec($cmd);                                   // the process doesn't need watching and we can go with shell_exec()
 
         // we must use proc_open()/proc_close()
-        $descriptors = [                                    // "pipes" or "files":
-            ($STDIN =0) => ['pipe', 'rb'],                  // ['file', '/dev/tty', 'rb'],
-            ($STDOUT=1) => ['pipe', 'wb'],                  // ['file', '/dev/tty', 'wb'],
-            ($STDERR=2) => ['pipe', 'wb'],                  // ['file', '/dev/tty', 'wb'],
+        $descriptors = [                                                // "pipes" or "files":
+            ($STDIN =0) => ['pipe', 'rb'],                              // ['file', '/dev/tty', 'rb'],
+            ($STDOUT=1) => ['pipe', 'wb'],                              // ['file', '/dev/tty', 'wb'],
+            ($STDERR=2) => ['pipe', 'wb'],                              // ['file', '/dev/tty', 'wb'],
         ];
         $pipes = [];
 
@@ -108,10 +108,10 @@ class PHP extends StaticClass {
         if (!$stdoutPassthrough && !$stderrPassthrough) {
             $stdout = stream_get_contents($pipes[$STDOUT]);
             $stderr = stream_get_contents($pipes[$STDERR]);
-            fclose($pipes[$STDIN ]);                        // $pipes[0] => writeable handle connected to the child's STDIN
-            fclose($pipes[$STDOUT]);                        // $pipes[1] => readable handle connected to the child's STDOUT
-            fclose($pipes[$STDERR]);                        // $pipes[2] => readable handle connected to the child's STDERR
-            $exitCode = proc_close($hProc);                 // we must close the pipes before proc_close() to avoid a deadlock
+            fclose($pipes[$STDIN ]);                                    // $pipes[0] => writeable handle connected to the child's STDIN
+            fclose($pipes[$STDOUT]);                                    // $pipes[1] => readable handle connected to the child's STDOUT
+            fclose($pipes[$STDERR]);                                    // $pipes[2] => readable handle connected to the child's STDERR
+            $exitCode = proc_close($hProc);                             // we must close the pipes before proc_close() to avoid a deadlock
             return $stdout;
         }
 
@@ -136,7 +136,7 @@ class PHP extends StaticClass {
         $null = null;
         do {
             $readable = $observed;
-            $changes = stream_select($readable, $null, $null, $seconds=0, $microseconds=200000);    // timeout = 0.2 sec
+            stream_select($readable, $null, $null, 0, 200000);          // timeout = 0.2 sec
             foreach ($readable as $stream) {
                 if (($line=fgets($stream)) === false) {                 // this covers fEof() too
                     fclose($stream);

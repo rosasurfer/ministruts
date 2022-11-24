@@ -839,7 +839,7 @@ class Module extends CObject {
         while (strlen($pattern)) {
             if (isset($this->mappings['paths'][$pattern]))          // path keys start and end with a slash "/"
                 return $this->mappings['paths'][$pattern];
-            $pattern = strLeftTo($pattern, '/', $count=-2, $includeLimiter=true);
+            $pattern = strLeftTo($pattern, '/', -2, true);
             if ($pattern == '/')
                 break;
         }

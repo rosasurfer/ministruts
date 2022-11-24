@@ -46,7 +46,7 @@ abstract class Singleton extends CObject {
         $currentCreations[$class] = true;
 
         // check validity of the passed class (omitting this check can cause an uncatchable fatal error)
-        if (!is_a($class, __CLASS__, $allowString=true)) {
+        if (!is_a($class, __CLASS__, true)) {
             if (!is_class($class)) throw new ClassNotFoundException('Class not found: '.$class );
             throw new InvalidTypeException('Not a '.__CLASS__.' subclass: '.$class);
         }

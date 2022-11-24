@@ -36,7 +36,7 @@ class ClassLoader extends CObject {
      */
     public function register() {
         if (!$this->registered) {
-            spl_autoload_register([$this, 'autoLoad'], $throw=true, $prepend=false);
+            spl_autoload_register([$this, 'autoLoad'], true, false);
             $this->registered = true;
         }
         return $this;

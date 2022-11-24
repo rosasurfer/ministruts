@@ -777,7 +777,7 @@ class Logger extends StaticClass {
     private static function resolveCallerLocation(array &$context) {
         !isset($context['trace']) && self::generateTrace($context);
 
-        foreach ($context['trace'] as $i => $frame) {
+        foreach ($context['trace'] as $frame) {
             if (isset($frame['file'])) {                // find the first frame with 'file' (skips internal PHP functions)
                 $context['file'] = $frame['file'];
                 $context['line'] = $frame['line'];
