@@ -134,20 +134,26 @@ class ErrorHandler extends StaticClass {
      * @param  int                  $line               - line of file where the error occurred
      * @param  array<string, mixed> $symbols [optional] - symbol table at the point of the error
      *
-     * @return bool - TRUE,  if the error was successfully handled.
-     *                FALSE, if the error shall be processed as if the handler was not installed.
+     * @return bool - TRUE  if the error was handled and PHP should call error_clear_last()
+     *                FALSE if the error was not handled and PHP should not call error_clear_last()
      *
      * @throws PHPError
      */
     public static function handleError($level, $message, $file, $line, array $symbols = null) {
         //echof('ErrorHandler::handleError()  '.self::errorLevelToStr($level).': '.$message.', in '.$file.', line '.$line);
         if (!self::$errorHandlingMode) return false;
+
+        // anonymous function to chain a previously active handler
         $args = func_get_args();
+        $prevErrorHandler = function() use ($args) {                        // a possibly static handler must be invoked with call_user_func()
+            self::$prevErrorHandler && call_user_func(self::$prevErrorHandler, ...$args);
+            return true;                                                    // tell PHP to call error_clear_last()
+        };
 
         // ignore suppressed errors and errors not covered by the current reporting level
         $reportingLevel = error_reporting();
-        if (!$reportingLevel)            return false;                      // the @ operator was specified
-        if (!($reportingLevel & $level)) return true;                       // the error is not covered by the active reporting level
+        if (!$reportingLevel)            return $prevErrorHandler();        // the @ operator was specified
+        if (!($reportingLevel & $level)) return $prevErrorHandler();        // the error is not covered by the active reporting level
 
         // convert error to a PHPError exception
         $message = 'PHP '.self::errorLevelDescr($level).': '.strLeftTo($message, ' (this will throw an Error in a future version of PHP)', -1);
@@ -171,11 +177,7 @@ class ErrorHandler extends StaticClass {
                 'file'  => $error->getFile(),
                 'line'  => $error->getLine(),
             ]);
-
-            if (self::$prevErrorHandler) {                                  // chain a previously active error handler
-                call_user_func(self::$prevErrorHandler, ...$args);          // a possibly static handler must be invoked with call_user_func()
-            }
-            return true;
+            return $prevErrorHandler();
         }
 
         // throw back everything as an exception
@@ -354,7 +356,7 @@ class ErrorHandler extends StaticClass {
         // @link  http://php.net/manual/en/language.oop5.decon.php
         // @see   self::handleDestructorException()
 
-        // If regular PHP error handling is enabled catch and handle fatal runtime errors.
+        // If error handling is enabled handle fatal runtime errors.
         //
         // @link  https://github.com/bugsnag/bugsnag-laravel/issues/226
         // @link  https://gist.github.com/dominics/61c23f2ded720d039554d889d304afc9
@@ -603,7 +605,7 @@ class ErrorHandler extends StaticClass {
         for ($i=0; $i < $size; $i++) {               // align FILE and LINE
             $frame = &$trace[$i];
 
-            $call = self::getFrameMethod($frame, $nsToLower=true);
+            $call = self::getFrameMethod($frame, true);
 
             if ($call!='{main}' && !strEndsWith($call, '{closure}'))
                 $call.='()';
