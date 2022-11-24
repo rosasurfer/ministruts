@@ -65,10 +65,7 @@ class ErrorHandler extends StaticClass {
     /** @var bool - whether the script is in the shutdown phase */
     protected static $inScriptShutdown = false;
 
-    /** @var string - RegExp for detecting out-of-memory errors */
-    protected static $oomRegExp = '/^Allowed memory size of ([0-9]+) bytes exhausted/';
-
-    /** @var string - memory block reserved for handling out-of-memory errors */
+    /** @var string - memory block reserved for detection of out-of-memory errors */
     protected static $oomEmergencyMemory;
 
 
@@ -116,7 +113,7 @@ class ErrorHandler extends StaticClass {
 
         if (!$handlerRegistered) {
             register_shutdown_function(__CLASS__.'::onScriptShutdown');
-            self::$oomEmergencyMemory = str_repeat('*', 1*MB);          // allocate some memory for OOM errors
+            self::$oomEmergencyMemory = str_repeat('*', 1*MB);          // allocate some memory for OOM error detection
             $handlerRegistered = true;
         }
     }
@@ -183,8 +180,8 @@ class ErrorHandler extends StaticClass {
         // throw back everything as an exception
         // There are rare cases were throwing an exception from the error handler causes even more errors.
 
-        // fatal out-of-memory errors
-        if (self::$inScriptShutdown && $level==E_ERROR && preg_match(self::$oomRegExp, $message)) {
+        // fatal out-of-memory errors                                       // TODO: remove this duplicate check
+        if (self::$inScriptShutdown && preg_match('/^Allowed memory size of ([0-9]+) bytes exhausted/', $message)) {
             $context = [
                 'file'            => $file,
                 'line'            => $line,
@@ -305,6 +302,10 @@ class ErrorHandler extends StaticClass {
      * @link   http://php.net/manual/en/language.oop5.decon.php
      */
     public static function handleDestructorException($exception) {
+        // Handle destructor exceptions during shutdown differently. Otherwise such exceptions will cause fatal errors.
+        //
+        // @link  http://php.net/manual/en/language.oop5.decon.php
+        // @see   self::handleDestructorException()
         if (self::$inScriptShutdown) {
             $currentHandler = set_exception_handler(function() {});
             restore_exception_handler();
@@ -348,28 +349,22 @@ class ErrorHandler extends StaticClass {
      * @return mixed
      */
     public static function onScriptShutdown() {
-        echof('ErrorHandler::onScriptShutdown()');
         self::$inScriptShutdown = true;
 
-        // Handle destructor exceptions during shutdown differently. Otherwise such exceptions will cause fatal errors.
-        //
-        // @link  http://php.net/manual/en/language.oop5.decon.php
-        // @see   self::handleDestructorException()
+        // Errors showing up here haven't been passed to an installed error handler, e.g. "out-of-memory" errors.
+        if ($error = error_get_last()) {
+            // release the reserved memory, so preg_match() survives a potential OOM condition
+            self::$oomEmergencyMemory = $match = null;
 
-        // If error handling is enabled handle fatal runtime errors.
-        //
-        // @link  https://github.com/bugsnag/bugsnag-laravel/issues/226
-        // @link  https://gist.github.com/dominics/61c23f2ded720d039554d889d304afc9
-        if (self::$errorHandlingMode) {
-            self::$oomEmergencyMemory = $match = null;                  // release the reserved memory, meant to be used by preg_match()
-            $error = error_get_last();
-            if ($error && $error['type']==E_ERROR && preg_match(self::$oomRegExp, $error['message'], $match)) {
-                ini_set('memory_limit', (int)$match[1] + 10*MB);        // try to allocate some more memory for the regular handler
-
-                $currentHandler = set_error_handler(function() {});     // handle the error regularily
-                restore_error_handler();
-                $currentHandler && call_user_func($currentHandler, ...array_values($error));
+            if (preg_match('/^Allowed memory size of ([0-9]+) bytes exhausted/', $error['message'], $match)) {
+                // we have an OOM error, widen the current limit to survive regular error handling
+                ini_set('memory_limit', (string)((int)$match[1] + 10*MB));
             }
+
+            // call the active error handler manually
+            $currentHandler = set_error_handler(function() {});
+            restore_error_handler();
+            $currentHandler && call_user_func($currentHandler, ...array_values($error));
         }
     }
 

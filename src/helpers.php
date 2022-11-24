@@ -72,7 +72,7 @@ const SATURDAY          = 6;
 // byte sizes
 const KB                = 1024;
 const MB                = 1024 << 10;
-const GB                = 1024 << 20;                               // not TB (doesn't fit in 32 bits)
+const GB                = 1024 << 20;
 
 // array indexing types
 const ARRAY_ASSOC       = 1;
