@@ -71,8 +71,8 @@ final class RequestData extends CObject {
 
             if (!isset($headers['Authorization'])) {
                 if (isset($_SERVER['PHP_AUTH_USER'])) {
-                    $passwd = $_SERVER['PHP_AUTH_PW'] ?? '';
-                    $headers['Authorization'] = 'Basic '. base64_encode($_SERVER['PHP_AUTH_USER'].':'.$passwd);
+                    $passwd = isset($_SERVER['PHP_AUTH_PW']) ? $_SERVER['PHP_AUTH_PW'] : '';
+                    $headers['Authorization'] = 'Basic '.base64_encode($_SERVER['PHP_AUTH_USER'].':'.$passwd);
                 }
                 elseif (isset($_SERVER['PHP_AUTH_DIGEST'])) {
                     $headers['Authorization'] = $_SERVER['PHP_AUTH_DIGEST'];

@@ -2,7 +2,6 @@
 namespace rosasurfer\core;
 
 use rosasurfer\core\di\DiAwareTrait;
-use rosasurfer\core\error\ErrorHandler;
 
 
 /**

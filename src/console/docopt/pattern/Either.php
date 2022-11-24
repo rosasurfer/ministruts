@@ -18,9 +18,7 @@ class Either extends BranchPattern {
         $outcomes = [];
         foreach ($this->children as $pattern) {
             list ($matched, $dump1, $dump2) = $outcome = $pattern->match($left, $collected);
-            if ($matched) {
-                $outcomes[] = $outcome;
-            }
+            $matched && $outcomes[] = $outcome;
         }
         if ($outcomes) {
             // return min(outcomes, key=lambda outcome: len(outcome[1]))

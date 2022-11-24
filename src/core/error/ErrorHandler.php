@@ -379,7 +379,7 @@ class ErrorHandler extends StaticClass {
      *
      * @return string
      */
-    public static function errorLevelDescr(int $level) {
+    public static function errorLevelDescr($level) {
         Assert::int($level);
 
         static $levels = [

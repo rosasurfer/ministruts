@@ -220,7 +220,7 @@ class Application extends CObject {
         $memoryWarnLimit = php_byte_value($config->get('log.warn.memory_limit', 0));
         if ($memoryWarnLimit > 0) {
             register_shutdown_function(function() use ($memoryWarnLimit) {
-                $usedBytes = memory_get_peak_usage($real=true);
+                $usedBytes = memory_get_peak_usage(true);
                 if ($usedBytes > $memoryWarnLimit) {
                     Logger::log('Memory consumption exceeded '.prettyBytes($memoryWarnLimit).' (peak usage: '.prettyBytes($usedBytes).')', L_WARN, ['class' => __CLASS__]);
                 }
@@ -301,7 +301,7 @@ class Application extends CObject {
      * @param  string              $rootDir - application root directory
      */
     protected function expandDirsRecursive(array &$dirs, $rootDir) {
-        foreach ($dirs as $name => &$dir) {
+        foreach ($dirs as &$dir) {
             if (is_array($dir)) {
                 $this->{__FUNCTION__}($dir, $rootDir);
                 continue;
@@ -309,7 +309,8 @@ class Application extends CObject {
             if (isRelativePath($dir))
                 $dir = $rootDir.'/'.$dir;
             if (is_dir($dir)) $dir = realpath($dir);
-        }; unset($dir);
+        };
+        unset($dir);
     }
 
 
