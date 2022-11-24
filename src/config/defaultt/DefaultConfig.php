@@ -1,7 +1,6 @@
 <?php
 namespace rosasurfer\config\defaultt;
 
-use rosasurfer\Application;
 use rosasurfer\config\Config;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\exception\InvalidArgumentException;
@@ -10,7 +9,7 @@ use const rosasurfer\CLI;
 
 
 /**
- * An {@link Application}'s default configuration using Java-like property files.
+ * An application's default configuration using Java-like property files.
  *
  * A variant of the standard {@link Config}. It automatically loads and monitores a standard set of configuration files from
  * the directory "{app.dir.config}". These files are in the following order (later config settings with the same key override
