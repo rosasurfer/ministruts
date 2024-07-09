@@ -9,12 +9,12 @@
     }],
     "config": {
         "platform": {
-            "php": "5.6.40"
+            "php": "7.4"
         },
         "optimize-autoloader": true
     },
     "require": {
-        "php":           ">=5.6",
+        "php":           ">=5.6 || 7.*",
         "ext-ctype":     "*",
         "ext-filter":    "*",
         "ext-json":      "*",
@@ -22,6 +22,9 @@
         "ext-mbstring":  "*",
         "ext-simplexml": "*",
         "psr/container": "^1.0"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "<1.11.2"
     },
     "autoload": {
         "psr-4": {
@@ -33,5 +36,9 @@
         "branch-alias": {
             "dev-development": "0.11.x-dev"
         }
-    }
+    },
+    "_comment": [
+        "previous platform constraint was php=5.6.40",
+        "since PHPStan v1.11.2 terminal colors in Mintty v3.6.2 are broken (Symphony?)"
+    ]
 }
