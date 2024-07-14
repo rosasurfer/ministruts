@@ -168,7 +168,7 @@ class PHP extends StaticClass {
         // core configuration
         // ------------------
         if (!php_ini_loaded_file())                                                                                  $issues[] = 'Error: no "php.ini" configuration file loaded  [setup]';
-        /*PHP_INI_PERDIR*/ if (      !ini_get_bool('short_open_tag'                ))                                $issues[] = 'Error: short_open_tag is not On  [security]';
+        /*PHP_INI_PERDIR*/ if (       ini_get_bool('short_open_tag'                ))                                $issues[] = 'Error: short_open_tag is not Off [XML compatibility]';
         /*PHP_INI_PERDIR*/ if (       ini_get_bool('asp_tags'                      ) && PHP_VERSION_ID <  70000)     $issues[] = 'Info:  asp_tags is not Off  [standards]';
         /*PHP_INI_ONLY  */ if (       ini_get_bool('expose_php'                    ) && !CLI)                        $issues[] = 'Warn:  expose_php is not Off  [security]';
         /*PHP_INI_ALL   */ if (       ini_get_int ('max_execution_time'            ) > 30 && !CLI /*hardcoded*/)     $issues[] = 'Info:  max_execution_time is very high: '.ini_get('max_execution_time').'  [resources]';

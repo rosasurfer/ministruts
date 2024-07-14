@@ -64,18 +64,18 @@ class Application extends Object {
         if (!isSet($options['app.handle-exceptions'])) $options['app.handle-exceptions'] = true;
         if (!isSet($options['app.globals'          ])) $options['app.globals'          ] = isSet($options['app.global-helpers']) ? $options['app.global-helpers'] : false;
 
-        // (1) setup configuration
+        // setup configuration
         $this->setupErrorHandling    ($options['app.handle-errors'    ]);
         $this->setupExceptionHandling($options['app.handle-exceptions']);
         $this->loadGlobals           ($options['app.globals'          ]);
 
         $config = $this->loadConfiguration($options);
 
-        // (2) check "app.id"
+        // check "app.id"
         $appId = $config->get('app.id', null);
         if (!$appId) $config->set('app.id', substr(md5($config->get('app.dir.root')), 0, 16));
 
-        // (3) check for PHP admin tasks if the remote IP has allowance
+        // check for PHP admin tasks if the remote IP has allowance
         // __phpinfo__             : show PHP config at start of script
         // __config__ + __phpinfo__: show PHP config after loading of the application configuration
         // __cache__               : show cache admin interface
@@ -109,10 +109,10 @@ class Application extends Object {
             }
         }
 
-        // (4) load further php.ini settings from the configuration
+        // load further php.ini settings from the configuration
         $this->configurePhp();
 
-        // (5) execute "config-info" task if enabled
+        // execute "config-info" task if enabled
         if ($configInfoTask) {
             $configFiles = Config::getDefault()->getMonitoredFiles();
             $files = [];
@@ -143,21 +143,23 @@ class Application extends Object {
                 exit(0);
         }
 
-        // (6) execute "phpinfo" after-config task if enabled
+        // execute "phpinfo" after-config task if enabled
         if ($phpInfoTask || $phpInfoAfterConfigTask) {
             PHP::phpinfo();
             exit(0);
         }
 
-        // (7) execute "cache-info" task if enabled
+        // execute "cache-info" task if enabled
         if ($cacheInfoTask) {
             //include(MINISTRUTS_ROOT.'/src/debug/apc.php'); // TODO: not yet implemented
         }
 
-        // (8) enforce mission-critical PHP requirements (after processing any admin tasks)
-        !php_ini_loaded_file()                   && exit(1|echoPre('application error (see error log'.(self::isAdminIP() ? ': '.(strlen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: No "php.ini" configuration file was loaded.'));
-        !CLI && !ini_get_bool('short_open_tag')  && exit(1|echoPre('application error (see error log'.(self::isAdminIP() ? ': '.(strlen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: The PHP configuration value "short_open_tag" must be enabled (security).'));
-        !CLI && ini_get('request_order') != 'GP' && exit(1|echoPre('application error (see error log'.(self::isAdminIP() ? ': '.(strlen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')')|error_log('Error: The PHP configuration value "request_order" must be "GP" (current value "'.ini_get('request_order').'").'));
+        // enforce mission-critical requirements
+        if (!php_ini_loaded_file()) {
+            echoPre('application error (see error log'.(self::isAdminIP() ? ': '.(strlen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')');
+            error_log('Error: No "php.ini" configuration file was loaded.');
+            exit(1);
+        }
     }
 
 
