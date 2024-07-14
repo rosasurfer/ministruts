@@ -41,7 +41,7 @@ function registerClassLoader() {
             case ClassLoader ::class: require(MINISTRUTS_ROOT.'/src/core/loader/ClassLoader.php'); break;
         }
     };
-    spl_autoload_register($bootstrap, $throw=true, $prepend=true);
+    spl_autoload_register($bootstrap, true, true);
 
     // instantiate and register the framework's class loader
     $loader = new ClassLoader();

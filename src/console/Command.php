@@ -178,7 +178,7 @@ class Command extends CObject {
         if ($this->frozen)      throw new RuntimeException('Configuration of "'.get_class($this).'" is frozen');
         if ($this->name === '') throw new IllegalStateException('A default command (name="") cannot have aliases');
 
-        foreach ($names as $i => $alias) {
+        foreach ($names as $alias) {
             $this->validateName($alias);
         }
         $this->aliases = array_diff($names, [$this->name]);     // remove an overlapping command name

@@ -136,7 +136,7 @@ class PHP extends StaticClass {
         $null = null;
         do {
             $readable = $observed;
-            $changes = stream_select($readable, $null, $null, $seconds=0, $microseconds=200000);    // timeout = 0.2 sec
+            stream_select($readable, $null, $null, 0, 200000);          // timeout = 0.2 sec
             foreach ($readable as $stream) {
                 if (($line=fgets($stream)) === false) {                 // this covers fEof() too
                     fclose($stream);
@@ -350,7 +350,7 @@ class PHP extends StaticClass {
             if (is_file($file=$appRoot.'/composer.json') && extension_loaded('json')) {
                 $composer = json_decode(file_get_contents($file), true);
                 if (isset($composer['require']) && is_array($composer['require'])) {
-                    foreach ($composer['require'] as $name => $version) {
+                    foreach (\array_keys($composer['require']) as $name) {
                         $name = trim(strtolower($name));
                         if (in_array($name, ['php', 'php-64bit', 'hhvm']) || strContains($name, '/')) continue;
                         if (strStartsWith($name, 'ext-')) $name = strRight($name, -4);

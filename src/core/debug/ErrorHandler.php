@@ -169,19 +169,19 @@ class ErrorHandler extends StaticClass {
 
         // Wrap everything else in the matching PHPError exception.
         switch ($level) {
-            case E_PARSE            : $exception = new PHPParseError      ($message, $code=null, $severity=$level, $file, $line); break;
-            case E_COMPILE_WARNING  : $exception = new PHPCompileWarning  ($message, $code=null, $severity=$level, $file, $line); break;
-            case E_COMPILE_ERROR    : $exception = new PHPCompileError    ($message, $code=null, $severity=$level, $file, $line); break;
-            case E_CORE_WARNING     : $exception = new PHPCoreWarning     ($message, $code=null, $severity=$level, $file, $line); break;
-            case E_CORE_ERROR       : $exception = new PHPCoreError       ($message, $code=null, $severity=$level, $file, $line); break;
-            case E_STRICT           : $exception = new PHPStrict          ($message, $code=null, $severity=$level, $file, $line); break;
-            case E_NOTICE           : $exception = new PHPNotice          ($message, $code=null, $severity=$level, $file, $line); break;
-            case E_WARNING          : $exception = new PHPWarning         ($message, $code=null, $severity=$level, $file, $line); break;
-            case E_ERROR            : $exception = new PHPError           ($message, $code=null, $severity=$level, $file, $line); break;
-            case E_RECOVERABLE_ERROR: $exception = new PHPRecoverableError($message, $code=null, $severity=$level, $file, $line); break;
-            case E_USER_ERROR       : $exception = new PHPUserError       ($message, $code=null, $severity=$level, $file, $line); break;
+            case E_PARSE            : $exception = new PHPParseError      ($message, null, $level, $file, $line); break;
+            case E_COMPILE_WARNING  : $exception = new PHPCompileWarning  ($message, null, $level, $file, $line); break;
+            case E_COMPILE_ERROR    : $exception = new PHPCompileError    ($message, null, $level, $file, $line); break;
+            case E_CORE_WARNING     : $exception = new PHPCoreWarning     ($message, null, $level, $file, $line); break;
+            case E_CORE_ERROR       : $exception = new PHPCoreError       ($message, null, $level, $file, $line); break;
+            case E_STRICT           : $exception = new PHPStrict          ($message, null, $level, $file, $line); break;
+            case E_NOTICE           : $exception = new PHPNotice          ($message, null, $level, $file, $line); break;
+            case E_WARNING          : $exception = new PHPWarning         ($message, null, $level, $file, $line); break;
+            case E_ERROR            : $exception = new PHPError           ($message, null, $level, $file, $line); break;
+            case E_RECOVERABLE_ERROR: $exception = new PHPRecoverableError($message, null, $level, $file, $line); break;
+            case E_USER_ERROR       : $exception = new PHPUserError       ($message, null, $level, $file, $line); break;
 
-            default                 : $exception = new PHPUnknownError    ($message, $code=null, $severity=$level, $file, $line);
+            default                 : $exception = new PHPUnknownError    ($message, null, $level, $file, $line);
         }
 
         // Handle the error according to the configuration.

@@ -216,9 +216,9 @@ class MySQLConnector extends Connector {
 
         // connect
         $ex = null;
-        try {                                                                      // flags: CLIENT_FOUND_ROWS = 2
+        try {                                                           // flags: CLIENT_FOUND_ROWS = 2
             error_clear_last();
-            $this->hConnection = mysql_connect($host, $user, $pass, $newLink=true/*, $flags=2*/);
+            $this->hConnection = mysql_connect($host, $user, $pass, true/*, $flags=2*/);
             if (!$this->hConnection) throw new DatabaseException(error_get_last()['message']);
         }
         catch (IRosasurferException $ex) {}
@@ -317,7 +317,8 @@ class MySQLConnector extends Connector {
 
             foreach ($names as &$subname) {
                 $subname = '`'.str_replace('`', '``', $subname).'`';
-            }; unset($subname);
+            }
+            unset($subname);
 
             return join('.', $names);
         }

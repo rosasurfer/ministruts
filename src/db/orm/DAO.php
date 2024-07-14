@@ -43,7 +43,7 @@ abstract class DAO extends Singleton {
      * @return DAO
      */
     final public static function getImplementation($class) {
-        if (!is_a($class, __CLASS__, $allowString=true)) {
+        if (!is_a($class, __CLASS__, true)) {
             if (!is_class($class)) throw new ClassNotFoundException('Class not found: '.$class );
             throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
         }
@@ -219,7 +219,7 @@ abstract class DAO extends Singleton {
             }
             $mapping['properties'][$name] = &$property;
             unset($mapping['properties'][$i], $property);
-        };
+        }
 
         if (isset($mapping['relations'])) {
             foreach ($mapping['relations'] as $i => $property) {
@@ -266,7 +266,7 @@ abstract class DAO extends Singleton {
                 $mapping['getters'][$getter] = &$property;
                 $mapping['relations'][$name] = &$property;
                 unset($mapping['relations'][$i], $property);
-            };
+            }
         }
         else $mapping['relations'] = [];
 

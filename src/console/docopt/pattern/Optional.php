@@ -16,7 +16,7 @@ class Optional extends BranchPattern {
      */
     public function match(array $left, array $collected = []) {
         foreach ($this->children as $pattern) {
-            list($m, $left, $collected) = $pattern->match($left, $collected);
+            list(, $left, $collected) = $pattern->match($left, $collected);
         }
         return [true, $left, $collected];
     }

@@ -20,7 +20,7 @@ class Output extends CObject {
      * @param  mixed $message
      */
     public function out($message) {
-        $message = printPretty($message, $return=true);
+        $message = printPretty($message, true);
 
         $hStream = CLI ? \STDOUT : fopen('php://stdout', 'a');
         fwrite($hStream, $message);
@@ -34,7 +34,7 @@ class Output extends CObject {
      * @param  mixed $message
      */
     public function error($message) {
-        $message = printPretty($message, $return=true);
+        $message = printPretty($message, true);
 
         $hStream = CLI ? \STDERR : fopen('php://stderr', 'a');
         fwrite($hStream, $message);

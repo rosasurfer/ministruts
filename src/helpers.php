@@ -120,8 +120,9 @@ define('PHP_INI_ALL',    INI_ALL   );       // 7    flag            // entry can
  */
 function array_filter($input, $callback=null, $flags=0) {
     $args = func_get_args();
-    if ($input instanceof \Traversable)
-        $args[0] = iterator_to_array($input, $useKeys=true);
+    if ($input instanceof \Traversable) {
+        $args[0] = iterator_to_array($input, true);
+    }
     return \array_filter(...$args);
 }
 
@@ -174,7 +175,7 @@ function key_exists($key, $array) {
 function array_keys($array, $search=null, $strict=false) {
     $args = func_get_args();
     if ($array instanceof \Traversable) {
-        $args[0] = iterator_to_array($array, $useKeys=true);
+        $args[0] = iterator_to_array($array, true);
     }
     return \array_keys(...$args);
 }
@@ -195,8 +196,9 @@ function array_keys($array, $search=null, $strict=false) {
 function array_merge($array1, ...$arrays) {
     $args = func_get_args();
     foreach ($args as $key => $arg) {
-        if ($arg instanceof \Traversable)
-            $args[$key] = iterator_to_array($arg, $useKeys=true);
+        if ($arg instanceof \Traversable) {
+            $args[$key] = iterator_to_array($arg, true);
+        }
     }
     return \array_merge(...$args);
 }
@@ -214,8 +216,9 @@ function array_merge($array1, ...$arrays) {
  * @return bool
  */
 function in_array($needle, $haystack, $strict = false) {
-    if ($haystack instanceof \Traversable)
-        $haystack = iterator_to_array($haystack, $useKeys=false);
+    if ($haystack instanceof \Traversable) {
+        $haystack = iterator_to_array($haystack, false);
+    }
     return \in_array($needle, $haystack, $strict);
 }
 
@@ -228,9 +231,9 @@ function in_array($needle, $haystack, $strict = false) {
  * @return mixed - the first element or NULL if the array-like variable is empty
  */
 function first($values) {
-    if ($values instanceof \Traversable)
-        $values = iterator_to_array($values, $useKeys=false);
-
+    if ($values instanceof \Traversable) {
+        $values = iterator_to_array($values, false);
+    }
     return $values ? reset($values) : null;
 }
 
@@ -262,10 +265,11 @@ function firstKey($values) {
  */
 function last($values) {
     if ($values instanceof \Traversable) {
-        $values = iterator_to_array($values, $useKeys=false);
+        $values = iterator_to_array($values, false);
     }
-    else Assert::isArray($values);
-
+    else {
+        Assert::isArray($values);
+    }
     return $values ? end($values) : null;
 }
 
@@ -359,7 +363,7 @@ function echof($var, $flushBuffers = true) {
  * @see    printPretty()
  */
 function echoPre($var, $flushBuffers = true) {
-    printPretty($var, $return=false, $flushBuffers);
+    printPretty($var, false, $flushBuffers);
 }
 
 
@@ -796,7 +800,7 @@ function strCompare($stringA, $stringB, $ignoreCase = false) {
  * @return bool
  */
 function strCompareI($stringA, $stringB) {
-    return strCompare($stringA, $stringB, $ignoreCase=true);
+    return strCompare($stringA, $stringB, true);
 }
 
 
@@ -834,7 +838,7 @@ function strContains($haystack, $needle, $ignoreCase = false) {
  * @return bool
  */
 function strContainsI($haystack, $needle) {
-    return strContains($haystack, $needle, $ignoreCase=true);
+    return strContains($haystack, $needle, true);
 }
 
 
@@ -880,7 +884,7 @@ function strStartsWith($string, $prefix, $ignoreCase = false) {
  * @return bool
  */
 function strStartsWithI($string, $prefix) {
-    return strStartsWith($string, $prefix, $ignoreCase=true);
+    return strStartsWith($string, $prefix, true);
 }
 
 
@@ -925,7 +929,7 @@ function strEndsWith($string, $suffix, $ignoreCase = false) {
  * @return bool
  */
 function strEndsWithI($string, $suffix) {
-    return strEndsWith($string, $suffix, $ignoreCase=true);
+    return strEndsWith($string, $suffix, true);
 }
 
 
@@ -1500,7 +1504,7 @@ function is_array_like($var) {
  * @return string
  */
 function simpleClassName($className) {
-    return strRightFrom($className, $limiter='\\', $count=-1, $includeLimiter=false, $onNotFound=$className);
+    return strRightFrom($className, '\\', -1, false, $className);
 }
 
 

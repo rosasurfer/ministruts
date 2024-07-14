@@ -338,7 +338,8 @@ class PostgresConnector extends Connector {
 
             foreach ($names as &$subname) {
                 $subname = pg_escape_identifier($this->hConnection, $subname);
-            }; unset($subname);
+            }
+            unset($subname);
 
             return join('.', $names);
         }
