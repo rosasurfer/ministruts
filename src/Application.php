@@ -83,7 +83,7 @@ class Application extends Object {
 
         if (isSet($_GET['__phpinfo__']) || isSet($_GET['__config__']) || isSet($_GET['__cache__'])) {
             if (self::isAdminIP()) {
-                foreach ($_GET as $param => $value) {
+                foreach (\array_keys($_GET) as $param) {
                     if ($param == '__phpinfo__') {
                         if ($configInfoTask) {
                             $phpInfoTask            = false;
@@ -182,7 +182,7 @@ class Application extends Object {
     private function configurePhp() {
         register_shutdown_function(function() {
             $warnLimit = php_byte_value(Config::getDefault()->get('log.warn.memory_limit', PHP_INT_MAX));
-            $usedBytes = memory_get_peak_usage($real=true);
+            $usedBytes = memory_get_peak_usage(true);
             if ($usedBytes > $warnLimit) {
                 Logger::log('Memory consumption exceeded '.prettyBytes($warnLimit).' (peak usage: '.prettyBytes($usedBytes).')', L_WARN, ['class' => __CLASS__]);
             }
@@ -231,7 +231,7 @@ class Application extends Object {
             if (!$config->get('app.dir.config', false)) {
                 $files = $config->getMonitoredFiles();
                 end($files);
-                list($file, $exists) = each($files);
+                $file = key($files);
                 $config->set('app.dir.config', dirname($file));
             }
             unset($options['app.config']);
@@ -279,15 +279,17 @@ class Application extends Object {
      * @param  string $rootDir - application root directory
      */
     private function expandDirsRecursive(array &$dirs, $rootDir) {
-        foreach ($dirs as $name => &$dir) {
+        foreach ($dirs as &$dir) {
             if (is_array($dir)) {
                 $this->{__FUNCTION__}($dir, $rootDir);
                 continue;
             }
-            if (isRelativePath($dir))
+            if (isRelativePath($dir)) {
                 $dir = $rootDir.'/'.$dir;
+            }
             if (is_dir($dir)) $dir = realpath($dir);
-        }; unset($dir);
+        }
+        unset($dir);
     }
 
 

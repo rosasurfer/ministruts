@@ -29,7 +29,7 @@ class PHPError extends \ErrorException implements IRosasurferException {
      * @param  int    $line     - the line number in the file where the error occurred
      */
     public function __construct($message, $code, $severity, $file, $line) {
-        parent::__construct($message, $code, $severity, $file, $line, $cause=null);
+        parent::__construct($message, $code, $severity, $file, $line, null);
     }
 
 

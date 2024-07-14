@@ -85,7 +85,7 @@ abstract class PersistableObject extends Object {
         $mapping = $this->dao()->getMapping();
         $array   = (array) $this;
 
-        foreach ($mapping['relations'] as $name => $property) {
+        foreach (\array_keys($mapping['relations']) as $name) {
             if (is_object($this->$name)) {
                 /** @var PersistableObject $object */
                 $object = $this->$name;
@@ -425,7 +425,7 @@ abstract class PersistableObject extends Object {
 
         // collect column values
         $values = [];
-        foreach ($mapping['columns'] as $column => $property) {
+        foreach (\array_keys($mapping['columns']) as $column) {
             $values[$column] = $this->getPhysicalValue($column);
         };
 
@@ -526,7 +526,8 @@ abstract class PersistableObject extends Object {
         // translate column values
         foreach ($values as &$value) {
             $value = $db->escapeLiteral($value);
-        }; unset($value);
+        }
+        unset($value);
 
         // create SQL statement
         $sql = 'insert into '.$table.' ('.join(', ', \array_keys($values)).')

@@ -173,7 +173,7 @@ function key_exists($key, $array) {
 function array_keys($array, $search=null, $strict=false) {
     $args = func_get_args();
     if ($array instanceof \Traversable) {
-        $args[0] = iterator_to_array($array, $useKeys=true);
+        $args[0] = iterator_to_array($array, true);
     }
     return \array_keys(...$args);
 }
@@ -194,8 +194,9 @@ function array_keys($array, $search=null, $strict=false) {
 function array_merge($values) {
     $args = func_get_args();
     foreach ($args as $key => $arg) {
-        if ($arg instanceof \Traversable)
-            $args[$key] = iterator_to_array($arg, $useKeys=true);
+        if ($arg instanceof \Traversable) {
+            $args[$key] = iterator_to_array($arg, true);
+        }
     }
     return \array_merge(...$args);
 }
@@ -270,7 +271,7 @@ function echof($var, $flushBuffers = true) {
  * @see    printPretty()
  */
 function echoPre($var, $flushBuffers = true) {
-    printPretty($var, $return=false, $flushBuffers);
+    printPretty($var, false, $flushBuffers);
 }
 
 
@@ -643,7 +644,7 @@ function strCompare($stringA, $stringB, $ignoreCase = false) {
  * @return bool
  */
 function strCompareI($stringA, $stringB) {
-    return strCompare($stringA, $stringB, $ignoreCase=true);
+    return strCompare($stringA, $stringB, true);
 }
 
 
@@ -681,7 +682,7 @@ function strContains($haystack, $needle, $ignoreCase = false) {
  * @return bool
  */
 function strContainsI($haystack, $needle) {
-    return strContains($haystack, $needle, $ignoreCase=true);
+    return strContains($haystack, $needle, true);
 }
 
 
@@ -728,7 +729,7 @@ function strStartsWith($string, $prefix, $ignoreCase = false) {
  * @return bool
  */
 function strStartsWithI($string, $prefix) {
-    return strStartsWith($string, $prefix, $ignoreCase=true);
+    return strStartsWith($string, $prefix, true);
 }
 
 
@@ -774,7 +775,7 @@ function strEndsWith($string, $suffix, $ignoreCase = false) {
  * @return bool
  */
 function strEndsWithI($string, $suffix) {
-    return strEndsWith($string, $suffix, $ignoreCase=true);
+    return strEndsWith($string, $suffix, true);
 }
 
 
@@ -1218,7 +1219,7 @@ function mkDirWritable($path, $mode = 0755) {
     if (!is_string($path))                            throw new IllegalTypeException('Illegal type of parameter $path: '.gettype($path));
     if ($mode!==null && !is_int($mode))               throw new IllegalTypeException('Illegal type of parameter $mode: '.gettype($mode));
 
-    clearstatcache($clearRealPathCache=true, $path);
+    clearstatcache(true, $path);
 
     if (is_file($path))                               throw new IOException('Cannot write to directory "'.$path.'" (is a file)');
     if (!is_dir($path) && !mkdir($path, $mode, true)) throw new IOException('Cannot create directory "'.$path.'"');
@@ -1341,7 +1342,7 @@ function is_array_like($var) {
  * @return string
  */
 function simpleClassName($className) {
-    return strRightFrom($className, $limiter='\\', $count=-1, $includeLimiter=false, $onNotFound=$className);
+    return strRightFrom($className, '\\', -1, false, $className);
 }
 
 

@@ -74,7 +74,7 @@ class AutoConfig extends Config {
 
         // set "app.dir.config" to the directory of the most recently added file
         end($this->files);
-        list($file, $isFile) = each($this->files);
+        $file = key($this->files);
         $this->set('app.dir.config', dirname($file));
 
 

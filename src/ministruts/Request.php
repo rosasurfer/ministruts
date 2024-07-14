@@ -675,10 +675,10 @@ class Request extends Singleton {
             // delete the session cookie
             if (ini_get_bool('session.use_cookies')) {
                 $params = session_get_cookie_params();
-                setcookie($name=session_name(), $value='', $expire=time()-1*DAY, $params['path'    ],
-                                                                                 $params['domain'  ],
-                                                                                 $params['secure'  ],
-                                                                                 $params['httponly']);
+                setcookie(session_name(), '', time()-1*DAY, $params['path'    ],
+                                                            $params['domain'  ],
+                                                            $params['secure'  ],
+                                                            $params['httponly']);
             }
             session_destroy();                      // TODO: check if SID is reset
         }

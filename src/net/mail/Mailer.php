@@ -143,8 +143,9 @@ abstract class Mailer extends Object implements MailerInterface {
         // reversely iterate over the array to find the last of duplicate headers
         for (end($headers); key($headers)!==null; prev($headers)){
             $header = current($headers);
-            if (strStartsWithI($header, $name.':'))
+            if (strStartsWithI($header, $name.':')) {
                 return trim(substr($header, strlen($name)+1));
+            }
         }
         return null;
     }

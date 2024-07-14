@@ -215,9 +215,9 @@ class MySQLConnector extends Connector {
         $pass = $this->password;
 
         // connect
-        try {                                                                      // flags: CLIENT_FOUND_ROWS = 2
+        try {                                                               // flags: CLIENT_FOUND_ROWS = 2
             $php_errormsg = '';
-            $this->hConnection = mysql_connect($host, $user, $pass, $newLink=true/*, $flags=2*/);
+            $this->hConnection = mysql_connect($host, $user, $pass, true/*, $flags=2*/);
             !$this->hConnection && trigger_error($php_errormsg, E_USER_ERROR);
         }
         catch (\Exception $ex) {
@@ -316,7 +316,8 @@ class MySQLConnector extends Connector {
 
             foreach ($names as &$subname) {
                 $subname = '`'.str_replace('`', '``', $subname).'`';
-            }; unset($subname);
+            }
+            unset($subname);
 
             return join('.', $names);
         }

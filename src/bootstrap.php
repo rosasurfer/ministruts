@@ -50,7 +50,7 @@ function registerClassLoader() {
             case ClassLoader ::class: require(MINISTRUTS_ROOT.'/src/loader/ClassLoader.php'); break;
         }
     };
-    spl_autoload_register($bootstrap, $throw=true, $prepend=true);
+    spl_autoload_register($bootstrap, true, true);
 
     // instantiate and register the framework's class loader
     $loader = new ClassLoader();
@@ -59,7 +59,7 @@ function registerClassLoader() {
 
     // register an otherwise lost legacy auto-loader
     if ($legacyAutoLoad && spl_autoload_functions()[0]!='__autoload') {
-        spl_autoload_register('__autoload', $throw=true, $prepend=true);
+        spl_autoload_register('__autoload', true, true);
     }
 }
 registerClassLoader();

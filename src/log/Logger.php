@@ -681,7 +681,7 @@ class Logger extends StaticClass {
                 $session = $_SESSION;
             }
             else if ($request->hasSessionId()) {
-                $request->getSession($suppressHeadersAlreadySentError = true);
+                $request->getSession(true);
                 if (session_id() == $request->getSessionId())       // if both differ the id was regenerated and
                     $session = $_SESSION;                           // the session is empty
             }
@@ -798,7 +798,7 @@ class Logger extends StaticClass {
             self::generateStackTrace($context);
         $trace = $context['trace'];
 
-        foreach ($trace as $i => $frame) {                  // find the first frame with "file"
+        foreach ($trace as $frame) {                        // find the first frame with "file"
             if (isSet($frame['file'])) {                    // skip internal PHP functions
                 $context['file'] = $frame['file'];
                 $context['line'] = $frame['line'];

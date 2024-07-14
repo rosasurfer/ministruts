@@ -11,7 +11,6 @@ namespace rosasurfer\bin\logwatch;
 use rosasurfer\config\Config;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\net\mail\Mailer;
-use rosasurfer\util\PHP;
 
 use function rosasurfer\echoPre;
 use function rosasurfer\stderror;

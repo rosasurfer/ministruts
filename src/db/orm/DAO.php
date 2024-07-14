@@ -247,7 +247,7 @@ abstract class DAO extends Singleton {
                 $mapping['getters'][$getter] = &$property;
                 $mapping['relations'][$name] = &$property;
                 unset($mapping['relations'][$i], $property);
-            };
+            }
         }
         else $mapping['relations'] = [];
 

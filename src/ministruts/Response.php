@@ -135,9 +135,9 @@ class Response extends Singleton {
                     $cookieDomain = substr($cookieDomain, 1);
                 }
 
-                if ($domainMatch = (preg_match('/\b'.$cookieDomain.'$/', $targetDomain) && ($cookieDomain==$targetDomain || $subdomains))) {
-                    if ($pathMatch = strStartsWith($targetPath, $cookiePath)) {
-                        if ($secureMatch = !$cookieSecure || $targetSecure) {
+                if (preg_match('/\b'.$cookieDomain.'$/', $targetDomain) && ($cookieDomain==$targetDomain || $subdomains)) { // domain match
+                    if (strStartsWith($targetPath, $cookiePath)) {                                                          // path match
+                        if (!$cookieSecure || $targetSecure) {                                                              // secure match
                             if (isSet($target['fragment']))  $url  = strLeft($url, strlen($hash = '#'.$target['fragment']));
                             else if (strEndsWith($url, '#')) $url  = strLeft($url, strlen($hash = '#'));
                             else                             $hash = '';
