@@ -91,7 +91,7 @@ class EntityMapping extends Object implements \Iterator {
      */
     public function getIdentity() {
         if ($this->identity === null) {
-            foreach ($this->mapping['properties'] as $name => $property) {
+            foreach ($this->mapping['properties'] as $property) {
                 if (isset($property['primary']) && $property['primary']===true) {
                     return $this->identity = new PropertyMapping($this, $property);
                 }
@@ -109,7 +109,7 @@ class EntityMapping extends Object implements \Iterator {
      */
     public function getVersion() {
         if ($this->version === null) {
-            foreach ($this->mapping['properties'] as $name => $property) {
+            foreach ($this->mapping['properties'] as $property) {
                 if (isset($property['version']) && $property['version']===true) {
                     return $this->version = new PropertyMapping($this, $property);
                 }

@@ -804,11 +804,11 @@ class Module extends Object {
 
         $pattern = $path;
         while (strlen($pattern)) {
-            if (isset($this->mappings['paths'][$pattern]))          // path keys start and end with a slash "/"
+            if (isset($this->mappings['paths'][$pattern])) {    // path keys start and end with a slash "/"
                 return $this->mappings['paths'][$pattern];
-            $pattern = strLeftTo($pattern, '/', $count=-2, $includeLimiter=true);
-            if ($pattern == '/')
-                break;
+            }
+            $pattern = strLeftTo($pattern, '/', -2, true);
+            if ($pattern == '/') break;
         }
         return null;
     }

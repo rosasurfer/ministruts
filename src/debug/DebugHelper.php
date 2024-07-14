@@ -121,7 +121,7 @@ class DebugHelper extends StaticClass {
         for ($i=0; $i < $size; $i++) {               // align FILE and LINE
             $frame = &$trace[$i];
 
-            $call = self::getFQFunctionName($frame, $nsLowerCase=true);
+            $call = self::getFQFunctionName($frame, true);
 
             if ($call!='{main}' && !strEndsWith($call, '{closure}'))
                 $call.='()';
@@ -270,7 +270,7 @@ class DebugHelper extends StaticClass {
         else if (($level &  E_ALL)                  ==  E_ALL)                  $levels = ['E_ALL'];                    // 32767
         else if (($level & (E_ALL & ~E_DEPRECATED)) == (E_ALL & ~E_DEPRECATED)) $levels = ['E_ALL & ~E_DEPRECATED'];    // 24575
         else {
-            foreach ($levels as $key => $value) {
+            foreach (\array_keys($levels) as $key) {
                 if ($level & $key) continue;
                 unset($levels[$key]);
             }

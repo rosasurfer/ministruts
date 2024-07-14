@@ -233,7 +233,7 @@ class ActionForward extends Object {
         }
         $value = (string) $value;
         $path = $this->getPath();
-        $this->setPath(strLeftTo($path, '#', $count=1, $includeLimiter=false, $onNotFound=$path).'#'.$value);
+        $this->setPath(strLeftTo($path, '#', 1, false, $path).'#'.$value);
 
         return $this;
     }

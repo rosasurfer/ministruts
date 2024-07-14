@@ -105,7 +105,8 @@ class PHPMailer extends Mailer {
             $name   = $match[1];
             $value  = $this->encodeNonAsciiChars(trim($match[2]));
             $header = $name.': '.$value;
-        }; unset($header);
+        }
+        unset($header);
 
         // add more needed headers
         $headers[] = 'X-Mailer: Microsoft Office Outlook 11';               // save us from Hotmail junk folder

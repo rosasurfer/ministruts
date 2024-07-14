@@ -51,7 +51,7 @@ class Input extends Object {
         if (!$this->docoptResult)
             return false;
 
-        if (!($len=strlen($name)) || !isset($this->docoptResult[$name]))
+        if (!strlen($name) || !isset($this->docoptResult[$name]))
             return false;
         return (bool) preg_match('/^[a-z]+$/', $name);
     }

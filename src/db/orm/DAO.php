@@ -42,7 +42,7 @@ abstract class DAO extends Singleton {
      * @return self
      */
     final public static function getImplementation($class) {
-        if (!is_a($class, __CLASS__, $allowString=true)) {
+        if (!is_a($class, __CLASS__, true)) {
             if (!is_class($class)) throw new ClassNotFoundException('Class not found: '.$class );
             throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
         }

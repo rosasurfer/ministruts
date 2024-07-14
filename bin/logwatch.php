@@ -12,7 +12,6 @@ use rosasurfer\Application;
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\net\mail\Mailer;
-use rosasurfer\util\PHP;
 
 use function rosasurfer\echoPre;
 use function rosasurfer\stderr;

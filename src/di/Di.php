@@ -97,7 +97,7 @@ class Di extends Object implements DiInterface {
     public function get($name) {
         if (!isset($this->services[$name])) throw new ServiceNotFoundException('Service "'.$name.'" not found.');
         try {
-            return $this->services[$name]->resolve($factory=false);
+            return $this->services[$name]->resolve(false);
         }
         catch (\Exception $ex) {
             throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex);
@@ -116,7 +116,7 @@ class Di extends Object implements DiInterface {
     public function create($name, ...$params) {
         if (!isset($this->services[$name])) throw new ServiceNotFoundException('Service "'.$name.'" not found.');
         try {
-            return $this->services[$name]->resolve($factory=true, $params);
+            return $this->services[$name]->resolve(true, $params);
         }
         catch (\Exception $ex) {
             throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex);

@@ -122,7 +122,7 @@ class HttpRequest extends Object {
 
         // drop existing headers of the same name (ignore case)
         $existing = \array_intersect_ukey($this->headers, [$name => '1'], 'strCaseCmp');
-        foreach ($existing as $key => $v) {
+        foreach (\array_keys($existing) as $key) {
             unset($this->headers[$key]);
         }
 
@@ -156,7 +156,7 @@ class HttpRequest extends Object {
 
         // memorize and drop existing headers of the same name (ignore case)
         $existing = \array_intersect_ukey($this->headers, [$name => '1'], 'strCaseCmp');
-        foreach ($existing as $key => $v) {
+        foreach (\array_keys($existing) as $key) {
             unset($this->headers[$key]);
         }
 

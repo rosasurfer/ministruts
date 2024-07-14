@@ -84,7 +84,7 @@ abstract class PersistableObject extends Object {
         $mapping = $this->dao()->getMapping();
         $array   = (array) $this;
 
-        foreach ($mapping['relations'] as $name => $property) {
+        foreach (\array_keys($mapping['relations']) as $name) {
             if (is_object($this->$name)) {
                 /** @var PersistableObject $object */
                 $object = $this->$name;
@@ -423,7 +423,7 @@ abstract class PersistableObject extends Object {
 
         // collect column values
         $values = [];
-        foreach ($mapping['columns'] as $column => $property) {
+        foreach (\array_keys($mapping['columns']) as $column) {
             $values[$column] = $this->getPhysicalValue($column);
         };
 
@@ -524,7 +524,8 @@ abstract class PersistableObject extends Object {
         // translate column values
         foreach ($values as &$value) {
             $value = $db->escapeLiteral($value);
-        }; unset($value);
+        }
+        unset($value);
 
         // create SQL statement
         $sql = 'insert into '.$table.' ('.join(', ', \array_keys($values)).')
@@ -700,8 +701,8 @@ abstract class PersistableObject extends Object {
      * @return self
      */
     public static function populateNew($class, array $row) {
-        if (static::class != __CLASS__)                  throw new IllegalAccessException('Cannot access method '.__METHOD__.'() on a derived class.');
-        if (!is_a($class, __CLASS__, $allowString=true)) throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
+        if (static::class != __CLASS__)     throw new IllegalAccessException('Cannot access method '.__METHOD__.'() on a derived class.');
+        if (!is_a($class, __CLASS__, true)) throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
 
         /** @var self $object */
         $object = new $class();

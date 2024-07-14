@@ -476,7 +476,8 @@ class Config extends Object implements IConfig {
                 }
             }
             $value = str_pad($key, $maxKeyLength, ' ', STR_PAD_RIGHT).' = '.$value;
-        }; unset($value);
+        }
+        unset($value);
         $lines += $values;
 
         $padLeft = isset($options['pad-left']) ? $options['pad-left'] : '';
@@ -539,7 +540,7 @@ class Config extends Object implements IConfig {
             }
         }
 
-        foreach ($values as $key => &$value) {
+        foreach ($values as &$value) {
             // convert special values to their string representation
             if     (is_null($value)) $value = '(null)';
             elseif (is_bool($value)) $value = ($value ? '(true)' : '(false)');
@@ -562,7 +563,8 @@ class Config extends Object implements IConfig {
                             $value = '"'.$value.'"';
                 }
             }
-        }; unset($value);
+        }
+        unset($value);
 
         return $values;
     }

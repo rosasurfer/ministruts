@@ -791,7 +791,7 @@ class Logger extends StaticClass {
             self::generateStackTrace($context);
         $trace = $context['trace'];
 
-        foreach ($trace as $i => $frame) {                  // find the first frame with "file"
+        foreach ($trace as $frame) {                        // find the first frame with "file"
             if (isset($frame['file'])) {                    // skip internal PHP functions
                 $context['file'] = $frame['file'];
                 $context['line'] = $frame['line'];
