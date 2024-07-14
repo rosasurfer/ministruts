@@ -8,7 +8,7 @@ use function rosasurfer\strLeftTo;
 
 
 /**
- * A trait adding {@link CObject} behavior to any class. Used to add error detection features.
+ * A trait capable of adding {@link CObject} behavior to any class. Used to add error detection features.
  */
 trait ObjectTrait {
 

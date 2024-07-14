@@ -350,7 +350,7 @@ class PHP extends StaticClass {
             if (is_file($file=$appRoot.'/composer.json') && extension_loaded('json')) {
                 $composer = json_decode(file_get_contents($file), true);
                 if (isset($composer['require']) && is_array($composer['require'])) {
-                    foreach ($composer['require'] as $name => $version) {
+                    foreach (array_keys($composer['require']) as $name) {
                         $name = trim(strtolower($name));
                         if (in_array($name, ['php', 'php-64bit', 'hhvm']) || strContains($name, '/')) continue;
                         if (strStartsWith($name, 'ext-')) $name = strRight($name, -4);
@@ -426,8 +426,8 @@ class PHP extends StaticClass {
 
 
     /**
-     * Set the specified php.ini setting&#46;  Opposite to the built-in PHP function this method does not return the old
-     * value but a boolean success status&#46;  Used to detect assignment errors if the access level of the specified option
+     * Set the specified php.ini setting. Opposite to the built-in PHP function this method does not return the old
+     * value but a boolean success status. Used to detect assignment errors if the access level of the specified option
      * doesn't allow a modification.
      *
      * @param  string          $option

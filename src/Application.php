@@ -34,34 +34,34 @@ class Application extends CObject {
 
 
     /**
-     * Create and initialize a new MiniStruts application.                                                                      <br>
+     * Create and initialize a new MiniStruts application.
      *
-     * @param  array $options [optional] - Expects an array with any of the following options:                                  <br>
+     * @param  array $options [optional] - array with any of the following options:
      *
-     *        "app.dir.root"          - string:  The project's root directory.                                                  <br>
-     *                                           (default: the current directory)                                               <br>
+     *        "app.dir.root"          - string:  The project's root directory.
+     *                                           (default: the current directory)
      *
-     *        "app.dir.config"        - string:  The project's configuration location as a directory or a file.                 <br>
-     *                                           (default: the current directory)                                               <br>
+     *        "app.dir.config"        - string:  The project's configuration location as a directory or a file.
+     *                                           (default: the current directory)
      *
-     *        "app.globals"           - bool:    If enabled definitions in "src/helpers.php" are additionally mapped to the     <br>
-     *                                           global namespace. In general this is not recommended to avoid potential naming <br>
-     *                                           conflicts in the global scope. However it may be used to simplify life of      <br>
-     *                                           developers using editors with limited code completion capabilities.            <br>
-     *                                           (default: disabled)                                                            <br>
+     *        "app.globals"           - bool:    If enabled definitions in "src/helpers.php" are additionally mapped to the
+     *                                           global namespace. In general this is not recommended to avoid potential naming
+     *                                           conflicts in the global scope. However it may be used to simplify life of
+     *                                           developers using editors with limited code completion capabilities.
+     *                                           (default: disabled)
      *
-     *        "app.handle-errors"     - string:  How to handle regular PHP errors: If set to "exception" errors are converted   <br>
-     *                                           to ErrorExceptions and thrown. If set to "log" errors are only logged and     <br>
-     *                                           execution continues. If set to "ignore" the application must implement its     <br>
-     *                                           own error handling mechanism.                                                  <br>
-     *                                           (default: "strict")                                                            <br>
+     *        "app.handle-errors"     - string:  How to handle regular PHP errors: If set to "exception" errors are converted
+     *                                           to ErrorExceptions and thrown. If set to "log" errors are only logged and
+     *                                           execution continues. If set to "ignore" the application must implement its
+     *                                           own error handling mechanism.
+     *                                           (default: "strict")
      *
-     *        "app.handle-exceptions" - bool:    How to handle PHP exceptions: If enabled exceptions are handled by the         <br>
-     *                                           framework's exception handler. Otherwise the application must implement its    <br>
-     *                                           own exception handling mechanism.                                              <br>
-     *                                           (default: enabled)                                                             <br>
+     *        "app.handle-exceptions" - bool:    How to handle PHP exceptions: If enabled exceptions are handled by the
+     *                                           framework's exception handler. Otherwise the application must implement its
+     *                                           own exception handling mechanism.
+     *                                           (default: enabled)
      *
-     * All further options are added to the application's current default configuration as regular config values.               <br>
+     * All further options are added to the application's configuration as regular config values.
      */
     public function __construct(array $options = []) {
         // set default values
@@ -96,7 +96,7 @@ class Application extends CObject {
 
         if (isset($_GET['__phpinfo__']) || isset($_GET['__config__']) || isset($_GET['__cache__'])) {
             if (self::isAdminIP()) {
-                foreach ($_GET as $param => $value) {
+                foreach (array_keys($_GET) as $param) {
                     if ($param == '__phpinfo__') {
                         if ($configInfoTask) {
                             $phpInfoTask            = false;

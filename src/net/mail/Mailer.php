@@ -127,7 +127,7 @@ abstract class Mailer extends CObject implements MailerInterface {
 
 
     /**
-     * Search for a given header and return its value&#46;  If the array contains multiple headers of that the last such
+     * Search for a given header and return its value. If the array contains multiple headers of that the last such
      * header is returned.
      *
      * @param  string[] $headers - array of headers
@@ -150,7 +150,7 @@ abstract class Mailer extends CObject implements MailerInterface {
 
 
     /**
-     * Remove a given header from the array and return its value&#46;  If the array contains multiple headers of that name
+     * Remove a given header from the array and return its value. If the array contains multiple headers of that name
      * all such headers are removed and the last removed one is returned.
      *
      * @param  string[] $headers - reference to an array of headers
@@ -175,7 +175,7 @@ abstract class Mailer extends CObject implements MailerInterface {
 
 
     /**
-     * Encode non-ASCII characters with UTF-8&#46;  If a string doesn't contain non-ASCII characters it is not modified.
+     * Encode non-ASCII characters with UTF-8. If a string doesn't contain non-ASCII characters it is not modified.
      *
      * @param  string|string[] $value - a single or a list of values
      *
@@ -193,7 +193,6 @@ abstract class Mailer extends CObject implements MailerInterface {
 
         if (preg_match('/[\x80-\xFF]/', $value)) {
             return '=?utf-8?B?'.base64_encode($value).'?=';
-          //$value = '=?utf-8?Q?'.imap_8bit($value).'?=';       // requires imap extension and the encoded string is longer
         }
         return $value;
 
