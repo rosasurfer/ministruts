@@ -160,7 +160,7 @@ function stderr($message) {
 /**
  * Send an "X-Debug-{id}" header with a message. Each sent header will have a different and increasing id.
  *
- * @param  string $message
+ * @param  mixed $message
  */
 function debugHeader($message) {
     \rosasurfer\debugHeader($message);

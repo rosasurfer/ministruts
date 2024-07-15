@@ -338,21 +338,20 @@ function stderr($message) {
 
 
 /**
- * Send an "X-Debug-{id}" header with a message. Each sent header will have a different and increasing id.
+ * Send an "X-Debug-???" header with a message. Each sent header name will end with a different and increasing number.
  *
- * @param  string $message
+ * @param  mixed $message
  */
 function debugHeader($message) {
     if (CLI) return;
 
-    if (!is_string($message))
-        $message = (string) $message;
-    $message = str_replace(chr(0), '\0', $message);         // headers must not contain NUL bytes
-    $message = normalizeEOL($message);
-    $message = str_replace(NL, '\n ', $message);            // header() does not accept multi-line headers
+    if (!is_string($message)) {
+        if (is_array($message)) $message = print_r($message, true);
+        else                    $message = (string) $message;
+    }
 
     static $i = 0;
-    header('X-Debug-'.++$i.': '.$message);
+    header('X-Debug-'.++$i.': '.str_replace(["\r", "\n"], ['\r', '\n'], $message));
 }
 
 
