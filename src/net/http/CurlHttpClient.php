@@ -5,6 +5,10 @@ use rosasurfer\core\error\ErrorHandler;
 use rosasurfer\core\exception\IOException;
 use rosasurfer\log\Logger;
 
+use function rosasurfer\ini_get_bool;
+use function rosasurfer\strLeftTo;
+use function rosasurfer\strRightFrom;
+
 use const rosasurfer\L_INFO;
 use const rosasurfer\L_WARN;
 use const rosasurfer\NL;
@@ -27,7 +31,7 @@ class CurlHttpClient extends HttpClient {
     /** @var array - zusaetzliche CURL-Optionen */
     protected $options = [];
 
-    /** @var string[] - CURL-Fehlerbeschreibungen */
+    /** @var string[] - cURL-Fehlerbeschreibungen */
     protected static $errors = [
         CURLE_OK                          => 'CURLE_OK',
         CURLE_UNSUPPORTED_PROTOCOL        => 'CURLE_UNSUPPORTED_PROTOCOL',
@@ -139,7 +143,7 @@ class CurlHttpClient extends HttpClient {
 
 
     /**
-     * Destructor, schliesst ein ggf&#46; noch offenes CURL-Handle.
+     * Destructor, schliesst ein ggf&#46; noch offenes cURL-Handle.
      */
     public function __destruct() {
         try {
@@ -171,7 +175,7 @@ class CurlHttpClient extends HttpClient {
         $options  = $this->prepareCurlOptions($request, $response);
 
         // CURLOPT_FOLLOWLOCATION funktioniert nur bei deaktiviertem "open_basedir"-Setting
-        if (!ini_get('open_basedir')) {
+        if (!ini_get_bool('open_basedir')) {
             if ($this->isFollowRedirects()) {
                 $options[CURLOPT_FOLLOWLOCATION] = true;
             }
@@ -183,21 +187,24 @@ class CurlHttpClient extends HttpClient {
             }
         }
 
-        if ($request->getMethod() == 'POST') {
+        if ($request->getMethod() != 'POST') {
+            $options[CURLOPT_POST] = false;
+        }
+        else {
             $options[CURLOPT_POST      ] = true;
-            $options[CURLOPT_URL       ] = substr($request->getUrl(), 0, strpos($request->getUrl(), '?'));
-            $options[CURLOPT_POSTFIELDS] = strstr($request->getUrl(), '?');
+            $options[CURLOPT_URL       ] = strLeftTo($request->getUrl(), '?');
+            $options[CURLOPT_POSTFIELDS] = strRightFrom($request->getUrl(), '?');   // use URL parameters as POST fields
         }
         curl_setopt_array($this->hCurl, $options);
 
         // Request ausfuehren
-        if (curl_exec($this->hCurl) === false) throw new IOException('cURL error '.self::getError($this->hCurl).','.NL.'URL: '.$request->getUrl());
+        if (curl_exec($this->hCurl) === false) throw new IOException('cURL error '.self::getError($this->hCurl).','.NL.'URL: '.$options[CURLOPT_URL]);
         $status = curl_getinfo($this->hCurl, CURLINFO_HTTP_CODE);
         $response->setStatus($status);
 
         // ggf. manuellen Redirect ausfuehren (falls "open_basedir" aktiviert ist)
-        if (($status==301 || $status==302) && $this->isFollowRedirects() && ini_get('open_basedir')) {
-            if ($this->manualRedirects >= $this->maxRedirects) throw new IOException('CURL error: maxRedirects limit exceeded - '.$this->maxRedirects.', URL: '.$request->getUrl());
+        if (($status==301 || $status==302) && $this->isFollowRedirects() && ini_get_bool('open_basedir')) {
+            if ($this->manualRedirects >= $this->maxRedirects) throw new IOException('CURL error: maxRedirects limit exceeded - '.$this->maxRedirects.', URL: '.$options[CURLOPT_URL]);
             $this->manualRedirects++;
 
             /** @var string $location */
@@ -220,18 +227,21 @@ class CurlHttpClient extends HttpClient {
      * @return array - resulting options
      */
     protected function prepareCurlOptions(HttpRequest $request, CurlHttpResponse $response) {
-        $options  = [CURLOPT_URL       => $request->getUrl()] + $this->options;
-        $options += [CURLOPT_TIMEOUT   => $this->timeout    ];
+        $options = $this->options;                                  // options passed to the constructor
+        $options    [CURLOPT_URL]      =  $request->getUrl();       // set or overwrite an existing URL
+        $options += [CURLOPT_TIMEOUT   => $this->timeout    ];      // set but don't overwrite these existing options
         $options += [CURLOPT_USERAGENT => $this->userAgent  ];
-        $options += [CURLOPT_ENCODING  => ''                ];  // empty string activates all supported encodings
+        $options += [CURLOPT_ENCODING  => ''                ];      // an empty string activates all supported encodings
 
-        if (!isset($options[CURLOPT_WRITEHEADER]))
+        if (!isset($options[CURLOPT_WRITEHEADER])) {
             $options += [CURLOPT_HEADERFUNCTION => [$response, 'writeHeader']];
+        }
 
-        if (!isset($options[CURLOPT_FILE]))                     // overrides CURLOPT_RETURNTRANSFER
+        if (!isset($options[CURLOPT_FILE])) {                       // overrides CURLOPT_RETURNTRANSFER
             $options += [CURLOPT_WRITEFUNCTION  => [$response, 'writeContent']];
+        }
 
-        foreach ($request->getHeaders() as $key => $value) {    // add all specified request headers
+        foreach ($request->getHeaders() as $key => $value) {        // add all additionally specified request headers
             $options[CURLOPT_HTTPHEADER][] = $key.': '.$value;
         }
         return $options;
@@ -239,9 +249,9 @@ class CurlHttpClient extends HttpClient {
 
 
     /**
-     * Gibt eine Beschreibung des letzten CURL-Fehlers zurueck.
+     * Gibt eine Beschreibung des letzten cURL-Fehlers zurueck.
      *
-     * @param  resource $hCurl - CURL-Handle
+     * @param  resource $hCurl - cURL-Handle
      *
      * @return string
      */

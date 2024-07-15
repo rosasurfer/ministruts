@@ -206,8 +206,8 @@ class ErrorHandler extends StaticClass {
             if ($function=='require' || $function=='require_once') {
                 $currentHandler = set_exception_handler(function() {});
                 restore_exception_handler();
-                $currentHandler && call_user_func($currentHandler, $error);     // We MUST use call_user_func() as a static handler cannot be invoked dynamically.
-                return (bool)$currentHandler;                                   // PHP will terminate the script anyway
+                $currentHandler && call_user_func($currentHandler, $error);     // a possibly static handler must be invoked with call_user_func()
+                return (bool)$currentHandler;                                   // PHP will terminate the script anyway.
             }
         }
 
@@ -311,7 +311,7 @@ class ErrorHandler extends StaticClass {
             restore_exception_handler();
 
             if ($currentHandler) {
-                call_user_func($currentHandler, $exception);    // We MUST use call_user_func() as a static handler cannot be invoked dynamically.
+                call_user_func($currentHandler, $exception);    // A possibly static handler must be invoked with call_user_func().
                 exit(1);                                        // Calling exit() is the only way to prevent the immediately following
             }                                                   // non-catchable fatal error. However, calling exit() in a destructor will
         }                                                       // also prevent execution of any remaining shutdown routines.
@@ -337,7 +337,7 @@ class ErrorHandler extends StaticClass {
         restore_exception_handler();
 
         if ($currentHandler) {
-            call_user_func($currentHandler, $exception);        // We MUST use call_user_func() as a static handler cannot be invoked dynamically.
+            call_user_func($currentHandler, $exception);        // A possibly static handler must be invoked with call_user_func().
             exit(1);                                            // Calling exit() is the only way to prevent the immediately following
         }                                                       // non-catchable fatal error.
     }
