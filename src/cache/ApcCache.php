@@ -16,8 +16,8 @@ class ApcCache extends CachePeer {
     /**
      * Constructor.
      *
-     * @param  string $label   [optional] - cache identifier used for namespacing
-     * @param  array  $options [optional] - additional options
+     * @param  string $label   [optional] - cache identifier (namespace, default: none)
+     * @param  array  $options [optional] - additional instantiation options (default: none)
      */
     public function __construct($label=null, array $options=[]) {
         $this->label     = $label;
@@ -27,15 +27,11 @@ class ApcCache extends CachePeer {
 
 
     /**
-     * Whether a value with the specified key exists in the cache.
-     *
-     * @param  string $key
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function isCached($key) {
-        // The actual working horse. The method does not only check existence of the key. It retrieves the value and stores
-        // it in the local reference pool, so following cache queries can use the local reference.
+        // The actual working horse. This method does not only check the key's existence, it also retrieves the value and
+        // stores it in the local reference pool. Thus following cache queries can use the local reference.
 
         // check local reference pool
         if ($this->getReferencePool()->isCached($key))
@@ -43,8 +39,7 @@ class ApcCache extends CachePeer {
 
         // query APC cache
         $data = apc_fetch($this->namespace.'::'.$key);
-        if (!$data)                                     // cache miss
-            return false;
+        if (!$data) return false;                       // cache miss
 
         // cache hit
         $created = $data[0];                            // data: [created, expires, serialized([$value, $dependency])]
@@ -71,7 +66,7 @@ class ApcCache extends CachePeer {
                         $this->drop($key);
                         return false;
                     }
-                    // reset the creation time by writing back to the cache (resets $minValid period)
+                    // reset creation time by writing back to the cache (resets $minValid period)
                     return $this->set($key, $value, $expires, $dependency);
                 }
             }
@@ -88,12 +83,7 @@ class ApcCache extends CachePeer {
 
 
     /**
-     * Return the cached value with the specified key or the default value if no such value exists in the cache.
-     *
-     * @param  string $key                - key
-     * @param  mixed  $default [optional] - default value
-     *
-     * @return mixed - cached value (may be NULL) or NULL if no value with the specified key exists in the cache
+     * {@inheritdoc}
      */
     public function get($key, $default = null) {
         if ($this->isCached($key))
@@ -103,37 +93,22 @@ class ApcCache extends CachePeer {
 
 
     /**
-     * Delete the value with the specified key from the cache.
-     *
-     * @param  string $key - key
-     *
-     * @return bool - TRUE on successful deletion;
-     *                FALSE if no such value exists in the cache
+     * {@inheritdoc}
      */
     public function drop($key) {
         $this->getReferencePool()->drop($key);
-
         return apc_delete($this->namespace.'::'.$key);
     }
 
 
     /**
-     * Store a value under the specified key in the cache. An existing value already stored under the key is overwritten.
-     * If expiration time or dependency are provided and those conditions are met the value is automatically invalidated but
-     * not automatically removed from the cache.
-     *
-     * @param  string     $key                   - key
-     * @param  mixed      $value                 - value
-     * @param  int        $expires    [optional] - time in seconds after which the value becomes invalid (default: never)
-     * @param  Dependency $dependency [optional] - a dependency object monitoring validity of the value (default: none)
-     *
-     * @return bool - TRUE on successful storage; FALSE otherwise
+     * {@inheritdoc}
      */
     public function set($key, &$value, $expires=Cache::EXPIRES_NEVER, Dependency $dependency=null) {
         Assert::string($key,  '$key');
         Assert::int($expires, '$expires');
 
-        // data format in the cache: [created, expires, serialized([value, dependency])]
+        // stored data: [created, expires, serialized([value, dependency])]
         $fullKey = $this->namespace.'::'.$key;
         $created = time();
         $data    = [$value, $dependency];
@@ -154,7 +129,6 @@ class ApcCache extends CachePeer {
          * @see http://stackoverflow.com/questions/1670034/why-would-apc-store-return-false
          * @see http://notmysock.org/blog/php/user-cache-timebomb.html
          */
-
 
         // store value:
         // - If possible use apc_add() which causes less memory fragmentation and minimizes lock waits.

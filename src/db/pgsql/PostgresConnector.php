@@ -315,7 +315,7 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * Whether the adapter currently is connected to the database.
+     * Whether the adapter is currently connected to the database.
      *
      * @return bool
      */

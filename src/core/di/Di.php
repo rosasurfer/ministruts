@@ -17,6 +17,7 @@ use rosasurfer\core\di\service\ServiceNotFoundException;
  * The design principle is determined at runtime from the called DI resolver method.
  *
  * <pre>
+ *  &lt;?php
  *  $di = new Di();                                         // creating a new container
  *  $di = $this->di();                                      // getting the default container in a class context
  *  $di = Application::getDi();                             // getting the default container in a non-class context

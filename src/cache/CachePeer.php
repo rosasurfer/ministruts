@@ -8,34 +8,17 @@ use rosasurfer\core\CObject;
 /**
  * CachePeer
  *
- * Abstrakte Basisklasse fuer Cache-Implementierungen.
+ * Abstract base class for actual cache implementations.
  *
- * Anwendung:
- * ----------
- *
- *    Wert speichern:
- *
- *       CachePeer::set($key, $value, $expires);
- *
- *
- *    Wert hinzufuegen (nur speichern, wenn er noch nicht im Cache existiert):
- *
- *       CachePeer::add($key, $value, $expires)
- *
- *
- *    Wert ersetzen (nur speichern, wenn er bereits im Cache existiert):
- *
- *       CachePeer::replace($key, $value, $expires)
- *
- *
- *    Wert aus dem Cache holen:
- *
- *       $value = CachePeer::get($key);
- *
- *
- *    Wert loeschen:
- *
- *       CachePeer::drop($key);
+ * @example
+ * <pre>
+ *  &lt;?php
+ *  CachePeer::set($key, $value, $expires);         // store a value in the cache
+ *  CachePeer::add($key, $value, $expires);         // store a value only if it doesn't yet exist in the cache
+ *  CachePeer::replace($key, $value, $expires);     // store a value only if it already exists in the cache
+ *  $value = CachePeer::get($key);                  // retrieve a value from the cache
+ *  CachePeer::drop($key);                          // delete a cached value
+ * </pre>
  *
  * @see ApcCache
  * @see FileSystemCache
@@ -58,7 +41,7 @@ abstract class CachePeer extends CObject {
 
 
     /**
-     * Gibt den lokalen ReferencePool zurueck.
+     * Return the {@link ReferencePool} instance of the cache (the identity manager).
      *
      * @return ReferencePool
      */
@@ -70,32 +53,9 @@ abstract class CachePeer extends CObject {
 
 
     /**
-     * Gibt einen Wert aus dem Cache zurueck.  Existiert der Wert nicht, wird der angegebene Defaultwert
-     * zurueckgegeben.
+     * Whether a value exists in the cache under the specified key.
      *
-     * @param  string $key                - Schluessel, unter dem der Wert gespeichert ist
-     * @param  mixed  $default [optional] - Defaultwert (kann selbst auch NULL sein)
-     *
-     * @return mixed - Der gespeicherte Wert, NULL, falls kein solcher Schluessel existiert oder der
-     *                 angegebene Defaultwert
-     */
-    abstract public function get($key, $default = null);
-
-
-    /**
-     * Loescht einen Wert aus dem Cache.
-     *
-     * @param  string $key - Schluessel, unter dem der Wert gespeichert ist
-     *
-     * @return bool - TRUE bei Erfolg, FALSE, falls kein solcher Schluessel existiert
-     */
-    abstract public function drop($key);
-
-
-    /**
-     * Ob unter dem angegebenen Schluessel ein Wert im Cache gespeichert ist.
-     *
-     * @param  string $key - Schluessel
+     * @param  string $key - identifier
      *
      * @return bool
      */
@@ -103,56 +63,74 @@ abstract class CachePeer extends CObject {
 
 
     /**
-     * Speichert einen Wert im Cache.  Ein schon vorhandener Wert unter demselben Schluessel wird
-     * ueberschrieben.  Laeuft die angegebene Zeitspanne ab oder aendert sich der Status der angegebenen
-     * Abhaengigkeit, wird der Wert automatisch ungueltig.
+     * Retrieve a value from the cache or the specified default value if no such value exists in the cache.
      *
-     * @param  string     $key                   - Schluessel, unter dem der Wert gespeichert wird
-     * @param  mixed      $value                 - der zu speichernde Wert
-     * @param  int        $expires    [optional] - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfaellt (default: nie)
-     * @param  Dependency $dependency [optional] - Abhaengigkeit der Gueltigkeit des gespeicherten Wertes
+     * @param  string $key                - identifier of the stored value
+     * @param  mixed  $default [optional] - default value
      *
-     * @return bool - TRUE bei Erfolg, FALSE andererseits
+     * @return mixed - stored value (may be NULL itself) or the specified default value
+     */
+    abstract public function get($key, $default = null);
+
+
+    /**
+     * Delete the value with the specified key from the cache.
+     *
+     * @param  string $key - key
+     *
+     * @return bool - success status or FALSE if no such value exists in the cache
+     */
+    abstract public function drop($key);
+
+
+    /**
+     * Store a value under the specified key in the cache and overwrite an existing value. The stored value is automatically
+     * invalidated after expiration of the specified time interval or on status change of the specified {@link Dependency}.
+     *
+     * @param  string     $key                   - key
+     * @param  mixed      $value                 - value
+     * @param  int        $expires    [optional] - time interval in seconds for automatic invalidation (default: never)
+     * @param  Dependency $dependency [optional] - dependency object monitoring validity of the value (default: none)
+     *
+     * @return bool - success status
      */
     abstract public function set($key, &$value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null);
 
 
     /**
-     * Speichert einen Wert im Cache nur dann, wenn noch kein Wert unter dem angegebenen Schluessel
-     * existiert.  Laeuft die angegebene Zeitspanne ab oder aendert sich der Status der angegebenen
-     * Abhaengigkeit, wird der Wert automatisch ungueltig.
+     * Store a value in the cache only if there's no other value yet stored under the same key. The stored value is
+     * automatically invalidated after expiration of the specified time interval or on status change of the specified
+     * {@link Dependency}.
      *
-     * @param  string     $key                   - Schluessel, unter dem der Wert gespeichert wird
-     * @param  mixed      $value                 - der zu speichernde Wert
-     * @param  int        $expires    [optional] - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfaellt (default: nie)
-     * @param  Dependency $dependency [optional] - Abhaengigkeit der Gueltigkeit des gespeicherten Wertes
+     * @param  string     $key                   - key
+     * @param  mixed      $value                 - value
+     * @param  int        $expires    [optional] - time interval in seconds for automatic invalidation (default: never)
+     * @param  Dependency $dependency [optional] - dependency object monitoring validity of the value (default: none)
      *
-     * @return bool - TRUE bei Erfolg, FALSE andererseits
+     * @return bool - success status
      */
     final public function add($key, &$value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null) {
         if ($this->isCached($key))
             return false;
-
         return $this->set($key, $value, $expires, $dependency);
     }
 
 
     /**
-     * Speichert einen Wert im Cache nur dann, wenn unter dem angegebenen Schluessel bereits ein Wert
-     * existiert.  Laeuft die angegebene Zeitspanne ab oder aendert sich der Status der angegebenen
-     * Abhaengigkeit, wird der Wert automatisch ungueltig.
+     * Store a value in the cache only if there's already another value stored under the same key. Overwrites the existing
+     * value. The stored value is automatically invalidated after expiration of the specified time interval or on status
+     * change of the specified {@link Dependency}.
      *
-     * @param  string     $key                   - Schluessel, unter dem der Wert gespeichert wird
-     * @param  mixed      $value                 - der zu speichernde Wert
-     * @param  int        $expires    [optional] - Zeitspanne in Sekunden, nach deren Ablauf der Wert verfaellt (default: nie)
-     * @param  Dependency $dependency [optional] - Abhaengigkeit der Gueltigkeit des gespeicherten Wertes
+     * @param  string     $key                   - key
+     * @param  mixed      $value                 - value
+     * @param  int        $expires    [optional] - time interval in seconds for automatic invalidation (default: never)
+     * @param  Dependency $dependency [optional] - dependency object monitoring validity of the value (default: none)
      *
-     * @return bool - TRUE bei Erfolg, FALSE andererseits
+     * @return bool - success status
      */
     final public function replace($key, &$value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null) {
         if (!$this->isCached($key))
             return false;
-
         return $this->set($key, $value, $expires, $dependency);
     }
 }
