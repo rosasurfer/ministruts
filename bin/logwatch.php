@@ -12,7 +12,6 @@ use rosasurfer\Application;
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\net\mail\Mailer;
-use rosasurfer\util\PHP;
 
 use function rosasurfer\echof;
 use function rosasurfer\stderr;

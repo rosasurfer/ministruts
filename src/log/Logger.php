@@ -26,7 +26,6 @@ use function rosasurfer\strEndsWith;
 use function rosasurfer\strLeftTo;
 use function rosasurfer\strRightFrom;
 use function rosasurfer\strStartsWith;
-use function rosasurfer\strStartsWithI;
 
 use const rosasurfer\CLI;
 use const rosasurfer\EOL_WINDOWS;
