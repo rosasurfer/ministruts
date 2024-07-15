@@ -260,7 +260,7 @@ class Logger extends StaticClass {
                 }
             }
             Assert::int($level, '$level');
-            if (!isset(self::$logLevels[$level])) throw new InvalidValueException('Invalid parameter $level: '.$level.' (not a loglevel)');
+            if (!\key_exists($level, self::$logLevels)) throw new InvalidValueException('Invalid parameter $level: '.$level.' (not a loglevel)');
 
             // filter messages below the active loglevel
             $filtered = false;
@@ -289,12 +289,14 @@ class Logger extends StaticClass {
         catch (\Exception $logException) {}
 
         if ($logException) {
-            // If the call comes from the internal exception handler failed logging is already handled. If the call comes
-            // from user-land make sure the message doesn't get lost and is logged to the PHP default error log.
+            // If the call comes from our framework's exception handler (that's \rosasurfer\core\error\ErrorHandler::handleException())
+            // a failed logging is already handled. If the call comes from user-land code make sure the message doesn't get
+            // lost and is logged to the PHP default error log.
             if (!isset($context['unhandled-exception'])) {
-                $file = isset($context['file']) ? $context['file'] : '';
-                $line = isset($context['line']) ? $context['line'] : '';
-                $msg  = 'PHP ['.strtoupper(self::$logLevels[$level]).'] '.$loggable.NL.' in '.$file.' on line '.$line;
+                $file  = isset($context['file']) ? $context['file'] : '';
+                $line  = isset($context['line']) ? $context['line'] : '';
+                $level = isset(self::$logLevels[$level]) ? strtoupper(self::$logLevels[$level]) : 'ERROR';
+                $msg   = 'PHP ['.$level.'] '.$loggable.NL.' in '.$file.' on line '.$line;
                 error_log(trim($msg), ERROR_LOG_DEFAULT);
             }
             throw $logException;

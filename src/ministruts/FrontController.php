@@ -9,6 +9,7 @@ use rosasurfer\core\di\proxy\Request as RequestProxy;
 use rosasurfer\core\exception\IllegalStateException;
 use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\core\exception\RuntimeException;
+use rosasurfer\net\http\HttpResponse;
 
 use function rosasurfer\strLeftTo;
 use function rosasurfer\strStartsWith;
@@ -131,17 +132,35 @@ class FrontController extends Singleton {
         $request = RequestProxy::instance();
         $response = Response::me();
 
-        // select the Module
-        $prefix = $controller->getModulePrefix($request);
-        $module = $controller->modules[$prefix];
-        $request->setAttribute(MODULE_KEY, $module);
+        if (strStartsWith($request->getPath(), '/')) {
+            // select the Module
+            $prefix = $controller->getModulePrefix($request);
+            $module = $controller->modules[$prefix];
+            $request->setAttribute(MODULE_KEY, $module);
 
-        // get the RequestProcessor
-        $processor = $controller->getRequestProcessor($module, $options);
+            // get the RequestProcessor
+            $processor = $controller->getRequestProcessor($module, $options);
 
-        // process the request
-        $processor->process($request, $response);
+            // process the request
+            $processor->process($request, $response);
+        }
+        else {
+            // proxy request or any other invalid request: HTTP 404
+            $response->setStatus(HttpResponse::SC_NOT_FOUND);
+            header('HTTP/1.1 404 Not Found', true, HttpResponse::SC_NOT_FOUND);
 
+            echo <<<FRONTCONTROLLER_PROCESS_REQUEST_ERROR_SC_404
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html><head>
+<title>404 Not Found</title>
+</head><body>
+<h1>Not Found</h1>
+<p>The requested URL was not found on this server.</p>
+<hr>
+<address>...lamented the MiniStruts.</address>
+</body></html>
+FRONTCONTROLLER_PROCESS_REQUEST_ERROR_SC_404;
+        }
         return $response;
     }
 
