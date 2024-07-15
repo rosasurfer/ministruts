@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
-use function rosasurfer\echof;
 use function rosasurfer\docopt;
+use function rosasurfer\echof;
 
 require(dirname(realpath(__FILE__)).'/../../../../../src/load.php');
 
