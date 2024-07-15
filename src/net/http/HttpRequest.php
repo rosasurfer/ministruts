@@ -83,7 +83,7 @@ class HttpRequest extends CObject {
     public function setUrl($url) {
         Assert::string($url);
         // TODO: validate URL
-        if (strpos($url, ' ') !== false)throw new InvalidValueException('Invalid parameter $url: '.$url);
+        if (strpos($url, ' ') !== false) throw new InvalidValueException('Invalid parameter $url: '.$url);
         $this->url = $url;
         return $this;
     }

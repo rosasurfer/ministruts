@@ -227,9 +227,10 @@ function in_array($needle, $haystack, $strict = false) {
  * @return mixed - the first element or NULL if the array-like variable is empty
  */
 function first($values) {
-    if ($values instanceof \Traversable)
+    if ($values instanceof \Traversable) {
         $values = iterator_to_array($values, false);
-    return reset($values);
+    }
+    return $values ? reset($values) : null;
 }
 
 
@@ -241,8 +242,10 @@ function first($values) {
  * @return mixed - the first key or NULL if the array-like variable is empty
  */
 function firstKey($values) {
-    if ($values instanceof \Traversable)
+    if ($values instanceof \Traversable) {
         $values = iterator_to_array($values);
+    }
+    if (!$values) return null;
     reset($values);
     return key($values);
 }
