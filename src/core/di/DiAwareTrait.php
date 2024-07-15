@@ -5,7 +5,7 @@ use rosasurfer\Application;
 
 
 /**
- * A trait adding the behaviour "dependency injection awareness" to any class. Used to access dependencies in the dependency
+ * A trait adding the behavior "dependency injection awareness" to any class. Used to access dependencies in the dependency
  * container of the {@link Application}. Any class can easily be made dependency aware.
  */
 trait DiAwareTrait {

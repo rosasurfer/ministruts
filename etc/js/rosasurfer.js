@@ -2,7 +2,7 @@
 
 
 /**
- * Polyfills and objects extensions.
+ * Polyfills
  */
 if (!Array.from) { Array.from = (function() {
     var toStr = Object.prototype.toString;
@@ -160,7 +160,7 @@ var rosasurfer = {
      *
      * @param  string url [optional] - URL to get query parameters from (default: the current page location)
      *
-     * @return array - {key1: value1, key2: value2, ..., keyN: valueN}
+     * @return object - {key1: value1, key2: value2, ..., keyN: valueN}
      */
     getQueryParameters: function getQueryParameters(url) {
         var pos, query;

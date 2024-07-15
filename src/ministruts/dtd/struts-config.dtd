@@ -187,7 +187,7 @@
   //alias                TODO: Not yet implemented
   //                     The name of another "mapping" element to use for request processing instead of the current one.
   //                     Allows the definition of multiple request paths using the same mapping definition. Can not be used
-  //                     in combination with "action", "include", "forward" or "redirect".
+  //                     in combination with "action", "include", "redirect" or "forward".
 
     form                 Class name of an {@link ActionForm} subclass, that is associated with the mapping. Optional.
 
