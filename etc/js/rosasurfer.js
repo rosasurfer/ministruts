@@ -285,11 +285,12 @@ var rosasurfer = {
             else if (arg.constructor) type = arg.constructor.name || arg.constructor.toString();
             else                      type = ''+ arg;
 
-            if (type.startsWith('[object ')) {              // [object HTMLAnchorElement]
+            if (type.startsWith('[object ')) {                      // [object HTMLAnchorElement]
                 type = type.slice(8, -1);
             }
-            else if (type.startsWith('function ')) {        // function HTMLAnchorElement() { [native code] }
-                type = type.slice(9, type.indexOf('('));
+            else if (type.startsWith('function')) {                 // function HTMLAnchorElement() { [native code] }
+                var name = type.slice(8, type.indexOf('(')).trim(); // function( param1, param2... ) { <custom code> }
+                type = name.length ? name : 'function';
             }
         }
         return type;
