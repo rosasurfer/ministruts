@@ -1074,12 +1074,30 @@ function strIsDoubleQuoted($value) {
 /**
  * Whether a string consists only of digits (0-9).
  *
- * @param  mixed $value
+ * @param  scalar $value
  *
  * @return bool
  */
 function strIsDigits($value) {
     return ctype_digit($value);
+}
+
+
+/**
+ * Whether a string represents a valid integer value, i.e. consists of only digits and optionally a leading "-" (minus) character.
+ *
+ * @param  scalar $value
+ *
+ * @return bool
+ */
+function strIsInteger($value) {
+    if (is_int($value))
+        return true;
+
+    if (!is_string($value))
+        return false;
+
+    return ($value === (string)(int)$value);
 }
 
 
