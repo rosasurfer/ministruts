@@ -474,7 +474,8 @@ class Config extends CObject implements ConfigInterface {
                 }
             }
             $value = str_pad($key, $maxKeyLength, ' ', STR_PAD_RIGHT).' = '.$value;
-        }; unset($value);
+        }
+        unset($value);
         $lines += $values;
 
         $padLeft = isset($options['pad-left']) ? $options['pad-left'] : '';
@@ -560,7 +561,7 @@ class Config extends CObject implements ConfigInterface {
                             $value = '"'.$value.'"';
                 }
             }
-        };
+        }
         unset($value);
 
         return $values;

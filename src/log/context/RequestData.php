@@ -122,7 +122,7 @@ final class RequestData extends CObject {
                 if (isset($file['name']) && is_array($file['name'])) {
                     $properties = array_keys($file);
                     $normalized = [];
-                    foreach (array_keys($file['name']) as $name) {
+                    foreach (\array_keys($file['name']) as $name) {
                         foreach ($properties as $property) {
                             $normalized[$name][$property] = $file[$property][$name];
                         }

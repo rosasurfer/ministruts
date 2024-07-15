@@ -317,7 +317,8 @@ class MySQLConnector extends Connector {
 
             foreach ($names as &$subname) {
                 $subname = '`'.str_replace('`', '``', $subname).'`';
-            }; unset($subname);
+            }
+            unset($subname);
 
             return join('.', $names);
         }

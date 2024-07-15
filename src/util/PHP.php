@@ -350,7 +350,7 @@ class PHP extends StaticClass {
             if (is_file($file=$appRoot.'/composer.json') && extension_loaded('json')) {
                 $composer = json_decode(file_get_contents($file), true);
                 if (isset($composer['require']) && is_array($composer['require'])) {
-                    foreach (array_keys($composer['require']) as $name) {
+                    foreach (\array_keys($composer['require']) as $name) {
                         $name = trim(strtolower($name));
                         if (in_array($name, ['php', 'php-64bit', 'hhvm']) || strContains($name, '/')) continue;
                         if (strStartsWith($name, 'ext-')) $name = strRight($name, -4);

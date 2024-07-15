@@ -96,7 +96,7 @@ class Application extends CObject {
 
         if (isset($_GET['__phpinfo__']) || isset($_GET['__config__']) || isset($_GET['__cache__'])) {
             if (self::isAdminIP()) {
-                foreach (array_keys($_GET) as $param) {
+                foreach (\array_keys($_GET) as $param) {
                     if ($param == '__phpinfo__') {
                         if ($configInfoTask) {
                             $phpInfoTask            = false;
@@ -311,7 +311,7 @@ class Application extends CObject {
             if (isRelativePath($dir))
                 $dir = $rootDir.'/'.$dir;
             if (is_dir($dir)) $dir = realpath($dir);
-        };
+        }
         unset($dir);
     }
 

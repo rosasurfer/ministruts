@@ -432,7 +432,7 @@ class ErrorHandler extends StaticClass {
         else if (($flag &  E_ALL)                  ==  E_ALL)                  $levels = ['E_ALL'];                     // 32767
         else if (($flag & (E_ALL & ~E_DEPRECATED)) == (E_ALL & ~E_DEPRECATED)) $levels = ['E_ALL & ~E_DEPRECATED'];     // 24575
         else {
-            foreach ($levels as $key => $value) {
+            foreach (\array_keys($levels) as $key) {
                 if ($flag & $key) continue;
                 unset($levels[$key]);
             }
