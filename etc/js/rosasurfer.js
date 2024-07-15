@@ -295,6 +295,18 @@ var rosasurfer = {
         return type;
     },
 
+
+    /**
+     * Whether a variable is defined.
+     *
+     * @param  mixed arg
+     *
+     * @return bool
+     */
+    isDefined: function isDefined(arg) {
+        return (typeof(arg) != 'undefined');
+    },
+
     
     /**
      * A JavaScript implementation of the RSA Data Security, Inc. MD5 Message Digest Algorithm, as defined in RFC 1321.
