@@ -217,17 +217,13 @@ class Application extends CObject {
      * Update the PHP configuration with user defined settings.
      */
     protected function configurePhp() {
-        /** @var ConfigInterface $config */
-        $config = self::$defaultConfig;
-        $memoryWarnLimit = php_byte_value($config->get('log.warn.memory_limit', 0));
-        if ($memoryWarnLimit > 0) {
-            register_shutdown_function(function() use ($memoryWarnLimit) {
-                $usedBytes = memory_get_peak_usage(true);
-                if ($usedBytes > $memoryWarnLimit) {
-                    Logger::log('Memory consumption exceeded '.prettyBytes($memoryWarnLimit).' (peak usage: '.prettyBytes($usedBytes).')', L_WARN, ['class' => __CLASS__]);
-                }
-            });
-        }
+        register_shutdown_function(function() {
+            $warnLimit = php_byte_value(self::$defaultConfig->get('log.warn.memory_limit', PHP_INT_MAX));
+            $usedBytes = memory_get_peak_usage(true);
+            if ($usedBytes > $warnLimit) {
+                Logger::log('Memory consumption exceeded '.prettyBytes($warnLimit).' (peak usage: '.prettyBytes($usedBytes).')', L_WARN, ['class' => __CLASS__]);
+            }
+        });
         /*
         ini_set('arg_separator.output'    , '&amp;'                );
         ini_set('default_mimetype'        , 'text/html'            );
