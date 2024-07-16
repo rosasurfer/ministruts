@@ -127,8 +127,6 @@ class Request extends Proxy {
 
 
     /**
-     * {@inheritdoc}
-     *
      * @return string
      */
     protected static function getServiceId() {

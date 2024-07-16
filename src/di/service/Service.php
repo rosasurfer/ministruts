@@ -47,8 +47,6 @@ class Service implements ServiceInterface {
 
 
     /**
-     * {@inheritdoc}
-     *
      * @return string
      */
     public function getName() {
@@ -57,8 +55,6 @@ class Service implements ServiceInterface {
 
 
     /**
-     * {@inheritdoc}
-     *
      * @return string|object $definition - a class name, an instance or a Closure acting as an instance factory
      */
     public function getDefinition() {
@@ -91,8 +87,6 @@ class Service implements ServiceInterface {
 
 
     /**
-     * {@inheritdoc}
-     *
      * @param  bool  $factory    [optional] - whether to return a new instance (default: no)
      * @param  array $parameters [optional] - additional parameters of a factory call (default: none)
      *

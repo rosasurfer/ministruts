@@ -28,8 +28,6 @@ class RosasurferException extends \Exception implements IRosasurferException {
 
 
     /**
-     * {@inheritdoc}
-     *
      * @return array
      */
     public function getBetterTrace() {

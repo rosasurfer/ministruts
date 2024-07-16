@@ -325,7 +325,7 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     *
      */
     public function escapeIdentifier($name) {
         Assert::string($name);
@@ -348,7 +348,7 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     *
      */
     public function escapeLiteral($value) {
         // bug or feature: pg_escape_literal(null) => '' quoted empty string instead of 'null'
@@ -369,7 +369,7 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     *
      */
     public function escapeString($value) {
         // bug or feature: pg_escape_string(null) => empty string instead of NULL

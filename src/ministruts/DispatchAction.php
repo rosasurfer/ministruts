@@ -18,8 +18,6 @@ class DispatchAction extends Action {
      *
      * By default the action returns a redirect to the root URI of the application. To change the default behavior implement
      * an application specific base DispatchAction which your concrete dispatch actions inherit from.
-     *
-     * {@inheritdoc}
      */
     public function execute(Request $request, Response $response) {
         return new ActionForward('generic', $request->getApplicationUrl(), true);

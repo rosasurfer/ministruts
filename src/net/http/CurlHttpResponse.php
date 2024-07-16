@@ -51,7 +51,7 @@ class CurlHttpResponse extends HttpResponse {
 
 
     /**
-     * {@inheritdoc}
+     *
      */
     public function getStatus() {
         return $this->status;
@@ -59,7 +59,7 @@ class CurlHttpResponse extends HttpResponse {
 
 
     /**
-     * {@inheritdoc}
+     *
      */
     public function isHeader($name) {
         return $this->headerParser->isHeader($name);
@@ -67,7 +67,7 @@ class CurlHttpResponse extends HttpResponse {
 
 
     /**
-     * {@inheritdoc}
+     *
      */
     public function getHeader($name) {
         return $this->headerParser->getHeader($name);
@@ -75,7 +75,7 @@ class CurlHttpResponse extends HttpResponse {
 
 
     /**
-     * {@inheritdoc}
+     *
      */
     public function getHeaders() {
         return $this->headerParser->getHeaders();
@@ -115,7 +115,7 @@ class CurlHttpResponse extends HttpResponse {
 
 
     /**
-     * {@inheritdoc}
+     *
      */
     public function getContent() {
         return (string)$this->content;

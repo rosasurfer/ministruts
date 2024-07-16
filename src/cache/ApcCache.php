@@ -27,7 +27,7 @@ class ApcCache extends CachePeer {
 
 
     /**
-     * {@inheritdoc}
+     *
      */
     public function isCached($key) {
         // The actual working horse. This method does not only check the key's existence, it also retrieves the value and
@@ -83,7 +83,7 @@ class ApcCache extends CachePeer {
 
 
     /**
-     * {@inheritdoc}
+     *
      */
     public function get($key, $default = null) {
         if ($this->isCached($key))
@@ -93,7 +93,7 @@ class ApcCache extends CachePeer {
 
 
     /**
-     * {@inheritdoc}
+     *
      */
     public function drop($key) {
         $this->getReferencePool()->drop($key);
@@ -102,7 +102,7 @@ class ApcCache extends CachePeer {
 
 
     /**
-     * {@inheritdoc}
+     *
      */
     public function set($key, &$value, $expires=Cache::EXPIRES_NEVER, Dependency $dependency=null) {
         Assert::string($key,  '$key');
