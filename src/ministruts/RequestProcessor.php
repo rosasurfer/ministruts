@@ -158,7 +158,7 @@ class RequestProcessor extends CObject {
      * @param  Request  $request
      * @param  Response $response
      *
-     * @return ActionMapping|null - ActionMapping oder NULL
+     * @return ActionMapping? - ActionMapping oder NULL
      */
     protected function processMapping(Request $request, Response $response) {
         // Pfad fuer die Mappingauswahl ermitteln ...
@@ -277,7 +277,7 @@ PROCESS_METHOD_ERROR_SC_405;
         if (empty($mapping->getRoles()))
             return true;
 
-        /** @var ActionForward|string|null $forward */
+        /** @var ActionForward|string? $forward */
         $forward = $this->module->getRoleProcessor()->processRoles($request, $mapping);
         if (!isset($forward))
             return true;
@@ -298,7 +298,7 @@ PROCESS_METHOD_ERROR_SC_405;
      * @param  Request       $request
      * @param  ActionMapping $mapping
      *
-     * @return ActionForm|null
+     * @return ActionForm?
      */
     protected function processActionFormCreate(Request $request, ActionMapping $mapping) {
         $formClass = $mapping->getFormClassName();
@@ -413,7 +413,7 @@ PROCESS_METHOD_ERROR_SC_405;
      * @param  Response $response
      * @param  Action   $action
      *
-     * @return ActionForward|null
+     * @return ActionForward?
      */
     protected function processActionExecute(Request $request, Response $response, Action $action) {
         $forward = $ex = null;

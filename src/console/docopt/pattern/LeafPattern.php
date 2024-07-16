@@ -9,13 +9,15 @@ use function rosasurfer\array_merge;
 
 /**
  * LeafPattern
+ *
+ * @phpstan-consistent-constructor
  */
 abstract class LeafPattern extends Pattern {
 
 
     /**
-     * @param  string|null $name
-     * @param  mixed       $value [optional]
+     * @param  string? $name
+     * @param  mixed   $value [optional]
      */
     public function __construct($name, $value = null) {
         $this->name = $name;

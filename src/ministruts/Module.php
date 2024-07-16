@@ -831,7 +831,7 @@ class Module extends CObject {
      *
      * @param  string $path
      *
-     * @return ActionMapping|null - mapping or NULL if no such mapping was found
+     * @return ActionMapping? - mapping or NULL if no such mapping was found
      */
     public function findMapping($path) {
         if (!strEndsWith($path, '/'))
@@ -858,7 +858,7 @@ class Module extends CObject {
      *
      * @param  string $name
      *
-     * @return ActionMapping|null - mapping or NULL if no such mapping exists
+     * @return ActionMapping? - mapping or NULL if no such mapping exists
      */
     public function getMapping($name) {
         if (isset($this->mappings['names'][$name]))
@@ -870,7 +870,7 @@ class Module extends CObject {
     /**
      * Return the module's default {@link ActionMapping} (if configured).
      *
-     * @return ActionMapping|null - instance or NULL if no default mapping is configured
+     * @return ActionMapping? - instance or NULL if no default mapping is configured
      */
     public function getDefaultMapping() {
         return $this->defaultMapping;
@@ -987,7 +987,7 @@ class Module extends CObject {
     /**
      * Return the {@link RoleProcessor} intance of the module.
      *
-     * @return RoleProcessor|null - instance or NULL if no RoleProcessor is configured for the module
+     * @return RoleProcessor? - instance or NULL if no RoleProcessor is configured for the module
      */
     public function getRoleProcessor() {
         if (!$this->roleProcessor) {
@@ -1115,7 +1115,7 @@ class Module extends CObject {
      *
      * @param  string $name - forward name
      *
-     * @return ActionForward|null - instance or NULL if no such forward was found
+     * @return ActionForward? - instance or NULL if no such forward was found
      */
     public function findForward($name) {
         if (isset($this->globalForwards[$name]))
@@ -1129,7 +1129,7 @@ class Module extends CObject {
      *
      * @param  string $name - tile name
      *
-     * @return Tile|null - instance or NULL if no such tile was found
+     * @return Tile? - instance or NULL if no such tile was found
      */
     public function findTile($name) {
         if (isset($this->tiles[$name]))
@@ -1185,7 +1185,7 @@ class Module extends CObject {
      *
      * @param  string $name - relative name
      *
-     * @return string|null - full filename or NULL if no such file was found
+     * @return string? - full filename or NULL if no such file was found
      */
     private function findFile($name) {
         // strip a potential query string

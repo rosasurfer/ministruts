@@ -180,7 +180,7 @@ class MySQLResult extends Result {
     /**
      * Return the result's internal result object.
      *
-     * @return resource|null - result handle or NULL for a result-less query
+     * @return resource? - result handle or NULL for a result-less query
      */
     public function getInternalResult() {
         return $this->hResult;

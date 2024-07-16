@@ -169,7 +169,7 @@ class PHP extends StaticClass {
      * PHP_INI_PERDIR - entry can be set in php.ini, httpd.conf, .htaccess and in .user.ini
      */
     public static function phpinfo() {
-        /** @var ConfigInterface|null $config */
+        /** @var ConfigInterface? $config */
         $config = self::di('config');
         $issues = [];
 

@@ -62,7 +62,7 @@ abstract class Pattern extends CObject {
     /**
      * Make pattern-tree tips point to same object if they are equal.
      *
-     * @param Pattern[]|null $unique [optional]
+     * @param Pattern[]? $unique [optional]
      *
      * @return $this
      */
@@ -196,12 +196,15 @@ abstract class Pattern extends CObject {
      * @return string
      */
     public function __toString() {
+        $value = '';
+
         try {
             $value = serialize($this);
             Assert::string($value);                             // Ensure __toString() returns a string as otherwise...
-            return $value;                                      // PHP will trigger a non-catchable fatal error.
-        }
+        }                                                       // PHP will trigger a non-catchable fatal error.
         catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }
         catch (\Exception $ex) { ErrorHandler::handleToStringException($ex); }
+
+        return $value;
     }
 }

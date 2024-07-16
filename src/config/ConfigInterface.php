@@ -38,8 +38,8 @@ interface ConfigInterface extends \ArrayAccess, \Countable {
      *                                                  'default' => $default, <br>
      *                                                  'flags'   => $flags    <br>
      *                                              ]</tt>                     <br>
-     * @return bool|null - boolean value or NULL if the flag FILTER_NULL_ON_FAILURE is set and the setting does not represent
-     *                     a boolean value
+     * @return bool? - boolean value or NULL if the flag FILTER_NULL_ON_FAILURE is set and the setting does not represent
+     *                 a boolean value
      *
      * @throws RuntimeException if the setting is not found and $default was not specified
      */

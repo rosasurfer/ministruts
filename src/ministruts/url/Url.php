@@ -60,6 +60,8 @@ class Url extends CObject {
      * @return string
      */
     public function __toString() {
+        $uri = '';
+
         try {
             $uri = $this->appRelativeUri;
             if ($this->parameters) {
@@ -70,9 +72,10 @@ class Url extends CObject {
             $uri = Request::getApplicationBaseUri().$uri;
 
             Assert::string($uri);                               // Ensure __toString() returns a string as otherwise...
-            return $uri;                                        // PHP will trigger a non-catchable fatal error.
-        }
+        }                                                       // PHP will trigger a non-catchable fatal error.
         catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }
         catch (\Exception $ex) { ErrorHandler::handleToStringException($ex); }
+
+        return $uri;
     }
 }

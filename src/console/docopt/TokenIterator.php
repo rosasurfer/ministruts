@@ -9,6 +9,8 @@ use rosasurfer\di\DiAwareTrait;
 
 /**
  * TokenIterator
+ *
+ * @phpstan-consistent-constructor
  */
 class TokenIterator extends \ArrayIterator {
 

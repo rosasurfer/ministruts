@@ -222,7 +222,7 @@ class Logger extends StaticClass {
      *
      * @param  string $value - loglevel description
      *
-     * @return int|null - loglevel constant or NULL, if $value is not a valid loglevel description
+     * @return int? - loglevel constant or NULL, if $value is not a valid loglevel description
      */
     public static function logLevelToId($value) {
         Assert::string($value);

@@ -29,6 +29,8 @@ use function rosasurfer\isRelativePath;
  * Solange die Datei nicht veraendert wird, bleibt die Abhaengigkeit erfuellt und der Aufruf von
  * $dependency->isValid() gibt TRUE zurueck.  Nach Aenderung oder Loeschen der Datei gibt der Aufruf von
  * $dependency->isValid() FALSE zurueck.
+ *
+ * @phpstan-consistent-constructor
  */
 class FileDependency extends Dependency {
 
