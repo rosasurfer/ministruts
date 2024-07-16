@@ -1,65 +1,47 @@
 #
-# Requires:
-#  PHP 7.1
-#  https://github.com/rosasurfer/phpstan, branch "0.9-pewa"
-#
 # Usage:
-#  alias phpstan09='php71 -d memory_limit=-1 -d short_open_tag=On /path/to/rosasurfer-phpstan/bin/phpstan'
-#  phpstan09 analyse -a etc/phpstan/autoload.php -c etc/phpstan/config.neon --level=0..7 [--] <path>
+#  See the PHPStan wrapper "bin/phpstan".
 #
-
+# File format:
+#  @see https://phpstan.org/config-reference
+#
 parameters:
-    autoload_files:
-        - etc/phpstan/api-stubs.php                                         # stubs for PHP extensions and procedural code
+  phpVersion: 70400                                 # assume PHP 7.4 if running under a different PHP version
+  level:      6                                     # a rule level on the command line overrides this hardcoded value
 
-    excludes_analyse:
-        - doc/
-        - etc/
-        - src/globals.php
-        - vendor/
+  bootstrapFiles:                                   # API stubs of unloaded PHP extensions
+    - api-stubs.php
 
-    universalObjectCratesClasses:
-        - rosasurfer\ministruts\Page
+  scanFiles:                                        # additional non-autoloaded files to scan for symbols
+    #- helpers.php
 
-    polluteScopeWithLoopInitialAssignments: true
-    polluteCatchScopeWithTryAssignments:    true
+  paths:                                            # paths on the command line override these hardcoded values
+    - ../../bin
+    - ../../src
 
-    ignoreErrors:
-        # intentionally ignore the following issues
-        - '/Array \(array<([^ ]+)>\) does not accept (\1\|)?null\b/'                                                # NULL is a value and not a type. It should always be valid.
-        - '/(Static )?property [^ ]+ \(([^ ]+)\) does not accept (\2\|)?null\b/i'                                   # - dito -
-        - '/Parameter #[0-9]+ [^ ]+ of class [^ ]+ constructor expects ([^ ]+), (\1\|)?null given\b/'               # - dito -
-        - '/Parameter #[0-9]+ [^ ]+ of (static )?(function|method) [^ ]+ expects ([^ ]+), (\3\|)?null given\b/'     # - dito -
-        - '/Calling method [^ ]+\(\) on possibly null value of type [^ ]+\|null\b/'
-        - "/Casting to (bool|int|float|string) something that's already (bool|int|float|string)/"                   # PHPStan contradicts itself by treating NULL as a value.
-        - '/Strict comparison using [=!]== between (int|string) and null will always evaluate to (true|false)\b/'
+  excludePaths:
+    - ../../doc
+    - ../../etc
+    - ../../vendor
 
-        # false positives since v0.8
-        - '/Method rosasurfer\\db\\orm\\meta\\EntityMapping::getVersion\(\) should return rosasurfer\\db\\orm\\meta\\PropertyMapping\|null but returns bool\|rosasurfer\\db\\orm\\meta\\PropertyMapping\|null\b/'
+  dynamicConstantNames:                             # changing constants depending on the environment
+    - rosasurfer\_CLI
+    - rosasurfer\_LOCALHOST
+    - rosasurfer\_MACOS
+    - rosasurfer\_WINDOWS
+    - rosasurfer\_NUL_DEVICE
 
+    - rosasurfer\CLI
+    - rosasurfer\LOCALHOST
+    - rosasurfer\MACOS
+    - rosasurfer\WINDOWS
+    - rosasurfer\NUL_DEVICE
 
-services: # Services must be loaded via cmd line option --autoload-file as they are
-          # instantiated before execution of block "parameters/autoload_files".
-    -
-        class: rosasurfer\phpstan\DAO_Find_ReturnType
-        tags:
-            - phpstan.broker.dynamicMethodReturnTypeExtension
-            - phpstan.broker.dynamicStaticMethodReturnTypeExtension
-    -
-        class: rosasurfer\phpstan\DAO_FindAll_ReturnType
-        tags:
-            - phpstan.broker.dynamicMethodReturnTypeExtension
-            - phpstan.broker.dynamicStaticMethodReturnTypeExtension
-    -
-        class: rosasurfer\phpstan\Di_Set_ReturnType
-        tags:
-            - phpstan.broker.dynamicMethodReturnTypeExtension
-    -
-        class: rosasurfer\phpstan\PersistableObject_Dao_ReturnType
-        tags:
-            - phpstan.broker.dynamicMethodReturnTypeExtension
-            - phpstan.broker.dynamicStaticMethodReturnTypeExtension
-    -
-        class: rosasurfer\phpstan\Singleton_GetInstance_ReturnType
-        tags:
-            - phpstan.broker.dynamicStaticMethodReturnTypeExtension
+  ignoreErrors:
+
+  reportUnmatchedIgnoredErrors: false
+
+  parallel:
+    maximumNumberOfProcesses: 4
+  tmpDir:       .tmp
+  tipsOfTheDay: false

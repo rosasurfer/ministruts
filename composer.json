@@ -1,6 +1,6 @@
 {
     "name":        "rosasurfer/ministruts",
-    "description": "Java Struts inspired MVC micro framework for PHP",
+    "description": "MVC micro framework for PHP inspired by Java Struts",
     "type":        "library",
     "license":     "WTFPL",
     "authors": [{
@@ -8,9 +8,6 @@
         "email": "ministruts@rosasurfer.com"
     }],
     "config": {
-        "platform": {
-            "php": "5.6.40"
-        },
         "optimize-autoloader": true
     },
     "require": {
@@ -22,6 +19,9 @@
         "ext-mbstring":  "*",
         "ext-simplexml": "*",
         "psr/container": "^1.0"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "*"
     },
     "autoload": {
         "psr-4": {
