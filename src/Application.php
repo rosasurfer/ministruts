@@ -23,10 +23,10 @@ use rosasurfer\util\PHP;
 class Application extends CObject {
 
 
-    /** @var ConfigInterface|null - the application's current default configuration */
+    /** @var ConfigInterface? - the application's current default configuration */
     protected static $defaultConfig;
 
-    /** @var DiInterface|null - the application's current default DI container */
+    /** @var DiInterface? - the application's current default DI container */
     protected static $defaultDi;
 
     /** @var Command[] - registered CLI commands */
@@ -411,7 +411,7 @@ class Application extends CObject {
      * Return the current default configuration of the {@link Application}. This is the configuration previously set
      * with {@link Application::setConfig()}.
      *
-     * @return ConfigInterface|null
+     * @return ConfigInterface?
      */
     public static function getConfig() {
         return self::$defaultConfig;
@@ -423,7 +423,7 @@ class Application extends CObject {
      *
      * @param  ConfigInterface $configuration
      *
-     * @return ConfigInterface|null - the previously registered default configuration
+     * @return ConfigInterface? - the previously registered default configuration
      */
     final public static function setConfig(ConfigInterface $configuration) {
         $previous = self::$defaultConfig;
@@ -438,7 +438,7 @@ class Application extends CObject {
      * Return the default dependency injection container of the {@link Application}. This is the instance previously set
      * with {@link Application::setDi()}.
      *
-     * @return DiInterface|null
+     * @return DiInterface?
      */
     public static function getDi() {
         return self::$defaultDi;
@@ -450,7 +450,7 @@ class Application extends CObject {
      *
      * @param  DiInterface $di
      *
-     * @return DiInterface|null - the previously registered default container
+     * @return DiInterface? - the previously registered default container
      */
     final public static function setDi(DiInterface $di) {
         $previous = self::$defaultDi;

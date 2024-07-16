@@ -36,7 +36,7 @@ class Input extends Facade {
      * @param  string $name               - parameter name
      * @param  string $default [optional] - value to return if the specified parameter was not transmitted
      *                                      (default: none)
-     * @return string|null
+     * @return string?
      */
     public static function get($name, $default = null) {
         $input = static::current();

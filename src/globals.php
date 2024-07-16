@@ -175,7 +175,7 @@ function debugHeader($message) {
  *                                          FALSE, if the variable is to be dumped to the standard output device (default)
  * @param  bool  $flushBuffers [optional] - whether to flush output buffers on output (default: TRUE)
  *
- * @return string|null - string if the result is to be returned, NULL otherwise
+ * @return string? - string if the result is to be returned, NULL otherwise
  */
 function dump($var, $return=false, $flushBuffers=true) {
     return \rosasurfer\dump($var, $return, $flushBuffers);
@@ -205,7 +205,7 @@ function echof($var, $flushBuffers = true) {
  *                                          FALSE, if the result is to be printed to the screen (default)
  * @param  bool  $flushBuffers [optional] - whether to flush output buffers on output (default: TRUE)
  *
- * @return string|null - string if the result is to be returned, NULL otherwise
+ * @return string? - string if the result is to be returned, NULL otherwise
  */
 function print_p($var, $return=false, $flushBuffers=true) {
     return \rosasurfer\print_p($var, $return, $flushBuffers);
@@ -262,7 +262,7 @@ function numf($number, $decimals=0, $decimalSeparator='.', $thousandsSeparator='
  *                                     TRUE:  invalid values cause a runtime exception (default)
  *                                     FALSE: invalid values are converted to a boolean
  *
- * @return bool|null - boolean value or NULL if the setting doesn't exist
+ * @return bool? - boolean value or NULL if the setting doesn't exist
  */
 function ini_get_bool($option, $strict = true) {
     return \rosasurfer\ini_get_bool($option, $strict);
@@ -279,7 +279,7 @@ function ini_get_bool($option, $strict = true) {
  *                                     TRUE:  invalid values cause a runtime exception (default)
  *                                     FALSE: invalid values are converted to an integer
  *
- * @return int|null - integer value or NULL if the setting doesn't exist
+ * @return int? - integer value or NULL if the setting doesn't exist
  */
 function ini_get_int($option, $strict = true) {
     return \rosasurfer\ini_get_int($option, $strict);
@@ -296,7 +296,7 @@ function ini_get_int($option, $strict = true) {
  *                                     TRUE:  invalid values cause a runtime exception (default)
  *                                     FALSE: invalid values are converted to an integer
  *
- * @return int|null - integer value or NULL if the setting doesn't exist
+ * @return int? - integer value or NULL if the setting doesn't exist
  */
 function ini_get_bytes($option, $strict = true) {
     return \rosasurfer\ini_get_bytes($option, $strict);
@@ -636,8 +636,8 @@ function strIsNumeric($value) {
  *
  * @param  mixed $value - boolean representation
  *
- * @return bool|null - Boolean or NULL if the parameter doesn't represent a boolean. The accepted values of a boolean's
- *                     numerical string representation (integer or float) are 0 (zero) and 1 (one).
+ * @return bool? - Boolean or NULL if the parameter doesn't represent a boolean. The accepted values of a boolean's
+ *                 numerical string representation (integer or float) are 0 (zero) and 1 (one).
  */
 function strToBool($value) {
     return \rosasurfer\strToBool($value);
@@ -720,7 +720,7 @@ function is_dir_empty($dirname, $ignore = []) {
  *
  * @param  string $name - name
  *
- * @return string|null - the same name or NULL if a component of that name doesn't exist or couldn't be loaded
+ * @return string? - the same name or NULL if a component of that name doesn't exist or couldn't be loaded
  */
 function autoload($name) {
     return \rosasurfer\autoload($name);

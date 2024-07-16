@@ -138,11 +138,11 @@ abstract class PersistableObject extends CObject {
      *
      * @param  string $property - property name
      *
-     * @return PersistableObject|PersistableObject[]|null - property value
+     * @return PersistableObject|PersistableObject[]? - property value
      */
     private function getRelationValue($property) {
         $propertyName = $property;
-        /** @var PersistableObject|PersistableObject[]|scalar|null $value */
+        /** @var PersistableObject|PersistableObject[]|scalar? $value */
         $value = &$this->$propertyName;                                 // existing property value
 
         if (is_object($value)) return $value;                           // relation is fetched and is an object or an array
@@ -152,7 +152,7 @@ abstract class PersistableObject extends CObject {
         $mapping      =  $dao->getMapping();
         $relation     = &$mapping['relations'][$propertyName];
         $isCollection = strEndsWith($relation['assoc'], 'many');
-        /** @var PersistableObject[]|null $emptyResult */
+        /** @var PersistableObject[]? $emptyResult */
         $emptyResult  = $isCollection ? [] : null;
 
         if ($value === null) {

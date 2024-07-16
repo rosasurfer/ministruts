@@ -40,8 +40,8 @@ class Tile extends CObject {
     protected $properties = [];
 
     /**
-     * @var Tile|null - Die zur Laufzeit diese Tile-Instanz umgebende Instanz oder NULL, wenn diese Instanz das aeusserste
-     *                  Fragment der Ausgabe darstellt.
+     * @var Tile? - Die zur Laufzeit diese Tile-Instanz umgebende Instanz oder NULL, wenn diese Instanz das aeusserste
+     *              Fragment der Ausgabe darstellt.
      */
     protected $parent;
 
@@ -128,7 +128,7 @@ class Tile extends CObject {
     /**
      * Whether the MVC push model is activated for the tile.
      *
-     * @return bool|null - configured state or NULL if the state is inherited from a surrounding element
+     * @return bool? - configured state or NULL if the state is inherited from a surrounding element
      */
     public function isPushModelSupport() {
         return $this->pushModelSupport;

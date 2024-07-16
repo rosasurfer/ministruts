@@ -111,7 +111,7 @@ class Input extends CObject {
      *
      * @param  string $name
      *
-     * @return string|null - argument value or NULL if the argument was not specified
+     * @return string? - argument value or NULL if the argument was not specified
      */
     public function getArgument($name) {
         Assert::string($name);

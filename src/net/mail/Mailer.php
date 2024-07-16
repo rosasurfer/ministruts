@@ -98,7 +98,7 @@ abstract class Mailer extends CObject implements MailerInterface {
      *
      * @param  string $value
      *
-     * @return string[]|null - aray with name and address part or NULL if the specified address is invalid
+     * @return string[]? - aray with name and address part or NULL if the specified address is invalid
      */
     public static function parseAddress($value) {
         Assert::string($value);
@@ -133,7 +133,7 @@ abstract class Mailer extends CObject implements MailerInterface {
      * @param  string[] $headers - array of headers
      * @param  string   $name    - header to search for
      *
-     * @return string|null - value of the last found header or NULL if the header was not found
+     * @return string? - value of the last found header or NULL if the header was not found
      */
     protected function getHeader(array $headers, $name) {
         Assert::string($name, '$name');
@@ -156,7 +156,7 @@ abstract class Mailer extends CObject implements MailerInterface {
      * @param  string[] $headers - reference to an array of headers
      * @param  string   $name    - header to remove
      *
-     * @return string|null - value of the last removed header or NULL if the header was not found
+     * @return string? - value of the last removed header or NULL if the header was not found
      */
     protected function removeHeader(array &$headers, $name) {
         Assert::string($name, '$name');
