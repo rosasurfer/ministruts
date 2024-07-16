@@ -10,7 +10,7 @@ parameters:
   level:      6                                     # a rule level on the command line overrides this hardcoded value
 
   bootstrapFiles:                                   # API stubs of unloaded PHP extensions
-    #- api.php
+    - api-stubs.php
 
   scanFiles:                                        # additional non-autoloaded files to scan for symbols
     #- helpers.php
@@ -25,22 +25,22 @@ parameters:
     - ../../vendor
 
   dynamicConstantNames:                             # changing constants depending on the environment
-    - rosasurfer\_CLI        
-    - rosasurfer\_LOCALHOST  
-    - rosasurfer\_MACOS      
-    - rosasurfer\_WINDOWS    
-    - rosasurfer\_NUL_DEVICE 
+    - rosasurfer\_CLI
+    - rosasurfer\_LOCALHOST
+    - rosasurfer\_MACOS
+    - rosasurfer\_WINDOWS
+    - rosasurfer\_NUL_DEVICE
 
-    - rosasurfer\CLI        
-    - rosasurfer\LOCALHOST  
-    - rosasurfer\MACOS      
-    - rosasurfer\WINDOWS    
-    - rosasurfer\NUL_DEVICE 
+    - rosasurfer\CLI
+    - rosasurfer\LOCALHOST
+    - rosasurfer\MACOS
+    - rosasurfer\WINDOWS
+    - rosasurfer\NUL_DEVICE
 
   ignoreErrors:
-    -  # false-positive: the constructor is already final, see https://github.com/phpstan/phpstan/issues/8298
-      message: "#^Unsafe usage of new static\\(\\)\\.$#"
-      path: ../../src/file/xml/SimpleXMLElement.php
+    #-  # false-positive: the constructor is already final, see https://github.com/phpstan/phpstan/issues/8298
+    #  message: "#^Unsafe usage of new static\\(\\)\\.$#"
+    #  path: ../../src/file/xml/SimpleXMLElement.php
 
   reportUnmatchedIgnoredErrors: false
 

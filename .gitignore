@@ -26,6 +26,7 @@ nbactions.xml
 
 vendor/
 /composer.lock
+/composer-phpstan.*
 /php-error.log
 /services.php
 
