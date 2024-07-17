@@ -145,7 +145,7 @@ function boolToStr($value) {
  *                                          FALSE, if the variable is to be dumped to the standard output device (default)
  * @param  bool  $flushBuffers [optional] - whether to flush output buffers on output (default: TRUE)
  *
- * @return string? - string if the result is to be returned, NULL otherwise
+ * @return ?string - string if the result is to be returned, NULL otherwise
  */
 function dump($var, $return=false, $flushBuffers=true) {
     return \rosasurfer\dump($var, $return, $flushBuffers);
@@ -218,7 +218,7 @@ function debugHeader($message) {
  *                                          FALSE, if the result is to be printed to the standard output device (default)
  * @param  bool  $flushBuffers [optional] - whether to flush output buffers on output (default: TRUE)
  *
- * @return string? - string if the result is to be returned, NULL otherwise
+ * @return ?string - string if the result is to be returned, NULL otherwise
  *
  * @see    printPretty()
  */
@@ -235,7 +235,7 @@ function pp($var, $return=false, $flushBuffers=true) {
  *                                          FALSE, if the result is to be printed to the standard output device (default)
  * @param  bool  $flushBuffers [optional] - whether to flush output buffers on output (default: TRUE)
  *
- * @return string? - string if the result is to be returned, NULL otherwise
+ * @return ?string - string if the result is to be returned, NULL otherwise
  */
 function printPretty($var, $return=false, $flushBuffers=true) {
     return \rosasurfer\printPretty($var, $return, $flushBuffers);
@@ -293,7 +293,7 @@ function numf($number, $decimals=0, $decimalSeparator='.', $thousandsSeparator='
  *                                     FALSE: invalid values are converted to the target type (i.e. boolean)
  *                                     (default: TRUE)
  *
- * @return bool? - boolean value or NULL if the setting doesn't exist
+ * @return ?bool - boolean value or NULL if the setting doesn't exist
  */
 function ini_get_bool($option, $strict = true) {
     return \rosasurfer\ini_get_bool($option, $strict);
@@ -311,7 +311,7 @@ function ini_get_bool($option, $strict = true) {
  *                                     FALSE: invalid values are converted to the target type (i.e. integer)
  *                                     (default: TRUE)
  *
- * @return int? - integer value or NULL if the setting doesn't exist
+ * @return ?int - integer value or NULL if the setting doesn't exist
  */
 function ini_get_int($option, $strict = true) {
     return \rosasurfer\ini_get_int($option, $strict);
@@ -329,7 +329,7 @@ function ini_get_int($option, $strict = true) {
  *                                     FALSE: invalid values are converted to the target type (i.e. integer)
  *                                     (default: TRUE)
  *
- * @return int? - integer value or NULL if the setting doesn't exist
+ * @return ?int - integer value or NULL if the setting doesn't exist
  */
 function ini_get_bytes($option, $strict = true) {
     return \rosasurfer\ini_get_bytes($option, $strict);
@@ -670,7 +670,7 @@ function strIsNumeric($value) {
  *
  * @param  mixed $value - boolean representation
  *
- * @return bool? - Boolean or NULL if the parameter doesn't represent a boolean. The accepted values of a boolean's
+ * @return ?bool - Boolean or NULL if the parameter doesn't represent a boolean. The accepted values of a boolean's
  *                 numerical string representation (integer or float) are 0 (zero) and 1 (one).
  */
 function strToBool($value) {
@@ -755,7 +755,7 @@ function is_dir_empty($dirname, $ignore = []) {
  *
  * @param  string $name - name
  *
- * @return string? - the same name or NULL if a component of that name doesn't exist or couldn't be loaded
+ * @return ?string - the same name or NULL if a component of that name doesn't exist or couldn't be loaded
  */
 function autoload($name) {
     return \rosasurfer\autoload($name);

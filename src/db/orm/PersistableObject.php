@@ -142,7 +142,7 @@ abstract class PersistableObject extends CObject {
      */
     private function getRelationValue($property) {
         $propertyName = $property;
-        /** @var PersistableObject|PersistableObject[]|scalar? $value */
+        /** @var ?PersistableObject|PersistableObject[]|scalar $value */
         $value = &$this->$propertyName;                                 // existing property value
 
         if (is_object($value)) return $value;                           // relation is fetched and is an object or an array

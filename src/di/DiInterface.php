@@ -71,7 +71,7 @@ interface DiInterface extends \ArrayAccess, ContainerInterface {
      *
      * @param  string $name - service identifier
      *
-     * @return ServiceInterface? - the removed service wrapper or NULL if no such service was found
+     * @return ?ServiceInterface - the removed service wrapper or NULL if no such service was found
      */
     public function remove($name);
 }

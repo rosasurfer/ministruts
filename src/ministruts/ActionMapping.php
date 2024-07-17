@@ -176,7 +176,7 @@ class ActionMapping extends CObject {
      * Return the mapping's role constraint. Depending on the used {@link RoleProcessor} this may be a single role identifier
      * or a logical expression (possibly referencing multiple roles).
      *
-     * @return string? - role constraint or NULL if no role constraint is defined
+     * @return ?string - role constraint or NULL if no role constraint is defined
      */
     public function getRoles() {
         return $this->roles;
@@ -261,7 +261,7 @@ class ActionMapping extends CObject {
     /**
      * Return the class name of the {@link Action} to process requests.
      *
-     * @return string? - Action class name or NULL if no Action is configured
+     * @return ?string - Action class name or NULL if no Action is configured
      */
     public function getActionClassName() {
         return $this->actionClassName;
@@ -468,7 +468,7 @@ class ActionMapping extends CObject {
      *
      * @param  string $name - logical name; can be "self" to return a redirect forward to the mapping itself
      *
-     * @return ActionForward? - ActionForward or NULL if no such forward was found
+     * @return ?ActionForward - ActionForward or NULL if no such forward was found
      */
     public function findForward($name) {
         $forward = null;
@@ -508,7 +508,7 @@ class ActionMapping extends CObject {
      * @param  string $name [optional] - logical name; can be "self" to return a redirect forward to the mapping itself
      *                                   (default: none)
      *
-     * @return ActionForward? - ActionForward or NULL if no name was specified and no forward is configured
+     * @return ?ActionForward - ActionForward or NULL if no name was specified and no forward is configured
      *
      * @throws StrutsConfigException if a name was specified but no such forward was found
      */

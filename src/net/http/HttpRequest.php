@@ -93,7 +93,7 @@ class HttpRequest extends CObject {
      * Set an HTTP header&#46;  This method overwrites an existing header of the same name.
      *
      * @param  string  $name  - header name
-     * @param  string? $value - header value (an empty value removes an existing header)
+     * @param  ?string $value - header value (an empty value removes an existing header)
      *
      * @return $this
      */
@@ -157,7 +157,7 @@ class HttpRequest extends CObject {
      *
      * @param  string $name - header name (case is ignored)
      *
-     * @return string? - header value or NULL if no such header was found
+     * @return ?string - header value or NULL if no such header was found
      */
     public function getHeader($name) {
         Assert::string($name);

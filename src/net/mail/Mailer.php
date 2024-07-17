@@ -133,7 +133,7 @@ abstract class Mailer extends CObject implements MailerInterface {
      * @param  string[] $headers - array of headers
      * @param  string   $name    - header to search for
      *
-     * @return string? - value of the last found header or NULL if the header was not found
+     * @return ?string - value of the last found header or NULL if the header was not found
      */
     protected function getHeader(array $headers, $name) {
         Assert::string($name, '$name');
@@ -156,7 +156,7 @@ abstract class Mailer extends CObject implements MailerInterface {
      * @param  string[] $headers - reference to an array of headers
      * @param  string   $name    - header to remove
      *
-     * @return string? - value of the last removed header or NULL if the header was not found
+     * @return ?string - value of the last removed header or NULL if the header was not found
      */
     protected function removeHeader(array &$headers, $name) {
         Assert::string($name, '$name');

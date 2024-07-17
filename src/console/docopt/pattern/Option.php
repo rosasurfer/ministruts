@@ -26,7 +26,7 @@ class Option extends LeafPattern {
      * @param  string       $short    [optional]
      * @param  string       $long     [optional]
      * @param  int          $argcount [optional]
-     * @param  bool|string? $value    [optional]
+     * @param  ?bool|string $value    [optional]
      */
     public function __construct($short=null, $long=null, $argcount=0, $value=false) {
         if ($argcount > 1) throw new \InvalidArgumentException();
