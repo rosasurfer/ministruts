@@ -27,6 +27,7 @@ class Input extends CObject {
      */
     public function setDocoptResult(DocoptResult $docopt) {
         $this->docoptResult = $docopt;
+        return $this;
     }
 
 
