@@ -117,6 +117,7 @@ return array(
     'rosasurfer\\db\\sqlite\\SQLiteResult' => $baseDir . '/src/db/sqlite/SQLiteResult.php',
     'rosasurfer\\file\\FileSystem' => $baseDir . '/src/file/FileSystem.php',
     'rosasurfer\\file\\xml\\SimpleXMLElement' => $baseDir . '/src/file/xml/SimpleXMLElement.php',
+    'rosasurfer\\file\\xml\\SimpleXMLElementInterface' => $baseDir . '/src/file/xml/SimpleXMLElementInterface.php',
     'rosasurfer\\file\\zip\\ZipArchive' => $baseDir . '/src/file/zip/ZipArchive.php',
     'rosasurfer\\log\\Logger' => $baseDir . '/src/log/Logger.php',
     'rosasurfer\\log\\context\\RequestData' => $baseDir . '/src/log/context/RequestData.php',

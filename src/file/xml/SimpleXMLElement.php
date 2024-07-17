@@ -16,7 +16,7 @@ use const rosasurfer\NL;
  *
  * A {@link \SimpleXMLElement} with additional functionalities.
  */
-class SimpleXMLElement extends \SimpleXMLElement {
+class SimpleXMLElement extends \SimpleXMLElement implements SimpleXMLElementInterface {
 
     use ObjectTrait, DiAwareTrait;
 
@@ -46,7 +46,7 @@ class SimpleXMLElement extends \SimpleXMLElement {
         /** @var SimpleXMLElement $xml */
         $xml = $ex = null;
         try {
-            $xml = new static(...func_get_args());
+            $xml = new static(...func_get_args());                          // since PHP 8.0 the constructor is not final anymore
         }
         catch (IRosasurferException $ex) {}
         catch (\Throwable           $ex) { $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex); }
