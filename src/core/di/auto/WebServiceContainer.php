@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\core\di\defaultt;
+namespace rosasurfer\core\di\auto;
 
 use rosasurfer\console\io\Output;
 use rosasurfer\core\di\Di;
