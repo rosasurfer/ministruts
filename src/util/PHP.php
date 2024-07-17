@@ -195,9 +195,8 @@ class PHP extends StaticClass {
                     else if ($warnLimit >        128*MB)                                                             $issues[] = 'Info:  log.warn.memory_limit ('.$sWarnLimit.') is very high (memory_limit: '.ini_get('memory_limit').')  [configuration]';
                 }
             }
-        /*PHP_INI_PERDIR*/ if (       ini_get_bool('register_argc_argv'            ) && !CLI      /*hardcoded*/)     $issues[] = 'Info:  register_argc_argv is not Off  [performance]';
+        /*PHP_INI_PERDIR*/ if (       ini_get_bool('register_argc_argv'            ) && !CLI /*hardcoded*/)          $issues[] = 'Info:  register_argc_argv is not Off  [performance]';
         /*PHP_INI_PERDIR*/ if (      !ini_get_bool('auto_globals_jit'              ))                                $issues[] = 'Info:  auto_globals_jit is not On  [performance]';
-        /*PHP_INI_ALL   */ if ( empty(ini_get     ('date.timezone'                 )) && empty($_SERVER['TZ']))      $issues[] = 'Error: date.timezone is not set  [setup]';
         /*PHP_INI_ALL   */ if (!empty(ini_get     ('open_basedir'                  )))                               $issues[] = 'Info:  open_basedir is not empty: "'.ini_get('open_basedir').'"  [performance]';
         /*PHP_INI_SYSTEM*/ if (      !ini_get_bool('allow_url_fopen'               ))                                $issues[] = 'Info:  allow_url_fopen is not On  [functionality]';
         /*PHP_INI_SYSTEM*/ if (       ini_get_bool('allow_url_include'))                                             $issues[] = 'Error: allow_url_include is not Off  [security]';
@@ -399,7 +398,7 @@ class PHP extends StaticClass {
             </div>
             <?php
             echo NL;
-            @phpinfo();         // PHP might trigger warnings that are already checked and displayed (e.g. "date.timezone").
+            phpinfo();
         }
     }
 
