@@ -46,7 +46,7 @@ class SimpleXMLElement extends \SimpleXMLElement {
         /** @var SimpleXMLElement $xml */
         $xml = $ex = null;
         try {
-            $xml = new static(...func_get_args());                      // @phpstan-ignore-line
+            $xml = new static(...func_get_args());                      // @phpstan-ignore-line since PHP 8.0 the constructor is not final anymore
         }
         catch (IRosasurferException $ex) {}
         catch (\Throwable           $ex) { $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex); }
