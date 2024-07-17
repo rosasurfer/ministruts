@@ -2,7 +2,7 @@
 namespace rosasurfer;
 
 use rosasurfer\config\ConfigInterface;
-use rosasurfer\config\defaultt\DefaultConfig;
+use rosasurfer\config\auto\DefaultConfig;
 use rosasurfer\console\Command;
 use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;

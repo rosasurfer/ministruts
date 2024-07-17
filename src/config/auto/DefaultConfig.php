@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\config\defaultt;
+namespace rosasurfer\config\auto;
 
 use rosasurfer\Application;
 use rosasurfer\config\Config;
