@@ -177,7 +177,6 @@ class PHP extends StaticClass {
         // ------------------
         if (!php_ini_loaded_file())                                                                                  $issues[] = 'Error: no "php.ini" configuration file loaded  [setup]';
         /*PHP_INI_PERDIR*/ if (       ini_get_bool('short_open_tag'                ))                                $issues[] = 'Error: short_open_tag is not Off [XML compatibility]';
-        /*PHP_INI_PERDIR*/ if (       ini_get_bool('asp_tags'                      ) && PHP_VERSION_ID <  70000)     $issues[] = 'Info:  asp_tags is not Off  [standards]';
         /*PHP_INI_ONLY  */ if (       ini_get_bool('expose_php'                    ) && !CLI)                        $issues[] = 'Warn:  expose_php is not Off  [security]';
         /*PHP_INI_ALL   */ if (       ini_get_int ('max_execution_time'            ) > 30 && !CLI /*hardcoded*/)     $issues[] = 'Info:  max_execution_time is very high: '.ini_get('max_execution_time').'  [resources]';
         /*PHP_INI_ALL   */ if (       ini_get_int ('default_socket_timeout'        ) > 30   /*PHP default: 60*/)     $issues[] = 'Info:  default_socket_timeout is very high: '.ini_get('default_socket_timeout').'  [resources]';
@@ -196,19 +195,9 @@ class PHP extends StaticClass {
                     else if ($warnLimit >        128*MB)                                                             $issues[] = 'Info:  log.warn.memory_limit ('.$sWarnLimit.') is very high (memory_limit: '.ini_get('memory_limit').')  [configuration]';
                 }
             }
-        /*PHP_INI_PERDIR*/ if (       ini_get_bool('register_globals'              ) && PHP_VERSION_ID <  50400)     $issues[] = 'Error: register_globals is not Off  [security]';
-        /*PHP_INI_PERDIR*/ if (       ini_get_bool('register_long_arrays'          ) && PHP_VERSION_ID <  50400)     $issues[] = 'Info:  register_long_arrays is not Off  [performance]';
         /*PHP_INI_PERDIR*/ if (       ini_get_bool('register_argc_argv'            ) && !CLI      /*hardcoded*/)     $issues[] = 'Info:  register_argc_argv is not Off  [performance]';
         /*PHP_INI_PERDIR*/ if (      !ini_get_bool('auto_globals_jit'              ))                                $issues[] = 'Info:  auto_globals_jit is not On  [performance]';
-        /*PHP_INI_ALL   */ if (       ini_get_bool('define_syslog_variables'       ) && PHP_VERSION_ID <  50400)     $issues[] = 'Info:  define_syslog_variables is not Off  [performance]';
-        /*PHP_INI_PERDIR*/ if (       ini_get_bool('allow_call_time_pass_reference') && PHP_VERSION_ID <  50400)     $issues[] = 'Info:  allow_call_time_pass_reference is not Off  [standards]';
-        /*PHP_INI_ALL   */ if (      !ini_get_bool('y2k_compliance'                ) && PHP_VERSION_ID <  50400)     $issues[] = 'Info:  y2k_compliance is not On  [standards]';
-        /*PHP_INI_ALL   */ $timezone = ini_get    ('date.timezone'                 );
-            if (empty($timezone) && (empty($_SERVER['TZ'])                           || PHP_VERSION_ID >= 50400))    $issues[] = 'Error: date.timezone is not set  [setup]';
-        /*PHP_INI_SYSTEM*/ if (       ini_get_bool('safe_mode'                     ) && PHP_VERSION_ID <  50400)     $issues[] = 'Error: safe_mode is not Off  [functionality]';
-            /**
-             * With 'safe_mode'=On plenty of required function parameters are ignored: e.g. http://php.net/manual/en/function.mysql-connect.php
-             */
+        /*PHP_INI_ALL   */ if ( empty(ini_get     ('date.timezone'                 )) && empty($_SERVER['TZ']))      $issues[] = 'Error: date.timezone is not set  [setup]';
         /*PHP_INI_ALL   */ if (!empty(ini_get     ('open_basedir'                  )))                               $issues[] = 'Info:  open_basedir is not empty: "'.ini_get('open_basedir').'"  [performance]';
         /*PHP_INI_SYSTEM*/ if (      !ini_get_bool('allow_url_fopen'               ))                                $issues[] = 'Info:  allow_url_fopen is not On  [functionality]';
         /*PHP_INI_SYSTEM*/ if (       ini_get_bool('allow_url_include'))                                             $issues[] = 'Error: allow_url_include is not Off  [security]';
@@ -250,11 +239,6 @@ class PHP extends StaticClass {
 
         // input sanitizing
         // ----------------
-        if (PHP_VERSION_ID < 50400) {
-            /*PHP_INI_ALL   */ if      (ini_get_bool('magic_quotes_sybase' )) /*overrides 'magic_quotes_gpc'*/       $issues[] = 'Error: magic_quotes_sybase is not Off  [standards]';
-            /*PHP_INI_PERDIR*/ else if (ini_get_bool('magic_quotes_gpc'    ))                                        $issues[] = 'Error: magic_quotes_gpc is not Off  [standards]';
-            /*PHP_INI_ALL   */ if      (ini_get_bool('magic_quotes_runtime'))                                        $issues[] = 'Error: magic_quotes_runtime is not Off  [standards]';
-        }
         /*PHP_INI_SYSTEM*/     if      (ini_get_bool('sql.safe_mode'       ))                                        $issues[] = 'Warn:  sql.safe_mode is not Off  [setup]';
 
         // request & HTML handling
@@ -270,8 +254,7 @@ class PHP extends StaticClass {
                 }
                 $order = $newOrder;
             }              if ($order != 'GP')                                                                       $issues[] = 'Error: request_order is not "GP": "'.(empty(ini_get('request_order')) ? '" (empty) => variables_order:"':'').$order.'"  [standards]';
-        /*PHP_INI_PERDIR*/ if (       ini_get_bool('always_populate_raw_post_data' ) && PHP_VERSION_ID <  70000)     $issues[] = 'Info:  always_populate_raw_post_data is not Off  [performance]';
-        /*PHP_INI_PERDIR*/ if (      !ini_get_bool('enable_post_data_reading'      ) && PHP_VERSION_ID >= 50400)     $issues[] = 'Warn:  enable_post_data_reading is not On  [request handling]';
+        /*PHP_INI_PERDIR*/ if (      !ini_get_bool('enable_post_data_reading'      ))                                $issues[] = 'Warn:  enable_post_data_reading is not On  [request handling]';
         /*PHP_INI_ALL   */ if (       ini_get     ('arg_separator.output'          ) != '&')                         $issues[] = 'Warn:  arg_separator.output is not "&": "'.ini_get('arg_separator.output').'"  [standards]';
         /*PHP_INI_ALL   */ if (      !ini_get_bool('ignore_user_abort'             ) && !CLI)                        $issues[] = 'Error: ignore_user_abort is not On  [setup]';
         /*PHP_INI_PERDIR*/ $postMaxSize = ini_get_bytes('post_max_size');
@@ -315,12 +298,8 @@ class PHP extends StaticClass {
                  definition using auto_prepend_file in which you load the class definition else you will have to serialize()
                  your object and unserialize() it afterwards.
         */
-        if (PHP_VERSION_ID < 50400) {
-            /*PHP_INI_ALL*/ if ( ini_get_bool('session.bug_compat_42')) {                                            $issues[] = 'Info:  session.bug_compat_42 is not Off';
-            /*PHP_INI_ALL*/ if (!ini_get_bool('session.bug_compat_warn'))                                            $issues[] = 'Info:  session.bug_compat_warn is not On';
-        }}
         /*PHP_INI_ALL   */ if ( ini_get     ('session.referer_check') != '')                                         $issues[] = 'Warn:  session.referer_check is not "": "'.ini_get('session.referer_check').'"  [functionality]';
-        /*PHP_INI_ALL   */ if (!ini_get_bool('session.use_strict_mode') && PHP_VERSION_ID >= 50502)                  $issues[] = 'Warn:  session.use_strict_mode is not On  [security]';
+        /*PHP_INI_ALL   */ if (!ini_get_bool('session.use_strict_mode'))                                             $issues[] = 'Warn:  session.use_strict_mode is not On  [security]';
         /*PHP_INI_ALL   */ if (!ini_get_bool('session.use_cookies'))                                                 $issues[] = 'Warn:  session.use_cookies is not On  [security]';
         /*PHP_INI_ALL   */ if (!ini_get_bool('session.use_only_cookies'))                                            $issues[] = 'Warn:  session.use_only_cookies is not On  [security]';
         /*PHP_INI_ALL   */ if ( ini_get_bool('session.use_trans_sid')) {

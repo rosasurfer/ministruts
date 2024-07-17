@@ -143,15 +143,8 @@ class Assert extends StaticClass {
      * @return bool - whether the assertion is TRUE
      */
     public static function throwable($value, $message = null, ...$args) {
-        if (PHP_VERSION_ID < 70000) {
-            if (!$value instanceof \Exception) {
-                throw new InvalidTypeException(static::illegalTypeMessage($value, '\Exception', $message, $args));
-            }
-        }
-        else {
-            if (!$value instanceof \Throwable) {
-                throw new InvalidTypeException(static::illegalTypeMessage($value, '\Throwable', $message, $args));
-            }
+        if (!$value instanceof \Throwable) {
+            throw new InvalidTypeException(static::illegalTypeMessage($value, '\Throwable', $message, $args));
         }
         return true;
     }
