@@ -107,8 +107,8 @@ class ErrorHandler extends StaticClass {
                  * @link  https://gist.github.com/dominics/61c23f2ded720d039554d889d304afc9
                  */
                 if (self::$errorMode) {
-                    $oomEmergencyMemory = $match = null;                        // release the reserved memory, meant to be used by preg_match()
                     $error = error_get_last();
+                    $oomEmergencyMemory = $match = null;                        // release the reserved memory to be available for preg_match()
                     if ($error && $error['type']==E_ERROR && preg_match(self::$oomRegExp, $error['message'], $match)) {
                         ini_set('memory_limit', (int)$match[1] + 10*MB);        // allocate memory for the regular handler
 
