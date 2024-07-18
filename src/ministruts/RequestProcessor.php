@@ -108,7 +108,7 @@ class RequestProcessor extends CObject {
      * @param  Request  $request
      * @param  Response $response
      *
-     * @return ActionMapping? - ActionMapping or NULL if no mapping responsible for processing the request was found
+     * @return ?ActionMapping - ActionMapping or NULL if no mapping responsible for processing the request was found
      */
     protected function processMapping(Request $request, Response $response) {
         // resolve the full request path
@@ -229,7 +229,7 @@ PROCESS_METHOD_ERROR_SC_405;
         if (empty($mapping->getRoles()))
             return true;
 
-        /** @var ActionForward|string? $forward */
+        /** @var ?ActionForward|string $forward */
         $forward = $this->module->getRoleProcessor()->processRoles($request, $mapping);
         if (!isset($forward))
             return true;
@@ -347,7 +347,7 @@ PROCESS_METHOD_ERROR_SC_405;
      * @param  Response $response
      * @param  Action   $action
      *
-     * @return ActionForward? - ActionForward or NULL if request processing has already finished
+     * @return ?ActionForward - ActionForward or NULL if request processing has already finished
      */
     protected function processActionExecute(Request $request, Response $response, Action $action) {
         $forward = $ex = null;

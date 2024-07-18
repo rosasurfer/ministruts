@@ -16,7 +16,7 @@ abstract class LeafPattern extends Pattern {
 
 
     /**
-     * @param  string? $name
+     * @param  ?string $name
      * @param  mixed   $value [optional]
      */
     public function __construct($name, $value = null) {

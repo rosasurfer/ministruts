@@ -237,7 +237,7 @@ class Command extends CObject {
     /**
      * Return the command's dynamic validation implementation.
      *
-     * @return \Closure?
+     * @return ?\Closure
      */
     public function getValidator() {
         return $this->validator;
@@ -261,7 +261,7 @@ class Command extends CObject {
     /**
      * Return the command's dynamic task implementation.
      *
-     * @return \Closure?
+     * @return ?\Closure
      */
     public function getTask() {
         return $this->task;

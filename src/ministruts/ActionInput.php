@@ -47,7 +47,7 @@ class ActionInput extends CObject implements \ArrayAccess {
      * @param  string $name               - parameter name
      * @param  string $default [optional] - value to return if the specified parameter was not transmitted
      *                                      (default: none)
-     * @return string?
+     * @return ?string
      */
     public function get($name, $default = null) {
         if (\key_exists($name, $this->parameters)) {
@@ -124,7 +124,7 @@ class ActionInput extends CObject implements \ArrayAccess {
      *
      * @param  string $name
      *
-     * @return string|array? - parameter or NULL if no such input parameter exists
+     * @return ?string|array - parameter or NULL if no such input parameter exists
      */
     public function offsetGet($name) {
         if (\key_exists($name, $this->parameters))

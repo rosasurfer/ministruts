@@ -116,7 +116,7 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
     /**
      * Return the dispatch action key (if the action is a {@link DispatchAction} and a key was submitted).
      *
-     * @return string? - action key or NULL if no action key was submitted
+     * @return ?string - action key or NULL if no action key was submitted
      *
      * @see    java.struts.DispatchAction
      */

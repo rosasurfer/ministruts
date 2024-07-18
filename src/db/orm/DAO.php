@@ -70,7 +70,7 @@ abstract class DAO extends Singleton {
      * @param  string $query                - SQL query with optional ORM syntax
      * @param  bool   $allowMany [optional] - whether the query is allowed to return a multi-row result (default: no)
      *
-     * @return PersistableObject?
+     * @return ?PersistableObject
      *
      * @throws MultipleRecordsException if the query returned multiple rows and $allowMany was not set to TRUE.
      */
@@ -343,7 +343,7 @@ abstract class DAO extends Singleton {
      * Escape a DBMS literal, i.e. a column's value. The resulting string can be used in queries "as-is" and doesn't need
      * additional quoting.
      *
-     * @param  scalar? $value - value to escape
+     * @param  ?scalar $value - value to escape
      *
      * @return string - escaped and quoted string or stringified scalar value if the value was not a string
      */
@@ -355,9 +355,9 @@ abstract class DAO extends Singleton {
     /**
      * Escape a scalar value. The resulting string must be quoted according to the DBMS before it can be used in queries.
      *
-     * @param  scalar? $value - value to escape
+     * @param  ?scalar $value - value to escape
      *
-     * @return string? - escaped but unquoted string or NULL if the value was NULL
+     * @return ?string - escaped but unquoted string or NULL if the value was NULL
      */
     public function escapeString($value) {
         return $this->db()->escapeString($value);

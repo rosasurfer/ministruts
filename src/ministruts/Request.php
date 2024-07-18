@@ -205,7 +205,7 @@ class Request extends CObject {
      *
      * @param  string $name - parameter name of the file upload
      *
-     * @return array? - array or NULL if no such file was uploaded
+     * @return ?array - array or NULL if no such file was uploaded
      *
      * TODO: Convert the returned array to an instance of {@link UploadedFile}.
      */
@@ -405,7 +405,7 @@ class Request extends CObject {
     /**
      * Resolve the value of an existing APP_BASE_URI server variable. Considers existing redirection values.
      *
-     * @return string? - value or NULL if the variable is not defined
+     * @return ?string - value or NULL if the variable is not defined
      */
     private function resolveBaseUriVar() {
         $envName = 'APP_BASE_URI';
@@ -475,7 +475,7 @@ class Request extends CObject {
     /**
      * Return the value of a transmitted "X-Forwarded-For" header.
      *
-     * @return string? - header value (one or more ip addresses or hostnames) or NULL if the header was not transmitted
+     * @return ?string - header value (one or more ip addresses or hostnames) or NULL if the header was not transmitted
      */
     public function getForwardedRemoteAddress() {
         return $this->getHeaderValue(['X-Forwarded-For', 'X-UP-Forwarded-For']);
@@ -514,7 +514,7 @@ class Request extends CObject {
      * Return the "Content-Type" header of the request. If multiple "Content-Type" headers have been transmitted the first
      * one is returned.
      *
-     * @return string? - "Content-Type" header or NULL if no "Content-Type" header was transmitted
+     * @return ?string - "Content-Type" header or NULL if no "Content-Type" header was transmitted
      */
     public function getContentType() {
         $contentType = $this->getHeaderValue('Content-Type');
@@ -631,7 +631,7 @@ class Request extends CObject {
      *
      * @param  string $name - header name
      *
-     * @return string? - header value or NULL if no such header was transmitted
+     * @return ?string - header value or NULL if no such header was transmitted
      */
     public function getHeader($name) {
         Assert::string($name);
@@ -701,7 +701,7 @@ class Request extends CObject {
      *
      * @param  string|string[] $names - one or multiple header names
      *
-     * @return string? - value or NULL if no such headers have been transmitted
+     * @return ?string - value or NULL if no such headers have been transmitted
      */
     public function getHeaderValue($names) {
         if (is_string($names)) {
@@ -844,7 +844,7 @@ class Request extends CObject {
      *
      * @param  string $key [optional]
      *
-     * @return string? - message
+     * @return ?string - message
      */
     public function getActionMessage($key = null) {
         Assert::nullOrString($key);
@@ -950,7 +950,7 @@ class Request extends CObject {
      *
      * @param  string $key [optional]
      *
-     * @return string? - message
+     * @return ?string - message
      */
     public function getActionError($key = null) {
         Assert::nullOrString($key);
@@ -1052,7 +1052,7 @@ class Request extends CObject {
     /**
      * Return the MiniStruts {@link ActionMapping} responsible for processing the current request.
      *
-     * @return ActionMapping? - instance or NULL if the request doesn't match any of the configured mappings
+     * @return ?ActionMapping - instance or NULL if the request doesn't match any of the configured mappings
      */
     final public function getMapping() {
         return $this->getAttribute(ACTION_MAPPING_KEY);
@@ -1062,7 +1062,7 @@ class Request extends CObject {
     /**
      * Return the MiniStruts {@link Module} the current request is assigned to.
      *
-     * @return Module? - instance or NULL if the request doesn't match any of the configured modules
+     * @return ?Module - instance or NULL if the request doesn't match any of the configured modules
      */
     final public function getModule() {
         return $this->getAttribute(MODULE_KEY);

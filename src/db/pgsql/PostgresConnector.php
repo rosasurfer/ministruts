@@ -215,7 +215,7 @@ class PostgresConnector extends Connector {
     /**
      * Return the database's current schema search path.
      *
-     * @return string? - schema search path or NULL in case of errors
+     * @return ?string - schema search path or NULL in case of errors
      */
     protected function getSchemaSearchPath() {
         $options = $this->options;

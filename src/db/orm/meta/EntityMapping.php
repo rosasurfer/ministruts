@@ -71,7 +71,7 @@ class EntityMapping extends CObject implements \Iterator {
      *
      * @param  string $name - a property's PHP name
      *
-     * @return PropertyMapping? - mapping or NULL if no such property exists
+     * @return ?PropertyMapping - mapping or NULL if no such property exists
      */
     public function getProperty($name) {
         if (!isset($this->mapping['properties'][$name]))
@@ -105,7 +105,7 @@ class EntityMapping extends CObject implements \Iterator {
     /**
      * Return the mapping instance of the entity's versioning property.
      *
-     * @return PropertyMapping? - mapping or NULL if versioning is not configured
+     * @return ?PropertyMapping - mapping or NULL if versioning is not configured
      */
     public function getVersion() {
         if ($this->version === null) {

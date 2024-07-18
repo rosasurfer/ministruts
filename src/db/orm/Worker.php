@@ -49,7 +49,7 @@ class Worker extends CObject {
      * @param  string $query                - SQL query with optional ORM syntax
      * @param  bool   $allowMany [optional] - whether the query is allowed to return a multi-row result (default: no)
      *
-     * @return PersistableObject?
+     * @return ?PersistableObject
      *
      * @throws MultipleRecordsException if the query returned multiple rows and $allowMany was not set to TRUE.
      */
@@ -140,7 +140,7 @@ class Worker extends CObject {
      *
      * @param  IResult $result
      *
-     * @return PersistableObject? - instance or NULL if the result doesn't hold any more rows
+     * @return ?PersistableObject - instance or NULL if the result doesn't hold any more rows
      */
     protected function makeObject(IResult $result) {
 
