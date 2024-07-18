@@ -9,9 +9,9 @@ use rosasurfer\core\exception\IllegalStateException;
 use rosasurfer\core\exception\InvalidTypeException;
 use rosasurfer\core\exception\InvalidValueException;
 use rosasurfer\core\exception\RuntimeException;
-use rosasurfer\net\NetTools;
 
 use function rosasurfer\first;
+use function rosasurfer\getHostByAddress;
 use function rosasurfer\ini_get_bool;
 use function rosasurfer\strCompareI;
 use function rosasurfer\strEndsWith;
@@ -466,7 +466,7 @@ class Request extends CObject {
         static $hostname = null;
         if (!$hostname) {
             /** @var string $hostname */
-            $hostname = NetTools::getHostByAddress($this->getRemoteAddress());
+            $hostname = getHostByAddress($this->getRemoteAddress());
         }
         return $hostname;
     }

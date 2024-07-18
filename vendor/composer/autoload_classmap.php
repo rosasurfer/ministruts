@@ -140,7 +140,6 @@ return array(
     'rosasurfer\\ministruts\\Tile' => $baseDir . '/src/ministruts/Tile.php',
     'rosasurfer\\ministruts\\url\\Url' => $baseDir . '/src/ministruts/url/Url.php',
     'rosasurfer\\ministruts\\url\\VersionedUrl' => $baseDir . '/src/ministruts/url/VersionedUrl.php',
-    'rosasurfer\\net\\NetTools' => $baseDir . '/src/net/NetTools.php',
     'rosasurfer\\net\\http\\CurlHttpClient' => $baseDir . '/src/net/http/CurlHttpClient.php',
     'rosasurfer\\net\\http\\CurlHttpResponse' => $baseDir . '/src/net/http/CurlHttpResponse.php',
     'rosasurfer\\net\\http\\HeaderParser' => $baseDir . '/src/net/http/HeaderParser.php',

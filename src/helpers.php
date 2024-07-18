@@ -1539,6 +1539,28 @@ function ifEmpty($value, $altValue) {
 
 
 /**
+ * Return the host name of the internet host specified by a given IP address.
+ *
+ * @param  string $ipAddress - the host IP address
+ *
+ * @return string - the host name on success, or the unmodified IP address on resolver error
+ */
+function getHostByAddress($ipAddress) {
+    Assert::string($ipAddress);
+    if ($ipAddress == '') throw new InvalidValueException('Invalid parameter $ipAddress: "'.$ipAddress.'"');
+
+    $result = \gethostbyaddr($ipAddress);
+
+    if ($result === false) throw new InvalidValueException('Invalid parameter $ipAddress: "'.$ipAddress.'"');
+
+    if ($result==='localhost' && !strStartsWith($ipAddress, '127.')) {
+        $result = $ipAddress;
+    }
+    return $result;
+}
+
+
+/**
  * Return a sorted copy of the specified array using the algorythm and parameters of {@link \ksort()}.
  * Opposite to ksort() this function will not modify the passed array.
  *

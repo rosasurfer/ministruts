@@ -905,6 +905,18 @@ function ifEmpty($value, $altValue) {
 
 
 /**
+ * Return the host name of the internet host specified by a given IP address.
+ *
+ * @param  string $ipAddress - the host IP address
+ *
+ * @return string - the host name on success, or the unmodified IP address on resolver error
+ */
+function getHostByAddress($ipAddress) {
+    return \rosasurfer\getHostByAddress($ipAddress);
+}
+
+
+/**
  * Return a sorted copy of the specified array using the algorythm and parameters of {@link \ksort()}.
  * Opposite to ksort() this function will not modify the passed array.
  *

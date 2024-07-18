@@ -11,10 +11,10 @@ use rosasurfer\core\error\PHPError;
 use rosasurfer\core\exception\IllegalStateException;
 use rosasurfer\core\exception\InvalidValueException;
 use rosasurfer\log\context\RequestData;
-use rosasurfer\net\NetTools;
 use rosasurfer\net\mail\Mailer;
 
 use function rosasurfer\echof;
+use function rosasurfer\getHostByAddress;
 use function rosasurfer\hsc;
 use function rosasurfer\ini_get_bool;
 use function rosasurfer\ksortc;
@@ -575,7 +575,7 @@ class Logger extends StaticClass {
                 $session = print_r(ksortc($_SESSION), true);
             }
             $ip      = $_SERVER['REMOTE_ADDR'];
-            $host    = NetTools::getHostByAddress($ip);
+            $host    = getHostByAddress($ip);
             if ($host != $ip)
                 $ip .= ' ('.$host.')';
             $msg .= NL.NL.'Request:'.NL.'--------'.NL.$request.NL.NL
