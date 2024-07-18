@@ -172,9 +172,7 @@ class ActionForward extends CObject {
         Assert::string      ($key,   '$key');
         Assert::nullOrScalar($value, '$value');
 
-        if     (!isset($value))  $value = '';
-        elseif (is_bool($value)) $value = (int) $value;
-
+        if (is_bool($value)) $value = (int) $value;
         $value = (string) $value;
 
         // TODO: extend to process multiple parameters at once
@@ -195,13 +193,11 @@ class ActionForward extends CObject {
      */
     public function setHash($value) {
         // TODO: freeze the instance after configuration and automatically call copy()
+        Assert::scalar($value);
 
-        if (isset($value)) {
-            Assert::scalar($value);
-            if (is_bool($value))
-                $value = (int) $value;
-        }
+        if (is_bool($value)) $value = (int) $value;
         $value = (string) $value;
+
         $path = $this->getPath();
         $this->setPath(strLeftTo($path, '#', 1, false, $path).'#'.$value);
 

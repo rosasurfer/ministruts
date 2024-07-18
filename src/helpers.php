@@ -849,7 +849,6 @@ function strEndsWithI($string, $suffix) {
  * </pre>
  */
 function strLeft($string, $length) {
-    if (!isset($string)) return '';
     Assert::string($string, '$string');
     Assert::int   ($length, '$length');
 
@@ -945,12 +944,10 @@ function strLeftTo($string, $limiter, $count=1, $includeLimiter=false, $onNotFou
  * </pre>
  */
 function strRight($string, $length) {
-    if (!isset($string)) return '';
     Assert::string($string, '$string');
     Assert::int   ($length, '$length');
 
-    if ($length == 0)
-        return '';
+    if (!$length) return '';
 
     $result = substr($string, -$length);
     return $result===false ? '' : $result;

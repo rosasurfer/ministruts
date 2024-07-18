@@ -145,7 +145,7 @@ class MySQLConnector extends Connector {
     /**
      * Set the password for the connection (if any).
      *
-     * @param  string $password - may be empty or NULL (no password)
+     * @param  ?string $password - may be empty or NULL (no password)
      *
      * @return $this
      */
