@@ -28,26 +28,11 @@ final class NetTools extends StaticClass {
         Assert::string($ipAddress);
         if ($ipAddress == '') throw new InvalidValueException('Invalid parameter $ipAddress: "'.$ipAddress.'"');
 
-        $result = gethostbyaddr($ipAddress);
+        $result = \gethostbyaddr($ipAddress);
 
         if ($result==='localhost' && !strStartsWith($ipAddress, '127.'))
             $result = $ipAddress;
 
         return $result;
-    }
-
-
-    /**
-     * Gibt die IP-Adresse eines Hostnamens zurueck.
-     *
-     * @param  string $name - Hostname
-     *
-     * @return string - IP-Adresse oder der originale Hostname, wenn dieser nicht aufgeloest werden kann
-     */
-    public static function getHostByName($name) {
-        Assert::string($name);
-        if ($name == '') throw new InvalidValueException('Invalid parameter $name: "'.$name.'"');
-
-        return \gethostbyname($name);
     }
 }
