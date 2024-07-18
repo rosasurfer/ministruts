@@ -145,7 +145,6 @@ class SQLiteConnector extends Connector {
         }
         catch (IRosasurferException $ex) {}
         catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
-        catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
 
         if ($ex) {
             $file = $this->file;
@@ -322,7 +321,6 @@ class SQLiteConnector extends Connector {
         }
         catch (IRosasurferException $ex) {}
         catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
-        catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
         if ($ex) throw $ex->appendMessage('Database: '.$this->file.NL.'SQL: "'.$sql.'"');
 
         // track last_insert_id

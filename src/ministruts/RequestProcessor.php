@@ -365,7 +365,6 @@ PROCESS_METHOD_ERROR_SC_405;
             }
         }
         catch (\Throwable $ex) {}           // auftretende Exceptions zwischenspeichern
-        catch (\Exception $ex) {}
 
         // falls statt eines ActionForwards ein String-Identifier zurueckgegeben wurde, diesen aufloesen
         if (is_string($forward))

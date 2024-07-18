@@ -286,7 +286,6 @@ class Logger extends StaticClass {
             $isActive = false;                                                  // unlock the section
         }
         catch (\Throwable $logException) {}
-        catch (\Exception $logException) {}
 
         if ($logException) {
             // If the call comes from our framework's exception handler (that's \rosasurfer\core\error\ErrorHandler::handleException())

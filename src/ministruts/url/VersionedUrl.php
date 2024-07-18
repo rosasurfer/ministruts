@@ -33,11 +33,9 @@ class VersionedUrl extends Url {
                 else                $uri .= '&';
                 $uri .= dechex(crc32(filesize($fileName).'|'.filemtime($fileName)));
             }
-            Assert::string($uri);                                               
+            Assert::string($uri);
         }                                                                       // Ensure __toString() doesn't throw an exception as otherwise
         catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }  // PHP < 7.4 will trigger a non-catchable fatal error.
-        catch (\Exception $ex) { ErrorHandler::handleToStringException($ex); }  // @see  https://bugs.php.net/bug.php?id=53648
-
-        return $uri;
+        return $uri;                                                            // @see  https://bugs.php.net/bug.php?id=53648
     }
 }

@@ -236,7 +236,6 @@ class ErrorHandler extends StaticClass {
             ]);
         }
         catch (\Throwable $secondEx) {}
-        catch (\Exception $secondEx) {}
 
         if ($secondEx)  {
             // secondary exception: the logger itself crashed, last chance to log
@@ -276,7 +275,6 @@ class ErrorHandler extends StaticClass {
                 else echof('application error (see error log)');
             }
             catch (\Throwable $thirdEx) { echof('application error (see error log)'); }
-            catch (\Exception $thirdEx) { echof('application error (see error log)'); }
         }
 
         // chain a previously active exception handler

@@ -234,7 +234,6 @@ class PostgresConnector extends Connector {
                 break;
             }
             catch (\Throwable $ex) {}
-            catch (\Exception $ex) {}
 
             if ($ex) {
                 if (strContainsI($ex->getMessage(), 'current transaction is aborted, commands ignored until end of transaction block')) {
@@ -269,7 +268,6 @@ class PostgresConnector extends Connector {
         }
         catch (IRosasurferException $ex) {}
         catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
-        catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
         if ($ex) throw $ex->appendMessage('Cannot connect to PostgreSQL server with connection string: "'.$connStr.'"');
 
         $this->setConnectionOptions();
@@ -461,7 +459,6 @@ class PostgresConnector extends Connector {
         }
         catch (IRosasurferException $ex) {}
         catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
-        catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
         if ($ex) throw $ex->appendMessage('Database: '.$this->getConnectionDescription().NL.'SQL: "'.$sql.'"');
 
         /** @var string $status */
@@ -573,7 +570,7 @@ class PostgresConnector extends Connector {
                     $this->lastInsertId = $this->query('select lastVal()')->fetchInt();
                 }
                 catch (\Throwable $ex) {}
-                catch (\Exception $ex) {}
+
                 if ($ex) {
                     if (stripos($ex->getMessage(), 'ERROR:  lastval is not yet defined in this session') === false)
                         throw $ex;

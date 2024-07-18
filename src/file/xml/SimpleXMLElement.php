@@ -50,7 +50,6 @@ class SimpleXMLElement extends \SimpleXMLElement implements SimpleXMLElementInte
         }
         catch (IRosasurferException $ex) {}
         catch (\Throwable           $ex) { $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex); }
-        catch (\Exception           $ex) { $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex); }
 
         finally {
             restore_error_handler();

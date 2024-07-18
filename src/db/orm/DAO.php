@@ -173,8 +173,10 @@ abstract class DAO extends Singleton {
             $this->db()->commit();
             return $result;
         }
-        catch (\Throwable $ex) { $this->db()->rollback(); throw $ex; }
-        catch (\Exception $ex) { $this->db()->rollback(); throw $ex; }
+        catch (\Throwable $ex) {
+            $this->db()->rollback();
+            throw $ex;
+        }
     }
 
 

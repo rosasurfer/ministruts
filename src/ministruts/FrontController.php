@@ -114,7 +114,6 @@ class FrontController extends Singleton {
         }
         catch (IRosasurferException $ex) {}
         catch (\Throwable           $ex) { $ex = new StrutsConfigException($ex->getMessage(), $ex->getCode(), $ex); }
-        catch (\Exception           $ex) { $ex = new StrutsConfigException($ex->getMessage(), $ex->getCode(), $ex); }
 
         if ($ex) throw $ex->appendMessage('Error instantiating Struts module from file "'.$file.'"');
     }
