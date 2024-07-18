@@ -519,14 +519,6 @@ class Logger extends StaticClass {
                         catch (\Exception $ex) {}
                         continue;
                     }
-                    if (!isset($content)) {
-                        try {
-                            self::log('Empty reply from server, URL: '.$request->getUrl(), L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
-                        }
-                        catch (\Throwable $ex) {}   // intentionally eat it
-                        catch (\Exception $ex) {}
-                        continue;
-                    }
                 }
                 return;
             }

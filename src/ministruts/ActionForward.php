@@ -162,8 +162,8 @@ class ActionForward extends CObject {
     /**
      * Add a query parameter to the forward's URI.
      *
-     * @param  string $key   - parameter name
-     * @param  scalar $value - parameter value
+     * @param  string  $key   - parameter name
+     * @param  ?scalar $value - parameter value
      *
      * @return $this
      */
@@ -189,7 +189,7 @@ class ActionForward extends CObject {
     /**
      * Set the hash fragment of the forward's URI.
      *
-     * @param  scalar $value - hash value
+     * @param  ?scalar $value - hash value
      *
      * @return $this
      */
@@ -198,8 +198,7 @@ class ActionForward extends CObject {
 
         if (isset($value)) {
             Assert::scalar($value);
-            if (is_bool($value))
-                $value = (int) $value;
+            if (is_bool($value)) $value = (int) $value;
         }
         $value = (string) $value;
         $path = $this->getPath();

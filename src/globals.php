@@ -490,9 +490,9 @@ function strEndsWithI($string, $suffix) {
 /**
  * Return a left part of a string.
  *
- * @param  string $string - initial string
- * @param  int    $length - greater than/equal to zero: length of the returned substring<br>
- *                          lower than zero:            all except the specified number of right characters
+ * @param  ?string $string - initial string
+ * @param  int     $length - greater than/equal to zero: length of the returned substring<br>
+ *                           lower than zero:            all except the specified number of right characters
  *
  * @return string - substring
  *
@@ -542,9 +542,9 @@ function strLeftTo($string, $limiter, $count=1, $includeLimiter=false, $onNotFou
 /**
  * Return a right part of a string.
  *
- * @param  string $string - initial string
- * @param  int    $length - greater than/equal to zero: length of the returned substring<br>
- *                          lower than zero:            all except the specified number of left characters
+ * @param  ?string $string - initial string
+ * @param  int     $length - greater than/equal to zero: length of the returned substring<br>
+ *                           lower than zero:            all except the specified number of left characters
  *
  * @return string - substring
  *

@@ -289,10 +289,9 @@ class Request extends CObject {
                 return $file;
             };
             $this->files = [];
-            if (isset($_FILES)) {
-                foreach ($_FILES as $key => $file) {
-                    $this->files[$key] = $normalizeLevel($file);
-                }
+
+            foreach ($_FILES as $key => $file) {
+                $this->files[$key] = $normalizeLevel($file);
             }
         }
         return $this->files;
@@ -1009,7 +1008,7 @@ class Request extends CObject {
      * Store an ActionMessage for the specified key.
      *
      * @param  string|int $key     - message key
-     * @param  string     $message - message; if NULL is passed the message for the specified key is removed
+     * @param  ?string    $message - message; if NULL is passed the message for the specified key is removed
      */
     public function setActionMessage($key, $message) {
         if (!is_string($key) && !is_int($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.gettype($key));
@@ -1113,7 +1112,7 @@ class Request extends CObject {
      * Store an ActionError for the specified key.
      *
      * @param  string|int $key     - error key
-     * @param  string     $message - message; if NULL is passed the error for the specified key is removed
+     * @param  ?string    $message - message; if NULL is passed the error for the specified key is removed
      */
     public function setActionError($key, $message) {
         if (!is_string($key) && !is_int($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.gettype($key));
