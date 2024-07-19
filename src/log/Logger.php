@@ -307,9 +307,9 @@ class Logger extends StaticClass {
     /**
      * Display a log message on STDOUT, STDERR or as part of the HTTP response.
      *
-     * @param  string|\Exception|\Throwable $loggable - message or exception
-     * @param  int                          $level    - loglevel
-     * @param  array                        $context  - reference to the log context with additional data
+     * @param  string|\Throwable $loggable - message or exception
+     * @param  int               $level    - loglevel
+     * @param  array             $context  - reference to the log context with additional data
      */
     private static function invokePrintHandler($loggable, $level, array &$context) {
         $context['print.message'] = true;
@@ -337,9 +337,9 @@ class Logger extends StaticClass {
     /**
      * Pass a log message to the PHP system logger via "error_log()".
      *
-     * @param  string|\Exception|\Throwable $loggable - message or exception
-     * @param  int                          $level    - loglevel
-     * @param  array                        $context  - reference to the log context with additional data
+     * @param  string|\Throwable $loggable - message or exception
+     * @param  int               $level    - loglevel
+     * @param  array             $context  - reference to the log context with additional data
      */
     private static function invokeErrorLogHandler($loggable, $level, array &$context) {
         $context['errorLog.message'] = true;
@@ -368,9 +368,9 @@ class Logger extends StaticClass {
     /**
      * Send the message to the configured mail receivers.
      *
-     * @param  string|\Exception|\Throwable $loggable - message or exception
-     * @param  int                          $level    - loglevel
-     * @param  array                        $context  - reference to the log context with additional data
+     * @param  string|\Throwable $loggable - message or exception
+     * @param  int               $level    - loglevel
+     * @param  array             $context  - reference to the log context with additional data
      */
     private static function invokeMailHandler($loggable, $level, array &$context) {
         $context['mail.message'] = true;
@@ -404,9 +404,9 @@ class Logger extends StaticClass {
     /**
      * Compose a CLI log message and store it under $context['cliMessage'].
      *
-     * @param  string|\Exception|\Throwable $loggable - message or exception
-     * @param  int                          $level    - loglevel
-     * @param  array                        $context  - reference to the log context
+     * @param  string|\Throwable $loggable - message or exception
+     * @param  int               $level    - loglevel
+     * @param  array             $context  - reference to the log context
      */
     private static function composeCliMessage($loggable, $level, array &$context) {
         !isset($context['file'], $context['line']) && self::resolveCallerLocation($context);
@@ -470,9 +470,9 @@ class Logger extends StaticClass {
     /**
      * Compose an HTML log message and store it under $context['htmlMessage'].
      *
-     * @param  string|\Exception|\Throwable $loggable - message or exception
-     * @param  int                          $level    - loglevel
-     * @param  array                        $context  - reference to the log context
+     * @param  string|\Throwable $loggable - message or exception
+     * @param  int               $level    - loglevel
+     * @param  array             $context  - reference to the log context
      */
     private static function composeHtmlMessage($loggable, $level, array &$context) {
         !isset($context['file'], $context['line']) && self::resolveCallerLocation($context);
@@ -552,9 +552,9 @@ class Logger extends StaticClass {
     /**
      * Compose a mail log message and store it in the passed log context under the keys "mailSubject" and "mailBody".
      *
-     * @param  string|\Exception|\Throwable $loggable - message or exception to log
-     * @param  int                          $level    - loglevel of the loggable
-     * @param  array                        $context  - reference to the log context
+     * @param  string|\Throwable $loggable - message or exception to log
+     * @param  int               $level    - loglevel of the loggable
+     * @param  array             $context  - reference to the log context
      */
     private static function composeMailMessage($loggable, $level, array &$context) {
         !isset($context['cliMessage']) && self::composeCliMessage($loggable, $level, $context);
@@ -595,10 +595,10 @@ class Logger extends StaticClass {
     /**
      * Return a string representation of the message details.
      *
-     * @param  string|\Exception|\Throwable $loggable - message or exception to log
-     * @param  int                          $level    - loglevel of the loggable
-     * @param  array                        $context  - reference to the log context
-     * @param  bool                         $html     - whether to get an HTML (true) or a CLI (false) representation
+     * @param  string|\Throwable $loggable - message or exception to log
+     * @param  int               $level    - loglevel of the loggable
+     * @param  array             $context  - reference to the log context
+     * @param  bool              $html     - whether to get an HTML (true) or a CLI (false) representation
      *
      * @return string - message details (ending with a line break) or an empty string if not applicable
      */
@@ -635,10 +635,10 @@ class Logger extends StaticClass {
 
 
     /**
-     * @param  string|\Exception|\Throwable $loggable - message or exception to log
-     * @param  int                          $level    - loglevel of the loggable
-     * @param  array                        $context  - reference to the log context
-     * @param  bool                         $html     - whether to get an HTML (true) or a CLI (false) representation
+     * @param  string|\Throwable $loggable - message or exception to log
+     * @param  int               $level    - loglevel of the loggable
+     * @param  array             $context  - reference to the log context
+     * @param  bool              $html     - whether to get an HTML (true) or a CLI (false) representation
      *
      * @return string - trace details (ending with a line break) or an empty string if not applicable
      */
@@ -651,7 +651,7 @@ class Logger extends StaticClass {
         if (is_string($loggable)) {
             // process an existing context exception
             if (isset($context['exception'])) {
-                /** @var \Exception|\Throwable $exception */
+                /** @var \Throwable $exception */
                 $exception = $context['exception'];
                 $msg       = $indent.trim(ErrorHandler::getBetterMessage($exception, $indent)).NL.NL;
                 $html && $msg ='<br/>'.nl2br(hsc($msg));
@@ -681,10 +681,10 @@ class Logger extends StaticClass {
 
 
     /**
-     * @param  string|\Exception|\Throwable $loggable - message or exception to log
-     * @param  int                          $level    - loglevel of the loggable
-     * @param  array                        $context  - reference to the log context
-     * @param  bool                         $html     - whether to get an HTML (true) or a CLI (false) representation
+     * @param  string|\Throwable $loggable - message or exception to log
+     * @param  int               $level    - loglevel of the loggable
+     * @param  array             $context  - reference to the log context
+     * @param  bool              $html     - whether to get an HTML (true) or a CLI (false) representation
      *
      * @return string - request details (ending with a line break) or an empty string if not applicable
      */
@@ -706,10 +706,10 @@ class Logger extends StaticClass {
 
 
     /**
-     * @param  string|\Exception|\Throwable $loggable - message or exception to log
-     * @param  int                          $level    - loglevel of the loggable
-     * @param  array                        $context  - reference to the log context
-     * @param  bool                         $html     - whether to get an HTML (true) or a CLI (false) representation
+     * @param  string|\Throwable $loggable - message or exception to log
+     * @param  int               $level    - loglevel of the loggable
+     * @param  array             $context  - reference to the log context
+     * @param  bool              $html     - whether to get an HTML (true) or a CLI (false) representation
      *
      * @return string - session details (ending with a line break) or an empty string if not applicable
      */
@@ -732,10 +732,10 @@ class Logger extends StaticClass {
 
 
     /**
-     * @param  string|\Exception|\Throwable $loggable - message or exception to log
-     * @param  int                          $level    - loglevel of the loggable
-     * @param  array                        $context  - reference to the log context
-     * @param  bool                         $html     - whether to get an HTML (true) or a CLI (false) representation
+     * @param  string|\Throwable $loggable - message or exception to log
+     * @param  int               $level    - loglevel of the loggable
+     * @param  array             $context  - reference to the log context
+     * @param  bool              $html     - whether to get an HTML (true) or a CLI (false) representation
      *
      * @return string - server details (ending with a line break) or an empty string if not applicable
      */

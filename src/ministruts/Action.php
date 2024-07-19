@@ -49,8 +49,8 @@ abstract class Action extends CObject {
      * @param  Request  $request
      * @param  Response $response
      *
-     * @return ?ActionForward|string - NULL to continue request processing;
-     *                                 ActionForward or forward name if request processing is finished
+     * @return ActionForward|string|null - NULL to continue request processing;
+     *                                     ActionForward or forward name if request processing is finished
      */
     public function executeBefore(Request $request, Response $response) {
         return null;
@@ -63,8 +63,8 @@ abstract class Action extends CObject {
      * @param  Request  $request
      * @param  Response $response
      *
-     * @return ?ActionForward|string - ActionForward or forward name to forward to;
-     *                                 NULL if request processing is finished
+     * @return ActionForward|string|null - ActionForward or forward name to forward to;
+     *                                     NULL if request processing is finished
      */
     abstract public function execute(Request $request, Response $response);
 

@@ -101,9 +101,9 @@ interface RosasurferExceptionInterface {
 
 
     /**
-     * Return the exception causing this exception (if any).
+     * Return the throwable causing this throwable (if any).
      *
-     * @return ?\Exception|\Throwable
+     * @return ?\Throwable
      */
 	public function getPrevious();
 

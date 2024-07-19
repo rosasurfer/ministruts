@@ -62,7 +62,7 @@ abstract class Pattern extends CObject {
     /**
      * Make pattern-tree tips point to same object if they are equal.
      *
-     * @param Pattern[]? $unique [optional]
+     * @param ?Pattern[] $unique [optional]
      *
      * @return $this
      */

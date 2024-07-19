@@ -219,19 +219,19 @@ class ErrorHandler extends StaticClass {
     /**
      * A handler for uncatched exceptions. After the handler returns PHP terminates the script.
      *
-     * @param  \Exception|\Throwable $exception - the unhandled exception (PHP5) or throwable (PHP7)
+     * @param  \Throwable $throwable - the unhandled throwable
      */
-    public static function handleException($exception) {
-        //echof('ErrorHandler::handleException()  '.$exception->getMessage());
+    public static function handleException($throwable) {
+        //echof('ErrorHandler::handleException()  '.$throwable->getMessage());
         if (!self::$exceptionHandling) return;
 
         // Exceptions thrown from the exception handler itself will not be passed back to the handler but
         // cause an uncatchable fatal error. To prevent this they are handled explicitly.
         $secondEx = null;
         try {
-            Logger::log($exception, L_FATAL, [
-                'file'            => $exception->getFile(),
-                'line'            => $exception->getLine(),
+            Logger::log($throwable, L_FATAL, [
+                'file'            => $throwable->getFile(),
+                'line'            => $throwable->getLine(),
                 'unhandled-error' => true,
             ]);
         }
@@ -248,12 +248,12 @@ class ErrorHandler extends StaticClass {
             $msg2 .= self::getBetterTraceAsString($secondEx, $indent);
 
             // primary (the causing) exception
-            $msg1  = $indent.'Unhandled '.trim(self::getBetterMessage($exception)).NL;
-            $file1 = $exception->getFile();
-            $line1 = $exception->getLine();
+            $msg1  = $indent.'Unhandled '.trim(self::getBetterMessage($throwable)).NL;
+            $file1 = $throwable->getFile();
+            $line1 = $throwable->getLine();
             $msg1 .= $indent.'in '.$file1.' on line '.$line1.NL.NL;
             $msg1 .= $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
-            $msg1 .= self::getBetterTraceAsString($exception, $indent);
+            $msg1 .= self::getBetterTraceAsString($throwable, $indent);
 
             $msg  = $msg2.NL;
             $msg .= $indent.'caused by'.NL;
@@ -279,7 +279,7 @@ class ErrorHandler extends StaticClass {
 
         // chain a previously active exception handler
         if (self::$prevExceptionHandler) {
-            call_user_func(self::$prevExceptionHandler, $exception);    // a possibly static handler must be invoked with call_user_func()
+            call_user_func(self::$prevExceptionHandler, $throwable);    // a possibly static handler must be invoked with call_user_func()
         }
     }
 
@@ -293,13 +293,13 @@ class ErrorHandler extends StaticClass {
      * script is terminated. If the script is not in the shutdown phase this method ignores the exception and regular
      * exception handling takes over. For an example see this package's README file.
      *
-     * @param  \Exception|\Throwable $exception - exception (PHP5) or throwable (PHP7)
+     * @param  \Throwable $throwable - throwable
      *
-     * @return \Exception|\Throwable - the same exception or throwable
+     * @return \Throwable - the same throwable
      *
      * @link   http://php.net/manual/en/language.oop5.decon.php
      */
-    public static function handleDestructorException($exception) {
+    public static function handleDestructorException($throwable) {
         // Handle destructor exceptions during shutdown differently. Otherwise such exceptions will cause fatal errors.
         //
         // @link  http://php.net/manual/en/language.oop5.decon.php
@@ -309,11 +309,11 @@ class ErrorHandler extends StaticClass {
             restore_exception_handler();
 
             if ($currentHandler) {
-                call_user_func($currentHandler, $exception);    // A possibly static handler must be invoked with call_user_func().
+                call_user_func($currentHandler, $throwable);    // A possibly static handler must be invoked with call_user_func().
                 exit(1);                                        // Calling exit() is the only way to prevent the immediately following
             }                                                   // non-catchable fatal error. However, calling exit() in a destructor will
         }                                                       // also prevent execution of any remaining shutdown routines.
-        return $exception;
+        return $throwable;
     }
 
 
@@ -321,21 +321,21 @@ class ErrorHandler extends StaticClass {
      * A manually called handler for exceptions raised in object::__toString(). It allows regular handling of exceptions thrown
      * from object::__toString() in PHP < 7.4, which is not possible in those versions due to an internal PHP design issue.
      *
-     * Behaviour PHP < 7.4: Fatal error:  Method object::__toString() must not throw an exception in {file} on {line}.
+     * Behavior PHP < 7.4: Fatal error:  Method object::__toString() must not throw an exception in {file} on {line}.
      *
-     * @param  \Exception|\Throwable $exception - exception (PHP5) or throwable (PHP7)
+     * @param  \Throwable $throwable - throwable
      *
      * @see  https://bugs.php.net/bug.php?id=53648
      * @see  https://wiki.php.net/rfc/tostring_exceptions
      * @see  https://github.com/symfony/symfony/blob/1c110fa1f7e3e9f5daba73ad52d9f7e843a7b3ff/src/Symfony/Component/Debug/ErrorHandler.php#L457-L489
      */
-    public static function handleToStringException($exception) {
+    public static function handleToStringException($throwable) {
         //echof('ErrorHandler::handleToStringException()  '.$exception->getMessage());
         $currentHandler = set_exception_handler(function() {});
         restore_exception_handler();
 
         if ($currentHandler) {
-            call_user_func($currentHandler, $exception);        // A possibly static handler must be invoked with call_user_func().
+            call_user_func($currentHandler, $throwable);        // A possibly static handler must be invoked with call_user_func().
             exit(1);                                            // Calling exit() is the only way to prevent the immediately following
         }                                                       // non-catchable fatal error.
     }
@@ -441,30 +441,30 @@ class ErrorHandler extends StaticClass {
 
     /**
      * Return the message of an exception in a more readable way. Same as {@link IRosasurferException::getBetterMessage()} except that this
-     * method can be used with all PHP exceptions.
+     * method can be used with all PHP throwables.
      *
-     * @param  \Exception|\Throwable $exception         - any exception
-     * @param  string                $indent [optional] - indent all lines by the specified value (default: no indentation)
+     * @param  \Throwable $throwable         - any throwable
+     * @param  string     $indent [optional] - indent all lines by the specified value (default: no indentation)
      *
      * @return string - message
      */
-    public static function getBetterMessage($exception, $indent = '') {
-        Assert::throwable($exception, '$exception');
+    public static function getBetterMessage($throwable, $indent = '') {
+        Assert::throwable($throwable, '$exception');
 
-        $message = trim($exception->getMessage());
+        $message = trim($throwable->getMessage());
 
-        if ($exception instanceof PHPError) {
+        if ($throwable instanceof PHPError) {
             $type = '';
         }
         else {
-            $class     = get_class($exception);
+            $class     = get_class($throwable);
             $namespace = strtolower(strLeftTo($class, '\\', -1, true, ''));
             $basename  = simpleClassName($class);
             $type      = $namespace.$basename;
             $message   = (strlen($message) ? ': ':'').$message;
 
-            if ($exception instanceof \ErrorException) {            // a PHP error exception not created by the framework
-                $type .= '('.self::errorLevelDescr($exception->getSeverity()).')';
+            if ($throwable instanceof \ErrorException) {            // a PHP error exception not created by the framework
+                $type .= '('.self::errorLevelDescr($throwable->getSeverity()).')';
             }
         }
         $message = $type.$message;
@@ -557,19 +557,19 @@ class ErrorHandler extends StaticClass {
      * Return the stacktrace of an exception in a more readable way as a string. The returned string contains nested exceptions.
      * Same as {@link IRosasurferException::getBetterTraceAsString()} except that this method can be used with all PHP exceptions.
      *
-     * @param  \Exception|\Throwable $exception         - any exception (PHP5) or throwable (PHP7)
-     * @param  string                $indent [optional] - indent the resulting lines by the specified value
-     *                                                    (default: no indentation)
+     * @param  \Throwable $throwable         - any throwable
+     * @param  string     $indent [optional] - indent the resulting lines by the specified value (default: no indentation)
+     *
      * @return string - readable stacktrace
      */
-    public static function getBetterTraceAsString($exception, $indent = '') {
-        Assert::throwable($exception, '$exception');
+    public static function getBetterTraceAsString($throwable, $indent = '') {
+        Assert::throwable($throwable, '$throwable');
 
-        if ($exception instanceof IRosasurferException) $trace = $exception->getBetterTrace();
-        else                                            $trace = self::getBetterTrace($exception->getTrace(), $exception->getFile(), $exception->getLine());
+        if ($throwable instanceof IRosasurferException) $trace = $throwable->getBetterTrace();
+        else                                            $trace = self::getBetterTrace($throwable->getTrace(), $throwable->getFile(), $throwable->getLine());
         $result = self::formatTrace($trace, $indent);
 
-        if ($cause = $exception->getPrevious()) {
+        if ($cause = $throwable->getPrevious()) {
             // recursively add stacktraces of nested exceptions
             $message = trim(self::getBetterMessage($cause, $indent));
             $result .= NL.$indent.'caused by'.NL.$indent.$message.NL.NL;
