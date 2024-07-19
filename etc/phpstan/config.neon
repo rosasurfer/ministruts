@@ -6,14 +6,13 @@
 #  @see https://phpstan.org/config-reference
 #
 parameters:
-  phpVersion: 70400                                 # assume PHP 7.4 if running under a different PHP version
+  phpVersion: 70499                                 # assume PHP 7.4 if running under a different PHP version
   level:      6                                     # a rule level on the command line overrides this hardcoded value
 
   bootstrapFiles:                                   # API stubs of unloaded PHP extensions
     - api-stubs.php
 
   scanFiles:                                        # additional non-autoloaded files to scan for symbols
-    #- helpers.php
 
   paths:                                            # paths on the command line override these hardcoded values
     - ../../bin

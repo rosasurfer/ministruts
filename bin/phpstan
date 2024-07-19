@@ -157,4 +157,4 @@ set -- "${ARGS[@]}"
 
 
 # call PHPStan
-"$BIN_DIR/phpstan" "$@"
+"$BIN_DIR/phpstan" "$@" --ansi
