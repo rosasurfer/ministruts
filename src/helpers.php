@@ -772,9 +772,9 @@ function json_decode($value, $assoc=false, $depth=512, $options=0) {
 /**
  * Functional replacement for ($stringA === $stringB).
  *
- * @param  string $stringA
- * @param  string $stringB
- * @param  bool   $ignoreCase [optional] - default: no
+ * @param  ?string $stringA
+ * @param  ?string $stringB
+ * @param  bool    $ignoreCase [optional] - default: no
  *
  * @return bool
  */
@@ -783,8 +783,9 @@ function strCompare($stringA, $stringB, $ignoreCase = false) {
     Assert::nullOrString($stringB, '$stringB');
 
     if ($ignoreCase) {
-        if ($stringA===null || $stringB===null)
+        if ($stringA===null || $stringB===null) {
             return ($stringA === $stringB);
+        }
         return (strtolower($stringA) === strtolower($stringB));
     }
     return ($stringA === $stringB);
@@ -1487,12 +1488,12 @@ function is_trait($name) {
  *
  * Complement for PHP's <tt>is_array()</tt> function adding support for {@link \ArrayAccess} parameters.
  *
- * @param  array|\ArrayAccess $var
+ * @param  ?mixed $var
  *
  * @return bool
  */
 function is_array_like($var) {
-    return is_array($var) || $var instanceof \ArrayAccess;
+    return \is_array($var) || $var instanceof \ArrayAccess;
 }
 
 

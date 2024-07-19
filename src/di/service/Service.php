@@ -5,6 +5,7 @@ use rosasurfer\core\exception\ClassNotFoundException;
 use rosasurfer\core\exception\IllegalTypeException;
 
 use function rosasurfer\is_class;
+use rosasurfer\core\exception\InvalidArgumentException;
 
 
 /**
@@ -29,8 +30,8 @@ class Service implements ServiceInterface {
     /** @var string|object */
     protected $definition;
 
-    /** @var object */
-    protected $instance;
+    /** @var ?object */
+    protected $instance = null;
 
 
     /**
@@ -42,6 +43,10 @@ class Service implements ServiceInterface {
     public function __construct($name, $definition) {
         $this->name       = $name;
         $this->aliases[]  = $name;
+
+        if (!is_string($definition) && !is_object($definition)) {   // @phpstan-ignore-line
+            throw new IllegalTypeException('Illegal type of parameter $definition: '.gettype($definition));
+        }
         $this->definition = $definition;
     }
 
@@ -96,7 +101,7 @@ class Service implements ServiceInterface {
         if (!$factory && $this->instance)
             return $this->instance;
 
-        $instance   = null;
+        $instance = null;
         $definition = $this->definition;
         !$factory && $parameters = [];
 
@@ -104,13 +109,13 @@ class Service implements ServiceInterface {
             if (!is_class($definition)) throw new ClassNotFoundException('Cannot resolve service "'.$this->name.'" (unknown class "'.$definition.'")');
             $instance = new $definition(...$parameters);
         }
-        else if (is_object($definition)) {                  // objects may be a \Closure or an already resolved instance
+        else {                                              // objects may be a \Closure or an already resolved instance
             $instance = $definition instanceof \Closure ? $definition(...$parameters) : $definition;
         }
-        else throw new IllegalTypeException('Cannot resolve service "'.$this->name.'" (illegal definition type: '.gettype($definition).')');
 
-        if (!$factory)
+        if (!$factory) {
             $this->instance = $instance;
+        }
         return $instance;
     }
 }

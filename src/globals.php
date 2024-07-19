@@ -380,9 +380,9 @@ function isRelativePath($path) {
 /**
  * Functional replacement for ($stringA === $stringB).
  *
- * @param  string $stringA
- * @param  string $stringB
- * @param  bool   $ignoreCase [optional] - default: no
+ * @param  ?string $stringA
+ * @param  ?string $stringB
+ * @param  bool    $ignoreCase [optional] - default: no
  *
  * @return bool
  */
@@ -798,6 +798,20 @@ function is_interface($name) {
  */
 function is_trait($name) {
     return \rosasurfer\is_trait($name);
+}
+
+
+/**
+ * Whether a variable can be used like an array.
+ *
+ * Complement for PHP's <tt>is_array()</tt> function adding support for {@link \ArrayAccess} parameters.
+ *
+ * @param  ?mixed $var
+ *
+ * @return bool
+ */
+function is_array_like($var) {
+    return \rosasurfer\is_array_like($var);
 }
 
 

@@ -51,11 +51,11 @@ class SQLiteConnector extends Connector {
     /** @var string - DBMS type */
     protected $type = 'sqlite';
 
-    /** @var string - DBMS version string */
-    protected $versionString;
+    /** @var ?string - DBMS version string */
+    protected $versionString = null;
 
-    /** @var int - DBMS version number */
-    protected $versionNumber;
+    /** @var ?int - DBMS version number */
+    protected $versionNumber = null;
 
     /** @var string - database file to connect to */
     protected $file;
@@ -137,10 +137,10 @@ class SQLiteConnector extends Connector {
     public function connect() {
         if (!class_exists('SQLite3')) throw new RuntimeException('Undefined class \SQLite3 (sqlite3 extension is not available)');
 
-        $flags = SQLITE3_OPEN_READWRITE;                                // available flags:
-        $ex = null;                                                     // SQLITE3_OPEN_CREATE
-        try {                                                           // SQLITE3_OPEN_READONLY
-            $this->sqlite = new \SQLite3($this->file, $flags);          // SQLITE3_OPEN_READWRITE
+        $flags = SQLITE3_OPEN_READWRITE;                                    // available flags:
+        $ex = null;                                                         // 1: SQLITE3_OPEN_READONLY
+        try {                                                               // 2: SQLITE3_OPEN_READWRITE
+            $this->sqlite = new \SQLite3($this->file, $flags);              // 4: SQLITE3_OPEN_CREATE
         }
         catch (IRosasurferException $ex) {}
         catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
@@ -151,11 +151,12 @@ class SQLiteConnector extends Connector {
             $what = $where = null;
             if (file_exists($file)) {
                 $what = 'open';
-                if (is_dir($file=realpath($file)))
+                if (is_dir($file=realpath($file))) {
                     $where = ' (directory)';
+                }
             }
             else {
-                $what = ($flags & SQLITE3_OPEN_CREATE) ? 'create' : 'find';
+                $what = ($flags & SQLITE3_OPEN_CREATE) ? 'create' : 'find'; // @phpstan-ignore-line
                 isRelativePath($file) && $where=' in "'.getcwd().'"';
             }
             throw $ex->addMessage('Cannot '.$what.' database file "'.$file.'"'.$where);

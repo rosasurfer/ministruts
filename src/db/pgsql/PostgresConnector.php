@@ -234,18 +234,16 @@ class PostgresConnector extends Connector {
                 break;
             }
             catch (\Throwable $ex) {}
-            catch (\Exception $ex) {}   // @phpstan-ignore-line
+            catch (\Exception $ex) {}                   // @phpstan-ignore-line
 
-            if ($ex) {
-                if (strContainsI($ex->getMessage(), 'current transaction is aborted, commands ignored until end of transaction block')) {
-                    if ($this->transactionLevel > 0) {
-                        $this->transactionLevel = 1;        // immediately skip nested transactions
-                        $this->rollback();
-                        continue;
-                    }
+            if (strContainsI($ex->getMessage(), 'current transaction is aborted, commands ignored until end of transaction block')) {
+                if ($this->transactionLevel > 0) {
+                    $this->transactionLevel = 1;        // immediately skip nested transactions
+                    $this->rollback();
+                    continue;
                 }
-                throw $ex;
             }
+            throw $ex;
         }
         return $path;
     }

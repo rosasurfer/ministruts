@@ -108,8 +108,8 @@ class Response extends Singleton {
     /**
      * Send a "Location" header (redirect) pointing to the specified URI&#46;  Afterwards the script is terminated.
      *
-     * @param  string $uri - absolute or relative URI
-     * @param  int    $type - redirect type: 301 (SC_MOVED_PERMANENTLY) or 302 (SC_MOVED_TEMPORARILY)
+     * @param  string $uri  - absolute or relative URI
+     * @param  int    $type - redirect type: 301=SC_MOVED_PERMANENTLY or 302=SC_MOVED_TEMPORARILY
      */
     public function redirect($uri, $type=HttpResponse::SC_MOVED_TEMPORARILY) {
         $currentUrl = RequestProxy::getUrl();
@@ -122,7 +122,7 @@ class Response extends Singleton {
             if (!ini_get_bool('session.use_only_cookies')) {        //                          TODO: check if session_destroy() resets SID
                 $cookie       = session_get_cookie_params();
                 $cookieDomain = strtolower(empty($cookie['domain']) ? RequestProxy::getHostname() : $cookie['domain']);
-                $cookiePath   =            empty($cookie['path'  ]) ? '/'                         : $cookie['path'  ];
+                $cookiePath   =                  $cookie['path'  ];
                 $cookieSecure =                  $cookie['secure'];
 
                 $target       = parse_url($url);

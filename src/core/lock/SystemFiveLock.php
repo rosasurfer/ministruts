@@ -25,12 +25,6 @@ class SystemFiveLock extends BaseLock {
     /** @var bool */
     private static $logDebug;
 
-    /** @var bool */
-    private static $logInfo;
-
-    /** @var bool */
-    private static $logNotice;
-
     /** @var resource[] - semaphore handles */
     private static $hSemaphores = [];
 
@@ -60,10 +54,8 @@ class SystemFiveLock extends BaseLock {
         if (\key_exists($key, self::$hSemaphores)) throw new RuntimeException('Dead-lock detected: already holding a lock for key "'.$key.'"');
         self::$hSemaphores[$key] = null;
 
-        $loglevel        = Logger::getLogLevel(__CLASS__);
-        self::$logDebug  = ($loglevel <= L_DEBUG );
-        self::$logInfo   = ($loglevel <= L_INFO  );
-        self::$logNotice = ($loglevel <= L_NOTICE);
+        $loglevel = Logger::getLogLevel(__CLASS__);
+        self::$logDebug = ($loglevel <= L_DEBUG );
 
         // use fTok() instead
         $integer = $this->keyToId($key);
@@ -81,31 +73,29 @@ class SystemFiveLock extends BaseLock {
             }
             catch (IRosasurferException $ex) {}
             catch (\Throwable           $ex) { $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex); }
-            catch (\Exception           $ex) { $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex); }
+            catch (\Exception           $ex) { $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex); }    // @phpstan-ignore-line
 
-            if ($ex) {
-                // TODO: Quellcode umschreiben (ext/sysvsem/sysvsem.c) und Fehler lokalisieren (vermutlich wird ein File-Limit ueberschritten)
-                $message  = $ex->getMessage();
-                $hexId    = dechex($integer);
-                $prefixes = [
-                    'sem_get(): failed for key 0x'.$hexId.': Invalid argument',
-                    'sem_get(): failed for key 0x'.$hexId.': Identifier removed',
-                    'sem_get(): failed acquiring SYSVSEM_SETVAL for key 0x'.$hexId.': Invalid argument',
-                    'sem_get(): failed acquiring SYSVSEM_SETVAL for key 0x'.$hexId.': Identifier removed',
-                    'sem_get(): failed releasing SYSVSEM_SETVAL for key 0x'.$hexId.': Invalid argument',
-                    'sem_get(): failed releasing SYSVSEM_SETVAL for key 0x'.$hexId.': Identifier removed',
-                    'sem_acquire(): failed to acquire key 0x'.$hexId.': Invalid argument',
-                    'sem_acquire(): failed to acquire key 0x'.$hexId.': Identifier removed',
-                ];
-                if (++$i < $trials && strStartsWith($message, $prefixes)) {
-                    self::$logDebug && Logger::log($message.', trying again ... ('.($i+1).')', L_DEBUG);
-                    $messages[] = $message;
-                    usleep(200000); // 200 msec. warten
-                    continue;
-                }
-                // Endlosschleife verhindern
-                throw $ex->addMessage('Giving up to get lock for key "'.$key.'" after '.$i.' trials'.($messages ? ', former errors:'.NL.join(NL, $messages) : ''));
+            // TODO: Quellcode umschreiben (ext/sysvsem/sysvsem.c) und Fehler lokalisieren (vermutlich wird ein File-Limit ueberschritten)
+            $message  = $ex->getMessage();
+            $hexId    = dechex($integer);
+            $prefixes = [
+                'sem_get(): failed for key 0x'.$hexId.': Invalid argument',
+                'sem_get(): failed for key 0x'.$hexId.': Identifier removed',
+                'sem_get(): failed acquiring SYSVSEM_SETVAL for key 0x'.$hexId.': Invalid argument',
+                'sem_get(): failed acquiring SYSVSEM_SETVAL for key 0x'.$hexId.': Identifier removed',
+                'sem_get(): failed releasing SYSVSEM_SETVAL for key 0x'.$hexId.': Invalid argument',
+                'sem_get(): failed releasing SYSVSEM_SETVAL for key 0x'.$hexId.': Identifier removed',
+                'sem_acquire(): failed to acquire key 0x'.$hexId.': Invalid argument',
+                'sem_acquire(): failed to acquire key 0x'.$hexId.': Identifier removed',
+            ];
+            if (++$i < $trials && strStartsWith($message, $prefixes)) {
+                self::$logDebug && Logger::log($message.', trying again ... ('.($i+1).')', L_DEBUG);
+                $messages[] = $message;
+                usleep(200000); // 200 msec. warten
+                continue;
             }
+            // Endlosschleife verhindern
+            throw $ex->addMessage('Giving up to get lock for key "'.$key.'" after '.$i.' trials'.($messages ? ', former errors:'.NL.join(NL, $messages) : ''));
         }
         while (true);
 
@@ -124,7 +114,7 @@ class SystemFiveLock extends BaseLock {
             $this->release();
         }
         catch (\Throwable $ex) { throw ErrorHandler::handleDestructorException($ex); }
-        catch (\Exception $ex) { throw ErrorHandler::handleDestructorException($ex); }
+        catch (\Exception $ex) { throw ErrorHandler::handleDestructorException($ex); }  // @phpstan-ignore-line
     }
 
 

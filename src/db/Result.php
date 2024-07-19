@@ -37,7 +37,7 @@ abstract class Result extends CObject implements ResultInterface {
             $this->release();
         }
         catch (\Throwable $ex) { throw ErrorHandler::handleDestructorException($ex); }
-        catch (\Exception $ex) { throw ErrorHandler::handleDestructorException($ex); }
+        catch (\Exception $ex) { throw ErrorHandler::handleDestructorException($ex); }  // @phpstan-ignore-line
     }
 
 
@@ -45,8 +45,9 @@ abstract class Result extends CObject implements ResultInterface {
      *
      */
     public function fetchColumn($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
-        if (!is_int($column) && !is_string($column))
+        if (!is_int($column) && !is_string($column)) {                                  // @phpstan-ignore-line
             throw new IllegalTypeException('Illegal type of parameter $column: '.gettype($column));
+        }
         if (isset($row)) throw new UnimplementedFeatureException('$row='.$row.' (!= NULL)');
 
         // Generic default implementation:

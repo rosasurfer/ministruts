@@ -578,15 +578,13 @@ class Logger extends StaticClass {
             // $loggable is a simple message
             $msg = $loggable;
 
-            if (strlen($indent)) {                      // indent multiline messages
-                $lines = explode(NL, normalizeEOL($msg));
-                $eom = '';
-                if (strEndsWith($msg, NL)) {
-                    \array_pop($lines);
-                    $eom = NL;
-                }
-                $msg = join(NL.$indent, $lines).$eom;
+            $lines = explode(NL, normalizeEOL($msg));       // indent multiline messages
+            $eom = '';
+            if (strEndsWith($msg, NL)) {
+                \array_pop($lines);
+                $eom = NL;
             }
+            $msg = join(NL.$indent, $lines).$eom;
             $cliMessage = '['.strtoupper(self::$logLevels[$level]).'] '.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
 
             // if there was no exception append the internal stacktrace to "cliExtra"

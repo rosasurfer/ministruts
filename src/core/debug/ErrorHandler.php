@@ -236,9 +236,9 @@ class ErrorHandler extends StaticClass {
     public static function handleException($exception) {
         $context = [
             'class'               => __CLASS__,
-            'file'                => $exception->getFile(),   // If the location is not preset the logger will resolve this
-            'line'                => $exception->getLine(),   // exception handler as the originating location.
-            'unhandled-exception' => true,                    // flag to signal origin
+            'file'                => $exception->getFile(),     // If the location is not preset the logger will resolve this
+            'line'                => $exception->getLine(),     // exception handler as the originating location.
+            'unhandled-exception' => true,                      // flag to signal origin
         ];
 
         // Exceptions thrown from the exception handler itself will not be passed back to the handler again but instead
@@ -246,10 +246,10 @@ class ErrorHandler extends StaticClass {
         $second = null;
         try {
             Assert::throwable($exception);
-            Logger::log($exception, L_FATAL, $context);       // log with the highest level
+            Logger::log($exception, L_FATAL, $context);         // log with the highest level
         }
         catch (\Throwable $second) {}
-        catch (\Exception $second) {}
+        catch (\Exception $second) {}                           // @phpstan-ignore-line
 
         if ($second)  {
             // secondary exception: the application is crashing, last try to log
@@ -261,20 +261,13 @@ class ErrorHandler extends StaticClass {
             $msg2 .= $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
             $msg2 .= DebugHelper::getBetterTraceAsString($second, $indent);
 
-            // primary (the causing) exception
-            if (isset($context['cliMessage'])) {
-                $msg1 = $context['cliMessage'];
-                if (isset($context['cliExtra']))
-                    $msg1 .= $context['cliExtra'];
-            }
-            else {
-                $msg1  = $indent.'Unhandled '.trim(DebugHelper::composeBetterMessage($exception)).NL;
-                $file  = $exception->getFile();
-                $line  = $exception->getLine();
-                $msg1 .= $indent.'in '.$file.' on line '.$line.NL.NL;
-                $msg1 .= $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
-                $msg1 .= DebugHelper::getBetterTraceAsString($exception, $indent);
-            }
+            // primary (causing) exception
+            $msg1  = $indent.'Unhandled '.trim(DebugHelper::composeBetterMessage($exception)).NL;
+            $file  = $exception->getFile();
+            $line  = $exception->getLine();
+            $msg1 .= $indent.'in '.$file.' on line '.$line.NL.NL;
+            $msg1 .= $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
+            $msg1 .= DebugHelper::getBetterTraceAsString($exception, $indent);
 
             $msg  = $msg2.NL;
             $msg .= $indent.'caused by'.NL;
@@ -297,7 +290,7 @@ class ErrorHandler extends StaticClass {
                 else echoPre('application error (see error log)');
             }
             catch (\Throwable $third) { echoPre('application error (see error log)'); }
-            catch (\Exception $third) { echoPre('application error (see error log)'); }
+            catch (\Exception $third) { echoPre('application error (see error log)'); }     // @phpstan-ignore-line
         }
     }
 

@@ -22,14 +22,14 @@ use function rosasurfer\is_class;
 abstract class DAO extends Singleton {
 
 
-    /** @var IConnector - the db connector for this DAO */
-    private $connector;
+    /** @var ?IConnector - the db connector for this DAO */
+    private $connector = null;
 
-    /** @var Worker - the worker this DAO uses */
-    private $worker;
+    /** @var ?Worker - the worker this DAO uses */
+    private $worker = null;
 
-    /** @var EntityMapping - the mapping of the DAO's entity */
-    private $entityMapping;
+    /** @var ?EntityMapping - the mapping of the DAO's entity */
+    private $entityMapping = null;
 
     /** @var string - the PHP class name of the DAO's entity */
     protected $entityClass;
@@ -174,7 +174,7 @@ abstract class DAO extends Singleton {
             return $result;
         }
         catch (\Throwable $ex) { $this->db()->rollback(); throw $ex; }
-        catch (\Exception $ex) { $this->db()->rollback(); throw $ex; }
+        catch (\Exception $ex) { $this->db()->rollback(); throw $ex; }  // @phpstan-ignore-line
     }
 
 

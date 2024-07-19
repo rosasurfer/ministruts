@@ -60,8 +60,8 @@ class MySQLConnector extends Connector {
     /** @var string */
     protected $password;
 
-    /** @var string */
-    protected $database;
+    /** @var ?string */
+    protected $database = null;
 
     /** @var string[] - connection options */
     protected $options = [];
@@ -161,15 +161,15 @@ class MySQLConnector extends Connector {
     /**
      * Set the name of the default database schema to use.
      *
-     * @param  string $name - schema name
+     * @param  ?string $name - schema name
      *
      * @return $this
      */
     protected function setDatabase($name) {
         Assert::nullOrString($name);
-        if (!strlen($name))
+        if (!strlen($name)) {
             $name = null;
-
+        }
         $this->database = $name;
         return $this;
     }
@@ -223,7 +223,8 @@ class MySQLConnector extends Connector {
         }
         catch (IRosasurferException $ex) {}
         catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
-        catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
+        catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }   // @phpstan-ignore-line
+
         if ($ex) throw $ex->addMessage('Can not connect to MySQL server on "'.$host.'"');
 
         $this->setConnectionOptions();
@@ -269,12 +270,13 @@ class MySQLConnector extends Connector {
         if (isset($this->database)) {
             $ex = null;
             try {
-                if (!mysql_select_db($this->database, $this->hConnection))
+                if (!mysql_select_db($this->database, $this->hConnection)) {
                     throw new DatabaseException(mysql_error($this->hConnection), mysql_errno($this->hConnection));
+                }
             }
             catch (IRosasurferException $ex) {}
             catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), mysql_errno($this->hConnection), $ex); }
-            catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), mysql_errno($this->hConnection), $ex); }
+            catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), mysql_errno($this->hConnection), $ex); }  // @phpstan-ignore-line
             if ($ex) throw $ex->addMessage('Can not select database "'.$this->database.'"');
         }
         return $this;
@@ -420,7 +422,7 @@ class MySQLConnector extends Connector {
         }
         catch (IRosasurferException $ex) {}
         catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), mysql_errno($this->hConnection), $ex); }
-        catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), mysql_errno($this->hConnection), $ex); }
+        catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), mysql_errno($this->hConnection), $ex); }  // @phpstan-ignore-line
         if ($ex) throw $ex->addMessage('Database: '.$this->getConnectionDescription().NL.'SQL: "'.$sql.'"');
 
         // track last_insert_id

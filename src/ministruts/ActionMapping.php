@@ -51,8 +51,8 @@ class ActionMapping extends CObject {
     /** @var bool */
     protected $default = false;
 
-    /** @var ActionForward - the mapping's explicitely specified ActionForward. */
-    protected $forward;
+    /** @var ?ActionForward - the mapping's explicitely specified ActionForward. */
+    protected $forward = null;
 
     /** @var ActionForward[] - the mapping's local forwards */
     protected $forwards = [];
