@@ -45,7 +45,10 @@ class Response extends Singleton {
      */
     public static function me() {
         if (CLI) throw new RuntimeException('Cannot create a '.static::class.' instance in a non-web context.');
-        return self::getInstance(static::class);
+
+        /** @var static $instance */
+        $instance = self::getInstance(static::class);
+        return $instance;
     }
 
 

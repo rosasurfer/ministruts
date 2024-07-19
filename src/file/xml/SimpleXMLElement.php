@@ -43,7 +43,7 @@ class SimpleXMLElement extends \SimpleXMLElement implements SimpleXMLElementInte
             return true;
         });
 
-        /** @var SimpleXMLElement $xml */
+        /** @var static $xml */
         $xml = $ex = null;
         try {
             $xml = new static(...func_get_args());                          // since PHP 8.0 the constructor is not final anymore

@@ -66,8 +66,8 @@ class MySQLConnector extends Connector {
     /** @var string[] - connection options */
     protected $options = [];
 
-    /** @var resource - internal connection handle */
-    protected $hConnection;
+    /** @var ?resource - internal connection handle */
+    protected $hConnection = null;
 
     /** @var int - transaction nesting level */
     protected $transactionLevel = 0;

@@ -20,8 +20,8 @@ class SQLiteResult extends Result {
     /** @var string - SQL statement the result was generated from */
     protected $sql;
 
-    /** @var \SQLite3Result - the database connector's original result object */
-    protected $result;
+    /** @var ?\SQLite3Result - the database connector's original result object */
+    protected $result = null;
 
     /** @var int - last inserted row id of the connection at instance creation time (not reset between queries) */
     protected $lastInsertId = 0;
@@ -158,7 +158,7 @@ class SQLiteResult extends Result {
     public function release() {
         if ($this->result) {
             $tmp = $this->result;
-            $this->result       = null;
+            $this->result = null;
             $this->nextRowIndex = -1;
 
             if ($this->connector->isConnected()) {              // if disconnected the result is already released

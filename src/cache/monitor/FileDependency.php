@@ -38,8 +38,8 @@ class FileDependency extends Dependency {
     /** @var string - Dateiname */
     private $fileName;
 
-    /** @var int - letzter Aenderungszeitpunkt der Datei (Unix-Timestamp) */
-    private $lastModified;
+    /** @var ?int - letzter Aenderungszeitpunkt der Datei (Unix-Timestamp) */
+    private $lastModified = null;
 
 
     /**

@@ -65,8 +65,8 @@ class ErrorHandler extends StaticClass {
     /** @var bool - whether the script is in the shutdown phase */
     protected static $inScriptShutdown = false;
 
-    /** @var string - memory block reserved for detection of out-of-memory errors */
-    protected static $oomEmergencyMemory;
+    /** @var ?string - memory block reserved for detection of out-of-memory errors */
+    protected static $oomEmergencyMemory = null;
 
 
     /**

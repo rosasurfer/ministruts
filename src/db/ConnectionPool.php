@@ -50,7 +50,9 @@ final class ConnectionPool extends Singleton {
      * @return static
      */
     public static function me() {
-        return self::getInstance(static::class);
+        /** @var static $instance */
+        $instance = self::getInstance(static::class);
+        return $instance;
     }
 
 

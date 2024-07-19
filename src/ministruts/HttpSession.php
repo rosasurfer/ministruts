@@ -29,7 +29,9 @@ class HttpSession extends Singleton {
      * @throws RuntimeException if not called from the web interface
      */
     public static function me() {
-        return self::getInstance(static::class);
+        /** @var static $instance */
+        $instance = self::getInstance(static::class);
+        return $instance;
     }
 
 

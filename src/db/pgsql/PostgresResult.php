@@ -47,8 +47,8 @@ class PostgresResult extends Result {
     /** @var string - SQL statement the result was generated from */
     protected $sql;
 
-    /** @var resource - the database connector's original result handle */
-    protected $hResult;
+    /** @var ?resource - the database connector's original result handle */
+    protected $hResult = null;
 
     /** @var int - last number of affected rows (not reset between queries) */
     protected $lastAffectedRows = 0;
@@ -160,7 +160,7 @@ class PostgresResult extends Result {
     public function release() {
         if ($this->hResult) {
             $tmp = $this->hResult;
-            $this->hResult      = null;
+            $this->hResult = null;
             $this->nextRowIndex = -1;
             pg_free_result($tmp);
         }
