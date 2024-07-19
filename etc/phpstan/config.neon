@@ -37,7 +37,6 @@ parameters:
     - rosasurfer\NUL_DEVICE
 
   ignoreErrors:
-
   reportUnmatchedIgnoredErrors: false
 
   parallel:

@@ -87,7 +87,7 @@ class SMTPMailer extends Mailer {
             $this->disconnect();
         }
         catch (\Throwable $ex) { throw ErrorHandler::handleDestructorException($ex); }
-        catch (\Exception $ex) { throw ErrorHandler::handleDestructorException($ex); }
+        catch (\Exception $ex) { throw ErrorHandler::handleDestructorException($ex); }  // @phpstan-ignore-line
     }
 
 
@@ -112,13 +112,14 @@ class SMTPMailer extends Mailer {
         $response = $this->readResponse();
 
         $this->parseResponse($response);
-        if ($this->responseStatus != 250) {
+        if ($this->responseStatus !== 250) {
             $this->writeData('HELO '.$this->hostName);  // regular "Hello" if the extended one fails
             $response = $this->readResponse();
 
             $this->parseResponse($response);
-            if ($this->responseStatus != 250)
+            if ($this->responseStatus !== 250) {
                 throw new RuntimeException('HELO command not accepted: '.$this->responseStatus.' '.$this->response);
+            }
         }
     }
 
@@ -127,35 +128,38 @@ class SMTPMailer extends Mailer {
      * Authenticate the connection.
      */
     private function authenticate() {
-        if (!is_resource($this->connection))
+        if (!is_resource($this->connection)) {
             throw new RuntimeException('Cannot authenticate: Not connected');
+        }
 
         // init authentication
         $this->writeData('AUTH LOGIN');
         $response = $this->readResponse();
 
         $this->parseResponse($response);
-        if ($this->responseStatus == 503)
-            return;                                     // already authenticated
+        if ($this->responseStatus === 503) return;      // already authenticated
 
-        if ($this->responseStatus != 334)
+        if ($this->responseStatus !== 334) {
             throw new RuntimeException('AUTH LOGIN command not supported: '.$this->responseStatus.' '.$this->response);
+        }
 
         // send username
         $this->writeData(base64_encode($this->options['auth_username']));
         $response = $this->readResponse();
 
         $this->parseResponse($response);
-        if ($this->responseStatus != 334)
+        if ($this->responseStatus !== 334) {            // @phpstan-ignore-line
             throw new RuntimeException('Username '.$this->options['auth_username'].' not accepted'.$this->responseStatus.' '.$this->response);
+        }
 
         // send password
         $this->writeData(base64_encode($this->options['auth_password']));
         $response = $this->readResponse();
 
         $this->parseResponse($response);
-        if ($this->responseStatus != 235)
+        if ($this->responseStatus !== 235) {
             throw new RuntimeException('Login failed for username '.$this->options['auth_username'].': '.$this->responseStatus.' '.$this->response);
+        }
     }
 
 
@@ -254,27 +258,30 @@ class SMTPMailer extends Mailer {
         $response = $this->readResponse();
 
         $this->parseResponse($response);
-        if ($this->responseStatus != 250)
+        if ($this->responseStatus !== 250) {
             throw new RuntimeException('MAIL FROM: <'.$returnPath['address'].'> command not accepted: '.$this->responseStatus.' '.$this->response.NL.NL.'SMTP transfer log:'.NL.'------------------'.NL.$this->logBuffer);
+        }
 
         $this->writeData('RCPT TO: <'.$rcpt['address'].'>');
-        $response = $this->readResponse();              // TODO: a DNS lookup in the receiving MTA might cause a timeout in readResponse()
+        $response = $this->readResponse();                                      // TODO: a DNS lookup in the receiving MTA might cause a timeout in readResponse()
 
         $this->parseResponse($response);
-        if ($this->responseStatus != 250 && $this->responseStatus != 251)
+        if ($this->responseStatus !== 250 && $this->responseStatus !== 251) {   // @phpstan-ignore-line
             throw new RuntimeException('RCPT TO: <'.$rcpt['address'].'> command not accepted: '.$this->responseStatus.' '.$this->response.NL.NL.'SMTP transfer log:'.NL.'------------------'.NL.$this->logBuffer);
+        }
 
         $this->writeData('DATA');
         $response = $this->readResponse();
 
         $this->parseResponse($response);
-        if ($this->responseStatus != 354)
+        if ($this->responseStatus !== 354) {
             throw new RuntimeException('DATA command not accepted: '.$this->responseStatus.' '.$this->response.NL.NL.'SMTP transfer log:'.NL.'------------------'.NL.$this->logBuffer);
+        }
 
         // TODO: wrap long header lines
 
         // needed headers
-        $this->writeData('Date: '.date('r'));
+        $this->writeData('Date: '.date('r'));                                   // @phpstan-ignore-line
 
         $from = $this->encodeNonAsciiChars($from);
         $this->writeData('From: '.$from['name'].' <'.$from['address'].'>');
@@ -285,7 +292,7 @@ class SMTPMailer extends Mailer {
         $encSubject = $this->encodeNonAsciiChars($subject);
         if (strlen($encSubject) > 76) throw new RuntimeException('The encoded mail subject exceeds the maximum number of characters per line: "'.$subject.'"');
         $this->writeData('Subject: '.$encSubject);
-        $this->writeData('X-Mailer: Microsoft Office Outlook 11');  // save us from Hotmail junk folder
+        $this->writeData('X-Mailer: Microsoft Office Outlook 11');              // save us from Hotmail junk folder
         $this->writeData('X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2900.2180');
 
 
@@ -333,11 +340,11 @@ class SMTPMailer extends Mailer {
         $response = $this->readResponse();
 
         $this->parseResponse($response);
-        if ($this->responseStatus != 250) throw new RuntimeException('Sent data not accepted: '.$this->responseStatus.' '.$this->response.NL
-                                                                     .NL
-                                                                     .'SMTP transfer log:'.NL
-                                                                     .'------------------'.NL
-                                                                     .$this->logBuffer);
+        if ($this->responseStatus !== 250) throw new RuntimeException('Sent data not accepted: '.$this->responseStatus.' '.$this->response.NL
+                                                                      .NL
+                                                                      .'SMTP transfer log:'.NL
+                                                                      .'------------------'.NL
+                                                                      .$this->logBuffer);
     }
 
 
@@ -345,15 +352,17 @@ class SMTPMailer extends Mailer {
      * Reset the connection.
      */
     public function reset() {
-        if (!is_resource($this->connection))
+        if (!is_resource($this->connection)) {
             throw new RuntimeException('Cannot reset connection: Not connected');
+        }
 
         $this->writeData('RSET');
         $response = $this->readResponse();
 
         $this->parseResponse($response);
-        if ($this->responseStatus != 250)
+        if ($this->responseStatus !== 250) {
             throw new RuntimeException('RSET command not accepted: '.$this->responseStatus.' '.$this->response.NL.NL.'SMTP transfer log:'.NL.'------------------'.NL.$this->logBuffer);
+        }
     }
 
 
@@ -363,16 +372,16 @@ class SMTPMailer extends Mailer {
      * @param  bool $silent [optional] - whether to silently suppress disconnect errors (default: don't)
      */
     public function disconnect($silent = false) {
-        if (!is_resource($this->connection))
-            return;
+        if (!is_resource($this->connection)) return;
 
         if (!$silent) {
             $this->writeData('QUIT');
             $response = $this->readResponse();
 
             $this->parseResponse($response);
-            if ($this->responseStatus != 221)
+            if ($this->responseStatus !== 221) {
                 throw new RuntimeException('QUIT command not accepted: '.$this->responseStatus.' '.$this->response.NL.NL.'SMTP transfer log:'.NL.'------------------'.NL.$this->logBuffer);
+            }
         }
 
         fclose($this->connection);
@@ -391,8 +400,7 @@ class SMTPMailer extends Mailer {
                 break;
         }
         $data = stream_get_meta_data($this->connection);
-        if ($data['timed_out'])
-            throw new RuntimeException('Timeout on socket connection');
+        if ($data['timed_out']) throw new RuntimeException('Timeout on socket connection');
 
         $this->logResponse($lines);
         return $lines;
@@ -407,9 +415,9 @@ class SMTPMailer extends Mailer {
     private function writeData($data) {
         $count = fwrite($this->connection, $data.EOL_WINDOWS, strlen($data)+2);
 
-        if ($count != strlen($data)+2)
+        if ($count != strlen($data)+2) {
             throw new RuntimeException('Error writing to socket, length of data: '.(strlen($data)+2).', bytes written: '.$count.NL.'data: '.$data.NL.NL.'SMTP transfer log:'.NL.'------------------'.NL.$this->logBuffer);
-
+        }
         $this->logSentData($data);
     }
 

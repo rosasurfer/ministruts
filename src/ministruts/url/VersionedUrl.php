@@ -35,10 +35,10 @@ class VersionedUrl extends Url {
                 $uri .= dechex(crc32(filesize($fileName).'|'.filemtime($fileName)));
             }
 
-            Assert::string($uri);                               // Ensure __toString() returns a string as otherwise...
-        }                                                       // PHP will trigger a non-catchable fatal error.
+            Assert::string($uri);                                               // Ensure __toString() returns a string as otherwise...
+        }                                                                       // PHP will trigger a non-catchable fatal error.
         catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }
-        catch (\Exception $ex) { ErrorHandler::handleToStringException($ex); }
+        catch (\Exception $ex) { ErrorHandler::handleToStringException($ex); }  // @phpstan-ignore-line
 
         return $uri;
     }

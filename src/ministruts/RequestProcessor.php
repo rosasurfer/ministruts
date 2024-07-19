@@ -113,16 +113,20 @@ class RequestProcessor extends CObject {
      */
     protected function cacheActionMessages(Request $request) {
         $errors = $request->removeActionErrors();
-        if ($errors && $request->getSession()) {
-            if (isset($_SESSION[ACTION_ERRORS_KEY]))
+        if ($errors) {
+            $request->getSession();                         // initialize session
+            if (isset($_SESSION[ACTION_ERRORS_KEY])) {
                 $errors = \array_merge($_SESSION[ACTION_ERRORS_KEY], $errors);
+            }
             $_SESSION[ACTION_ERRORS_KEY] = $errors;
         }
 
         $messages = $request->removeActionMessages();
-        if ($messages && $request->getSession()) {
-            if (isset($_SESSION[ACTION_MESSAGES_KEY]))
+        if ($messages) {
+            $request->getSession();                         // initialize session
+            if (isset($_SESSION[ACTION_MESSAGES_KEY])) {
                 $messages = \array_merge($_SESSION[ACTION_MESSAGES_KEY], $messages);
+            }
             $_SESSION[ACTION_MESSAGES_KEY] = $messages;
         }
     }
@@ -135,7 +139,8 @@ class RequestProcessor extends CObject {
      * @param  Request $request
      */
     protected function restoreCachedActionMessages(Request $request) {
-        if ($request->hasSessionId() && $request->getSession()) {
+        if ($request->hasSessionId()) {
+            $request->getSession();                         // initialize session
             $messages = $errors = [];
 
             if (isset($_SESSION[ACTION_MESSAGES_KEY])) {
@@ -302,24 +307,24 @@ PROCESS_METHOD_ERROR_SC_405;
      */
     protected function processActionFormCreate(Request $request, ActionMapping $mapping) {
         $formClass = $mapping->getFormClassName();
-        if (!$formClass)
-            return null;
+        if (!$formClass) return null;
 
-        /** @var ActionForm $form */
+        /** @var ?ActionForm $form */
         $form = null;
 
         // if the form has "session" scope try to find an existing form in the session
-        if ($mapping->isSessionScope())
+        if ($mapping->isSessionScope()) {
             $form = $request->getSession()->getAttribute($formClass);       // implicitely starts a session
+        }
 
         // if none was found create a new instance
-        /** @var ActionForm $form */
         if (!$form) $form = new $formClass($request);
 
         // if a DispatchAction is used read the action key
         $actionClass = $mapping->getActionClassName();
-        if (is_subclass_of($actionClass, DispatchAction::class))
+        if (is_subclass_of($actionClass, DispatchAction::class)) {
             $form->initActionKey($request);
+        }
 
         // populate the form
         $form->populate($request);
@@ -431,7 +436,7 @@ PROCESS_METHOD_ERROR_SC_405;
             }
         }
         catch (\Throwable $ex) {}           // auftretende Exceptions zwischenspeichern
-        catch (\Exception $ex) {}
+        catch (\Exception $ex) {}           // @phpstan-ignore-line
 
         // falls statt eines ActionForwards ein String-Identifier zurueckgegeben wurde, diesen aufloesen
         if (is_string($forward))

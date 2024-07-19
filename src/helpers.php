@@ -1438,7 +1438,7 @@ function is_class($name) {
         return class_exists($name, true);
     }
     catch (\Throwable $ex) {}   // faulty class loaders must not block the script from continuation
-    catch (\Exception $ex) {}
+    catch (\Exception $ex) {}   // @phpstan-ignore-line
 
     return class_exists($name, false);
 }
@@ -1457,7 +1457,7 @@ function is_interface($name) {
         return interface_exists($name, true);
     }
     catch (\Throwable $ex) {}   // faulty class loaders must not block the script from continuation
-    catch (\Exception $ex) {}
+    catch (\Exception $ex) {}   // @phpstan-ignore-line
 
     return interface_exists($name, false);
 }
@@ -1476,7 +1476,7 @@ function is_trait($name) {
         return trait_exists($name, true);
     }
     catch (\Throwable $ex) {}   // faulty class loaders must not block the script from continuation
-    catch (\Exception $ex) {}
+    catch (\Exception $ex) {}   // @phpstan-ignore-line
 
     return trait_exists($name, false);
 }

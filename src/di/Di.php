@@ -114,7 +114,7 @@ class Di extends CObject implements DiInterface {
             return $this->services[$name]->resolve(true, $params);
         }
         catch (\Throwable $ex) { throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex); }
-        catch (\Exception $ex) { throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex); }
+        catch (\Exception $ex) { throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex); }    // @phpstan-ignore-line
     }
 
 
@@ -129,7 +129,7 @@ class Di extends CObject implements DiInterface {
             return $this->services[$name]->resolve(false);
         }
         catch (\Throwable $ex) { throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex); }
-        catch (\Exception $ex) { throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex); }
+        catch (\Exception $ex) { throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex); }    // @phpstan-ignore-line
     }
 
 

@@ -29,8 +29,8 @@ class SQLiteResult extends Result {
     /** @var int - last number of affected rows (not reset between queries) */
     protected $lastAffectedRows = 0;
 
-    /** @var int - number of rows returned by the statement */
-    protected $numRows;
+    /** @var ?int - number of rows returned by the statement */
+    protected $numRows = null;
 
 
     /**
@@ -140,7 +140,7 @@ class SQLiteResult extends Result {
             while ($this->fetchRow());                          // loop from current position to the end
 
             // we hit the end
-            if ($this->numRows) {
+            if ($this->numRows) {                               // @phpstan-ignore-line
                 $this->result->reset();                         // back to start
                 $this->nextRowIndex = 0;
                 while ($previous--) {                           // loop back to former position

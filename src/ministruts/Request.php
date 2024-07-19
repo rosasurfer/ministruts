@@ -42,8 +42,8 @@ class Request extends CObject {
     /** @var string */
     private $path;
 
-    /** @var array - normalized structure of files uploaded with the request */
-    private $files;
+    /** @var ?array - normalized structure of files uploaded with the request */
+    private $files = null;
 
     /** @var array - additional variables context */
     private $attributes = [];
@@ -931,7 +931,7 @@ class Request extends CObject {
     public function isUserInRole($role) {
         Assert::string($role);
 
-        /** @var Module $module */
+        /** @var ?Module $module */
         $module = $this->getAttribute(MODULE_KEY);
         if (!$module) throw new RuntimeException('Current Struts module not found');
 
@@ -1011,7 +1011,7 @@ class Request extends CObject {
      * @param  ?string    $message - message; if NULL is passed the message for the specified key is removed
      */
     public function setActionMessage($key, $message) {
-        if (!is_string($key) && !is_int($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.gettype($key));
+        if (!is_string($key) && !is_int($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.gettype($key));    // @phpstan-ignore-line
         Assert::nullOrString($message, '$message');
 
         if (!isset($message)) {
@@ -1115,7 +1115,7 @@ class Request extends CObject {
      * @param  ?string    $message - message; if NULL is passed the error for the specified key is removed
      */
     public function setActionError($key, $message) {
-        if (!is_string($key) && !is_int($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.gettype($key));
+        if (!is_string($key) && !is_int($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.gettype($key));    // @phpstan-ignore-line
         Assert::nullOrString($message, '$message');
 
         if (!isset($message)) {
@@ -1144,8 +1144,7 @@ class Request extends CObject {
                 $removed[$key] = $errors[$key];
             unset($this->attributes[ACTION_ERRORS_KEY][$key]);
         }
-        if ($keys)
-            return $removed;
+        if ($keys) return $removed;
 
         unset($this->attributes[ACTION_ERRORS_KEY]);
         return $errors;
@@ -1208,7 +1207,7 @@ class Request extends CObject {
                 $maxLen = max(strlen($key), $maxLen);
             }
 
-            $maxLen++;                                          // add one char for ':'
+            $maxLen++;                                                          // add one char for ':'
             foreach ($headers as $key => $value) {
                 $string .= str_pad($key.':', $maxLen).' '.$value.NL;
             }
@@ -1216,13 +1215,13 @@ class Request extends CObject {
             // content (request body)
             $content = $this->getContent();
             if (strlen($content)) {
-                $string .= NL.substr($content, 0, 1024).NL;     // limit the request body to 1024 bytes
+                $string .= NL.substr($content, 0, 1024).NL;                     // limit the request body to 1024 bytes
             }
 
-            Assert::string($string);                            // Ensure __toString() returns a string as otherwise...
-        }                                                       // PHP will trigger a non-catchable fatal error.
+            Assert::string($string);                                            // Ensure __toString() returns a string as otherwise...
+        }                                                                       // PHP will trigger a non-catchable fatal error.
         catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }
-        catch (\Exception $ex) { ErrorHandler::handleToStringException($ex); }
+        catch (\Exception $ex) { ErrorHandler::handleToStringException($ex); }  // @phpstan-ignore-line
 
         return $string;
     }

@@ -35,7 +35,7 @@ class TorHelper extends StaticClass {
     private static $logDebug;
 
     /** @var bool */
-    private static $logInfo;
+    private static $logInfo;            // @phpstan-ignore-line
 
     /** @var bool */
     private static $logNotice;

@@ -43,9 +43,9 @@ class FileSystem extends StaticClass {
             }
             catch (IRosasurferException $ex) {}
             catch (\Throwable           $ex) { $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex); }
-            catch (\Exception           $ex) { $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex); }
+            catch (\Exception           $ex) { $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex); }    // @phpstan-ignore-line
 
-            if ($ex) throw $ex->addMessage('Cannot create directory "'.$path.'"');
+            throw $ex->addMessage('Cannot create directory "'.$path.'"');
         }
         return true;
     }

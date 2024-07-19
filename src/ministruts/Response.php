@@ -118,8 +118,8 @@ class Response extends Singleton {
         $url = self::relativeToAbsoluteUrl($uri, $currentUrl);
 
         // append session id if a session is active and URL rewriting is not disabled (strongly discouraged)
-        if (defined('SID') && strlen(SID)) {                        // empty string if the session id was submitted in a cookie
-            if (!ini_get_bool('session.use_only_cookies')) {        // TODO: check if session_destroy() resets SID
+        if (defined('SID') && strlen(SID)) {                        // @phpstan-ignore-line     empty string if the session id was submitted in a cookie
+            if (!ini_get_bool('session.use_only_cookies')) {        //                          TODO: check if session_destroy() resets SID
                 $cookie       = session_get_cookie_params();
                 $cookieDomain = strtolower(empty($cookie['domain']) ? RequestProxy::getHostname() : $cookie['domain']);
                 $cookiePath   =            empty($cookie['path'  ]) ? '/'                         : $cookie['path'  ];

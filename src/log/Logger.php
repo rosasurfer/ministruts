@@ -125,9 +125,6 @@ class Logger extends StaticClass {
     /** @var string[] - SMS receivers */
     private static $smsReceivers = [];
 
-    /** @var int - additional SMS loglevel constraint */
-    private static $smsLogLevel = null;
-
     /** @var array - SMS options; resolved at log message time */
     private static $smsOptions = [];
 
@@ -155,7 +152,7 @@ class Logger extends StaticClass {
         /** @var ConfigInterface $config */
         $config = self::di('config');
 
-        // (1) Get the application's default loglevel configuration (fall back to the built-in default).
+        // Get the application's default loglevel configuration (fall back to the built-in default).
         $logLevel = $config->get('log.level', '');
         if (is_array($logLevel))
             $logLevel = isset($logLevel['']) ? $logLevel[''] : '';
@@ -163,7 +160,7 @@ class Logger extends StaticClass {
         self::$appLogLevel = $logLevel;
 
 
-        // (2) mail handler: enabled if mail receivers are configured
+        // mail handler: enabled if mail receivers are configured
         $receivers = [];
         foreach (explode(',', $config->get('log.mail.receiver', '')) as $receiver) {
             if ($receiver = trim($receiver)) {
@@ -176,16 +173,16 @@ class Logger extends StaticClass {
         self::$mailReceivers =        $receivers;
 
 
-        // (3) L_FATAL print handler: enabled on local/white-listed access or if explicitely enabled
+        // L_FATAL print handler: enabled on local/white-listed access or if explicitely enabled
         self::$printFatalHandler = CLI || Application::isAdminIP() || ini_get_bool('display_errors');
 
 
-        // (4) non L_FATAL print handler: enabled on local access, if explicitely enabled or if the mail handler is disabled
+        // non L_FATAL print handler: enabled on local access, if explicitely enabled or if the mail handler is disabled
         self::$printNonfatalHandler = CLI || in_array($_SERVER['REMOTE_ADDR'], ['127.0.0.1', $_SERVER['SERVER_ADDR']])
                                           || ini_get_bool('display_errors')
                                           || (self::$printFatalHandler && !self::$mailHandler);
 
-        // (5) SMS handler: enabled if SMS receivers are configured (operator settings are checked at log time)
+        // SMS handler: enabled if SMS receivers are configured (operator settings are checked at log time)
         self::$smsReceivers = [];
         foreach (explode(',', $config->get('log.sms.receiver', '')) as $receiver) {
             if ($receiver=trim($receiver)) {
@@ -199,9 +196,9 @@ class Logger extends StaticClass {
             }
         }
         $logLevel = $config->get('log.sms.level', self::$appLogLevel);
-        if (is_string($logLevel))                                   // a string if configured
+        if (is_string($logLevel)) {             // a string if configured
             $logLevel = self::logLevelToId($logLevel) ?: self::$appLogLevel;
-        self::$smsLogLevel = $logLevel;
+        }
 
         $options = $config->get('sms', []);
         Assert::isArray($options, 'config value "sms"');
@@ -209,8 +206,7 @@ class Logger extends StaticClass {
 
         self::$smsHandler = self::$smsReceivers && self::$smsOptions;
 
-
-        // (6) PHP error_log handler: enabled if the mail handler is disabled
+        // PHP error_log handler: enabled if the mail handler is disabled
         self::$errorLogHandler = !self::$mailHandler;
 
         $initialized = true;
@@ -314,8 +310,9 @@ class Logger extends StaticClass {
             // validate parameters
             if (!is_string($loggable)) {
                 Assert::hasMethod($loggable, '__toString', '$loggable');
-                if (!$loggable instanceof \Throwable && !$loggable instanceof \Exception)
+                if (!$loggable instanceof \Throwable && !$loggable instanceof \Exception) { // @phpstan-ignore-line
                     $loggable = (string) $loggable;
+                }
             }
             Assert::int($level, '$level');
             if (!\key_exists($level, self::$logLevels)) throw new InvalidArgumentException('Invalid argument $level: '.$level.' (not a loglevel)');
@@ -323,7 +320,7 @@ class Logger extends StaticClass {
             $filtered = false;
 
             // filter messages below the active loglevel
-            if (!$filtered && $level!=L_FATAL) {                                // L_FATAL (highest) can't be below
+            if ($level != L_FATAL) {                                            // L_FATAL (highest) can't be below
                 if (!\key_exists('class', $context))                            // resolve the calling class and check its loglevel
                     self::resolveLogCaller($context);
                 $filtered = $level < self::getLogLevel($context['class']);      // message is below the active loglevel
@@ -352,7 +349,7 @@ class Logger extends StaticClass {
 
         }
         catch (\Throwable $ex) {}
-        catch (\Exception $ex) {}
+        catch (\Exception $ex) {}       // @phpstan-ignore-line
 
         if ($ex) {
             // If the call comes from our framework's exception handler \rosasurfer\core\debug\ErrorHandler::handleException()
@@ -440,22 +437,21 @@ class Logger extends StaticClass {
      * @TODO   replace CURL dependency with internal PHP functions
      */
     private static function invokeSmsHandler($loggable, $level, array &$context) {
-        if (!\key_exists('cliMessage', $context))
+        if (!\key_exists('cliMessage', $context)) {
             self::composeCliMessage($loggable, $level, $context);
+        }
 
-        // (1) CURL options (all service providers)
+        // CURL options (all service providers)
         $curlOptions = [];
         $curlOptions[CURLOPT_SSL_VERIFYPEER] = false;                  // the SSL certifikat may be self-signed or invalid
       //$curlOptions[CURLOPT_VERBOSE       ] = true;                   // enable debugging
 
-
-        // (2) clean-up message
+        // clean-up message
         $message = trim($context['cliMessage']);
         $message = normalizeEOL($message);                             // enforce Unix line-breaks
         $message = substr($message, 0, 150);                           // limit length to about one text message
 
-
-        // (3) check availability and use Clickatell
+        // check availability and use Clickatell
         if (isset(self::$smsOptions['clickatell'])) {
             $smsOptions = self::$smsOptions['clickatell'];
             if (!empty($smsOptions['user']) && !empty($smsOptions['password']) && !empty($smsOptions['api_id'])) {
@@ -479,7 +475,7 @@ class Logger extends StaticClass {
                             self::log('Unexpected HTTP status code '.$status.' ('.HttpResponse::$sc[$status].') for URL: '.$request->getUrl(), L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
                         }
                         catch (\Throwable $ex) {}   // intentionally eat it
-                        catch (\Exception $ex) {}
+                        catch (\Exception $ex) {}   // @phpstan-ignore-line
                         continue;
                     }
                     if (strStartsWithI($content, 'ERR: 113')) {
@@ -491,8 +487,7 @@ class Logger extends StaticClass {
             }
         }
 
-
-        // (4) check availability and use Nexmo
+        // check availability and use Nexmo
         // TODO encoding issues when sending to Bulgarian receivers (some chars are auto-converted to ciryllic crap)
         if (isset(self::$smsOptions['nexmo'])) {
             $smsOptions = self::$smsOptions['nexmo'];
@@ -516,7 +511,7 @@ class Logger extends StaticClass {
                             self::log('Unexpected HTTP status code '.$status.' ('.HttpResponse::$sc[$status].') for URL: '.$request->getUrl(), L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
                         }
                         catch (\Throwable $ex) {}   // intentionally eat it
-                        catch (\Exception $ex) {}
+                        catch (\Exception $ex) {}   // @phpstan-ignore-line
                         continue;
                     }
                 }
