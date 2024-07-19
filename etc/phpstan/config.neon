@@ -13,7 +13,6 @@ parameters:
     - api-stubs.php
 
   scanFiles:                                        # additional non-autoloaded files to scan for symbols
-    #- helpers.php
 
   paths:                                            # paths on the command line override these hardcoded values
     - ../../bin
