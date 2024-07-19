@@ -3,7 +3,7 @@ namespace rosasurfer\db\sqlite;
 
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\InvalidValueException;
 use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\db\Connector;
@@ -63,8 +63,8 @@ class SQLiteConnector extends Connector {
     /** @var string[] - configuration options */
     protected $options = [];
 
-    /** @var \SQLite3 - internal database handler instance */
-    protected $sqlite;
+    /** @var ?\SQLite3 - internal database handler instance */
+    protected $sqlite = null;
 
     /** @var int - transaction nesting level */
     protected $transactionLevel = 0;
@@ -103,13 +103,12 @@ class SQLiteConnector extends Connector {
      */
     protected function setFile($file) {
         Assert::string($file);
-        if (!strlen($file)) throw new InvalidArgumentException('Invalid parameter $file: "'.$file.'" (empty)');
+        if (!strlen($file)) throw new InvalidValueException('Invalid parameter $file: "'.$file.'" (empty)');
 
         if ($file == ':memory:' || !isRelativePath($file)) {
             $this->file = $file;
         }
         else {
-            /** @var ConfigInterface $config */
             $rootDir = $this->di('config')['app.dir.root'];
             $this->file = str_replace('\\', '/', $rootDir.'/'.$file);
         }
@@ -145,7 +144,6 @@ class SQLiteConnector extends Connector {
         }
         catch (IRosasurferException $ex) {}
         catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
-        catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
 
         if ($ex) {
             $file = $this->file;
@@ -159,7 +157,7 @@ class SQLiteConnector extends Connector {
                 $what = ($flags & SQLITE3_OPEN_CREATE) ? 'create' : 'find';
                 isRelativePath($file) && $where=' in "'.getcwd().'"';
             }
-            throw $ex->addMessage('Cannot '.$what.' database file "'.$file.'"'.$where);
+            throw $ex->appendMessage('Cannot '.$what.' database file "'.$file.'"'.$where);
         }
 
         $this->setConnectionOptions();
@@ -322,8 +320,7 @@ class SQLiteConnector extends Connector {
         }
         catch (IRosasurferException $ex) {}
         catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
-        catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
-        if ($ex) throw $ex->addMessage('Database: '.$this->file.NL.'SQL: "'.$sql.'"');
+        if ($ex) throw $ex->appendMessage('Database: '.$this->file.NL.'SQL: "'.$sql.'"');
 
         // track last_insert_id
         $this->lastInsertId = $this->sqlite->lastInsertRowID();

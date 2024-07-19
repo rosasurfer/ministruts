@@ -1,12 +1,11 @@
 #!/usr/bin/env php
 <?php
-use function rosasurfer\echoPre;
 use function rosasurfer\docopt;
+use function rosasurfer\echof;
 
 require(dirname(realpath(__FILE__)).'/../../../../../src/load.php');
 
 $doc = <<<DOCOPT
-
 Usage: git add [options] [--] [<filepattern>...]
 
     -h, --help
@@ -28,5 +27,5 @@ DOCOPT;
 
 $result = docopt($doc);
 foreach ($result as $key => $value) {
-    echoPre($key.': '.json_encode($value));
+    echof($key.': '.json_encode($value));
 }

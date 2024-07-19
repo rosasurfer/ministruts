@@ -13,7 +13,7 @@ abstract class Action extends CObject {
     /** @var ActionMapping - encapsulates a single routing configuration */
     protected $mapping;
 
-    /** @var ActionForm - holds user input of the current request */
+    /** @var ActionForm - holds interpreted user input of the current request */
     protected $form;
 
 
@@ -22,10 +22,10 @@ abstract class Action extends CObject {
      *
      * Create a new Action instance.
      *
-     * @param  ActionMapping $mapping         - the mapping using the Action
-     * @param  ActionForm    $form [optional] - user input of the request
+     * @param  ActionMapping $mapping - the mapping using the Action
+     * @param  ActionForm    $form    - user input of the request
      */
-    public function __construct(ActionMapping $mapping, ActionForm $form = null) {
+    public function __construct(ActionMapping $mapping, ActionForm $form) {
         $this->mapping = $mapping;
         $this->form    = $form;
     }
@@ -49,8 +49,8 @@ abstract class Action extends CObject {
      * @param  Request  $request
      * @param  Response $response
      *
-     * @return ActionForward|string? - NULL to continue request processing;
-     *                                 ActionForward or forward name if request processing is finished
+     * @return ActionForward|string|null - NULL to continue request processing;
+     *                                     ActionForward or forward name if request processing is finished
      */
     public function executeBefore(Request $request, Response $response) {
         return null;
@@ -63,8 +63,8 @@ abstract class Action extends CObject {
      * @param  Request  $request
      * @param  Response $response
      *
-     * @return ActionForward|string? - ActionForward or forward name to forward to;
-     *                                 NULL if request processing is finished
+     * @return ActionForward|string|null - ActionForward or forward name to forward to;
+     *                                     NULL if request processing is finished
      */
     abstract public function execute(Request $request, Response $response);
 
@@ -80,7 +80,7 @@ abstract class Action extends CObject {
      * @param  Response      $response
      * @param  ActionForward $forward [optional] - original ActionForward as returned by Action::execute()
      *
-     * @return ActionForward? - original or modified ActionForward (e.g. a route with added query parameters)
+     * @return ?ActionForward - original or modified ActionForward (e.g. a route with added query parameters)
      */
     public function executeAfter(Request $request, Response $response, ActionForward $forward = null) {
         return $forward;
@@ -92,7 +92,7 @@ abstract class Action extends CObject {
      *
      * @param  string $name - forward identifier
      *
-     * @return ActionForward? - found ActionForward or NULL if no such forward was found
+     * @return ?ActionForward - found ActionForward or NULL if no such forward was found
      */
     protected function findForward($name) {
         return $this->mapping->findForward($name);

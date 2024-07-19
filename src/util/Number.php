@@ -3,14 +3,13 @@ namespace rosasurfer\util;
 
 use rosasurfer\core\StaticClass;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\core\exception\IllegalTypeException;
+use rosasurfer\core\exception\InvalidTypeException;
 
 
 /**
  * Number
  */
 class Number extends StaticClass {
-
 
     /**
      * Format a numeric value with a currency format&#46;  Opposite to the PHP built-in function number_format() this
@@ -24,8 +23,7 @@ class Number extends StaticClass {
      * @return string
      */
     public static function formatMoney($value, $decimals=2, $decimalsSeparator='.', $thousandsSeparator='') {
-        if (!is_int($value) && !is_float($value))
-            throw new IllegalTypeException('Illegal type of parameter $value: '.gettype($value));
+        if (!is_int($value) && !is_float($value)) throw new InvalidTypeException('Invalid type of parameter $value: '.gettype($value));
         Assert::int   ($decimals,           '$decimals');
         Assert::string($decimalsSeparator,  '$decimalsSeparator');
         Assert::string($thousandsSeparator, '$thousandsSeparator');

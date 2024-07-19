@@ -3,9 +3,9 @@ namespace rosasurfer\ministruts;
 
 use rosasurfer\core\Singleton;
 use rosasurfer\core\assert\Assert;
+use rosasurfer\core\di\proxy\Request as RequestProxy;
+use rosasurfer\core\error\PHPError;
 use rosasurfer\core\exception\RuntimeException;
-use rosasurfer\core\exception\error\PHPError;
-use rosasurfer\di\proxy\Request as RequestProxy;
 use rosasurfer\util\PHP;
 
 
@@ -29,7 +29,9 @@ class HttpSession extends Singleton {
      * @throws RuntimeException if not called from the web interface
      */
     public static function me() {
-        return self::getInstance(static::class);
+        /** @var static $instance */
+        $instance = self::getInstance(static::class);
+        return $instance;
     }
 
 

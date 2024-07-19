@@ -2,7 +2,7 @@
 namespace rosasurfer\cache\monitor;
 
 use rosasurfer\core\assert\Assert;
-use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\InvalidValueException;
 
 use function rosasurfer\isRelativePath;
 
@@ -38,8 +38,8 @@ class FileDependency extends Dependency {
     /** @var string - Dateiname */
     private $fileName;
 
-    /** @var int - letzter Aenderungszeitpunkt der Datei (Unix-Timestamp) */
-    private $lastModified;
+    /** @var ?int - letzter Aenderungszeitpunkt der Datei (Unix-Timestamp) */
+    private $lastModified = null;
 
 
     /**
@@ -51,7 +51,7 @@ class FileDependency extends Dependency {
      */
     public function __construct($fileName) {
         Assert::string($fileName);
-        if (!strlen($fileName)) throw new InvalidArgumentException('Invalid argument $fileName: '.$fileName);
+        if (!strlen($fileName)) throw new InvalidValueException('Invalid parameter $fileName: '.$fileName);
 
         if (file_exists($fileName)) {                       // existierende Datei
             $this->fileName     = realpath($fileName);
@@ -78,10 +78,10 @@ class FileDependency extends Dependency {
     public static function create($fileNames) {
         if (!is_array($fileNames)) {
             Assert::string($fileNames);
-            if (!strlen($fileNames)) throw new InvalidArgumentException('Invalid argument $fileNames: '.$fileNames);
+            if (!strlen($fileNames)) throw new InvalidValueException('Invalid parameter $fileNames: '.$fileNames);
             $fileNames = [$fileNames];
         }
-        if (!$fileNames) throw new InvalidArgumentException('Invalid argument $fileNames: '.$fileNames);
+        if (!$fileNames) throw new InvalidValueException('Invalid parameter $fileNames: []');
 
         $dependency = null;
 

@@ -13,7 +13,7 @@ use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\net\mail\Mailer;
 
-use function rosasurfer\echoPre;
+use function rosasurfer\echof;
 use function rosasurfer\stderr;
 use function rosasurfer\strStartsWith;
 
@@ -22,7 +22,7 @@ use const rosasurfer\NL;
 use const rosasurfer\WINDOWS;
 
 require(dirname(realpath(__FILE__)).'/../app/init.php');    // TODO: adjust to your project
-!CLI && exit(1|stderr('error: This script must be executed via CLI.'));
+!CLI && exit(1|stderr('error: This script must be executed via CLI.'.NL));
 
 
 // --- configuration --------------------------------------------------------------------------------------------------------
@@ -42,7 +42,7 @@ foreach ($args as $i => $arg) {
     if ($arg == '-h') { help(); exit(0);                           }    // help
     if ($arg == '-q') { $quiet = true; unset($args[$i]); continue; }    // quiet mode
 
-    stderr('invalid argument: '.$arg);
+    stderr('invalid argument: '.$arg.NL);
     !$quiet && help();
     exit(1);
 }
@@ -54,21 +54,21 @@ foreach ($args as $i => $arg) {
 // (1) define the location of the error log
 $errorLog = ini_get('error_log');
 if (empty($errorLog) || $errorLog=='syslog') {              // errors are logged elsewhere
-    if (empty($errorLog)) $quiet || echoPre('errors are logged elsewhere ('.(CLI     ?    'stderr':'sapi'  ).')');
-    else                  $quiet || echoPre('errors are logged elsewhere ('.(WINDOWS ? 'event log':'syslog').')');
+    if (empty($errorLog)) $quiet || echof('errors are logged elsewhere ('.(CLI     ?    'stderr':'sapi'  ).')');
+    else                  $quiet || echof('errors are logged elsewhere ('.(WINDOWS ? 'event log':'syslog').')');
     exit(0);
 }
 
 
 // (2) check log file for existence and process it
-if (!is_file    ($errorLog)) { $quiet || echoPre('error log empty: '       .$errorLog); exit(0); }
-if (!is_writable($errorLog)) {            stderr('cannot access log file: '.$errorLog); exit(1); }
+if (!is_file    ($errorLog)) { $quiet || echof('error log empty: '       .$errorLog);    exit(0); }
+if (!is_writable($errorLog)) {          stderr('cannot access log file: '.$errorLog.NL); exit(1); }
 $errorLog = realpath($errorLog);
 
 // rename the file; we don't want to lock it as doing so could block the main app
 $tempName = tempnam(dirname($errorLog), basename($errorLog).'.');
 if (!rename($errorLog, $tempName)) {
-    stderr('cannot rename log file: '  .$errorLog);
+    stderr('cannot rename log file: '  .$errorLog.NL);
     exit(1);
 }
 
@@ -137,7 +137,7 @@ function processEntry($entry) {
     }
 
     global $quiet;
-    $quiet || echoPre(substr($subject, 0, 80).'...');
+    $quiet || echof(substr($subject, 0, 80).'...');
 
     foreach ($receivers as $receiver) {
         $mailer->sendMail($sender, $receiver, $subject, $message, $headers);

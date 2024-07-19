@@ -2,7 +2,7 @@
 namespace rosasurfer\net\http;
 
 use rosasurfer\core\assert\Assert;
-use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\InvalidValueException;
 
 
 /**
@@ -43,7 +43,7 @@ class CurlHttpResponse extends HttpResponse {
      */
     public function setStatus($status) {
         Assert::int($status);
-        if ($status < 1) throw new InvalidArgumentException('Invalid argument $status: '.$status);
+        if ($status < 1) throw new InvalidValueException('Invalid parameter $status: '.$status);
 
         $this->status = $status;
         return $this;

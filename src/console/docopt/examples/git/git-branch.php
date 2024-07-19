@@ -1,12 +1,11 @@
 #!/usr/bin/env php
 <?php
-use function rosasurfer\echoPre;
 use function rosasurfer\docopt;
+use function rosasurfer\echof;
 
 require(dirname(realpath(__FILE__)).'/../../../../../src/load.php');
 
 $doc = <<<DOCOPT
-
 Usage: git branch [options] [-r | -a] [--merged=<commit> | --no-merged=<commit>]
        git branch [options] [-l] [-f] <branchname> [<start-point>]
        git branch [options] [-r] (-d | -D) <branchname>
@@ -37,5 +36,5 @@ DOCOPT;
 
 $result = docopt($doc);
 foreach ($result as $key => $value) {
-    echoPre($key.': '.json_encode($value));
+    echof($key.': '.json_encode($value));
 }

@@ -1,22 +1,20 @@
 #!/usr/bin/env php
 <?php
-use function rosasurfer\echoPre;
 use function rosasurfer\docopt;
+use function rosasurfer\echof;
 
 require(dirname(realpath(__FILE__)).'/../../../../src/load.php');
 
-$self = basename($_SERVER['PHP_SELF']);
 $doc = <<<DOCOPT
-
 Naval Fate.
 
 Usage:
-  $self  ship new <name>...
-  $self  ship <name> move <x> <y> [--speed=<kn>]
-  $self  ship shoot <x> <y>
-  $self  mine (set|remove) <x> <y> [--moored|--drifting]
-  $self  -h | --help
-  $self  --version
+  {:cmd:}  ship new <name>...
+  {:cmd:}  ship <name> move <x> <y> [--speed=<kn>]
+  {:cmd:}  ship shoot <x> <y>
+  {:cmd:}  mine (set|remove) <x> <y> [--moored|--drifting]
+  {:cmd:}  -h | --help
+  {:cmd:}  --version
 
 Options:
   -h --help     Show this screen.
@@ -29,5 +27,5 @@ DOCOPT;
 
 $result = docopt($doc, null, ['version'=>'Naval Fate 2.0']);
 foreach ($result as $key => $value) {
-    echoPre($key.': '.json_encode($value));
+    echof($key.': '.json_encode($value));
 }

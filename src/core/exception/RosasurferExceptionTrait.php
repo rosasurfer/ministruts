@@ -2,17 +2,15 @@
 namespace rosasurfer\core\exception;
 
 use rosasurfer\core\assert\Assert;
-use rosasurfer\core\debug\DebugHelper;
-use rosasurfer\core\debug\ErrorHandler;
+use rosasurfer\core\error\ErrorHandler;
 
 use const rosasurfer\NL;
 
 
 /**
- * A trait capable of adding the behavior of {@link RosasurferException} to any {@link \Exception} or {@link \Throwable}.
+ * A trait adding the behavior of a {@link RosasurferException} to any custom {@link \Throwable}.
  */
 trait RosasurferExceptionTrait {
-
 
     /** @var string - better message */
     private $betterMessage;
@@ -25,14 +23,13 @@ trait RosasurferExceptionTrait {
 
 
     /**
-     * Add a message to the exception's existing message. Used during up-bubbling to add additional infos to an exception's
-     * original message.
+     * Add a message to the exception's existing message. Used to enrich the exception with additional data.
      *
      * @param  string $message
      *
      * @return $this
      */
-    public function addMessage($message) {
+    public function appendMessage($message) {
         if (strlen($message)) {
             $this->message = trim(trim($this->message).NL.$message);
         }
@@ -41,14 +38,16 @@ trait RosasurferExceptionTrait {
 
 
     /**
-     * Set the error code of an {@link \Exception} or {@link \Throwable}. Used during up-bubbling to add additional infos
-     * to an existing exception. Ignored if the exception's error code is already set.
+     * Set the error code of an exception. Used to enrich the exception with additional data.
+     * Ignored if the error code is already set.
      *
-     * @param  int|string $code
+     * @param  int $code
      *
      * @return $this
      */
     public function setCode($code) {
+        Assert::int($code);
+
         if (!isset($this->code)) {
             $this->code = $code;
         }
@@ -57,55 +56,41 @@ trait RosasurferExceptionTrait {
 
 
     /**
-     * Return the message of the {@link \Exception} or {@link \Throwable} in a more readable way.
+     * Return the message of the exception in a more readable way.
      *
      * @return string
      */
     public function getBetterMessage() {
         if (!$this->betterMessage)
-            $this->betterMessage = DebugHelper::composeBetterMessage($this);
+            $this->betterMessage = ErrorHandler::getBetterMessage($this);
         return $this->betterMessage;
     }
 
 
     /**
-     * Return a string representation of the stack trace of the {@link \Exception} or {@link \Throwable} in a more readable
-     * way (Java-like).
+     * Return the stacktrace of the exception in a more readable way as a string. The returned string contains nested exceptions.
      *
      * @return string
      */
     public function getBetterTraceAsString() {
         if (!$this->betterTraceAsString)
-            $this->betterTraceAsString = DebugHelper::getBetterTraceAsString($this);
+            $this->betterTraceAsString = ErrorHandler::getBetterTraceAsString($this);
         return $this->betterTraceAsString;
     }
 
 
     /**
-     * Return the name of the function or method (if any) where the {@link \Exception} or {@link \Throwable} was created.
-     *
-     * @return string
-     */
-    public function getFunction() {
-        return DebugHelper::getFQFunctionName($this->getBetterTrace()[0]);
-    }
-
-
-    /**
-     * Return a string representation of the {@link \Exception} or {@link \Throwable}.
+     * Return a string representation of the exception.
      *
      * @return string
      */
     public function __toString() {
         $value = '';
-
         try {
             $value = $this->getBetterMessage();
-            Assert::string($value);                             // Ensure __toString() returns a string as otherwise...
-        }                                                       // PHP will trigger a non-catchable fatal error.
-        catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }
-        catch (\Exception $ex) { ErrorHandler::handleToStringException($ex); }
-
-        return $value;
+            Assert::string($value);
+        }                                                                       // Ensure __toString() doesn't throw an exception as otherwise
+        catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }  // PHP < 7.4 will trigger a non-catchable fatal error.
+        return $value;                                                          // @see  https://bugs.php.net/bug.php?id=53648
     }
 }

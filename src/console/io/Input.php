@@ -9,7 +9,7 @@ use rosasurfer\core\assert\Assert;
 /**
  * Input
  *
- * An object providing access to command line input and parsed command line arguments.
+ * An object providing access to parsed command line arguments.
  */
 class Input extends CObject {
 
@@ -19,7 +19,7 @@ class Input extends CObject {
 
 
     /**
-     * Set the internal docopt result.
+     * Set the internal Docopt result.
      *
      * @param  DocoptResult $docopt
      *
@@ -32,7 +32,7 @@ class Input extends CObject {
 
 
     /**
-     * Return the internal docopt result.
+     * Return the internal Docopt result.
      *
      * @return DocoptResult
      */
@@ -54,7 +54,7 @@ class Input extends CObject {
         if (!$this->docoptResult)
             return false;
 
-        if (!strlen($name) || !isset($this->docoptResult[$name]))
+        if (!strlen($name) || !key_exists($name, $this->docoptResult->getArgs()))
             return false;
         return (bool) preg_match('/^[a-z]+$/', $name);
     }
@@ -96,7 +96,7 @@ class Input extends CObject {
         if (!$this->docoptResult)
             return false;
 
-        if (!($len=strlen($name)) || !isset($this->docoptResult[$name]))
+        if (!($len=strlen($name)) || !key_exists($name, $this->docoptResult->getArgs()))
             return false;
 
         $isBracketed = ('<'==$name[0] && $name[$len-1]=='>');
@@ -112,7 +112,7 @@ class Input extends CObject {
      *
      * @param  string $name
      *
-     * @return string? - argument value or NULL if the argument was not specified
+     * @return ?string - argument value or NULL if the argument was not specified
      */
     public function getArgument($name) {
         Assert::string($name);
@@ -166,7 +166,7 @@ class Input extends CObject {
         if (!$this->docoptResult)
             return false;
 
-        if (!strlen($name) || !isset($this->docoptResult[$name]) || $name[0]!='-' || $name=='-' || $name=='--')
+        if (!strlen($name) || !key_exists($name, $this->docoptResult->getArgs()) || $name[0]!='-' || $name=='-' || $name=='--')
             return false;
         return true;
     }
@@ -191,16 +191,14 @@ class Input extends CObject {
 
         if ($this->isOption($name)) {
             $value = $this->docoptResult[$name];
-            if (is_array($value))                                   // repetitive option with arguments
-                return $value ? $value[0] : false;
-            /*
-            if (is_int($value))  return $value;                     // repetitive option without arguments
-            if (is_bool($value)) return $value;                     // non-repetitive option, no arguments
-            else                 return $value;                     // non-repetitive option with argument
-            */
-            return $value;
+            if (is_array($value)) return $value ? $value[0] : false;    // repetitive option with arguments
+          //if (is_int($value))   return $value;                        // repetitive option without arguments
+          //if (is_bool($value))  return $value;                        // non-repetitive option, no arguments
+          //if (!is_null($value)) return $value;                        // non-repetitive option with argument
+          //return false;                                               // non-repetitive option not specified
+            if (!is_null($value)) return $value;
         }
-        return false;
+        return false;                                                   // undefined option
     }
 
 
@@ -219,15 +217,13 @@ class Input extends CObject {
 
         if ($this->isOption($name)) {
             $value = $this->docoptResult[$name];
-            if (is_array($value))                                   // repetitive option with arguments
-                return $value;
-            /*
-            if (is_int($value))  return [$value];                   // repetitive option without arguments
-            if (is_bool($value)) return $value ? [$value] : [];     // non-repetitive option, no arguments
-            else                 return [$value];                   // non-repetitive option with argument
-            */
-            if ($value !== false) return [$value];
+            if (is_array($value)) return $value;                        // repetitive option with arguments
+          //if (is_int($value))   return [$value];                      // repetitive option without arguments
+          //if (is_bool($value))  return $value ? [$value] : [];        // non-repetitive option, no arguments
+          //if (!is_null($value)) return [$value];                      // non-repetitive option with argument
+          //return [];                                                  // non-repetitive option not specified
+            if ($value!==false && $value!==null) return [$value];
         }
-        return [];
+        return [];                                                      // undefined option
     }
 }

@@ -11,7 +11,7 @@
         "optimize-autoloader": true
     },
     "require": {
-        "php":           "5.6 - 8",
+        "php":           "7.4 - 8",
         "ext-ctype":     "*",
         "ext-filter":    "*",
         "ext-json":      "*",
@@ -28,5 +28,10 @@
             "rosasurfer\\": "src"
         },
         "files": ["src/load.php"]
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "0.11.x-dev"
+        }
     }
 }

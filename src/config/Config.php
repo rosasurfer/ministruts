@@ -3,7 +3,7 @@ namespace rosasurfer\config;
 
 use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\InvalidValueException;
 use rosasurfer\core\exception\RuntimeException;
 
 use function rosasurfer\isRelativePath;
@@ -111,7 +111,7 @@ class Config extends CObject implements ConfigInterface {
             if (sizeof($parts) < 2) {
                 // Don't trigger a regular error as it will cause an infinite loop if the same config is used by the error handler.
                 $msg = __METHOD__.'()  Skipping syntax error in "'.$filename.'", line '.($i+1).': missing key-value separator';
-                stderr($msg);
+                stderr($msg.NL);
                 error_log($msg, ERROR_LOG_DEFAULT);
                 continue;
             }
@@ -213,7 +213,7 @@ class Config extends CObject implements ConfigInterface {
      *                                                  'default' => $default, <br>
      *                                                  'flags'   => $flags    <br>
      *                                              ]</tt>                     <br>
-     * @return bool? - boolean value or NULL if the flag FILTER_NULL_ON_FAILURE is set and the setting does not represent
+     * @return ?bool - boolean value or NULL if the flag FILTER_NULL_ON_FAILURE is set and the setting does not represent
      *                 a boolean value
      *
      * @throws RuntimeException if the setting does not exist and no default value was specified
@@ -332,7 +332,7 @@ class Config extends CObject implements ConfigInterface {
 
         for ($i=0; $i < $subkeysSize; ++$i) {
             $subkey = trim($subkeys[$i]);
-            if (!strlen($subkey)) throw new InvalidArgumentException('Invalid argument $key: '.$key);
+            if (!strlen($subkey)) throw new InvalidValueException('Invalid parameter $key: '.$key);
 
             if ($i+1 < $subkeysSize) {
                 // not yet the last subkey
@@ -404,12 +404,12 @@ class Config extends CObject implements ConfigInterface {
             foreach ($quoteChars as $char) {
                 if (strpos($k, $char) === 0) {          // subkey starts with a quote char
                     $pos = strpos($k, $char, 1);        // find the ending quote char
-                    if ($pos === false) throw new InvalidArgumentException('Invalid argument $key: '.$key);
+                    if ($pos === false) throw new InvalidValueException('Invalid parameter $key: '.$key);
                     $subkeys[] = substr($k, 1, $pos-1);
                     $k         = trim(substr($k, $pos+1));
                     if (!strlen($k))                    // last subkey or next char is a key separator
                         break 2;
-                    if (strpos($k, '.') !== 0) throw new InvalidArgumentException('Invalid argument $key: '.$key);
+                    if (strpos($k, '.') !== 0) throw new InvalidValueException('Invalid parameter $key: '.$key);
                     $k = substr($k, 1);
                     continue 2;
                 }

@@ -3,7 +3,7 @@ namespace rosasurfer\net\mail;
 
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\InvalidValueException;
 use rosasurfer\util\PHP;
 
 use function rosasurfer\normalizeEOL;
@@ -19,11 +19,11 @@ class PHPMailer extends Mailer {
 
 
     /**
-     * Send an email&#46;  Sender and receiver addresses can be specified in simple or full format&#46;  The simple format
-     * can be specified with or without angle brackets&#46;  If an empty sender is specified the mail is sent from the
+     * Send an email. Sender and receiver addresses can be specified in simple or full format. The simple format
+     * can be specified with or without angle brackets. If an empty sender is specified the mail is sent from the
      * current user.
      *
-     * @param  string   $sender             - mail sender (From:), full format: "FirstName LastName <user@domain.tld>"
+     * @param  ?string  $sender             - mail sender (From:), full format: "FirstName LastName <user@domain.tld>"
      * @param  string   $receiver           - mail receiver (To:), full format: "FirstName LastName <user@domain.tld>"
      * @param  string   $subject            - mail subject
      * @param  string   $message            - mail body
@@ -42,7 +42,7 @@ class PHPMailer extends Mailer {
         foreach ($headers as $i => $header) {
             Assert::string($header, '$headers['.$i.']');
             if (!preg_match('/^[a-z]+(-[a-z]+)*:/i', $header))
-                                           throw new InvalidArgumentException('Invalid parameter $headers['.$i.']: "'.$header.'"');
+                                           throw new InvalidValueException('Invalid parameter $headers['.$i.']: "'.$header.'"');
         }
 
         // auto-complete sender if not specified
@@ -56,41 +56,41 @@ class PHPMailer extends Mailer {
         // Return-Path: (invisible sender)
         Assert::string($sender, '$sender');
         $returnPath = self::parseAddress($sender);
-        if (!$returnPath)                  throw new InvalidArgumentException('Invalid parameter $sender: '.$sender);
+        if (!$returnPath)                  throw new InvalidValueException('Invalid parameter $sender: '.$sender);
         $value = $this->removeHeader($headers, 'Return-Path');
         if (strlen($value)) {
             $returnPath = self::parseAddress($value);
-            if (!$returnPath)              throw new InvalidArgumentException('Invalid header "Return-Path: '.$value.'"');
+            if (!$returnPath)              throw new InvalidValueException('Invalid header "Return-Path: '.$value.'"');
         }
 
         // From: (visible sender)
         $from = self::parseAddress($sender);
-        if (!$from)                        throw new InvalidArgumentException('Invalid parameter $sender: '.$sender);
+        if (!$from)                        throw new InvalidValueException('Invalid parameter $sender: '.$sender);
         $value = $this->removeHeader($headers, 'From');
         if (strlen($value)) {
             $from = self::parseAddress($value);
-            if (!$from)                    throw new InvalidArgumentException('Invalid header "From: '.$value.'"');
+            if (!$from)                    throw new InvalidValueException('Invalid header "From: '.$value.'"');
         }
         $from = $this->encodeNonAsciiChars($from);
 
         // RCPT: (receiving mailbox)
         Assert::string($receiver, '$receiver');
         $rcpt = self::parseAddress($receiver);
-        if (!$rcpt)                        throw new InvalidArgumentException('Invalid parameter $receiver: '.$receiver);
+        if (!$rcpt)                        throw new InvalidValueException('Invalid parameter $receiver: '.$receiver);
         $forced = $config->get('mail.forced-receiver', '');
         Assert::string($forced, 'config value "mail.forced-receiver"');
         if (strlen($forced)) {
             $rcpt = self::parseAddress($forced);
-            if (!$rcpt)                    throw new InvalidArgumentException('Invalid config value "mail.forced-receiver": '.$forced);
+            if (!$rcpt)                    throw new InvalidValueException('Invalid config value "mail.forced-receiver": '.$forced);
         }
 
         // To: (visible receiver)
         $to = self::parseAddress($receiver);
-        if (!$to)                          throw new InvalidArgumentException('Invalid parameter $receiver: '.$receiver);
+        if (!$to)                          throw new InvalidValueException('Invalid parameter $receiver: '.$receiver);
         $value = $this->removeHeader($headers, 'To');
         if (strlen($value)) {
             $to = self::parseAddress($value);
-            if (!$to)                      throw new InvalidArgumentException('Invalid header "To: '.$value.'"');
+            if (!$to)                      throw new InvalidValueException('Invalid header "To: '.$value.'"');
         }
         $to = $this->encodeNonAsciiChars($to);
 
@@ -102,7 +102,7 @@ class PHPMailer extends Mailer {
         foreach ($headers as $i => &$header) {
             $pattern = '/^([a-z]+(?:-[a-z]+)*): *(.*)/i';
             $match = null;
-            if (!preg_match($pattern, $header, $match)) throw new InvalidArgumentException('Invalid parameter $headers['.$i.']: "'.$header.'"');
+            if (!preg_match($pattern, $header, $match)) throw new InvalidValueException('Invalid parameter $headers['.$i.']: "'.$header.'"');
             $name   = $match[1];
             $value  = $this->encodeNonAsciiChars(trim($match[2]));
             $header = $name.': '.$value;
@@ -119,7 +119,7 @@ class PHPMailer extends Mailer {
 
         // mail body
         Assert::string($message, '$message');
-        $message = str_replace(chr(0), '?', $message);                      // replace NUL bytes which destroy the mail
+        $message = str_replace(chr(0), '\0', $message);                     // replace NUL bytes which destroy the mail
         $message = normalizeEOL($message, EOL_WINDOWS);                     // multiple lines must be separated by CRLF
 
         // TODO: wrap long lines into several shorter ones                  // max 998 chars per RFC but e.g. FastMail only accepts 990

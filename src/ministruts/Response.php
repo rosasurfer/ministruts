@@ -3,10 +3,10 @@ namespace rosasurfer\ministruts;
 
 use rosasurfer\core\Singleton;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\di\proxy\Request as RequestProxy;
+use rosasurfer\core\exception\InvalidValueException;
 use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\core\exception\RuntimeException;
-use rosasurfer\di\proxy\Request as RequestProxy;
 use rosasurfer\net\http\HttpResponse;
 
 use function rosasurfer\ini_get_bool;
@@ -45,7 +45,10 @@ class Response extends Singleton {
      */
     public static function me() {
         if (CLI) throw new RuntimeException('Cannot create a '.static::class.' instance in a non-web context.');
-        return self::getInstance(static::class);
+
+        /** @var static $instance */
+        $instance = self::getInstance(static::class);
+        return $instance;
     }
 
 
@@ -58,7 +61,7 @@ class Response extends Singleton {
      */
     public function setStatus($status) {
         Assert::int($status);
-        if ($status < 1) throw new InvalidArgumentException('Invalid argument $status: '.$status);
+        if ($status < 1) throw new InvalidValueException('Invalid parameter $status: '.$status);
 
         $this->status = $status;
         return $this;
@@ -134,9 +137,9 @@ class Response extends Singleton {
                     $cookieDomain = substr($cookieDomain, 1);
                 }
 
-                if (preg_match('/\b'.$cookieDomain.'$/', $targetDomain) && ($cookieDomain==$targetDomain || $subdomains)) { // domain match
-                    if (strStartsWith($targetPath, $cookiePath)) {                                                          // path match
-                        if (!$cookieSecure || $targetSecure) {                                                              // secure match
+                if (/*domainMatch*/ preg_match('/\b'.$cookieDomain.'$/', $targetDomain) && ($cookieDomain==$targetDomain || $subdomains)) {
+                    if (/*pathMatch*/ strStartsWith($targetPath, $cookiePath)) {
+                        if (/*secureMatch*/ !$cookieSecure || $targetSecure) {
                             if (isset($target['fragment']))  $url  = strLeft($url, strlen($hash = '#'.$target['fragment']));
                             else if (strEndsWith($url, '#')) $url  = strLeft($url, strlen($hash = '#'));
                             else                             $hash = '';
@@ -166,7 +169,7 @@ class Response extends Singleton {
      * @return string - absolute URL
      *
      *
-     * @todo   Rewrite as parse_url() fails at query parameters with colons, e.g. "/beanstalk-console?server=vm-centos:11300".
+     * TODO: Rewrite as parse_url() fails at query parameters with colons, e.g. "/beanstalk-console?server=vm-centos:11300".
      */
     public static function relativeToAbsoluteUrl($rel, $base) {
         $relFragment = strRightFrom($rel, '#');
@@ -175,8 +178,8 @@ class Response extends Singleton {
         $relQuery = strRightFrom($rel, '?');
         strlen($relQuery) && $rel = strLeft($rel, -strlen($relQuery)-1);
 
-        if (($relParts =parse_url($rel )) === false) throw new InvalidArgumentException('Invalid argument $rel: '.$rel);
-        if (($baseParts=parse_url($base)) === false) throw new InvalidArgumentException('Invalid argument $base: '.$base);
+        if (($relParts =parse_url($rel )) === false) throw new InvalidValueException('Invalid parameter $rel: '.$rel);
+        if (($baseParts=parse_url($base)) === false) throw new InvalidValueException('Invalid parameter $base: '.$base);
 
         if (strlen($relQuery)) {
             $relParts['query'] = $relQuery;
@@ -225,7 +228,7 @@ class Response extends Singleton {
             return $scheme.'://'.$user.$pass.$at.$host.$port.$path;
         }
         catch (IRosasurferException $ex) {
-            throw $ex->addMessage('Illegal parameter $base: "'.$base.'"');
+            throw $ex->appendMessage('Illegal parameter $base: "'.$base.'"');
         }
     }
 }

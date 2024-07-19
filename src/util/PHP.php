@@ -4,11 +4,11 @@ namespace rosasurfer\util;
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\StaticClass;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\core\debug\DebugHelper;
+use rosasurfer\core\error\ErrorHandler;
 use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\core\exception\RuntimeException;
 
-use function rosasurfer\echoPre;
+use function rosasurfer\echof;
 use function rosasurfer\ini_get_bool;
 use function rosasurfer\ini_get_bytes;
 use function rosasurfer\ini_get_int;
@@ -77,13 +77,13 @@ class PHP extends StaticClass {
         $stderrPassthrough = isset($options['stderr-passthrough']) && $options['stderr-passthrough'];
 
         if (!$needStderr && !$needExitCode && !WINDOWS)
-            return \shell_exec($cmd);                       // the process doesn't need watching and we can go with shell_exec()
+            return \shell_exec($cmd);                                   // the process doesn't need watching and we can go with shell_exec()
 
         // we must use proc_open()/proc_close()
-        $descriptors = [                                    // "pipes" or "files":
-            ($STDIN =0) => ['pipe', 'rb'],                  // ['file', '/dev/tty', 'rb'],
-            ($STDOUT=1) => ['pipe', 'wb'],                  // ['file', '/dev/tty', 'wb'],
-            ($STDERR=2) => ['pipe', 'wb'],                  // ['file', '/dev/tty', 'wb'],
+        $descriptors = [                                                // "pipes" or "files":
+            ($STDIN =0) => ['pipe', 'rb'],                              // ['file', '/dev/tty', 'rb'],
+            ($STDOUT=1) => ['pipe', 'wb'],                              // ['file', '/dev/tty', 'wb'],
+            ($STDERR=2) => ['pipe', 'wb'],                              // ['file', '/dev/tty', 'wb'],
         ];
         $pipes = [];
 
@@ -93,25 +93,24 @@ class PHP extends StaticClass {
         }
         catch (IRosasurferException $ex) {}
         catch (\Throwable           $ex) { $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex); }
-        catch (\Exception           $ex) { $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex); }
 
         if ($ex) {
             $match = null;
             if (WINDOWS && preg_match('/proc_open\(\): CreateProcess failed, error code - ([0-9]+)/i', $ex->getMessage(), $match)) {
                 $error = Windows::errorToString((int) $match[1]);
-                if ($error != $match[1]) $ex->addMessage($match[1].': '.$error);
+                if ($error != $match[1]) $ex->appendMessage($match[1].': '.$error);
             }
-            throw $ex->addMessage('CMD: "'.$cmd.'"');
+            throw $ex->appendMessage('CMD: "'.$cmd.'"');
         }
 
         // if the process doesn't need asynchronous watching
         if (!$stdoutPassthrough && !$stderrPassthrough) {
             $stdout = stream_get_contents($pipes[$STDOUT]);
             $stderr = stream_get_contents($pipes[$STDERR]);
-            fclose($pipes[$STDIN ]);                        // $pipes[0] => writeable handle connected to the child's STDIN
-            fclose($pipes[$STDOUT]);                        // $pipes[1] => readable handle connected to the child's STDOUT
-            fclose($pipes[$STDERR]);                        // $pipes[2] => readable handle connected to the child's STDERR
-            $exitCode = proc_close($hProc);                 // we must close the pipes before proc_close() to avoid a deadlock
+            fclose($pipes[$STDIN ]);                                    // $pipes[0] => writeable handle connected to the child's STDIN
+            fclose($pipes[$STDOUT]);                                    // $pipes[1] => readable handle connected to the child's STDOUT
+            fclose($pipes[$STDERR]);                                    // $pipes[2] => readable handle connected to the child's STDERR
+            $exitCode = proc_close($hProc);                             // we must close the pipes before proc_close() to avoid a deadlock
             return $stdout;
         }
 
@@ -169,7 +168,7 @@ class PHP extends StaticClass {
      * PHP_INI_PERDIR - entry can be set in php.ini, httpd.conf, .htaccess and in .user.ini
      */
     public static function phpinfo() {
-        /** @var ConfigInterface? $config */
+        /** @var ?ConfigInterface $config */
         $config = self::di('config');
         $issues = [];
 
@@ -177,7 +176,6 @@ class PHP extends StaticClass {
         // ------------------
         if (!php_ini_loaded_file())                                                                                  $issues[] = 'Error: no "php.ini" configuration file loaded  [setup]';
         /*PHP_INI_PERDIR*/ if (       ini_get_bool('short_open_tag'                ))                                $issues[] = 'Error: short_open_tag is not Off [XML compatibility]';
-        /*PHP_INI_PERDIR*/ if (       ini_get_bool('asp_tags'                      ) && PHP_VERSION_ID <  70000)     $issues[] = 'Info:  asp_tags is not Off  [standards]';
         /*PHP_INI_ONLY  */ if (       ini_get_bool('expose_php'                    ) && !CLI)                        $issues[] = 'Warn:  expose_php is not Off  [security]';
         /*PHP_INI_ALL   */ if (       ini_get_int ('max_execution_time'            ) > 30 && !CLI /*hardcoded*/)     $issues[] = 'Info:  max_execution_time is very high: '.ini_get('max_execution_time').'  [resources]';
         /*PHP_INI_ALL   */ if (       ini_get_int ('default_socket_timeout'        ) > 30   /*PHP default: 60*/)     $issues[] = 'Info:  default_socket_timeout is very high: '.ini_get('default_socket_timeout').'  [resources]';
@@ -188,27 +186,16 @@ class PHP extends StaticClass {
             else if ($memoryLimit > 128*MB)                                                                          $issues[] = 'Info:  memory_limit is very high: '.ini_get('memory_limit').'  [resources]';
 
             if ($config) {
-                $sWarnLimit  = $config->get('log.warn.memory_limit', '');
-                $warnLimit   = php_byte_value($sWarnLimit);
+                $sWarnLimit = $config->get('log.warn.memory_limit', '');
+                $warnLimit  = php_byte_value($sWarnLimit);
                 if ($warnLimit) {
                     if      ($warnLimit <             0)                                                             $issues[] = 'Error: log.warn.memory_limit is invalid: '.$sWarnLimit.'  [configuration]';
                     else if ($warnLimit >= $memoryLimit)                                                             $issues[] = 'Error: log.warn.memory_limit ('.$sWarnLimit.') is not lower than memory_limit ('.ini_get('memory_limit').')  [configuration]';
                     else if ($warnLimit >        128*MB)                                                             $issues[] = 'Info:  log.warn.memory_limit ('.$sWarnLimit.') is very high (memory_limit: '.ini_get('memory_limit').')  [configuration]';
                 }
             }
-        /*PHP_INI_PERDIR*/ if (       ini_get_bool('register_globals'              ) && PHP_VERSION_ID <  50400)     $issues[] = 'Error: register_globals is not Off  [security]';
-        /*PHP_INI_PERDIR*/ if (       ini_get_bool('register_long_arrays'          ) && PHP_VERSION_ID <  50400)     $issues[] = 'Info:  register_long_arrays is not Off  [performance]';
-        /*PHP_INI_PERDIR*/ if (       ini_get_bool('register_argc_argv'            ) && !CLI      /*hardcoded*/)     $issues[] = 'Info:  register_argc_argv is not Off  [performance]';
+        /*PHP_INI_PERDIR*/ if (       ini_get_bool('register_argc_argv'            ) && !CLI /*hardcoded*/)          $issues[] = 'Info:  register_argc_argv is not Off  [performance]';
         /*PHP_INI_PERDIR*/ if (      !ini_get_bool('auto_globals_jit'              ))                                $issues[] = 'Info:  auto_globals_jit is not On  [performance]';
-        /*PHP_INI_ALL   */ if (       ini_get_bool('define_syslog_variables'       ) && PHP_VERSION_ID <  50400)     $issues[] = 'Info:  define_syslog_variables is not Off  [performance]';
-        /*PHP_INI_PERDIR*/ if (       ini_get_bool('allow_call_time_pass_reference') && PHP_VERSION_ID <  50400)     $issues[] = 'Info:  allow_call_time_pass_reference is not Off  [standards]';
-        /*PHP_INI_ALL   */ if (      !ini_get_bool('y2k_compliance'                ) && PHP_VERSION_ID <  50400)     $issues[] = 'Info:  y2k_compliance is not On  [standards]';
-        /*PHP_INI_ALL   */ $timezone = ini_get    ('date.timezone'                 );
-            if (empty($timezone) && (empty($_SERVER['TZ'])                           || PHP_VERSION_ID >= 50400))    $issues[] = 'Error: date.timezone is not set  [setup]';
-        /*PHP_INI_SYSTEM*/ if (       ini_get_bool('safe_mode'                     ) && PHP_VERSION_ID <  50400)     $issues[] = 'Error: safe_mode is not Off  [functionality]';
-            /**
-             * With 'safe_mode'=On plenty of required function parameters are ignored: e.g. http://php.net/manual/en/function.mysql-connect.php
-             */
         /*PHP_INI_ALL   */ if (!empty(ini_get     ('open_basedir'                  )))                               $issues[] = 'Info:  open_basedir is not empty: "'.ini_get('open_basedir').'"  [performance]';
         /*PHP_INI_SYSTEM*/ if (      !ini_get_bool('allow_url_fopen'               ))                                $issues[] = 'Info:  allow_url_fopen is not On  [functionality]';
         /*PHP_INI_SYSTEM*/ if (       ini_get_bool('allow_url_include'))                                             $issues[] = 'Error: allow_url_include is not Off  [security]';
@@ -221,7 +208,7 @@ class PHP extends StaticClass {
         // --------------
         /*PHP_INI_ALL   */ $current = ini_get_int('error_reporting');
             $target = E_ALL & ~E_DEPRECATED;
-            if ($notCovered=($target ^ $current) & $target)                                                          $issues[] = 'Warn:  error_reporting does not cover '.DebugHelper::errorLevelToStr($notCovered).'  [standards]';
+            if ($notCovered=($target ^ $current) & $target)                                                          $issues[] = 'Warn:  error_reporting does not cover '.ErrorHandler::errorLevelToStr($notCovered).'  [standards]';
         if (!WINDOWS) { /* Windows is always development */
             /*PHP_INI_ALL*/ if (ini_get_bool('display_errors'        )) /*bool|string:stderr*/                       $issues[] = 'Warn:  display_errors is not Off  [security]';
             /*PHP_INI_ALL*/ if (ini_get_bool('display_startup_errors'))                                              $issues[] = 'Warn:  display_startup_errors is not Off  [security]';
@@ -250,11 +237,6 @@ class PHP extends StaticClass {
 
         // input sanitizing
         // ----------------
-        if (PHP_VERSION_ID < 50400) {
-            /*PHP_INI_ALL   */ if      (ini_get_bool('magic_quotes_sybase' )) /*overrides 'magic_quotes_gpc'*/       $issues[] = 'Error: magic_quotes_sybase is not Off  [standards]';
-            /*PHP_INI_PERDIR*/ else if (ini_get_bool('magic_quotes_gpc'    ))                                        $issues[] = 'Error: magic_quotes_gpc is not Off  [standards]';
-            /*PHP_INI_ALL   */ if      (ini_get_bool('magic_quotes_runtime'))                                        $issues[] = 'Error: magic_quotes_runtime is not Off  [standards]';
-        }
         /*PHP_INI_SYSTEM*/     if      (ini_get_bool('sql.safe_mode'       ))                                        $issues[] = 'Warn:  sql.safe_mode is not Off  [setup]';
 
         // request & HTML handling
@@ -270,8 +252,7 @@ class PHP extends StaticClass {
                 }
                 $order = $newOrder;
             }              if ($order != 'GP')                                                                       $issues[] = 'Error: request_order is not "GP": "'.(empty(ini_get('request_order')) ? '" (empty) => variables_order:"':'').$order.'"  [standards]';
-        /*PHP_INI_PERDIR*/ if (       ini_get_bool('always_populate_raw_post_data' ) && PHP_VERSION_ID <  70000)     $issues[] = 'Info:  always_populate_raw_post_data is not Off  [performance]';
-        /*PHP_INI_PERDIR*/ if (      !ini_get_bool('enable_post_data_reading'      ) && PHP_VERSION_ID >= 50400)     $issues[] = 'Warn:  enable_post_data_reading is not On  [request handling]';
+        /*PHP_INI_PERDIR*/ if (      !ini_get_bool('enable_post_data_reading'      ))                                $issues[] = 'Warn:  enable_post_data_reading is not On  [request handling]';
         /*PHP_INI_ALL   */ if (       ini_get     ('arg_separator.output'          ) != '&')                         $issues[] = 'Warn:  arg_separator.output is not "&": "'.ini_get('arg_separator.output').'"  [standards]';
         /*PHP_INI_ALL   */ if (      !ini_get_bool('ignore_user_abort'             ) && !CLI)                        $issues[] = 'Error: ignore_user_abort is not On  [setup]';
         /*PHP_INI_PERDIR*/ $postMaxSize = ini_get_bytes('post_max_size');
@@ -315,12 +296,8 @@ class PHP extends StaticClass {
                  definition using auto_prepend_file in which you load the class definition else you will have to serialize()
                  your object and unserialize() it afterwards.
         */
-        if (PHP_VERSION_ID < 50400) {
-            /*PHP_INI_ALL*/ if ( ini_get_bool('session.bug_compat_42')) {                                            $issues[] = 'Info:  session.bug_compat_42 is not Off';
-            /*PHP_INI_ALL*/ if (!ini_get_bool('session.bug_compat_warn'))                                            $issues[] = 'Info:  session.bug_compat_warn is not On';
-        }}
         /*PHP_INI_ALL   */ if ( ini_get     ('session.referer_check') != '')                                         $issues[] = 'Warn:  session.referer_check is not "": "'.ini_get('session.referer_check').'"  [functionality]';
-        /*PHP_INI_ALL   */ if (!ini_get_bool('session.use_strict_mode') && PHP_VERSION_ID >= 50502)                  $issues[] = 'Warn:  session.use_strict_mode is not On  [security]';
+        /*PHP_INI_ALL   */ if (!ini_get_bool('session.use_strict_mode'))                                             $issues[] = 'Warn:  session.use_strict_mode is not On  [security]';
         /*PHP_INI_ALL   */ if (!ini_get_bool('session.use_cookies'))                                                 $issues[] = 'Warn:  session.use_cookies is not On  [security]';
         /*PHP_INI_ALL   */ if (!ini_get_bool('session.use_only_cookies'))                                            $issues[] = 'Warn:  session.use_only_cookies is not On  [security]';
         /*PHP_INI_ALL   */ if ( ini_get_bool('session.use_trans_sid')) {
@@ -400,8 +377,8 @@ class PHP extends StaticClass {
         }
 
         // show issues or confirm if none are found
-        if ($issues) echoPre('PHP configuration issues:'.NL.'-------------------------'.NL.join(NL, $issues));
-        else         echoPre('PHP configuration OK');
+        if ($issues) echof('PHP configuration issues:'.NL.'-------------------------'.NL.join(NL, $issues));
+        else         echof('PHP configuration OK');
 
         // call phpinfo() if on a web server
         if (!CLI) {
@@ -420,14 +397,14 @@ class PHP extends StaticClass {
             </div>
             <?php
             echo NL;
-            @phpinfo();         // PHP might trigger warnings that are already checked and displayed (e.g. "date.timezone").
+            phpinfo();
         }
     }
 
 
     /**
-     * Set the specified php.ini setting&#46;  Opposite to the built-in PHP function this method does not return the old
-     * value but a boolean success status&#46;  Used to detect assignment errors if the access level of the specified option
+     * Set the specified php.ini setting. Opposite to the built-in PHP function this method does not return the old
+     * value but a boolean success status. Used to detect assignment errors if the access level of the specified option
      * doesn't allow a modification.
      *
      * @param  string          $option

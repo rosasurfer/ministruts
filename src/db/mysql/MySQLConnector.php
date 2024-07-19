@@ -2,7 +2,7 @@
 namespace rosasurfer\db\mysql;
 
 use rosasurfer\core\assert\Assert;
-use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\InvalidValueException;
 use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\db\Connector;
@@ -66,8 +66,8 @@ class MySQLConnector extends Connector {
     /** @var string[] - connection options */
     protected $options = [];
 
-    /** @var resource - internal connection handle */
-    protected $hConnection;
+    /** @var ?resource - internal connection handle */
+    protected $hConnection = null;
 
     /** @var int - transaction nesting level */
     protected $transactionLevel = 0;
@@ -104,7 +104,7 @@ class MySQLConnector extends Connector {
      */
     protected function setHost($hostname) {
         Assert::string($hostname);
-        if (!strlen($hostname)) throw new InvalidArgumentException('Invalid parameter $hostname: "'.$hostname.'" (empty)');
+        if (!strlen($hostname)) throw new InvalidValueException('Invalid parameter $hostname: "'.$hostname.'" (empty)');
 
         $host = $hostname;
         $port = null;
@@ -112,12 +112,12 @@ class MySQLConnector extends Connector {
         if (strpos($host, ':') !== false) {
             list($host, $port) = explode(':', $host, 2);
             $host = trim($host);
-            if (!strlen($host)) throw new InvalidArgumentException('Invalid parameter $hostname: "'.$hostname.'" (empty host name)');
+            if (!strlen($host)) throw new InvalidValueException('Invalid parameter $hostname: "'.$hostname.'" (empty host name)');
 
             $port = trim($port);
-            if (!ctype_digit($port)) throw new InvalidArgumentException('Invalid parameter $hostname: "'.$hostname.'" (not a port)');
+            if (!ctype_digit($port)) throw new InvalidValueException('Invalid parameter $hostname: "'.$hostname.'" (not a port)');
             $port = (int) $port;
-            if (!$port || $port > 65535) throw new InvalidArgumentException('Invalid parameter $hostname: "'.$hostname.'" (illegal port)');
+            if (!$port || $port > 65535) throw new InvalidValueException('Invalid parameter $hostname: "'.$hostname.'" (illegal port)');
         }
 
         $this->host = $host;
@@ -135,7 +135,7 @@ class MySQLConnector extends Connector {
      */
     protected function setUsername($name) {
         Assert::string($name);
-        if (!strlen($name)) throw new InvalidArgumentException('Invalid parameter $name: "'.$name.'" (empty)');
+        if (!strlen($name)) throw new InvalidValueException('Invalid parameter $name: "'.$name.'" (empty)');
 
         $this->username = $name;
         return $this;
@@ -145,7 +145,7 @@ class MySQLConnector extends Connector {
     /**
      * Set the password for the connection (if any).
      *
-     * @param  string $password - may be empty or NULL (no password)
+     * @param  ?string $password - may be empty or NULL (no password)
      *
      * @return $this
      */
@@ -216,15 +216,14 @@ class MySQLConnector extends Connector {
 
         // connect
         $ex = null;
-        try {                                                           // flags: CLIENT_FOUND_ROWS = 2
+        try {                                                                      // flags: CLIENT_FOUND_ROWS = 2
             error_clear_last();
             $this->hConnection = mysql_connect($host, $user, $pass, true/*, $flags=2*/);
             if (!$this->hConnection) throw new DatabaseException(error_get_last()['message']);
         }
         catch (IRosasurferException $ex) {}
         catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
-        catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
-        if ($ex) throw $ex->addMessage('Can not connect to MySQL server on "'.$host.'"');
+        if ($ex) throw $ex->appendMessage('Can not connect to MySQL server on "'.$host.'"');
 
         $this->setConnectionOptions();
         $this->selectDatabase();
@@ -274,8 +273,7 @@ class MySQLConnector extends Connector {
             }
             catch (IRosasurferException $ex) {}
             catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), mysql_errno($this->hConnection), $ex); }
-            catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), mysql_errno($this->hConnection), $ex); }
-            if ($ex) throw $ex->addMessage('Can not select database "'.$this->database.'"');
+            if ($ex) throw $ex->appendMessage('Can not select database "'.$this->database.'"');
         }
         return $this;
     }
@@ -420,8 +418,7 @@ class MySQLConnector extends Connector {
         }
         catch (IRosasurferException $ex) {}
         catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), mysql_errno($this->hConnection), $ex); }
-        catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), mysql_errno($this->hConnection), $ex); }
-        if ($ex) throw $ex->addMessage('Database: '.$this->getConnectionDescription().NL.'SQL: "'.$sql.'"');
+        if ($ex) throw $ex->appendMessage('Database: '.$this->getConnectionDescription().NL.'SQL: "'.$sql.'"');
 
         // track last_insert_id
         $affected = 0;

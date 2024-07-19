@@ -5,7 +5,7 @@ use rosasurfer\core\CObject;
 use rosasurfer\core\exception\ConcurrentModificationException;
 use rosasurfer\core\exception\IllegalAccessException;
 use rosasurfer\core\exception\IllegalStateException;
-use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\InvalidTypeException;
 use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\db\ConnectorInterface as IConnector;
 
@@ -142,7 +142,7 @@ abstract class PersistableObject extends CObject {
      */
     private function getRelationValue($property) {
         $propertyName = $property;
-        /** @var PersistableObject|PersistableObject[]|scalar? $value */
+        /** @var PersistableObject|PersistableObject[]|scalar|null $value */
         $value = &$this->$propertyName;                                 // existing property value
 
         if (is_object($value)) return $value;                           // relation is fetched and is an object or an array
@@ -483,6 +483,7 @@ abstract class PersistableObject extends CObject {
 
         try {
             $this->__inDelete = true;
+
             if (!$this->isPersistent()) throw new IllegalStateException('Cannot delete non-persistent '.get_class($this));
 
             $this->dao()->transaction(function() {
@@ -702,7 +703,7 @@ abstract class PersistableObject extends CObject {
      */
     public static function populateNew($class, array $row) {
         if (static::class != __CLASS__)     throw new IllegalAccessException('Cannot access method '.__METHOD__.'() on a derived class.');
-        if (!is_a($class, __CLASS__, true)) throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
+        if (!is_a($class, __CLASS__, true)) throw new InvalidTypeException('Not a '.__CLASS__.' subclass: '.$class);
 
         /** @var self $object */
         $object = new $class();

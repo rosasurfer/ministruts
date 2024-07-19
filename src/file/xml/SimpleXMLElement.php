@@ -2,9 +2,9 @@
 namespace rosasurfer\file\xml;
 
 use rosasurfer\core\ObjectTrait;
+use rosasurfer\core\di\DiAwareTrait;
 use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\core\exception\RuntimeException;
-use rosasurfer\di\DiAwareTrait;
 
 use function rosasurfer\strRightFrom;
 
@@ -16,7 +16,7 @@ use const rosasurfer\NL;
  *
  * A {@link \SimpleXMLElement} with additional functionalities.
  */
-class SimpleXMLElement extends \SimpleXMLElement {
+class SimpleXMLElement extends \SimpleXMLElement implements SimpleXMLElementInterface {
 
     use ObjectTrait, DiAwareTrait;
 
@@ -34,23 +34,22 @@ class SimpleXMLElement extends \SimpleXMLElement {
      */
     public static function from($data, $options=0, $dataIsUri=false, $ns='', $nsIsPrefix=false) {
         $errors = [];
-        $oldHandler = null;                                             // prevent Eclipse PDT validation error
-        $oldHandler = set_error_handler(function($level, $message, $file, $line, $context=null) use (&$errors, &$oldHandler) {
-            if ($oldHandler && in_array($level, [E_DEPRECATED, E_USER_DEPRECATED, E_USER_NOTICE, E_USER_WARNING])) {
-                return call_user_func($oldHandler, func_get_args());    // a possibly static handler can only be invoked by call_user_func()
+        $origHandler = null;                                                // prevent Eclipse PDT validation error
+        $origHandler = set_error_handler(function($level, $message, $file, $line, $context=null) use (&$errors, &$origHandler) {
+            if ($origHandler && in_array($level, [E_DEPRECATED, E_USER_DEPRECATED, E_USER_NOTICE, E_USER_WARNING])) {
+                return call_user_func($origHandler, ...func_get_args());    // a possibly static handler must be invoked with call_user_func()
             }
             $errors[] = func_get_args();
             return true;
         });
 
-        /** @var SimpleXMLElement $xml */
+        /** @var static $xml */
         $xml = $ex = null;
         try {
-            $xml = new static(...func_get_args());                      // @phpstan-ignore-line
+            $xml = new static(...func_get_args());                          // since PHP 8.0 the constructor is not final anymore
         }
         catch (IRosasurferException $ex) {}
         catch (\Throwable           $ex) { $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex); }
-        catch (\Exception           $ex) { $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex); }
 
         finally {
             restore_error_handler();
@@ -59,12 +58,12 @@ class SimpleXMLElement extends \SimpleXMLElement {
                 foreach ($errors as $i => $error) {
                     $errors[$i] = strRightFrom($error[1], 'SimpleXMLElement::__construct(): ', 1, false, $error[1]);
                 }
-                throw $ex->addMessage(join(NL, $errors));
+                throw $ex->appendMessage(join(NL, $errors));
             }
-
-            // pass on errors to the original handler
-            foreach ($errors as $error) {
-                $oldHandler && call_user_func($oldHandler, $error);     // a possibly static handler can only be invoked by call_user_func()
+            if ($origHandler) {
+                foreach ($errors as $error) {
+                    call_user_func($origHandler, ...$error);                // pass errors on to the original handler
+                }
             }
         }
         return $xml;

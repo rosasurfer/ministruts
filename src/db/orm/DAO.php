@@ -3,7 +3,7 @@ namespace rosasurfer\db\orm;
 
 use rosasurfer\core\Singleton;
 use rosasurfer\core\exception\ClassNotFoundException;
-use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\InvalidTypeException;
 use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\db\ConnectorInterface as IConnector;
 use rosasurfer\db\MultipleRecordsException;
@@ -45,7 +45,7 @@ abstract class DAO extends Singleton {
     final public static function getImplementation($class) {
         if (!is_a($class, __CLASS__, true)) {
             if (!is_class($class)) throw new ClassNotFoundException('Class not found: '.$class );
-            throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
+            throw new InvalidTypeException('Not a '.__CLASS__.' subclass: '.$class);
         }
         /** @var self $dao */
         $dao = self::getInstance($class);
@@ -70,7 +70,7 @@ abstract class DAO extends Singleton {
      * @param  string $query                - SQL query with optional ORM syntax
      * @param  bool   $allowMany [optional] - whether the query is allowed to return a multi-row result (default: no)
      *
-     * @return PersistableObject?
+     * @return ?PersistableObject
      *
      * @throws MultipleRecordsException if the query returned multiple rows and $allowMany was not set to TRUE.
      */
@@ -173,8 +173,10 @@ abstract class DAO extends Singleton {
             $this->db()->commit();
             return $result;
         }
-        catch (\Throwable $ex) { $this->db()->rollback(); throw $ex; }
-        catch (\Exception $ex) { $this->db()->rollback(); throw $ex; }
+        catch (\Throwable $ex) {
+            $this->db()->rollback();
+            throw $ex;
+        }
     }
 
 
@@ -219,7 +221,7 @@ abstract class DAO extends Singleton {
             }
             $mapping['properties'][$name] = &$property;
             unset($mapping['properties'][$i], $property);
-        }
+        };
 
         if (isset($mapping['relations'])) {
             foreach ($mapping['relations'] as $i => $property) {
@@ -266,7 +268,7 @@ abstract class DAO extends Singleton {
                 $mapping['getters'][$getter] = &$property;
                 $mapping['relations'][$name] = &$property;
                 unset($mapping['relations'][$i], $property);
-            }
+            };
         }
         else $mapping['relations'] = [];
 
@@ -343,7 +345,7 @@ abstract class DAO extends Singleton {
      * Escape a DBMS literal, i.e. a column's value. The resulting string can be used in queries "as-is" and doesn't need
      * additional quoting.
      *
-     * @param  scalar? $value - value to escape
+     * @param  ?scalar $value - value to escape
      *
      * @return string - escaped and quoted string or stringified scalar value if the value was not a string
      */
@@ -355,9 +357,9 @@ abstract class DAO extends Singleton {
     /**
      * Escape a scalar value. The resulting string must be quoted according to the DBMS before it can be used in queries.
      *
-     * @param  scalar? $value - value to escape
+     * @param  ?scalar $value - value to escape
      *
-     * @return string? - escaped but unquoted string or NULL if the value was NULL
+     * @return ?string - escaped but unquoted string or NULL if the value was NULL
      */
     public function escapeString($value) {
         return $this->db()->escapeString($value);

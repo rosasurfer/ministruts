@@ -42,7 +42,9 @@ class ApcCache extends CachePeer {
         if (!$data) return false;                       // cache miss
 
         // cache hit
+        /** @var int $created */
         $created = $data[0];                            // data: [created, expires, serialized([$value, $dependency])]
+        /** @var int $expires */
         $expires = $data[1];
 
         // check expiration

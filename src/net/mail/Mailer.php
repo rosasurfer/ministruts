@@ -3,7 +3,7 @@ namespace rosasurfer\net\mail;
 
 use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\InvalidValueException;
 
 use function rosasurfer\strContains;
 use function rosasurfer\strEndsWith;
@@ -98,7 +98,7 @@ abstract class Mailer extends CObject implements MailerInterface {
      *
      * @param  string $value
      *
-     * @return string[]? - aray with name and address part or NULL if the specified address is invalid
+     * @return ?string[] - aray with name and address part or NULL if the specified address is invalid
      */
     public static function parseAddress($value) {
         Assert::string($value);
@@ -127,17 +127,17 @@ abstract class Mailer extends CObject implements MailerInterface {
 
 
     /**
-     * Search for a given header and return its value&#46;  If the array contains multiple headers of that the last such
+     * Search for a given header and return its value. If the array contains multiple headers of that the last such
      * header is returned.
      *
      * @param  string[] $headers - array of headers
      * @param  string   $name    - header to search for
      *
-     * @return string? - value of the last found header or NULL if the header was not found
+     * @return ?string - value of the last found header or NULL if the header was not found
      */
     protected function getHeader(array $headers, $name) {
         Assert::string($name, '$name');
-        if (!preg_match('/^[a-z]+(-[a-z]+)*$/i', $name)) throw new InvalidArgumentException('Invalid parameter $name: "'.$name.'"');
+        if (!preg_match('/^[a-z]+(-[a-z]+)*$/i', $name)) throw new InvalidValueException('Invalid parameter $name: "'.$name.'"');
 
         // reversely iterate over the array to find the last of duplicate headers
         for (end($headers); key($headers)!==null; prev($headers)){
@@ -150,17 +150,17 @@ abstract class Mailer extends CObject implements MailerInterface {
 
 
     /**
-     * Remove a given header from the array and return its value&#46;  If the array contains multiple headers of that name
+     * Remove a given header from the array and return its value. If the array contains multiple headers of that name
      * all such headers are removed and the last removed one is returned.
      *
      * @param  string[] $headers - reference to an array of headers
      * @param  string   $name    - header to remove
      *
-     * @return string? - value of the last removed header or NULL if the header was not found
+     * @return ?string - value of the last removed header or NULL if the header was not found
      */
     protected function removeHeader(array &$headers, $name) {
         Assert::string($name, '$name');
-        if (!preg_match('/^[a-z]+(-[a-z]+)*$/i', $name)) throw new InvalidArgumentException('Invalid parameter $name: "'.$name.'"');
+        if (!preg_match('/^[a-z]+(-[a-z]+)*$/i', $name)) throw new InvalidValueException('Invalid parameter $name: "'.$name.'"');
 
         $result = null;
 
@@ -175,7 +175,7 @@ abstract class Mailer extends CObject implements MailerInterface {
 
 
     /**
-     * Encode non-ASCII characters with UTF-8&#46;  If a string doesn't contain non-ASCII characters it is not modified.
+     * Encode non-ASCII characters with UTF-8. If a string doesn't contain non-ASCII characters it is not modified.
      *
      * @param  string|string[] $value - a single or a list of values
      *
@@ -193,7 +193,6 @@ abstract class Mailer extends CObject implements MailerInterface {
 
         if (preg_match('/[\x80-\xFF]/', $value)) {
             return '=?utf-8?B?'.base64_encode($value).'?=';
-          //$value = '=?utf-8?Q?'.imap_8bit($value).'?=';       // requires imap extension and the encoded string is longer
         }
         return $value;
 

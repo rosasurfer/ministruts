@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\cache;
 
-use rosasurfer\config\ConfigInterface;
+use rosasurfer\config\ConfigInterface as IConfig;
 use rosasurfer\core\StaticClass;
 use rosasurfer\core\assert\Assert;
 
@@ -23,10 +23,8 @@ final class Cache extends StaticClass {
     /** @var int */
     const EXPIRES_NEVER = 0;
 
-
     /** @var CachePeer - default cache implementation */
     private static $default;
-
 
     /** @var CachePeer[] - array of further cache implementations */
     private static $caches;
@@ -44,10 +42,10 @@ final class Cache extends StaticClass {
         // TODO: prevent accidental usage of the application id as cache identifier
 
         // default cache
-        if ($label === null) {
+        if (!isset($label)) {
             if (!self::$default) {
                 // create new instance
-                if (extension_loaded('apc') && ini_get_bool(CLI ? 'apc.enable_cli':'apc.enabled')) {
+                if (extension_loaded('apc') && ini_get_bool(CLI ? 'apc.enable_cli' : 'apc.enabled')) {
                     self::$default = new ApcCache($label);
                 }
                 else {
@@ -61,7 +59,7 @@ final class Cache extends StaticClass {
         Assert::string($label);
 
         if (!isset(self::$caches[$label])) {
-            /** @var ConfigInterface $config */
+            /** @var IConfig $config */
             $config = self::di('config');
 
             // get cache configuration and create new instance

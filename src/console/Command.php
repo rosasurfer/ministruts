@@ -8,8 +8,10 @@ use rosasurfer\console\io\Input;
 use rosasurfer\console\io\Output;
 use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
+use rosasurfer\core\di\proxy\CliInput as InputProxy;
+use rosasurfer\core\di\proxy\Output as OutputProxy;
 use rosasurfer\core\exception\IllegalStateException;
-use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\InvalidValueException;
 use rosasurfer\core\exception\RuntimeException;
 
 
@@ -21,6 +23,8 @@ use rosasurfer\core\exception\RuntimeException;
  */
 class Command extends CObject {
 
+    /** @var string */
+    const DOCOPT = '';
 
     /** @var string */
     private $name = '';
@@ -28,10 +32,10 @@ class Command extends CObject {
     /** @var string[] */
     private $aliases = [];
 
-    /** @var string - syntax definition in docopt format */
+    /** @var string - syntax definition in Docopt format */
     private $docoptDefinition;
 
-    /** @var DocoptResult - parsed and matched docopt block */
+    /** @var DocoptResult - parsed and matched Docopt block */
     private $docoptResult;
 
     /** @var \Closure */
@@ -43,6 +47,12 @@ class Command extends CObject {
     /** @var bool - whether the command configuration is frozen */
     private $frozen = false;
 
+    /** @var Input */
+    protected $input;
+
+    /** @var Output */
+    protected $output;
+
     /** @var int - the command's error status */
     protected $status = 0;
 
@@ -53,6 +63,8 @@ class Command extends CObject {
      * Create a new command.
      */
     public function __construct() {
+        $this->input  = InputProxy::instance();
+        $this->output = OutputProxy::instance();
         $this->configure();
     }
 
@@ -64,6 +76,9 @@ class Command extends CObject {
      * @return $this
      */
     protected function configure() {
+        if (strlen($docopt = static::DOCOPT)) {
+            $this->setDocoptDefinition($docopt);
+        }
         return $this;
     }
 
@@ -74,18 +89,17 @@ class Command extends CObject {
      * @return int - execution status (0 for success)
      */
     public function run() {
-        /** @var Input $input */
-        $input = $this->di('input');
-        $input->setDocoptResult($this->docoptResult);
+        $input = $this->input;
+        $output = $this->output;
 
-        /** @var Output $output */
-        $output = $this->di('output');
+        $input->setDocoptResult($this->docoptResult);
 
         if ($this->validator) $error = $this->validator->__invoke($input, $output);
         else                  $error = $this->validate($input, $output);
 
-        if ($error)
+        if ($error) {
             return $this->status = (int) $error;
+        }
 
         if ($this->task) $status = $this->task->__invoke($input, $output);
         else             $status = $this->execute($input, $output);
@@ -187,9 +201,9 @@ class Command extends CObject {
 
 
     /**
-     * Return the command's docopt definition.
+     * Return the command's Docopt definition.
      *
-     * @return string - syntax definition in docopt format
+     * @return string - syntax definition in Docopt format
      */
     public function getDocoptDefinition() {
         return $this->docoptDefinition;
@@ -197,17 +211,20 @@ class Command extends CObject {
 
 
     /**
-     * Set the command's docopt definition.
+     * Set the command's Docopt definition.
      *
-     * @param  string $doc - syntax definition in docopt format
+     * @param  string $doc - syntax definition in Docopt format
      *
      * @return $this
      *
-     * @link   http://docopt.org
+     * @link   http://docopt.org/
      */
     public function setDocoptDefinition($doc) {
         if ($this->frozen) throw new RuntimeException('Configuration of "'.get_class($this).'" is frozen');
         Assert::string($doc);
+
+        $self = basename($_SERVER['PHP_SELF']);
+        $doc = str_replace('{:cmd:}', $self, $doc);
 
         $parser = new DocoptParser();
         $this->docoptResult = $parser->parse($doc);
@@ -220,7 +237,7 @@ class Command extends CObject {
     /**
      * Return the command's dynamic validation implementation.
      *
-     * @return \Closure?
+     * @return ?\Closure
      */
     public function getValidator() {
         return $this->validator;
@@ -244,7 +261,7 @@ class Command extends CObject {
     /**
      * Return the command's dynamic task implementation.
      *
-     * @return \Closure?
+     * @return ?\Closure
      */
     public function getTask() {
         return $this->task;
@@ -274,7 +291,7 @@ class Command extends CObject {
     final public function freeze() {
         if (!$this->frozen) {
             if (!isset($this->name))         throw new IllegalStateException('Incomplete command configuration: no name');
-            if (!isset($this->docoptResult)) throw new IllegalStateException('Incomplete command configuration: no docopt definition');
+            if (!isset($this->docoptResult)) throw new IllegalStateException('Incomplete command configuration: no Docopt definition');
             $this->frozen = true;
         }
         return $this;
@@ -290,10 +307,10 @@ class Command extends CObject {
      */
     private function validateName($name) {
         Assert::string($name);
-        if ($name != trim($name)) throw new InvalidArgumentException('Invalid parameter $name: "'.$name.'" (enclosing white space)');
+        if ($name != trim($name)) throw new InvalidValueException('Invalid parameter $name: "'.$name.'" (enclosing white space)');
 
         if (strlen($name) && !preg_match('/^[^\s:]+(:[^\s:]+)*$/', $name))
-            throw new InvalidArgumentException('Invalid parameter $name: "'.$name.'" (not a command name)');
+            throw new InvalidValueException('Invalid parameter $name: "'.$name.'" (not a command name)');
         return $this;
     }
 }

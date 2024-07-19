@@ -29,7 +29,7 @@ abstract class RoleProcessor extends CObject {
      * @param  Request       $request
      * @param  ActionMapping $mapping
      *
-     * @return ActionForward|string? - ActionForward instance or the name of a configured ActionForward
+     * @return ActionForward|string|null - ActionForward instance or the name of a configured ActionForward
      */
     abstract public function processRoles(Request $request, ActionMapping $mapping);
 }

@@ -3,7 +3,7 @@ namespace rosasurfer\net\http;
 
 use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\InvalidValueException;
 use rosasurfer\core\exception\IOException;
 
 
@@ -37,7 +37,7 @@ abstract class HttpClient extends CObject {
      */
     public function setTimeout($timeout) {
         Assert::int($timeout);
-        if ($timeout < 1) throw new InvalidArgumentException('Invalid argument $timeout: '.$timeout);
+        if ($timeout < 1) throw new InvalidValueException('Invalid parameter $timeout: '.$timeout);
 
         $this->timeout = $timeout;
         return $this;

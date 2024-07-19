@@ -3,7 +3,7 @@ namespace rosasurfer\core;
 
 
 /**
- * Parent class for all classes meant to be used only statical. Derived classes cannot be instantiated.
+ * Base class of all classes to be used in a static context only. Derived classes cannot be instantiated.
  */
 abstract class StaticClass extends CObject {
 

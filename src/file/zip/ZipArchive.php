@@ -2,7 +2,7 @@
 namespace rosasurfer\file\zip;
 
 use rosasurfer\core\ObjectTrait;
-use rosasurfer\di\DiAwareTrait;
+use rosasurfer\core\di\DiAwareTrait;
 use rosasurfer\log\Logger;
 
 use const rosasurfer\L_ERROR;

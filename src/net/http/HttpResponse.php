@@ -9,7 +9,7 @@ use rosasurfer\core\CObject;
  *
  * Abstrakte Basisklasse fuer HttpResponse-Implementierungen.
  *
- * @todo  toString()-Methode implementieren, die alle Header anzeigt
+ * TODO: toString()-Methode implementieren, die alle Header anzeigt
  */
 abstract class HttpResponse extends CObject {
 
@@ -245,7 +245,7 @@ abstract class HttpResponse extends CObject {
     /**
      * @var string[] - HTTP status code descriptions
      *
-     * @todo HttpResponse::$sc - unmoeglicher Name
+     * TODO: HttpResponse::$sc - unmoeglicher Name
      */
     public static $sc = [
         self::SC_CONTINUE                        => 'SC_CONTINUE'                       ,

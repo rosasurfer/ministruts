@@ -4,14 +4,14 @@ namespace rosasurfer\ministruts;
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\core\debug\ErrorHandler;
+use rosasurfer\core\error\ErrorHandler;
 use rosasurfer\core\exception\IllegalStateException;
-use rosasurfer\core\exception\IllegalTypeException;
-use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\InvalidTypeException;
+use rosasurfer\core\exception\InvalidValueException;
 use rosasurfer\core\exception\RuntimeException;
-use rosasurfer\net\NetTools;
 
 use function rosasurfer\first;
+use function rosasurfer\getHostByAddress;
 use function rosasurfer\ini_get_bool;
 use function rosasurfer\strCompareI;
 use function rosasurfer\strEndsWith;
@@ -37,12 +37,30 @@ class Request extends CObject {
     private $method;
 
     /** @var string */
-    private $hostUrl;
-
-    /** @var string */
     private $path;
 
-    /** @var array - normalized structure of files uploaded with the request */
+    /** @var string */
+    private $hostUrl;
+
+    /** @var array */
+    private $_GET;
+
+    /** @var array */
+    private $_POST;
+
+    /** @var array */
+    private $_REQUEST;
+
+    /** @var ActionInput - all input */
+    private $allInput;
+
+    /** @var ActionInput - GET input*/
+    private $getInput;
+
+    /** @var ActionInput - POST input */
+    private $postInput;
+
+    /** @var array - normalized array of files uploaded with the request */
     private $files;
 
     /** @var array - additional variables context */
@@ -53,53 +71,10 @@ class Request extends CObject {
      * Constructor
      */
     public function __construct() {
-        $this->method = $_SERVER['REQUEST_METHOD'];
-
-        // issue: if $_SERVER['QUERY_STRING'] is empty (e.g. at times in nginx) PHP will not parse
-        //        query parameters and it has to be done manually
-        $query = $this->getQueryString();
-
-        if (!$_GET && strlen($query)) {
-            $this->parseQueryString($query);
-        }
-    }
-
-
-    /**
-     * Parse the specified query string and store parameters in $GET and $_REQUEST.
-     *
-     * @param  string $data - raw query string
-     */
-    protected function parseQueryString($data) {
-        $params = explode('&', $data);
-
-        foreach ($params as $param) {
-            $parts = explode('=', $param, 2);
-            $name  = trim(urldecode($parts[0])); if (!strlen($name)) continue;
-            //$name  = str_replace(['.', ' '], '_', $name);                         // replace as the PHP implementation does
-            $value = sizeof($parts)==1 ? '' : urldecode($parts[1]);
-
-            // TODO: process multi-dimensional arrays
-
-            if (($open=strpos($name, '[')) && ($close=strpos($name, ']')) && strlen($name)==$close+1) {
-                // name is an array index
-                $name = trim(substr($name, 0, $open));
-                $key  = trim(substr($name, $open+1, $close-$open-1));
-
-                if (!strlen($key)) {
-                    $_GET[$name][] = $_REQUEST[$name][] = $value;
-                }
-                else {
-                    $_GET[$name][$key]                                    = $value;
-                    !isset($_POST[$name][$key]) && $_REQUEST[$name][$key] = $value; // GET must not over-write POST
-                }
-            }
-            else {
-                // name is not an array index
-                $_GET[$name]                              = $value;
-                !isset($_POST[$name]) && $_REQUEST[$name] = $value;                 // GET must not over-write POST
-            }
-        }
+        $this->method   = $_SERVER['REQUEST_METHOD'];
+        $this->_GET     = $_GET;
+        $this->_POST    = $_POST;
+        $this->_REQUEST = $_REQUEST;
     }
 
 
@@ -156,110 +131,38 @@ class Request extends CObject {
 
 
     /**
-     * Return the single $_REQUEST parameter with the specified name. If multiple $_REQUEST parameters with that name have
-     * been transmitted, the last one is returned. A transmitted array of $_REQUEST parameters with that name is ignored.
+     * Return an object wrapper for all raw input parameters of the request. It includes GET and POST parameters.
      *
-     * @param  string $name - parameter name
-     *
-     * @return string? - value or NULL if no such $_REQUEST parameter has been transmitted
+     * @return ActionInput
      */
-    public function getParameter($name) {
-        if (isset($_REQUEST[$name])) {
-            $value = $_REQUEST[$name];
-            if (!is_array($value))
-                return $value;
-        }
-        return null;
+    public function input() {
+        if (!$this->allInput)
+            $this->allInput = new ActionInput($this->_REQUEST);
+        return $this->allInput;
     }
 
 
     /**
-     * Return an array of $_REQUEST parameters with the specified name. A single transmitted $_REQUEST parameter with that
-     * name is ignored.
+     * Return an object wrapper for all raw GET parameters of the request.
      *
-     * @param  string $name - parameter name
-     *
-     * @return string[] - values or an empty array if no such array of $_REQUEST parameters has been transmitted
+     * @return ActionInput
      */
-    public function getParameters($name) {
-        if (\key_exists($name, $_REQUEST)) {
-            $value = $_REQUEST[$name];
-            if (is_array($value))
-                return $value;
-        }
-        return [];
+    public function get() {
+        if (!$this->getInput)
+            $this->getInput = new ActionInput($this->_GET);
+        return $this->getInput;
     }
 
 
     /**
-     * Return the single $_GET parameter with the specified name. If multiple $_GET parameters with that name have been
-     * transmitted, the last one is returned. A transmitted array of $_GET parameters with that name is ignored.
+     * Return an object wrapper for all raw POST parameters of the request.
      *
-     * @param  string $name - parameter name
-     *
-     * @return string? - value or NULL if no such $_GET parameter has been transmitted
+     * @return ActionInput
      */
-    public function getGetParameter($name) {
-        if (isset($_GET[$name])) {
-            $value = $_GET[$name];
-            if (!is_array($value))
-                return $value;
-        }
-        return null;
-    }
-
-
-    /**
-     * Return an array of $_GET parameters with the specified name. A single transmitted $_GET parameter with that name is
-     * ignored.
-     *
-     * @param  string $name - parameter name
-     *
-     * @return string[] - values or an empty array if no such array of $_GET parameters has been transmitted
-     */
-    public function getGetParameters($name) {
-        if (isset($_GET[$name])) {
-            $value = $_GET[$name];
-            if (is_array($value))
-                return $value;
-        }
-        return [];
-    }
-
-
-    /**
-     * Return the single $_POST parameter with the specified name. If multiple $_POST parameters with that name have been
-     * transmitted, the last one is returned. A transmitted array of $_POST parameters with that name is ignored.
-     *
-     * @param  string $name - parameter name
-     *
-     * @return string? - value or NULL if no such $_POST parameter has been transmitted
-     */
-    public function getPostParameter($name) {
-        if (isset($_POST[$name])) {
-            $value = $_POST[$name];
-            if (!is_array($value))
-                return $value;
-        }
-        return null;
-    }
-
-
-    /**
-     * Return an array of $_POST parameters with the specified name. A single transmitted $_POST parameter with that name
-     * is ignored.
-     *
-     * @param  string $name - parameter name
-     *
-     * @return string[] - values or an empty array if no such array of $_POST parameters has been transmitted
-     */
-    public function getPostParameters($name) {
-        if (isset($_POST[$name])) {
-            $value = $_POST[$name];
-            if (is_array($value))
-                return $value;
-        }
-        return [];
+    public function post() {
+        if (!$this->postInput)
+            $this->postInput = new ActionInput($this->_POST);
+        return $this->postInput;
     }
 
 
@@ -269,11 +172,11 @@ class Request extends CObject {
      *
      * @return array - associative array of files
      *
-     * @todo   Convert the returned arrays to instances of {@link UploadedFile}.
+     * TODO: Convert the returned arrays to instances of {@link UploadedFile}.
      */
     public function getFiles() {
         if (!isset($this->files)) {
-            $normalizeLevel = null;                     // prevent Eclipse PDT validation error
+            $normalizeLevel = null;
             $normalizeLevel = function(array $file) use (&$normalizeLevel) {
                 if (isset($file['name']) && is_array($file['name'])) {
                     $properties = \array_keys($file);
@@ -289,10 +192,8 @@ class Request extends CObject {
                 return $file;
             };
             $this->files = [];
-            if (isset($_FILES)) {
-                foreach ($_FILES as $key => $file) {
-                    $this->files[$key] = $normalizeLevel($file);
-                }
+            foreach ($_FILES as $key => $file) {
+                $this->files[$key] = $normalizeLevel($file);
             }
         }
         return $this->files;
@@ -304,9 +205,9 @@ class Request extends CObject {
      *
      * @param  string $name - parameter name of the file upload
      *
-     * @return array? - array or NULL if no such file was uploaded
+     * @return ?array - array or NULL if no such file was uploaded
      *
-     * @todo   Convert the returned array to an instance of {@link UploadedFile}.
+     * TODO: Convert the returned array to an instance of {@link UploadedFile}.
      */
     public function getFile($name) {
         Assert::string($name);
@@ -504,7 +405,7 @@ class Request extends CObject {
     /**
      * Resolve the value of an existing APP_BASE_URI server variable. Considers existing redirection values.
      *
-     * @return string? - value or NULL if the variable is not defined
+     * @return ?string - value or NULL if the variable is not defined
      */
     private function resolveBaseUriVar() {
         $envName = 'APP_BASE_URI';
@@ -534,7 +435,7 @@ class Request extends CObject {
      */
     public function getQueryString() {
         // The variable $_SERVER['QUERY_STRING'] is set by the server and can differ from the transmitted query string.
-        // It might hold additional parameters added by the server or it might be empty (e.g. on a mis-configured nginx).
+        // The server variable may hold additional parameters, or it may be empty (e.g. on a mis-configured Nginx).
 
         if (isset($_SERVER['QUERY_STRING']) && strlen($_SERVER['QUERY_STRING'])) {
             $query = $_SERVER['QUERY_STRING'];
@@ -565,7 +466,7 @@ class Request extends CObject {
         static $hostname = null;
         if (!$hostname) {
             /** @var string $hostname */
-            $hostname = NetTools::getHostByAddress($this->getRemoteAddress());
+            $hostname = getHostByAddress($this->getRemoteAddress());
         }
         return $hostname;
     }
@@ -574,7 +475,7 @@ class Request extends CObject {
     /**
      * Return the value of a transmitted "X-Forwarded-For" header.
      *
-     * @return string? - header value (one or more ip addresses or hostnames) or NULL if the header was not transmitted
+     * @return ?string - header value (one or more ip addresses or hostnames) or NULL if the header was not transmitted
      */
     public function getForwardedRemoteAddress() {
         return $this->getHeaderValue(['X-Forwarded-For', 'X-UP-Forwarded-For']);
@@ -594,9 +495,8 @@ class Request extends CObject {
         if (!$isRead) {
             if ($this->getContentType() == 'multipart/form-data') {
                 // file upload
-                if ($_POST) {                                                   // php://input is not available with
-                    $content = '$_POST => '.print_r($_POST, true).NL;           // enctype="multipart/form-data"
-                    // TODO: we should limit excessive variable values to 1KB
+                if ($_POST) {                                           // php://input is not available with enctype="multipart/form-data"
+                    $content = '$_POST => '.print_r($_POST, true).NL;
                 }
                 $content .= '$_FILES => '.print_r($this->getFiles(), true);
             }
@@ -614,7 +514,7 @@ class Request extends CObject {
      * Return the "Content-Type" header of the request. If multiple "Content-Type" headers have been transmitted the first
      * one is returned.
      *
-     * @return string? - "Content-Type" header or NULL if no "Content-Type" header was transmitted
+     * @return ?string - "Content-Type" header or NULL if no "Content-Type" header was transmitted
      */
     public function getContentType() {
         $contentType = $this->getHeaderValue('Content-Type');
@@ -685,8 +585,8 @@ class Request extends CObject {
 
 
     /**
-     * Whether a valid session id was transmitted with the request. An invalid id is a URL based session id when the php.ini
-     * setting "session.use_only_cookies" is enabled.
+     * Whether a valid session id was transmitted with the current request. For example, a URL based session id is invalid
+     * if the "php.ini" setting "session.use_only_cookies" is enabled.
      *
      * @return bool
      */
@@ -731,7 +631,7 @@ class Request extends CObject {
      *
      * @param  string $name - header name
      *
-     * @return string? - header value or NULL if no such header was transmitted
+     * @return ?string - header value or NULL if no such header was transmitted
      */
     public function getHeader($name) {
         Assert::string($name);
@@ -756,29 +656,24 @@ class Request extends CObject {
                 Assert::string($name, '$names['.$i.']');
             }
         }
-        else throw new IllegalTypeException('Illegal type of parameter $names: '.gettype($names));
+        else throw new InvalidTypeException('Invalid type of parameter $names: '.gettype($names));
 
-        // read all headers once
-        static $headers = null; if ($headers === null) {
-            if (function_exists('apache_request_headers')) {
-                $headers = apache_request_headers();
-                // TODO: Apache skips REDIRECT_* headers
-            }
-            else {
-                static $fixHeaderNames = ['CDN'=>1, 'DNT'=>2, 'X-CDN'=>3];
-                $headers = [];
-                foreach ($_SERVER as $name => $value) {
-                    while (substr($name, 0, 9) == 'REDIRECT_') {
-                        $name = substr($name, 9);
-                        if (isset($_SERVER[$name]))
-                            continue 2;
-                    }
-                    if (substr($name, 0, 5) == 'HTTP_') {
-                        $name = substr($name, 5);
-                        if (!isset($fixHeaderNames[$name]))
-                            $name = str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower($name))));
-                        $headers[$name] = $value;
-                    }
+        static $headers = null;
+        static $fixHeaderNames = ['CDN'=>1, 'DNT'=>2, 'X-CDN'=>3];
+
+        // read headers only once
+        if ($headers === null) {
+            $headers = [];
+            foreach ($_SERVER as $name => $value) {
+                while (substr($name, 0, 9) == 'REDIRECT_') {
+                    $name = substr($name, 9);
+                    if (isset($_SERVER[$name])) continue 2;
+                }
+                if (substr($name, 0, 5) == 'HTTP_') {
+                    $name = substr($name, 5);
+                    if (!isset($fixHeaderNames[$name]))
+                        $name = str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower($name))));
+                    $headers[$name] = $value;
                 }
             }
 
@@ -796,27 +691,28 @@ class Request extends CObject {
         // return all or just the specified headers
         if (!$names)
             return $headers;
-        return \array_intersect_ukey($headers, \array_flip($names), 'strCaseCmp');
+        return \array_intersect_ukey($headers, \array_flip($names), 'strcasecmp');
     }
 
 
     /**
-     * Return a single value of all specified header(s). If multiple headers are specified or multiple headers have been
+     * Return a single value of the specified header/s. If multiple headers are specified or multiple headers have been
      * transmitted, return all values as one comma-separated value (in transmission order).
      *
      * @param  string|string[] $names - one or multiple header names
      *
-     * @return string? - value or NULL if no such headers have been transmitted
+     * @return ?string - value or NULL if no such headers have been transmitted
      */
     public function getHeaderValue($names) {
-        if (is_string($names))
+        if (is_string($names)) {
             $names = [$names];
+        }
         elseif (is_array($names)) {
             foreach ($names as $i => $name) {
                 Assert::string($name, '$names['.$i.']');
             }
         }
-        else throw new IllegalTypeException('Illegal type of parameter $names: '.gettype($names));
+        else throw new InvalidTypeException('Invalid type of parameter $names: '.gettype($names));
 
         $headers = $this->getHeaders($names);
         if ($headers)
@@ -840,7 +736,7 @@ class Request extends CObject {
                 Assert::string($name, '$names['.$i.']');
             }
         }
-        else throw new IllegalTypeException('Illegal type of parameter $names: '.gettype($names));
+        else throw new InvalidTypeException('Illegal type of parameter $names: '.gettype($names));
 
         $headers = $this->getHeaders($names);
         if (!$headers)
@@ -913,7 +809,7 @@ class Request extends CObject {
         Assert::int($expires, '$expires');
         Assert::nullOrString($path, '$path');
 
-        if ($expires < 0) throw new InvalidArgumentException('Invalid argument $expires: '.$expires);
+        if ($expires < 0) throw new InvalidValueException('Invalid parameter $expires: '.$expires);
 
         if (!isset($path)) {
             $path = $this->getApplicationBaseUri();
@@ -948,7 +844,7 @@ class Request extends CObject {
      *
      * @param  string $key [optional]
      *
-     * @return string? - message
+     * @return ?string - message
      */
     public function getActionMessage($key = null) {
         Assert::nullOrString($key);
@@ -1009,10 +905,10 @@ class Request extends CObject {
      * Store an ActionMessage for the specified key.
      *
      * @param  string|int $key     - message key
-     * @param  string     $message - message; if NULL is passed the message for the specified key is removed
+     * @param  ?string    $message - message; if NULL is passed the message for the specified key is removed
      */
     public function setActionMessage($key, $message) {
-        if (!is_string($key) && !is_int($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.gettype($key));
+        if (!is_string($key) && !is_int($key)) throw new InvalidTypeException('Illegal type of parameter $key: '.gettype($key));
         Assert::nullOrString($message, '$message');
 
         if (!isset($message)) {
@@ -1054,7 +950,7 @@ class Request extends CObject {
      *
      * @param  string $key [optional]
      *
-     * @return string? - message
+     * @return ?string - message
      */
     public function getActionError($key = null) {
         Assert::nullOrString($key);
@@ -1113,10 +1009,10 @@ class Request extends CObject {
      * Store an ActionError for the specified key.
      *
      * @param  string|int $key     - error key
-     * @param  string     $message - message; if NULL is passed the error for the specified key is removed
+     * @param  ?string    $message - message; if NULL is passed the error for the specified key is removed
      */
     public function setActionError($key, $message) {
-        if (!is_string($key) && !is_int($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.gettype($key));
+        if (!is_string($key) && !is_int($key)) throw new InvalidTypeException('Illegal type of parameter $key: '.gettype($key));
         Assert::nullOrString($message, '$message');
 
         if (!isset($message)) {
@@ -1156,7 +1052,7 @@ class Request extends CObject {
     /**
      * Return the MiniStruts {@link ActionMapping} responsible for processing the current request.
      *
-     * @return ActionMapping? - instance or NULL if the request doesn't match any of the configured mappings
+     * @return ?ActionMapping - instance or NULL if the request doesn't match any of the configured mappings
      */
     final public function getMapping() {
         return $this->getAttribute(ACTION_MAPPING_KEY);
@@ -1166,7 +1062,7 @@ class Request extends CObject {
     /**
      * Return the MiniStruts {@link Module} the current request is assigned to.
      *
-     * @return Module? - instance or NULL if the request doesn't match any of the configured modules
+     * @return ?Module - instance or NULL if the request doesn't match any of the configured modules
      */
     final public function getModule() {
         return $this->getAttribute(MODULE_KEY);
@@ -1196,20 +1092,17 @@ class Request extends CObject {
      */
     public function __toString() {
         $string = '';
-
         try {
             // request
             $string = $_SERVER['REQUEST_METHOD'].' '.$_SERVER['REQUEST_URI'].' '.$_SERVER['SERVER_PROTOCOL'].NL;
 
             // headers
-            $headers = $this->getHeaders() ?: [];
-
+            $headers = $this->getHeaders();
             $maxLen = 0;
             foreach ($headers as $key => $value) {
                 $maxLen = max(strlen($key), $maxLen);
             }
-
-            $maxLen++;                                          // add one char for ':'
+            $maxLen++;                                                          // add one char for ':'
             foreach ($headers as $key => $value) {
                 $string .= str_pad($key.':', $maxLen).' '.$value.NL;
             }
@@ -1217,15 +1110,12 @@ class Request extends CObject {
             // content (request body)
             $content = $this->getContent();
             if (strlen($content)) {
-                $string .= NL.substr($content, 0, 1024).NL;     // limit the request body to 1024 bytes
+                $string .= NL.substr($content, 0, 2048).NL;                     // limit the request body to 2048 bytes
             }
-
-            Assert::string($string);                            // Ensure __toString() returns a string as otherwise...
-        }                                                       // PHP will trigger a non-catchable fatal error.
-        catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }
-        catch (\Exception $ex) { ErrorHandler::handleToStringException($ex); }
-
-        return $string;
+            Assert::string($string);
+        }                                                                       // Ensure __toString() doesn't throw an exception as otherwise
+        catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }  // PHP < 7.4 will trigger a non-catchable fatal error.
+        return $string;                                                         // @see  https://bugs.php.net/bug.php?id=53648
     }
 
 
@@ -1237,6 +1127,8 @@ class Request extends CObject {
      * @deprecated
      */
     public static function me() {
-        return self::di(__CLASS__);
+        /** @var static $request */
+        $request = self::di(__CLASS__);
+        return $request;
     }
 }

@@ -1,21 +1,19 @@
 #!/usr/bin/env php
 <?php
 use function rosasurfer\docopt;
-use function rosasurfer\echoPre;
+use function rosasurfer\echof;
 
 require(dirname(realpath(__FILE__)).'/../../../../src/load.php');
 
-$self = basename($_SERVER['PHP_SELF']);
 $doc = <<<DOCOPT
-
 Example of a program with many options.
 
 Usage:
-  $self  [-hvqrf NAME] [--exclude=PATTERNS]
-         [--select=ERRORS | --ignore=ERRORS] [--show-source]
-         [--statistics] [--count] [--benchmark] PATH...
-  $self  (--doctest | --testsuite=DIR)
-  $self  --version
+  {:cmd:}  [-hvqrf NAME] [--exclude=PATTERNS]
+           [--select=ERRORS | --ignore=ERRORS] [--show-source]
+           [--statistics] [--count] [--benchmark] PATH...
+  {:cmd:}  (--doctest | --testsuite=DIR)
+  {:cmd:}  --version
 
 Arguments:
   PATH                 destination path
@@ -44,5 +42,5 @@ DOCOPT;
 
 $result = docopt($doc, null, ['version'=>'1.0.0rc2']);
 foreach ($result as $key => $value) {
-    echoPre($key.': '.json_encode($value));
+    echof($key.': '.json_encode($value));
 }

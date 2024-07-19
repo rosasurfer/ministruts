@@ -8,13 +8,13 @@ use function rosasurfer\strLeftTo;
 
 
 /**
- * A trait adding {@link CObject} behavior to any class (i.e. common error detection capabilities).
+ * A trait capable of adding {@link CObject} behavior to any class. Used to add error detection features.
  */
 trait ObjectTrait {
 
 
     /**
-     * Method catching otherwise fatal errors triggered by calls of non-existing or inaccessible instance methods.
+     * A method catching otherwise fatal errors triggered by calls of non-existing or inaccessible instance methods.
      *
      * @param  string $method - name of the called method
      * @param  array  $args   - arguments passed to the method call

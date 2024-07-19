@@ -3,8 +3,8 @@ namespace rosasurfer\ministruts;
 
 use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
+use rosasurfer\core\di\proxy\Request as RequestProxy;
 use rosasurfer\core\exception\IllegalStateException;
-use rosasurfer\di\proxy\Request as RequestProxy;
 
 use function rosasurfer\strCompareI;
 use function rosasurfer\strLeftTo;
@@ -16,7 +16,7 @@ use function rosasurfer\strLeftTo;
  * An ActionMapping encapsulates the processing instructions for a single route. For in-depth documentation of properties
  * and configuration see the following link:
  *
- * @link  https://github.com/rosasurfer/ministruts/blob/master/src/ministruts/dtd/struts-config.dtd#L137
+ * @link  https://github.com/rosasurfer/ministruts/blob/master/src/ministruts/dtd/struts-config.dtd#L141
  */
 class ActionMapping extends CObject {
 
@@ -36,9 +36,6 @@ class ActionMapping extends CObject {
     /** @var string */
     protected $formClassName;
 
-    /** @var string */
-    protected $formScope = 'request';
-
     /** @var bool */
     protected $formValidateFirst;
 
@@ -51,7 +48,7 @@ class ActionMapping extends CObject {
     /** @var bool */
     protected $default = false;
 
-    /** @var ActionForward - the mapping's explicitely specified ActionForward. */
+    /** @var ActionForward - the mapping's explicitly specified ActionForward. */
     protected $forward;
 
     /** @var ActionForward[] - the mapping's local forwards */
@@ -176,7 +173,7 @@ class ActionMapping extends CObject {
      * Return the mapping's role constraint. Depending on the used {@link RoleProcessor} this may be a single role identifier
      * or a logical expression (possibly referencing multiple roles).
      *
-     * @return string? - role constraint or NULL if no role constraint is defined
+     * @return ?string - role constraint or NULL if no role constraint is defined
      */
     public function getRoles() {
         return $this->roles;
@@ -261,7 +258,7 @@ class ActionMapping extends CObject {
     /**
      * Return the class name of the {@link Action} to process requests.
      *
-     * @return string? - Action class name or NULL if no Action is configured
+     * @return ?string - Action class name or NULL if no Action is configured
      */
     public function getActionClassName() {
         return $this->actionClassName;
@@ -296,58 +293,6 @@ class ActionMapping extends CObject {
      */
     public function getFormClassName() {
         return $this->formClassName;
-    }
-
-
-    /**
-     * Set the scope attribute of the mapping's {@link ActionForm}. The scope attribute identifies the storage location of
-     * the Actionform.
-     *
-     * @param  string $value - may be "request" or "session"
-     *
-     * @return $this
-     *
-     * @throws StrutsConfigException on configuration errors
-     */
-    public function setFormScope($value) {
-        if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-        $name = $this->name ? ' name="'.$this->name.'"':'';
-        $path = $this->path ? ' path="'.$this->path.'"':'';
-
-        if ($value!='request' && $value!='session') throw new StrutsConfigException('<mapping'.$name.$path.' form-scope="'.$value.'": Invalid form scope.');
-
-        $this->formScope = $value;
-        return $this;
-    }
-
-
-    /**
-     * Return the scope attribute of the mapping's {@link ActionForm}.
-     *
-     * @return string - scope attribute value
-     */
-    public function getFormScope() {
-        return $this->formScope;
-    }
-
-
-    /**
-     * Whether the mapping's {@link ActionForm} is stored in the {@link Request}.
-     *
-     * @return bool
-     */
-    public function isRequestScope() {
-        return ($this->formScope == 'request');
-    }
-
-
-    /**
-     * Whether the mapping's {@link ActionForm} is stored in the {@link HttpSession}.
-     *
-     * @return bool
-     */
-    public function isSessionScope() {
-        return ($this->formScope == 'session');
     }
 
 
@@ -468,7 +413,7 @@ class ActionMapping extends CObject {
      *
      * @param  string $name - logical name; can be "self" to return a redirect forward to the mapping itself
      *
-     * @return ActionForward? - ActionForward or NULL if no such forward was found
+     * @return ?ActionForward - ActionForward or NULL if no such forward was found
      */
     public function findForward($name) {
         $forward = null;
@@ -508,7 +453,7 @@ class ActionMapping extends CObject {
      * @param  string $name [optional] - logical name; can be "self" to return a redirect forward to the mapping itself
      *                                   (default: none)
      *
-     * @return ActionForward? - ActionForward or NULL if no name was specified and no forward is configured
+     * @return ?ActionForward - ActionForward or NULL if no name was specified and no forward is configured
      *
      * @throws StrutsConfigException if a name was specified but no such forward was found
      */

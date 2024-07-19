@@ -5,10 +5,10 @@ use rosasurfer\cache\Cache;
 use rosasurfer\cache\monitor\FileDependency;
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\Singleton;
+use rosasurfer\core\di\proxy\Request as RequestProxy;
 use rosasurfer\core\exception\IllegalStateException;
 use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\core\exception\RuntimeException;
-use rosasurfer\di\proxy\Request as RequestProxy;
 use rosasurfer\net\http\HttpResponse;
 
 use function rosasurfer\strLeftTo;
@@ -114,18 +114,17 @@ class FrontController extends Singleton {
         }
         catch (IRosasurferException $ex) {}
         catch (\Throwable           $ex) { $ex = new StrutsConfigException($ex->getMessage(), $ex->getCode(), $ex); }
-        catch (\Exception           $ex) { $ex = new StrutsConfigException($ex->getMessage(), $ex->getCode(), $ex); }
 
-        if ($ex) throw $ex->addMessage('Error instantiating Struts module from file "'.$file.'"');
+        if ($ex) throw $ex->appendMessage('Error instantiating Struts module from file "'.$file.'"');
     }
 
 
     /**
-     * Process the current HTTP request.
+     * Process the current HTTP request and return the response wrapper.
      *
      * @param  array $options [optional] - runtime options (default: none)
      *
-     * @return Response - respone wrapper
+     * @return Response - response wrapper
      */
     public static function processRequest(array $options = []) {
         $controller = self::me();

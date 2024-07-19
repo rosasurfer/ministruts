@@ -3,7 +3,7 @@ namespace rosasurfer\console\docopt\pattern;
 
 use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\core\debug\ErrorHandler;
+use rosasurfer\core\error\ErrorHandler;
 
 use function rosasurfer\array_merge;
 
@@ -62,7 +62,7 @@ abstract class Pattern extends CObject {
     /**
      * Make pattern-tree tips point to same object if they are equal.
      *
-     * @param Pattern[]? $unique [optional]
+     * @param ?Pattern[] $unique [optional]
      *
      * @return $this
      */
@@ -197,14 +197,11 @@ abstract class Pattern extends CObject {
      */
     public function __toString() {
         $value = '';
-
         try {
             $value = serialize($this);
-            Assert::string($value);                             // Ensure __toString() returns a string as otherwise...
-        }                                                       // PHP will trigger a non-catchable fatal error.
-        catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }
-        catch (\Exception $ex) { ErrorHandler::handleToStringException($ex); }
-
-        return $value;
+            Assert::string($value);
+        }                                                                       // Ensure __toString() doesn't throw an exception as otherwise
+        catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }  // PHP < 7.4 will trigger a non-catchable fatal error.
+        return $value;                                                          // @see  https://bugs.php.net/bug.php?id=53648
     }
 }

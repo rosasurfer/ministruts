@@ -7,11 +7,10 @@ namespace rosasurfer;
 use rosasurfer\console\docopt\DocoptParser;
 use rosasurfer\console\docopt\DocoptResult;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\core\exception\IllegalArgumentException;
-use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\di\proxy\Request;
+use rosasurfer\core\exception\InvalidValueException;
 use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\core\lock\Lock;
-use rosasurfer\di\proxy\Request;
 use rosasurfer\ministruts\ActionMapping;
 use rosasurfer\ministruts\Module;
 use rosasurfer\ministruts\url\Url;
@@ -46,11 +45,11 @@ const L_ERROR           = 16;
 const L_FATAL           = 32;
 
 // log destinations for the built-in function error_log()
-const ERROR_LOG_DEFAULT =  0;                                       // message is sent to the configured log or the system logger
-const ERROR_LOG_MAIL    =  1;                                       // message is sent by email
-const ERROR_LOG_DEBUG   =  2;                                       // message is sent through the PHP debugging connection
-const ERROR_LOG_FILE    =  3;                                       // message is appended to a file destination
-const ERROR_LOG_SAPI    =  4;                                       // message is sent directly to the SAPI logging handler
+const ERROR_LOG_DEFAULT =  0;                                       // message is sent to syslog, a file or the SAPI logger, depending on php.ini setting "error_log" (default)
+const ERROR_LOG_MAIL    =  1;                                       // message is sent by e-mail
+const ERROR_LOG_DEBUG   =  2;                                       // message is sent through the PHP debugging connection (no longer available)
+const ERROR_LOG_FILE    =  3;                                       // message is appended to the file in parameter 'destination'
+const ERROR_LOG_SAPI    =  4;                                       // message is sent directly to the SAPI logger (e.g. Apache or STDERR)
 
 // time periods
 const SECOND            =   1;           const SECONDS = SECOND;
@@ -73,7 +72,7 @@ const SATURDAY          = 6;
 // byte sizes
 const KB                = 1024;
 const MB                = 1024 << 10;
-const GB                = 1024 << 20;                               // not TB (doesn't fit in 32 bits)
+const GB                = 1024 << 20;
 
 // array indexing types
 const ARRAY_ASSOC       = 1;
@@ -120,9 +119,8 @@ define('PHP_INI_ALL',    INI_ALL   );       // 7    flag            // entry can
  */
 function array_filter($input, $callback=null, $flags=0) {
     $args = func_get_args();
-    if ($input instanceof \Traversable) {
+    if ($input instanceof \Traversable)
         $args[0] = iterator_to_array($input, true);
-    }
     return \array_filter(...$args);
 }
 
@@ -196,9 +194,8 @@ function array_keys($array, $search=null, $strict=false) {
 function array_merge($array1, ...$arrays) {
     $args = func_get_args();
     foreach ($args as $key => $arg) {
-        if ($arg instanceof \Traversable) {
+        if ($arg instanceof \Traversable)
             $args[$key] = iterator_to_array($arg, true);
-        }
     }
     return \array_merge(...$args);
 }
@@ -216,9 +213,8 @@ function array_merge($array1, ...$arrays) {
  * @return bool
  */
 function in_array($needle, $haystack, $strict = false) {
-    if ($haystack instanceof \Traversable) {
+    if ($haystack instanceof \Traversable)
         $haystack = iterator_to_array($haystack, false);
-    }
     return \in_array($needle, $haystack, $strict);
 }
 
@@ -246,11 +242,10 @@ function first($values) {
  * @return mixed - the first key or NULL if the array-like variable is empty
  */
 function firstKey($values) {
-    if ($values instanceof \Traversable)
+    if ($values instanceof \Traversable) {
         $values = iterator_to_array($values);
-
-    if (!$values)
-        return null;
+    }
+    if (!$values) return null;
     reset($values);
     return key($values);
 }
@@ -267,9 +262,8 @@ function last($values) {
     if ($values instanceof \Traversable) {
         $values = iterator_to_array($values, false);
     }
-    else {
-        Assert::isArray($values);
-    }
+    else Assert::isArray($values);
+
     return $values ? end($values) : null;
 }
 
@@ -319,63 +313,12 @@ function boolToStr($value) {
 
 
 /**
- * Dumps a variable to the standard output device or into a string.
- *
- * @param  mixed $var                     - variable
- * @param  bool  $return       [optional] - TRUE,  if the variable is to be dumped into a string <br>
- *                                          FALSE, if the variable is to be dumped to the standard output device (default)
- * @param  bool  $flushBuffers [optional] - whether to flush output buffers on output (default: TRUE)
- *
- * @return string? - string if the result is to be returned, NULL otherwise
- */
-function dump($var, $return=false, $flushBuffers=true) {
-    if ($return) ob_start();
-    var_dump($var);
-    if ($return) return ob_get_clean();
-
-    if ($flushBuffers)
-        ob_get_level() && ob_flush();
-    return null;
-}
-
-
-/**
- * Functional replacement for <tt>"echo($var)"</tt> which is a language construct and can't be used as a regular function.
- *
- * @param  mixed $var
- * @param  bool  $flushBuffers [optional] - whether to flush output buffers (default: TRUE)
- */
-function echof($var, $flushBuffers = true) {
-    echo $var;
-    if ($flushBuffers)
-        ob_get_level() && ob_flush();
-}
-
-
-/**
- * Alias of printPretty($var, false, $flushBuffers)
- *
- * Prints a variable in a pretty way. Output always ends with a line feed.
- *
- * @param  mixed $var
- * @param  bool  $flushBuffers [optional] - whether to flush output buffers (default: TRUE)
- *
- * @see    printPretty()
- */
-function echoPre($var, $flushBuffers = true) {
-    printPretty($var, false, $flushBuffers);
-}
-
-
-/**
  * Print a message to STDOUT.
  *
  * @param  string $message
  */
 function stdout($message) {
     Assert::string($message);
-    if (!strEndsWith($message, NL))
-        $message .= NL;
 
     $hStream = CLI ? \STDOUT : fopen('php://stdout', 'a');
     fwrite($hStream, $message);
@@ -390,8 +333,6 @@ function stdout($message) {
  */
 function stderr($message) {
     Assert::string($message);
-    if (!strEndsWith($message, NL))
-        $message .= NL;
 
     $hStream = CLI ? \STDERR : fopen('php://stderr', 'a');
     fwrite($hStream, $message);
@@ -418,21 +359,38 @@ function debugHeader($message) {
 
 
 /**
- * Alias of {@link printPretty()}
- *
- * Prints a variable in a pretty way. Output always ends with a line feed.
+ * Dumps a variable to the screen or into a string.
  *
  * @param  mixed $var                     - variable
- * @param  bool  $return       [optional] - TRUE,  if the result is to be returned as a string <br>
- *                                          FALSE, if the result is to be printed to the standard output device (default)
+ * @param  bool  $return       [optional] - TRUE,  if the variable is to be dumped into a string <br>
+ *                                          FALSE, if the variable is to be dumped to the standard output device (default)
  * @param  bool  $flushBuffers [optional] - whether to flush output buffers on output (default: TRUE)
  *
- * @return string? - string if the result is to be returned, NULL otherwise
- *
- * @see    printPretty()
+ * @return ?string - string if the result is to be returned, NULL otherwise
  */
-function pp($var, $return=false, $flushBuffers=true) {
-    return printPretty($var, $return, $flushBuffers);
+function dump($var, $return=false, $flushBuffers=true) {
+    if ($return) ob_start();
+    var_dump($var);
+    if ($return) return ob_get_clean();
+
+    $flushBuffers && ob_get_level() && ob_flush();
+    return null;
+}
+
+
+/**
+ * Alias of print_p($var, false, $flushBuffers)
+ *
+ * Outputs a variable in a formatted and pretty way. Output always ends with a line feed.
+ *
+ * @param  mixed $var
+ * @param  bool  $flushBuffers [optional] - whether to flush output buffers (default: yes)
+ *
+ * @return bool - always TRUE
+ */
+function echof($var, $flushBuffers = true) {
+    print_p($var, false, $flushBuffers);
+    return true;
 }
 
 
@@ -441,12 +399,12 @@ function pp($var, $return=false, $flushBuffers=true) {
  *
  * @param  mixed $var                     - variable
  * @param  bool  $return       [optional] - TRUE,  if the result is to be returned as a string <br>
- *                                          FALSE, if the result is to be printed to the standard output device (default)
+ *                                          FALSE, if the result is to be printed to the screen (default)
  * @param  bool  $flushBuffers [optional] - whether to flush output buffers on output (default: TRUE)
  *
- * @return string? - string if the result is to be returned, NULL otherwise
+ * @return ?string - string if the result is to be returned, NULL otherwise
  */
-function printPretty($var, $return=false, $flushBuffers=true) {
+function print_p($var, $return=false, $flushBuffers=true) {
     if (is_object($var) && method_exists($var, '__toString') && !$var instanceof \SimpleXMLElement) {
         $str = (string) $var;
     }
@@ -454,7 +412,7 @@ function printPretty($var, $return=false, $flushBuffers=true) {
         $str = print_r($var, true);
     }
     elseif ($var === null) {
-        $str = '(null)';                            // analogous to typeof(null) = 'NULL';
+        $str = '(null)';                            // analogous to typeof(null) = 'NULL'
     }
     elseif (is_bool($var)) {
         $str = ($var ? 'true':'false').' (bool)';
@@ -463,7 +421,7 @@ function printPretty($var, $return=false, $flushBuffers=true) {
         $str = (string) $var;
     }
 
-    if (!CLI)
+    if (!CLI) {
         $str = '<div align="left"
                      style="display:initial; visibility:initial; clear:both;
                      position:relative; z-index:4294967295; top:initial; left:initial;
@@ -474,6 +432,7 @@ function printPretty($var, $return=false, $flushBuffers=true) {
                                 color:inherit; background-color:inherit; white-space:pre; line-height:12px;
                                 font:normal normal 12px/normal \'Courier New\',courier,serif">'.hsc($str).'</pre>
                 </div>';
+    }
     if (!strEndsWith($str, NL))
         $str .= NL;
 
@@ -481,9 +440,7 @@ function printPretty($var, $return=false, $flushBuffers=true) {
         return $str;
 
     echo $str;
-
-    if ($flushBuffers)
-        ob_get_level() && ob_flush();
+    $flushBuffers && ob_get_level() && ob_flush();
     return null;
 }
 
@@ -499,13 +456,13 @@ function printPretty($var, $return=false, $flushBuffers=true) {
 function prettyBytes($value, $decimals = 1) {
     if (!is_int($value)) {
         if (is_string($value)) {
-            if (!strIsNumeric($value)) throw new InvalidArgumentException('Invalid parameter $value: "'.$value.'" (non-numeric)');
+            if (!strIsNumeric($value)) throw new InvalidValueException('Invalid parameter $value: "'.$value.'" (non-numeric)');
             $value = (float) $value;
         }
         else Assert::float($value, '$value');
 
-        if ($value < PHP_INT_MIN) throw new IllegalArgumentException('Illegal parameter $value: '.$value.' (out of range)');
-        if ($value > PHP_INT_MAX) throw new IllegalArgumentException('Illegal parameter $value: '.$value.' (out of range)');
+        if ($value < PHP_INT_MIN) throw new InvalidValueException('Invalid parameter $value: '.$value.' (out of range)');
+        if ($value > PHP_INT_MAX) throw new InvalidValueException('Invalid parameter $value: '.$value.' (out of range)');
         $value = (int) round($value);
     }
     Assert::int($decimals, '$decimals');
@@ -525,7 +482,7 @@ function prettyBytes($value, $decimals = 1) {
 
 
 /**
- * Convert a byte value to an integer supporting php.ini shorthand notation ("K", "M", "G").
+ * Convert a byte value to an integer supporting "php.ini" shorthand notation ("K", "M", "G").
  *
  * @param  string|int $value - byte value
  *
@@ -538,7 +495,7 @@ function php_byte_value($value) {
 
     $match = null;
     if (!preg_match('/^([+-]?[0-9]+)([KMG]?)$/i', $value, $match)) {
-        throw new InvalidArgumentException('Invalid argument $value: "'.$value.'" (not a PHP byte value)');
+        throw new InvalidValueException('Invalid parameter $value: "'.$value.'" (not a PHP byte value)');
     }
 
     $iValue = (int)$match[1];
@@ -568,26 +525,22 @@ function numf($number, $decimals=0, $decimalSeparator='.', $thousandsSeparator='
 
 
 /**
- * Return the value of a php.ini option as a boolean.
+ * Return the value of a "php.ini" option as a boolean.
  *
- * NOTE: Never use ini_get() to read boolean php.ini values as it will return the plain string passed to ini_set().
+ * NOTE: Don't use ini_get() to read boolean "php.ini" values as it will return the plain string as passed to ini_set().
  *
  * @param  string $option            - option name
- * @param  bool   $strict [optional] - Whether to enable strict checking of the found value:
- *                                     TRUE:  invalid values cause a runtime exception
- *                                     FALSE: invalid values are converted to the target type (i.e. boolean)
- *                                     (default: TRUE)
+ * @param  bool   $strict [optional] - whether to enable strict checking of the found value:
+ *                                     TRUE:  invalid values cause a runtime exception (default)
+ *                                     FALSE: invalid values are converted to a boolean
  *
- * @return bool? - boolean value or NULL if the setting doesn't exist
+ * @return ?bool - boolean value or NULL if the setting doesn't exist
  */
 function ini_get_bool($option, $strict = true) {
     $value = ini_get($option);
 
-    if ($value === false)                   // setting doesn't exist
-        return null;
-
-    if ($value === '')                      // setting is NULL (unset)
-        return (bool)null;
+    if ($value === false) return null;      // setting doesn't exist
+    if ($value === '')    return false;     // setting is NULL (unset)
 
     switch (strtolower($value)) {
         case '1'    :
@@ -601,72 +554,63 @@ function ini_get_bool($option, $strict = true) {
         case 'no'   :
         case 'none' : return false;
     }
-
-    if ($strict) throw new RuntimeException('Invalid php.ini setting for type boolean: "'.$option.'" = "'.$value.'"');
+    if ($strict) throw new InvalidValueException('Invalid "php.ini" setting for type boolean: "'.$option.'" = "'.$value.'"');
 
     return (bool)(int)$value;
 }
 
 
 /**
- * Return the value of a php.ini option as an integer.
+ * Return the value of a "php.ini" option as an integer.
  *
- * NOTE: Never use ini_get() to read php.ini integer values as it will return the plain string passed to ini_set().
+ * NOTE: Don't use ini_get() to read "php.ini" integer values as it will return the plain string as passed to ini_set().
  *
  * @param  string $option            - option name
- * @param  bool   $strict [optional] - Whether to enable strict checking of the found value:
- *                                     TRUE:  invalid values cause a runtime exception
- *                                     FALSE: invalid values are converted to the target type (i.e. integer)
- *                                     (default: TRUE)
+ * @param  bool   $strict [optional] - whether to enable strict checking of the found value:
+ *                                     TRUE:  invalid values cause a runtime exception (default)
+ *                                     FALSE: invalid values are converted to an integer
  *
- * @return int? - integer value or NULL if the setting doesn't exist
+ * @return ?int - integer value or NULL if the setting doesn't exist
  */
 function ini_get_int($option, $strict = true) {
     $value = ini_get($option);
 
-    if ($value === false)                   // setting doesn't exist
-        return null;
-
-    if ($value === '')                      // setting is NULL (unset)
-        return (int)null;
+    if ($value === false) return null;      // setting doesn't exist
+    if ($value === '')    return 0;         // setting is NULL (unset)
 
     $iValue = (int)$value;
 
     if ($strict && $value!==(string)$iValue)
-        throw new RuntimeException('Invalid php.ini setting for type integer: "'.$option.'" = "'.$value.'"');
+        throw new InvalidValueException('Invalid "php.ini" setting for type integer: "'.$option.'" = "'.$value.'"');
 
     return $iValue;
 }
 
 
 /**
- * Return the value of a php.ini option as a byte value supporting PHP shorthand notation ("K", "M", "G").
+ * Return the value of a "php.ini" option as a byte value supporting PHP shorthand notation ("K", "M", "G").
  *
- * NOTE: Never use ini_get() to read php.ini byte values as it will return the plain string passed to ini_set().
+ * NOTE: Don't use ini_get() to read "php.ini" byte values as it will return the plain string as passed to ini_set().
  *
  * @param  string $option            - option name
- * @param  bool   $strict [optional] - Whether to enable strict checking of the found value:
- *                                     TRUE:  invalid values cause a runtime exception
- *                                     FALSE: invalid values are converted to the target type (i.e. integer)
- *                                     (default: TRUE)
+ * @param  bool   $strict [optional] - whether to enable strict checking of the found value:
+ *                                     TRUE:  invalid values cause a runtime exception (default)
+ *                                     FALSE: invalid values are converted to an integer
  *
- * @return int? - integer value or NULL if the setting doesn't exist
+ * @return ?int - integer value or NULL if the setting doesn't exist
  */
 function ini_get_bytes($option, $strict = true) {
     $value = ini_get($option);
 
-    if ($value === false)                   // setting doesn't exist
-        return null;
-
-    if ($value === '')                      // setting is NULL (unset)
-        return (int)null;
+    if ($value === false) return null;      // setting doesn't exist
+    if ($value === '')    return 0;         // setting is NULL (unset)
 
     $result = 0;
     try {
         $result = php_byte_value($value);
     }
-    catch (RuntimeException $ex) {
-        if ($strict) throw new RuntimeException('Invalid php.ini setting for PHP byte value: "'.$option.'" = "'.$value.'"', null, $ex);
+    catch (InvalidValueException $ex) {
+        if ($strict) throw new InvalidValueException('Invalid "php.ini" setting for PHP byte value: "'.$option.'" = "'.$value.'"', 0, $ex);
         $result = (int)$value;
     }
     return $result;
@@ -680,7 +624,7 @@ function ini_get_bytes($option, $strict = true) {
  *
  * @param  string $string
  * @param  int    $flags        [optional] - default: ENT_QUOTES|ENT_SUBSTITUTE|ENT_HTML5
- * @param  string $encoding     [optional] - default: ini_get("default_charset")
+ * @param  string $encoding     [optional] - default: 'UTF-8'
  * @param  bool   $doubleEncode [optional] - default: TRUE
  *
  * @return string - converted string
@@ -688,9 +632,9 @@ function ini_get_bytes($option, $strict = true) {
  * @see   \htmlspecialchars()
  */
 function hsc($string, $flags=null, $encoding=null, $doubleEncode=true) {
-    if ($flags === null) {
-        $flags = ENT_QUOTES|ENT_SUBSTITUTE|ENT_HTML5;
-    }
+    if ($flags    === null) $flags = ENT_QUOTES|ENT_SUBSTITUTE|ENT_HTML5;
+    if ($encoding === null) $encoding = 'UTF-8';
+
     return htmlspecialchars($string, $flags, $encoding, $doubleEncode);
 }
 
@@ -721,51 +665,7 @@ function isRelativePath($path) {
     if (strlen($path) && $path[0]=='/')
         return false;
 
-    return true;                // an empty string cannot be considered absolute, so it's assumed to be a relative
-}
-
-
-/**
- * Decode a JSON value. Wrapper for the built-in method <tt>json_encode()</tt> with improved error handling.
- *
- * @param  mixed $value
- * @param  int   $options [optional] - default: 0
- * @param  int   $depth   [optional] - default: 512
- *
- * @return string - encoded value
- *
- * Note: Since version 7.3 PHP supports the flag JSON_THROW_ON_ERROR to change the default behavior on errors.
- *       No need for additional helpers anymore.
- *
- * @see  https://github.com/alexeyshockov/php-json-wrapper
- */
-function json_encode($value, $options=0, $depth=512) {
-    $result = \json_encode(...func_get_args());
-    if (json_last_error()) throw new InvalidArgumentException('Cannot convert value "'.$value.'" to JSON ('.json_last_error_msg().')', json_last_error());
-    return $result;
-}
-
-
-/**
- * Decode a JSON value. Wrapper for the built-in method <tt>json_decode()</tt> with improved error handling.
- *
- * @param  string $value
- * @param  bool   $assoc   [optional] - default: FALSE
- * @param  int    $depth   [optional] - default: 512
- * @param  int    $options [optional] - default: 0
- *
- * @return mixed - decoded value
- *
- * Note: Since version 7.3 PHP supports the flag JSON_THROW_ON_ERROR to change the default behavior on errors.
- *       No need for additional helpers anymore.
- *
- * @see  https://github.com/alexeyshockov/php-json-wrapper
- */
-function json_decode($value, $assoc=false, $depth=512, $options=0) {
-    Assert::string($value);
-    $result = \json_decode(...func_get_args());
-    if (json_last_error()) throw new InvalidArgumentException('Invalid JSON value in "'.$value.'" ('.json_last_error_msg().')', json_last_error());
-    return $result;
+    return true;                // an empty string cannot be considered absolute, so it's interpreted as relative
 }
 
 
@@ -949,7 +849,6 @@ function strEndsWithI($string, $suffix) {
  * </pre>
  */
 function strLeft($string, $length) {
-    if (!isset($string)) return '';
     Assert::string($string, '$string');
     Assert::int   ($length, '$length');
 
@@ -970,10 +869,10 @@ function strLeft($string, $length) {
  *                                             (default: 1 = the first occurrence)
  * @param  bool   $includeLimiter [optional] - whether to include the limiting substring in the returned result
  *                                             (default: FALSE)
- * @param  mixed  $onNotFound     [optional] - value to return if the specified occurrence of the limiting substring is not found
+ * @param  string $onNotFound     [optional] - string to return if the specified occurrence of the limiter is not found
  *                                             (default: the initial string)
  *
- * @return string - left part of the initial string or the $onNotFound value
+ *  strLeftTo('abccc', 'c', -99) => 'abccc'   // specified number of occurrences doesn't exist
  *
  * @example
  * <pre>
@@ -981,15 +880,15 @@ function strLeft($string, $length) {
  *  strLeftTo('abcde', 'x')      => 'abcde'   // limiter not found
  *  strLeftTo('abccc', 'c',   3) => 'abcc'
  *  strLeftTo('abccc', 'c',  -3) => 'ab'
- *  strLeftTo('abccc', 'c', -99) => 'abccc'   // number of occurrences not found
+ *  strLeftTo('abccc', 'c', -99) => 'abccc'   // number of occurrences doesn't exist
  * </pre>
  */
-function strLeftTo($string, $limiter, $count=1, $includeLimiter=false, $onNotFound=null) {
+function strLeftTo($string, $limiter, $count=1, $includeLimiter=false, $onNotFound='') {
     Assert::string($string,         '$string');
     Assert::string($limiter,        '$limiter');
     Assert::int   ($count,          '$count');
     Assert::bool  ($includeLimiter, '$includeLimiter');
-    if (!strlen($limiter)) throw new IllegalArgumentException('Illegal limiting substring: "" (empty)');
+    if (!strlen($limiter)) throw new InvalidValueException('Invalid limiting substring: "" (empty)');
 
     if ($count > 0) {
         $pos = -1;
@@ -1045,12 +944,10 @@ function strLeftTo($string, $limiter, $count=1, $includeLimiter=false, $onNotFou
  * </pre>
  */
 function strRight($string, $length) {
-    if (!isset($string)) return '';
     Assert::string($string, '$string');
     Assert::int   ($length, '$length');
 
-    if ($length == 0)
-        return '';
+    if (!$length) return '';
 
     $result = substr($string, -$length);
     return $result===false ? '' : $result;
@@ -1070,7 +967,7 @@ function strRight($string, $length) {
  *                                             (default: 1 = the first occurrence)
  * @param  bool   $includeLimiter [optional] - whether to include the limiting substring in the returned result
  *                                             (default: FALSE)
- * @param  mixed  $onNotFound     [optional] - value to return if the specified occurrence of the limiting substring is not found
+ * @param  string $onNotFound     [optional] - value to return if the specified occurrence of the limiting substring is not found
  *                                             (default: empty string)
  *
  * @return string - right part of the initial string or the $onNotFound value
@@ -1088,7 +985,7 @@ function strRightFrom($string, $limiter, $count=1, $includeLimiter=false, $onNot
     Assert::string($limiter,        '$limiter');
     Assert::int   ($count,          '$count');
     Assert::bool  ($includeLimiter, '$includeLimiter');
-    if (!strlen($limiter)) throw new IllegalArgumentException('Illegal limiting substring: "" (empty)');
+    if (!strlen($limiter)) throw new InvalidValueException('Illegal limiting substring: "" (empty)');
 
     if ($count > 0) {
         $pos = -1;
@@ -1187,8 +1084,7 @@ function strIsDigits($value) {
 
 
 /**
- * Whether a string represents a valid integer value, i.e. consists of only digits and optionally a leading "-" (minus)
- * character.
+ * Whether a string represents a valid integer value, i.e. consists of only digits and optionally a leading "-" (minus) character.
  *
  * @param  scalar $value
  *
@@ -1232,7 +1128,7 @@ function strIsNumeric($value) {
  *
  * @param  mixed $value - boolean representation
  *
- * @return bool? - Boolean or NULL if the parameter doesn't represent a boolean. The accepted values of a boolean's
+ * @return ?bool - Boolean or NULL if the parameter doesn't represent a boolean. The accepted values of a boolean's
  *                 numerical string representation (integer or float) are 0 (zero) and 1 (one).
  */
 function strToBool($value) {
@@ -1284,9 +1180,8 @@ function strCollapseWhiteSpace($string, $joinLines=true, $separator=' ') {
 
 
 /**
- * Normalize line endings of a string. If the string contains mixed line endings the number of lines of the original
- * and the resulting string may differ. Netscape line endings are honored only if all line endings are Netscape format
- * (no mixed mode).
+ * Normalize line endings of a string. If the string contains mixed line endings the number of lines of the original and the
+ * resulting string may differ. Netscape line endings are honored only if all line endings are Netscape format (no mixed mode).
  *
  * @param  string $string          - string to normalize
  * @param  string $mode [optional] - format of the resulting string, can be one of:                             <br>
@@ -1300,9 +1195,9 @@ function normalizeEOL($string, $mode = EOL_UNIX) {
     Assert::string($string, '$string');
     Assert::string($mode,   '$mode');
     $done = false;
-    $count1 = $count2 = 0;
 
     if (strContains($string, EOL_NETSCAPE)) {
+        $count1 = $count2 = null;
         $tmp = str_replace(EOL_NETSCAPE, EOL_UNIX, $string, $count1);
         if (!strContains($tmp, EOL_MAC)) {
             str_replace(EOL_UNIX, '.', $tmp, $count2);
@@ -1318,7 +1213,7 @@ function normalizeEOL($string, $mode = EOL_UNIX) {
         $string = str_replace(EOL_UNIX, $mode, $string);
     }
     else if ($mode !== EOL_UNIX) {
-        throw new InvalidArgumentException('Invalid parameter $mode: "'.$mode.'"');
+        throw new InvalidValueException('Invalid parameter $mode: "'.$mode.'"');
     }
     return $string;
 }
@@ -1416,7 +1311,7 @@ function is_dir_empty($dirname, $ignore = []) {
  *
  * @param  string $name - name
  *
- * @return string? - the same name or NULL if a component of that name doesn't exist or couldn't be loaded
+ * @return ?string - the same name or NULL if a component of that name doesn't exist or couldn't be loaded
  */
 function autoload($name) {
     if (class_exists($name, true) || interface_exists($name, true) || trait_exists($name, true))
@@ -1438,7 +1333,6 @@ function is_class($name) {
         return class_exists($name, true);
     }
     catch (\Throwable $ex) {}   // faulty class loaders must not block the script from continuation
-    catch (\Exception $ex) {}
 
     return class_exists($name, false);
 }
@@ -1457,7 +1351,6 @@ function is_interface($name) {
         return interface_exists($name, true);
     }
     catch (\Throwable $ex) {}   // faulty class loaders must not block the script from continuation
-    catch (\Exception $ex) {}
 
     return interface_exists($name, false);
 }
@@ -1476,7 +1369,6 @@ function is_trait($name) {
         return trait_exists($name, true);
     }
     catch (\Throwable $ex) {}   // faulty class loaders must not block the script from continuation
-    catch (\Exception $ex) {}
 
     return trait_exists($name, false);
 }
@@ -1499,12 +1391,14 @@ function is_array_like($var) {
 /**
  * Return the simple name of a class name (i.e. the base name).
  *
- * @param  string $className - full class name
+ * @param  string|object $class - class name or instance
  *
  * @return string
  */
-function simpleClassName($className) {
-    return strRightFrom($className, '\\', -1, false, $className);
+function simpleClassName($class) {
+    if (is_object($class)) $class = get_class($class);
+    else                   Assert::string($class);
+    return strRightFrom($class, '\\', -1, false, $class);
 }
 
 
@@ -1517,7 +1411,7 @@ function simpleClassName($className) {
  */
 function metatypeOf($name) {
     Assert::string($name);
-    if ($name == '') throw new InvalidArgumentException('Invalid argument $name: ""');
+    if ($name == '') throw new InvalidValueException('Invalid parameter $name: ""');
 
     if (is_class    ($name)) return 'class';
     if (is_interface($name)) return 'interface';
@@ -1642,16 +1536,37 @@ function ifEmpty($value, $altValue) {
 
 
 /**
- * Return a sorted copy of the specified array using the algorythm and parameters of ksort().
+ * Return the host name of the internet host specified by a given IP address.
+ *
+ * @param  string $ipAddress - the host IP address
+ *
+ * @return string - the host name on success, or the unmodified IP address on resolver error
+ */
+function getHostByAddress($ipAddress) {
+    Assert::string($ipAddress);
+    if ($ipAddress == '') throw new InvalidValueException('Invalid parameter $ipAddress: "'.$ipAddress.'"');
+
+    $result = \gethostbyaddr($ipAddress);
+
+    if ($result === false) throw new InvalidValueException('Invalid parameter $ipAddress: "'.$ipAddress.'"');
+
+    if ($result==='localhost' && !strStartsWith($ipAddress, '127.')) {
+        $result = $ipAddress;
+    }
+    return $result;
+}
+
+
+/**
+ * Return a sorted copy of the specified array using the algorythm and parameters of {@link \ksort()}.
+ * Opposite to ksort() this function will not modify the passed array.
  *
  * @param  array $values
  * @param  int   $sort_flags [optional]
  *
  * @return array
- *
- * @see    ksort()
  */
-function ksort_r(array $values, $sort_flags = SORT_REGULAR) {
+function ksortc(array $values, $sort_flags = SORT_REGULAR) {
     ksort($values, $sort_flags);
     return $values;
 }
@@ -1661,8 +1576,8 @@ function ksort_r(array $values, $sort_flags = SORT_REGULAR) {
  * Return a pluralized string according to the specified number of items.
  *
  * @param  int    $count               - the number of items to determine the output from
- * @param  string $singular [optional] - singular form of string
- * @param  string $plural   [optional] - plural form of string
+ * @param  string $singular [optional] - singular form of string (default: empty string)
+ * @param  string $plural   [optional] - plural form of string (default: "s")
  *
  * @return string
  */
@@ -1764,9 +1679,9 @@ function asset($uri) {
 
 
 /**
- * Parse command line arguments and match them against the specified {@link http://docopt.org} syntax definition.
+ * Parse command line arguments and match them against the specified {@link http://docopt.org/#} syntax definition.
  *
- * @param  string          $doc                - help text, i.e. a syntax definition in docopt language format
+ * @param  string          $doc                - help text, i.e. a syntax definition in Docopt language format
  * @param  string|string[] $args    [optional] - arguments to parse (default: the arguments passed in $_SERVER['argv'])
  * @param  array           $options [optional] - parser options (default: none)
  *

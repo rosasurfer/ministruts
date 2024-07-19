@@ -4,8 +4,8 @@ namespace rosasurfer\cache;
 use rosasurfer\cache\monitor\Dependency;
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\assert\Assert;
+use rosasurfer\core\error\PHPError;
 use rosasurfer\core\exception\RuntimeException;
-use rosasurfer\core\exception\error\PHPError;
 use rosasurfer\file\FileSystem as FS;
 
 use function rosasurfer\isRelativePath;
@@ -76,7 +76,9 @@ final class FileSystemCache extends CachePeer {
         if (!$data) return false;           // cache miss
 
         // cache hit
+        /** @var int $created */
         $created    = $data[0];             // data: [created, $expires, $value, $dependency]
+        /** @var int $expires */
         $expires    = $data[1];
         $value      = $data[2];
         $dependency = $data[3];

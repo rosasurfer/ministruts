@@ -3,7 +3,7 @@ namespace rosasurfer\cache\monitor;
 
 use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\InvalidValueException;
 
 
 /**
@@ -102,7 +102,7 @@ abstract class Dependency extends CObject {
      */
     public function setMinValidity($time) {
         Assert::int($time);
-        if ($time < 0) throw new InvalidArgumentException('Invalid argument $time: '.$time);
+        if ($time < 0) throw new InvalidValueException('Invalid parameter $time: '.$time);
 
         $this->minValidity = $time;
         return $this;

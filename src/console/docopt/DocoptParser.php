@@ -17,15 +17,16 @@ use rosasurfer\console\docopt\pattern\Required;
 
 use function rosasurfer\array_filter;
 use function rosasurfer\array_merge;
-use function rosasurfer\echoPre;
 use function rosasurfer\strEndsWith;
 use function rosasurfer\strStartsWith;
+
+use const rosasurfer\NL;
 
 
 /**
  * DocoptParser
  *
- * A command line argument parser for the {@link http://docopt.org} language format.
+ * A command line argument parser for the {@link http://docopt.org/#} language format.
  */
 class DocoptParser extends CObject {
 
@@ -42,8 +43,8 @@ class DocoptParser extends CObject {
     /** @var bool */
     protected $exitFullUsage = false;
 
-    /** @var string - help text displayed with every parser generated output */
-    protected $autoHelp;
+    /** @var ?string - help text displayed with every parser generated output */
+    protected $autoHelp = null;
 
     /** @var string */
     protected $version;
@@ -52,7 +53,7 @@ class DocoptParser extends CObject {
     /**
      * Constructor
      *
-     * Create a new docopt command line argument parser.
+     * Create a new Docopt command line argument parser.
      *
      * @param  array $options [optional]
      */
@@ -66,7 +67,7 @@ class DocoptParser extends CObject {
 
 
     /**
-     * Parse command line arguments and match them against the specified {@link http://docopt.org} syntax definition.
+     * Parse command line arguments and match them against the specified {@link http://docopt.org/#} syntax definition.
      *
      * @param  string         $doc
      * @param  string|mixed[] $args [optional]
@@ -106,13 +107,14 @@ class DocoptParser extends CObject {
                         $result[$name] = $pattern->value;
                     }
                 }
-                return new DocoptResult($result);
+                return new DocoptResult($result, $usage);
             }
             throw new DocoptUserNotification();
         }
         catch (DocoptUserNotification $ex) {
             $this->handleExit($ex);
-            return new DocoptResult([], $ex->status, $ex->addMessage($this->autoHelp)->getMessage());
+            $msg = trim($ex->getMessage().NL.$this->autoHelp);
+            return new DocoptResult([], '', $ex->status, $msg);
         }
     }
 
@@ -152,7 +154,7 @@ class DocoptParser extends CObject {
      */
     protected function handleExit(DocoptUserNotification $exception) {
         if ($this->exit) {
-            echoPre($exception->addMessage($this->autoHelp)->getMessage());
+            echo trim($exception->getMessage().NL.$this->autoHelp).NL;
             exit($exception->status);
         }
     }

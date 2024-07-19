@@ -1,2 +1,2 @@
 
-### A [docopt](http://docopt.org/) implementation for PHP
+### A [Docopt](http://docopt.org/#) implementation for PHP

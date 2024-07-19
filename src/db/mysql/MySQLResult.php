@@ -20,8 +20,8 @@ class MySQLResult extends Result {
     /** @var string - SQL statement the result was generated from */
     protected $sql;
 
-    /** @var resource - the database connector's original result handle */
-    protected $hResult;
+    /** @var ?resource - the database connector's original result handle */
+    protected $hResult = null;
 
     /** @var int - last inserted row id of the connection at instance creation time (not reset between queries) */
     protected $lastInsertId = 0;
@@ -170,7 +170,7 @@ class MySQLResult extends Result {
     public function release() {
         if (is_resource($this->hResult)) {
             $tmp = $this->hResult;
-            $this->hResult      = null;
+            $this->hResult = null;
             $this->nextRowIndex = -1;
             mysql_free_result($tmp);
         }
@@ -180,7 +180,7 @@ class MySQLResult extends Result {
     /**
      * Return the result's internal result object.
      *
-     * @return resource? - result handle or NULL for a result-less query
+     * @return ?resource - result handle or NULL for a result-less query
      */
     public function getInternalResult() {
         return $this->hResult;

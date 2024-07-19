@@ -3,7 +3,7 @@ namespace rosasurfer\ministruts\url;
 
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\core\debug\ErrorHandler;
+use rosasurfer\core\error\ErrorHandler;
 
 
 /**
@@ -18,7 +18,6 @@ class VersionedUrl extends Url {
      */
     public function __toString() {
         $uri = '';
-
         try {
             $uri = parent::__toString();
             $relativeUri = $this->appRelativeUri;
@@ -34,12 +33,9 @@ class VersionedUrl extends Url {
                 else                $uri .= '&';
                 $uri .= dechex(crc32(filesize($fileName).'|'.filemtime($fileName)));
             }
-
-            Assert::string($uri);                               // Ensure __toString() returns a string as otherwise...
-        }                                                       // PHP will trigger a non-catchable fatal error.
-        catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }
-        catch (\Exception $ex) { ErrorHandler::handleToStringException($ex); }
-
-        return $uri;
+            Assert::string($uri);
+        }                                                                       // Ensure __toString() doesn't throw an exception as otherwise
+        catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }  // PHP < 7.4 will trigger a non-catchable fatal error.
+        return $uri;                                                            // @see  https://bugs.php.net/bug.php?id=53648
     }
 }

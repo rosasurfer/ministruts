@@ -2,7 +2,7 @@
 namespace rosasurfer\core;
 
 use rosasurfer\core\exception\ClassNotFoundException;
-use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\InvalidTypeException;
 use rosasurfer\core\exception\RuntimeException;
 
 use function rosasurfer\is_class;
@@ -48,7 +48,7 @@ abstract class Singleton extends CObject {
         // check validity of the passed class (omitting this check can cause an uncatchable fatal error)
         if (!is_a($class, __CLASS__, true)) {
             if (!is_class($class)) throw new ClassNotFoundException('Class not found: '.$class );
-            throw new InvalidArgumentException('Not a '.__CLASS__.' subclass: '.$class);
+            throw new InvalidTypeException('Not a '.__CLASS__.' subclass: '.$class);
         }
 
         // instantiate the class with the passed parameters

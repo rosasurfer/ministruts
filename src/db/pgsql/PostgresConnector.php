@@ -66,13 +66,13 @@ class PostgresConnector extends Connector {
     /** @var string[] - session variables */
     protected $sessionVars = [];
 
-    /** @var resource - internal connection handle */
-    protected $hConnection;
+    /** @var ?resource - internal connection handle */
+    protected $hConnection = null;
 
     /** @var int - transaction nesting level */
     protected $transactionLevel = 0;
 
-    /** @var int - the last inserted row id (not reset between queries) */
+    /** @var ?int - the last inserted row id (not reset between queries) */
     protected $lastInsertId = null;        // distinguish between "not yet set" and "zero"
 
     /** @var int - the last number of affected rows (not reset between queries) */
@@ -215,7 +215,7 @@ class PostgresConnector extends Connector {
     /**
      * Return the database's current schema search path.
      *
-     * @return string? - schema search path or NULL in case of errors
+     * @return ?string - schema search path or NULL in case of errors
      */
     protected function getSchemaSearchPath() {
         $options = $this->options;
@@ -234,7 +234,6 @@ class PostgresConnector extends Connector {
                 break;
             }
             catch (\Throwable $ex) {}
-            catch (\Exception $ex) {}
 
             if ($ex) {
                 if (strContainsI($ex->getMessage(), 'current transaction is aborted, commands ignored until end of transaction block')) {
@@ -269,8 +268,7 @@ class PostgresConnector extends Connector {
         }
         catch (IRosasurferException $ex) {}
         catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
-        catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
-        if ($ex) throw $ex->addMessage('Cannot connect to PostgreSQL server with connection string: "'.$connStr.'"');
+        if ($ex) throw $ex->appendMessage('Cannot connect to PostgreSQL server with connection string: "'.$connStr.'"');
 
         $this->setConnectionOptions();
         return $this;
@@ -461,15 +459,15 @@ class PostgresConnector extends Connector {
         }
         catch (IRosasurferException $ex) {}
         catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
-        catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
-        if ($ex) throw $ex->addMessage('Database: '.$this->getConnectionDescription().NL.'SQL: "'.$sql.'"');
+        if ($ex) throw $ex->appendMessage('Database: '.$this->getConnectionDescription().NL.'SQL: "'.$sql.'"');
 
         /** @var string $status */
         $status = pg_result_status($result, PGSQL_STATUS_STRING);
 
         // reset last_insert_id on INSERTs, afterwards it's resolved on request as it requires an extra SQL query
-        if (strStartsWithI($status, 'INSERT '))
+        if (strStartsWithI($status, 'INSERT ')) {
             $this->lastInsertId = null;
+        }
 
         // track last_affected_rows
         $pattern = '/^(INSERT|UPDATE|DELETE)\b/i';
@@ -573,7 +571,7 @@ class PostgresConnector extends Connector {
                     $this->lastInsertId = $this->query('select lastVal()')->fetchInt();
                 }
                 catch (\Throwable $ex) {}
-                catch (\Exception $ex) {}
+
                 if ($ex) {
                     if (stripos($ex->getMessage(), 'ERROR:  lastval is not yet defined in this session') === false)
                         throw $ex;

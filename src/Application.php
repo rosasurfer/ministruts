@@ -2,15 +2,15 @@
 namespace rosasurfer;
 
 use rosasurfer\config\ConfigInterface;
-use rosasurfer\config\defaultt\DefaultConfig;
+use rosasurfer\config\auto\DefaultConfig;
 use rosasurfer\console\Command;
 use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\core\debug\ErrorHandler;
-use rosasurfer\core\exception\InvalidArgumentException;
-use rosasurfer\di\DiInterface;
-use rosasurfer\di\defaultt\CliServiceContainer;
-use rosasurfer\di\defaultt\WebServiceContainer;
+use rosasurfer\core\di\DiInterface;
+use rosasurfer\core\di\auto\CliServiceContainer;
+use rosasurfer\core\di\auto\WebServiceContainer;
+use rosasurfer\core\error\ErrorHandler;
+use rosasurfer\core\exception\InvalidValueException;
 use rosasurfer\log\Logger;
 use rosasurfer\ministruts\FrontController;
 use rosasurfer\ministruts\Response;
@@ -18,15 +18,15 @@ use rosasurfer\util\PHP;
 
 
 /**
- * An object representing a running application.
+ * A class representing the application instance.
  */
 class Application extends CObject {
 
 
-    /** @var ConfigInterface? - the application's current default configuration */
+    /** @var ?ConfigInterface - the application's current default configuration */
     protected static $defaultConfig;
 
-    /** @var DiInterface? - the application's current default DI container */
+    /** @var ?DiInterface - the application's current default DI container */
     protected static $defaultDi;
 
     /** @var Command[] - registered CLI commands */
@@ -34,45 +34,45 @@ class Application extends CObject {
 
 
     /**
-     * Create and initialize a new MiniStruts application.                                                                      <br>
+     * Create and initialize a new MiniStruts application.
      *
-     * @param  array $options [optional] - Expects an array with any of the following options:                                  <br>
+     * @param  array $options [optional] - array with any of the following options:
      *
-     *        "app.dir.root"          - string:  The project's root directory.                                                  <br>
-     *                                           (default: the current directory)                                               <br>
+     *        "app.dir.root"          - string:  The project's root directory.
+     *                                           (default: the current directory)
      *
-     *        "app.dir.config"        - string:  The project's configuration location as a directory or a file.                 <br>
-     *                                           (default: the current directory)                                               <br>
+     *        "app.dir.config"        - string:  The project's configuration location as a directory or a file.
+     *                                           (default: the current directory)
      *
-     *        "app.globals"           - bool:    If enabled definitions in "src/helpers.php" are additionally mapped to the     <br>
-     *                                           global namespace. In general this is not recommended to avoid potential naming <br>
-     *                                           conflicts in the global scope. However it may be used to simplify life of      <br>
-     *                                           developers using editors with limited code completion capabilities.            <br>
-     *                                           (default: disabled)                                                            <br>
+     *        "app.globals"           - bool:    If enabled definitions in "src/helpers.php" are additionally mapped to the
+     *                                           global namespace. In general this is not recommended to avoid potential naming
+     *                                           conflicts in the global scope. However it may be used to simplify life of
+     *                                           developers using editors with limited code completion capabilities.
+     *                                           (default: disabled)
      *
-     *        "app.handle-errors"     - string:  How to handle regular PHP errors: If set to "strict" errors are converted to   <br>
-     *                                           ErrorExceptions and thrown. If set to "weak" errors are only logged and        <br>
-     *                                           execution continues. If set to "ignore" the application must implement its     <br>
-     *                                           own error handling mechanism.                                                  <br>
-     *                                           (default: "strict")                                                            <br>
+     *        "app.handle-errors"     - string:  How to handle regular PHP errors: If set to "exception" errors are converted
+     *                                           to ErrorExceptions and thrown. If set to "log" errors are only logged and
+     *                                           execution continues. If set to "ignore" the application must implement its
+     *                                           own error handling mechanism.
+     *                                           (default: "strict")
      *
-     *        "app.handle-exceptions" - bool:    How to handle PHP exceptions: If enabled exceptions are handled by the         <br>
-     *                                           framework's exception handler. Otherwise the application must implement its    <br>
-     *                                           own exception handling mechanism.                                              <br>
-     *                                           (default: enabled)                                                             <br>
+     *        "app.handle-exceptions" - bool:    How to handle PHP exceptions: If enabled exceptions are handled by the
+     *                                           framework's exception handler. Otherwise the application must implement its
+     *                                           own exception handling mechanism.
+     *                                           (default: enabled)
      *
-     * All further options are added to the application's current default configuration as regular config values.               <br>
+     * All further options are added to the application's configuration as regular config values.
      */
     public function __construct(array $options = []) {
         // set default values
-        if (!isset($options['app.handle-errors'    ])) $options['app.handle-errors'    ] = 'strict';
-        if (!isset($options['app.handle-exceptions'])) $options['app.handle-exceptions'] = true;
+        if (!isset($options['app.handle-errors'    ])) $options['app.handle-errors'    ] = 'exception';
+        if (!isset($options['app.handle-exceptions'])) $options['app.handle-exceptions'] = 'catch';
         if (!isset($options['app.globals'          ])) $options['app.globals'          ] = false;
 
         // setup the configuration
-        $this->setupErrorHandling    ($options['app.handle-errors'    ]);
-        $this->setupExceptionHandling($options['app.handle-exceptions']);
-        $this->loadGlobals           ($options['app.globals'          ]);
+        $this->initErrorHandling    ($options['app.handle-errors'    ]);
+        $this->initExceptionHandling($options['app.handle-exceptions']);
+        $this->loadGlobals          ($options['app.globals'          ]);
 
         /** @var DefaultConfig $config */
         $config = $this->initDefaultConfig($options);
@@ -169,7 +169,7 @@ class Application extends CObject {
 
         // enforce mission-critical requirements
         if (!php_ini_loaded_file()) {
-            echoPre('application error (see error log'.(self::isAdminIP() ? ': '.(strlen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')');
+            echof('application error (see error log'.(self::isAdminIP() ? ': '.(strlen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')');
             error_log('Error: No "php.ini" configuration file was loaded.');
             exit(1);
         }
@@ -196,18 +196,20 @@ class Application extends CObject {
      *
      * @param  array $options [optional] - additional execution options (default: none)
      *
-     * @return Response|int - the HTTP response if a web application; the error status if a command line application
+     * @return Response|int - the HTTP response wrapper for a web application, or the error status for a CLI application
      */
     public function run(array $options = []) {
-        if (!CLI)
+        if (!CLI) {
             return FrontController::processRequest($options);
+        }
+        if ($this->commands) {
+            if (sizeof($this->commands) > 1) echof('Multi-level commands are not yet supported.');
 
-        if (sizeof($this->commands) > 1)
-            echoPre('At the moment multi-level commands are not supported.');
-
-        /** @var Command? $cmd */
-        $cmd = first($this->commands);
-        return $cmd ? $cmd->run() : 0;
+            /** @var Command $cmd */
+            $cmd = first($this->commands);
+            return $cmd->run();
+        }
+        return 0;
     }
 
 
@@ -216,9 +218,7 @@ class Application extends CObject {
      */
     protected function configurePhp() {
         register_shutdown_function(function() {
-            /** @var ConfigInterface $config */
-            $config = self::$defaultConfig;
-            $warnLimit = php_byte_value($config->get('log.warn.memory_limit', PHP_INT_MAX));
+            $warnLimit = php_byte_value(self::$defaultConfig->get('log.warn.memory_limit', PHP_INT_MAX));
             $usedBytes = memory_get_peak_usage(true);
             if ($usedBytes > $warnLimit) {
                 Logger::log('Memory consumption exceeded '.prettyBytes($warnLimit).' (peak usage: '.prettyBytes($usedBytes).')', L_WARN, ['class' => __CLASS__]);
@@ -282,7 +282,7 @@ class Application extends CObject {
      */
     protected function expandAppDirs(ConfigInterface $config, $rootDir) {
         Assert::string($rootDir, '$rootDir');
-        if (!strlen($rootDir) || isRelativePath($rootDir)) throw new InvalidArgumentException('Invalid config option "app.dir.root": "'.$rootDir.'" (not an absolute path)');
+        if (!strlen($rootDir) || isRelativePath($rootDir)) throw new InvalidValueException('Invalid config option "app.dir.root": "'.$rootDir.'" (not an absolute path)');
 
         $rootDir = rtrim(str_replace('\\', '/', $rootDir), '/');
         $dirs = $config->get('app.dir', []);
@@ -304,9 +304,8 @@ class Application extends CObject {
                 $this->{__FUNCTION__}($dir, $rootDir);
                 continue;
             }
-            if (isRelativePath($dir)) {
+            if (isRelativePath($dir))
                 $dir = $rootDir.'/'.$dir;
-            }
             if (is_dir($dir)) $dir = realpath($dir);
         }
         unset($dir);
@@ -327,40 +326,44 @@ class Application extends CObject {
 
 
     /**
-     * Setup the way the application handles regular PHP errors.
+     * Initialize handling of internal PHP errors. Controls whether errors are ignored, logged or converted to exceptions.
      *
-     * @param  string $value - configuration value as passed to the framework loader:
-     *                         "strict": errors are converted to instances of PHP ErrorExceptions and thrown
-     *                         "weak":   errors are only logged
-     *                         "ignore": errors are ignored
+     * @param  string $mode - string representation of an error handling mode:
+     *                        "ignore":    errors are ignored
+     *                        "log":       errors are logged
+     *                        "exception": errors are converted to exceptions and thrown back (default)
      */
-    protected function setupErrorHandling($value) {
-        $mode = ErrorHandler::THROW_EXCEPTIONS;                     // strict (default if an invalid parameter was passed)
+    protected function initErrorHandling($mode) {
+        Assert::string($mode);
 
-        if (is_string($value)) {
-            $value = strtolower($value);
-            if      ($value == 'weak'  ) $mode = ErrorHandler::LOG_ERRORS;
-            else if ($value == 'ignore') $mode = 0;
+        switch ($mode) {
+            case 'ignore':    $iMode = ErrorHandler::ERRORS_IGNORE;    break;
+            case 'log':       $iMode = ErrorHandler::ERRORS_LOG;       break;
+            case 'exception': $iMode = ErrorHandler::ERRORS_EXCEPTION; break;
+            default:
+                throw new InvalidValueException('Invalid error handling mode: "'.$mode.'"');
         }
-        $mode && ErrorHandler::setupErrorHandling($mode);
+        ErrorHandler::setupErrorHandling($iMode);
     }
 
 
     /**
-     * Setup the application's exception handling.
+     * Initialize handling of uncatched exceptions. Controls whether exceptions are ignored or catched.
      *
-     * @param  bool|int|string $value - configuration value as passed to the framework loader
+     * @param  string $mode - string representation of an exception handling mode:
+     *                        "ignore": exceptions are ignored
+     *                        "catch":  exceptions are catched and logged
      */
-    protected function setupExceptionHandling($value) {
-        $enabled = true;                                            // TRUE (default if an invalid parameter was passed)
-        if (is_bool($value) || is_int($value)) {
-            $enabled = (bool) $value;
+    protected function initExceptionHandling($mode) {
+        Assert::string($mode);
+
+        switch ($mode) {
+            case 'ignore': $iMode = ErrorHandler::EXCEPTIONS_IGNORE; break;
+            case 'catch':  $iMode = ErrorHandler::EXCEPTIONS_CATCH;  break;
+            default:
+                throw new InvalidValueException('Invalid exception handling mode: "'.$mode.'"');
         }
-        elseif (is_string($value)) {
-            $value   = trim(strtolower($value));
-            $enabled = ($value=='0' || $value=='off' || $value=='false');
-        }
-        $enabled && ErrorHandler::setupExceptionHandling();
+        ErrorHandler::setupExceptionHandling($iMode);
     }
 
 
@@ -408,7 +411,7 @@ class Application extends CObject {
      * Return the current default configuration of the {@link Application}. This is the configuration previously set
      * with {@link Application::setConfig()}.
      *
-     * @return ConfigInterface?
+     * @return ?ConfigInterface
      */
     public static function getConfig() {
         return self::$defaultConfig;
@@ -420,7 +423,7 @@ class Application extends CObject {
      *
      * @param  ConfigInterface $configuration
      *
-     * @return ConfigInterface? - the previously registered default configuration
+     * @return ?ConfigInterface - the previously registered default configuration
      */
     final public static function setConfig(ConfigInterface $configuration) {
         $previous = self::$defaultConfig;
@@ -435,7 +438,7 @@ class Application extends CObject {
      * Return the default dependency injection container of the {@link Application}. This is the instance previously set
      * with {@link Application::setDi()}.
      *
-     * @return DiInterface?
+     * @return ?DiInterface
      */
     public static function getDi() {
         return self::$defaultDi;
@@ -447,7 +450,7 @@ class Application extends CObject {
      *
      * @param  DiInterface $di
      *
-     * @return DiInterface? - the previously registered default container
+     * @return ?DiInterface - the previously registered default container
      */
     final public static function setDi(DiInterface $di) {
         $previous = self::$defaultDi;

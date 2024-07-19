@@ -2,8 +2,8 @@
 namespace rosasurfer\db;
 
 use rosasurfer\core\CObject;
-use rosasurfer\core\debug\ErrorHandler;
-use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\error\ErrorHandler;
+use rosasurfer\core\exception\InvalidTypeException;
 use rosasurfer\db\ConnectorInterface as IConnector;
 
 
@@ -29,7 +29,6 @@ abstract class Connector extends CObject implements ConnectorInterface {
             }
         }
         catch (\Throwable $ex) { throw ErrorHandler::handleDestructorException($ex); }
-        catch (\Exception $ex) { throw ErrorHandler::handleDestructorException($ex); }
     }
 
 
@@ -42,7 +41,7 @@ abstract class Connector extends CObject implements ConnectorInterface {
      * @return IConnector
      */
     public static function create($class, array $options) {
-        if (!is_subclass_of($class, IConnector::class)) throw new InvalidArgumentException('Not a '.IConnector::class.' implementing class: '.$class);
+        if (!is_subclass_of($class, IConnector::class)) throw new InvalidTypeException('Not a '.IConnector::class.' implementing class: '.$class);
         return new $class($options);
     }
 
@@ -63,6 +62,5 @@ abstract class Connector extends CObject implements ConnectorInterface {
             return $result;
         }
         catch (\Throwable $ex) { $this->rollback(); throw $ex; }
-        catch (\Exception $ex) { $this->rollback(); throw $ex; }
     }
 }

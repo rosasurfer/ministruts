@@ -3,7 +3,7 @@ namespace rosasurfer\core\lock;
 
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\assert\Assert;
-use rosasurfer\core\debug\ErrorHandler;
+use rosasurfer\core\error\ErrorHandler;
 use rosasurfer\core\exception\RuntimeException;
 
 
@@ -88,6 +88,5 @@ class Lock extends BaseLock {
             $this->release();
         }
         catch (\Throwable $ex) { throw ErrorHandler::handleDestructorException($ex); }
-        catch (\Exception $ex) { throw ErrorHandler::handleDestructorException($ex); }
     }
 }

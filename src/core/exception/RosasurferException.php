@@ -2,32 +2,33 @@
 namespace rosasurfer\core\exception;
 
 use rosasurfer\core\ObjectTrait;
-use rosasurfer\core\debug\DebugHelper;
-use rosasurfer\di\DiAwareTrait;
-use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
+use rosasurfer\core\di\DiAwareTrait;
+use rosasurfer\core\error\ErrorHandler;
 
 
 /**
  * Base class for all "rosasurfer" exceptions.
  */
-class RosasurferException extends \Exception implements IRosasurferException {
+class RosasurferException extends \Exception implements RosasurferExceptionInterface {
 
     use RosasurferExceptionTrait, ObjectTrait, DiAwareTrait;
 
 
     /**
-     * Create a new instance. Parameters are identical to the built-in PHP {@link \Exception} and passed on.
+     * Create a new instance. Parameters are identical to the built-in PHP {@link \Exception} but stronger typed.
      *
-     * @param  string                $message [optional] - exception description
-     * @param  int                   $code    [optional] - exception identifier, typically an application id
-     * @param  \Exception|\Throwable $cause   [optional] - another exception (PHP5) or throwable (PHP7) causing this exception
+     * @param  string     $message [optional] - exception description
+     * @param  int        $code    [optional] - exception identifier (typically an application error id)
+     * @param  \Throwable $cause   [optional] - another throwable causing this throwable
      */
-    public function __construct($message=null, $code=null, $cause = null) {
+    public function __construct($message='', $code=0, $cause=null) {
         parent::__construct($message, $code, $cause);
     }
 
 
-    /**
+	/**
+     * Return the stack trace of the exception in a more readable way.
+     *
      * @return array
      */
     public function getBetterTrace() {
@@ -35,7 +36,7 @@ class RosasurferException extends \Exception implements IRosasurferException {
 
         if (!$betterTrace) {
             // transform the original stacktrace into a better one
-            $betterTrace = DebugHelper::fixTrace($this->getTrace(), $this->getFile(), $this->getLine());
+            $betterTrace = ErrorHandler::getBetterTrace($this->getTrace(), $this->getFile(), $this->getLine());
 
             /*
             // if the exception was thrown in a magic "__set()" shift frames until we reach the erroneous assignment
@@ -52,7 +53,6 @@ class RosasurferException extends \Exception implements IRosasurferException {
             }
             */
 
-            // store the new stacktrace
             $this->betterTrace = $betterTrace;
         }
         return $betterTrace;

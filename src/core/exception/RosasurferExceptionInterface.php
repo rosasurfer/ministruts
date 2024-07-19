@@ -7,20 +7,8 @@ namespace rosasurfer\core\exception;
  */
 interface RosasurferExceptionInterface {
 
-
     /**
-     * Add a message to the exception's existing message. Used during up-bubbling to add additional infos to an exception's
-     * original message.
-     *
-     * @param  string $message
-     *
-     * @return $this
-     */
-    public function addMessage($message);
-
-
-    /**
-     * Return the message of the {@link \Exception} or {@link \Throwable}.
+     * Return the message of the exception.
      *
      * @return string
      */
@@ -28,7 +16,7 @@ interface RosasurferExceptionInterface {
 
 
     /**
-     * Return the message of the {@link \Exception} or {@link \Throwable} in a more readable way.
+     * Return the message of the exception in a more readable way.
      *
      * @return string
      */
@@ -36,10 +24,28 @@ interface RosasurferExceptionInterface {
 
 
     /**
-     * Set the error code of an {@link \Exception} or {@link \Throwable}. Used during up-bubbling to add additional infos
-     * to an existing exception. Ignored if the exception's error code is already set.
+     * Add a message to the exception's existing message. Used to enrich the exception with additional data.
      *
-     * @param  int|string $code
+     * @param  string $message
+     *
+     * @return $this
+     */
+    public function appendMessage($message);
+
+
+    /**
+     * Return the error code of the exception.
+     *
+     * @return int
+     */
+    public function getCode();
+
+
+    /**
+     * Set the error code of an exception. Used to enrich the exception with additional data.
+     * Ignored if the error code is already set.
+     *
+     * @param  int $code
      *
      * @return $this
      */
@@ -47,15 +53,7 @@ interface RosasurferExceptionInterface {
 
 
     /**
-     * Return the error code of the {@link \Exception} or {@link \Throwable}.
-     *
-     * @return int|string
-     */
-    public function getCode();
-
-
-    /**
-     * Return the filename where the {@link \Exception} or {@link \Throwable} was created.
+     * Return the name of the file where the exception was created.
      *
      * @return string
      */
@@ -63,7 +61,7 @@ interface RosasurferExceptionInterface {
 
 
     /**
-     * Return the line number of the file where the {@link \Exception} or {@link \Throwable} was created.
+     * Return the line of the file where the exception was created.
      *
      * @return int
      */
@@ -71,15 +69,7 @@ interface RosasurferExceptionInterface {
 
 
     /**
-     * Return the name of the function or method (if any) where the {@link \Exception} or {@link \Throwable} was created.
-     *
-     * @return string
-     */
-    public function getFunction();
-
-
-    /**
-     * Return the stack trace of the {@link \Exception} or {@link \Throwable}.
+     * Return the stack trace of the exception.
      *
      * @return array
      */
@@ -87,7 +77,7 @@ interface RosasurferExceptionInterface {
 
 
     /**
-     * Return the stack trace of the {@link \Exception} or {@link \Throwable} as a string.
+     * Return the stack trace of the exception as a string.
      *
      * @return string
      */
@@ -95,7 +85,7 @@ interface RosasurferExceptionInterface {
 
 
 	/**
-     * Return the stack trace of the {@link \Exception} or {@link \Throwable} in a more readable way (Java-like).
+     * Return the stack trace of the exception in a more readable way.
      *
      * @return array
      */
@@ -103,8 +93,7 @@ interface RosasurferExceptionInterface {
 
 
     /**
-     * Return a string representation of the stack trace of the {@link \Exception} or {@link \Throwable} in a more readable
-     * way (Java-like).
+     * Return the stacktrace of the exception in a more readable way as a string. The returned string contains nested exceptions.
      *
      * @return string
      */
@@ -112,15 +101,15 @@ interface RosasurferExceptionInterface {
 
 
     /**
-     * Return the {@link \Exception} or {@link \Throwable} (if any) causing this exception.
+     * Return the throwable causing this throwable (if any).
      *
-     * @return \Exception|\Throwable?
+     * @return ?\Throwable
      */
 	public function getPrevious();
 
 
     /**
-     * Return a string representation of the {@link \Exception} or {@link \Throwable}.
+     * Return a string representation of the exception.
      *
      * @return string
      */

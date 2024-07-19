@@ -3,8 +3,8 @@ namespace rosasurfer\ministruts;
 
 use rosasurfer\Application;
 use rosasurfer\core\CObject;
+use rosasurfer\core\di\proxy\Request as RequestProxy;
 use rosasurfer\core\exception\IllegalStateException;
-use rosasurfer\di\proxy\Request as RequestProxy;
 
 use function rosasurfer\strLeft;
 use function rosasurfer\strRightFrom;
@@ -40,7 +40,7 @@ class Tile extends CObject {
     protected $properties = [];
 
     /**
-     * @var Tile? - Die zur Laufzeit diese Tile-Instanz umgebende Instanz oder NULL, wenn diese Instanz das aeusserste
+     * @var ?Tile - Die zur Laufzeit diese Tile-Instanz umgebende Instanz oder NULL, wenn diese Instanz das aeusserste
      *              Fragment der Ausgabe darstellt.
      */
     protected $parent;
@@ -128,7 +128,7 @@ class Tile extends CObject {
     /**
      * Whether the MVC push model is activated for the tile.
      *
-     * @return bool? - configured state or NULL if the state is inherited from a surrounding element
+     * @return ?bool - configured state or NULL if the state is inherited from a surrounding element
      */
     public function isPushModelSupport() {
         return $this->pushModelSupport;
@@ -243,7 +243,7 @@ class Tile extends CObject {
         foreach ($nestedTiles as $tile) {
             $tile->setParent($this);
         }
-        $properties  = $this->getMergedProperties();
+        $properties = $this->getMergedProperties();
 
         if (!defined($namespace.'APP')) {
             define($namespace.'APP', strLeft($appUri, -1));

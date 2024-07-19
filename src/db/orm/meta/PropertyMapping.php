@@ -52,7 +52,7 @@ class PropertyMapping extends CObject {
     /**
      * Return the property's column name (if any).
      *
-     * @return string?
+     * @return ?string
      */
     public function getColumn() {
         return isset($this->mapping['column']) ? $this->mapping['column'] : null;

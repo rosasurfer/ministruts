@@ -138,47 +138,6 @@ function boolToStr($value) {
 
 
 /**
- * Dumps a variable to the standard output device or into a string.
- *
- * @param  mixed $var                     - variable
- * @param  bool  $return       [optional] - TRUE,  if the variable is to be dumped into a string <br>
- *                                          FALSE, if the variable is to be dumped to the standard output device (default)
- * @param  bool  $flushBuffers [optional] - whether to flush output buffers on output (default: TRUE)
- *
- * @return string? - string if the result is to be returned, NULL otherwise
- */
-function dump($var, $return=false, $flushBuffers=true) {
-    return \rosasurfer\dump($var, $return, $flushBuffers);
-}
-
-
-/**
- * Functional replacement for <tt>"echo($var)"</tt> which is a language construct and can't be used as a regular function.
- *
- * @param  mixed $var
- * @param  bool  $flushBuffers [optional] - whether to flush output buffers (default: TRUE)
- */
-function echof($var, $flushBuffers = true) {
-    \rosasurfer\echof($var, $flushBuffers);
-}
-
-
-/**
- * Alias of printPretty($var, false, $flushBuffers)
- *
- * Prints a variable in a pretty way. Output always ends with a line feed.
- *
- * @param  mixed $var
- * @param  bool  $flushBuffers [optional] - whether to flush output buffers (default: TRUE)
- *
- * @see    printPretty()
- */
-function echoPre($var, $flushBuffers = true) {
-    \rosasurfer\echoPre($var, $flushBuffers);
-}
-
-
-/**
  * Print a message to STDOUT.
  *
  * @param  string $message
@@ -199,7 +158,7 @@ function stderr($message) {
 
 
 /**
- * Send an "X-Debug-???" header with a message. Each sent header name will end with a different and increasing number.
+ * Send an "X-Debug-{id}" header with a message. Each sent header will have a different and increasing id.
  *
  * @param  mixed $message
  */
@@ -209,21 +168,32 @@ function debugHeader($message) {
 
 
 /**
- * Alias of {@link printPretty()}
- *
- * Prints a variable in a pretty way. Output always ends with a line feed.
+ * Dumps a variable to the screen or into a string.
  *
  * @param  mixed $var                     - variable
- * @param  bool  $return       [optional] - TRUE,  if the result is to be returned as a string <br>
- *                                          FALSE, if the result is to be printed to the standard output device (default)
+ * @param  bool  $return       [optional] - TRUE,  if the variable is to be dumped into a string <br>
+ *                                          FALSE, if the variable is to be dumped to the standard output device (default)
  * @param  bool  $flushBuffers [optional] - whether to flush output buffers on output (default: TRUE)
  *
- * @return string? - string if the result is to be returned, NULL otherwise
- *
- * @see    printPretty()
+ * @return ?string - string if the result is to be returned, NULL otherwise
  */
-function pp($var, $return=false, $flushBuffers=true) {
-    return \rosasurfer\pp($var, $return, $flushBuffers);
+function dump($var, $return=false, $flushBuffers=true) {
+    return \rosasurfer\dump($var, $return, $flushBuffers);
+}
+
+
+/**
+ * Alias of print_p($var, false, $flushBuffers)
+ *
+ * Outputs a variable in a formatted and pretty way. Output always ends with a line feed.
+ *
+ * @param  mixed $var
+ * @param  bool  $flushBuffers [optional] - whether to flush output buffers (default: yes)
+ *
+ * @return bool - always TRUE
+ */
+function echof($var, $flushBuffers = true) {
+    return \rosasurfer\echof($var, $flushBuffers);
 }
 
 
@@ -232,13 +202,13 @@ function pp($var, $return=false, $flushBuffers=true) {
  *
  * @param  mixed $var                     - variable
  * @param  bool  $return       [optional] - TRUE,  if the result is to be returned as a string <br>
- *                                          FALSE, if the result is to be printed to the standard output device (default)
+ *                                          FALSE, if the result is to be printed to the screen (default)
  * @param  bool  $flushBuffers [optional] - whether to flush output buffers on output (default: TRUE)
  *
- * @return string? - string if the result is to be returned, NULL otherwise
+ * @return ?string - string if the result is to be returned, NULL otherwise
  */
-function printPretty($var, $return=false, $flushBuffers=true) {
-    return \rosasurfer\printPretty($var, $return, $flushBuffers);
+function print_p($var, $return=false, $flushBuffers=true) {
+    return \rosasurfer\print_p($var, $return, $flushBuffers);
 }
 
 
@@ -256,7 +226,7 @@ function prettyBytes($value, $decimals = 1) {
 
 
 /**
- * Convert a byte value to an integer supporting php.ini shorthand notation ("K", "M", "G").
+ * Convert a byte value to an integer supporting "php.ini" shorthand notation ("K", "M", "G").
  *
  * @param  string|int $value - byte value
  *
@@ -283,17 +253,16 @@ function numf($number, $decimals=0, $decimalSeparator='.', $thousandsSeparator='
 
 
 /**
- * Return the value of a php.ini option as a boolean.
+ * Return the value of a "php.ini" option as a boolean.
  *
- * NOTE: Never use ini_get() to read boolean php.ini values as it will return the plain string passed to ini_set().
+ * NOTE: Don't use ini_get() to read boolean "php.ini" values as it will return the plain string as passed to ini_set().
  *
  * @param  string $option            - option name
- * @param  bool   $strict [optional] - Whether to enable strict checking of the found value:
- *                                     TRUE:  invalid values cause a runtime exception
- *                                     FALSE: invalid values are converted to the target type (i.e. boolean)
- *                                     (default: TRUE)
+ * @param  bool   $strict [optional] - whether to enable strict checking of the found value:
+ *                                     TRUE:  invalid values cause a runtime exception (default)
+ *                                     FALSE: invalid values are converted to a boolean
  *
- * @return bool? - boolean value or NULL if the setting doesn't exist
+ * @return ?bool - boolean value or NULL if the setting doesn't exist
  */
 function ini_get_bool($option, $strict = true) {
     return \rosasurfer\ini_get_bool($option, $strict);
@@ -301,17 +270,16 @@ function ini_get_bool($option, $strict = true) {
 
 
 /**
- * Return the value of a php.ini option as an integer.
+ * Return the value of a "php.ini" option as an integer.
  *
- * NOTE: Never use ini_get() to read php.ini integer values as it will return the plain string passed to ini_set().
+ * NOTE: Don't use ini_get() to read "php.ini" integer values as it will return the plain string as passed to ini_set().
  *
  * @param  string $option            - option name
- * @param  bool   $strict [optional] - Whether to enable strict checking of the found value:
- *                                     TRUE:  invalid values cause a runtime exception
- *                                     FALSE: invalid values are converted to the target type (i.e. integer)
- *                                     (default: TRUE)
+ * @param  bool   $strict [optional] - whether to enable strict checking of the found value:
+ *                                     TRUE:  invalid values cause a runtime exception (default)
+ *                                     FALSE: invalid values are converted to an integer
  *
- * @return int? - integer value or NULL if the setting doesn't exist
+ * @return ?int - integer value or NULL if the setting doesn't exist
  */
 function ini_get_int($option, $strict = true) {
     return \rosasurfer\ini_get_int($option, $strict);
@@ -319,17 +287,16 @@ function ini_get_int($option, $strict = true) {
 
 
 /**
- * Return the value of a php.ini option as a byte value supporting PHP shorthand notation ("K", "M", "G").
+ * Return the value of a "php.ini" option as a byte value supporting PHP shorthand notation ("K", "M", "G").
  *
- * NOTE: Never use ini_get() to read php.ini byte values as it will return the plain string passed to ini_set().
+ * NOTE: Don't use ini_get() to read "php.ini" byte values as it will return the plain string as passed to ini_set().
  *
  * @param  string $option            - option name
- * @param  bool   $strict [optional] - Whether to enable strict checking of the found value:
- *                                     TRUE:  invalid values cause a runtime exception
- *                                     FALSE: invalid values are converted to the target type (i.e. integer)
- *                                     (default: TRUE)
+ * @param  bool   $strict [optional] - whether to enable strict checking of the found value:
+ *                                     TRUE:  invalid values cause a runtime exception (default)
+ *                                     FALSE: invalid values are converted to an integer
  *
- * @return int? - integer value or NULL if the setting doesn't exist
+ * @return ?int - integer value or NULL if the setting doesn't exist
  */
 function ini_get_bytes($option, $strict = true) {
     return \rosasurfer\ini_get_bytes($option, $strict);
@@ -343,7 +310,7 @@ function ini_get_bytes($option, $strict = true) {
  *
  * @param  string $string
  * @param  int    $flags        [optional] - default: ENT_QUOTES|ENT_SUBSTITUTE|ENT_HTML5
- * @param  string $encoding     [optional] - default: ini_get("default_charset")
+ * @param  string $encoding     [optional] - default: 'UTF-8'
  * @param  bool   $doubleEncode [optional] - default: TRUE
  *
  * @return string - converted string
@@ -520,7 +487,7 @@ function strLeft($string, $length) {
  *                                             (default: 1 = the first occurrence)
  * @param  bool   $includeLimiter [optional] - whether to include the limiting substring in the returned result
  *                                             (default: FALSE)
- * @param  mixed  $onNotFound     [optional] - value to return if the specified occurrence of the limiting substring is not found
+ * @param  string $onNotFound     [optional] - string to return if the specified occurrence of the limiter is not found
  *                                             (default: the initial string)
  *
  * @return string - left part of the initial string or the $onNotFound value
@@ -531,10 +498,10 @@ function strLeft($string, $length) {
  *  strLeftTo('abcde', 'x')      => 'abcde'   // limiter not found
  *  strLeftTo('abccc', 'c',   3) => 'abcc'
  *  strLeftTo('abccc', 'c',  -3) => 'ab'
- *  strLeftTo('abccc', 'c', -99) => 'abccc'   // number of occurrences not found
+ *  strLeftTo('abccc', 'c', -99) => 'abccc'   // number of occurrences doesn't exist
  * </pre>
  */
-function strLeftTo($string, $limiter, $count=1, $includeLimiter=false, $onNotFound=null) {
+function strLeftTo($string, $limiter, $count=1, $includeLimiter=false, $onNotFound='') {
     return \rosasurfer\strLeftTo(...func_get_args());
 }
 
@@ -572,7 +539,7 @@ function strRight($string, $length) {
  *                                             (default: 1 = the first occurrence)
  * @param  bool   $includeLimiter [optional] - whether to include the limiting substring in the returned result
  *                                             (default: FALSE)
- * @param  mixed  $onNotFound     [optional] - value to return if the specified occurrence of the limiting substring is not found
+ * @param  string $onNotFound     [optional] - value to return if the specified occurrence of the limiting substring is not found
  *                                             (default: empty string)
  *
  * @return string - right part of the initial string or the $onNotFound value
@@ -639,8 +606,7 @@ function strIsDigits($value) {
 
 
 /**
- * Whether a string represents a valid integer value, i.e. consists of only digits and optionally a leading "-" (minus)
- * character.
+ * Whether a string represents a valid integer value, i.e. consists of only digits and optionally a leading "-" (minus) character.
  *
  * @param  scalar $value
  *
@@ -670,7 +636,7 @@ function strIsNumeric($value) {
  *
  * @param  mixed $value - boolean representation
  *
- * @return bool? - Boolean or NULL if the parameter doesn't represent a boolean. The accepted values of a boolean's
+ * @return ?bool - Boolean or NULL if the parameter doesn't represent a boolean. The accepted values of a boolean's
  *                 numerical string representation (integer or float) are 0 (zero) and 1 (one).
  */
 function strToBool($value) {
@@ -693,9 +659,8 @@ function strCollapseWhiteSpace($string, $joinLines=true, $separator=' ') {
 
 
 /**
- * Normalize line endings of a string. If the string contains mixed line endings the number of lines of the original
- * and the resulting string may differ. Netscape line endings are honored only if all line endings are Netscape format
- * (no mixed mode).
+ * Normalize line endings of a string. If the string contains mixed line endings the number of lines of the original and the
+ * resulting string may differ. Netscape line endings are honored only if all line endings are Netscape format (no mixed mode).
  *
  * @param  string $string          - string to normalize
  * @param  string $mode [optional] - format of the resulting string, can be one of:                             <br>
@@ -755,7 +720,7 @@ function is_dir_empty($dirname, $ignore = []) {
  *
  * @param  string $name - name
  *
- * @return string? - the same name or NULL if a component of that name doesn't exist or couldn't be loaded
+ * @return ?string - the same name or NULL if a component of that name doesn't exist or couldn't be loaded
  */
 function autoload($name) {
     return \rosasurfer\autoload($name);
@@ -804,12 +769,12 @@ function is_trait($name) {
 /**
  * Return the simple name of a class name (i.e. the base name).
  *
- * @param  string $className - full class name
+ * @param  string|object $class - class name or instance
  *
  * @return string
  */
-function simpleClassName($className) {
-    return \rosasurfer\simpleClassName($className);
+function simpleClassName($class) {
+    return \rosasurfer\simpleClassName($class);
 }
 
 
@@ -940,17 +905,28 @@ function ifEmpty($value, $altValue) {
 
 
 /**
- * Return a sorted copy of the specified array using the algorythm and parameters of ksort().
+ * Return the host name of the internet host specified by a given IP address.
+ *
+ * @param  string $ipAddress - the host IP address
+ *
+ * @return string - the host name on success, or the unmodified IP address on resolver error
+ */
+function getHostByAddress($ipAddress) {
+    return \rosasurfer\getHostByAddress($ipAddress);
+}
+
+
+/**
+ * Return a sorted copy of the specified array using the algorythm and parameters of {@link \ksort()}.
+ * Opposite to ksort() this function will not modify the passed array.
  *
  * @param  array $values
  * @param  int   $sort_flags [optional]
  *
  * @return array
- *
- * @see    ksort()
  */
-function ksort_r(array $values, $sort_flags = SORT_REGULAR) {
-    return \rosasurfer\ksort_r($values, $sort_flags);
+function ksortc(array $values, $sort_flags = SORT_REGULAR) {
+    return \rosasurfer\ksortc($values, $sort_flags);
 }
 
 
@@ -958,8 +934,8 @@ function ksort_r(array $values, $sort_flags = SORT_REGULAR) {
  * Return a pluralized string according to the specified number of items.
  *
  * @param  int    $count               - the number of items to determine the output from
- * @param  string $singular [optional] - singular form of string
- * @param  string $plural   [optional] - plural form of string
+ * @param  string $singular [optional] - singular form of string (default: empty string)
+ * @param  string $plural   [optional] - plural form of string (default: "s")
  *
  * @return string
  */
@@ -1024,9 +1000,9 @@ function asset($uri) {
 
 
 /**
- * Parse command line arguments and match them against the specified {@link http://docopt.org} syntax definition.
+ * Parse command line arguments and match them against the specified {@link http://docopt.org/#} syntax definition.
  *
- * @param  string          $doc                - help text, i.e. a syntax definition in docopt language format
+ * @param  string          $doc                - help text, i.e. a syntax definition in Docopt language format
  * @param  string|string[] $args    [optional] - arguments to parse (default: the arguments passed in $_SERVER['args'])
  * @param  array           $options [optional] - parser options (default: none)
  *
