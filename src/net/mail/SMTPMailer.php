@@ -27,8 +27,8 @@ class SMTPMailer extends Mailer {
         'timeout' => 300,                   // socket timeout
     ];
 
-    /** @var resource */
-    private $connection;
+    /** @var ?resource */
+    private $connection = null;
 
     /** @var int */
     private $responseStatus = 0;

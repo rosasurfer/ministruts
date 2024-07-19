@@ -98,7 +98,7 @@ abstract class Mailer extends CObject implements MailerInterface {
      *
      * @param  string $value
      *
-     * @return string[]? - aray with name and address part or NULL if the specified address is invalid
+     * @return ?string[] - aray with name and address part or NULL if the specified address is invalid
      */
     public static function parseAddress($value) {
         Assert::string($value);

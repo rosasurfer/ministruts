@@ -63,8 +63,8 @@ class SQLiteConnector extends Connector {
     /** @var string[] - configuration options */
     protected $options = [];
 
-    /** @var \SQLite3 - internal database handler instance */
-    protected $sqlite;
+    /** @var ?\SQLite3 - internal database handler instance */
+    protected $sqlite = null;
 
     /** @var int - transaction nesting level */
     protected $transactionLevel = 0;

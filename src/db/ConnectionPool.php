@@ -47,10 +47,12 @@ final class ConnectionPool extends Singleton {
     /**
      * Return the Singleton instance of this class.
      *
-     * @return static
+     * @return self
      */
     public static function me() {
-        return self::getInstance(static::class);
+        /** @var self $instance */
+        $instance = self::getInstance(static::class);
+        return $instance;
     }
 
 
@@ -79,7 +81,7 @@ final class ConnectionPool extends Singleton {
             if (!$options) throw new IllegalStateException('No configuration found for database alias "'.$id.'"');
 
             // resolve the class name to use for the connector
-            $className = $options['connector']; 
+            $className = $options['connector'];
             unset($options['connector']);
             $className = str_replace('/', '\\', $className);
             if ($className[0]=='\\') $className = substr($className, 1);

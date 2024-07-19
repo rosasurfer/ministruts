@@ -22,8 +22,8 @@ use function rosasurfer\strRightFrom;
 class CurlHttpClient extends HttpClient {
 
 
-    /** @var resource - Curl-Handle */
-    protected $hCurl;
+    /** @var ?resource - Curl-Handle */
+    protected $hCurl = null;
 
     /** @var int - Zaehler fuer manuelle Redirects (falls "open_basedir" aktiv ist) */
     protected $manualRedirects = 0;

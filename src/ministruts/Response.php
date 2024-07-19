@@ -36,16 +36,18 @@ class Response extends Singleton {
 
 
     /**
-     * Gibt die Singleton-Instanz dieser Klasse zurueck, wenn das Script im Kontext eines HTTP-Requestes aufgerufen
-     * wurde&#46;  In allen anderen Faellen, z.B&#46; bei Aufruf in der Konsole, wird NULL zurueckgegeben.
+     * Gibt die Singleton-Instanz dieser Klasse zurueck.
      *
-     * @return static
+     * @return self
      *
      * @throws RuntimeException if not called from the web interface
      */
     public static function me() {
         if (CLI) throw new RuntimeException('Cannot create a '.static::class.' instance in a non-web context.');
-        return self::getInstance(static::class);
+
+        /** @var self $instance */
+        $instance = self::getInstance(static::class);
+        return $instance;
     }
 
 

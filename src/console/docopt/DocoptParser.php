@@ -42,8 +42,8 @@ class DocoptParser extends CObject {
     /** @var bool */
     protected $exitFullUsage = false;
 
-    /** @var string - help text displayed with every parser generated output */
-    protected $autoHelp;
+    /** @var ?string - help text displayed with every parser generated output */
+    protected $autoHelp = null;
 
     /** @var string */
     protected $version;

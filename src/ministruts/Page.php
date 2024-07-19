@@ -26,10 +26,12 @@ class Page extends Singleton {
     /**
      * Return the {@link Singleton} instance of this class.
      *
-     * @return static
+     * @return self
      */
     public static function me() {
-        return self::getInstance(static::class);
+        /** @var self $instance */
+        $instance = self::getInstance(static::class);
+        return $instance;
     }
 
 
