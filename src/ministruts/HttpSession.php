@@ -24,12 +24,12 @@ class HttpSession extends Singleton {
     /**
      * Return the {@link Singleton} instance.
      *
-     * @return self
+     * @return static
      *
      * @throws RuntimeException if not called from the web interface
      */
     public static function me() {
-        /** @var self $instance */
+        /** @var static $instance */
         $instance = self::getInstance(static::class);
         return $instance;
     }

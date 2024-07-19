@@ -38,14 +38,14 @@ class Response extends Singleton {
     /**
      * Gibt die Singleton-Instanz dieser Klasse zurueck.
      *
-     * @return self
+     * @return static
      *
      * @throws RuntimeException if not called from the web interface
      */
     public static function me() {
         if (CLI) throw new RuntimeException('Cannot create a '.static::class.' instance in a non-web context.');
 
-        /** @var self $instance */
+        /** @var static $instance */
         $instance = self::getInstance(static::class);
         return $instance;
     }

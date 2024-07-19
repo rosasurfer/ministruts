@@ -1231,12 +1231,12 @@ class Request extends CObject {
     /**
      * Return the instance currently registered in the service container.
      *
-     * @return self
+     * @return static
      *
      * @deprecated
      */
     public static function me() {
-        /** @var self $instance */
+        /** @var static $instance */
         $instance = self::di(__CLASS__);
         return $instance;
     }
