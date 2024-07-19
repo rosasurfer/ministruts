@@ -14,8 +14,8 @@ use rosasurfer\core\assert\Assert;
 class Input extends CObject {
 
 
-    /** @var DocoptResult */
-    private $docoptResult;
+    /** @var ?DocoptResult */
+    private $docoptResult = null;
 
 
     /**
@@ -34,7 +34,7 @@ class Input extends CObject {
     /**
      * Return the internal docopt result.
      *
-     * @return DocoptResult
+     * @return ?DocoptResult
      */
     public function getDocoptResult() {
         return $this->docoptResult;
@@ -75,8 +75,9 @@ class Input extends CObject {
 
         if ($this->isCommand($name)) {
             $value = $this->docoptResult[$name];
-            if (is_int($value) && $value > 1)
+            if (is_int($value) && $value > 1) {
                 return $value;
+            }
             return (bool) $value;
         }
         return false;

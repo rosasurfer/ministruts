@@ -31,14 +31,14 @@ class Command extends CObject {
     /** @var string - syntax definition in docopt format */
     private $docoptDefinition;
 
-    /** @var DocoptResult - parsed and matched docopt block */
-    private $docoptResult;
+    /** @var ?DocoptResult - parsed and matched docopt block */
+    private $docoptResult = null;
 
-    /** @var \Closure */
-    private $validator;
+    /** @var ?\Closure */
+    private $validator = null;
 
-    /** @var \Closure */
-    private $task;
+    /** @var ?\Closure */
+    private $task = null;
 
     /** @var bool - whether the command configuration is frozen */
     private $frozen = false;
@@ -84,8 +84,9 @@ class Command extends CObject {
         if ($this->validator) $error = $this->validator->__invoke($input, $output);
         else                  $error = $this->validate($input, $output);
 
-        if ($error)
+        if ($error) {
             return $this->status = (int) $error;
+        }
 
         if ($this->task) $status = $this->task->__invoke($input, $output);
         else             $status = $this->execute($input, $output);
@@ -273,8 +274,8 @@ class Command extends CObject {
      */
     final public function freeze() {
         if (!$this->frozen) {
-            if (!isset($this->name))         throw new IllegalStateException('Incomplete command configuration: no name');
-            if (!isset($this->docoptResult)) throw new IllegalStateException('Incomplete command configuration: no docopt definition');
+            if ($this->name === '')   throw new IllegalStateException('Incomplete command configuration: no name');
+            if (!$this->docoptResult) throw new IllegalStateException('Incomplete command configuration: no docopt definition');
             $this->frozen = true;
         }
         return $this;
@@ -292,8 +293,9 @@ class Command extends CObject {
         Assert::string($name);
         if ($name != trim($name)) throw new InvalidArgumentException('Invalid parameter $name: "'.$name.'" (enclosing white space)');
 
-        if (strlen($name) && !preg_match('/^[^\s:]+(:[^\s:]+)*$/', $name))
+        if (strlen($name) && !preg_match('/^[^\s:]+(:[^\s:]+)*$/', $name)) {
             throw new InvalidArgumentException('Invalid parameter $name: "'.$name.'" (not a command name)');
+        }
         return $this;
     }
 }

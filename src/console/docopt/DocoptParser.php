@@ -196,7 +196,7 @@ class DocoptParser extends CObject {
                 while ($tokens->current() !== null) {
                     $parsed[] = new Argument(null, $tokens->move());
                 }
-                return $parsed;
+                return $parsed;                     // @phpstan-ignore-line
             }
             elseif (strStartsWith($tokens->current(), '--')) {
                 $parsed = array_merge($parsed, static::parseLong($tokens, $options));

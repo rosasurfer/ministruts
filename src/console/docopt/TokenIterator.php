@@ -75,6 +75,6 @@ class TokenIterator extends \ArrayIterator {
         while (($token=$this->move()) !== null) {
             $left[] = $token;
         }
-        return $left;
+        return $left;           // @phpstan-ignore-line
     }
 }

@@ -36,8 +36,8 @@ abstract class CachePeer extends CObject {
     /** @var array */
     protected $options;
 
-    /** @var ReferencePool */
-    private $referencePool;
+    /** @var ?ReferencePool */
+    private $referencePool = null;
 
 
     /**
@@ -46,8 +46,9 @@ abstract class CachePeer extends CObject {
      * @return ReferencePool
      */
     protected function getReferencePool() {
-        if (!$this->referencePool)
+        if (!$this->referencePool) {
             $this->referencePool = new ReferencePool($this->label);
+        }
         return $this->referencePool;
     }
 

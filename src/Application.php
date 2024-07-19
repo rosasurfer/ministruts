@@ -96,27 +96,27 @@ class Application extends CObject {
 
         if (isset($_GET['__phpinfo__']) || isset($_GET['__config__']) || isset($_GET['__cache__'])) {
             if (self::isAdminIP()) {
-                foreach (\array_keys($_GET) as $param) {
+                foreach ($_GET as $param => $value) {
                     if ($param == '__phpinfo__') {
                         if ($configInfoTask) {
-                            $phpInfoTask            = false;
+                            $phpInfoTask = false;
                             $phpInfoAfterConfigTask = true;
                         }
                         else {
                             $phpInfoTask = true;
                         }
-                        break;                                    // stop parsing after "__phpinfo__"
+                        break;                                  // stop parsing after "__phpinfo__"
                     }
                     else if ($param == '__config__') {
                         $configInfoTask = true;
-                        if ($phpInfoTask) {
-                            $phpInfoTask            = false;
+                        if ($phpInfoTask) {                     // @phpstan-ignore-line
+                            $phpInfoTask = false;
                             $phpInfoAfterConfigTask = true;
                         }
                     }
                     else if ($param == '__cache__') {
                         $cacheInfoTask = true;
-                        break;                                    // stop parsing after "__cache__"
+                        break;                                  // stop parsing after "__cache__"
                     }
                 }
             }
