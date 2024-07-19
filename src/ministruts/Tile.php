@@ -33,7 +33,7 @@ class Tile extends CObject {
     /** @var bool - whether the MVC push model is activated for the tile */
     protected $pushModelSupport;
 
-    /** @var Tile[] - nested tiles */
+    /** @var array<string, ?Tile> - nested tiles */
     protected $nestedTiles = [];
 
     /** @var array - additional tile properties */

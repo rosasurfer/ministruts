@@ -51,17 +51,17 @@ class Request extends CObject {
     /** @var array */
     private $_REQUEST;
 
-    /** @var ActionInput - all input */
-    private $allInput;
+    /** @var ?ActionInput - all input */
+    private $allInput = null;
 
-    /** @var ActionInput - GET input*/
-    private $getInput;
+    /** @var ?ActionInput - GET input*/
+    private $getInput = null;
 
-    /** @var ActionInput - POST input */
-    private $postInput;
+    /** @var ?ActionInput - POST input */
+    private $postInput = null;
 
-    /** @var array - normalized array of files uploaded with the request */
-    private $files;
+    /** @var ?array - normalized array of files uploaded with the request */
+    private $files = null;
 
     /** @var array - additional variables context */
     private $attributes = [];
@@ -828,7 +828,7 @@ class Request extends CObject {
     public function isUserInRole($role) {
         Assert::string($role);
 
-        /** @var Module $module */
+        /** @var ?Module $module */
         $module = $this->getAttribute(MODULE_KEY);
         if (!$module) throw new RuntimeException('Current Struts module not found');
 
@@ -908,7 +908,7 @@ class Request extends CObject {
      * @param  ?string    $message - message; if NULL is passed the message for the specified key is removed
      */
     public function setActionMessage($key, $message) {
-        if (!is_string($key) && !is_int($key)) throw new InvalidTypeException('Illegal type of parameter $key: '.gettype($key));
+        if (!is_string($key) && !is_int($key)) throw new InvalidTypeException('Illegal type of parameter $key: '.gettype($key));    // @phpstan-ignore-line
         Assert::nullOrString($message, '$message');
 
         if (!isset($message)) {
@@ -1012,7 +1012,7 @@ class Request extends CObject {
      * @param  ?string    $message - message; if NULL is passed the error for the specified key is removed
      */
     public function setActionError($key, $message) {
-        if (!is_string($key) && !is_int($key)) throw new InvalidTypeException('Illegal type of parameter $key: '.gettype($key));
+        if (!is_string($key) && !is_int($key)) throw new InvalidTypeException('Illegal type of parameter $key: '.gettype($key));    // @phpstan-ignore-line
         Assert::nullOrString($message, '$message');
 
         if (!isset($message)) {

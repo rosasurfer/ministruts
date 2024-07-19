@@ -53,21 +53,22 @@ class FrontController extends Singleton {
             //                                                              //
             // $controller = $cache->get($class);                           // re-check after the lock is aquired
 
-                if (!$controller) {
-                    $controller = self::getInstance(static::class);
+            if (!$controller) {                                             // @phpstan-ignore-line
+                $controller = self::getInstance(static::class);
 
-                    $config = self::di('config');
-                    if (!$config) throw new RuntimeException('Application configuration not found');
+                $config = self::di('config');
+                if (!$config) throw new RuntimeException('Application configuration not found');
 
-                    $configDir  = $config['app.dir.config'];
-                    $configFile = str_replace('\\', '/', $configDir.'/struts-config.xml');
-                    $dependency = FileDependency::create($configFile);
-                    if (!WINDOWS && !LOCALHOST)                             // distinction dev/production?  TODO: non-sense
-                        $dependency->setMinValidity(1 * MINUTE);
-
-                    // ...and cache it with a FileDependency
-                    $cache->set(static::class, $controller, Cache::EXPIRES_NEVER, $dependency);
+                $configDir  = $config['app.dir.config'];
+                $configFile = str_replace('\\', '/', $configDir.'/struts-config.xml');
+                $dependency = FileDependency::create($configFile);
+                if (!WINDOWS && !LOCALHOST) {                               // distinction dev/production?  TODO: non-sense
+                    $dependency->setMinValidity(1 * MINUTE);
                 }
+
+                // ...and cache it with a FileDependency
+                $cache->set(static::class, $controller, Cache::EXPIRES_NEVER, $dependency);
+            }
 
             //$lock->release();
         }

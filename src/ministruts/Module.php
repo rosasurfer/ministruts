@@ -69,9 +69,9 @@ class Module extends CObject {
      * Default action mapping of the module or NULL if undefined. Used when a request does not match any other action mapping
      * (configurable).
      *
-     * @var ActionMapping
+     * @var ?ActionMapping
      */
-    protected $defaultMapping;
+    protected $defaultMapping = null;
 
     /** @var Tile[] - all tiles of the module (configurable) */
     protected $tiles = [];
@@ -94,8 +94,8 @@ class Module extends CObject {
     /** @var string - classname of the {@link RoleProcessor} implementation used by the module (configurable) */
     protected $roleProcessorClass;
 
-    /** @var RoleProcessor - the RoleProcessor instance used by the module */
-    protected $roleProcessor;
+    /** @var ?RoleProcessor - the RoleProcessor instance used by the module */
+    protected $roleProcessor = null;
 
     /** @var string[] - module initialization context for detecting circular tile references */
     protected $tilesContext = [];
@@ -278,7 +278,7 @@ class Module extends CObject {
             $mapping      = isset($tag['mapping'      ]) ? (string)$tag['mapping'      ] : null;
             $alias        = isset($tag['forward'      ]) ? (string)$tag['forward'      ] : null;
 
-            /** @var ActionForward $forward */
+            /** @var ?ActionForward $forward */
             $forward = null;
 
             if (isset($include)) {
@@ -290,11 +290,9 @@ class Module extends CObject {
                 if ($this->isTileDefinition($include, $xml)) {
                     $tile = $this->getTile($include, $xml);
                     if ($tile->isAbstract())                              throw new StrutsConfigException('<global-forwards> <forward name="'.$name.'" include="'.$include.'": The included tile is a template and cannot be used as a forward resource.');
-                    /** @var ActionForward $forward */
                     $forward = new $this->forwardClass($name, $include, false);
                 }
                 else {
-                    /** @var ActionForward $forward */
                     $forward = new $this->forwardClass($name, $this->findFile($include), false);
                 }
             }
@@ -302,8 +300,6 @@ class Module extends CObject {
             if (isset($redirect)) {
                 if (isset($include) || isset($mapping) || isset($alias))  throw new StrutsConfigException('<global-forwards> <forward name="'.$name.'": Only one of "include", "redirect", "mapping" or "forward" can be specified.');
                 $redirectType = $redirectType=='temporary' ? HttpResponse::SC_MOVED_TEMPORARILY : HttpResponse::SC_MOVED_PERMANENTLY;
-
-                /** @var ActionForward $forward */
                 $forward = new $this->forwardClass($name, $redirect, true, $redirectType);  // TODO: URL validieren
             }
             elseif (isset($tag['redirect-type']))                         throw new StrutsConfigException('<global-forwards> <forward name="'.$name.'": The "redirect" attribute must be specified if "redirect-type" is defined.');
@@ -313,8 +309,6 @@ class Module extends CObject {
                 $tag = first($xml->xpath('/struts-config/action-mappings/mapping[@name="'.$mapping.'"]') ?: []);
                 if (!$tag)                                                throw new StrutsConfigException('<global-forwards> <forward name="'.$name.'": Referenced action mapping "'.$mapping.'" not found.');
                 $path = (string)$tag['path'];
-
-                /** @var ActionForward $forward */
                 $forward = new $this->forwardClass($name, $path, true);
             }
 
@@ -378,16 +372,15 @@ class Module extends CObject {
                 $include = (string) $tag['include'];
                 if (!$this->isIncludable($include, $xml)) throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'" include="'.$include.'": '.(strStartsWith($include, '.') ? 'Tile definition':'File').' not found.');
 
+                /** @var ActionForward $forward */
                 $forward = null;
 
                 if ($this->isTileDefinition($include, $xml)) {
                     $tile = $this->getTile($include, $xml);
                     if ($tile->isAbstract()) throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'" include="'.$include.'": The included tile is a template and cannot be used in a "mapping" definition.');
-                    /** @var ActionForward $forward */
                     $forward = new $this->forwardClass('generic', $include, false);
                 }
                 else {
-                    /** @var ActionForward $forward */
                     $forward = new $this->forwardClass('generic', $this->findFile($include), false);
                 }
                 $mapping->setForward($forward);
@@ -411,7 +404,7 @@ class Module extends CObject {
                 if ($mapping->getForward()) throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'": Only one of "action", "include", "redirect", "forward" can be specified.');
                 $forwardAttr = (string) $tag['forward'];
 
-                /** @var ActionForward $forward */
+                /** @var ?ActionForward $forward */
                 $forward = $this->findForward($forwardAttr);
                 if (!$forward)              throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'": Forward "'.$forwardAttr.'" not found.');
                 $mapping->setForward($forward);
@@ -477,7 +470,6 @@ class Module extends CObject {
                 $mapping->setDefault($tag['default']=='true');
             }
 
-
             // process child nodes
             // -------------------
             // process all local forwards having no "forward" attribute
@@ -493,7 +485,7 @@ class Module extends CObject {
                 $mappingAttr  = isset($forwardTag['mapping'      ]) ? (string)$forwardTag['mapping'      ] : null;
                 $alias        = isset($forwardTag['forward'      ]) ? (string)$forwardTag['forward'      ] : null;
 
-                /** @var ActionForward $forward */
+                /** @var ?ActionForward $forward */
                 $forward = null;
 
                 if (isset($include)) {
@@ -505,11 +497,9 @@ class Module extends CObject {
                     if ($this->isTileDefinition($include, $xml)) {
                         $tile = $this->getTile($include, $xml);
                         if ($tile->isAbstract()) throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'"> <forward name="'.$name.'" include="'.$include.'": The included tile is a template and cannot be used as a forward resource.');
-                        /** @var ActionForward $forward */
                         $forward = new $this->forwardClass($name, $include, false);
                     }
                     else {
-                        /** @var ActionForward $forward */
                         $forward = new $this->forwardClass($name, $this->findFile($include), false);
                     }
                 }
@@ -517,8 +507,6 @@ class Module extends CObject {
                 if (isset($redirect)) {
                     if (isset($include) || isset($mappingAttr) || isset($alias)) throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'"> <forward name="'.$name.'": Only one of "include", "redirect", "mapping" or "forward" can be specified.');
                     $redirectType = $redirectType=='temporary' ? HttpResponse::SC_MOVED_TEMPORARILY : HttpResponse::SC_MOVED_PERMANENTLY;
-
-                    /** @var ActionForward $forward */
                     $forward = new $this->forwardClass($name, $redirect, true, $redirectType);  // TODO: URL validieren
                 }
                 elseif (isset($forwardTag['redirect-type'])) throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'"> <forward name="'.$name.'": The "redirect" attribute must be specified if "redirect-type" is defined.');
@@ -528,8 +516,6 @@ class Module extends CObject {
                     $mappingTag = first($xml->xpath('/struts-config/action-mappings/mapping[@name="'.$mappingAttr.'"]') ?: []);
                     if (!$mappingTag)                                         throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'"> <forward name="'.$name.'": Referenced action mapping "'.$mapping.'" not found.');
                     $mappingPath = (string)$mappingTag['path'];
-
-                    /** @var ActionForward $forward */
                     $forward = new $this->forwardClass($name, $mappingPath, true);
                 }
 

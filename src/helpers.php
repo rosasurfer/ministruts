@@ -1379,12 +1379,12 @@ function is_trait($name) {
  *
  * Complement for PHP's <tt>is_array()</tt> function adding support for {@link \ArrayAccess} parameters.
  *
- * @param  array|\ArrayAccess $var
+ * @param  ?mixed $var
  *
  * @return bool
  */
 function is_array_like($var) {
-    return is_array($var) || $var instanceof \ArrayAccess;
+    return \is_array($var) || $var instanceof \ArrayAccess;
 }
 
 

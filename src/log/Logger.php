@@ -255,7 +255,7 @@ class Logger extends StaticClass {
             // validate parameters
             if (!is_string($loggable)) {
                 Assert::hasMethod($loggable, '__toString', '$loggable');
-                if (!$loggable instanceof \Throwable && !$loggable instanceof \Exception) {
+                if (!$loggable instanceof \Throwable) {
                     $loggable = (string) $loggable;
                 }
             }

@@ -449,13 +449,13 @@ PROCESS_METHOD_ERROR_SC_405;
      * @param  Request $request
      */
     protected function restoreActionForm(Request $request) {
-        if ($request->hasSessionId() && $request->getSession()) {
+        if ($request->hasSessionId()) {
+            $request->getSession();                     // initialize session
             $oldFormKey = ACTION_FORM_KEY.'.old';
 
             if (isset($_SESSION[$oldFormKey])) {
                 $form = $_SESSION[$oldFormKey];
                 unset($_SESSION[$oldFormKey]);
-
                 $request->setAttribute($oldFormKey, $form);
             }
         }
@@ -470,14 +470,16 @@ PROCESS_METHOD_ERROR_SC_405;
      */
     protected function storeActionMessages(Request $request) {
         $errors = $request->getActionErrors();
-        if ($errors && $request->getSession()) {
+        if ($errors) {
+            $request->getSession();                     // initialize session
             if (isset($_SESSION[ACTION_ERRORS_KEY]))
                 $errors = \array_merge($_SESSION[ACTION_ERRORS_KEY], $errors);
             $_SESSION[ACTION_ERRORS_KEY] = $errors;
         }
 
         $messages = $request->getActionMessages();
-        if ($messages && $request->getSession()) {
+        if ($messages) {
+            $request->getSession();                     // initialize session
             if (isset($_SESSION[ACTION_MESSAGES_KEY]))
                 $messages = \array_merge($_SESSION[ACTION_MESSAGES_KEY], $messages);
             $_SESSION[ACTION_MESSAGES_KEY] = $messages;
@@ -492,7 +494,8 @@ PROCESS_METHOD_ERROR_SC_405;
      * @param  Request $request
      */
     protected function restoreActionMessages(Request $request) {
-        if ($request->hasSessionId() && $request->getSession()) {
+        if ($request->hasSessionId()) {
+            $request->getSession();                     // initialize session
             $messages = $errors = [];
 
             if (isset($_SESSION[ACTION_MESSAGES_KEY])) {

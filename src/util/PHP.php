@@ -430,34 +430,4 @@ class PHP extends StaticClass {
         if ($throwException) throw new RuntimeException('Cannot set php.ini option "'.$option.'" (former value="'.$oldValue.'")');
         return false;
     }
-
-
-    /**
-     * Return the query string of the current URL (if any).
-     *
-     * @return string
-     */
-    private static function getUrlQueryString() {
-        // The variable $_SERVER['QUERY_STRING'] is set by the server and can differ, e.g. it might hold additional
-        // parameters or it might be empty (nginx).
-
-        if (isset($_SERVER['QUERY_STRING']) && strlen($_SERVER['QUERY_STRING'])) {
-            $query = $_SERVER['QUERY_STRING'];
-        }
-        else {
-            $query = strRightFrom($_SERVER['REQUEST_URI'], '?');
-        }
-        return $query;
-    }
-
-
-    /**
-     * Return the hash string of the current URL (if any).
-     *
-     * @return string - hash including the hash mark or an empty string
-     */
-    private static function getUrlHash() {
-        $queryStr = self::getUrlQueryString();
-        return strRightFrom($queryStr, '#', 1, true);
-    }
 }

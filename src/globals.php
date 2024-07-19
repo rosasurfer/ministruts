@@ -767,6 +767,20 @@ function is_trait($name) {
 
 
 /**
+ * Whether a variable can be used like an array.
+ *
+ * Complement for PHP's <tt>is_array()</tt> function adding support for {@link \ArrayAccess} parameters.
+ *
+ * @param  ?mixed $var
+ *
+ * @return bool
+ */
+function is_array_like($var) {
+    return \rosasurfer\is_array_like($var);
+}
+
+
+/**
  * Return the simple name of a class name (i.e. the base name).
  *
  * @param  string|object $class - class name or instance

@@ -109,54 +109,15 @@ class Response extends Singleton {
     /**
      * Send a "Location" header (redirect) pointing to the specified URI&#46;  Afterwards the script is terminated.
      *
-     * @param  string $uri - absolute or relative URI
-     * @param  int    $type - redirect type: 301 (SC_MOVED_PERMANENTLY) or 302 (SC_MOVED_TEMPORARILY)
+     * @param  string $uri  - absolute or relative URI
+     * @param  int    $type - redirect type (SC_MOVED_TEMPORARILY | SC_MOVED_PERMANENTLY)
      */
-    public function redirect($uri, $type=HttpResponse::SC_MOVED_TEMPORARILY) {
+    public function redirect($uri, $type = HttpResponse::SC_MOVED_TEMPORARILY) {
         $currentUrl = RequestProxy::getUrl();
 
-        // HTTP/1.1 requires an absolute 'Location' value
-        $url = self::relativeToAbsoluteUrl($uri, $currentUrl);
-
-        // append session id if a session is active and URL rewriting is not disabled (strongly discouraged)
-        if (defined('SID') && strlen(SID)) {                        // empty string if the session id was submitted in a cookie
-            if (!ini_get_bool('session.use_only_cookies')) {        // TODO: check if session_destroy() resets SID
-                $cookie       = session_get_cookie_params();
-                $cookieDomain = strtolower(empty($cookie['domain']) ? RequestProxy::getHostname() : $cookie['domain']);
-                $cookiePath   =            empty($cookie['path'  ]) ? '/'                         : $cookie['path'  ];
-                $cookieSecure =                  $cookie['secure'];
-
-                $target       = parse_url($url);
-                $targetDomain = strtolower($target['host'  ]);
-                $targetPath   =      empty($target['path'  ]) ? '/' : $target['path'];
-                $targetSecure = strtolower($target['scheme']) == 'https';
-
-                $subdomains = false;
-                if ($cookieDomain[0] == '.') {                      // TODO: check if the leading dot is still required
-                    $subdomains = true;                             //       (@see http://bayou.io/draft/cookie.domain.html)
-                    $cookieDomain = substr($cookieDomain, 1);
-                }
-
-                if (/*domainMatch*/ preg_match('/\b'.$cookieDomain.'$/', $targetDomain) && ($cookieDomain==$targetDomain || $subdomains)) {
-                    if (/*pathMatch*/ strStartsWith($targetPath, $cookiePath)) {
-                        if (/*secureMatch*/ !$cookieSecure || $targetSecure) {
-                            if (isset($target['fragment']))  $url  = strLeft($url, strlen($hash = '#'.$target['fragment']));
-                            else if (strEndsWith($url, '#')) $url  = strLeft($url, strlen($hash = '#'));
-                            else                             $hash = '';
-
-                            $separator = !strContains($url, '?') ? '?' : '&';
-                            $url .= $separator.SID.$hash;
-                        }
-                    }
-                }
-            }
-        }
-
-        // set the header
-        header('Location: '.$url, true, $type);
-
-        // terminate the script
-        exit(0);
+        $url = self::relativeToAbsoluteUrl($uri, $currentUrl);  // HTTP/1.1 requires an absolute 'Location' value
+        header('Location: '.$url, true, $type);                 // set the header
+        exit(0);                                                // terminate the script
     }
 
 
@@ -168,8 +129,7 @@ class Response extends Singleton {
      *
      * @return string - absolute URL
      *
-     *
-     * TODO: Rewrite as parse_url() fails at query parameters with colons, e.g. "/beanstalk-console?server=vm-centos:11300".
+     * TODO: rewrite as parse_url() fails at query parameters with colons, e.g. "/beanstalk-console?server=vm-centos:11300"
      */
     public static function relativeToAbsoluteUrl($rel, $base) {
         $relFragment = strRightFrom($rel, '#');

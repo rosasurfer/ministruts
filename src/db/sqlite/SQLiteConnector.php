@@ -138,9 +138,9 @@ class SQLiteConnector extends Connector {
         if (!class_exists('SQLite3')) throw new RuntimeException('Undefined class \SQLite3 (sqlite3 extension is not available)');
 
         $flags = SQLITE3_OPEN_READWRITE;                                // available flags:
-        $ex = null;                                                     // SQLITE3_OPEN_CREATE
-        try {                                                           // SQLITE3_OPEN_READONLY
-            $this->sqlite = new \SQLite3($this->file, $flags);          // SQLITE3_OPEN_READWRITE
+        $ex = null;                                                     // 1: SQLITE3_OPEN_READONLY
+        try {                                                           // 2: SQLITE3_OPEN_READWRITE
+            $this->sqlite = new \SQLite3($this->file, $flags);          // 4: SQLITE3_OPEN_CREATE
         }
         catch (IRosasurferException $ex) {}
         catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
