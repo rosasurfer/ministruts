@@ -277,7 +277,7 @@ PROCESS_METHOD_ERROR_SC_405;
         if (empty($mapping->getRoles()))
             return true;
 
-        /** @var ?ActionForward|string $forward */
+        /** @var ActionForward|string|null $forward */
         $forward = $this->module->getRoleProcessor()->processRoles($request, $mapping);
         if (!isset($forward))
             return true;

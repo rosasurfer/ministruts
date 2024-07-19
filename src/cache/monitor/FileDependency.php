@@ -81,7 +81,7 @@ class FileDependency extends Dependency {
             if (!strlen($fileNames)) throw new InvalidArgumentException('Invalid argument $fileNames: '.$fileNames);
             $fileNames = [$fileNames];
         }
-        if (!$fileNames) throw new InvalidArgumentException('Invalid argument $fileNames: '.$fileNames);
+        if (!$fileNames) throw new InvalidArgumentException('Invalid argument $fileNames: []');
 
         $dependency = null;
 

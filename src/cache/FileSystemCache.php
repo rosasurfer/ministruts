@@ -76,7 +76,9 @@ final class FileSystemCache extends CachePeer {
         if (!$data) return false;           // cache miss
 
         // cache hit
+        /** @var int $created */
         $created    = $data[0];             // data: [created, $expires, $value, $dependency]
+        /** @var int $created */
         $expires    = $data[1];
         $value      = $data[2];
         $dependency = $data[3];
