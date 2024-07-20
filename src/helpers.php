@@ -672,9 +672,9 @@ function isRelativePath($path) {
 /**
  * Functional replacement for ($stringA === $stringB).
  *
- * @param  string $stringA
- * @param  string $stringB
- * @param  bool   $ignoreCase [optional] - default: no
+ * @param  ?string $stringA
+ * @param  ?string $stringB
+ * @param  bool    $ignoreCase [optional] - default: no
  *
  * @return bool
  */
