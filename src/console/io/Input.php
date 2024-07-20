@@ -19,8 +19,8 @@ class Input extends Object {
     /**
      * Constructor
      *
-     * NULL may be passed instead of an actual {@link DocoptResult} to initialize an empty default Input service.
-     * Such an instance will return an empty value on all command, argument or option queries.
+     * NULL may be passed instead of an actual {@link \rosasurfer\console\docopt\DocoptResult} to initialize an empty default Input
+     * service. Such an instance will return empty values on all command, argument or option queries.
      *
      * @param  DocoptResult $docopt [optional] - a parsed and matched docopt result
      */

@@ -5,7 +5,7 @@ use rosasurfer\di\DiAwareTrait;
 
 
 /**
- * Parent class of all "rosasurfer" classes. Other classes may directly use {@link ObjectTrait} and/or {@link DiAwareTrait}
+ * Parent class of all "rosasurfer" classes. Other classes may directly use {@link ObjectTrait} and/or {@link \rosasurfer\di\DiAwareTrait}
  * to implement the same functionality.
  */
 class Object {

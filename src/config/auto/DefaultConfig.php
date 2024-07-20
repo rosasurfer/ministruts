@@ -1,7 +1,6 @@
 <?php
 namespace rosasurfer\config\auto;
 
-use rosasurfer\Application;
 use rosasurfer\config\Config;
 use rosasurfer\exception\IllegalTypeException;
 use rosasurfer\exception\InvalidArgumentException;
@@ -10,19 +9,18 @@ use const rosasurfer\CLI;
 
 
 /**
- * An {@link Application}'s default configuration using Java-like property files.
+ * An {@link \rosasurfer\Application}'s default configuration using Java-like property files.
  *
- * A variant of the standard {@link Config}. It automatically loads and monitores a standard set of configuration files from
- * the directory "{app.dir.config}". These files are in the following order (later config settings with the same key override
- * existing ones):
+ * A variant of the standard {@link \rosasurfer\config\Config}. Loads and monitores a standard set of configuration files from directory
+ * "{app.dir.config}". Files are loaded in the following order (later config settings with the same key override existing ones):
  *
- *  - The framework config file: "config.properties"
+ *  - framework config file: "config.properties"
  *
- *  - The project config files:  "config.dist.properties"
- *                               "config.cli.properties" (if applicable)
+ *  - project config files:  "config.dist.properties"
+ *                           "config.cli.properties" (if called from CLI)
  *
- *  - An explicitely defined user config file, e.g. "config.production.properties" or the default user config file
- *    "config.properties" if no explicite definition is given.
+ *  - an explicitely defined user config file, e.g. "config.production.properties" or the default user config file
+ *    "config.properties" if no explicite definition is given
  */
 class DefaultConfig extends Config {
 

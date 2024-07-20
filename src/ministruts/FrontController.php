@@ -34,7 +34,7 @@ class FrontController extends Singleton {
 
 
     /**
-     * Return the {@link Singleton} instance of this class. The instance might be loaded from a cache.
+     * Return the {@link \rosasurfer\core\Singleton} instance of this class. The instance might be loaded from a cache.
      *
      * @return static
      */

@@ -24,7 +24,7 @@ class HttpSession extends Singleton {
 
 
     /**
-     * Return the {@link Singleton} instance.
+     * Return the {@link \rosasurfer\core\Singleton} instance.
      *
      * @param  Request $request - request the session belongs to
      *

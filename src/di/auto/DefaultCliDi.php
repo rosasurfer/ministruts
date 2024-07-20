@@ -10,7 +10,7 @@ use rosasurfer\di\service\Service;
 /**
  * Default DI automatically created for command-line interface applications.
  *
- * A variant of the standard {@link Di} especially suitable for CLI applications. It automatically registers all the
+ * A variant of the standard {@link \rosasurfer\di\Di} especially suitable for CLI applications. It automatically registers all the
  * services provided by the framework and loads user-defined services from the file "{app.dir.config}/services.php".
  */
 class DefaultCliDi extends Di {

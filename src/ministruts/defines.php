@@ -68,12 +68,12 @@ const ACTION_FORM_KEY = 'org.apache.struts.action.FORM';
 const ACTION_MAPPING_KEY = 'org.apache.struts.action.MAPPING';
 
 /**
- * Session key under which the currently selected {@link Locale} is stored.
+ * Session key under which the currently selected locale is stored.
  */
 const LOCALE_KEY = 'org.apache.struts.action.LOCALE';
 
 /**
- * Request key under which available {@link MessageResource}s are stored (i18n).
+ * Request key under which available message resources are stored (i18n).
  */
 const MESSAGES_KEY = 'org.apache.struts.action.MESSAGE_RESOURCES';
 
