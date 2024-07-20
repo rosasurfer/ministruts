@@ -430,7 +430,7 @@ class ErrorHandler extends StaticClass {
         else if (($flag &  E_ALL)                  ==  E_ALL)                  $levels = ['E_ALL'];                     // 32767
         else if (($flag & (E_ALL & ~E_DEPRECATED)) == (E_ALL & ~E_DEPRECATED)) $levels = ['E_ALL & ~E_DEPRECATED'];     // 24575
         else {
-            foreach (\array_keys($levels) as $key) {
+            foreach ($levels as $key => $v) {
                 if ($flag & $key) continue;
                 unset($levels[$key]);
             }
@@ -440,8 +440,8 @@ class ErrorHandler extends StaticClass {
 
 
     /**
-     * Return the message of an exception in a more readable way. Same as {@link IRosasurferException::getBetterMessage()} except that this
-     * method can be used with all PHP throwables.
+     * Return the message of an exception in a more readable way. Same as {@link \rosasurfer\core\exception\RosasurferException::getBetterMessage()}
+     * except that this method can be used with all PHP throwables.
      *
      * @param  \Throwable $exception
      * @param  string     $indent [optional] - indent all lines by the specified value (default: no indentation)
@@ -477,8 +477,8 @@ class ErrorHandler extends StaticClass {
 
 
     /**
-     * Takes a regular PHP stacktrace and adjusts it to be more readable. Same as {@link IRosasurferException::getBetterTrace()} except
-     * that this method can be used with all PHP exceptions.
+     * Takes a regular PHP stacktrace and adjusts it to be more readable. Same as {@link \rosasurfer\core\exception\RosasurferException::getBetterTrace()}
+     * except that this method can be used with all PHP exceptions.
      *
      * @param  array  $trace           - regular PHP stacktrace
      * @param  string $file [optional] - name of the file where the stacktrace was generated
@@ -555,7 +555,8 @@ class ErrorHandler extends StaticClass {
 
     /**
      * Return the stacktrace of an exception in a more readable way as a string. The returned string contains nested exceptions.
-     * Same as {@link IRosasurferException::getBetterTraceAsString()} except that this method can be used with all PHP exceptions.
+     * Same as {@link \rosasurfer\core\exception\RosasurferException::getBetterTraceAsString()} except that this method can be used with
+     * all PHP throwables.
      *
      * @param  \Throwable $exception
      * @param  string     $indent [optional] - indent the resulting lines by the specified value (default: no indentation)

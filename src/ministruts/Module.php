@@ -134,7 +134,7 @@ class Module extends CObject {
 
 
     /**
-     * Read and validate the module configuration, and convert it to a {@link SimpleXMLElement} instance.
+     * Read and validate the module configuration, and convert it to a {@link \rosasurfer\file\xml\SimpleXMLElement} instance.
      *
      * @param  string $fileName - full filename
      *
@@ -617,7 +617,6 @@ class Module extends CObject {
         $this->tilesContext[] = $name;
 
         // find the tile definition...
-        /** @var SimpleXMLElement[] $nodes */
         $nodes = $xml->xpath("/struts-config/tiles/tile[@name='".$name."']");
         if (!$nodes)            throw new StrutsConfigException('Tile named "'.$name.'" not found');
         if (sizeof($nodes) > 1) throw new StrutsConfigException('Multiple tiles named "'.$name.'" found');

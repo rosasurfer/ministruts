@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\core\di;
 
-use rosasurfer\core\di\service\ServiceInterface;
+use rosasurfer\core\di\service\ServiceInterface as Service;
 use rosasurfer\core\di\service\ServiceNotFoundException;
 
 use Psr\Container\ContainerInterface;
@@ -71,7 +71,7 @@ interface DiInterface extends \ArrayAccess, ContainerInterface {
      *
      * @param  string $name - service identifier
      *
-     * @return ?ServiceInterface - the removed service wrapper or NULL if no such service was found
+     * @return Service|null - the removed service or NULL if no such service was found
      */
     public function remove($name);
 }

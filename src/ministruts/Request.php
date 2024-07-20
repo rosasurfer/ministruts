@@ -172,7 +172,7 @@ class Request extends CObject {
      *
      * @return array - associative array of files
      *
-     * TODO: Convert the returned arrays to instances of {@link UploadedFile}.
+     * TODO: Convert the returned arrays to instances of UploadedFile.
      */
     public function getFiles() {
         if (!isset($this->files)) {
@@ -181,7 +181,7 @@ class Request extends CObject {
                 if (isset($file['name']) && is_array($file['name'])) {
                     $properties = \array_keys($file);
                     $normalized = [];
-                    foreach (\array_keys($file['name']) as $name) {
+                    foreach ($file['name'] as $name => $v) {
                         foreach ($properties as $property) {
                             $normalized[$name][$property] = $file[$property][$name];
                         }
@@ -191,6 +191,7 @@ class Request extends CObject {
                 }
                 return $file;
             };
+
             $this->files = [];
             foreach ($_FILES as $key => $file) {
                 $this->files[$key] = $normalizeLevel($file);
@@ -207,7 +208,7 @@ class Request extends CObject {
      *
      * @return ?array - array or NULL if no such file was uploaded
      *
-     * TODO: Convert the returned array to an instance of {@link UploadedFile}.
+     * TODO: Convert the returned array to an instance of UploadedFile.
      */
     public function getFile($name) {
         Assert::string($name);

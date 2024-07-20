@@ -122,7 +122,7 @@ final class RequestData extends CObject {
                 if (isset($file['name']) && is_array($file['name'])) {
                     $properties = array_keys($file);
                     $normalized = [];
-                    foreach (\array_keys($file['name']) as $name) {
+                    foreach ($file['name'] as $name => $v) {
                         foreach ($properties as $property) {
                             $normalized[$name][$property] = $file[$property][$name];
                         }
@@ -132,6 +132,7 @@ final class RequestData extends CObject {
                 }
                 return $file;
             };
+
             $this->files = [];
             foreach ($_FILES as $key => $file) {
                 $this->files[$key] = $normalizeLevel($file);

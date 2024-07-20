@@ -1,13 +1,11 @@
 <?php
 namespace rosasurfer\core\di\proxy;
 
-use rosasurfer\core\di\service\Service;
-
 
 /**
  * Output
  *
- * A {@link Proxy} for the "output" {@link Service} currently registered in the service container.
+ * A {@link Proxy} for the "output" {@link \rosasurfer\core\di\service\Service} currently registered in the service container.
  *
  * Default implementation: {@link \rosasurfer\console\io\Output}
  *

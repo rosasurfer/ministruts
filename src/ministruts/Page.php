@@ -24,7 +24,7 @@ class Page extends Singleton {
 
 
     /**
-     * Return the {@link Singleton} instance of this class.
+     * Return the {@link \rosasurfer\core\Singleton} instance of this class.
      *
      * @return static
      */

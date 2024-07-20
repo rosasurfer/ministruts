@@ -2,9 +2,6 @@
 namespace rosasurfer\ministruts;
 
 use rosasurfer\core\CObject;
-use rosasurfer\core\di\facade\Form;
-use rosasurfer\core\di\facade\Forms;
-use rosasurfer\core\di\service\Service;
 use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\net\http\HttpResponse;
 
@@ -17,8 +14,8 @@ use rosasurfer\net\http\HttpResponse;
  * A custom implementation can be configured for a single application {@link Module} by defining the module's Struts config
  * attribute <tt>/struts-config/controller[@request-processor="%ClassName"]</tt>.
  *
- * A custom implementation can be configured for all application Modules by re-defining the DI {@link Service} named
- * "requestProcessor".
+ * A custom implementation can be configured for all application Modules by re-defining the DI {@link \rosasurfer\core\di\service\Service}
+ * named "requestProcessor".
  */
 class RequestProcessor extends CObject {
 
@@ -429,8 +426,9 @@ PROCESS_METHOD_ERROR_SC_405;
 
     /**
      * Copy the {@link ActionForm} configured for the current {@link ActionMapping} from the {@link Request} to the
-     * {@link HttpSession}. On the next HTML request the form will be made available via the facade {@link Form::old()} as
-     * form of the previous request. An {@link EmptyActionForm} can't be configured for a mapping, and will not be copied.
+     * {@link HttpSession}. On the next HTML request the form will be made available via the facade
+     * {@link \rosasurfer\core\di\facade\Form::old()} as form of the previous request. An {@link EmptyActionForm} can't be
+     * configured for a mapping, and will not be copied.
      *
      * @param  Request $request
      */
@@ -443,8 +441,8 @@ PROCESS_METHOD_ERROR_SC_405;
 
 
     /**
-     * Move an old {@link ActionForm} stored in the session to the current {@link Request}. The form will be available
-     * via the facades {@link Forms} and {@link Form::old()} as form of the previous request.
+     * Move an old {@link ActionForm} stored in the session to the current {@link Request}. The form will be available via the
+     * facades {@link \rosasurfer\core\di\facade\Forms} and {@link \rosasurfer\core\di\facade\Form::old()} as form of the previous request.
      *
      * @param  Request $request
      */
