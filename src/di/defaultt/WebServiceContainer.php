@@ -11,7 +11,7 @@ use rosasurfer\ministruts\Request;
 /**
  * Default dependency injector automatically created for web applications.
  *
- * A variant of the standard dependency injector {@link Di} suitable for web applications. Registers web app related
+ * A variant of the standard dependency injector {@link \rosasurfer\di\Di} suitable for web applications. Registers web app related
  * services provided by the framework and user-defined services loaded from the file "{app.dir.config}/services.php".
  */
 class WebServiceContainer extends Di {

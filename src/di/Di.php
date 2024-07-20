@@ -55,7 +55,7 @@ class Di extends CObject implements DiInterface {
 
 
     /**
-     * Register a {@link IService} in the container.
+     * Register a {@link \rosasurfer\di\service\Service} in the container.
      *
      * @param  IService $service
      *

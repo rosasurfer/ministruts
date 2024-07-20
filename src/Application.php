@@ -96,7 +96,7 @@ class Application extends CObject {
 
         if (isset($_GET['__phpinfo__']) || isset($_GET['__config__']) || isset($_GET['__cache__'])) {
             if (self::isAdminIP()) {
-                foreach ($_GET as $param => $value) {
+                foreach ($_GET as $param => $v) {
                     if ($param == '__phpinfo__') {
                         if ($configInfoTask) {
                             $phpInfoTask = false;
@@ -177,8 +177,8 @@ class Application extends CObject {
 
 
     /**
-     * Register {@link Command} with the application for execution in CLI mode. An already registered command with the same
-     * name as the one to add will be overwritten.
+     * Register {@link \rosasurfer\console\Command} with the application for execution in CLI mode. An already registered command
+     * with the same name as the one to add will be overwritten.
      *
      * @param  Command $command
      *
@@ -246,7 +246,7 @@ class Application extends CObject {
 
 
     /**
-     * Load and initialize a {@link DefaultConfig}.
+     * Load and initialize a {@link \rosasurfer\config\defaultt\DefaultConfig}.
      *
      * @param  array $options - configuration options as passed to the framework loader
      *

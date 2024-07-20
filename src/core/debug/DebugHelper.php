@@ -274,7 +274,7 @@ class DebugHelper extends StaticClass {
         else if (($level &  E_ALL)                  ==  E_ALL)                  $levels = ['E_ALL'];                    // 32767
         else if (($level & (E_ALL & ~E_DEPRECATED)) == (E_ALL & ~E_DEPRECATED)) $levels = ['E_ALL & ~E_DEPRECATED'];    // 24575
         else {
-            foreach (\array_keys($levels) as $key) {
+            foreach ($levels as $key => $v) {
                 if ($level & $key) continue;
                 unset($levels[$key]);
             }

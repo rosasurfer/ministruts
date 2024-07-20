@@ -1,7 +1,6 @@
 <?php
 namespace rosasurfer\console;
 
-use rosasurfer\Application;
 use rosasurfer\console\docopt\DocoptParser;
 use rosasurfer\console\docopt\DocoptResult;
 use rosasurfer\console\io\Input;
@@ -16,7 +15,7 @@ use rosasurfer\core\exception\RuntimeException;
 /**
  * Command
  *
- * The configuration of a command will be frozen after it is added to the {@link Application}. A frozen configuration
+ * The configuration of a command will be frozen after it is added to the {@link \rosasurfer\Application}. A frozen configuration
  * can't be changed anymore.
  */
 class Command extends CObject {
@@ -31,7 +30,7 @@ class Command extends CObject {
     /** @var string - syntax definition in docopt format */
     private $docoptDefinition;
 
-    /** @var ?DocoptResult - parsed and matched docopt block */
+    /** @var DocoptResult|null - parsed and matched docopt block */
     private $docoptResult = null;
 
     /** @var ?\Closure */
@@ -268,7 +267,7 @@ class Command extends CObject {
 
     /**
      * Validate the command configuration and lock its configuration. Called after the command is added to the
-     * {@link Application}.
+     * {@link \rosasurfer\Application}.
      *
      * @return $this
      */

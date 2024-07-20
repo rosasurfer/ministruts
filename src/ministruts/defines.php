@@ -48,12 +48,12 @@ const ACTION_FORM_BASE_CLASS = ActionForm::class;
 const ROLE_PROCESSOR_BASE_CLASS = RoleProcessor::class;
 
 /**
- * Request or session key under which {@link ActionMessage}s are stored (if any).
+ * Request or session key under which action messages are stored (if any).
  */
 const ACTION_MESSAGES_KEY = 'org.apache.struts.action.MESSAGES';
 
 /**
- * Request or session key under which {@link ActionError}s are stored (if any).
+ * Request or session key under which action errors are stored (if any).
  */
 const ACTION_ERRORS_KEY = 'org.apache.struts.action.ERRORS';
 
@@ -68,12 +68,12 @@ const ACTION_FORM_KEY = 'org.apache.struts.action.FORM';
 const ACTION_MAPPING_KEY = 'org.apache.struts.action.MAPPING';
 
 /**
- * Session key under which the currently selected {@link Locale} is stored.
+ * Session key under which the currently selected locale is stored.
  */
 const LOCALE_KEY = 'org.apache.struts.action.LOCALE';
 
 /**
- * Request key under which available {@link MessageResource}s are stored (i18n).
+ * Request key under which available message resources are stored (i18n).
  */
 const MESSAGES_KEY = 'org.apache.struts.action.MESSAGE_RESOURCES';
 

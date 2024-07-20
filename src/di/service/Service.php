@@ -5,7 +5,6 @@ use rosasurfer\core\exception\ClassNotFoundException;
 use rosasurfer\core\exception\IllegalTypeException;
 
 use function rosasurfer\is_class;
-use rosasurfer\core\exception\InvalidArgumentException;
 
 
 /**

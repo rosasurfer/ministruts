@@ -1,7 +1,6 @@
 <?php
 namespace rosasurfer\db\sqlite;
 
-use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\exception\InvalidArgumentException;
 use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
@@ -38,7 +37,7 @@ use const rosasurfer\NL;
  * Notes:                                                                                                                   <br>
  * ------                                                                                                                   <br>
  * The php_sqlite3 module version v0.7-dev (at least PHP 5.6.12-5.6.40) has a bug. The first call of
- * {@link \SQLite3Result::fetchArray()} and calls after a {@link SQLite3Result::reset()} trigger re-execution of an already
+ * {@link \SQLite3Result::fetchArray()} and calls after a {@link \SQLite3Result::reset()} trigger re-execution of an already
  * executed query. The workaround for DDL and DML statements is to check with {@link \SQLite3Result::numColumns()} for an
  * empty result before calling <tt>fetchArray()</tt>. There is <b>no</b> workaround to prevent multiple executions of SELECT
  * queries except using a different SQLite adapter, e.g. the PDO SQLite3 adapter.

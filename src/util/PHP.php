@@ -1,7 +1,7 @@
 <?php
 namespace rosasurfer\util;
 
-use rosasurfer\config\ConfigInterface;
+use rosasurfer\config\ConfigInterface as Config;
 use rosasurfer\core\StaticClass;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\debug\DebugHelper;
@@ -169,7 +169,7 @@ class PHP extends StaticClass {
      * PHP_INI_PERDIR - entry can be set in php.ini, httpd.conf, .htaccess and in .user.ini
      */
     public static function phpinfo() {
-        /** @var ?ConfigInterface $config */
+        /** @var Config|null $config */
         $config = self::di('config');
         $issues = [];
 
@@ -331,7 +331,7 @@ class PHP extends StaticClass {
             if (is_file($file=$appRoot.'/composer.json') && extension_loaded('json')) {
                 $composer = json_decode(file_get_contents($file), true);
                 if (isset($composer['require']) && is_array($composer['require'])) {
-                    foreach (\array_keys($composer['require']) as $name) {
+                    foreach ($composer['require'] as $name => $v) {
                         $name = trim(strtolower($name));
                         if (in_array($name, ['php', 'php-64bit', 'hhvm']) || strContains($name, '/')) continue;
                         if (strStartsWith($name, 'ext-')) $name = strRight($name, -4);
