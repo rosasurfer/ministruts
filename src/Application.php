@@ -56,7 +56,7 @@ class Application extends Object {
      *                                           If set to FALSE you have to setup your own exception handling mechanism.<br>
      *                                           (default: TRUE)<br>
      *
-     * All further options are added to the application's default configuration {@link Config} as regular config values.
+     * All further options are added to the application's default configuration {@link \rosasurfer\config\Config} as regular config values.
      */
     public function __construct(array $options = []) {
         // set default values
@@ -83,7 +83,7 @@ class Application extends Object {
 
         if (isSet($_GET['__phpinfo__']) || isSet($_GET['__config__']) || isSet($_GET['__cache__'])) {
             if (self::isAdminIP()) {
-                foreach (\array_keys($_GET) as $param) {
+                foreach ($_GET as $param => $v) {
                     if ($param == '__phpinfo__') {
                         if ($configInfoTask) {
                             $phpInfoTask            = false;
@@ -164,7 +164,7 @@ class Application extends Object {
 
 
     /**
-     * Run the application and return the {@link Response} if a web application.
+     * Run the application and return the {@link \rosasurfer\ministruts\Response} if a web application.
      *
      * @param  array $options [optional] - runtime options
      *

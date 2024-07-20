@@ -106,7 +106,7 @@ class RequestProcessor extends Object {
 
 
     /**
-     * Moves all ActionMessages (including ActionErrors) from the current {@link Request} to the session.
+     * Moves all ActionMessages (including ActionErrors) from the current equest} to the session.
      * At the next request the messages are restored and moved back to the new request.
      *
      * @param  Request $request

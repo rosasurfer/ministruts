@@ -264,7 +264,7 @@ class Request extends Singleton {
      * Return an object-oriented representation of the uploaded files. The broken PHP array structure of uploaded files is
      * converted to regular file arrays.
      *
-     * @TODO: convert file data to {@link UploadedFile} instances
+     * @TODO: convert file data to UploadedFile instances
      *
      * @return array - associative array of files
      */
@@ -276,7 +276,7 @@ class Request extends Singleton {
                 if (isSet($file['name']) && is_array($file['name'])) {
                     $properties = \array_keys($file);
                     $normalized = [];
-                    foreach (\array_keys($file['name']) as $name) {
+                    foreach ($file['name'] as $name => $v) {
                         foreach ($properties as $property) {
                             $normalized[$name][$property] = $file[$property][$name];
                         }
@@ -286,11 +286,10 @@ class Request extends Singleton {
                 }
                 return $file;
             };
+
             $files = [];
-            if (isSet($_FILES)) {
-                foreach ($_FILES as $key => $file) {
-                    $files[$key] = $normalizeLevel($file);
-                }
+            foreach ($_FILES as $key => $file) {
+                $files[$key] = $normalizeLevel($file);
             }
         }
         return $files;

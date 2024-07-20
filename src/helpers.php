@@ -10,8 +10,6 @@ use rosasurfer\exception\InvalidArgumentException;
 use rosasurfer\exception\IOException;
 use rosasurfer\exception\RuntimeException;
 use rosasurfer\lock\Lock;
-use rosasurfer\ministruts\ActionMapping;
-use rosasurfer\ministruts\Module;
 use rosasurfer\ministruts\Request;
 use rosasurfer\ministruts\url\Url;
 use rosasurfer\ministruts\url\VersionedUrl;
@@ -1535,7 +1533,7 @@ function synchronized(\Closure $task, $mutex = null) {
 
 
 /**
- * Lookup and return a {@link Url} helper for the named {@link ActionMapping}.
+ * Lookup and return a {@link \rosasurfer\ministruts\url\Url} helper for the named {@link \rosasurfer\ministruts\ActionMapping}.
  *
  * @param  string $name - route name
  *
@@ -1573,9 +1571,9 @@ function route($name) {
 
 
 /**
- * Return a {@link Url} helper for the given URI. An URI starting with a slash "/" is interpreted as relative to the
- * application's base URI. An URI not starting with a slash is interpreted as relative to the application {@link Module}'s
- * base URI (the module the current request belongs to).<br>
+ * Return a {@link \rosasurfer\ministruts\url\Url} helper for the given URI. An URI starting with a slash "/" is interpreted
+ * as relative to the application's base URI. An URI not starting with a slash is interpreted as relative to the application
+ * {@link \rosasurfer\ministruts\Module}'s base URI (the module the current request belongs to).<br>
  *
  * Procedural equivalent of <tt>new \rosasurfer\ministruts\url\Url($uri)</tt>.
  *
@@ -1589,9 +1587,9 @@ function url($uri) {
 
 
 /**
- * Return a version-aware URL helper for the given URI {@link VersionedUrl}. An URI starting with a slash "/" is interpreted
- * as relative to the application's base URI. An URI not starting with a slash is interpreted as relative to the application
- * {@link Module}'s base URI (the module the current request belongs to).<br>
+ * Return a version-aware URL helper for the given URI {@link \rosasurfer\ministruts\url\VersionedUrl}. An URI starting with a slash "/"
+ * is interpreted as relative to the application's base URI. An URI not starting with a slash is interpreted as relative to the application
+ * {@link \rosasurfer\ministruts\Module}'s base URI (the module the current request belongs to).<br>
  *
  * Procedural equivalent of <tt>new \rosasurfer\ministruts\url\VersionedUrl($uri)</tt>.
  *
