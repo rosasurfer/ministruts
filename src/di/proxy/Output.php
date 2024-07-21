@@ -14,8 +14,8 @@ namespace rosasurfer\di\proxy;
  *
  *
  * @method static \rosasurfer\console\io\Output instance()            Get the object behind the proxy.
- * @method static                               out(mixed $message)   Write a message to STDOUT.
- * @method static                               error(mixed $message) Write a message to STDERR.
+ * @method static void                          out(mixed $message)   Write a message to STDOUT.
+ * @method static void                          error(mixed $message) Write a message to STDERR.
  */
 class Output extends Proxy {
 
