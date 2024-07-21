@@ -54,12 +54,12 @@ class Application extends CObject {
      *                                           to ErrorExceptions and thrown. If set to "log" errors are only logged and
      *                                           execution continues. If set to "ignore" the application must implement its
      *                                           own error handling mechanism.
-     *                                           (default: "strict")
+     *                                           (default: "exception")
      *
-     *        "app.handle-exceptions" - bool:    How to handle PHP exceptions: If enabled exceptions are handled by the
-     *                                           framework's exception handler. Otherwise the application must implement its
-     *                                           own exception handling mechanism.
-     *                                           (default: enabled)
+     *        "app.handle-exceptions" - string:  How to handle PHP exceptions: If set to "catch" exceptions are catched and handled
+     *                                           by the framework's exception handler. If set to "ignore" the application must
+     *                                           implement its own exception handling mechanism.
+     *                                           (default: "catch")
      *
      * All further options are added to the application's configuration as regular config values.
      */
