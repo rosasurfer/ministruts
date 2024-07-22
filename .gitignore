@@ -23,12 +23,14 @@ nbactions.xml
 # ignore the following folders and files
 /etc/httpd/cgi/php.ini
 /etc/phpstan/.tmp/
+/php-error.log
 
 vendor/
+/composer
+/composer.phar
 /composer.lock
-/composer-dev.*
-/php-error.log
-/services.php
+/composer-*
 
-config.*properties
+config*.properties
 !config.dist.properties
+/services.php
