@@ -94,8 +94,7 @@ class Input extends CObject {
      */
     public function isArgument($name) {
         Assert::string($name);
-        if (!$this->docoptResult)
-            return false;
+        if (!$this->docoptResult) return false;
 
         if (!($len=strlen($name)) || !isset($this->docoptResult[$name]))
             return false;
@@ -117,13 +116,14 @@ class Input extends CObject {
      */
     public function getArgument($name) {
         Assert::string($name);
-        if (!$this->docoptResult)
-            return null;
+        if (!$this->docoptResult) return null;
 
         if ($this->isArgument($name)) {
+            /** @var string|string[]|null $value */
             $value = $this->docoptResult[$name];
-            if (is_array($value))
+            if (is_array($value)) {
                 return $value ? $value[0] : null;
+            }
             return $value;
         }
         return null;
@@ -140,14 +140,13 @@ class Input extends CObject {
      */
     public function getArguments($name) {
         Assert::string($name);
-        if (!$this->docoptResult)
-            return [];
+        if (!$this->docoptResult) return [];
 
         if ($this->isArgument($name)) {
+            /** @var string|string[]|null $value */
             $value = $this->docoptResult[$name];
-            if (is_array($value))
-                return $value;
-            return [$value];
+            if (is_array($value)) return $value;
+            if (isset($value))   return [$value];
         }
         return [];
     }
@@ -156,7 +155,7 @@ class Input extends CObject {
     /**
      * Whether the option with the given name is defined (not whether the option was specified).
      *
-     * Options are command line parameters with one leading dash (short options) or with two leading dashes (long options).
+     * Options are command line parameters with one leading dash (short options) or two leading dashes (long options).
      *
      * @param  string $name - long or short option name with leading dash(es)
      *
@@ -164,8 +163,7 @@ class Input extends CObject {
      */
     public function isOption($name) {
         Assert::string($name);
-        if (!$this->docoptResult)
-            return false;
+        if (!$this->docoptResult) return false;
 
         if (!strlen($name) || !isset($this->docoptResult[$name]) || $name[0]!='-' || $name=='-' || $name=='--')
             return false;
@@ -187,21 +185,18 @@ class Input extends CObject {
      */
     public function getOption($name) {
         Assert::string($name);
-        if (!$this->docoptResult)
-            return false;
+        if (!$this->docoptResult) return false;
 
         if ($this->isOption($name)) {
             $value = $this->docoptResult[$name];
-            if (is_array($value))                                   // repetitive option with arguments
-                return $value ? $value[0] : false;
-            /*
-            if (is_int($value))  return $value;                     // repetitive option without arguments
-            if (is_bool($value)) return $value;                     // non-repetitive option, no arguments
-            else                 return $value;                     // non-repetitive option with argument
-            */
-            return $value;
+            if (is_array($value)) return $value ? $value[0] : false;    // repetitive option with arguments
+          //if (is_int($value))   return $value;                        // repetitive option without arguments
+          //if (is_bool($value))  return $value;                        // non-repetitive option, no arguments
+          //if (!is_null($value)) return $value;                        // non-repetitive option with argument
+          //return false;                                               // non-repetitive option not specified
+            if (!is_null($value)) return $value;
         }
-        return false;
+        return false;                                                   // undefined option
     }
 
 
@@ -211,24 +206,21 @@ class Input extends CObject {
      *
      * @param  string $name
      *
-     * @return string[] - option values or an empty array if the option was not specified
+     * @return array<bool|int|string> - option values or an empty array if the option was not specified
      */
     public function getOptions($name) {
         Assert::string($name);
-        if (!$this->docoptResult)
-            return [];
+        if (!$this->docoptResult) return [];
 
         if ($this->isOption($name)) {
             $value = $this->docoptResult[$name];
-            if (is_array($value))                                   // repetitive option with arguments
-                return $value;
-            /*
-            if (is_int($value))  return [$value];                   // repetitive option without arguments
-            if (is_bool($value)) return $value ? [$value] : [];     // non-repetitive option, no arguments
-            else                 return [$value];                   // non-repetitive option with argument
-            */
-            if ($value !== false) return [$value];
+            if (is_array($value)) return $value;                        // repetitive option with arguments
+          //if (is_int($value))   return [$value];                      // repetitive option without arguments
+          //if (is_bool($value))  return $value ? [$value] : [];        // non-repetitive option, no arguments
+          //if (!is_null($value)) return [$value];                      // non-repetitive option with argument
+          //return [];                                                  // non-repetitive option not specified
+            if ($value!==false && $value!==null) return [$value];
         }
-        return [];
+        return [];                                                      // undefined option
     }
 }
