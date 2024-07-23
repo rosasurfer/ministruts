@@ -15,7 +15,7 @@ use const rosasurfer\NL;
 class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
 
 
-    /** @var array */
+    /** @var array<bool|int|string[]|null> */
     protected $args;
 
     /** @var string */
@@ -49,7 +49,7 @@ class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
     /**
      * Return the parsed CLI arguments.
      *
-     * @return array
+     * @return array<bool|int|string[]|null>
      */
     public function getArgs() {
         return $this->args;
@@ -110,7 +110,7 @@ class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
     /**
      * @param  mixed $offset
      *
-     * @return string
+     * @return bool|int|string[]|null
      */
     public function offsetGet($offset) {
         return $this->args[$offset];

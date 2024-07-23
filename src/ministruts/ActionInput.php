@@ -31,7 +31,7 @@ class ActionInput extends CObject implements \ArrayAccess {
     /**
      * Return all raw input parameters.
      *
-     * @return string[]
+     * @return array<string|mixed[]>
      */
     public function all() {
         return $this->parameters;
@@ -51,8 +51,9 @@ class ActionInput extends CObject implements \ArrayAccess {
      */
     public function get($name, $default = null) {
         if (\key_exists($name, $this->parameters)) {
-            if (!is_array($this->parameters[$name]))
+            if (!is_array($this->parameters[$name])) {
                 return $this->parameters[$name];
+            }
         }
         return $default;
     }
@@ -70,8 +71,9 @@ class ActionInput extends CObject implements \ArrayAccess {
      */
     public function getArray($name, array $default = []) {
         if (\key_exists($name, $this->parameters)) {
-            if (is_array($this->parameters[$name]))
+            if (is_array($this->parameters[$name])) {
                 return $this->parameters[$name];
+            }
         }
         return $default;
     }

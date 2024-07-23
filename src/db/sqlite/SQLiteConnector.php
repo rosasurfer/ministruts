@@ -136,10 +136,10 @@ class SQLiteConnector extends Connector {
     public function connect() {
         if (!class_exists('SQLite3')) throw new RuntimeException('Undefined class \SQLite3 (sqlite3 extension is not available)');
 
-        $flags = SQLITE3_OPEN_READWRITE;                                // available flags:
-        $ex = null;                                                     // 1: SQLITE3_OPEN_READONLY
-        try {                                                           // 2: SQLITE3_OPEN_READWRITE
-            $this->sqlite = new \SQLite3($this->file, $flags);          // 4: SQLITE3_OPEN_CREATE
+        $flags = SQLITE3_OPEN_READWRITE;                                        // available flags:
+        $ex = null;                                                             // 1: SQLITE3_OPEN_READONLY
+        try {                                                                   // 2: SQLITE3_OPEN_READWRITE
+            $this->sqlite = new \SQLite3($this->file, $flags);                  // 4: SQLITE3_OPEN_CREATE
         }
         catch (IRosasurferException $ex) {}
         catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
@@ -153,7 +153,7 @@ class SQLiteConnector extends Connector {
                     $where = ' (directory)';
             }
             else {
-                $what = ($flags & SQLITE3_OPEN_CREATE) ? 'create' : 'find';
+                $what = ($flags & SQLITE3_OPEN_CREATE) ? 'create' : 'find';     // @phpstan-ignore ternary.alwaysFalse (keep for testing)
                 isRelativePath($file) && $where=' in "'.getcwd().'"';
             }
             throw $ex->appendMessage('Cannot '.$what.' database file "'.$file.'"'.$where);

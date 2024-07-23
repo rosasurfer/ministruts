@@ -93,8 +93,7 @@ class Input extends CObject {
      */
     public function isArgument($name) {
         Assert::string($name);
-        if (!$this->docoptResult)
-            return false;
+        if (!$this->docoptResult) return false;
 
         if (!($len=strlen($name)) || !key_exists($name, $this->docoptResult->getArgs()))
             return false;
@@ -116,13 +115,14 @@ class Input extends CObject {
      */
     public function getArgument($name) {
         Assert::string($name);
-        if (!$this->docoptResult)
-            return null;
+        if (!$this->docoptResult) return null;
 
         if ($this->isArgument($name)) {
+            /** @var bool|int|string[]|null $value */
             $value = $this->docoptResult[$name];
-            if (is_array($value))
+            if (is_array($value)) {
                 return $value ? $value[0] : null;
+            }
             return $value;
         }
         return null;
@@ -139,14 +139,13 @@ class Input extends CObject {
      */
     public function getArguments($name) {
         Assert::string($name);
-        if (!$this->docoptResult)
-            return [];
+        if (!$this->docoptResult) return [];
 
         if ($this->isArgument($name)) {
+            /** @var string|string[]|null $value */
             $value = $this->docoptResult[$name];
-            if (is_array($value))
-                return $value;
-            return [$value];
+            if (is_array($value)) return $value;
+            if (isset($value))   return [$value];
         }
         return [];
     }
@@ -155,7 +154,7 @@ class Input extends CObject {
     /**
      * Whether the option with the given name is defined (not whether the option was specified).
      *
-     * Options are command line parameters with one leading dash (short options) or with two leading dashes (long options).
+     * Options are command line parameters with one leading dash (short options) or two leading dashes (long options).
      *
      * @param  string $name - long or short option name with leading dash(es)
      *
@@ -163,8 +162,7 @@ class Input extends CObject {
      */
     public function isOption($name) {
         Assert::string($name);
-        if (!$this->docoptResult)
-            return false;
+        if (!$this->docoptResult) return false;
 
         if (!strlen($name) || !key_exists($name, $this->docoptResult->getArgs()) || $name[0]!='-' || $name=='-' || $name=='--')
             return false;
@@ -186,8 +184,7 @@ class Input extends CObject {
      */
     public function getOption($name) {
         Assert::string($name);
-        if (!$this->docoptResult)
-            return false;
+        if (!$this->docoptResult) return false;
 
         if ($this->isOption($name)) {
             $value = $this->docoptResult[$name];
@@ -208,12 +205,11 @@ class Input extends CObject {
      *
      * @param  string $name
      *
-     * @return string[] - option values or an empty array if the option was not specified
+     * @return array<bool|int|string> - option values or an empty array if the option was not specified
      */
     public function getOptions($name) {
         Assert::string($name);
-        if (!$this->docoptResult)
-            return [];
+        if (!$this->docoptResult) return [];
 
         if ($this->isOption($name)) {
             $value = $this->docoptResult[$name];

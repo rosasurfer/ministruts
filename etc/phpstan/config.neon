@@ -36,6 +36,9 @@ parameters:
     - rosasurfer\WINDOWS
     - rosasurfer\NUL_DEVICE
 
+  universalObjectCratesClasses:
+    - rosasurfer\ministruts\ActionForm
+
   ignoreErrors:
     #-  # false-positive: the constructor is already final, see https://github.com/phpstan/phpstan/issues/8298
     #  message: "#^Unsafe usage of new static\\(\\)\\.$#"

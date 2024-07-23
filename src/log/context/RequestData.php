@@ -18,17 +18,17 @@ use const rosasurfer\NL;
 final class RequestData extends CObject {
 
 
-    /** @var array<string, string> - request headers */
-    private $headers;
+    /** @var ?array<string, string> - request headers */
+    private $headers = null;
 
-    /** @var array<string, string[]> - normalized metadata of uploaded files */
-    private $files;
+    /** @var ?array<string, string[]> - normalized metadata of uploaded files */
+    private $files = null;
 
-    /** @var string - request body */
-    private $content;
+    /** @var ?string - request body */
+    private $content = null;
 
-    /** @var self */
-    private static $instance;
+    /** @var ?self */
+    private static $instance = null;
 
 
     /**

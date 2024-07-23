@@ -92,6 +92,8 @@ class SMTPMailer extends Mailer {
 
     /**
      * Connect to the SMTP server.
+     *
+     * @return void
      */
     private function connect() {
         $errorCode = $errorMsg = null;
@@ -116,18 +118,18 @@ class SMTPMailer extends Mailer {
             $response = $this->readResponse();
 
             $this->parseResponse($response);
-            if ($this->responseStatus != 250)
-                throw new RuntimeException('HELO command not accepted: '.$this->responseStatus.' '.$this->response);
+            if ($this->responseStatus != 250) throw new RuntimeException('HELO command not accepted: '.$this->responseStatus.' '.$this->response);
         }
     }
 
 
     /**
      * Authenticate the connection.
+     *
+     * @return void
      */
     private function authenticate() {
-        if (!is_resource($this->connection))
-            throw new RuntimeException('Cannot authenticate: Not connected');
+        if (!is_resource($this->connection)) throw new RuntimeException('Cannot authenticate: Not connected');
 
         // init authentication
         $this->writeData('AUTH LOGIN');
@@ -168,6 +170,8 @@ class SMTPMailer extends Mailer {
      * @param  string   $subject            - mail subject
      * @param  string   $message            - mail body
      * @param  string[] $headers [optional] - additional MIME headers (default: none)
+     *
+     * @return void
      */
     public function sendMail($sender, $receiver, $subject, $message, array $headers = []) {
         // delay sending to the script's shutdown if configured (e.g. as to not to block other tasks)
@@ -342,6 +346,8 @@ class SMTPMailer extends Mailer {
 
     /**
      * Reset the connection.
+     *
+     * @return void
      */
     public function reset() {
         if (!is_resource($this->connection))
@@ -360,6 +366,8 @@ class SMTPMailer extends Mailer {
      * Disconnect.
      *
      * @param  bool $silent [optional] - whether to silently suppress disconnect errors (default: don't)
+     *
+     * @return void
      */
     public function disconnect($silent = false) {
         if (!is_resource($this->connection))
@@ -381,13 +389,14 @@ class SMTPMailer extends Mailer {
 
     /**
      * Read the MTA's response.
+     *
+     * @return string
      */
     private function readResponse() {
-        $lines = null;
+        $lines = '';
         while (trim($line = fgets($this->connection)) != '') {
             $lines .= $line;
-            if (substr($line, 3, 1) == ' ')
-                break;
+            if (substr($line, 3, 1) == ' ') break;
         }
         $data = stream_get_meta_data($this->connection);
         if ($data['timed_out'])
@@ -402,6 +411,8 @@ class SMTPMailer extends Mailer {
      * Write data into the open socket.
      *
      * @param string $data
+     *
+     * @return void
      */
     private function writeData($data) {
         $count = fwrite($this->connection, $data.EOL_WINDOWS, strlen($data)+2);
@@ -416,7 +427,9 @@ class SMTPMailer extends Mailer {
     /**
      * Parse the MTA's response.
      *
-     * @param string $response
+     * @param  string $response
+     *
+     * @return void
      */
     private function parseResponse($response) {
         $response = trim($response);
@@ -429,6 +442,8 @@ class SMTPMailer extends Mailer {
      * Log sent data.
      *
      * @param string $data
+     *
+     * @return void
      */
     private function logSentData($data) {
         $data = preg_replace('/^(.*)/m', ' -> $1', $data).NL;
@@ -440,6 +455,8 @@ class SMTPMailer extends Mailer {
      * Log reseived data.
      *
      * @param string $data
+     *
+     * @return void
      */
     private function logResponse($data) {
         $this->logBuffer .= $data;
