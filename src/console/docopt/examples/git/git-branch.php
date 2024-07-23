@@ -36,6 +36,7 @@ Specific git-branch actions:
 DOCOPT;
 
 $result = docopt($doc);
+
 foreach ($result as $key => $value) {
-    echoPre($key.': '.json_encode($value));
+    echoPre($key.': '.json_encode($value).(($type=gettype($value))=='NULL' ? '':" ($type)"));
 }

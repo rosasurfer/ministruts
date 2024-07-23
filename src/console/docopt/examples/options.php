@@ -43,6 +43,7 @@ Options:
 DOCOPT;
 
 $result = docopt($doc, null, ['version'=>'1.0.0rc2']);
+
 foreach ($result as $key => $value) {
-    echoPre($key.': '.json_encode($value));
+    echoPre($key.': '.json_encode($value).(($type=gettype($value))=='NULL' ? '':" ($type)"));
 }
