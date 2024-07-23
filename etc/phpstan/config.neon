@@ -36,6 +36,9 @@ parameters:
     - rosasurfer\WINDOWS
     - rosasurfer\NUL_DEVICE
 
+  universalObjectCratesClasses:
+    - rosasurfer\ministruts\ActionForm
+
   ignoreErrors:
   reportUnmatchedIgnoredErrors: false
 

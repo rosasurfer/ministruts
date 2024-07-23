@@ -119,7 +119,7 @@ abstract class ActionForm extends CObject {
         unset($array["\0*\0request"  ]);
         unset($array["\0*\0actionKey"]);
 
-        foreach ($array as $name => $property) {                        // @phpstan-ignore-line
+        foreach ($array as $name => $property) {
             if (is_object($property)) {
                 unset($array[$name]);                                   // drop all remaining object references
             }
