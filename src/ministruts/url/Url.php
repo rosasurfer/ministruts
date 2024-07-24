@@ -67,7 +67,7 @@ class Url extends CObject {
             if ($this->parameters) {
                 if (strpos($uri, '?') === false) $uri .= '?';
                 else                             $uri .= '&';
-                $uri .= http_build_query($this->parameters, null, '&');
+                $uri .= http_build_query($this->parameters, '', '&');
             }
             $uri = Request::getApplicationBaseUri().$uri;
 

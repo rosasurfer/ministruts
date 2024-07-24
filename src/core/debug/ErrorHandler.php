@@ -108,17 +108,17 @@ class ErrorHandler extends StaticClass {
                  */
                 if (self::$errorMode) {
                     $error = error_get_last();
-                    $oomEmergencyMemory = $match = null;                        // release the reserved memory to be available for preg_match()
+                    $oomEmergencyMemory = $match = null;                            // release the reserved memory to be available for preg_match()
                     if ($error && $error['type']==E_ERROR && preg_match(self::$oomRegExp, $error['message'], $match)) {
-                        ini_set('memory_limit', (int)$match[1] + 10*MB);        // allocate memory for the regular handler
+                        ini_set('memory_limit', (string)((int)$match[1] + 10*MB));  // allocate memory for the regular handler
 
-                        $currentHandler = set_error_handler(function() {});     // handle the error regularily
+                        $currentHandler = set_error_handler(null);                  // handle the error regularily
                         restore_error_handler();
                         $currentHandler && call_user_func($currentHandler, ...array_values($error));
                     }
                 }
             });
-            $oomEemergencyMemory = str_repeat('*', 1*MB);                       // reserve some extra memory to survive OOM errors
+            $oomEemergencyMemory = str_repeat('*', 1*MB);                           // reserve some extra memory to survive OOM errors
             $handlerRegistered = true;
         }
     }
@@ -153,10 +153,7 @@ class ErrorHandler extends StaticClass {
         if (!($reportingLevel & $level)) return true;      // the error is not covered by current reporting level
 
         $message = strLeftTo($message, ' (this will throw an Error in a future version of PHP)', -1);
-
-        $logContext         = [];
-        $logContext['file'] = $file;
-        $logContext['line'] = $line;
+        $logContext = ['file' => $file, 'line' => $line];
 
         // Process errors according to their severity level.
         switch ($level) {
@@ -169,19 +166,19 @@ class ErrorHandler extends StaticClass {
 
         // Wrap everything else in the matching PHPError exception.
         switch ($level) {
-            case E_PARSE            : $exception = new PHPParseError      ($message, null, $level, $file, $line); break;
-            case E_COMPILE_WARNING  : $exception = new PHPCompileWarning  ($message, null, $level, $file, $line); break;
-            case E_COMPILE_ERROR    : $exception = new PHPCompileError    ($message, null, $level, $file, $line); break;
-            case E_CORE_WARNING     : $exception = new PHPCoreWarning     ($message, null, $level, $file, $line); break;
-            case E_CORE_ERROR       : $exception = new PHPCoreError       ($message, null, $level, $file, $line); break;
-            case E_STRICT           : $exception = new PHPStrict          ($message, null, $level, $file, $line); break;
-            case E_NOTICE           : $exception = new PHPNotice          ($message, null, $level, $file, $line); break;
-            case E_WARNING          : $exception = new PHPWarning         ($message, null, $level, $file, $line); break;
-            case E_ERROR            : $exception = new PHPError           ($message, null, $level, $file, $line); break;
-            case E_RECOVERABLE_ERROR: $exception = new PHPRecoverableError($message, null, $level, $file, $line); break;
-            case E_USER_ERROR       : $exception = new PHPUserError       ($message, null, $level, $file, $line); break;
+            case E_PARSE            : $exception = new PHPParseError      ($message, 0, $level, $file, $line); break;
+            case E_COMPILE_WARNING  : $exception = new PHPCompileWarning  ($message, 0, $level, $file, $line); break;
+            case E_COMPILE_ERROR    : $exception = new PHPCompileError    ($message, 0, $level, $file, $line); break;
+            case E_CORE_WARNING     : $exception = new PHPCoreWarning     ($message, 0, $level, $file, $line); break;
+            case E_CORE_ERROR       : $exception = new PHPCoreError       ($message, 0, $level, $file, $line); break;
+            case E_STRICT           : $exception = new PHPStrict          ($message, 0, $level, $file, $line); break;
+            case E_NOTICE           : $exception = new PHPNotice          ($message, 0, $level, $file, $line); break;
+            case E_WARNING          : $exception = new PHPWarning         ($message, 0, $level, $file, $line); break;
+            case E_ERROR            : $exception = new PHPError           ($message, 0, $level, $file, $line); break;
+            case E_RECOVERABLE_ERROR: $exception = new PHPRecoverableError($message, 0, $level, $file, $line); break;
+            case E_USER_ERROR       : $exception = new PHPUserError       ($message, 0, $level, $file, $line); break;
 
-            default                 : $exception = new PHPUnknownError    ($message, null, $level, $file, $line);
+            default                 : $exception = new PHPUnknownError    ($message, 0, $level, $file, $line);
         }
 
         // Handle the error according to the configuration.

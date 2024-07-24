@@ -463,7 +463,7 @@ class Logger extends StaticClass {
 
                 foreach (self::$smsReceivers as $receiver) {
                     $params['to'] = $receiver;
-                    $url      = 'https://api.clickatell.com/http/sendmsg?'.http_build_query($params, null, '&');
+                    $url      = 'https://api.clickatell.com/http/sendmsg?'.http_build_query($params, '', '&');
                     $request  = new HttpRequest($url);
                     $client   = new CurlHttpClient($curlOptions);
                     $response = $client->send($request);
@@ -500,7 +500,7 @@ class Logger extends StaticClass {
 
                 foreach (self::$smsReceivers as $receiver) {
                     $params['to'] = $receiver;
-                    $url      = 'https://rest.nexmo.com/sms/json?'.http_build_query($params, null, '&');
+                    $url      = 'https://rest.nexmo.com/sms/json?'.http_build_query($params, '', '&');
                     $request  = new HttpRequest($url);
                     $client   = new CurlHttpClient($curlOptions);
                     $response = $client->send($request);
