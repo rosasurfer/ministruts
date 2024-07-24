@@ -10,8 +10,6 @@ use rosasurfer\log\Logger;
 use function rosasurfer\strStartsWith;
 
 use const rosasurfer\L_DEBUG;
-use const rosasurfer\L_INFO;
-use const rosasurfer\L_NOTICE;
 use const rosasurfer\NL;
 
 

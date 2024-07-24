@@ -16,7 +16,6 @@ use function rosasurfer\php_byte_value;
 use function rosasurfer\stderr;
 use function rosasurfer\strContains;
 use function rosasurfer\strRight;
-use function rosasurfer\strRightFrom;
 use function rosasurfer\strStartsWith;
 
 use const rosasurfer\CLI;
