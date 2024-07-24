@@ -386,8 +386,8 @@ class PHP extends StaticClass {
             unset($get['__phpinfo__'], $get['__config__']);
 
             // before/after link
-            if ($isConfig) $queryStr = http_build_query($get + ['__phpinfo__'=>'',                  ], null, '&amp;');
-            else           $queryStr = http_build_query($get + ['__config__' =>'', '__phpinfo__'=>''], null, '&amp;');
+            if ($isConfig) $queryStr = http_build_query($get + ['__phpinfo__'=>'',                  ], '', '&amp;');
+            else           $queryStr = http_build_query($get + ['__config__' =>'', '__phpinfo__'=>''], '', '&amp;');
             ?>
             <div style="clear:both; text-align:center; margin:0 0 15px 0; padding:20px 0 0 0; font-size:12px; font-weight:bold; font-family:sans-serif">
                 <a href="?<?=$queryStr?>" style="display:inline-block; min-width:220px; min-height:15px; margin:0 10px; padding:10px 0; background-color:#ccf; color:#222; border:1px outset #666; white-space:nowrap">
