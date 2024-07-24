@@ -60,8 +60,8 @@ class MySQLConnector extends Connector {
     /** @var string */
     protected $password;
 
-    /** @var string */
-    protected $database;
+    /** @var ?string */
+    protected $database = null;
 
     /** @var string[] - connection options */
     protected $options = [];
@@ -266,14 +266,15 @@ class MySQLConnector extends Connector {
      */
     protected function selectDatabase() {
         if (isset($this->database)) {
-            $ex = null;
             try {
-                if (!mysql_select_db($this->database, $this->hConnection))
+                if (!mysql_select_db($this->database, $this->hConnection)) {
                     throw new DatabaseException(mysql_error($this->hConnection), mysql_errno($this->hConnection));
+                }
             }
-            catch (IRosasurferException $ex) {}
-            catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), mysql_errno($this->hConnection), $ex); }
-            if ($ex) throw $ex->appendMessage('Can not select database "'.$this->database.'"');
+            catch (\Throwable $ex) {
+                if (!$ex instanceof IRosasurferException) $ex = new DatabaseException($ex->getMessage(), mysql_errno($this->hConnection), $ex);
+                throw $ex->appendMessage('Can not select database "'.$this->database.'"');
+            }
         }
         return $this;
     }
@@ -305,7 +306,7 @@ class MySQLConnector extends Connector {
 
 
     /**
-     *
+     * {@inheritdoc}
      */
     public function escapeIdentifier($name) {
         Assert::string($name);
