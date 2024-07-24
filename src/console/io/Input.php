@@ -118,7 +118,7 @@ class Input extends CObject {
         if (!$this->docoptResult) return null;
 
         if ($this->isArgument($name)) {
-            /** @var bool|int|string[]|null $value */
+            /** @var string|string[]|null $value */
             $value = $this->docoptResult[$name];
             if (is_array($value)) {
                 return $value ? $value[0] : null;
