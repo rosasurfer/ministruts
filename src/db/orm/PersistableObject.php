@@ -581,14 +581,14 @@ abstract class PersistableObject extends CObject {
         }                                                                       //        ...
         $sql  = strLeft($sql, -1);                                              //        ...
         $sql .= ' where '.$idColumn.' = '.$idValue;                             //    where id = value
-        if ($versionMapping) {                      // @phpstan-ignore-line     //        ...
-            $op   = $oldVersion=='null' ? 'is':'='; // @phpstan-ignore-line     //        ...
+        if ($versionMapping) {                                                  //        ...                           @phpstan-ignore if.alwaysFalse      (keep for testing)
+            $op   = $oldVersion=='null' ? 'is':'=';                             //        ...                           @phpstan-ignore ternary.alwaysFalse (keep for testing)
             $sql .= ' and '.$versionColumn.' '.$op.' '.$oldVersion;             //      and version = oldVersion
         }
 
         // execute SQL and check for concurrent modifications
         if ($db->execute($sql)->lastAffectedRows() != 1) {
-            if ($versionMapping) {                  // @phpstan-ignore-line
+            if ($versionMapping) {                                                                                   // @phpstan-ignore if.alwaysFalse      (keep for testing)
                 $this->reload();
                 $msg = 'expected version: '.$oldVersion.', found version: '.$this->$versionName;
             }
