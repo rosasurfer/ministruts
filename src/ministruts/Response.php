@@ -9,13 +9,9 @@ use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferExcepti
 use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\net\http\HttpResponse;
 
-use function rosasurfer\ini_get_bool;
-use function rosasurfer\strContains;
-use function rosasurfer\strEndsWith;
 use function rosasurfer\strLeft;
 use function rosasurfer\strLeftTo;
 use function rosasurfer\strRightFrom;
-use function rosasurfer\strStartsWith;
 
 use const rosasurfer\CLI;
 
