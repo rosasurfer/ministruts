@@ -12,17 +12,17 @@ use rosasurfer\core\exception\RuntimeException;
 class ChainedDependency extends Dependency {
 
 
-    /** @var Dependency[] - Abhaengigkeiten des Gesamtausdrucks */
+    /** @var Dependency[] - all dependencies of the instance */
     private $dependencies;
 
-    /** @var string - logischer Typ der Gesamtabhaengigkeit (AND oder OR) */
+    /** @var string - logical dependency type of the instance (AND | OR) */
     private $type;
 
 
     /**
      * Constructor
      *
-     * @param  Dependency $dependency - Abhaengigkeit
+     * @param  Dependency $dependency
      */
     private function __construct(Dependency $dependency) {
         $this->dependencies[] = $dependency;
@@ -31,9 +31,9 @@ class ChainedDependency extends Dependency {
 
 
     /**
-     * Erzeugt eine neue Instanz.
+     * Static helper to create a new instance.
      *
-     * @param  Dependency $dependency - Abhaengigkeit
+     * @param  Dependency $dependency
      *
      * @return static
      */
@@ -43,11 +43,9 @@ class ChainedDependency extends Dependency {
 
 
     /**
-     * Kombiniert diese Abhaengigkeit mit einer weiteren durch ein logisches UND (AND).
+     * {@inheritdoc}
      *
-     * @param  Dependency $dependency - Abhaengigkeit
-     *
-     * @return ChainedDependency
+     * @return self
      */
     public function andDependency(Dependency $dependency) {
         if ($dependency === $this)
@@ -65,11 +63,9 @@ class ChainedDependency extends Dependency {
 
 
     /**
-     * Kombiniert diese Abhaengigkeit mit einer weiteren durch ein logisches ODER (OR).
+     * {@inheritdoc}
      *
-     * @param  Dependency $dependency - Abhaengigkeit
-     *
-     * @return ChainedDependency
+     * @return self
      */
     public function orDependency(Dependency $dependency) {
         if ($dependency === $this)
@@ -87,24 +83,19 @@ class ChainedDependency extends Dependency {
 
 
     /**
-     * Ob das zu ueberwachende Ereignis oder der Zustandswechsel eingetreten sind oder nicht.
-     *
-     * @return bool - TRUE, wenn die Abhaengigkeit weiterhin erfuellt ist.
-     *                FALSE, wenn der Zustandswechsel eingetreten ist und die Abhaengigkeit nicht mehr erfuellt ist.
+     * {@inheritdoc}
      */
     public function isValid() {
         if ($this->type == 'AND') {
             foreach ($this->dependencies as $dependency) {
-                if (!$dependency->isValid())
-                    return false;
+                if (!$dependency->isValid()) return false;
             }
             return true;
         }
 
         if ($this->type == 'OR' ) {
             foreach ($this->dependencies as $dependency) {
-                if ($dependency->isValid())
-                    return true;
+                if ($dependency->isValid()) return true;
             }
             return false;
         }
