@@ -7,60 +7,52 @@ use rosasurfer\core\exception\InvalidValueException;
 
 
 /**
- * Dependency
+ * Base class for dependencies on states or conditions, to be used to trigger actions depending on state changes.
  *
- * Abstrakte Basisklasse fuer Abhaengigkeiten von bestimmten Zustaenden oder Bedingungen.  Wird benutzt,
- * um abhaengig von einer Aenderung Aktionen auszuloesen.  Jede Implementierung dieser Klasse bildet eine
- * Abhaengigkeit von einem bestimmten Zustand oder einer bestimmten Bedingung ab.  Soll ein Zustand
- * prozessuebergreifend verfolgt werden, muss die Instanz in einem entprechenden Persistenz-Container
- * gespeichert werden (Session, Datenbank, Dateisystem etc.).  Die Implementierungen muessen serialisierbar
- * sein.
+ * An instance of this class represents a dependency on a state or condition. If state is to be tracked across processes,
+ * the instance must be stored in a persistence container (cache, database or file system). Therefore implementations must
+ * be serializable. Several instances may be combined.
  *
- * Mehrere Abhaengigkeiten koennen durch logisches UND oder ODER kombiniert werden.
+ * @example
+ * <pre>
+ *  &lt;?php
+ *  $dependency = FileDependency::create('/etc/crontab')
+ *  ->andDependency(FileDependency::create('/etc/hosts'))
+ *  ->andDependency(FileDependency::create('/etc/resolve.conf'));
  *
- * Beispiel:
- * ---------
+ *  // ...
  *
- *    $dependency =               FileDependency::create('/etc/crontab')
- *                ->andDependency(FileDependency::create('/etc/hosts'))
- *                ->andDependency(FileDependency::create('/etc/resolve.conf'));
- *    ...
+ *  if (!$dependency->isValid()) {
+ *      // state of one of the files has changed, trigger some action...
+ *  }
+ * </pre>
  *
- *    if (!$dependency->isValid()) {
- *       // Zustand hat sich geaendert, beliebige Aktion ausfuehren
- *    }
- *
- * Dieses Beispiel definiert eine gemeinsame Abhaengigkeit vom Zustand dreier Dateien '/etc/crontab',
- * '/etc/hosts' und '/etc/resolv.conf' (AND-Verknuepfung).  Solange keine dieser Dateien veraendert oder
- * geloescht wird, bleibt die Abhaengigkeit erfuellt und der Aufruf von $dependency->isValid() gibt TRUE
- * zurueck.  Nach Aenderung oder Loeschen einer dieser Dateien gibt der Aufruf von $dependency->isValid()
- * FALSE zurueck.
- *
- * @see ChainedDependency
- * @see FileDependency
+ * The example defines a combined dependency on the state of three files. As long as no file is changed or deleted,
+ * the dependency remains fulfilled and calling $dependency->isValid() returns TRUE. After changing or deleting one
+ * of the files, calling $dependency->isValid() returns FALSE.
  */
 abstract class Dependency extends CObject {
 
 
-    /** @var int - Mindestgueltigkeit */
+    /** @var int - min. validity of the instance in seconds */
     private $minValidity = 0;
 
 
     /**
-     * Ob das zu ueberwachende Ereignis oder ein Zustandswechsel eingetreten sind oder nicht.
+     * Whether an event or state change to be monitored has occurred and invalidated the dependency.
      *
-     * @return bool - TRUE, wenn die Abhaengigkeit weiterhin erfuellt ist.
-     *                FALSE, wenn der Zustandswechsel eingetreten ist und die Abhaengigkeit nicht mehr erfuellt ist.
+     * @return bool - TRUE if the the event didn't yet occur and the dependency is still valid
+     *                FALSE if the event has occurred and invalidated the dependency
      */
     abstract public function isValid();
 
 
     /**
-     * Kombiniert diese Abhaengigkeit mit einer weiteren durch ein logisches UND (AND).
+     * Combine this instance with another instance by using logical AND.
      *
-     * @param  Dependency $dependency - Abhaengigkeit
+     * @param  Dependency $dependency
      *
-     * @return Dependency
+     * @return self
      */
     public function andDependency(Dependency $dependency) {
         if ($dependency === $this)
@@ -70,11 +62,11 @@ abstract class Dependency extends CObject {
 
 
     /**
-     * Kombiniert diese Abhaengigkeit mit einer weiteren durch ein logisches ODER (OR).
+     * Combine this instance with another instance by using logical OR.
      *
-     * @param  Dependency $dependency - Abhaengigkeit
+     * @param  Dependency $dependency
      *
-     * @return Dependency
+     * @return self
      */
     public function orDependency(Dependency $dependency) {
         if ($dependency === $this)
@@ -84,9 +76,9 @@ abstract class Dependency extends CObject {
 
 
     /**
-     * Gibt die Mindestgueltigkeit dieser Abhaengigkeit zurueck.
+     * Get the min. validity of the instance.
      *
-     * @return int - Mindestgueltigkeit in Sekunden
+     * @return int - seconds
      */
     public function getMinValidity() {
         return $this->minValidity;
@@ -94,11 +86,11 @@ abstract class Dependency extends CObject {
 
 
     /**
-     * Setzt die Mindestgueltigkeit dieser Abhaengigkeit.
+     * Set the min. validity of the instance.
      *
-     * @param  int $time - Mindestgueltigkeit in Sekunden
+     * @param  int $time - seconds
      *
-     * @return Dependency
+     * @return $this
      */
     public function setMinValidity($time) {
         Assert::int($time);

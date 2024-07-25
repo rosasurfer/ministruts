@@ -8,80 +8,74 @@ use function rosasurfer\isRelativePath;
 
 
 /**
- * FileDependency
+ * FileDependency - dependence on the last time a file was changed.
  *
- * Abhaengigkeit vom letzten Aenderungszeitpunkt einer Datei.  Die Abhaengigkeit ist erfuellt, wenn sich
- * der Zustand der Datei seit dem letzten Aufruf nicht geaendert hat.  Auch die Abhaengigkeit von einer
- * nicht existierenden Datei ist moeglich, die Abhaengigkeit ist in diesem Falle solange erfuellt, wie
- * die Datei weiterhin nicht existiert.
+ * The dependency is fulfilled if the state of the file has not changed since the last call. Dependence on a non-existent
+ * file is also possible; in this case the dependency is fulfilled as long as the file still does not exist.
  *
- * Anwendungsbeispiel:
- * -------------------
+ * @example
+ * <pre>
+ *  &lt;?php
+ *  $dependency = new FileDependency('/etc/crontab');
  *
- *    $dependency = new FileDependency('/etc/crontab');
- *    ....
+ *  // ...
  *
- *    if (!$dependency->isValid()) {
- *       // irgendeine Aktion
- *    }
+ *  if (!$dependency->isValid()) {
+ *      // file state has changed, trigger some action...
+ *  }
+ * </pre>
  *
- * Dieses Beispiel definiert eine Abhaengigkeit vom Aenderungszeitpunkt der Datei '/etc/crontab'.
- * Solange die Datei nicht veraendert wird, bleibt die Abhaengigkeit erfuellt und der Aufruf von
- * $dependency->isValid() gibt TRUE zurueck.  Nach Aenderung oder Loeschen der Datei gibt der Aufruf von
- * $dependency->isValid() FALSE zurueck.
+ * The example defines a dependency on the modification time of the file '/etc/crontab'. As long as the file is not changed,
+ * the dependency remains fulfilled and calling $dependency->isValid() returns TRUE. After changing or deleting the file,
+ * calling $dependency->isValid() returns FALSE.
  *
  * @phpstan-consistent-constructor
  */
 class FileDependency extends Dependency {
 
 
-    /** @var string - Dateiname */
+    /** @var string - name of the monitored file */
     private $fileName;
 
-    /** @var ?int - letzter Aenderungszeitpunkt der Datei (Unix-Timestamp) */
+    /** @var ?int - last modification time of the monitored file (Unix timestamp) */
     private $lastModified = null;
 
 
     /**
      * Constructor
      *
-     * Erzeugt eine neue FileDependency, die die angegebene Datei ueberwacht.
+     * Create a new dependency monitoring a single file.
      *
-     * @param  string $fileName - Dateiname
+     * @param  string $fileName - file name
      */
     public function __construct($fileName) {
         Assert::string($fileName);
         if (!strlen($fileName)) throw new InvalidValueException('Invalid parameter $fileName: '.$fileName);
 
-        if (file_exists($fileName)) {                       // existierende Datei
-            $this->fileName     = realpath($fileName);
+        if (file_exists($fileName)) {
+            $this->fileName = realpath($fileName);
             $this->lastModified = filemtime($this->fileName);
         }
-        else {                                              // nicht existierende Datei
+        else {
             $name = str_replace('\\', '/', $fileName);
-            if (isRelativePath($name))
-                $name=getcwd().'/'.$name;      // absoluten Pfad erzeugen, da Arbeitsverzeichnis wechseln kann
-
-            $this->fileName     = str_replace('/', DIRECTORY_SEPARATOR, $name);
+            if (isRelativePath($name)) {
+                $name = getcwd().'/'.$name;     // convert to absolute path
+            }
+            $this->fileName = str_replace('/', DIRECTORY_SEPARATOR, $name);
             $this->lastModified = null;
         }
     }
 
 
     /**
-     * Erzeugt eine neue FileDependency, die eine oder mehrere Dateien ueberwacht.
+     * Create a new dependency monitoring multiple file.
      *
-     * @param  mixed $fileNames - einzelner Dateiname (String) oder Array von Dateinamen
+     * @param  string[] $fileNames - file names
      *
      * @return Dependency
      */
-    public static function create($fileNames) {
-        if (!is_array($fileNames)) {
-            Assert::string($fileNames);
-            if (!strlen($fileNames)) throw new InvalidValueException('Invalid parameter $fileNames: '.$fileNames);
-            $fileNames = [$fileNames];
-        }
-        if (!$fileNames) throw new InvalidValueException('Invalid parameter $fileNames: []');
+    public static function create(array $fileNames) {
+        if (!$fileNames) throw new InvalidValueException('Invalid argument $fileNames (empty)');
 
         $dependency = null;
 
@@ -95,17 +89,15 @@ class FileDependency extends Dependency {
 
 
     /**
-     * Ob die der Abhaengigkeit zugrunde liegende Datei weiterhin unveraendert ist.
-     *
-     * @return bool - TRUE, wenn die Datei sich nicht geaendert hat.
-     *                FALSE, wenn die Datei sich geaendert hat.
+     * {@inheritdoc}
      */
     public function isValid() {
-        // TODO: stat-Cache bei wiederholten Aufrufen loeschen, siehe clearstatcache()
+        // TODO: reset stat cache on repeated call, @see clearstatcache()
 
         if (file_exists($this->fileName)) {
-            if ($this->lastModified !== filemtime($this->fileName))
+            if ($this->lastModified !== filemtime($this->fileName)) {
                 return false;
+            }
         }
         elseif ($this->lastModified !== null) {
             return false;
