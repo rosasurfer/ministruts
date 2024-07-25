@@ -69,15 +69,16 @@ class DocoptParser extends CObject {
     /**
      * Parse command line arguments and match them against the specified {@link http://docopt.org/#} syntax definition.
      *
-     * @param  string         $doc
-     * @param  string|mixed[] $args [optional]
+     * @param  string               $doc
+     * @param  string|string[]|null $args [optional]
      *
      * @return DocoptResult
      */
     public function parse($doc, $args = null) {
         try {
-            if (!isset($args) && isset($_SERVER['argv']))
+            if (!isset($args) && isset($_SERVER['argv'])) {
                 $args = array_slice($_SERVER['argv'], 1);
+            }
 
             $usage = static::parseSection('Usage:', $doc);
             if (!$usage)            throw new DocoptFormatError('"Usage:" section not found');

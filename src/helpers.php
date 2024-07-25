@@ -1679,9 +1679,9 @@ function asset($uri) {
 /**
  * Parse command line arguments and match them against the specified {@link http://docopt.org/#} syntax definition.
  *
- * @param  string          $doc                - help text, i.e. a syntax definition in Docopt language format
- * @param  string|string[] $args    [optional] - arguments to parse (default: the arguments passed in $_SERVER['argv'])
- * @param  array           $options [optional] - parser options (default: none)
+ * @param  string               $doc                - help text, i.e. a syntax definition in Docopt language format
+ * @param  string|string[]|null $args    [optional] - arguments to parse (default: the arguments passed in $_SERVER['argv'])
+ * @param  array                $options [optional] - parser options (default: none)
  *
  * @return DocoptResult - the parsing result
  */

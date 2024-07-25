@@ -33,6 +33,11 @@
         },
         "files": ["src/load.php"]
     },
+    "autoload-dev": {
+        "psr-4": {
+            "rosasurfer\\test\\": "test"
+        }
+    },
     "extra": {
         "branch-alias": {
             "dev-master": "0.11.x-dev"
