@@ -21,9 +21,9 @@ use function rosasurfer\docopt;
 
 
 /**
- * Ported Python tests
+ * Tests ported from Python to PHPUnit
  */
-class PortedPythonTest extends TestCase {
+class PythonPortedTest extends TestCase {
 
     /**
      *
