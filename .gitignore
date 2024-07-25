@@ -28,8 +28,7 @@ nbactions.xml
 vendor/
 /composer
 /composer.phar
-/composer.lock
-/composer-*
+/composer*.lock
 
 config*.properties
 !config.dist.properties
