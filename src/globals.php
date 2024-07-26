@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * If the {@link \rosasurfer\ministruts\Application} option "app.globals" is set definitions in namespace "\rosasurfer" are additionally mapped
  * to the global namespace.

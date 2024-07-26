@@ -1,5 +1,7 @@
 #!/usr/bin/env php
 <?php
+declare(strict_types=1);
+
 /**
  * Scans the application's PHP error logfile for new entries and mails them to the configured receivers. If no receivers
  * are configured mail is sent to the system user running the script. Processed entries are removed from the logfile.

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace rosasurfer\ministruts\console\io;
 
 use rosasurfer\ministruts\console\docopt\DocoptResult;

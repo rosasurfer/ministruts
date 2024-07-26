@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace rosasurfer\ministruts\log;
 
 use rosasurfer\ministruts\Application;

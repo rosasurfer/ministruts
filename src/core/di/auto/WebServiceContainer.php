@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace rosasurfer\ministruts\core\di\auto;
 
 use rosasurfer\ministruts\console\io\Output;

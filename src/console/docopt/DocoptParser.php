@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace rosasurfer\ministruts\console\docopt;
 
 use rosasurfer\ministruts\core\CObject;
@@ -230,7 +232,7 @@ class DocoptParser extends CObject {
         foreach (static::parseSection('options:', $doc) as $section) {
             # FIXME corner case "bla: options: --foo"
             list (, $section) = explode(':', $section, 2);
-            $splitTmp = array_slice(preg_split("/\n[ \t]*(-\S+?)/", "\n".$section, null, PREG_SPLIT_DELIM_CAPTURE), 1);
+            $splitTmp = array_slice(preg_split("/\n[ \t]*(-\S+?)/", "\n".$section, 0, PREG_SPLIT_DELIM_CAPTURE), 1);
             $split = [];
             for ($size=sizeof($splitTmp), $i=0; $i < $size; $i+=2) {
                 $split[] = $splitTmp[$i].(isset($splitTmp[$i+1]) ? $splitTmp[$i+1] : '');

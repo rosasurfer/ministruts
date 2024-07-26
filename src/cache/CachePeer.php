@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace rosasurfer\ministruts\cache;
 
 use rosasurfer\ministruts\cache\monitor\Dependency;

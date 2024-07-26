@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace rosasurfer\ministruts\console\docopt\exception;
 
 use rosasurfer\ministruts\core\exception\RuntimeException;
@@ -20,7 +22,7 @@ class DocoptUserNotification extends RuntimeException {
      * @param string $message [optional]
      * @param int    $status  [optional]
      */
-    public function __construct($message=null, $status=1) {
+    public function __construct($message='', $status=1) {
         parent::__construct($message);
         $this->status = $status;
     }

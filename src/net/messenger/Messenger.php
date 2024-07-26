@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace rosasurfer\ministruts\net\messenger;
 
 use rosasurfer\ministruts\core\CObject;

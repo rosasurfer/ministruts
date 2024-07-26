@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace rosasurfer\ministruts\db\orm;
 
 use rosasurfer\ministruts\core\CObject;

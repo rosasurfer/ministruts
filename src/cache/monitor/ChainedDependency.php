@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace rosasurfer\ministruts\cache\monitor;
 
 use rosasurfer\ministruts\core\exception\RuntimeException;

@@ -1,5 +1,7 @@
 #!/usr/bin/env php
 <?php
+declare(strict_types=1);
+
 /**
  * CLI version of the application's phpinfo() task accessible at "http://{application}/{any-url}?__phpinfo__".
  *

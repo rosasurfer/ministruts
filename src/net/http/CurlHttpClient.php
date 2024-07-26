@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace rosasurfer\ministruts\net\http;
 
 use rosasurfer\ministruts\core\error\ErrorHandler;
