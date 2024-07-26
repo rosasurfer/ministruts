@@ -107,12 +107,8 @@ class Application extends CObject {
                         }
                         break;                                  // stop parsing after "__phpinfo__"
                     }
-                    else if ($param == '__config__') {
+                    if ($param == '__config__') {
                         $configInfoTask = true;
-                        if ($phpInfoTask) {                     // @phpstan-ignore-line
-                            $phpInfoTask = false;
-                            $phpInfoAfterConfigTask = true;
-                        }
                     }
                     else if ($param == '__cache__') {
                         $cacheInfoTask = true;
