@@ -34,14 +34,14 @@ class Command extends CObject {
     /** @var string - syntax definition in Docopt format */
     private $docoptDefinition;
 
-    /** @var DocoptResult - parsed and matched Docopt block */
-    private $docoptResult;
+    /** @var DocoptResult|null - parsed and matched Docopt block */
+    private $docoptResult = null;
 
-    /** @var \Closure */
-    private $validator;
+    /** @var ?\Closure */
+    private $validator = null;
 
-    /** @var \Closure */
-    private $task;
+    /** @var ?\Closure */
+    private $task = null;
 
     /** @var bool - whether the command configuration is frozen */
     private $frozen = false;
@@ -289,8 +289,8 @@ class Command extends CObject {
      */
     final public function freeze() {
         if (!$this->frozen) {
-            if (!isset($this->name))         throw new IllegalStateException('Incomplete command configuration: no name');
-            if (!isset($this->docoptResult)) throw new IllegalStateException('Incomplete command configuration: no Docopt definition');
+            if ($this->name === '')   throw new IllegalStateException('Incomplete command configuration: no name');
+            if (!$this->docoptResult) throw new IllegalStateException('Incomplete command configuration: no Docopt definition');
             $this->frozen = true;
         }
         return $this;

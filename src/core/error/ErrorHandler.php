@@ -362,9 +362,11 @@ class ErrorHandler extends StaticClass {
             }
 
             // call the active error handler manually
-            $currentHandler = set_error_handler(function() {});
+            $currentHandler = set_error_handler(null);
             restore_error_handler();
-            $currentHandler && call_user_func($currentHandler, ...array_values($error));
+            if ($currentHandler) {
+                call_user_func($currentHandler, ...array_values($error));
+            }
         }
     }
 

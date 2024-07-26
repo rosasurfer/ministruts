@@ -99,7 +99,7 @@ class Application extends CObject {
                 foreach ($_GET as $param => $v) {
                     if ($param == '__phpinfo__') {
                         if ($configInfoTask) {
-                            $phpInfoTask            = false;
+                            $phpInfoTask = false;
                             $phpInfoAfterConfigTask = true;
                         }
                         else {
@@ -107,12 +107,8 @@ class Application extends CObject {
                         }
                         break;                                    // stop parsing after "__phpinfo__"
                     }
-                    else if ($param == '__config__') {
+                    if ($param == '__config__') {
                         $configInfoTask = true;
-                        if ($phpInfoTask) {
-                            $phpInfoTask            = false;
-                            $phpInfoAfterConfigTask = true;
-                        }
                     }
                     else if ($param == '__cache__') {
                         $cacheInfoTask = true;

@@ -61,7 +61,7 @@ class FrontController extends Singleton {
 
                 $configDir  = $config['app.dir.config'];
                 $configFile = str_replace('\\', '/', $configDir.'/struts-config.xml');
-                $dependency = FileDependency::create($configFile);
+                $dependency = FileDependency::create([$configFile]);
                 if (!WINDOWS && !LOCALHOST) {                               // distinction dev/production?  TODO: non-sense
                     $dependency->setMinValidity(1 * MINUTE);
                 }

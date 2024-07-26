@@ -199,12 +199,12 @@ class DocoptParser extends CObject {
                 while ($tokens->current() !== null) {
                     $parsed[] = new Argument(null, $tokens->move());
                 }
-                return $parsed;
+                return $parsed;                             // @phpstan-ignore-line FIXME: refactor using iterator->valid()
             }
             elseif (strStartsWith($tokens->current(), '--')) {
                 $parsed = array_merge($parsed, static::parseLong($tokens, $options));
             }
-            elseif (strStartsWith($tokens->current(), '-') && $tokens->current()!='-') {
+            elseif (strStartsWith($tokens->current(), '-') && $tokens->current() != '-') {
                 $parsed = array_merge($parsed, static::parseShort($tokens, $options));
             }
             elseif ($optionsFirst) {
@@ -425,8 +425,9 @@ class DocoptParser extends CObject {
             $value = null;
         }
 
-        if (strpos($long, '--') !== 0)
+        if (strpos($long, '--') !== 0) {
             throw new \UnexpectedValueException("Expected long option, found '$long'");
+        }
 
         $value = (!$eq && !$value) ? null : $value;
 

@@ -14,8 +14,8 @@ use rosasurfer\ministruts\core\assert\Assert;
 class Input extends CObject {
 
 
-    /** @var DocoptResult */
-    private $docoptResult;
+    /** @var ?DocoptResult */
+    private $docoptResult = null;
 
 
     /**
@@ -34,7 +34,7 @@ class Input extends CObject {
     /**
      * Return the internal Docopt result.
      *
-     * @return DocoptResult
+     * @return ?DocoptResult
      */
     public function getDocoptResult() {
         return $this->docoptResult;
@@ -50,12 +50,12 @@ class Input extends CObject {
      * @return bool
      */
     public function isCommand($name) {
-        Assert::string($name);
-        if (!$this->docoptResult)
-            return false;
+        Assert::string($name);                      // @phpstan-ignore booleanNot.alwaysFalse (can be FALSE as the type is not enforced)
+        if (!$this->docoptResult) return false;
 
-        if (!strlen($name) || !key_exists($name, $this->docoptResult->getArgs()))
+        if (!strlen($name) || !key_exists($name, $this->docoptResult->getArgs())) {
             return false;
+        }
         return (bool) preg_match('/^[a-z]+$/', $name);
     }
 
