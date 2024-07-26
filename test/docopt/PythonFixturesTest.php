@@ -11,11 +11,17 @@ use function rosasurfer\ministruts\docopt;
 
 
 /**
- * PHPUnit tests using original Python fixtures
+ * Unit tests using original Python fixtures
  */
 class PythonFixturesTest extends TestCase {
 
     /**
+     * @param  string $usage
+     * @param  string $argv
+     * @param  mixed  $expected
+     *
+     * @return void
+     *
      * @dataProvider dataProvider
      */
     public function testPythonFixture(string $usage, string $argv, $expected): void {

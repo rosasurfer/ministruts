@@ -10,7 +10,7 @@ parameters:
   level:      6                                     # a rule level on the command line overrides this hardcoded value
 
   bootstrapFiles:                                   # API stubs of unloaded PHP extensions
-    - api-stubs.php
+    - stubs.php
 
   scanFiles:                                        # additional non-autoloaded files to scan for symbols
 
@@ -24,7 +24,7 @@ parameters:
     - ../../etc
     - ../../vendor
 
-  dynamicConstantNames:                             # changing constants depending on the environment
+  dynamicConstantNames:                             # dynamic constants with values depending on the environment
     - rosasurfer\ministruts\_CLI
     - rosasurfer\ministruts\_LOCALHOST
     - rosasurfer\ministruts\_MACOS

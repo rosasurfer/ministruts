@@ -693,7 +693,7 @@ class PythonPortedTest extends TestCase {
     /**
      *
      */
-    function testLongOptionsErrorHandling4() {
+    function testLongOptionsErrorHandling4(): void {
         $this->expectException(DocoptFormatError::class);
         $this->docopt("Usage: prog --long=ARG\nOptions: --long");
     }
