@@ -41,9 +41,10 @@ abstract class Result extends CObject implements ResultInterface {
 
 
     /**
-     *
+     * {@inheritdoc}
      */
     public function fetchColumn($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
+        // @phpstan-ignore booleanAnd.alwaysFalse (can be FALSE as the type is not enforced)
         if (!is_int($column) && !is_string($column)) throw new InvalidTypeException('Illegal type of parameter $column: '.gettype($column));
         if (isset($row))                             throw new UnimplementedFeatureException('$row='.$row.' (!= NULL)');
 

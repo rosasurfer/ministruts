@@ -25,12 +25,6 @@ class SystemFiveLock extends BaseLock {
     /** @var bool */
     private static $logDebug;
 
-    /** @var bool */
-    private static $logInfo;
-
-    /** @var bool */
-    private static $logNotice;
-
     /** @var resource[] - semaphore handles */
     private static $hSemaphores = [];
 
@@ -60,10 +54,8 @@ class SystemFiveLock extends BaseLock {
         if (\key_exists($key, self::$hSemaphores)) throw new RuntimeException('Dead-lock detected: already holding a lock for key "'.$key.'"');
         self::$hSemaphores[$key] = null;
 
-        $loglevel        = Logger::getLogLevel(__CLASS__);
-        self::$logDebug  = ($loglevel <= L_DEBUG );
-        self::$logInfo   = ($loglevel <= L_INFO  );
-        self::$logNotice = ($loglevel <= L_NOTICE);
+        $loglevel = Logger::getLogLevel(__CLASS__);
+        self::$logDebug = ($loglevel <= L_DEBUG );
 
         // use fTok() instead
         $integer = $this->keyToId($key);
@@ -79,13 +71,12 @@ class SystemFiveLock extends BaseLock {
                 sem_acquire($hSemaphore);
                 break;                                          // TODO: bei Last koennen sem_get() oder sem_acquire() scheitern
             }
-            catch (IRosasurferException $ex) {}
-            catch (\Throwable           $ex) { $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex); }
+            catch (\Throwable $ex) {
+                if (!$ex instanceof IRosasurferException) $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex);
 
-            if ($ex) {
                 // TODO: Quellcode umschreiben (ext/sysvsem/sysvsem.c) und Fehler lokalisieren (vermutlich wird ein File-Limit ueberschritten)
-                $message  = $ex->getMessage();
-                $hexId    = dechex($integer);
+                $message = $ex->getMessage();
+                $hexId = dechex($integer);
                 $prefixes = [
                     'sem_get(): failed for key 0x'.$hexId.': Invalid argument',
                     'sem_get(): failed for key 0x'.$hexId.': Identifier removed',

@@ -602,7 +602,7 @@ class Logger extends StaticClass {
      *
      * @return string - message details (ending with a line break) or an empty string if not applicable
      */
-    private static function getMessageDetails($loggable, $level, array &$context, $html) {
+    private static function getMessageDetails($loggable, $level, array &$context, $html) {  // @phpstan-ignore method.unused (TODO: remove after refactoring)
         $key = 'messageDetails.'.($html ? 'web':'cli');
         if (isset($context[$key])) return $context[$key].'';
 
@@ -642,7 +642,7 @@ class Logger extends StaticClass {
      *
      * @return string - trace details (ending with a line break) or an empty string if not applicable
      */
-    private static function getTraceDetails($loggable, $level, array &$context, $html) {
+    private static function getTraceDetails($loggable, $level, array &$context, $html) {    // @phpstan-ignore method.unused (TODO: remove after refactoring)
         $key = 'traceDetails.'.($html ? 'web':'cli');
         if (isset($context[$key])) return $context[$key].'';
 
@@ -688,7 +688,7 @@ class Logger extends StaticClass {
      *
      * @return string - request details (ending with a line break) or an empty string if not applicable
      */
-    private static function getRequestDetails($loggable, $level, array &$context, $html) {
+    private static function getRequestDetails($loggable, $level, array &$context, $html) {      // @phpstan-ignore method.unused (TODO: remove after refactoring)
         $key = 'requestDetails.'.($html ? 'web':'cli');
         if (isset($context[$key])) return $context[$key].'';
 
@@ -713,7 +713,7 @@ class Logger extends StaticClass {
      *
      * @return string - session details (ending with a line break) or an empty string if not applicable
      */
-    private static function getSessionDetails($loggable, $level, array &$context, $html) {
+    private static function getSessionDetails($loggable, $level, array &$context, $html) {      // @phpstan-ignore method.unused (TODO: remove after refactoring)
         $key = 'sessionDetails.'.($html ? 'web':'cli');
         if (isset($context[$key])) return $context[$key].'';
 
@@ -739,7 +739,7 @@ class Logger extends StaticClass {
      *
      * @return string - server details (ending with a line break) or an empty string if not applicable
      */
-    private static function getServerDetails($loggable, $level, array &$context, $html) {
+    private static function getServerDetails($loggable, $level, array &$context, $html) {       // @phpstan-ignore method.unused (TODO: remove after refactoring)
         $key = 'serverDetails.'.($html ? 'web':'cli');
         if (isset($context[$key])) return $context[$key].'';
 

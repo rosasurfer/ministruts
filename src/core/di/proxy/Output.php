@@ -10,8 +10,8 @@ namespace rosasurfer\ministruts\core\di\proxy;
  * Default implementation: {@link \rosasurfer\ministruts\console\io\Output}
  *
  * @method static \rosasurfer\ministruts\console\io\Output instance()            Get the object behind the proxy.
- * @method static void                          out(mixed $message)   Write a message to STDOUT.
- * @method static void                          error(mixed $message) Write a message to STDERR.
+ * @method static void                                     out(mixed $message)   Write a message to STDOUT.
+ * @method static void                                     error(mixed $message) Write a message to STDERR.
  */
 class Output extends Proxy {
 
@@ -21,6 +21,6 @@ class Output extends Proxy {
      */
     protected static function getServiceName() {
         return 'output';
-        return \rosasurfer\ministruts\console\io\Output::class;
+        return \rosasurfer\ministruts\console\io\Output::class;     // @phpstan-ignore deadCode.unreachable (keep for testing)
     }
 }

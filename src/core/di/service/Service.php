@@ -2,7 +2,6 @@
 namespace rosasurfer\ministruts\core\di\service;
 
 use rosasurfer\ministruts\core\exception\ClassNotFoundException;
-use rosasurfer\ministruts\core\exception\InvalidTypeException;
 
 use function rosasurfer\ministruts\is_class;
 
@@ -29,8 +28,8 @@ class Service implements ServiceInterface {
     /** @var string|object */
     protected $definition;
 
-    /** @var object */
-    protected $instance;
+    /** @var ?object */
+    protected $instance = null;
 
 
     /**
@@ -93,10 +92,11 @@ class Service implements ServiceInterface {
      * @return object
      */
     public function resolve($factory=false, $parameters=[]) {
-        if (!$factory && $this->instance)
+        if (!$factory && $this->instance) {
             return $this->instance;
+        }
 
-        $instance   = null;
+        $instance = null;
         $definition = $this->definition;
         !$factory && $parameters = [];
 
@@ -107,10 +107,10 @@ class Service implements ServiceInterface {
         else if (is_object($definition)) {                  // objects may be a \Closure or an already resolved instance
             $instance = $definition instanceof \Closure ? $definition(...$parameters) : $definition;
         }
-        else throw new InvalidTypeException('Cannot resolve service "'.$this->name.'" (illegal definition type: '.gettype($definition).')');
 
-        if (!$factory)
+        if (!$factory) {
             $this->instance = $instance;
+        }
         return $instance;
     }
 }

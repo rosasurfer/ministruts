@@ -53,14 +53,14 @@ class ErrorHandler extends StaticClass {
     /** @var int - the configured error handling mode */
     protected static $errorHandlingMode = 0;
 
-    /** @var callable - a previously active error handler (if any) */
-    protected static $prevErrorHandler;
+    /** @var ?callable - a previously active error handler (if any) */
+    protected static $prevErrorHandler = null;
 
     /** @var bool - the configured exception handling status */
     protected static $exceptionHandling = false;
 
-    /** @var callable - a previously active exception handler (if any) */
-    protected static $prevExceptionHandler;
+    /** @var ?callable - a previously active exception handler (if any) */
+    protected static $prevExceptionHandler = null;
 
     /** @var bool - whether the script is in the shutdown phase */
     protected static $inScriptShutdown = false;
@@ -82,7 +82,7 @@ class ErrorHandler extends StaticClass {
         }
         else {
             self::$errorHandlingMode = $mode;
-            self::$prevErrorHandler  = set_error_handler(__CLASS__.'::handleError');
+            self::$prevErrorHandler = set_error_handler(__CLASS__.'::handleError');
             self::setupShutdownHandler();
         }
     }
@@ -143,7 +143,9 @@ class ErrorHandler extends StaticClass {
         // anonymous function to chain a previously active handler
         $args = func_get_args();
         $prevErrorHandler = function() use ($args) {                        // a possibly static handler must be invoked with call_user_func()
-            self::$prevErrorHandler && call_user_func(self::$prevErrorHandler, ...$args);
+            if (self::$prevErrorHandler) {
+                call_user_func(self::$prevErrorHandler, ...$args);
+            }
             return true;                                                    // tell PHP to call error_clear_last()
         };
 

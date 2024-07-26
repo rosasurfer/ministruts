@@ -22,8 +22,8 @@ final class ConnectionPool extends Singleton {
     /** @var IConnector[] - adapter pool */
     private $pool = [];
 
-    /** @var IConnector - default adapter */
-    private $default;
+    /** @var ?IConnector - default adapter */
+    private $default = null;
 
     /** @var string[] - common adapter aliases */
     private static $aliases = [
@@ -75,7 +75,7 @@ final class ConnectionPool extends Singleton {
         }
         else {                                                   // no, get the connection's config
             /** @var ConfigInterface $config */
-            $config  = self::di('config');
+            $config = self::di('config');
             $options = $config->get('db.'.$id, []);
             Assert::isArray($options, 'config value "db.'.$id.'"');
             if (!$options) throw new IllegalStateException('No configuration found for database alias "'.$id.'"');
@@ -88,8 +88,9 @@ final class ConnectionPool extends Singleton {
 
             // check known aliases for a match
             $lName = strtolower($className);
-            if (isset(self::$aliases[$lName]))
+            if (isset(self::$aliases[$lName])) {
                 $className = self::$aliases[$lName];
+            }
 
             // instantiate and save a new connector
             $me->pool[$id] = $connector = Connector::create($className, $options);

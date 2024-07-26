@@ -50,11 +50,11 @@ class SQLiteConnector extends Connector {
     /** @var string - DBMS type */
     protected $type = 'sqlite';
 
-    /** @var string - DBMS version string */
-    protected $versionString;
+    /** @var ?string - DBMS version string */
+    protected $versionString = null;
 
-    /** @var int - DBMS version number */
-    protected $versionNumber;
+    /** @var ?int - DBMS version number */
+    protected $versionNumber = null;
 
     /** @var string - database file to connect to */
     protected $file;
@@ -463,8 +463,9 @@ class SQLiteConnector extends Connector {
      */
     public function getVersionString() {
         if (!isset($this->versionString)) {
-            if (!$this->isConnected())
+            if (!$this->isConnected()) {
                 $this->connect();
+            }
             $this->versionString = $this->sqlite->version()['versionString'];
         }
         return $this->versionString;
@@ -478,8 +479,9 @@ class SQLiteConnector extends Connector {
      */
     public function getVersionNumber() {
         if (!isset($this->versionNumber)) {
-            if (!$this->isConnected())
+            if (!$this->isConnected()) {
                 $this->connect();
+            }
             $this->versionNumber = $this->sqlite->version()['versionNumber'];
         }
         return $this->versionNumber;

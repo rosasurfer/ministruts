@@ -19,8 +19,8 @@ class Lock extends BaseLock {
     /** @var string[] - Schluessel der im Moment gehaltenen Locks */
     private static $lockedKeys;
 
-    /** @var BaseLock - aktuelle Implementierung der Instanz */
-    private $impl;
+    /** @var ?BaseLock - aktuelle Implementierung der Instanz */
+    private $impl = null;
 
     /** @var string - aktueller Schluessel der Instanz */
     private $key;
@@ -38,7 +38,7 @@ class Lock extends BaseLock {
         self::$lockedKeys[$key] = $this->key = $key;
 
         // vorzugsweise SysVLock verwenden...
-        if (false && extension_loaded('sysvsem')) {
+        if (false && extension_loaded('sysvsem')) {     // @phpstan-ignore  booleanAnd.leftAlwaysFalse (keep for testing)
             $this->impl = new SystemFiveLock($key);
         }
         else {
@@ -61,8 +61,9 @@ class Lock extends BaseLock {
      * @return bool
      */
     public function isAquired() {
-        if ($this->impl)
+        if ($this->impl) {
             return $this->impl->isAquired();
+        }
         return false;
     }
 
