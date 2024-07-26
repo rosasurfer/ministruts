@@ -415,19 +415,18 @@ class PHP extends StaticClass {
      * @return bool - success status
      */
     public static function ini_set($option, $value, $throwException = true) {
-        if (is_bool($value))
-            $value = (int) $value;
-
-        $oldValue = ini_set($option, $value);
-        if ($oldValue !== false)
-            return true;
-
-        $oldValue = ini_get($option);       // ini_set() caused an error
+        if (is_bool($value)) $value = (int) $value;
         $newValue = (string) $value;
 
-        if ($oldValue == $newValue)         // the error can be ignored
+        $oldValue = ini_set($option, $newValue);
+        if ($oldValue !== false) {
             return true;
+        }
+        $oldValue = ini_get($option);       // ini_set() caused an error
 
+        if ($oldValue == $newValue) {       // the error can be ignored
+            return true;
+        }
         if ($throwException) throw new RuntimeException('Cannot set php.ini option "'.$option.'" (former value="'.$oldValue.'")');
         return false;
     }
