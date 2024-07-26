@@ -1,78 +1,78 @@
 <?php
 /**
- * If the {@link \rosasurfer\Application} option "app.globals" is set definitions in namespace "\rosasurfer" are additionally mapped
+ * If the {@link \rosasurfer\ministruts\Application} option "app.globals" is set definitions in namespace "\rosasurfer" are additionally mapped
  * to the global namespace.
  */
-use rosasurfer\Application;
-use rosasurfer\console\docopt\DocoptResult;
-use rosasurfer\ministruts\ActionMapping;
-use rosasurfer\ministruts\Module;
-use rosasurfer\ministruts\url\Url;
-use rosasurfer\ministruts\url\VersionedUrl;
+use rosasurfer\ministruts\Application;
+use rosasurfer\ministruts\console\docopt\DocoptResult;
+use rosasurfer\ministruts\struts\ActionMapping;
+use rosasurfer\ministruts\struts\Module;
+use rosasurfer\ministruts\struts\url\Url;
+use rosasurfer\ministruts\struts\url\VersionedUrl;
 
 
 // runtime environment
-const CLI               = \rosasurfer\CLI;
-const LOCALHOST         = \rosasurfer\LOCALHOST;
-const MACOS             = \rosasurfer\MACOS;
-const WINDOWS           = \rosasurfer\WINDOWS;
-const NUL_DEVICE        = \rosasurfer\NUL_DEVICE;                   // the system's NUL device name
+const CLI               = \rosasurfer\ministruts\CLI;
+const LOCALHOST         = \rosasurfer\ministruts\LOCALHOST;
+const MACOS             = \rosasurfer\ministruts\MACOS;
+const WINDOWS           = \rosasurfer\ministruts\WINDOWS;
+const NUL_DEVICE        = \rosasurfer\ministruts\NUL_DEVICE;            // the system's NUL device name
 
 // custom log level
-const L_DEBUG           = \rosasurfer\L_DEBUG;
-const L_INFO            = \rosasurfer\L_INFO;
-const L_NOTICE          = \rosasurfer\L_NOTICE;
-const L_WARN            = \rosasurfer\L_WARN;
-const L_ERROR           = \rosasurfer\L_ERROR;
-const L_FATAL           = \rosasurfer\L_FATAL;
+const L_DEBUG           = \rosasurfer\ministruts\L_DEBUG;
+const L_INFO            = \rosasurfer\ministruts\L_INFO;
+const L_NOTICE          = \rosasurfer\ministruts\L_NOTICE;
+const L_WARN            = \rosasurfer\ministruts\L_WARN;
+const L_ERROR           = \rosasurfer\ministruts\L_ERROR;
+const L_FATAL           = \rosasurfer\ministruts\L_FATAL;
 
 // log destinations for the built-in function error_log()
-const ERROR_LOG_DEFAULT = \rosasurfer\ERROR_LOG_DEFAULT;
-const ERROR_LOG_MAIL    = \rosasurfer\ERROR_LOG_MAIL;
-const ERROR_LOG_DEBUG   = \rosasurfer\ERROR_LOG_DEBUG;
-const ERROR_LOG_FILE    = \rosasurfer\ERROR_LOG_FILE;
-const ERROR_LOG_SAPI    = \rosasurfer\ERROR_LOG_SAPI;
+const ERROR_LOG_DEFAULT = \rosasurfer\ministruts\ERROR_LOG_DEFAULT;
+const ERROR_LOG_MAIL    = \rosasurfer\ministruts\ERROR_LOG_MAIL;
+const ERROR_LOG_DEBUG   = \rosasurfer\ministruts\ERROR_LOG_DEBUG;
+const ERROR_LOG_FILE    = \rosasurfer\ministruts\ERROR_LOG_FILE;
+const ERROR_LOG_SAPI    = \rosasurfer\ministruts\ERROR_LOG_SAPI;
 
 // time periods
-const SECOND            = \rosasurfer\SECOND; const SECONDS = SECOND;
-const MINUTE            = \rosasurfer\MINUTE; const MINUTES = MINUTE;
-const HOUR              = \rosasurfer\HOUR;   const HOURS   = HOUR;
-const DAY               = \rosasurfer\DAY;    const DAYS    = DAY;
-const WEEK              = \rosasurfer\WEEK;   const WEEKS   = WEEK;
-const MONTH             = \rosasurfer\MONTH;  const MONTHS  = MONTH;
-const YEAR              = \rosasurfer\YEAR;   const YEARS   = YEAR;
+const SECOND            = \rosasurfer\ministruts\SECOND; const SECONDS = SECOND;
+const MINUTE            = \rosasurfer\ministruts\MINUTE; const MINUTES = MINUTE;
+const HOUR              = \rosasurfer\ministruts\HOUR;   const HOURS   = HOUR;
+const DAY               = \rosasurfer\ministruts\DAY;    const DAYS    = DAY;
+const WEEK              = \rosasurfer\ministruts\WEEK;   const WEEKS   = WEEK;
+const MONTH             = \rosasurfer\ministruts\MONTH;  const MONTHS  = MONTH;
+const YEAR              = \rosasurfer\ministruts\YEAR;   const YEARS   = YEAR;
 
 // weekdays
-const SUNDAY            = \rosasurfer\SUNDAY;
-const MONDAY            = \rosasurfer\MONDAY;
-const TUESDAY           = \rosasurfer\TUESDAY;
-const WEDNESDAY         = \rosasurfer\WEDNESDAY;
-const THURSDAY          = \rosasurfer\THURSDAY;
-const FRIDAY            = \rosasurfer\FRIDAY;
-const SATURDAY          = \rosasurfer\SATURDAY;
+const SUNDAY            = \rosasurfer\ministruts\SUNDAY;
+const MONDAY            = \rosasurfer\ministruts\MONDAY;
+const TUESDAY           = \rosasurfer\ministruts\TUESDAY;
+const WEDNESDAY         = \rosasurfer\ministruts\WEDNESDAY;
+const THURSDAY          = \rosasurfer\ministruts\THURSDAY;
+const FRIDAY            = \rosasurfer\ministruts\FRIDAY;
+const SATURDAY          = \rosasurfer\ministruts\SATURDAY;
 
 // byte sizes
-const KB                = \rosasurfer\KB;
-const MB                = \rosasurfer\MB;
-const GB                = \rosasurfer\GB;
+const KB                = \rosasurfer\ministruts\KB;
+const MB                = \rosasurfer\ministruts\MB;
+const GB                = \rosasurfer\ministruts\GB;
 
 // array indexing types
-const ARRAY_ASSOC       = \rosasurfer\ARRAY_ASSOC;
-const ARRAY_NUM         = \rosasurfer\ARRAY_NUM;
-const ARRAY_BOTH        = \rosasurfer\ARRAY_BOTH;
+const ARRAY_ASSOC       = \rosasurfer\ministruts\ARRAY_ASSOC;
+const ARRAY_NUM         = \rosasurfer\ministruts\ARRAY_NUM;
+const ARRAY_BOTH        = \rosasurfer\ministruts\ARRAY_BOTH;
 
 // class member access levels
-const ACCESS_PUBLIC     = \rosasurfer\ACCESS_PUBLIC;
-const ACCESS_PROTECTED  = \rosasurfer\ACCESS_PROTECTED;
-const ACCESS_PRIVATE    = \rosasurfer\ACCESS_PRIVATE;
-const ACCESS_ALL        = \rosasurfer\ACCESS_ALL;
+const ACCESS_PUBLIC     = \rosasurfer\ministruts\ACCESS_PUBLIC;
+const ACCESS_PROTECTED  = \rosasurfer\ministruts\ACCESS_PROTECTED;
+const ACCESS_PRIVATE    = \rosasurfer\ministruts\ACCESS_PRIVATE;
+const ACCESS_ALL        = \rosasurfer\ministruts\ACCESS_ALL;
 
 // miscellaneous
-const NL                = \rosasurfer\NL;                       // = EOL_UNIX
-const EOL_MAC           = \rosasurfer\EOL_MAC;                  // "\r"       CR       0D       13
-const EOL_NETSCAPE      = \rosasurfer\EOL_NETSCAPE;             // "\r\r\n"   CRCRLF   0D0D0A   13,13,10
-const EOL_UNIX          = \rosasurfer\EOL_UNIX;                 // "\n"       LF       0A       10
-const EOL_WINDOWS       = \rosasurfer\EOL_WINDOWS;              // "\r\n"     CRLF     0D0A     13,10
+const NL                = \rosasurfer\ministruts\NL;                    // = EOL_UNIX
+const EOL_MAC           = \rosasurfer\ministruts\EOL_MAC;               // "\r"       CR       0D       13
+const EOL_NETSCAPE      = \rosasurfer\ministruts\EOL_NETSCAPE;          // "\r\r\n"   CRCRLF   0D0D0A   13,13,10
+const EOL_UNIX          = \rosasurfer\ministruts\EOL_UNIX;              // "\n"       LF       0A       10
+const EOL_WINDOWS       = \rosasurfer\ministruts\EOL_WINDOWS;           // "\r\n"     CRLF     0D0A     13,10
 
 
 /**
@@ -83,7 +83,7 @@ const EOL_WINDOWS       = \rosasurfer\EOL_WINDOWS;              // "\r\n"     CR
  * @return mixed - the first element or NULL if the array-like variable is empty
  */
 function first($values) {
-    return \rosasurfer\first($values);
+    return \rosasurfer\ministruts\first($values);
 }
 
 
@@ -95,7 +95,7 @@ function first($values) {
  * @return mixed - the first key or NULL if the array-like variable is empty
  */
 function firstKey($values) {
-    return \rosasurfer\firstKey($values);
+    return \rosasurfer\ministruts\firstKey($values);
 }
 
 
@@ -107,7 +107,7 @@ function firstKey($values) {
  * @return mixed - the last element or NULL if the array-like variable is empty
  */
 function last($values) {
-    return \rosasurfer\last($values);
+    return \rosasurfer\ministruts\last($values);
 }
 
 
@@ -119,7 +119,7 @@ function last($values) {
  * @return mixed - the last key or NULL if the array-like variable is empty
  */
 function lastKey($values) {
-    return \rosasurfer\lastKey($values);
+    return \rosasurfer\ministruts\lastKey($values);
 }
 
 
@@ -131,7 +131,7 @@ function lastKey($values) {
  * @return string
  */
 function boolToStr($value) {
-    return \rosasurfer\boolToStr($value);
+    return \rosasurfer\ministruts\boolToStr($value);
 }
 
 
@@ -141,7 +141,7 @@ function boolToStr($value) {
  * @param  string $message
  */
 function stdout($message) {
-    \rosasurfer\stdout($message);
+    \rosasurfer\ministruts\stdout($message);
 }
 
 
@@ -151,7 +151,7 @@ function stdout($message) {
  * @param  string $message
  */
 function stderr($message) {
-    \rosasurfer\stderr($message);
+    \rosasurfer\ministruts\stderr($message);
 }
 
 
@@ -161,7 +161,7 @@ function stderr($message) {
  * @param  mixed $message
  */
 function debugHeader($message) {
-    \rosasurfer\debugHeader($message);
+    \rosasurfer\ministruts\debugHeader($message);
 }
 
 
@@ -176,7 +176,7 @@ function debugHeader($message) {
  * @return ?string - string if the result is to be returned, NULL otherwise
  */
 function dump($var, $return=false, $flushBuffers=true) {
-    return \rosasurfer\dump($var, $return, $flushBuffers);
+    return \rosasurfer\ministruts\dump($var, $return, $flushBuffers);
 }
 
 
@@ -191,7 +191,7 @@ function dump($var, $return=false, $flushBuffers=true) {
  * @return bool - always TRUE
  */
 function echof($var, $flushBuffers = true) {
-    return \rosasurfer\echof($var, $flushBuffers);
+    return \rosasurfer\ministruts\echof($var, $flushBuffers);
 }
 
 
@@ -206,7 +206,7 @@ function echof($var, $flushBuffers = true) {
  * @return ?string - string if the result is to be returned, NULL otherwise
  */
 function print_p($var, $return=false, $flushBuffers=true) {
-    return \rosasurfer\print_p($var, $return, $flushBuffers);
+    return \rosasurfer\ministruts\print_p($var, $return, $flushBuffers);
 }
 
 
@@ -219,7 +219,7 @@ function print_p($var, $return=false, $flushBuffers=true) {
  * @return string - formatted byte value
  */
 function prettyBytes($value, $decimals = 1) {
-    return \rosasurfer\prettyBytes($value, $decimals);
+    return \rosasurfer\ministruts\prettyBytes($value, $decimals);
 }
 
 
@@ -231,7 +231,7 @@ function prettyBytes($value, $decimals = 1) {
  * @return int - converted byte value
  */
 function php_byte_value($value) {
-    return \rosasurfer\php_byte_value($value);
+    return \rosasurfer\ministruts\php_byte_value($value);
 }
 
 
@@ -246,7 +246,7 @@ function php_byte_value($value) {
  * @return string - formatted number
  */
 function numf($number, $decimals=0, $decimalSeparator='.', $thousandsSeparator=',') {
-    return \rosasurfer\numf($number, $decimals, $decimalSeparator, $thousandsSeparator);
+    return \rosasurfer\ministruts\numf($number, $decimals, $decimalSeparator, $thousandsSeparator);
 }
 
 
@@ -263,7 +263,7 @@ function numf($number, $decimals=0, $decimalSeparator='.', $thousandsSeparator='
  * @return ?bool - boolean value or NULL if the setting doesn't exist
  */
 function ini_get_bool($option, $strict = true) {
-    return \rosasurfer\ini_get_bool($option, $strict);
+    return \rosasurfer\ministruts\ini_get_bool($option, $strict);
 }
 
 
@@ -280,7 +280,7 @@ function ini_get_bool($option, $strict = true) {
  * @return ?int - integer value or NULL if the setting doesn't exist
  */
 function ini_get_int($option, $strict = true) {
-    return \rosasurfer\ini_get_int($option, $strict);
+    return \rosasurfer\ministruts\ini_get_int($option, $strict);
 }
 
 
@@ -297,7 +297,7 @@ function ini_get_int($option, $strict = true) {
  * @return ?int - integer value or NULL if the setting doesn't exist
  */
 function ini_get_bytes($option, $strict = true) {
-    return \rosasurfer\ini_get_bytes($option, $strict);
+    return \rosasurfer\ministruts\ini_get_bytes($option, $strict);
 }
 
 
@@ -316,7 +316,7 @@ function ini_get_bytes($option, $strict = true) {
  * @see   \htmlspecialchars()
  */
 function hsc($string, $flags=null, $encoding=null, $doubleEncode=true) {
-    return \rosasurfer\hsc($string, $flags, $encoding, $doubleEncode);
+    return \rosasurfer\ministruts\hsc($string, $flags, $encoding, $doubleEncode);
 }
 
 
@@ -326,7 +326,7 @@ function hsc($string, $flags=null, $encoding=null, $doubleEncode=true) {
  * @return bool
  */
 function isLittleEndian() {
-    return \rosasurfer\isLittleEndian();
+    return \rosasurfer\ministruts\isLittleEndian();
 }
 
 
@@ -338,7 +338,7 @@ function isLittleEndian() {
  * @return bool
  */
 function isRelativePath($path) {
-    return \rosasurfer\isRelativePath($path);
+    return \rosasurfer\ministruts\isRelativePath($path);
 }
 
 
@@ -352,7 +352,7 @@ function isRelativePath($path) {
  * @return bool
  */
 function strCompare($stringA, $stringB, $ignoreCase = false) {
-    return \rosasurfer\strCompare($stringA, $stringB, $ignoreCase);
+    return \rosasurfer\ministruts\strCompare($stringA, $stringB, $ignoreCase);
 }
 
 
@@ -365,7 +365,7 @@ function strCompare($stringA, $stringB, $ignoreCase = false) {
  * @return bool
  */
 function strCompareI($stringA, $stringB) {
-    return \rosasurfer\strCompareI($stringA, $stringB);
+    return \rosasurfer\ministruts\strCompareI($stringA, $stringB);
 }
 
 
@@ -379,7 +379,7 @@ function strCompareI($stringA, $stringB) {
  * @return bool
  */
 function strContains($haystack, $needle, $ignoreCase = false) {
-    return \rosasurfer\strContains($haystack, $needle, $ignoreCase);
+    return \rosasurfer\ministruts\strContains($haystack, $needle, $ignoreCase);
 }
 
 
@@ -392,7 +392,7 @@ function strContains($haystack, $needle, $ignoreCase = false) {
  * @return bool
  */
 function strContainsI($haystack, $needle) {
-    return \rosasurfer\strContainsI($haystack, $needle);
+    return \rosasurfer\ministruts\strContainsI($haystack, $needle);
 }
 
 
@@ -406,7 +406,7 @@ function strContainsI($haystack, $needle) {
  * @return bool
  */
 function strStartsWith($string, $prefix, $ignoreCase = false) {
-    return \rosasurfer\strStartsWith($string, $prefix, $ignoreCase);
+    return \rosasurfer\ministruts\strStartsWith($string, $prefix, $ignoreCase);
 }
 
 
@@ -420,7 +420,7 @@ function strStartsWith($string, $prefix, $ignoreCase = false) {
  * @return bool
  */
 function strStartsWithI($string, $prefix) {
-    return \rosasurfer\strStartsWithI($string, $prefix);
+    return \rosasurfer\ministruts\strStartsWithI($string, $prefix);
 }
 
 
@@ -434,7 +434,7 @@ function strStartsWithI($string, $prefix) {
  * @return bool
  */
 function strEndsWith($string, $suffix, $ignoreCase = false) {
-    return \rosasurfer\strEndsWith($string, $suffix, $ignoreCase);
+    return \rosasurfer\ministruts\strEndsWith($string, $suffix, $ignoreCase);
 }
 
 
@@ -448,7 +448,7 @@ function strEndsWith($string, $suffix, $ignoreCase = false) {
  * @return bool
  */
 function strEndsWithI($string, $suffix) {
-    return \rosasurfer\strEndsWithI($string, $suffix);
+    return \rosasurfer\ministruts\strEndsWithI($string, $suffix);
 }
 
 
@@ -468,7 +468,7 @@ function strEndsWithI($string, $suffix) {
  * </pre>
  */
 function strLeft($string, $length) {
-    return \rosasurfer\strLeft($string, $length);
+    return \rosasurfer\ministruts\strLeft($string, $length);
 }
 
 
@@ -500,7 +500,7 @@ function strLeft($string, $length) {
  * </pre>
  */
 function strLeftTo($string, $limiter, $count=1, $includeLimiter=false, $onNotFound='') {
-    return \rosasurfer\strLeftTo(...func_get_args());
+    return \rosasurfer\ministruts\strLeftTo(...func_get_args());
 }
 
 
@@ -520,7 +520,7 @@ function strLeftTo($string, $limiter, $count=1, $includeLimiter=false, $onNotFou
  * </pre>
  */
 function strRight($string, $length) {
-    return \rosasurfer\strRight($string, $length);
+    return \rosasurfer\ministruts\strRight($string, $length);
 }
 
 
@@ -551,7 +551,7 @@ function strRight($string, $length) {
  * </pre>
  */
 function strRightFrom($string, $limiter, $count=1, $includeLimiter=false, $onNotFound='') {
-    return \rosasurfer\strRightFrom(...func_get_args());
+    return \rosasurfer\ministruts\strRightFrom(...func_get_args());
 }
 
 
@@ -563,7 +563,7 @@ function strRightFrom($string, $limiter, $count=1, $includeLimiter=false, $onNot
  * @return bool
  */
 function strIsQuoted($value) {
-    return \rosasurfer\strIsQuoted($value);
+    return \rosasurfer\ministruts\strIsQuoted($value);
 }
 
 
@@ -575,7 +575,7 @@ function strIsQuoted($value) {
  * @return bool
  */
 function strIsSingleQuoted($value) {
-    return \rosasurfer\strIsSingleQuoted($value);
+    return \rosasurfer\ministruts\strIsSingleQuoted($value);
 }
 
 
@@ -587,7 +587,7 @@ function strIsSingleQuoted($value) {
  * @return bool
  */
 function strIsDoubleQuoted($value) {
-    return \rosasurfer\strIsDoubleQuoted($value);
+    return \rosasurfer\ministruts\strIsDoubleQuoted($value);
 }
 
 
@@ -599,7 +599,7 @@ function strIsDoubleQuoted($value) {
  * @return bool
  */
 function strIsDigits($value) {
-    return \rosasurfer\strIsDigits($value);
+    return \rosasurfer\ministruts\strIsDigits($value);
 }
 
 
@@ -611,7 +611,7 @@ function strIsDigits($value) {
  * @return bool
  */
 function strIsInteger($value) {
-    return \rosasurfer\strIsInteger($value);
+    return \rosasurfer\ministruts\strIsInteger($value);
 }
 
 
@@ -625,7 +625,7 @@ function strIsInteger($value) {
  * @return bool
  */
 function strIsNumeric($value) {
-    return \rosasurfer\strIsNumeric($value);
+    return \rosasurfer\ministruts\strIsNumeric($value);
 }
 
 
@@ -638,7 +638,7 @@ function strIsNumeric($value) {
  *                 numerical string representation (integer or float) are 0 (zero) and 1 (one).
  */
 function strToBool($value) {
-    return \rosasurfer\strToBool($value);
+    return \rosasurfer\ministruts\strToBool($value);
 }
 
 
@@ -652,7 +652,7 @@ function strToBool($value) {
  * @return string
  */
 function strCollapseWhiteSpace($string, $joinLines=true, $separator=' ') {
-    return \rosasurfer\strCollapseWhiteSpace($string, $joinLines, $separator);
+    return \rosasurfer\ministruts\strCollapseWhiteSpace($string, $joinLines, $separator);
 }
 
 
@@ -669,7 +669,7 @@ function strCollapseWhiteSpace($string, $joinLines=true, $separator=' ') {
  * @return string
  */
 function normalizeEOL($string, $mode = EOL_UNIX) {
-    return \rosasurfer\normalizeEOL($string, $mode);
+    return \rosasurfer\ministruts\normalizeEOL($string, $mode);
 }
 
 
@@ -682,7 +682,7 @@ function normalizeEOL($string, $mode = EOL_UNIX) {
  * @return array
  */
 function objectToArray($object, $access = ACCESS_PUBLIC) {
-    return \rosasurfer\objectToArray($object, $access);
+    return \rosasurfer\ministruts\objectToArray($object, $access);
 }
 
 
@@ -694,7 +694,7 @@ function objectToArray($object, $access = ACCESS_PUBLIC) {
  * @return string
  */
 function typeOf($var) {
-    return \rosasurfer\typeOf($var);
+    return \rosasurfer\ministruts\typeOf($var);
 }
 
 
@@ -709,7 +709,7 @@ function typeOf($var) {
  * @return bool
  */
 function is_dir_empty($dirname, $ignore = []) {
-    return \rosasurfer\is_dir_empty($dirname, $ignore);
+    return \rosasurfer\ministruts\is_dir_empty($dirname, $ignore);
 }
 
 
@@ -721,7 +721,7 @@ function is_dir_empty($dirname, $ignore = []) {
  * @return ?string - the same name or NULL if a component of that name doesn't exist or couldn't be loaded
  */
 function autoload($name) {
-    return \rosasurfer\autoload($name);
+    return \rosasurfer\ministruts\autoload($name);
 }
 
 
@@ -734,7 +734,7 @@ function autoload($name) {
  * @return bool
  */
 function is_class($name) {
-    return \rosasurfer\is_class($name);
+    return \rosasurfer\ministruts\is_class($name);
 }
 
 
@@ -747,7 +747,7 @@ function is_class($name) {
  * @return bool
  */
 function is_interface($name) {
-    return \rosasurfer\is_interface($name);
+    return \rosasurfer\ministruts\is_interface($name);
 }
 
 
@@ -760,7 +760,7 @@ function is_interface($name) {
  * @return bool
  */
 function is_trait($name) {
-    return \rosasurfer\is_trait($name);
+    return \rosasurfer\ministruts\is_trait($name);
 }
 
 
@@ -774,7 +774,7 @@ function is_trait($name) {
  * @return bool
  */
 function is_array_like($var) {
-    return \rosasurfer\is_array_like($var);
+    return \rosasurfer\ministruts\is_array_like($var);
 }
 
 
@@ -786,7 +786,7 @@ function is_array_like($var) {
  * @return string
  */
 function simpleClassName($class) {
-    return \rosasurfer\simpleClassName($class);
+    return \rosasurfer\ministruts\simpleClassName($class);
 }
 
 
@@ -798,12 +798,12 @@ function simpleClassName($class) {
  * @return string metatype
  */
 function metatypeOf($name) {
-    return \rosasurfer\metatypeOf($name);
+    return \rosasurfer\ministruts\metatypeOf($name);
 }
 
 
 /**
- * Procedural replacement for rosasurfer\util\Validator::isDateTime()
+ * Procedural replacement for rosasurfer\ministruts\util\Validator::isDateTime()
  *
  * Whether the specified string value represents a valid date or datetime value.
  *
@@ -817,10 +817,10 @@ function metatypeOf($name) {
  *
  * @return int|bool - timestamp matching the string or FALSE if the string is not a valid date/datetime value
  *
- * @see    rosasurfer\util\Validator::isDateTime()
+ * @see    rosasurfer\ministruts\util\Validator::isDateTime()
  */
 function is_datetime($string, $format = 'Y-m-d') {
-    return \rosasurfer\is_datetime($string, $format);
+    return \rosasurfer\ministruts\is_datetime($string, $format);
 }
 
 
@@ -845,7 +845,7 @@ function true($value = null) {
  * @return mixed
  */
 function ifTrue($value, $altValue) {
-    return \rosasurfer\ifTrue($value, $altValue);
+    return \rosasurfer\ministruts\ifTrue($value, $altValue);
 }
 
 
@@ -870,7 +870,7 @@ function false($value = null) {
  * @return mixed
  */
 function ifFalse($value, $altValue) {
-    return \rosasurfer\ifFalse($value, $altValue);
+    return \rosasurfer\ministruts\ifFalse($value, $altValue);
 }
 
 
@@ -897,7 +897,7 @@ function null($value = null) {
  * @see    is_null()
  */
 function ifNull($value, $altValue) {
-    return \rosasurfer\ifNull($value, $altValue);
+    return \rosasurfer\ministruts\ifNull($value, $altValue);
 }
 
 
@@ -912,7 +912,7 @@ function ifNull($value, $altValue) {
  * @see    empty()
  */
 function ifEmpty($value, $altValue) {
-    return \rosasurfer\ifEmpty($value, $altValue);
+    return \rosasurfer\ministruts\ifEmpty($value, $altValue);
 }
 
 
@@ -924,7 +924,7 @@ function ifEmpty($value, $altValue) {
  * @return string - the host name on success, or the unmodified IP address on resolver error
  */
 function getHostByAddress($ipAddress) {
-    return \rosasurfer\getHostByAddress($ipAddress);
+    return \rosasurfer\ministruts\getHostByAddress($ipAddress);
 }
 
 
@@ -938,7 +938,7 @@ function getHostByAddress($ipAddress) {
  * @return array
  */
 function ksortc(array $values, $sort_flags = SORT_REGULAR) {
-    return \rosasurfer\ksortc($values, $sort_flags);
+    return \rosasurfer\ministruts\ksortc($values, $sort_flags);
 }
 
 
@@ -952,7 +952,7 @@ function ksortc(array $values, $sort_flags = SORT_REGULAR) {
  * @return string
  */
 function pluralize($count, $singular='', $plural='s') {
-    return \rosasurfer\pluralize($count, $singular, $plural);
+    return \rosasurfer\ministruts\pluralize($count, $singular, $plural);
 }
 
 
@@ -963,56 +963,56 @@ function pluralize($count, $singular='', $plural='s') {
  * @param  string   $mutex [optional] - mutex identifier (default: the calling line of code)
  */
 function synchronized(\Closure $task, $mutex = null) {
-    \rosasurfer\synchronized($task, $mutex);
+    \rosasurfer\ministruts\synchronized($task, $mutex);
 }
 
 
 /**
- * Lookup and return a {@link \rosasurfer\ministruts\url\Url} helper for the named {@link \rosasurfer\ministruts\ActionMapping}.
+ * Lookup and return a {@link \rosasurfer\ministruts\struts\url\Url} helper for the named {@link \rosasurfer\ministruts\struts\ActionMapping}.
  *
  * @param  string $name - route name
  *
  * @return Url
  */
 function route($name) {
-    return \rosasurfer\route($name);
+    return \rosasurfer\ministruts\route($name);
 }
 
 
 /**
- * Return a {@link \rosasurfer\ministruts\url\Url} helper for the given URI. An URI starting with a slash "/" is interpreted
+ * Return a {@link \rosasurfer\ministruts\struts\url\Url} helper for the given URI. An URI starting with a slash "/" is interpreted
  * as relative to the application's base URI. An URI not starting with a slash is interpreted as relative to the application
- * {@link \rosasurfer\ministruts\Module}'s base URI (the module the current request belongs to).<br>
+ * {@link \rosasurfer\ministruts\struts\Module}'s base URI (the module the current request belongs to).<br>
  *
- * Procedural equivalent of <tt>new \rosasurfer\ministruts\url\Url($uri)</tt>.
+ * Procedural equivalent of <tt>new \rosasurfer\ministruts\struts\url\Url($uri)</tt>.
  *
  * @param  string $uri
  *
  * @return Url
  */
 function url($uri) {
-    return \rosasurfer\url($uri);
+    return \rosasurfer\ministruts\url($uri);
 }
 
 
 /**
  * Return a version-aware URL helper for the given URI {@link VersionedUrl}. An URI starting with a slash "/" is interpreted
  * as relative to the application's base URI. An URI not starting with a slash is interpreted as relative to the application
- * {@link \rosasurfer\ministruts\Module}'s base URI (the module the current request belongs to).<br>
+ * {@link \rosasurfer\ministruts\struts\Module}'s base URI (the module the current request belongs to).<br>
  *
- * Procedural equivalent of <tt>new \rosasurfer\ministruts\url\VersionedUrl($uri)</tt>.
+ * Procedural equivalent of <tt>new \rosasurfer\ministruts\struts\url\VersionedUrl($uri)</tt>.
  *
  * @param  string $uri
  *
  * @return VersionedUrl
  */
 function asset($uri) {
-    return \rosasurfer\asset($uri);
+    return \rosasurfer\ministruts\asset($uri);
 }
 
 
 /**
- * Parse command line arguments and match them against the specified {@link http://docopt.org/#} syntax definition.
+ * Parse command line arguments and match them against the specified {@link https://docopt.org/#} syntax definition.
  *
  * @param  string               $doc                - help text, i.e. a syntax definition in Docopt language format
  * @param  string|string[]|null $args    [optional] - arguments to parse (default: the arguments passed in $_SERVER['argv'])
@@ -1021,5 +1021,5 @@ function asset($uri) {
  * @return DocoptResult - the parsing result
  */
 function docopt($doc, $args=null, array $options=[]) {
-    return \rosasurfer\docopt($doc, $args, $options);
+    return \rosasurfer\ministruts\docopt($doc, $args, $options);
 }

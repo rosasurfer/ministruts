@@ -1,13 +1,13 @@
 <?php declare(strict_types=1);
 
-namespace rosasurfer\log\context;
+namespace rosasurfer\ministruts\log\context;
 
-use rosasurfer\core\CObject;
-use rosasurfer\core\exception\IllegalStateException;
-use rosasurfer\core\exception\InvalidTypeException;
+use rosasurfer\ministruts\core\CObject;
+use rosasurfer\ministruts\core\exception\IllegalStateException;
+use rosasurfer\ministruts\core\exception\InvalidTypeException;
 
-use const rosasurfer\CLI;
-use const rosasurfer\NL;
+use const rosasurfer\ministruts\CLI;
+use const rosasurfer\ministruts\NL;
 
 
 /**

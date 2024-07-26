@@ -4,7 +4,7 @@
                                     =====================================================
 
 
-    Struts 1.x general design and overview:  http://en.wikipedia.org/wiki/Apache_Struts_1
+    Struts 1.x general design and overview:  https://en.wikipedia.org/wiki/Apache_Struts_1
 -->
 
 
@@ -236,7 +236,7 @@
     "tile" elements.
 
     class      Class name of a {@link Tile} subclass used as the {@link Module}'s default tile implementation.
-               [default: rosasurfer\ministruts\Tile]
+               [default: rosasurfer\ministruts\struts\Tile]
 
     namespace  The PHP namespace used by view templates and tiles. The namespace will be populated with the configured view
                helpers (constants and helper functions). Valid namespace separators are the slash "/" and the backslash "\".
@@ -330,7 +330,7 @@
     The "controller" element describes controller related settings.
 
     request-processor  Name of the {@link RequestProcessor} subclass that will perform request processing for the {@link Module}.
-                       [default: "rosasurfer\ministruts\RequestProcessor"]
+                       [default: "rosasurfer\ministruts\struts\RequestProcessor"]
 
     role-processor     Name of the {@link RoleProcessor} subclass that will perform role checking for the {@link Module}.
                        [default: none]

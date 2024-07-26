@@ -1,10 +1,10 @@
 <?php
-namespace rosasurfer\util;
+namespace rosasurfer\ministruts\util;
 
-use rosasurfer\core\ObjectTrait;
-use rosasurfer\core\assert\Assert;
-use rosasurfer\core\di\DiAwareTrait;
-use rosasurfer\core\error\ErrorHandler;
+use rosasurfer\ministruts\core\ObjectTrait;
+use rosasurfer\ministruts\core\assert\Assert;
+use rosasurfer\ministruts\core\di\DiAwareTrait;
+use rosasurfer\ministruts\core\error\ErrorHandler;
 
 
 /**

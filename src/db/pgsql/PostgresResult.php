@@ -1,13 +1,13 @@
 <?php
-namespace rosasurfer\db\pgsql;
+namespace rosasurfer\ministruts\db\pgsql;
 
-use rosasurfer\core\assert\Assert;
-use rosasurfer\db\ConnectorInterface as IConnector;
-use rosasurfer\db\Result;
+use rosasurfer\ministruts\core\assert\Assert;
+use rosasurfer\ministruts\db\ConnectorInterface as IConnector;
+use rosasurfer\ministruts\db\Result;
 
-use const rosasurfer\ARRAY_ASSOC;
-use const rosasurfer\ARRAY_BOTH;
-use const rosasurfer\ARRAY_NUM;
+use const rosasurfer\ministruts\ARRAY_ASSOC;
+use const rosasurfer\ministruts\ARRAY_BOTH;
+use const rosasurfer\ministruts\ARRAY_NUM;
 
 
 /**
@@ -119,7 +119,7 @@ class PostgresResult extends Result {
      * @return int - last generated ID or 0 (zero) if no ID was generated yet in the current session;
      *               -1 if the PostgreSQL server version doesn't support this functionality
      *
-     * @link   http://github.com/rosasurfer/ministruts/tree/master/src/db
+     * @link   https://github.com/rosasurfer/ministruts/tree/master/src/db
      */
     public function lastInsertId() {
         return $this->connector->lastInsertId();
@@ -133,7 +133,7 @@ class PostgresResult extends Result {
      *
      * @return int - last number of affected rows or 0 (zero) if no rows were affected yet in the current session
      *
-     * @link   http://github.com/rosasurfer/ministruts/tree/master/src/db
+     * @link   https://github.com/rosasurfer/ministruts/tree/master/src/db
      */
     public function lastAffectedRows() {
         return (int) $this->lastAffectedRows;

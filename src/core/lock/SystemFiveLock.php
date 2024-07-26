@@ -1,18 +1,18 @@
 <?php
-namespace rosasurfer\core\lock;
+namespace rosasurfer\ministruts\core\lock;
 
-use rosasurfer\core\assert\Assert;
-use rosasurfer\core\error\ErrorHandler;
-use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
-use rosasurfer\core\exception\RuntimeException;
-use rosasurfer\log\Logger;
+use rosasurfer\ministruts\core\assert\Assert;
+use rosasurfer\ministruts\core\error\ErrorHandler;
+use rosasurfer\ministruts\core\exception\RosasurferExceptionInterface as IRosasurferException;
+use rosasurfer\ministruts\core\exception\RuntimeException;
+use rosasurfer\ministruts\log\Logger;
 
-use function rosasurfer\strStartsWith;
+use function rosasurfer\ministruts\strStartsWith;
 
-use const rosasurfer\L_DEBUG;
-use const rosasurfer\L_INFO;
-use const rosasurfer\L_NOTICE;
-use const rosasurfer\NL;
+use const rosasurfer\ministruts\L_DEBUG;
+use const rosasurfer\ministruts\L_INFO;
+use const rosasurfer\ministruts\L_NOTICE;
+use const rosasurfer\ministruts\NL;
 
 
 /**

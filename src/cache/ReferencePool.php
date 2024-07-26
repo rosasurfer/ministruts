@@ -1,8 +1,8 @@
 <?php
-namespace rosasurfer\cache;
+namespace rosasurfer\ministruts\cache;
 
-use rosasurfer\cache\monitor\Dependency;
-use rosasurfer\core\assert\Assert;
+use rosasurfer\ministruts\cache\monitor\Dependency;
+use rosasurfer\ministruts\core\assert\Assert;
 
 
 /**

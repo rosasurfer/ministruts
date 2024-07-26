@@ -1,31 +1,31 @@
 <?php
-namespace rosasurfer\core\error;
+namespace rosasurfer\ministruts\core\error;
 
-use rosasurfer\Application;
-use rosasurfer\core\StaticClass;
-use rosasurfer\core\assert\Assert;
-use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
-use rosasurfer\log\Logger;
+use rosasurfer\ministruts\Application;
+use rosasurfer\ministruts\core\StaticClass;
+use rosasurfer\ministruts\core\assert\Assert;
+use rosasurfer\ministruts\core\exception\RosasurferExceptionInterface as IRosasurferException;
+use rosasurfer\ministruts\log\Logger;
 
-use function rosasurfer\echof;
-use function rosasurfer\ini_get_bool;
-use function rosasurfer\normalizeEOL;
-use function rosasurfer\simpleClassName;
-use function rosasurfer\strEndsWith;
-use function rosasurfer\strLeftTo;
-use function rosasurfer\strRightFrom;
-use function rosasurfer\strStartsWith;
-use function rosasurfer\true;
+use function rosasurfer\ministruts\echof;
+use function rosasurfer\ministruts\ini_get_bool;
+use function rosasurfer\ministruts\normalizeEOL;
+use function rosasurfer\ministruts\simpleClassName;
+use function rosasurfer\ministruts\strEndsWith;
+use function rosasurfer\ministruts\strLeftTo;
+use function rosasurfer\ministruts\strRightFrom;
+use function rosasurfer\ministruts\strStartsWith;
+use function rosasurfer\ministruts\true;
 
-use const rosasurfer\CLI;
-use const rosasurfer\ERROR_LOG_DEFAULT;
-use const rosasurfer\L_ERROR;
-use const rosasurfer\L_FATAL;
-use const rosasurfer\L_INFO;
-use const rosasurfer\L_NOTICE;
-use const rosasurfer\L_WARN;
-use const rosasurfer\MB;
-use const rosasurfer\NL;
+use const rosasurfer\ministruts\CLI;
+use const rosasurfer\ministruts\ERROR_LOG_DEFAULT;
+use const rosasurfer\ministruts\L_ERROR;
+use const rosasurfer\ministruts\L_FATAL;
+use const rosasurfer\ministruts\L_INFO;
+use const rosasurfer\ministruts\L_NOTICE;
+use const rosasurfer\ministruts\L_WARN;
+use const rosasurfer\ministruts\MB;
+use const rosasurfer\ministruts\NL;
 
 
 /**
@@ -198,7 +198,7 @@ class ErrorHandler extends StaticClass {
          *           ignored. This termination is intended behavior and the main difference to include() and include_once().
          * Solution: Manually call the exception handler.
          *
-         * @see  http://stackoverflow.com/questions/25584494/php-set-exception-handler-not-working-for-error-thrown-in-set-error-handler-cal
+         * @see  https://stackoverflow.com/questions/25584494/php-set-exception-handler-not-working-for-error-thrown-in-set-error-handler-cal
          */
         $trace = $error->getBetterTrace();
         if ($trace) {                                                           // after a fatal error the trace may be empty
@@ -297,12 +297,12 @@ class ErrorHandler extends StaticClass {
      *
      * @return \Throwable - the same exception|error
      *
-     * @link   http://php.net/manual/en/language.oop5.decon.php
+     * @link   https://php.net/manual/en/language.oop5.decon.php
      */
     public static function handleDestructorException($exception) {
         // Handle destructor exceptions during shutdown differently. Otherwise such exceptions will cause fatal errors.
         //
-        // @link  http://php.net/manual/en/language.oop5.decon.php
+        // @link  https://php.net/manual/en/language.oop5.decon.php
         // @see   self::handleDestructorException()
         if (self::$inScriptShutdown) {
             $currentHandler = set_exception_handler(function() {});
@@ -440,7 +440,7 @@ class ErrorHandler extends StaticClass {
 
 
     /**
-     * Return the message of an exception in a more readable way. Same as {@link \rosasurfer\core\exception\RosasurferException::getBetterMessage()}
+     * Return the message of an exception in a more readable way. Same as {@link \rosasurfer\ministruts\core\exception\RosasurferException::getBetterMessage()}
      * except that this method can be used with all PHP throwables.
      *
      * @param  \Throwable $exception
@@ -477,7 +477,7 @@ class ErrorHandler extends StaticClass {
 
 
     /**
-     * Takes a regular PHP stacktrace and adjusts it to be more readable. Same as {@link \rosasurfer\core\exception\RosasurferException::getBetterTrace()}
+     * Takes a regular PHP stacktrace and adjusts it to be more readable. Same as {@link \rosasurfer\ministruts\core\exception\RosasurferException::getBetterTrace()}
      * except that this method can be used with all PHP exceptions.
      *
      * @param  array  $trace           - regular PHP stacktrace
@@ -555,7 +555,7 @@ class ErrorHandler extends StaticClass {
 
     /**
      * Return the stacktrace of an exception in a more readable way as a string. The returned string contains nested exceptions.
-     * Same as {@link \rosasurfer\core\exception\RosasurferException::getBetterTraceAsString()} except that this method can be used with
+     * Same as {@link \rosasurfer\ministruts\core\exception\RosasurferException::getBetterTraceAsString()} except that this method can be used with
      * all PHP throwables.
      *
      * @param  \Throwable $exception

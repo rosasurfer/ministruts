@@ -1,9 +1,9 @@
 <?php
-namespace rosasurfer\core\loader;
+namespace rosasurfer\ministruts\core\loader;
 
-use rosasurfer\core\CObject;
+use rosasurfer\ministruts\core\CObject;
 
-use const rosasurfer\MINISTRUTS_ROOT;
+use const rosasurfer\ministruts\MINISTRUTS_ROOT;
 
 
 /**

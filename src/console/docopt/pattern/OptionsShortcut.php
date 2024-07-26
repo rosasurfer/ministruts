@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\console\docopt\pattern;
+namespace rosasurfer\ministruts\console\docopt\pattern;
 
 
 /**

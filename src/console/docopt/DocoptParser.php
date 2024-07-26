@@ -1,32 +1,32 @@
 <?php
-namespace rosasurfer\console\docopt;
+namespace rosasurfer\ministruts\console\docopt;
 
-use rosasurfer\core\CObject;
+use rosasurfer\ministruts\core\CObject;
 
-use rosasurfer\console\docopt\exception\DocoptFormatError;
-use rosasurfer\console\docopt\exception\DocoptUserNotification;
-use rosasurfer\console\docopt\pattern\Argument;
-use rosasurfer\console\docopt\pattern\Command;
-use rosasurfer\console\docopt\pattern\Either;
-use rosasurfer\console\docopt\pattern\OneOrMore;
-use rosasurfer\console\docopt\pattern\Option;
-use rosasurfer\console\docopt\pattern\Optional;
-use rosasurfer\console\docopt\pattern\OptionsShortcut;
-use rosasurfer\console\docopt\pattern\Pattern;
-use rosasurfer\console\docopt\pattern\Required;
+use rosasurfer\ministruts\console\docopt\exception\DocoptFormatError;
+use rosasurfer\ministruts\console\docopt\exception\DocoptUserNotification;
+use rosasurfer\ministruts\console\docopt\pattern\Argument;
+use rosasurfer\ministruts\console\docopt\pattern\Command;
+use rosasurfer\ministruts\console\docopt\pattern\Either;
+use rosasurfer\ministruts\console\docopt\pattern\OneOrMore;
+use rosasurfer\ministruts\console\docopt\pattern\Option;
+use rosasurfer\ministruts\console\docopt\pattern\Optional;
+use rosasurfer\ministruts\console\docopt\pattern\OptionsShortcut;
+use rosasurfer\ministruts\console\docopt\pattern\Pattern;
+use rosasurfer\ministruts\console\docopt\pattern\Required;
 
-use function rosasurfer\array_filter;
-use function rosasurfer\array_merge;
-use function rosasurfer\strEndsWith;
-use function rosasurfer\strStartsWith;
+use function rosasurfer\ministruts\array_filter;
+use function rosasurfer\ministruts\array_merge;
+use function rosasurfer\ministruts\strEndsWith;
+use function rosasurfer\ministruts\strStartsWith;
 
-use const rosasurfer\NL;
+use const rosasurfer\ministruts\NL;
 
 
 /**
  * DocoptParser
  *
- * A command line argument parser for the {@link http://docopt.org/#} language format.
+ * A command line argument parser for the {@link https://docopt.org/#} language format.
  */
 class DocoptParser extends CObject {
 
@@ -67,7 +67,7 @@ class DocoptParser extends CObject {
 
 
     /**
-     * Parse command line arguments and match them against the specified {@link http://docopt.org/#} syntax definition.
+     * Parse command line arguments and match them against the specified {@link https://docopt.org/#} syntax definition.
      *
      * @param  string               $doc
      * @param  string|string[]|null $args [optional]

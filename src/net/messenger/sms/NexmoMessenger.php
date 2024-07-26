@@ -1,7 +1,7 @@
 <?php
-namespace rosasurfer\net\messenger\sms;
+namespace rosasurfer\ministruts\net\messenger\sms;
 
-use rosasurfer\core\exception\UnimplementedFeatureException;
+use rosasurfer\ministruts\core\exception\UnimplementedFeatureException;
 
 
 /**

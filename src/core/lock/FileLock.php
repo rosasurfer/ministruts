@@ -1,9 +1,9 @@
 <?php
-namespace rosasurfer\core\lock;
+namespace rosasurfer\ministruts\core\lock;
 
-use rosasurfer\core\assert\Assert;
-use rosasurfer\core\error\ErrorHandler;
-use rosasurfer\core\exception\RuntimeException;
+use rosasurfer\ministruts\core\assert\Assert;
+use rosasurfer\ministruts\core\error\ErrorHandler;
+use rosasurfer\ministruts\core\exception\RuntimeException;
 
 
 /**

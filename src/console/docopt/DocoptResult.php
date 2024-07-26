@@ -1,10 +1,10 @@
 <?php
-namespace rosasurfer\console\docopt;
+namespace rosasurfer\ministruts\console\docopt;
 
-use rosasurfer\core\CObject;
-use rosasurfer\core\exception\IllegalAccessException;
+use rosasurfer\ministruts\core\CObject;
+use rosasurfer\ministruts\core\exception\IllegalAccessException;
 
-use const rosasurfer\NL;
+use const rosasurfer\ministruts\NL;
 
 
 /**

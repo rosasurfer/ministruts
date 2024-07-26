@@ -1,10 +1,10 @@
 <?php
-namespace rosasurfer\core\lock;
+namespace rosasurfer\ministruts\core\lock;
 
-use rosasurfer\config\ConfigInterface;
-use rosasurfer\core\assert\Assert;
-use rosasurfer\core\error\ErrorHandler;
-use rosasurfer\core\exception\RuntimeException;
+use rosasurfer\ministruts\config\ConfigInterface;
+use rosasurfer\ministruts\core\assert\Assert;
+use rosasurfer\ministruts\core\error\ErrorHandler;
+use rosasurfer\ministruts\core\exception\RuntimeException;
 
 
 /**

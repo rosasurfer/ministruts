@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace rosasurfer\test\docopt;
+namespace rosasurfer\ministruts\test\docopt;
 
-use rosasurfer\console\docopt\pattern\Either;
-use rosasurfer\console\docopt\pattern\Pattern;
+use rosasurfer\ministruts\console\docopt\pattern\Either;
+use rosasurfer\ministruts\console\docopt\pattern\Pattern;
 
 
 /**

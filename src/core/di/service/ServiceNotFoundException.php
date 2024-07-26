@@ -1,7 +1,7 @@
 <?php
-namespace rosasurfer\core\di\service;
+namespace rosasurfer\ministruts\core\di\service;
 
-use rosasurfer\core\di\ContainerException;
+use rosasurfer\ministruts\core\di\ContainerException;
 
 use Psr\Container\NotFoundExceptionInterface;
 

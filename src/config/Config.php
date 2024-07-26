@@ -1,20 +1,20 @@
 <?php
-namespace rosasurfer\config;
+namespace rosasurfer\ministruts\config;
 
-use rosasurfer\core\CObject;
-use rosasurfer\core\assert\Assert;
-use rosasurfer\core\exception\InvalidValueException;
-use rosasurfer\core\exception\RuntimeException;
+use rosasurfer\ministruts\core\CObject;
+use rosasurfer\ministruts\core\assert\Assert;
+use rosasurfer\ministruts\core\exception\InvalidValueException;
+use rosasurfer\ministruts\core\exception\RuntimeException;
 
-use function rosasurfer\isRelativePath;
-use function rosasurfer\stderr;
-use function rosasurfer\strContains;
-use function rosasurfer\strIsQuoted;
-use function rosasurfer\strLeft;
-use function rosasurfer\strStartsWith;
+use function rosasurfer\ministruts\isRelativePath;
+use function rosasurfer\ministruts\stderr;
+use function rosasurfer\ministruts\strContains;
+use function rosasurfer\ministruts\strIsQuoted;
+use function rosasurfer\ministruts\strLeft;
+use function rosasurfer\ministruts\strStartsWith;
 
-use const rosasurfer\ERROR_LOG_DEFAULT;
-use const rosasurfer\NL;
+use const rosasurfer\ministruts\ERROR_LOG_DEFAULT;
+use const rosasurfer\ministruts\NL;
 
 
 /**

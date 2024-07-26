@@ -1,16 +1,16 @@
 <?php
-namespace rosasurfer\core\di\auto;
+namespace rosasurfer\ministruts\core\di\auto;
 
-use rosasurfer\console\io\Input;
-use rosasurfer\console\io\Output;
-use rosasurfer\core\di\Di;
-use rosasurfer\core\di\service\Service;
+use rosasurfer\ministruts\console\io\Input;
+use rosasurfer\ministruts\console\io\Output;
+use rosasurfer\ministruts\core\di\Di;
+use rosasurfer\ministruts\core\di\service\Service;
 
 
 /**
  * Default dependency injector automatically created for command-line applications.
  *
- * A variant of the standard dependency injector {@link \rosasurfer\core\di\Di} suitable for CLI applications. Registers CLI related
+ * A variant of the standard dependency injector {@link \rosasurfer\ministruts\core\di\Di} suitable for CLI applications. Registers CLI related
  * services provided by the framework and user-defined services loaded from the file "{app.dir.config}/services.php".
  */
 class CliServiceContainer extends Di {

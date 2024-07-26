@@ -1,7 +1,7 @@
 <?php
-namespace rosasurfer\db;
+namespace rosasurfer\ministruts\db;
 
-use rosasurfer\db\ResultInterface as IResult;
+use rosasurfer\ministruts\db\ResultInterface as IResult;
 
 
 /**
@@ -160,7 +160,7 @@ interface ConnectorInterface {
      * @return int - last generated ID or 0 (zero) if no ID was generated yet in the current session;
      *               -1 if the DBMS doesn't support this functionality
      *
-     * @link   http://github.com/rosasurfer/ministruts/tree/master/src/db
+     * @link   https://github.com/rosasurfer/ministruts/tree/master/src/db
      */
     public function lastInsertId();
 
@@ -171,7 +171,7 @@ interface ConnectorInterface {
      * @return int - last number of affected rows or 0 (zero) if no rows were modified yet in the current session;
      *               -1 if the DBMS doesn't support this functionality
      *
-     * @link   http://github.com/rosasurfer/ministruts/tree/master/src/db
+     * @link   https://github.com/rosasurfer/ministruts/tree/master/src/db
      */
     public function lastAffectedRows();
 

@@ -1,9 +1,9 @@
 <?php
-namespace rosasurfer\core\assert;
+namespace rosasurfer\ministruts\core\assert;
 
-use rosasurfer\core\StaticClass;
+use rosasurfer\ministruts\core\StaticClass;
 
-use function rosasurfer\strContains;
+use function rosasurfer\ministruts\strContains;
 
 
 /**

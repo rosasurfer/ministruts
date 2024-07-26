@@ -1,13 +1,13 @@
 <?php
-namespace rosasurfer\util;
+namespace rosasurfer\ministruts\util;
 
-use rosasurfer\core\StaticClass;
-use rosasurfer\core\assert\Assert;
-use rosasurfer\core\exception\InvalidValueException;
-use rosasurfer\log\Logger;
+use rosasurfer\ministruts\core\StaticClass;
+use rosasurfer\ministruts\core\assert\Assert;
+use rosasurfer\ministruts\core\exception\InvalidValueException;
+use rosasurfer\ministruts\log\Logger;
 
-use const rosasurfer\DAYS;
-use const rosasurfer\L_WARN;
+use const rosasurfer\ministruts\DAYS;
+use const rosasurfer\ministruts\L_WARN;
 
 
 /**

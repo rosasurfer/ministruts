@@ -1,12 +1,12 @@
 <?php
-namespace rosasurfer\core\di\facade;
+namespace rosasurfer\ministruts\core\di\facade;
 
 
 /**
  * Inputs
  *
- * A {@link Facade} for accessing the merged input parameters of the {@link \rosasurfer\ministruts\ActionInput} assigned to the
- * current HTTP request, and the {@link \rosasurfer\ministruts\ActionInput} assigned to the previous HTTP request if the current
+ * A {@link Facade} for accessing the merged input parameters of the {@link \rosasurfer\ministruts\struts\ActionInput} assigned to the
+ * current HTTP request, and the {@link \rosasurfer\ministruts\struts\ActionInput} assigned to the previous HTTP request if the current
  * request is a result of an HTTP redirect.
  *
  * The {@link Input} facade is used to access either one or the other input parameters. The {@link Inputs} facade is used

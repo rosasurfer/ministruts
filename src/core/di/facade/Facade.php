@@ -1,7 +1,7 @@
 <?php
-namespace rosasurfer\core\di\facade;
+namespace rosasurfer\ministruts\core\di\facade;
 
-use rosasurfer\core\StaticClass;
+use rosasurfer\ministruts\core\StaticClass;
 
 
 /**

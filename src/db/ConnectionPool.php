@@ -1,14 +1,14 @@
 <?php
-namespace rosasurfer\db;
+namespace rosasurfer\ministruts\db;
 
-use rosasurfer\config\ConfigInterface;
-use rosasurfer\core\Singleton;
-use rosasurfer\core\assert\Assert;
-use rosasurfer\core\exception\IllegalStateException;
-use rosasurfer\db\ConnectorInterface as IConnector;
-use rosasurfer\db\mysql\MySQLConnector;
-use rosasurfer\db\pgsql\PostgresConnector;
-use rosasurfer\db\sqlite\SQLiteConnector;
+use rosasurfer\ministruts\config\ConfigInterface;
+use rosasurfer\ministruts\core\Singleton;
+use rosasurfer\ministruts\core\assert\Assert;
+use rosasurfer\ministruts\core\exception\IllegalStateException;
+use rosasurfer\ministruts\db\ConnectorInterface as IConnector;
+use rosasurfer\ministruts\db\mysql\MySQLConnector;
+use rosasurfer\ministruts\db\pgsql\PostgresConnector;
+use rosasurfer\ministruts\db\sqlite\SQLiteConnector;
 
 
 /**

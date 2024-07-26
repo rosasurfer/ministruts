@@ -1,12 +1,12 @@
 <?php
-namespace rosasurfer\ministruts;
+namespace rosasurfer\ministruts\struts;
 
-use rosasurfer\core\CObject;
-use rosasurfer\core\assert\Assert;
-use rosasurfer\core\exception\InvalidValueException;
-use rosasurfer\net\http\HttpResponse;
+use rosasurfer\ministruts\core\CObject;
+use rosasurfer\ministruts\core\assert\Assert;
+use rosasurfer\ministruts\core\exception\InvalidValueException;
+use rosasurfer\ministruts\net\http\HttpResponse;
 
-use function rosasurfer\strLeftTo;
+use function rosasurfer\ministruts\strLeftTo;
 
 
 /**

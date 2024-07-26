@@ -1,7 +1,7 @@
 <?php
-namespace rosasurfer\db;
+namespace rosasurfer\ministruts\db;
 
-use rosasurfer\core\exception\RuntimeException;
+use rosasurfer\ministruts\core\exception\RuntimeException;
 
 
 /**

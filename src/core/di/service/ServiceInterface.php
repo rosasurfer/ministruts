@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\core\di\service;
+namespace rosasurfer\ministruts\core\di\service;
 
 
 /**

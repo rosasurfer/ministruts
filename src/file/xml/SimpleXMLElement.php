@@ -1,14 +1,14 @@
 <?php
-namespace rosasurfer\file\xml;
+namespace rosasurfer\ministruts\file\xml;
 
-use rosasurfer\core\ObjectTrait;
-use rosasurfer\core\di\DiAwareTrait;
-use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
-use rosasurfer\core\exception\RuntimeException;
+use rosasurfer\ministruts\core\ObjectTrait;
+use rosasurfer\ministruts\core\di\DiAwareTrait;
+use rosasurfer\ministruts\core\exception\RosasurferExceptionInterface as IRosasurferException;
+use rosasurfer\ministruts\core\exception\RuntimeException;
 
-use function rosasurfer\strRightFrom;
+use function rosasurfer\ministruts\strRightFrom;
 
-use const rosasurfer\NL;
+use const rosasurfer\ministruts\NL;
 
 
 /**

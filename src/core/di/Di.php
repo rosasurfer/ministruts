@@ -1,11 +1,11 @@
 <?php
-namespace rosasurfer\core\di;
+namespace rosasurfer\ministruts\core\di;
 
-use rosasurfer\core\CObject;
-use rosasurfer\core\assert\Assert;
-use rosasurfer\core\di\service\Service;
-use rosasurfer\core\di\service\ServiceInterface as IService;
-use rosasurfer\core\di\service\ServiceNotFoundException;
+use rosasurfer\ministruts\core\CObject;
+use rosasurfer\ministruts\core\assert\Assert;
+use rosasurfer\ministruts\core\di\service\Service;
+use rosasurfer\ministruts\core\di\service\ServiceInterface as IService;
+use rosasurfer\ministruts\core\di\service\ServiceNotFoundException;
 
 
 /**
@@ -23,11 +23,11 @@ use rosasurfer\core\di\service\ServiceNotFoundException;
  *  $di = Application::getDi();                             // getting the default container in a non-class context
  *
  *  // defining a parameterless service using a string
- *  $di->set('request', 'rosasurfer\\ministruts\\Request');
+ *  $di->set('request', 'rosasurfer\\ministruts\\struts\\Request');
  *
  *  // defining a parameterized service using an anonymous function
  *  $di->set('tile', function(...$args) {
- *      return new \rosasurfer\ministruts\Tile(...$args);
+ *      return new \rosasurfer\ministruts\struts\Tile(...$args);
  *  });
  *
  *  $request = $di->get('request');                         // resolving a shared instance using the service locator pattern
@@ -55,7 +55,7 @@ class Di extends CObject implements DiInterface {
 
 
     /**
-     * Register a {@link \rosasurfer\core\di\service\Service} in the container.
+     * Register a {@link \rosasurfer\ministruts\core\di\service\Service} in the container.
      *
      * @param  IService $service
      *

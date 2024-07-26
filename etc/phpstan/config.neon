@@ -25,26 +25,22 @@ parameters:
     - ../../vendor
 
   dynamicConstantNames:                             # changing constants depending on the environment
-    - rosasurfer\_CLI
-    - rosasurfer\_LOCALHOST
-    - rosasurfer\_MACOS
-    - rosasurfer\_WINDOWS
-    - rosasurfer\_NUL_DEVICE
+    - rosasurfer\ministruts\_CLI
+    - rosasurfer\ministruts\_LOCALHOST
+    - rosasurfer\ministruts\_MACOS
+    - rosasurfer\ministruts\_WINDOWS
+    - rosasurfer\ministruts\_NUL_DEVICE
 
-    - rosasurfer\CLI
-    - rosasurfer\LOCALHOST
-    - rosasurfer\MACOS
-    - rosasurfer\WINDOWS
-    - rosasurfer\NUL_DEVICE
+    - rosasurfer\ministruts\CLI
+    - rosasurfer\ministruts\LOCALHOST
+    - rosasurfer\ministruts\MACOS
+    - rosasurfer\ministruts\WINDOWS
+    - rosasurfer\ministruts\NUL_DEVICE
 
   universalObjectCratesClasses:
-    - rosasurfer\ministruts\ActionForm
+    - rosasurfer\ministruts\struts\ActionForm
 
   ignoreErrors:
-    #-  # false-positive: the constructor is already final, see https://github.com/phpstan/phpstan/issues/8298
-    #  message: "#^Unsafe usage of new static\\(\\)\\.$#"
-    #  path: ../../src/file/xml/SimpleXMLElement.php
-
   reportUnmatchedIgnoredErrors: false
 
   parallel:

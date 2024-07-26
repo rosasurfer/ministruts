@@ -1,16 +1,16 @@
 <?php
-namespace rosasurfer\core\di\auto;
+namespace rosasurfer\ministruts\core\di\auto;
 
-use rosasurfer\console\io\Output;
-use rosasurfer\core\di\Di;
-use rosasurfer\core\di\service\Service;
-use rosasurfer\ministruts\Request;
+use rosasurfer\ministruts\console\io\Output;
+use rosasurfer\ministruts\core\di\Di;
+use rosasurfer\ministruts\core\di\service\Service;
+use rosasurfer\ministruts\struts\Request;
 
 
 /**
  * Default dependency injector automatically created for web applications.
  *
- * A variant of the standard dependency injector {@link \rosasurfer\core\di\Di} suitable for web applications. Registers web app
+ * A variant of the standard dependency injector {@link \rosasurfer\ministruts\core\di\Di} suitable for web applications. Registers web app
  * related services provided by the framework and user-defined services loaded from the file "{app.dir.config}/services.php".
  */
 class WebServiceContainer extends Di {

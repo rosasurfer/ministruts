@@ -1,8 +1,8 @@
 <?php
-namespace rosasurfer\console\docopt;
+namespace rosasurfer\ministruts\console\docopt;
 
-use rosasurfer\core\CObject;
-use rosasurfer\console\docopt\pattern\Pattern;
+use rosasurfer\ministruts\core\CObject;
+use rosasurfer\ministruts\console\docopt\pattern\Pattern;
 
 
 /**

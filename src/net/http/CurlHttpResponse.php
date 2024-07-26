@@ -1,8 +1,8 @@
 <?php
-namespace rosasurfer\net\http;
+namespace rosasurfer\ministruts\net\http;
 
-use rosasurfer\core\assert\Assert;
-use rosasurfer\core\exception\InvalidValueException;
+use rosasurfer\ministruts\core\assert\Assert;
+use rosasurfer\ministruts\core\exception\InvalidValueException;
 
 
 /**

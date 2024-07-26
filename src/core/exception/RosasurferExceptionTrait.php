@@ -1,10 +1,10 @@
 <?php
-namespace rosasurfer\core\exception;
+namespace rosasurfer\ministruts\core\exception;
 
-use rosasurfer\core\assert\Assert;
-use rosasurfer\core\error\ErrorHandler;
+use rosasurfer\ministruts\core\assert\Assert;
+use rosasurfer\ministruts\core\error\ErrorHandler;
 
-use const rosasurfer\NL;
+use const rosasurfer\ministruts\NL;
 
 
 /**

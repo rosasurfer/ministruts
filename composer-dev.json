@@ -29,13 +29,13 @@
     },
     "autoload": {
         "psr-4": {
-            "rosasurfer\\": "src"
+            "rosasurfer\\ministruts\\": "src"
         },
         "files": ["src/load.php"]
     },
     "autoload-dev": {
         "psr-4": {
-            "rosasurfer\\test\\": "test"
+            "rosasurfer\\ministruts\\test\\": "test"
         }
     },
     "extra": {

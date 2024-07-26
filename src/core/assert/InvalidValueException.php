@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\core\assert;
+namespace rosasurfer\ministruts\core\assert;
 
 
 /**
@@ -7,7 +7,7 @@ namespace rosasurfer\core\assert;
  *
  * An assertion-specific InvalidValueException.
  */
-class InvalidValueException extends \rosasurfer\core\exception\InvalidValueException {
+class InvalidValueException extends \rosasurfer\ministruts\core\exception\InvalidValueException {
 
     use FailedAssertionTrait;
 }

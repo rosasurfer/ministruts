@@ -1,16 +1,16 @@
 <?php
-namespace rosasurfer\db;
+namespace rosasurfer\ministruts\db;
 
-use rosasurfer\core\CObject;
-use rosasurfer\core\error\ErrorHandler;
-use rosasurfer\core\exception\InvalidTypeException;
-use rosasurfer\core\exception\InvalidValueException;
-use rosasurfer\core\exception\UnimplementedFeatureException;
+use rosasurfer\ministruts\core\CObject;
+use rosasurfer\ministruts\core\error\ErrorHandler;
+use rosasurfer\ministruts\core\exception\InvalidTypeException;
+use rosasurfer\ministruts\core\exception\InvalidValueException;
+use rosasurfer\ministruts\core\exception\UnimplementedFeatureException;
 
-use function rosasurfer\strIsNumeric;
-use function rosasurfer\strToBool;
+use function rosasurfer\ministruts\strIsNumeric;
+use function rosasurfer\ministruts\strToBool;
 
-use const rosasurfer\ARRAY_BOTH;
+use const rosasurfer\ministruts\ARRAY_BOTH;
 
 
 /**

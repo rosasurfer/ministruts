@@ -1,25 +1,25 @@
 <?php
-namespace rosasurfer\ministruts;
+namespace rosasurfer\ministruts\struts;
 
-use rosasurfer\config\ConfigInterface;
-use rosasurfer\core\CObject;
-use rosasurfer\core\assert\Assert;
-use rosasurfer\core\exception\IllegalStateException;
-use rosasurfer\file\xml\SimpleXMLElement;
-use rosasurfer\net\http\HttpResponse;
+use rosasurfer\ministruts\config\ConfigInterface;
+use rosasurfer\ministruts\core\CObject;
+use rosasurfer\ministruts\core\assert\Assert;
+use rosasurfer\ministruts\core\exception\IllegalStateException;
+use rosasurfer\ministruts\file\xml\SimpleXMLElement;
+use rosasurfer\ministruts\net\http\HttpResponse;
 
-use function rosasurfer\first;
-use function rosasurfer\is_class;
-use function rosasurfer\isRelativePath;
-use function rosasurfer\simpleClassName;
-use function rosasurfer\strCompareI;
-use function rosasurfer\strContains;
-use function rosasurfer\strEndsWith;
-use function rosasurfer\strLeft;
-use function rosasurfer\strLeftTo;
-use function rosasurfer\strStartsWith;
+use function rosasurfer\ministruts\first;
+use function rosasurfer\ministruts\is_class;
+use function rosasurfer\ministruts\isRelativePath;
+use function rosasurfer\ministruts\simpleClassName;
+use function rosasurfer\ministruts\strCompareI;
+use function rosasurfer\ministruts\strContains;
+use function rosasurfer\ministruts\strEndsWith;
+use function rosasurfer\ministruts\strLeft;
+use function rosasurfer\ministruts\strLeftTo;
+use function rosasurfer\ministruts\strStartsWith;
 
-use const rosasurfer\NL;
+use const rosasurfer\ministruts\NL;
 
 
 /**
@@ -134,7 +134,7 @@ class Module extends CObject {
 
 
     /**
-     * Read and validate the module configuration, and convert it to a {@link \rosasurfer\file\xml\SimpleXMLElement} instance.
+     * Read and validate the module configuration, and convert it to a {@link \rosasurfer\ministruts\file\xml\SimpleXMLElement} instance.
      *
      * @param  string $fileName - full filename
      *

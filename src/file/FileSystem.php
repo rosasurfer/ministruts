@@ -1,9 +1,9 @@
 <?php
-namespace rosasurfer\file;
+namespace rosasurfer\ministruts\file;
 
-use rosasurfer\core\StaticClass;
-use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
-use rosasurfer\core\exception\RuntimeException;
+use rosasurfer\ministruts\core\StaticClass;
+use rosasurfer\ministruts\core\exception\RosasurferExceptionInterface as IRosasurferException;
+use rosasurfer\ministruts\core\exception\RuntimeException;
 
 
 /**

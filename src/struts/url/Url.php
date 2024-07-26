@@ -1,12 +1,12 @@
 <?php
-namespace rosasurfer\ministruts\url;
+namespace rosasurfer\ministruts\struts\url;
 
-use rosasurfer\core\CObject;
-use rosasurfer\core\assert\Assert;
-use rosasurfer\core\di\proxy\Request;
-use rosasurfer\core\error\ErrorHandler;
+use rosasurfer\ministruts\core\CObject;
+use rosasurfer\ministruts\core\assert\Assert;
+use rosasurfer\ministruts\core\di\proxy\Request;
+use rosasurfer\ministruts\core\error\ErrorHandler;
 
-use const rosasurfer\CLI;
+use const rosasurfer\ministruts\CLI;
 
 
 /**

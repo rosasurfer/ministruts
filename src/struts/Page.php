@@ -1,7 +1,7 @@
 <?php
-namespace rosasurfer\ministruts;
+namespace rosasurfer\ministruts\struts;
 
-use rosasurfer\core\Singleton;
+use rosasurfer\ministruts\core\Singleton;
 
 
 /**
@@ -24,7 +24,7 @@ class Page extends Singleton {
 
 
     /**
-     * Return the {@link \rosasurfer\core\Singleton} instance of this class.
+     * Return the {@link \rosasurfer\ministruts\core\Singleton} instance of this class.
      *
      * @return static
      */

@@ -1,10 +1,10 @@
 <?php
-namespace rosasurfer\cache\monitor;
+namespace rosasurfer\ministruts\cache\monitor;
 
-use rosasurfer\core\assert\Assert;
-use rosasurfer\core\exception\InvalidValueException;
+use rosasurfer\ministruts\core\assert\Assert;
+use rosasurfer\ministruts\core\exception\InvalidValueException;
 
-use function rosasurfer\isRelativePath;
+use function rosasurfer\ministruts\isRelativePath;
 
 
 /**

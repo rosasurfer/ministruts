@@ -1,12 +1,12 @@
 <?php
-namespace rosasurfer\file\zip;
+namespace rosasurfer\ministruts\file\zip;
 
-use rosasurfer\core\ObjectTrait;
-use rosasurfer\core\di\DiAwareTrait;
-use rosasurfer\log\Logger;
+use rosasurfer\ministruts\core\ObjectTrait;
+use rosasurfer\ministruts\core\di\DiAwareTrait;
+use rosasurfer\ministruts\log\Logger;
 
-use const rosasurfer\L_ERROR;
-use const rosasurfer\L_WARN;
+use const rosasurfer\ministruts\L_ERROR;
+use const rosasurfer\ministruts\L_WARN;
 
 
 /**

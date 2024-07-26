@@ -1,20 +1,20 @@
 <?php
-namespace rosasurfer;
+namespace rosasurfer\ministruts;
 
-use rosasurfer\config\ConfigInterface;
-use rosasurfer\config\auto\DefaultConfig;
-use rosasurfer\console\Command;
-use rosasurfer\core\CObject;
-use rosasurfer\core\assert\Assert;
-use rosasurfer\core\di\DiInterface;
-use rosasurfer\core\di\auto\CliServiceContainer;
-use rosasurfer\core\di\auto\WebServiceContainer;
-use rosasurfer\core\error\ErrorHandler;
-use rosasurfer\core\exception\InvalidValueException;
-use rosasurfer\log\Logger;
-use rosasurfer\ministruts\FrontController;
-use rosasurfer\ministruts\Response;
-use rosasurfer\util\PHP;
+use rosasurfer\ministruts\config\ConfigInterface;
+use rosasurfer\ministruts\config\auto\DefaultConfig;
+use rosasurfer\ministruts\console\Command;
+use rosasurfer\ministruts\core\CObject;
+use rosasurfer\ministruts\core\assert\Assert;
+use rosasurfer\ministruts\core\di\DiInterface;
+use rosasurfer\ministruts\core\di\auto\CliServiceContainer;
+use rosasurfer\ministruts\core\di\auto\WebServiceContainer;
+use rosasurfer\ministruts\core\error\ErrorHandler;
+use rosasurfer\ministruts\core\exception\InvalidValueException;
+use rosasurfer\ministruts\log\Logger;
+use rosasurfer\ministruts\struts\FrontController;
+use rosasurfer\ministruts\struts\Response;
+use rosasurfer\ministruts\util\PHP;
 
 
 /**
@@ -177,7 +177,7 @@ class Application extends CObject {
 
 
     /**
-     * Register {@link \rosasurfer\console\Command} with the application for execution in CLI mode. An already registered command
+     * Register {@link \rosasurfer\ministruts\console\Command} with the application for execution in CLI mode. An already registered command
      * with the same name as the one to add will be overwritten.
      *
      * @param  Command $command
@@ -246,7 +246,7 @@ class Application extends CObject {
 
 
     /**
-     * Load and initialize a {@link \rosasurfer\config\auto\DefaultConfig}.
+     * Load and initialize a {@link \rosasurfer\ministruts\config\auto\DefaultConfig}.
      *
      * @param  array $options - configuration options as passed to the framework loader
      *

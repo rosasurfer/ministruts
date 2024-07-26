@@ -2,7 +2,7 @@
 /**
  * Package constants
  */
-namespace rosasurfer\ministruts;
+namespace rosasurfer\ministruts\struts;
 
 
 /**

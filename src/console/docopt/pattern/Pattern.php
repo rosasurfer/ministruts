@@ -1,11 +1,11 @@
 <?php
-namespace rosasurfer\console\docopt\pattern;
+namespace rosasurfer\ministruts\console\docopt\pattern;
 
-use rosasurfer\core\CObject;
-use rosasurfer\core\assert\Assert;
-use rosasurfer\core\error\ErrorHandler;
+use rosasurfer\ministruts\core\CObject;
+use rosasurfer\ministruts\core\assert\Assert;
+use rosasurfer\ministruts\core\error\ErrorHandler;
 
-use function rosasurfer\array_merge;
+use function rosasurfer\ministruts\array_merge;
 
 
 /**

@@ -1,23 +1,23 @@
 <?php
-namespace rosasurfer\ministruts;
+namespace rosasurfer\ministruts\struts;
 
-use rosasurfer\cache\Cache;
-use rosasurfer\cache\monitor\FileDependency;
-use rosasurfer\config\ConfigInterface;
-use rosasurfer\core\Singleton;
-use rosasurfer\core\di\proxy\Request as RequestProxy;
-use rosasurfer\core\exception\IllegalStateException;
-use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
-use rosasurfer\core\exception\RuntimeException;
-use rosasurfer\net\http\HttpResponse;
+use rosasurfer\ministruts\cache\Cache;
+use rosasurfer\ministruts\cache\monitor\FileDependency;
+use rosasurfer\ministruts\config\ConfigInterface;
+use rosasurfer\ministruts\core\Singleton;
+use rosasurfer\ministruts\core\di\proxy\Request as RequestProxy;
+use rosasurfer\ministruts\core\exception\IllegalStateException;
+use rosasurfer\ministruts\core\exception\RosasurferExceptionInterface as IRosasurferException;
+use rosasurfer\ministruts\core\exception\RuntimeException;
+use rosasurfer\ministruts\net\http\HttpResponse;
 
-use function rosasurfer\strLeftTo;
-use function rosasurfer\strStartsWith;
+use function rosasurfer\ministruts\strLeftTo;
+use function rosasurfer\ministruts\strStartsWith;
 
-use const rosasurfer\CLI;
-use const rosasurfer\LOCALHOST;
-use const rosasurfer\MINUTE;
-use const rosasurfer\WINDOWS;
+use const rosasurfer\ministruts\CLI;
+use const rosasurfer\ministruts\LOCALHOST;
+use const rosasurfer\ministruts\MINUTE;
+use const rosasurfer\ministruts\WINDOWS;
 
 
 /**
@@ -36,7 +36,7 @@ class FrontController extends Singleton {
 
 
     /**
-     * Return the {@link \rosasurfer\core\Singleton} instance of this class. The instance might be loaded from a cache.
+     * Return the {@link \rosasurfer\ministruts\core\Singleton} instance of this class. The instance might be loaded from a cache.
      *
      * @return static
      */

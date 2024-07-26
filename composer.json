@@ -25,7 +25,7 @@
     },
     "autoload": {
         "psr-4": {
-            "rosasurfer\\": "src"
+            "rosasurfer\\ministruts\\": "src"
         },
         "files": ["src/load.php"]
     },

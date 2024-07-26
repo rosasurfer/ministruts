@@ -1,17 +1,17 @@
 <?php
-namespace rosasurfer\net\mail;
+namespace rosasurfer\ministruts\net\mail;
 
-use rosasurfer\config\ConfigInterface;
-use rosasurfer\core\assert\Assert;
-use rosasurfer\core\error\ErrorHandler;
-use rosasurfer\core\exception\InfrastructureException;
-use rosasurfer\core\exception\InvalidValueException;
-use rosasurfer\core\exception\RuntimeException;
+use rosasurfer\ministruts\config\ConfigInterface;
+use rosasurfer\ministruts\core\assert\Assert;
+use rosasurfer\ministruts\core\error\ErrorHandler;
+use rosasurfer\ministruts\core\exception\InfrastructureException;
+use rosasurfer\ministruts\core\exception\InvalidValueException;
+use rosasurfer\ministruts\core\exception\RuntimeException;
 
-use function rosasurfer\normalizeEOL;
+use function rosasurfer\ministruts\normalizeEOL;
 
-use const rosasurfer\EOL_WINDOWS;
-use const rosasurfer\NL;
+use const rosasurfer\ministruts\EOL_WINDOWS;
+use const rosasurfer\ministruts\NL;
 
 
 /**

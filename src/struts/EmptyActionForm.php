@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\ministruts;
+namespace rosasurfer\ministruts\struts;
 
 
 /**

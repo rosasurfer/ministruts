@@ -5,12 +5,12 @@ Error handling of destructor exceptions
 Attempting to throw an exception from an object destructor during script shutdown causes a fatal error which is not catchable
 by an installed error handler.
 
- @see  [http://php.net/manual/en/language.oop5.decon.php](http://php.net/manual/en/language.oop5.decon.php)
+ @see  [https://php.net/manual/en/language.oop5.decon.php](https://php.net/manual/en/language.oop5.decon.php)
 
 To catch and handle such exceptions the destructor must be wrapped. It's recommended to wrap any destructor regardless of the task.
 
 ```php
-use rosasurfer\core\error\ErrorHandler;
+use rosasurfer\ministruts\core\error\ErrorHandler;
 
 class Foo {
     public function __destruct() {

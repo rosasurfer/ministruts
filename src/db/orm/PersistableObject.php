@@ -1,17 +1,17 @@
 <?php
-namespace rosasurfer\db\orm;
+namespace rosasurfer\ministruts\db\orm;
 
-use rosasurfer\core\CObject;
-use rosasurfer\core\exception\ConcurrentModificationException;
-use rosasurfer\core\exception\IllegalAccessException;
-use rosasurfer\core\exception\IllegalStateException;
-use rosasurfer\core\exception\InvalidTypeException;
-use rosasurfer\core\exception\RuntimeException;
-use rosasurfer\db\ConnectorInterface as IConnector;
+use rosasurfer\ministruts\core\CObject;
+use rosasurfer\ministruts\core\exception\ConcurrentModificationException;
+use rosasurfer\ministruts\core\exception\IllegalAccessException;
+use rosasurfer\ministruts\core\exception\IllegalStateException;
+use rosasurfer\ministruts\core\exception\InvalidTypeException;
+use rosasurfer\ministruts\core\exception\RuntimeException;
+use rosasurfer\ministruts\db\ConnectorInterface as IConnector;
 
-use function rosasurfer\is_class;
-use function rosasurfer\strEndsWith;
-use function rosasurfer\strLeft;
+use function rosasurfer\ministruts\is_class;
+use function rosasurfer\ministruts\strEndsWith;
+use function rosasurfer\ministruts\strLeft;
 
 
 /**

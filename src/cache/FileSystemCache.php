@@ -1,15 +1,15 @@
 <?php
-namespace rosasurfer\cache;
+namespace rosasurfer\ministruts\cache;
 
-use rosasurfer\cache\monitor\Dependency;
-use rosasurfer\config\ConfigInterface;
-use rosasurfer\core\assert\Assert;
-use rosasurfer\core\error\PHPError;
-use rosasurfer\core\exception\RuntimeException;
-use rosasurfer\file\FileSystem as FS;
+use rosasurfer\ministruts\cache\monitor\Dependency;
+use rosasurfer\ministruts\config\ConfigInterface;
+use rosasurfer\ministruts\core\assert\Assert;
+use rosasurfer\ministruts\core\error\PHPError;
+use rosasurfer\ministruts\core\exception\RuntimeException;
+use rosasurfer\ministruts\file\FileSystem as FS;
 
-use function rosasurfer\isRelativePath;
-use function rosasurfer\strEndsWith;
+use function rosasurfer\ministruts\isRelativePath;
+use function rosasurfer\ministruts\strEndsWith;
 
 
 /**
@@ -207,7 +207,7 @@ final class FileSystemCache extends CachePeer {
         FS::mkDir(dirname($fileName));
         file_put_contents($fileName, serialize($value));
 
-        // TODO: http://phpdevblog.niknovo.com/2009/11/serialize-vs-var-export-vs-json-encode.html
+        // TODO: https://phpdevblog.niknovo.com/2009/11/serialize-vs-var-export-vs-json-encode.html
         return true;
     }
 }

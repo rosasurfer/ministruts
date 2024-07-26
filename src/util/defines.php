@@ -2,7 +2,7 @@
 /**
  * Package constants
  */
-namespace rosasurfer\util;
+namespace rosasurfer\ministruts\util;
 
 
 /** @var int - stdin */

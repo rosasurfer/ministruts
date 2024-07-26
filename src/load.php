@@ -8,7 +8,7 @@ if (PHP_VERSION_ID < 70000 || PHP_VERSION_ID >= 90000) {
 }
 
 // prevent multiple includes
-if (defined('rosasurfer\MINISTRUTS_ROOT')) return;
+if (defined('rosasurfer\ministruts\MINISTRUTS_ROOT')) return;
 
 // now include the framework
 require(__DIR__.'/bootstrap.php');

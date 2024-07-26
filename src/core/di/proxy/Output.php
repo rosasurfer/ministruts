@@ -1,15 +1,15 @@
 <?php
-namespace rosasurfer\core\di\proxy;
+namespace rosasurfer\ministruts\core\di\proxy;
 
 
 /**
  * Output
  *
- * A {@link Proxy} for the "output" {@link \rosasurfer\core\di\service\Service} currently registered in the service container.
+ * A {@link Proxy} for the "output" {@link \rosasurfer\ministruts\core\di\service\Service} currently registered in the service container.
  *
- * Default implementation: {@link \rosasurfer\console\io\Output}
+ * Default implementation: {@link \rosasurfer\ministruts\console\io\Output}
  *
- * @method static \rosasurfer\console\io\Output instance()            Get the object behind the proxy.
+ * @method static \rosasurfer\ministruts\console\io\Output instance()            Get the object behind the proxy.
  * @method static void                          out(mixed $message)   Write a message to STDOUT.
  * @method static void                          error(mixed $message) Write a message to STDERR.
  */
@@ -21,6 +21,6 @@ class Output extends Proxy {
      */
     protected static function getServiceName() {
         return 'output';
-        return \rosasurfer\console\io\Output::class;
+        return \rosasurfer\ministruts\console\io\Output::class;
     }
 }

@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\core\assert;
+namespace rosasurfer\ministruts\core\assert;
 
 
 /**

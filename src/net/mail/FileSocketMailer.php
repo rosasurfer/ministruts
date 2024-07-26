@@ -1,7 +1,7 @@
 <?php
-namespace rosasurfer\net\mail;
+namespace rosasurfer\ministruts\net\mail;
 
-use rosasurfer\core\exception\UnimplementedFeatureException;
+use rosasurfer\ministruts\core\exception\UnimplementedFeatureException;
 
 
 /**

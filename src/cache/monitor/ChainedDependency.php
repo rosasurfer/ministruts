@@ -1,7 +1,7 @@
 <?php
-namespace rosasurfer\cache\monitor;
+namespace rosasurfer\ministruts\cache\monitor;
 
-use rosasurfer\core\exception\RuntimeException;
+use rosasurfer\ministruts\core\exception\RuntimeException;
 
 
 /**

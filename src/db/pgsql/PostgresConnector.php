@@ -1,17 +1,17 @@
 <?php
-namespace rosasurfer\db\pgsql;
+namespace rosasurfer\ministruts\db\pgsql;
 
-use rosasurfer\core\assert\Assert;
-use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
-use rosasurfer\core\exception\RuntimeException;
-use rosasurfer\db\Connector;
-use rosasurfer\db\DatabaseException;
+use rosasurfer\ministruts\core\assert\Assert;
+use rosasurfer\ministruts\core\exception\RosasurferExceptionInterface as IRosasurferException;
+use rosasurfer\ministruts\core\exception\RuntimeException;
+use rosasurfer\ministruts\db\Connector;
+use rosasurfer\ministruts\db\DatabaseException;
 
-use function rosasurfer\strContains;
-use function rosasurfer\strContainsI;
-use function rosasurfer\strStartsWithI;
+use function rosasurfer\ministruts\strContains;
+use function rosasurfer\ministruts\strContainsI;
+use function rosasurfer\ministruts\strStartsWithI;
 
-use const rosasurfer\NL;
+use const rosasurfer\ministruts\NL;
 
 
 /**
@@ -306,7 +306,7 @@ class PostgresConnector extends Connector {
 
         // TODO: If there are open large object resources on the connection, do not close the connection before closing all
         //       large object resources.
-        // @see  http://php.net/manual/en/function.pg-close.php
+        // @see  https://php.net/manual/en/function.pg-close.php
     }
 
 
@@ -554,7 +554,7 @@ class PostgresConnector extends Connector {
      * @return int - last generated ID or 0 (zero) if no ID was generated yet in the current session
      *               -1 if the PostgreSQL version doesn't support this functionality
      *
-     * @link   http://github.com/rosasurfer/ministruts/tree/master/src/db
+     * @link   https://github.com/rosasurfer/ministruts/tree/master/src/db
      */
     public function lastInsertId() {
         if (!isset($this->lastInsertId)) {
@@ -580,12 +580,12 @@ class PostgresConnector extends Connector {
         return (int) $this->lastInsertId;
         /*
         @see  https://www.postgresql.org/docs/9.6/static/functions-sequence.html
-        @see  http://stackoverflow.com/questions/6485778/php-postgres-get-last-insert-id/6488840
-        @see  http://stackoverflow.com/questions/22530585/how-to-turn-off-multiple-statements-in-postgres
-        @see  http://php.net/manual/en/function.pg-query-params.php
-        @see  http://stackoverflow.com/questions/24182521/how-to-find-out-if-a-sequence-was-initialized-in-this-session
-        @see  http://stackoverflow.com/questions/32991564/how-to-check-in-postgres-that-lastval-is-defined
-        @see  http://stackoverflow.com/questions/55956/mysql-insert-id-alternative-for-postgresql
+        @see  https://stackoverflow.com/questions/6485778/php-postgres-get-last-insert-id/6488840
+        @see  https://stackoverflow.com/questions/22530585/how-to-turn-off-multiple-statements-in-postgres
+        @see  https://php.net/manual/en/function.pg-query-params.php
+        @see  https://stackoverflow.com/questions/24182521/how-to-find-out-if-a-sequence-was-initialized-in-this-session
+        @see  https://stackoverflow.com/questions/32991564/how-to-check-in-postgres-that-lastval-is-defined
+        @see  https://stackoverflow.com/questions/55956/mysql-insert-id-alternative-for-postgresql
       */
     }
 
@@ -596,7 +596,7 @@ class PostgresConnector extends Connector {
      *
      * @return int - last number of affected rows or 0 (zero) if no rows were affected yet in the current session
      *
-     * @link   http://github.com/rosasurfer/ministruts/tree/master/src/db
+     * @link   https://github.com/rosasurfer/ministruts/tree/master/src/db
      */
     public function lastAffectedRows() {
         return (int) $this->lastAffectedRows;

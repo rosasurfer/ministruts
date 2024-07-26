@@ -1,10 +1,10 @@
 <?php
-namespace rosasurfer\net\http;
+namespace rosasurfer\ministruts\net\http;
 
-use rosasurfer\core\CObject;
-use rosasurfer\core\assert\Assert;
-use rosasurfer\core\exception\InvalidTypeException;
-use rosasurfer\core\exception\InvalidValueException;
+use rosasurfer\ministruts\core\CObject;
+use rosasurfer\ministruts\core\assert\Assert;
+use rosasurfer\ministruts\core\exception\InvalidTypeException;
+use rosasurfer\ministruts\core\exception\InvalidValueException;
 
 
 /**
@@ -127,7 +127,7 @@ class HttpRequest extends CObject {
      *
      * @return $this
      *
-     * @see http://stackoverflow.com/questions/3241326/set-more-than-one-http-header-with-the-same-name
+     * @see    https://stackoverflow.com/questions/3241326/set-more-than-one-http-header-with-the-same-name
      */
     public function addHeader($name, $value) {
         Assert::string($name,  '$name');

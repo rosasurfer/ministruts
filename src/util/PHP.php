@@ -1,27 +1,27 @@
 <?php
-namespace rosasurfer\util;
+namespace rosasurfer\ministruts\util;
 
-use rosasurfer\config\ConfigInterface as Config;
-use rosasurfer\core\StaticClass;
-use rosasurfer\core\assert\Assert;
-use rosasurfer\core\error\ErrorHandler;
-use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
-use rosasurfer\core\exception\RuntimeException;
+use rosasurfer\ministruts\config\ConfigInterface as Config;
+use rosasurfer\ministruts\core\StaticClass;
+use rosasurfer\ministruts\core\assert\Assert;
+use rosasurfer\ministruts\core\error\ErrorHandler;
+use rosasurfer\ministruts\core\exception\RosasurferExceptionInterface as IRosasurferException;
+use rosasurfer\ministruts\core\exception\RuntimeException;
 
-use function rosasurfer\echof;
-use function rosasurfer\ini_get_bool;
-use function rosasurfer\ini_get_bytes;
-use function rosasurfer\ini_get_int;
-use function rosasurfer\php_byte_value;
-use function rosasurfer\stderr;
-use function rosasurfer\strContains;
-use function rosasurfer\strRight;
-use function rosasurfer\strStartsWith;
+use function rosasurfer\ministruts\echof;
+use function rosasurfer\ministruts\ini_get_bool;
+use function rosasurfer\ministruts\ini_get_bytes;
+use function rosasurfer\ministruts\ini_get_int;
+use function rosasurfer\ministruts\php_byte_value;
+use function rosasurfer\ministruts\stderr;
+use function rosasurfer\ministruts\strContains;
+use function rosasurfer\ministruts\strRight;
+use function rosasurfer\ministruts\strStartsWith;
 
-use const rosasurfer\CLI;
-use const rosasurfer\MB;
-use const rosasurfer\NL;
-use const rosasurfer\WINDOWS;
+use const rosasurfer\ministruts\CLI;
+use const rosasurfer\ministruts\MB;
+use const rosasurfer\ministruts\NL;
+use const rosasurfer\ministruts\WINDOWS;
 
 
 /**
@@ -340,7 +340,7 @@ class PHP extends StaticClass {
         // ------------
         if (extension_loaded('apc')) {
             //if (phpVersion('apc') >= '3.1.3' && phpVersion('apc') < '3.1.7')                                       $issues[] = 'Warn:  You are running a buggy APC version (a version < 3.1.3 or >= 3.1.7 is recommended): '.phpVersion('apc');
-            ///*PHP_INI_SYSTEM*/ if (!ini_get('apc.enabled'))                                                        $issues[] = 'Warn:  apc.enabled is not On [performance]';      // warning "Potential cache slam averted for key '...'" http://bugs.php.net/bug.php?id=58832
+            ///*PHP_INI_SYSTEM*/ if (!ini_get('apc.enabled'))                                                        $issues[] = 'Warn:  apc.enabled is not On [performance]';      // warning "Potential cache slam averted for key '...'" https://bugs.php.net/bug.php?id=58832
             ///*PHP_INI_SYSTEM*/ if ( ini_get('apc.report_autofilter'))                                              $issues[] = 'Warn:  apc.report_autofilter is not Off';
             //
             //if (WINDOWS) {       // development

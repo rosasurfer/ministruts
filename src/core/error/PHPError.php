@@ -1,10 +1,10 @@
 <?php
-namespace rosasurfer\core\error;
+namespace rosasurfer\ministruts\core\error;
 
-use rosasurfer\core\ObjectTrait;
-use rosasurfer\core\di\DiAwareTrait;
-use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
-use rosasurfer\core\exception\RosasurferExceptionTrait;
+use rosasurfer\ministruts\core\ObjectTrait;
+use rosasurfer\ministruts\core\di\DiAwareTrait;
+use rosasurfer\ministruts\core\exception\RosasurferExceptionInterface as IRosasurferException;
+use rosasurfer\ministruts\core\exception\RosasurferExceptionTrait;
 
 
 /**

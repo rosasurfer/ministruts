@@ -1,7 +1,7 @@
 <?php
-namespace rosasurfer\net\messenger;
+namespace rosasurfer\ministruts\net\messenger;
 
-use rosasurfer\core\CObject;
+use rosasurfer\ministruts\core\CObject;
 
 
 /**

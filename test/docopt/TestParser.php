@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace rosasurfer\test\docopt;
+namespace rosasurfer\ministruts\test\docopt;
 
-use rosasurfer\console\docopt\DocoptParser;
-use rosasurfer\console\docopt\TokenIterator;
-use rosasurfer\console\docopt\pattern\Pattern;
-use rosasurfer\console\docopt\pattern\Required;
+use rosasurfer\ministruts\console\docopt\DocoptParser;
+use rosasurfer\ministruts\console\docopt\TokenIterator;
+use rosasurfer\ministruts\console\docopt\pattern\Pattern;
+use rosasurfer\ministruts\console\docopt\pattern\Required;
 
 
 /**

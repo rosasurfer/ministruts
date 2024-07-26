@@ -1,7 +1,7 @@
 <?php
-namespace rosasurfer\db;
+namespace rosasurfer\ministruts\db;
 
-use const rosasurfer\ARRAY_BOTH;
+use const rosasurfer\ministruts\ARRAY_BOTH;
 
 
 /**
@@ -110,7 +110,7 @@ interface ResultInterface {
      * @return int - last generated ID or 0 (zero) if no ID was generated yet in the current session;
      *               -1 if the DBMS doesn't support this functionality
      *
-     * @link   http://github.com/rosasurfer/ministruts/tree/master/src/db
+     * @link   https://github.com/rosasurfer/ministruts/tree/master/src/db
      */
     public function lastInsertId();
 
@@ -121,7 +121,7 @@ interface ResultInterface {
      * @return int - last number of affected rows or 0 (zero) if no rows were affected yet in the current session;
      *               -1 if the DBMS doesn't support this functionality
      *
-     * @link   http://github.com/rosasurfer/ministruts/tree/master/src/db
+     * @link   https://github.com/rosasurfer/ministruts/tree/master/src/db
      */
     public function lastAffectedRows();
 

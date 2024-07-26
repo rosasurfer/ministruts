@@ -1,7 +1,7 @@
 <?php
-namespace rosasurfer\core\di;
+namespace rosasurfer\ministruts\core\di;
 
-use rosasurfer\core\exception\RuntimeException;
+use rosasurfer\ministruts\core\exception\RuntimeException;
 
 use Psr\Container\ContainerExceptionInterface;
 

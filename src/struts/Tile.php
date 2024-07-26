@@ -1,15 +1,15 @@
 <?php
-namespace rosasurfer\ministruts;
+namespace rosasurfer\ministruts\struts;
 
-use rosasurfer\Application;
-use rosasurfer\core\CObject;
-use rosasurfer\core\di\proxy\Request as RequestProxy;
-use rosasurfer\core\exception\IllegalStateException;
+use rosasurfer\ministruts\Application;
+use rosasurfer\ministruts\core\CObject;
+use rosasurfer\ministruts\core\di\proxy\Request as RequestProxy;
+use rosasurfer\ministruts\core\exception\IllegalStateException;
 
-use function rosasurfer\strLeft;
-use function rosasurfer\strRightFrom;
+use function rosasurfer\ministruts\strLeft;
+use function rosasurfer\ministruts\strRightFrom;
 
-use const rosasurfer\NL;
+use const rosasurfer\ministruts\NL;
 
 
 /**

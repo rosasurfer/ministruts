@@ -1,17 +1,17 @@
 <?php
-namespace rosasurfer\net\http;
+namespace rosasurfer\ministruts\net\http;
 
-use rosasurfer\core\error\ErrorHandler;
-use rosasurfer\core\exception\IOException;
-use rosasurfer\log\Logger;
+use rosasurfer\ministruts\core\error\ErrorHandler;
+use rosasurfer\ministruts\core\exception\IOException;
+use rosasurfer\ministruts\log\Logger;
 
-use function rosasurfer\ini_get_bool;
-use function rosasurfer\strLeftTo;
-use function rosasurfer\strRightFrom;
+use function rosasurfer\ministruts\ini_get_bool;
+use function rosasurfer\ministruts\strLeftTo;
+use function rosasurfer\ministruts\strRightFrom;
 
-use const rosasurfer\L_INFO;
-use const rosasurfer\L_WARN;
-use const rosasurfer\NL;
+use const rosasurfer\ministruts\L_INFO;
+use const rosasurfer\ministruts\L_WARN;
+use const rosasurfer\ministruts\NL;
 
 
 /**

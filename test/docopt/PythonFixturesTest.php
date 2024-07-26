@@ -1,13 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace rosasurfer\test\docopt;
+namespace rosasurfer\ministruts\test\docopt;
 
 use PHPUnit\Framework\TestCase;
 
-use rosasurfer\console\docopt\DocoptResult;
+use rosasurfer\ministruts\console\docopt\DocoptResult;
 
-use function rosasurfer\docopt;
+use function rosasurfer\ministruts\docopt;
 
 
 /**

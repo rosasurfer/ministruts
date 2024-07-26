@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\file\xml;
+namespace rosasurfer\ministruts\file\xml;
 
 
 /**

@@ -1,19 +1,19 @@
 <?php
-namespace rosasurfer\ministruts;
+namespace rosasurfer\ministruts\struts;
 
-use rosasurfer\core\Singleton;
-use rosasurfer\core\assert\Assert;
-use rosasurfer\core\di\proxy\Request as RequestProxy;
-use rosasurfer\core\exception\InvalidValueException;
-use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
-use rosasurfer\core\exception\RuntimeException;
-use rosasurfer\net\http\HttpResponse;
+use rosasurfer\ministruts\core\Singleton;
+use rosasurfer\ministruts\core\assert\Assert;
+use rosasurfer\ministruts\core\di\proxy\Request as RequestProxy;
+use rosasurfer\ministruts\core\exception\InvalidValueException;
+use rosasurfer\ministruts\core\exception\RosasurferExceptionInterface as IRosasurferException;
+use rosasurfer\ministruts\core\exception\RuntimeException;
+use rosasurfer\ministruts\net\http\HttpResponse;
 
-use function rosasurfer\strLeft;
-use function rosasurfer\strLeftTo;
-use function rosasurfer\strRightFrom;
+use function rosasurfer\ministruts\strLeft;
+use function rosasurfer\ministruts\strLeftTo;
+use function rosasurfer\ministruts\strRightFrom;
 
-use const rosasurfer\CLI;
+use const rosasurfer\ministruts\CLI;
 
 
 /**

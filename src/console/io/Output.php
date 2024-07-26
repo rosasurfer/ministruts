@@ -1,11 +1,11 @@
 <?php
-namespace rosasurfer\console\io;
+namespace rosasurfer\ministruts\console\io;
 
-use rosasurfer\core\CObject;
+use rosasurfer\ministruts\core\CObject;
 
-use function rosasurfer\print_p;
-use function rosasurfer\stderr;
-use function rosasurfer\stdout;
+use function rosasurfer\ministruts\print_p;
+use function rosasurfer\ministruts\stderr;
+use function rosasurfer\ministruts\stdout;
 
 
 /**

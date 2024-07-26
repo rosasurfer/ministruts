@@ -1,7 +1,7 @@
 <?php
-namespace rosasurfer\console\docopt\exception;
+namespace rosasurfer\ministruts\console\docopt\exception;
 
-use rosasurfer\core\exception\RuntimeException;
+use rosasurfer\ministruts\core\exception\RuntimeException;
 
 
 /**

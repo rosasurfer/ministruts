@@ -1,7 +1,7 @@
 <?php
-namespace rosasurfer\process;
+namespace rosasurfer\ministruts\process;
 
-use rosasurfer\core\StaticClass;
+use rosasurfer\ministruts\core\StaticClass;
 
 
 /**

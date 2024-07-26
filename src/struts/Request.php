@@ -1,27 +1,27 @@
 <?php
-namespace rosasurfer\ministruts;
+namespace rosasurfer\ministruts\struts;
 
-use rosasurfer\config\ConfigInterface;
-use rosasurfer\core\CObject;
-use rosasurfer\core\assert\Assert;
-use rosasurfer\core\error\ErrorHandler;
-use rosasurfer\core\exception\IllegalStateException;
-use rosasurfer\core\exception\InvalidTypeException;
-use rosasurfer\core\exception\InvalidValueException;
-use rosasurfer\core\exception\RuntimeException;
+use rosasurfer\ministruts\config\ConfigInterface;
+use rosasurfer\ministruts\core\CObject;
+use rosasurfer\ministruts\core\assert\Assert;
+use rosasurfer\ministruts\core\error\ErrorHandler;
+use rosasurfer\ministruts\core\exception\IllegalStateException;
+use rosasurfer\ministruts\core\exception\InvalidTypeException;
+use rosasurfer\ministruts\core\exception\InvalidValueException;
+use rosasurfer\ministruts\core\exception\RuntimeException;
 
-use function rosasurfer\first;
-use function rosasurfer\getHostByAddress;
-use function rosasurfer\ini_get_bool;
-use function rosasurfer\strCompareI;
-use function rosasurfer\strEndsWith;
-use function rosasurfer\strLeft;
-use function rosasurfer\strLeftTo;
-use function rosasurfer\strRightFrom;
-use function rosasurfer\strStartsWith;
+use function rosasurfer\ministruts\first;
+use function rosasurfer\ministruts\getHostByAddress;
+use function rosasurfer\ministruts\ini_get_bool;
+use function rosasurfer\ministruts\strCompareI;
+use function rosasurfer\ministruts\strEndsWith;
+use function rosasurfer\ministruts\strLeft;
+use function rosasurfer\ministruts\strLeftTo;
+use function rosasurfer\ministruts\strRightFrom;
+use function rosasurfer\ministruts\strStartsWith;
 
-use const rosasurfer\DAY;
-use const rosasurfer\NL;
+use const rosasurfer\ministruts\DAY;
+use const rosasurfer\ministruts\NL;
 
 
 /**

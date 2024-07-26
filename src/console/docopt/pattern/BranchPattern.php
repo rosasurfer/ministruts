@@ -1,7 +1,7 @@
 <?php
-namespace rosasurfer\console\docopt\pattern;
+namespace rosasurfer\ministruts\console\docopt\pattern;
 
-use function rosasurfer\array_merge;
+use function rosasurfer\ministruts\array_merge;
 
 
 /**

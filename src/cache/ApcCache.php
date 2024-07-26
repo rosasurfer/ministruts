@@ -1,8 +1,8 @@
 <?php
-namespace rosasurfer\cache;
+namespace rosasurfer\ministruts\cache;
 
-use rosasurfer\cache\monitor\Dependency;
-use rosasurfer\core\assert\Assert;
+use rosasurfer\ministruts\cache\monitor\Dependency;
+use rosasurfer\ministruts\core\assert\Assert;
 
 
 /**
@@ -121,15 +121,15 @@ class ApcCache extends CachePeer {
          * Bug: warning "Potential cache slam averted for key '...'"
          *      - apc_add() and apc_store() return FALSE if called multiple times for the same key
          *
-         * @see http://bugs.php.net/bug.php?id=58832
-         * @see http://stackoverflow.com/questions/4983370/php-apc-potential-cache-slam-averted-for-key
+         * @see  https://bugs.php.net/bug.php?id=58832
+         * @see  https://stackoverflow.com/questions/4983370/php-apc-potential-cache-slam-averted-for-key
          *
          * - solution for APC >= 3.1.7: re-introduced setting apc.slam_defense=0
          * - no solution yet for APC 3.1.3-3.1.6
          *
-         * @see http://serverfault.com/questions/342295/apc-keeps-crashing
-         * @see http://stackoverflow.com/questions/1670034/why-would-apc-store-return-false
-         * @see http://notmysock.org/blog/php/user-cache-timebomb.html
+         * @see  https://serverfault.com/questions/342295/apc-keeps-crashing
+         * @see  https://stackoverflow.com/questions/1670034/why-would-apc-store-return-false
+         * @see  https://notmysock.org/blog/php/user-cache-timebomb.html
          */
 
         // store value:

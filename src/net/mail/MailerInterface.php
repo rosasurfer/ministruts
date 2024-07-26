@@ -1,5 +1,5 @@
 <?php
-namespace rosasurfer\net\mail;
+namespace rosasurfer\ministruts\net\mail;
 
 
 /**

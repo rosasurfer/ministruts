@@ -1,16 +1,16 @@
 <?php
-namespace rosasurfer\db\sqlite;
+namespace rosasurfer\ministruts\db\sqlite;
 
-use rosasurfer\core\assert\Assert;
-use rosasurfer\core\exception\InvalidValueException;
-use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
-use rosasurfer\core\exception\RuntimeException;
-use rosasurfer\db\Connector;
-use rosasurfer\db\DatabaseException;
+use rosasurfer\ministruts\core\assert\Assert;
+use rosasurfer\ministruts\core\exception\InvalidValueException;
+use rosasurfer\ministruts\core\exception\RosasurferExceptionInterface as IRosasurferException;
+use rosasurfer\ministruts\core\exception\RuntimeException;
+use rosasurfer\ministruts\db\Connector;
+use rosasurfer\ministruts\db\DatabaseException;
 
-use function rosasurfer\isRelativePath;
+use function rosasurfer\ministruts\isRelativePath;
 
-use const rosasurfer\NL;
+use const rosasurfer\ministruts\NL;
 
 
 /**
@@ -42,7 +42,7 @@ use const rosasurfer\NL;
  * empty result before calling <tt>fetchArray()</tt>. There is <b>no</b> workaround to prevent multiple executions of SELECT
  * queries except using a different SQLite adapter, e.g. the PDO SQLite3 adapter.
  *
- * @see  http://bugs.php.net/bug.php?id=64531
+ * @see  https://bugs.php.net/bug.php?id=64531
  */
 class SQLiteConnector extends Connector {
 
@@ -404,7 +404,7 @@ class SQLiteConnector extends Connector {
      *
      * @return int - last generated ID or 0 (zero) if no ID was generated yet in the current session
      *
-     * @link   http://github.com/rosasurfer/ministruts/tree/master/src/db
+     * @link   https://github.com/rosasurfer/ministruts/tree/master/src/db
      */
     public function lastInsertId() {
         return (int) $this->lastInsertId;
@@ -417,7 +417,7 @@ class SQLiteConnector extends Connector {
      *
      * @return int - last number of affected rows or 0 (zero) if no rows were affected yet in the current session
      *
-     * @link   http://github.com/rosasurfer/ministruts/tree/master/src/db
+     * @link   https://github.com/rosasurfer/ministruts/tree/master/src/db
      */
     public function lastAffectedRows() {
         return (int) $this->lastAffectedRows;

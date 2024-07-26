@@ -1,9 +1,9 @@
 <?php
-namespace rosasurfer\ministruts\url;
+namespace rosasurfer\ministruts\struts\url;
 
-use rosasurfer\config\ConfigInterface;
-use rosasurfer\core\assert\Assert;
-use rosasurfer\core\error\ErrorHandler;
+use rosasurfer\ministruts\config\ConfigInterface;
+use rosasurfer\ministruts\core\assert\Assert;
+use rosasurfer\ministruts\core\error\ErrorHandler;
 
 
 /**

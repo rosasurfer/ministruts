@@ -1,7 +1,7 @@
 <?php
-namespace rosasurfer\ministruts;
+namespace rosasurfer\ministruts\struts;
 
-use rosasurfer\core\CObject;
+use rosasurfer\ministruts\core\CObject;
 
 
 /**

@@ -1098,7 +1098,7 @@ namespace {
 }
 
 
-namespace rosasurfer\bin\logwatch {
+namespace rosasurfer\ministruts\bin\logwatch {
 
     /**
      * @param  string $message [optional]
@@ -1112,7 +1112,7 @@ namespace rosasurfer\bin\logwatch {
 }
 
 
-namespace rosasurfer\util\apc\apc {
+namespace rosasurfer\ministruts\util\apc\apc {
 
     /**
      * @param  array $array1

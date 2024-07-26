@@ -1,16 +1,16 @@
 <?php
-namespace rosasurfer\core\di\facade;
+namespace rosasurfer\ministruts\core\di\facade;
 
-use rosasurfer\core\di\proxy\Request as RequestProxy;
-use rosasurfer\ministruts\ActionInput;
+use rosasurfer\ministruts\core\di\proxy\Request as RequestProxy;
+use rosasurfer\ministruts\struts\ActionInput;
 
-use const rosasurfer\ministruts\ACTION_INPUT_KEY;
+use const rosasurfer\ministruts\struts\ACTION_INPUT_KEY;
 
 
 /**
  * Input
  *
- * A {@link Facade} for accessing the raw input parameters of the current or the previous HTTP {@link \rosasurfer\ministruts\Request}.
+ * A {@link Facade} for accessing the raw input parameters of the current or the previous HTTP {@link \rosasurfer\ministruts\struts\Request}.
  */
 class Input extends Facade {
 
@@ -89,7 +89,7 @@ class Input extends Facade {
 
 
     /**
-     * Return the {@link \rosasurfer\ministruts\ActionInput} instance assigned to the current HTTP request.
+     * Return the {@link \rosasurfer\ministruts\struts\ActionInput} instance assigned to the current HTTP request.
      *
      * @return ActionInput
      */
@@ -99,7 +99,7 @@ class Input extends Facade {
 
 
     /**
-     * If the current request is a result of an HTTP redirect return the {@link \rosasurfer\ministruts\ActionInput} instance
+     * If the current request is a result of an HTTP redirect return the {@link \rosasurfer\ministruts\struts\ActionInput} instance
      * assigned to the previous one. If the current request is not a result of an HTTP redirect return an empty instance.
      *
      * @return ActionInput

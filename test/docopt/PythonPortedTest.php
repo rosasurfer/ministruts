@@ -1,23 +1,23 @@
 <?php
 declare(strict_types=1);
 
-namespace rosasurfer\test\docopt;
+namespace rosasurfer\ministruts\test\docopt;
 
 use PHPUnit\Framework\TestCase;
 
-use rosasurfer\console\docopt\DocoptResult;
-use rosasurfer\console\docopt\TokenIterator;
-use rosasurfer\console\docopt\exception\DocoptFormatError;
-use rosasurfer\console\docopt\pattern\Argument;
-use rosasurfer\console\docopt\pattern\Command;
-use rosasurfer\console\docopt\pattern\Either;
-use rosasurfer\console\docopt\pattern\OneOrMore;
-use rosasurfer\console\docopt\pattern\Option;
-use rosasurfer\console\docopt\pattern\Optional;
-use rosasurfer\console\docopt\pattern\OptionsShortcut;
-use rosasurfer\console\docopt\pattern\Required;
+use rosasurfer\ministruts\console\docopt\DocoptResult;
+use rosasurfer\ministruts\console\docopt\TokenIterator;
+use rosasurfer\ministruts\console\docopt\exception\DocoptFormatError;
+use rosasurfer\ministruts\console\docopt\pattern\Argument;
+use rosasurfer\ministruts\console\docopt\pattern\Command;
+use rosasurfer\ministruts\console\docopt\pattern\Either;
+use rosasurfer\ministruts\console\docopt\pattern\OneOrMore;
+use rosasurfer\ministruts\console\docopt\pattern\Option;
+use rosasurfer\ministruts\console\docopt\pattern\Optional;
+use rosasurfer\ministruts\console\docopt\pattern\OptionsShortcut;
+use rosasurfer\ministruts\console\docopt\pattern\Required;
 
-use function rosasurfer\docopt;
+use function rosasurfer\ministruts\docopt;
 
 
 /**

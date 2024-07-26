@@ -1,10 +1,10 @@
 <?php
-namespace rosasurfer\core\di\service;
+namespace rosasurfer\ministruts\core\di\service;
 
-use rosasurfer\core\exception\ClassNotFoundException;
-use rosasurfer\core\exception\InvalidTypeException;
+use rosasurfer\ministruts\core\exception\ClassNotFoundException;
+use rosasurfer\ministruts\core\exception\InvalidTypeException;
 
-use function rosasurfer\is_class;
+use function rosasurfer\ministruts\is_class;
 
 
 /**
@@ -13,7 +13,7 @@ use function rosasurfer\is_class;
  * Represents a service registered in the service container.
  *
  * <pre>
- *  $service = new Service('request', 'rosasurfer\\ministruts\\Request');
+ *  $service = new Service('request', 'rosasurfer\\ministruts\\struts\\Request');
  *  $request = $service->resolve();
  * </pre>
  */

@@ -1,8 +1,8 @@
 <?php
-namespace rosasurfer\ministruts;
+namespace rosasurfer\ministruts\struts;
 
-use rosasurfer\core\CObject;
-use rosasurfer\core\exception\IllegalAccessException;
+use rosasurfer\ministruts\core\CObject;
+use rosasurfer\ministruts\core\exception\IllegalAccessException;
 
 
 /**

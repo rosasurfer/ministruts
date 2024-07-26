@@ -1,7 +1,7 @@
 <?php
-namespace rosasurfer\net\http;
+namespace rosasurfer\ministruts\net\http;
 
-use rosasurfer\core\CObject;
+use rosasurfer\ministruts\core\CObject;
 
 
 /**

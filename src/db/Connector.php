@@ -1,10 +1,10 @@
 <?php
-namespace rosasurfer\db;
+namespace rosasurfer\ministruts\db;
 
-use rosasurfer\core\CObject;
-use rosasurfer\core\error\ErrorHandler;
-use rosasurfer\core\exception\InvalidTypeException;
-use rosasurfer\db\ConnectorInterface as IConnector;
+use rosasurfer\ministruts\core\CObject;
+use rosasurfer\ministruts\core\error\ErrorHandler;
+use rosasurfer\ministruts\core\exception\InvalidTypeException;
+use rosasurfer\ministruts\db\ConnectorInterface as IConnector;
 
 
 /**

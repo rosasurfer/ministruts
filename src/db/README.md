@@ -28,7 +28,7 @@
     <td nowrap align="center"> &nbsp; yes <small><sup>3</sup></small> </td>
 </tr>
 <tr>
-    <td nowrap>                rosasurfer\db\mysql\MySQLConnector </td>
+    <td nowrap>                rosasurfer\ministruts\db\mysql\MySQLConnector </td>
     <td nowrap>                <code>MySQLConnector::lastInsertId()</code><br><code>MySQLResult::lastInsertId()</code> </td>
     <td nowrap align="center"> &nbsp; yes <small><sup>5</sup></small> </td>
     <td nowrap align="center"> - </td>
@@ -46,7 +46,7 @@
     <td nowrap align="center"> &nbsp; </td>
 </tr>
 <tr>
-    <td nowrap>                rosasurfer\db\pgsql\PostgresConnector </td>
+    <td nowrap>                rosasurfer\ministruts\db\pgsql\PostgresConnector </td>
     <td nowrap>                <code>PostgresConnector::lastInsertId()</code><br><code>PostgresResult::lastInsertId()</code> </td>
     <td nowrap align="center"> &nbsp; yes <small><sup>4</sup></small> </td>
     <td nowrap align="center"> &nbsp; </td>
@@ -64,7 +64,7 @@
     <td nowrap align="center"> - </td>
 </tr>
 <tr>
-    <td nowrap>                rosasurfer\db\sqlite\SQLiteConnector </td>
+    <td nowrap>                rosasurfer\ministruts\db\sqlite\SQLiteConnector </td>
     <td nowrap>                <code>SQLiteConnector::lastInsertId()</code><br><code>SQLiteResult::lastInsertId()</code> </td>
     <td nowrap align="center"> &nbsp; yes <small><sup>5</sup></small> </td>
     <td nowrap align="center"> - </td>
@@ -103,7 +103,7 @@ _ _ _
     <td nowrap align="center"> &nbsp;&nbsp;&nbsp; yes <small><sup>3 8</sup></small> </td>
 </tr>
 <tr>
-    <td nowrap>                rosasurfer\db\mysql\MySQLConnector </td>
+    <td nowrap>                rosasurfer\ministruts\db\mysql\MySQLConnector </td>
     <td nowrap>                <code>MySQLConnector::lastAffectedRows()</code><br><code>MySQLResult::lastAffectedRows()</code> </td>
     <td nowrap align="center"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; yes <small><sup>4 8 9</sup></small> </td>
     <td nowrap align="center"> - </td>
@@ -121,7 +121,7 @@ _ _ _
     <td nowrap align="center"> &nbsp;&nbsp;&nbsp; yes <small><sup>5 6</sup></small> </td>
 </tr>
 <tr>
-    <td nowrap>                rosasurfer\db\pgsql\PostgresConnector </td>
+    <td nowrap>                rosasurfer\ministruts\db\pgsql\PostgresConnector </td>
     <td nowrap>                <code>PostgresConnector::lastAffectedRows()</code><br><code>PostgresResult::lastAffectedRows()</code> </td>
     <td nowrap align="center"> &nbsp;&nbsp;&nbsp; yes <small><sup>5 9</sup></small> </td>
     <td nowrap align="center"> &nbsp; </td>
@@ -139,7 +139,7 @@ _ _ _
     <td nowrap align="center"> - </td>
 </tr>
 <tr>
-    <td nowrap>                rosasurfer\db\sqlite\SQLiteConnector </td>
+    <td nowrap>                rosasurfer\ministruts\db\sqlite\SQLiteConnector </td>
     <td nowrap>                <code>SQLiteConnector::lastAffectedRows()</code><br><code>SQLiteResult::lastAffectedRows()</code> </td>
     <td nowrap align="center"> &nbsp;&nbsp;&nbsp; yes <small><sup>5 9</sup></small> </td>
     <td nowrap align="center"> - </td>

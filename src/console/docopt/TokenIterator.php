@@ -1,10 +1,10 @@
 <?php
-namespace rosasurfer\console\docopt;
+namespace rosasurfer\ministruts\console\docopt;
 
-use rosasurfer\console\docopt\exception\DocoptFormatError;
-use rosasurfer\console\docopt\exception\DocoptUserNotification;
-use rosasurfer\core\ObjectTrait;
-use rosasurfer\core\di\DiAwareTrait;
+use rosasurfer\ministruts\console\docopt\exception\DocoptFormatError;
+use rosasurfer\ministruts\console\docopt\exception\DocoptUserNotification;
+use rosasurfer\ministruts\core\ObjectTrait;
+use rosasurfer\ministruts\core\di\DiAwareTrait;
 
 
 /**

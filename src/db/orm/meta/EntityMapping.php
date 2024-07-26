@@ -1,8 +1,8 @@
 <?php
-namespace rosasurfer\db\orm\meta;
+namespace rosasurfer\ministruts\db\orm\meta;
 
-use rosasurfer\core\CObject;
-use rosasurfer\core\exception\RuntimeException;
+use rosasurfer\ministruts\core\CObject;
+use rosasurfer\ministruts\core\exception\RuntimeException;
 
 
 /**

@@ -1,9 +1,9 @@
 <?php
-namespace rosasurfer\console\io;
+namespace rosasurfer\ministruts\console\io;
 
-use rosasurfer\console\docopt\DocoptResult;
-use rosasurfer\core\CObject;
-use rosasurfer\core\assert\Assert;
+use rosasurfer\ministruts\console\docopt\DocoptResult;
+use rosasurfer\ministruts\core\CObject;
+use rosasurfer\ministruts\core\assert\Assert;
 
 
 /**

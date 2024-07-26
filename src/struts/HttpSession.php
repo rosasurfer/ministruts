@@ -1,11 +1,11 @@
 <?php
-namespace rosasurfer\ministruts;
+namespace rosasurfer\ministruts\struts;
 
-use rosasurfer\core\Singleton;
-use rosasurfer\core\assert\Assert;
-use rosasurfer\core\di\proxy\Request as RequestProxy;
-use rosasurfer\core\exception\RuntimeException;
-use rosasurfer\util\PHP;
+use rosasurfer\ministruts\core\Singleton;
+use rosasurfer\ministruts\core\assert\Assert;
+use rosasurfer\ministruts\core\di\proxy\Request as RequestProxy;
+use rosasurfer\ministruts\core\exception\RuntimeException;
+use rosasurfer\ministruts\util\PHP;
 
 
 /**
@@ -21,7 +21,7 @@ class HttpSession extends Singleton {
 
 
     /**
-     * Return the {@link \rosasurfer\core\Singleton} instance.
+     * Return the {@link \rosasurfer\ministruts\core\Singleton} instance.
      *
      * @return static
      *

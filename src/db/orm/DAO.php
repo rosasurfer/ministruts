@@ -1,17 +1,17 @@
 <?php
-namespace rosasurfer\db\orm;
+namespace rosasurfer\ministruts\db\orm;
 
-use rosasurfer\core\Singleton;
-use rosasurfer\core\exception\ClassNotFoundException;
-use rosasurfer\core\exception\InvalidTypeException;
-use rosasurfer\core\exception\RuntimeException;
-use rosasurfer\db\ConnectorInterface as IConnector;
-use rosasurfer\db\MultipleRecordsException;
-use rosasurfer\db\NoSuchRecordException;
-use rosasurfer\db\ResultInterface as IResult;
-use rosasurfer\db\orm\meta\EntityMapping;
+use rosasurfer\ministruts\core\Singleton;
+use rosasurfer\ministruts\core\exception\ClassNotFoundException;
+use rosasurfer\ministruts\core\exception\InvalidTypeException;
+use rosasurfer\ministruts\core\exception\RuntimeException;
+use rosasurfer\ministruts\db\ConnectorInterface as IConnector;
+use rosasurfer\ministruts\db\MultipleRecordsException;
+use rosasurfer\ministruts\db\NoSuchRecordException;
+use rosasurfer\ministruts\db\ResultInterface as IResult;
+use rosasurfer\ministruts\db\orm\meta\EntityMapping;
 
-use function rosasurfer\is_class;
+use function rosasurfer\ministruts\is_class;
 
 
 /**

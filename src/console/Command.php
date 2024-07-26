@@ -1,23 +1,23 @@
 <?php
-namespace rosasurfer\console;
+namespace rosasurfer\ministruts\console;
 
-use rosasurfer\console\docopt\DocoptParser;
-use rosasurfer\console\docopt\DocoptResult;
-use rosasurfer\console\io\Input;
-use rosasurfer\console\io\Output;
-use rosasurfer\core\CObject;
-use rosasurfer\core\assert\Assert;
-use rosasurfer\core\di\proxy\CliInput as InputProxy;
-use rosasurfer\core\di\proxy\Output as OutputProxy;
-use rosasurfer\core\exception\IllegalStateException;
-use rosasurfer\core\exception\InvalidValueException;
-use rosasurfer\core\exception\RuntimeException;
+use rosasurfer\ministruts\console\docopt\DocoptParser;
+use rosasurfer\ministruts\console\docopt\DocoptResult;
+use rosasurfer\ministruts\console\io\Input;
+use rosasurfer\ministruts\console\io\Output;
+use rosasurfer\ministruts\core\CObject;
+use rosasurfer\ministruts\core\assert\Assert;
+use rosasurfer\ministruts\core\di\proxy\CliInput as InputProxy;
+use rosasurfer\ministruts\core\di\proxy\Output as OutputProxy;
+use rosasurfer\ministruts\core\exception\IllegalStateException;
+use rosasurfer\ministruts\core\exception\InvalidValueException;
+use rosasurfer\ministruts\core\exception\RuntimeException;
 
 
 /**
  * Command
  *
- * The configuration of a command will be frozen after it is added to the {@link \rosasurfer\Application}. A frozen configuration
+ * The configuration of a command will be frozen after it is added to the {@link \rosasurfer\ministruts\Application}. A frozen configuration
  * can't be changed anymore.
  */
 class Command extends CObject {
@@ -216,7 +216,7 @@ class Command extends CObject {
      *
      * @return $this
      *
-     * @link   http://docopt.org/
+     * @link   https://docopt.org/
      */
     public function setDocoptDefinition($doc) {
         if ($this->frozen) throw new RuntimeException('Configuration of "'.get_class($this).'" is frozen');
@@ -283,7 +283,7 @@ class Command extends CObject {
 
     /**
      * Validate the command configuration and lock its configuration. Called after the command is added to the
-     * {@link \rosasurfer\Application}.
+     * {@link \rosasurfer\ministruts\Application}.
      *
      * @return $this
      */

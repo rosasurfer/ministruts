@@ -30,12 +30,12 @@ return [
 
     // defining a parameterless dependency using an anonymous function
     'logger' => function() {
-        return new \rosasurfer\log\Logger();
+        return new \rosasurfer\ministruts\log\Logger();
     },
 
     // defining a parameterized dependency using an anonymous function
     'mail' => function(...$args) {
-        return new \rosasurfer\net\mail\SMTPMailer(...$args);
+        return new \rosasurfer\ministruts\net\mail\SMTPMailer(...$args);
     },
 ];
 ```
@@ -65,7 +65,7 @@ return [
     // defining a dependency which requires the application configuration
     'db' => function() {
         $options = $this['config']['db.mysql'];
-        return new \rosasurfer\db\mysql\MySQLConnector($options);
+        return new \rosasurfer\ministruts\db\mysql\MySQLConnector($options);
     },
 ];
 ```

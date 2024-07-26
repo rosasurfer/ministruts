@@ -1,10 +1,10 @@
 <?php
-namespace rosasurfer\core;
+namespace rosasurfer\ministruts\core;
 
-use rosasurfer\core\exception\RuntimeException;
+use rosasurfer\ministruts\core\exception\RuntimeException;
 
-use function rosasurfer\simpleClassName;
-use function rosasurfer\strLeftTo;
+use function rosasurfer\ministruts\simpleClassName;
+use function rosasurfer\ministruts\strLeftTo;
 
 
 /**

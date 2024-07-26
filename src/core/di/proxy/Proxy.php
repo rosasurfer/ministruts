@@ -1,9 +1,9 @@
 <?php
-namespace rosasurfer\core\di\proxy;
+namespace rosasurfer\ministruts\core\di\proxy;
 
-use rosasurfer\core\StaticClass;
-use rosasurfer\core\exception\IllegalAccessException;
-use rosasurfer\core\exception\UnimplementedFeatureException;
+use rosasurfer\ministruts\core\StaticClass;
+use rosasurfer\ministruts\core\exception\IllegalAccessException;
+use rosasurfer\ministruts\core\exception\UnimplementedFeatureException;
 
 
 /**

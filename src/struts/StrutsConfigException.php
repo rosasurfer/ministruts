@@ -1,7 +1,7 @@
 <?php
-namespace rosasurfer\ministruts;
+namespace rosasurfer\ministruts\struts;
 
-use rosasurfer\core\exception\RosasurferException;
+use rosasurfer\ministruts\core\exception\RosasurferException;
 
 
 /**

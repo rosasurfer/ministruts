@@ -2,7 +2,7 @@
 /**
  * Package constants
  */
-namespace rosasurfer\db\orm\meta;
+namespace rosasurfer\ministruts\db\orm\meta;
 
 
 // Understood type identifiers usable for PHP scalars and database columns.

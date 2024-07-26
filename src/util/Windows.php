@@ -1,8 +1,8 @@
 <?php
-namespace rosasurfer\util;
+namespace rosasurfer\ministruts\util;
 
-use rosasurfer\core\StaticClass;
-use rosasurfer\core\assert\Assert;
+use rosasurfer\ministruts\core\StaticClass;
+use rosasurfer\ministruts\core\assert\Assert;
 
 
 /**

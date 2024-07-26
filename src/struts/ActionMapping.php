@@ -1,13 +1,13 @@
 <?php
-namespace rosasurfer\ministruts;
+namespace rosasurfer\ministruts\struts;
 
-use rosasurfer\core\CObject;
-use rosasurfer\core\assert\Assert;
-use rosasurfer\core\di\proxy\Request as RequestProxy;
-use rosasurfer\core\exception\IllegalStateException;
+use rosasurfer\ministruts\core\CObject;
+use rosasurfer\ministruts\core\assert\Assert;
+use rosasurfer\ministruts\core\di\proxy\Request as RequestProxy;
+use rosasurfer\ministruts\core\exception\IllegalStateException;
 
-use function rosasurfer\strCompareI;
-use function rosasurfer\strLeftTo;
+use function rosasurfer\ministruts\strCompareI;
+use function rosasurfer\ministruts\strLeftTo;
 
 
 /**
@@ -16,7 +16,7 @@ use function rosasurfer\strLeftTo;
  * An ActionMapping encapsulates the processing instructions for a single route. For in-depth documentation of properties
  * and configuration see the following link:
  *
- * @link  https://github.com/rosasurfer/ministruts/blob/master/src/ministruts/dtd/struts-config.dtd#L141
+ * @link  https://github.com/rosasurfer/ministruts/blob/master/src/struts/dtd/struts-config.dtd#L141
  */
 class ActionMapping extends CObject {
 

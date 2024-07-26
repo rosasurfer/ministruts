@@ -1,13 +1,13 @@
 <?php
-namespace rosasurfer\cache;
+namespace rosasurfer\ministruts\cache;
 
-use rosasurfer\config\ConfigInterface as IConfig;
-use rosasurfer\core\StaticClass;
-use rosasurfer\core\assert\Assert;
+use rosasurfer\ministruts\config\ConfigInterface as IConfig;
+use rosasurfer\ministruts\core\StaticClass;
+use rosasurfer\ministruts\core\assert\Assert;
 
-use function rosasurfer\ini_get_bool;
+use function rosasurfer\ministruts\ini_get_bool;
 
-use const rosasurfer\CLI;
+use const rosasurfer\ministruts\CLI;
 
 
 /**

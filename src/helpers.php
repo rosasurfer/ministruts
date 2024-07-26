@@ -2,26 +2,26 @@
 /**
  * Helper functions and constants
  */
-namespace rosasurfer;
+namespace rosasurfer\ministruts;
 
-use rosasurfer\console\docopt\DocoptParser;
-use rosasurfer\console\docopt\DocoptResult;
-use rosasurfer\core\assert\Assert;
-use rosasurfer\core\di\proxy\Request;
-use rosasurfer\core\exception\InvalidValueException;
-use rosasurfer\core\exception\RuntimeException;
-use rosasurfer\core\lock\Lock;
-use rosasurfer\ministruts\url\Url;
-use rosasurfer\ministruts\url\VersionedUrl;
-use rosasurfer\util\Validator;
+use rosasurfer\ministruts\console\docopt\DocoptParser;
+use rosasurfer\ministruts\console\docopt\DocoptResult;
+use rosasurfer\ministruts\core\assert\Assert;
+use rosasurfer\ministruts\core\di\proxy\Request;
+use rosasurfer\ministruts\core\exception\InvalidValueException;
+use rosasurfer\ministruts\core\exception\RuntimeException;
+use rosasurfer\ministruts\core\lock\Lock;
+use rosasurfer\ministruts\struts\url\Url;
+use rosasurfer\ministruts\struts\url\VersionedUrl;
+use rosasurfer\ministruts\util\Validator;
 
 
 // Whether we run on a command line interface, on localhost and/or on Windows.
-define('rosasurfer\_CLI',        defined('\STDIN') && is_resource(\STDIN));
-define('rosasurfer\_LOCALHOST',  !_CLI && in_array($_SERVER['REMOTE_ADDR'], ['127.0.0.1', $_SERVER['SERVER_ADDR']]));
-define('rosasurfer\_MACOS',      strtoupper(PHP_OS) == 'DARWIN');
-define('rosasurfer\_WINDOWS',    defined('\PHP_WINDOWS_VERSION_BUILD'));
-define('rosasurfer\_NUL_DEVICE', _WINDOWS ? 'nul' : '/dev/null');
+define('rosasurfer\ministruts\_CLI',        defined('\STDIN') && is_resource(\STDIN));
+define('rosasurfer\ministruts\_LOCALHOST',  !_CLI && in_array($_SERVER['REMOTE_ADDR'], ['127.0.0.1', $_SERVER['SERVER_ADDR']]));
+define('rosasurfer\ministruts\_MACOS',      strtoupper(PHP_OS) == 'DARWIN');
+define('rosasurfer\ministruts\_WINDOWS',    defined('\PHP_WINDOWS_VERSION_BUILD'));
+define('rosasurfer\ministruts\_NUL_DEVICE', _WINDOWS ? 'nul' : '/dev/null');
 
 /** @var bool    - whether we run on a command line interface */
 const CLI        = _CLI;
@@ -141,7 +141,7 @@ function array_key_exists($key, $array) {
 
 
 /**
- * Alias of {@link rosasurfer\array_key_exists()}.
+ * Alias of {@link rosasurfer\ministruts\array_key_exists()}.
  *
  * Whether the given index exists in an array-like variable.
  *
@@ -1420,7 +1420,7 @@ function metatypeOf($name) {
 
 
 /**
- * Procedural replacement for rosasurfer\util\Validator::isDateTime()
+ * Procedural replacement for rosasurfer\ministruts\util\Validator::isDateTime()
  *
  * Whether the specified string value represents a valid date or datetime value.
  *
@@ -1434,7 +1434,7 @@ function metatypeOf($name) {
  *
  * @return int|bool - timestamp matching the string or FALSE if the string is not a valid date/datetime value
  *
- * @see \rosasurfer\util\Validator::isDateTime()
+ * @see \rosasurfer\ministruts\util\Validator::isDateTime()
  */
 function is_datetime($string, $format = 'Y-m-d') {
     return Validator::isDateTime($string, $format);
@@ -1610,7 +1610,7 @@ function synchronized(\Closure $task, $mutex = null) {
 
 
 /**
- * Lookup and return a {@link \rosasurfer\ministruts\url\Url} helper for the named {@link \rosasurfer\ministruts\ActionMapping}.
+ * Lookup and return a {@link \rosasurfer\ministruts\struts\url\Url} helper for the named {@link \rosasurfer\ministruts\struts\ActionMapping}.
  *
  * @param  string $name - route name
  *
@@ -1645,11 +1645,11 @@ function route($name) {
 
 
 /**
- * Return a {@link \rosasurfer\ministruts\url\Url} helper for the given URI. An URI starting with a slash "/" is interpreted
+ * Return a {@link \rosasurfer\ministruts\struts\url\Url} helper for the given URI. An URI starting with a slash "/" is interpreted
  * as relative to the application's base URI. An URI not starting with a slash is interpreted as relative to the application
- * {@link \rosasurfer\ministruts\Module}'s base URI (the module the current request belongs to).<br>
+ * {@link \rosasurfer\ministruts\struts\Module}'s base URI (the module the current request belongs to).<br>
  *
- * Procedural equivalent of <tt>new \rosasurfer\ministruts\url\Url($uri)</tt>.
+ * Procedural equivalent of <tt>new \rosasurfer\ministruts\struts\url\Url($uri)</tt>.
  *
  * @param  string $uri
  *
@@ -1661,11 +1661,11 @@ function url($uri) {
 
 
 /**
- * Return a version-aware URL helper for the given URI {@link \rosasurfer\ministruts\url\VersionedUrl}. An URI starting with a slash "/"
+ * Return a version-aware URL helper for the given URI {@link \rosasurfer\ministruts\struts\url\VersionedUrl}. An URI starting with a slash "/"
  * is interpreted as relative to the application's base URI. An URI not starting with a slash is interpreted as relative to the application
- * {@link \rosasurfer\ministruts\Module}'s base URI (the module the current request belongs to).<br>
+ * {@link \rosasurfer\ministruts\struts\Module}'s base URI (the module the current request belongs to).<br>
  *
- * Procedural equivalent of <tt>new \rosasurfer\ministruts\url\VersionedUrl($uri)</tt>.
+ * Procedural equivalent of <tt>new \rosasurfer\ministruts\struts\url\VersionedUrl($uri)</tt>.
  *
  * @param  string $uri
  *
@@ -1677,7 +1677,7 @@ function asset($uri) {
 
 
 /**
- * Parse command line arguments and match them against the specified {@link http://docopt.org/#} syntax definition.
+ * Parse command line arguments and match them against the specified {@link https://docopt.org/#} syntax definition.
  *
  * @param  string               $doc                - help text, i.e. a syntax definition in Docopt language format
  * @param  string|string[]|null $args    [optional] - arguments to parse (default: the arguments passed in $_SERVER['argv'])

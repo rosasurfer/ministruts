@@ -1,11 +1,11 @@
 <?php
-namespace rosasurfer\core;
+namespace rosasurfer\ministruts\core;
 
-use rosasurfer\core\exception\ClassNotFoundException;
-use rosasurfer\core\exception\InvalidTypeException;
-use rosasurfer\core\exception\RuntimeException;
+use rosasurfer\ministruts\core\exception\ClassNotFoundException;
+use rosasurfer\ministruts\core\exception\InvalidTypeException;
+use rosasurfer\ministruts\core\exception\RuntimeException;
 
-use function rosasurfer\is_class;
+use function rosasurfer\ministruts\is_class;
 
 
 /**

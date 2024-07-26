@@ -1,15 +1,15 @@
 <?php
-namespace rosasurfer\db\orm;
+namespace rosasurfer\ministruts\db\orm;
 
-use rosasurfer\core\CObject;
-use rosasurfer\db\ConnectionPool;
-use rosasurfer\db\ConnectorInterface as IConnector;
-use rosasurfer\db\MultipleRecordsException;
-use rosasurfer\db\ResultInterface as IResult;
+use rosasurfer\ministruts\core\CObject;
+use rosasurfer\ministruts\db\ConnectionPool;
+use rosasurfer\ministruts\db\ConnectorInterface as IConnector;
+use rosasurfer\ministruts\db\MultipleRecordsException;
+use rosasurfer\ministruts\db\ResultInterface as IResult;
 
-use function rosasurfer\strLeftTo;
+use function rosasurfer\ministruts\strLeftTo;
 
-use const rosasurfer\ARRAY_ASSOC;
+use const rosasurfer\ministruts\ARRAY_ASSOC;
 
 
 /**

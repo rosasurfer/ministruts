@@ -6,20 +6,20 @@
  *
  * @see `logwatch.php -h` for command line options when integrating with CRON
  */
-namespace rosasurfer\bin\logwatch;
+namespace rosasurfer\ministruts\bin\logwatch;
 
-use rosasurfer\Application;
-use rosasurfer\config\ConfigInterface;
-use rosasurfer\core\assert\Assert;
-use rosasurfer\net\mail\Mailer;
+use rosasurfer\ministruts\Application;
+use rosasurfer\ministruts\config\ConfigInterface;
+use rosasurfer\ministruts\core\assert\Assert;
+use rosasurfer\ministruts\net\mail\Mailer;
 
-use function rosasurfer\echof;
-use function rosasurfer\stderr;
-use function rosasurfer\strStartsWith;
+use function rosasurfer\ministruts\echof;
+use function rosasurfer\ministruts\stderr;
+use function rosasurfer\ministruts\strStartsWith;
 
-use const rosasurfer\CLI;
-use const rosasurfer\NL;
-use const rosasurfer\WINDOWS;
+use const rosasurfer\ministruts\CLI;
+use const rosasurfer\ministruts\NL;
+use const rosasurfer\ministruts\WINDOWS;
 
 require(dirname(realpath(__FILE__)).'/../app/init.php');    // TODO: adjust to your project
 !CLI && exit(1|stderr('error: This script must be executed via CLI.'.NL));

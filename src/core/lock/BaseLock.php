@@ -1,8 +1,8 @@
 <?php
-namespace rosasurfer\core\lock;
+namespace rosasurfer\ministruts\core\lock;
 
-use rosasurfer\core\CObject;
-use rosasurfer\core\exception\IllegalStateException;
+use rosasurfer\ministruts\core\CObject;
+use rosasurfer\ministruts\core\exception\IllegalStateException;
 
 
 /**

@@ -1,7 +1,7 @@
 <?php
-namespace rosasurfer\console\docopt\pattern;
+namespace rosasurfer\ministruts\console\docopt\pattern;
 
-use rosasurfer\console\docopt\SingleMatch;
+use rosasurfer\ministruts\console\docopt\SingleMatch;
 
 
 /**

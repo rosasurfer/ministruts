@@ -1,43 +1,43 @@
 <?php
-namespace rosasurfer\log;
+namespace rosasurfer\ministruts\log;
 
-use rosasurfer\Application;
-use rosasurfer\config\ConfigInterface;
-use rosasurfer\core\StaticClass;
-use rosasurfer\core\assert\Assert;
-use rosasurfer\core\di\proxy\Request;
-use rosasurfer\core\error\ErrorHandler;
-use rosasurfer\core\error\PHPError;
-use rosasurfer\core\exception\IllegalStateException;
-use rosasurfer\core\exception\InvalidValueException;
-use rosasurfer\log\context\RequestData;
-use rosasurfer\net\mail\Mailer;
+use rosasurfer\ministruts\Application;
+use rosasurfer\ministruts\config\ConfigInterface;
+use rosasurfer\ministruts\core\StaticClass;
+use rosasurfer\ministruts\core\assert\Assert;
+use rosasurfer\ministruts\core\di\proxy\Request;
+use rosasurfer\ministruts\core\error\ErrorHandler;
+use rosasurfer\ministruts\core\error\PHPError;
+use rosasurfer\ministruts\core\exception\IllegalStateException;
+use rosasurfer\ministruts\core\exception\InvalidValueException;
+use rosasurfer\ministruts\log\context\RequestData;
+use rosasurfer\ministruts\net\mail\Mailer;
 
-use function rosasurfer\echof;
-use function rosasurfer\getHostByAddress;
-use function rosasurfer\hsc;
-use function rosasurfer\ini_get_bool;
-use function rosasurfer\ksortc;
-use function rosasurfer\normalizeEOL;
-use function rosasurfer\print_p;
-use function rosasurfer\stderr;
-use function rosasurfer\stdout;
-use function rosasurfer\strEndsWith;
-use function rosasurfer\strLeftTo;
-use function rosasurfer\strRightFrom;
-use function rosasurfer\strStartsWith;
+use function rosasurfer\ministruts\echof;
+use function rosasurfer\ministruts\getHostByAddress;
+use function rosasurfer\ministruts\hsc;
+use function rosasurfer\ministruts\ini_get_bool;
+use function rosasurfer\ministruts\ksortc;
+use function rosasurfer\ministruts\normalizeEOL;
+use function rosasurfer\ministruts\print_p;
+use function rosasurfer\ministruts\stderr;
+use function rosasurfer\ministruts\stdout;
+use function rosasurfer\ministruts\strEndsWith;
+use function rosasurfer\ministruts\strLeftTo;
+use function rosasurfer\ministruts\strRightFrom;
+use function rosasurfer\ministruts\strStartsWith;
 
-use const rosasurfer\CLI;
-use const rosasurfer\EOL_WINDOWS;
-use const rosasurfer\ERROR_LOG_DEFAULT;
-use const rosasurfer\L_DEBUG;
-use const rosasurfer\L_ERROR;
-use const rosasurfer\L_FATAL;
-use const rosasurfer\L_INFO;
-use const rosasurfer\L_NOTICE;
-use const rosasurfer\L_WARN;
-use const rosasurfer\NL;
-use const rosasurfer\WINDOWS;
+use const rosasurfer\ministruts\CLI;
+use const rosasurfer\ministruts\EOL_WINDOWS;
+use const rosasurfer\ministruts\ERROR_LOG_DEFAULT;
+use const rosasurfer\ministruts\L_DEBUG;
+use const rosasurfer\ministruts\L_ERROR;
+use const rosasurfer\ministruts\L_FATAL;
+use const rosasurfer\ministruts\L_INFO;
+use const rosasurfer\ministruts\L_NOTICE;
+use const rosasurfer\ministruts\L_WARN;
+use const rosasurfer\ministruts\NL;
+use const rosasurfer\ministruts\WINDOWS;
 
 
 /**
@@ -288,7 +288,7 @@ class Logger extends StaticClass {
         catch (\Throwable $logException) {}
 
         if ($logException) {
-            // If the call comes from our framework's exception handler (that's \rosasurfer\core\error\ErrorHandler::handleException())
+            // If the call comes from our framework's exception handler (that's \rosasurfer\ministruts\core\error\ErrorHandler::handleException())
             // a failed logging is already handled. If the call comes from user-land code make sure the message doesn't get
             // lost and is logged to the PHP default error log.
             if (!isset($context['unhandled-exception'])) {
