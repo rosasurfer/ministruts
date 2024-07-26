@@ -12,14 +12,13 @@ use rosasurfer\ministruts\core\di\DiAwareTrait;
 use rosasurfer\ministruts\core\loader\ClassLoader;
 
 
-define('rosasurfer\ministruts\_ROOT_', dirname(__DIR__));
-const MINISTRUTS_ROOT = _ROOT_;                          // constant declarations improve IDE code completion
+define('rosasurfer\ministruts\ROOT_DIR', dirname(__DIR__));
 
 
 // Include helper functions and constants which can't be auto-loaded (prevent multiple includes).
-if (!defined('rosasurfer\ministruts\CLI'))               require(MINISTRUTS_ROOT.'/src/helpers.php');
-if (!defined('rosasurfer\ministruts\db\orm\meta\BOOL'))  require(MINISTRUTS_ROOT.'/src/db/orm/meta/defines.php');
-if (!defined('rosasurfer\ministruts\struts\MODULE_KEY')) require(MINISTRUTS_ROOT.'/src/struts/defines.php');
+if (!defined('rosasurfer\ministruts\CLI'))               require(__DIR__.'/helpers.php');
+if (!defined('rosasurfer\ministruts\db\orm\meta\BOOL'))  require(__DIR__.'/db/orm/meta/defines.php');
+if (!defined('rosasurfer\ministruts\struts\MODULE_KEY')) require(__DIR__.'/struts/defines.php');
 
 
 /**
@@ -35,10 +34,10 @@ function registerClassLoader() {
     // register a bootstrap loader for class rosasurfer\ministruts\core\loader\ClassLoader
     $bootstrap = function($class) {
         switch ($class) {
-            case CObject     ::class: require(MINISTRUTS_ROOT.'/src/core/CObject.php'           ); break;
-            case ObjectTrait ::class: require(MINISTRUTS_ROOT.'/src/core/ObjectTrait.php'       ); break;
-            case DiAwareTrait::class: require(MINISTRUTS_ROOT.'/src/core/di/DiAwareTrait.php'   ); break;
-            case ClassLoader ::class: require(MINISTRUTS_ROOT.'/src/core/loader/ClassLoader.php'); break;
+            case CObject     ::class: require(__DIR__.'/core/CObject.php'           ); break;
+            case ObjectTrait ::class: require(__DIR__.'/core/ObjectTrait.php'       ); break;
+            case DiAwareTrait::class: require(__DIR__.'/core/di/DiAwareTrait.php'   ); break;
+            case ClassLoader ::class: require(__DIR__.'/core/loader/ClassLoader.php'); break;
         }
     };
     spl_autoload_register($bootstrap, true, true);

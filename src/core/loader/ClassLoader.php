@@ -3,7 +3,7 @@ namespace rosasurfer\ministruts\core\loader;
 
 use rosasurfer\ministruts\core\CObject;
 
-use const rosasurfer\ministruts\MINISTRUTS_ROOT;
+use const rosasurfer\ministruts\ROOT_DIR;
 
 
 /**
@@ -24,7 +24,7 @@ class ClassLoader extends CObject {
      */
     public function __construct() {
         // initialize a case-insensitive class map
-        $classMap = require(MINISTRUTS_ROOT.'/vendor/composer/autoload_classmap.php');
+        $classMap = require(ROOT_DIR.'/vendor/composer/autoload_classmap.php');
         $this->classMap = \array_change_key_case($classMap, CASE_LOWER);
     }
 

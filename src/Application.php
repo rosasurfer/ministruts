@@ -164,7 +164,7 @@ class Application extends CObject {
 
         // execute "cache-info" task if enabled
         if ($cacheInfoTask) {
-            //include(MINISTRUTS_ROOT.'/src/debug/apc.php'); // TODO: not yet implemented
+            //include(ROOT_DIR.'/src/debug/apc.php'); // TODO: not yet implemented
         }
 
         // enforce mission-critical requirements
@@ -368,7 +368,7 @@ class Application extends CObject {
 
 
     /**
-     * Map common definitions in namespace "\rosasurfer" to the global namespace.
+     * Map common definitions in namespace "rosasurfer\ministruts" to the global namespace.
      *
      * @param  mixed $value - configuration value as passed to the framework loader
      */
@@ -382,7 +382,7 @@ class Application extends CObject {
             $enabled = ($value=='1' || $value=='on' || $value=='true');
         }
         if ($enabled && !function_exists('booltostr')) {            // prevent multiple includes
-            include(MINISTRUTS_ROOT.'/src/globals.php');
+            include(__DIR__.'/globals.php');
         }
     }
 
