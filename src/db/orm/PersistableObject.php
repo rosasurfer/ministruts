@@ -84,7 +84,7 @@ abstract class PersistableObject extends CObject {
      */
     public function __sleep() {
         $mapping = $this->dao()->getMapping();
-        $array   = (array) $this;
+        $array = (array) $this;
 
         foreach ($mapping['relations'] as $name => $v) {
             if (is_object($this->$name)) {
@@ -94,7 +94,7 @@ abstract class PersistableObject extends CObject {
             }
             else if (is_array($this->$name)) {                      // property access level encoding
                 $protected = "\0*\0".$name;                         // ------------------------------
-                $public    = $name;                                 // private:   "\0{className}\0{propertyName}"
+                $public = $name;                                    // private:   "\0{className}\0{propertyName}"
                 unset($array[$protected], $array[$public]);         // protected: "\0*\0{propertyName}"
             }                                                       // public:    "{propertyName}"
         }
