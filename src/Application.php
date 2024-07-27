@@ -46,12 +46,6 @@ class Application extends CObject {
      *        "app.dir.config"        - string:  The project's configuration location as a directory or a file.
      *                                           (default: the current directory)
      *
-     *        "app.globals"           - bool:    If enabled definitions in "src/helpers.php" are additionally mapped to the
-     *                                           global namespace. In general this is not recommended to avoid potential naming
-     *                                           conflicts in the global scope. However it may be used to simplify life of
-     *                                           developers using editors with limited code completion capabilities.
-     *                                           (default: disabled)
-     *
      *        "app.handle-errors"     - string:  How to handle regular PHP errors: If set to "exception" errors are converted
      *                                           to ErrorExceptions and thrown. If set to "log" errors are only logged and
      *                                           execution continues. If set to "ignore" the application must implement its
@@ -69,12 +63,10 @@ class Application extends CObject {
         // set default values
         if (!isset($options['app.handle-errors'    ])) $options['app.handle-errors'    ] = 'exception';
         if (!isset($options['app.handle-exceptions'])) $options['app.handle-exceptions'] = 'catch';
-        if (!isset($options['app.globals'          ])) $options['app.globals'          ] = false;
 
         // setup the configuration
         $this->initErrorHandling    ($options['app.handle-errors'    ]);
         $this->initExceptionHandling($options['app.handle-exceptions']);
-        $this->loadGlobals          ($options['app.globals'          ]);
 
         /** @var DefaultConfig $config */
         $config = $this->initDefaultConfig($options);
@@ -362,26 +354,6 @@ class Application extends CObject {
                 throw new InvalidValueException('Invalid exception handling mode: "'.$mode.'"');
         }
         ErrorHandler::setupExceptionHandling($iMode);
-    }
-
-
-    /**
-     * Map common definitions in namespace "rosasurfer\ministruts" to the global namespace.
-     *
-     * @param  mixed $value - configuration value as passed to the framework loader
-     */
-    protected function loadGlobals($value) {
-        $enabled = false;                                           // default
-        if (is_bool($value) || is_int($value)) {
-            $enabled = (bool) $value;
-        }
-        elseif (is_string($value)) {
-            $value   = trim(strtolower($value));
-            $enabled = ($value=='1' || $value=='on' || $value=='true');
-        }
-        if ($enabled && !function_exists('booltostr')) {            // prevent multiple includes
-            include(__DIR__.'/globals.php');
-        }
     }
 
 
