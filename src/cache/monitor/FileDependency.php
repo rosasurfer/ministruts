@@ -28,8 +28,6 @@ use function rosasurfer\isRelativePath;
  * The example defines a dependency on the modification time of the file '/etc/crontab'. As long as the file is not changed,
  * the dependency remains fulfilled and calling $dependency->isValid() returns TRUE. After changing or deleting the file,
  * calling $dependency->isValid() returns FALSE.
- *
- * @phpstan-consistent-constructor
  */
 class FileDependency extends Dependency {
 

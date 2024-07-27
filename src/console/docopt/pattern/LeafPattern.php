@@ -9,8 +9,6 @@ use function rosasurfer\array_merge;
 
 /**
  * LeafPattern
- *
- * @phpstan-consistent-constructor
  */
 abstract class LeafPattern extends Pattern {
 

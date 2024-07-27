@@ -40,6 +40,9 @@ parameters:
     - rosasurfer\ministruts\ActionForm
 
   ignoreErrors:
+    # skip broken PHPStan checks
+    - '#^Unsafe usage of new static\(\)\.$#'
+
   reportUnmatchedIgnoredErrors: false
 
   parallel:
