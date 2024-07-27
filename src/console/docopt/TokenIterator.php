@@ -11,8 +11,6 @@ use rosasurfer\ministruts\core\di\DiAwareTrait;
 
 /**
  * TokenIterator
- *
- * @phpstan-consistent-constructor
  */
 class TokenIterator extends \ArrayIterator {
 

@@ -8,8 +8,6 @@ use rosasurfer\ministruts\console\docopt\SingleMatch;
 
 /**
  * Option
- *
- * @phpstan-consistent-constructor
  */
 class Option extends LeafPattern {
 

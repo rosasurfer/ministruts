@@ -8,8 +8,6 @@ use rosasurfer\ministruts\core\exception\RuntimeException;
 
 /**
  * ChainedDependency
- *
- * @phpstan-consistent-constructor
  */
 class ChainedDependency extends Dependency {
 

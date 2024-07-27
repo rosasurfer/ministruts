@@ -18,7 +18,7 @@ use const rosasurfer\ministruts\NL;
  *
  * A {@link \SimpleXMLElement} with additional functionalities.
  */
-class SimpleXMLElement extends \SimpleXMLElement implements SimpleXMLElementInterface {
+class SimpleXMLElement extends \SimpleXMLElement {
 
     use ObjectTrait, DiAwareTrait;
 
@@ -45,18 +45,16 @@ class SimpleXMLElement extends \SimpleXMLElement implements SimpleXMLElementInte
             return true;
         });
 
-        /** @var static $xml */
         $xml = $ex = null;
         try {
-            $xml = new static(...func_get_args());                          // since PHP 8.0 the constructor is not final anymore
+            $xml = new static(...func_get_args());
         }
-        catch (IRosasurferException $ex) {}
-        catch (\Throwable           $ex) { $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex); }
-
+        catch (\Throwable $ex) {
+            if (!$ex instanceof IRosasurferException) $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex);
+        }
         finally {
             restore_error_handler();
             if (!$xml) {
-                $ex = $ex ?: new RuntimeException('PHP errors/warnings while parsing the XML');
                 foreach ($errors as $i => $error) {
                     $errors[$i] = strRightFrom($error[1], 'SimpleXMLElement::__construct(): ', 1, false, $error[1]);
                 }
