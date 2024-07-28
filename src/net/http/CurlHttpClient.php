@@ -145,7 +145,7 @@ class CurlHttpClient extends HttpClient {
 
 
     /**
-     * Destructor, schliesst ein ggf&#46; noch offenes cURL-Handle.
+     * Destructor, schliesst ein ggf. noch offenes cURL-Handle.
      */
     public function __destruct() {
         try {

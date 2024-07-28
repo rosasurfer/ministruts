@@ -774,8 +774,8 @@ function strStartsWith($string, $prefix, $ignoreCase = false) {
 
 
 /**
- * Whether a string starts with a substring ignoring upper/lower case differences. If multiple prefixes are specified
- * whether the string starts with one of them.
+ * Whether a string starts with a substring ignoring upper/lower case differences.
+ * If multiple prefixes are specified whether the string starts with one of them.
  *
  * @param  string          $string
  * @param  string|string[] $prefix - one or more prefixes

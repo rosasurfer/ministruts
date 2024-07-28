@@ -89,7 +89,7 @@ class Tile extends CObject {
 
 
     /**
-     * Set the parent of this tile&#46;  Called before rendering as a tile can have different parents if re-used in multiple
+     * Set the parent of this tile.  Called before rendering as a tile can have different parents if re-used in multiple
      * places.
      *
      * @param  self $parent
@@ -191,7 +191,7 @@ class Tile extends CObject {
 
 
     /**
-     * Gibt die eigenen und die Properties der umgebenden Tile zurueck&#46;  Eigene Properties ueberschreiben gleichnamige
+     * Gibt die eigenen und die Properties der umgebenden Tile zurueck.  Eigene Properties ueberschreiben gleichnamige
      * Properties der umgebenden Tile.
      *
      * @return array - Properties

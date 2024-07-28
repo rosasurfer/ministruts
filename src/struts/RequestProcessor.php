@@ -169,7 +169,7 @@ PROCESS_MAPPING_ERROR_SC_404;
 
     /**
      * Wenn fuer das ActionMapping Methodenbeschraenkungen definiert sind, sicherstellen, dass der Request diese
-     * Beschraenkungen erfuellt&#46;  Gibt TRUE zurueck, wenn die Verarbeitung fortgesetzt und der Zugriff gewaehrt werden
+     * Beschraenkungen erfuellt.  Gibt TRUE zurueck, wenn die Verarbeitung fortgesetzt und der Zugriff gewaehrt werden
      * soll werden soll, oder FALSE, wenn der Zugriff nicht gewaehrt wird und der Request beendet wurde.
      *
      * @param  Request       $request
@@ -214,7 +214,7 @@ PROCESS_METHOD_ERROR_SC_405;
 
 
     /**
-     * Wenn die Action Zugriffsbeschraenkungen hat, sicherstellen, dass der User Inhaber der angegebenen Rollen ist&#46;
+     * Wenn die Action Zugriffsbeschraenkungen hat, sicherstellen, dass der User Inhaber der angegebenen Rollen ist.
      * Gibt TRUE zurueck, wenn die Verarbeitung fortgesetzt und der Zugriff gewaehrt werden soll, oder FALSE, wenn der
      * Zugriff nicht gewaehrt wird und der Request beendet wurde.
      *
@@ -264,9 +264,9 @@ PROCESS_METHOD_ERROR_SC_405;
 
 
     /**
-     * Validiert die ActionForm, wenn entprechend konfiguriert&#46;  Ist fuer das ActionMapping ein expliziter Forward
-     * konfiguriert, wird nach der Validierung auf diesen Forward weitergeleitet&#46;  Ist kein expliziter Forward definiert,
-     * wird auf die konfigurierte "success" oder "error"-Resource weitergeleitet&#46;  Gibt TRUE zurueck, wenn die
+     * Validiert die ActionForm, wenn entprechend konfiguriert.  Ist fuer das ActionMapping ein expliziter Forward
+     * konfiguriert, wird nach der Validierung auf diesen Forward weitergeleitet.  Ist kein expliziter Forward definiert,
+     * wird auf die konfigurierte "success" oder "error"-Resource weitergeleitet.  Gibt TRUE zurueck, wenn die
      * Verarbeitung fortgesetzt werden soll, oder FALSE, wenn auf eine andere Resource weitergeleitet und der Request bereits
      * beendet wurde.
      *
@@ -302,7 +302,7 @@ PROCESS_METHOD_ERROR_SC_405;
 
 
     /**
-     * Verarbeitet einen direkt im ActionMapping angegebenen ActionForward (wenn angegeben)&#46;  Gibt TRUE zurueck, wenn
+     * Verarbeitet einen direkt im ActionMapping angegebenen ActionForward (wenn angegeben).  Gibt TRUE zurueck, wenn
      * die Verarbeitung fortgesetzt werden soll, oder FALSE, wenn der Request bereits beendet wurde.
      *
      * @param  Request       $request
@@ -379,7 +379,7 @@ PROCESS_METHOD_ERROR_SC_405;
 
 
     /**
-     * Verarbeitet den von der Action zurueckgegebenen ActionForward&#46;  Leitet auf die Resource weiter, die der
+     * Verarbeitet den von der Action zurueckgegebenen ActionForward.  Leitet auf die Resource weiter, die der
      * ActionForward bezeichnet.
      *
      * @param  Request       $request

@@ -35,7 +35,7 @@ class Response extends Singleton {
 
     /**
      * Gibt die Singleton-Instanz dieser Klasse zurueck, wenn das Script im Kontext eines HTTP-Requestes aufgerufen
-     * wurde&#46;  In allen anderen Faellen, z.B&#46; bei Aufruf in der Konsole, wird NULL zurueckgegeben.
+     * wurde.  In allen anderen Faellen, z.B. bei Aufruf in der Konsole, wird NULL zurueckgegeben.
      *
      * @return static
      *
@@ -105,7 +105,7 @@ class Response extends Singleton {
 
 
     /**
-     * Send a "Location" header (redirect) pointing to the specified URI&#46;  Afterwards the script is terminated.
+     * Send a "Location" header (redirect) pointing to the specified URI.  Afterwards the script is terminated.
      *
      * @param  string $uri  - absolute or relative URI
      * @param  int    $type - redirect type (SC_MOVED_TEMPORARILY | SC_MOVED_PERMANENTLY)

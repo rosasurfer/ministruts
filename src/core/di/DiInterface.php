@@ -28,7 +28,7 @@ interface DiInterface extends \ArrayAccess, ContainerInterface {
 
 
     /**
-     * Resolve a named service and return its implementation&#46;  This method always returns a new instance.
+     * Resolve a named service and return its implementation.  This method always returns a new instance.
      *
      * @param  string   $name
      * @param  array ...$params - variable list of custom parameters
@@ -42,7 +42,7 @@ interface DiInterface extends \ArrayAccess, ContainerInterface {
 
 
     /**
-     * Resolve a named service and return its implementation&#46;  This method always returns the same instance.
+     * Resolve a named service and return its implementation.  This method always returns the same instance.
      *
      * @param  string $name
      *
@@ -55,8 +55,8 @@ interface DiInterface extends \ArrayAccess, ContainerInterface {
 
 
     /**
-     * Register a service in the container&#46;  An already existing service of the same name (and all its name aliases) will
-     * be replaced&#46;  The service usage type (service locator or factory pattern) is determined at runtime from the called
+     * Register a service in the container.  An already existing service of the same name (and all its name aliases) will
+     * be replaced.  The service usage type (service locator or factory pattern) is determined at runtime from the called
      * resolver method.
      *
      * @param  string        $name               - service identifier

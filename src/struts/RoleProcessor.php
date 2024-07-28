@@ -24,8 +24,8 @@ abstract class RoleProcessor extends CObject {
 
 
     /**
-     * Whether the rights of the current user satisfy the role constraints specified by the given {@link ActionMapping}&#46;
-     * If access to the ActionMapping is granted the method returns NULL&#46;  If access is denied the method returns an
+     * Whether the rights of the current user satisfy the role constraints specified by the given {@link ActionMapping}.
+     * If access to the ActionMapping is granted the method returns NULL.  If access is denied the method returns an
      * {@link ActionForward} pointing to the resource the user should be directed to.
      *
      * @param  Request       $request
