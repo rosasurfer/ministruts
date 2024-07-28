@@ -15,9 +15,9 @@ use const rosasurfer\NL;
 
 
 /**
- * Mailer sending email via TCP to a SMTP server.
+ * Mailer sending email via TCP directly to an SMTP server.
  *
- * @deprecated - Use a better maintained external library.
+ * @deprecated - use a better maintained external library
  */
 class SMTPMailer extends Mailer {
 
@@ -162,8 +162,8 @@ class SMTPMailer extends Mailer {
 
 
     /**
-     * Send an email&#46;  Sender and receiver addresses can be specified in simple or full format&#46;  The simple format
-     * can be specified with or without angle brackets&#46;  If an empty sender is specified the mail is sent from the
+     * Send an email.  Sender and receiver addresses can be specified in simple or full format.  The simple format
+     * can be specified with or without angle brackets.  If an empty sender is specified the mail is sent from the
      * current user.
      *
      * @param  ?string  $sender             - mail sender (From:), full format: "FirstName LastName <user@domain.tld>"
@@ -337,11 +337,13 @@ class SMTPMailer extends Mailer {
         $response = $this->readResponse();
 
         $this->parseResponse($response);
-        if ($this->responseStatus != 250) throw new RuntimeException('Sent data not accepted: '.$this->responseStatus.' '.$this->response.NL
-                                                                     .NL
-                                                                     .'SMTP transfer log:'.NL
-                                                                     .'------------------'.NL
-                                                                     .$this->logBuffer);
+        if ($this->responseStatus != 250) throw new RuntimeException(
+            'Sent data not accepted: '.$this->responseStatus.' '.$this->response.NL
+            .NL
+            .'SMTP transfer log:'.NL
+            .'------------------'.NL
+            .$this->logBuffer
+        );
     }
 
 

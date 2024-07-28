@@ -19,8 +19,8 @@ class PHPMailer extends Mailer {
 
 
     /**
-     * Send an email&#46;  Sender and receiver addresses can be specified in simple or full format&#46;  The simple format
-     * can be specified with or without angle brackets&#46;  If an empty sender is specified the mail is sent from the
+     * Send an email.  Sender and receiver addresses can be specified in simple or full format.  The simple format
+     * can be specified with or without angle brackets.  If an empty sender is specified the mail is sent from the
      * current user.
      *
      * @param  ?string  $sender             - mail sender (From:), full format: "FirstName LastName <user@domain.tld>"
@@ -30,7 +30,7 @@ class PHPMailer extends Mailer {
      * @param  string[] $headers [optional] - additional MIME headers (default: none)
      */
     public function sendMail($sender, $receiver, $subject, $message, array $headers = []) {
-        // delay sending to the script's shutdown if configured (e.g. as to not to block other tasks)
+        // delay sending to the script's shutdown if configured (e.g. as not to block other tasks)
         if (!empty($this->options['send-later'])) {
             $this->sendLater($sender, $receiver, $subject, $message, $headers);
             return;
@@ -41,8 +41,9 @@ class PHPMailer extends Mailer {
         // first validate the additional headers
         foreach ($headers as $i => $header) {
             Assert::string($header, '$headers['.$i.']');
-            if (!preg_match('/^[a-z]+(-[a-z]+)*:/i', $header))
-                                           throw new InvalidArgumentException('Invalid parameter $headers['.$i.']: "'.$header.'"');
+            if (!preg_match('/^[a-z]+(-[a-z]+)*:/i', $header)) {
+                throw new InvalidArgumentException('Invalid parameter $headers['.$i.']: "'.$header.'"');
+            }
         }
 
         // auto-complete sender if not specified

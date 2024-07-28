@@ -7,24 +7,27 @@ use rosasurfer\core\CObject;
 /**
  * Messenger
  *
- * Messenger-Factory und abstrakte Basisklasse fuer alle Messenger-Implementierungen.
+ * A Messenger factory and abstract base class for all Messenger implementations.
  */
 abstract class Messenger extends CObject {
+
+    /** @var array */
+    protected $options;
 
 
     /**
      * Constructor
      *
-     * @param  array $options - Messenger-Optionen
+     * @param  array $options
      */
     abstract protected function __construct(array $options);
 
 
     /**
-     * Verschickt eine Message.
+     * Send a message.
      *
-     * @param  string $receiver - Empfaenger (internationales Format)
-     * @param  string $message  - Nachricht
+     * @param  string $receiver
+     * @param  string $message
      *
      * @return void
      */

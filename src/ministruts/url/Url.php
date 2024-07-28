@@ -54,7 +54,7 @@ class Url extends CObject {
 
 
     /**
-     * Return a text presentation of this instance&#46;  This is the absolute URI reference to include in a HTML page to link
+     * Return a text presentation of this instance.  This is the absolute URI reference to include in a HTML page to link
      * to the resource.
      *
      * @return string

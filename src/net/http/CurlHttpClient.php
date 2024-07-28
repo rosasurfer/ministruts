@@ -17,21 +17,21 @@ use function rosasurfer\strRightFrom;
 /**
  * CurlHttpClient
  *
- * Eine Klasse, die mit cURL HttpRequests ausfuehren kann.
+ * An HTTP client executing HTTP requests using cURL.
  */
 class CurlHttpClient extends HttpClient {
 
 
-    /** @var ?resource - Curl-Handle */
+    /** @var ?resource - curl handle */
     protected $hCurl = null;
 
-    /** @var int - Zaehler fuer manuelle Redirects (falls "open_basedir" aktiv ist) */
+    /** @var int - counter of manual redirects (if "open_basedir" is enabled) */
     protected $manualRedirects = 0;
 
-    /** @var array - zusaetzliche cURL-Optionen */
+    /** @var array - additional curl options */
     protected $options = [];
 
-    /** @var string[] - cURL-Fehlerbeschreibungen */
+    /** @var string[] - curl error descriptions */
     protected static $errors = [
         CURLE_OK                          => 'CURLE_OK',
         CURLE_UNSUPPORTED_PROTOCOL        => 'CURLE_UNSUPPORTED_PROTOCOL',
@@ -132,10 +132,7 @@ class CurlHttpClient extends HttpClient {
     /**
      * Constructor
      *
-     * Create a new instance.
-     *
-     * @param  array $options [optional] - additional options
-     *                                     (default: none)
+     * @param  array $options [optional] - additional options (default: none)
      */
     public function __construct(array $options = []) {
         $this->options = $options;
@@ -143,7 +140,9 @@ class CurlHttpClient extends HttpClient {
 
 
     /**
-     * Destructor, schliesst ein ggf&#46; noch offenes cURL-Handle.
+     * Destructor
+     *
+     * Close an open curl handle (if any).
      */
     public function __destruct() {
         try {
@@ -159,13 +158,13 @@ class CurlHttpClient extends HttpClient {
 
 
     /**
-     * Fuehrt den uebergebenen Request aus und gibt die empfangene Antwort zurueck.
+     * {@inheritdoc}
      *
      * @param  HttpRequest $request
      *
      * @return HttpResponse
      *
-     * @throws IOException wenn ein Fehler auftritt
+     * @throws IOException in case of errors
      */
     public function send(HttpRequest $request) {
         if (!is_resource($this->hCurl))
@@ -174,7 +173,7 @@ class CurlHttpClient extends HttpClient {
         $response = new CurlHttpResponse();
         $options = $this->prepareCurlOptions($request, $response);
 
-        // CURLOPT_FOLLOWLOCATION funktioniert nur bei deaktiviertem "open_basedir"-Setting
+        // CURLOPT_FOLLOWLOCATION works only if php.ini setting "open_basedir" is disabled
         if (!ini_get_bool('open_basedir')) {
             if ($this->isFollowRedirects()) {
                 $options[CURLOPT_FOLLOWLOCATION] = true;
@@ -197,19 +196,19 @@ class CurlHttpClient extends HttpClient {
         }
         curl_setopt_array($this->hCurl, $options);
 
-        // Request ausfuehren
+        // execute request
         if (curl_exec($this->hCurl) === false) throw new IOException('cURL error '.self::getError($this->hCurl).','.NL.'URL: '.$options[CURLOPT_URL]);
         $status = curl_getinfo($this->hCurl, CURLINFO_HTTP_CODE);
         $response->setStatus($status);
 
-        // ggf. manuellen Redirect ausfuehren (falls "open_basedir" aktiviert ist)
+        // perform manual redirect (if "open_basedir" is enabled)
         if (($status==301 || $status==302) && $this->isFollowRedirects() && ini_get_bool('open_basedir')) {
             if ($this->manualRedirects >= $this->maxRedirects) throw new IOException('CURL error: maxRedirects limit exceeded - '.$this->maxRedirects.', URL: '.$options[CURLOPT_URL]);
             $this->manualRedirects++;
 
             /** @var string $location */
-            $location = $response->getHeader('Location');                           // TODO: relative Redirects abfangen
-            Logger::log('Performing manual redirect to: '.$location, L_INFO);       // TODO: verschachtelte IOExceptions abfangen
+            $location = $response->getHeader('Location');                           // TODO: catch/handle relative redirects
+            Logger::log('Performing manual redirect to: '.$location, L_INFO);       // TODO: catch/handle nested IOExceptions
             $request = new HttpRequest($location);
             $response = $this->send($request);
         }
@@ -219,7 +218,7 @@ class CurlHttpClient extends HttpClient {
 
 
     /**
-     * Create a cUrl options array for the current request.
+     * Create a curl options array for the current request.
      *
      * @param  HttpRequest      $request
      * @param  CurlHttpResponse $response
@@ -247,9 +246,9 @@ class CurlHttpClient extends HttpClient {
 
 
     /**
-     * Gibt eine Beschreibung des letzten cURL-Fehlers zurueck.
+     * Return a description of the last curl error code.
      *
-     * @param  resource $hCurl - cURL-Handle
+     * @param  resource $hCurl - curl handle
      *
      * @return string
      */

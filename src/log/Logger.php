@@ -472,7 +472,8 @@ class Logger extends StaticClass {
 
                     if ($status != 200) {
                         try {
-                            self::log('Unexpected HTTP status code '.$status.' ('.HttpResponse::$sc[$status].') for URL: '.$request->getUrl(), L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
+                            $description = isset(HttpResponse::$statusCodes[$status]) ? HttpResponse::$statusCodes[$status] : '?';
+                            self::log('Unexpected HTTP status code '.$status.' ('.$description.') for URL: '.$request->getUrl(), L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
                         }
                         catch (\Throwable $ex) {}   // intentionally eat it
                         catch (\Exception $ex) {}   // @phpstan-ignore-line
@@ -508,7 +509,8 @@ class Logger extends StaticClass {
                     $content  = $response->getContent();
                     if ($status != 200) {
                         try {
-                            self::log('Unexpected HTTP status code '.$status.' ('.HttpResponse::$sc[$status].') for URL: '.$request->getUrl(), L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
+                            $description = isset(HttpResponse::$statusCodes[$status]) ? HttpResponse::$statusCodes[$status] : '?';
+                            self::log('Unexpected HTTP status code '.$status.' ('.$description.') for URL: '.$request->getUrl(), L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
                         }
                         catch (\Throwable $ex) {}   // intentionally eat it
                         catch (\Exception $ex) {}   // @phpstan-ignore-line

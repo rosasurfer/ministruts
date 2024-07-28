@@ -6,19 +6,17 @@ use rosasurfer\net\messenger\Messenger;
 
 
 /**
- * Messenger, der eine Nachricht an einen IRC-Channel schickt.
+ * IRCMessenger
+ *
+ * A {@link rosasurfer\net\messenger\Messenger} for sending messages to an IRC channel.
  */
 class IRCMessenger extends Messenger {
 
 
-    /** @var array */
-    protected $options;
-
-
     /**
-     * Constructor
+     * {@inheritdoc}
      *
-     * @param  array $options - Messenger-Optionen
+     * @param  array $options
      */
     protected function __construct(array $options) {
         $this->options = $options;
@@ -26,10 +24,12 @@ class IRCMessenger extends Messenger {
 
 
     /**
-     * Verschickt eine Nachricht.
+     * Send a message to an IRC channel.
      *
-     * @param  string $channel - IRC-Channel
-     * @param  string $message - Nachricht
+     * @param  string $channel - channel name
+     * @param  string $message - message
+     *
+     * @return void
      */
     public function sendMessage($channel, $message) {
         throw new UnimplementedFeatureException(__METHOD__.'() not yet implemented');

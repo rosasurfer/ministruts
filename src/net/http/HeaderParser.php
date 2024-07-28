@@ -11,33 +11,31 @@ class HeaderParser extends CObject {
 
 
     /** @var array */
-    private $headers = [];
+    protected $headers = [];
 
     /** @var string */
-    private $currentHeader;
+    protected $currentHeader;
 
 
     /**
-     * Parst einen uebergebenen Headerblock.
+     * Parse the passed header block.
      *
-     * @param  string $data - rohe Headerdaten
+     * @param  string $data - raw header data
      *
      * @return $this
      */
     public function parseLines($data) {
-        $lines = explode("\n", $data);
-
-        foreach ($lines as $line)
+        foreach (explode("\n", $data) as $line) {
             $this->parseLine($line);
-
+        }
         return $this;
     }
 
 
     /**
-     * Parst eine einzelne Headerzeile.
+     * Parse a single header line.
      *
-     * @param  string $line - Headerzeile
+     * @param  string $line - full header line consisting of headername, colon and header value
      *
      * @return $this
      */
@@ -75,9 +73,9 @@ class HeaderParser extends CObject {
 
 
     /**
-     * Gibt alle empfangenen Header zurueck.
+     * Return all received headers.
      *
-     * @return array - assoziatives Array mit Headern
+     * @return array - associative array of headers
      */
     public function getHeaders() {
         return $this->headers;
@@ -85,25 +83,26 @@ class HeaderParser extends CObject {
 
 
     /**
-     * Ob ein Header mit dem angegebenen Namen existiert.
+     * Return the header with the specified name.
      *
-     * @param  string $name - Name des Headers
+     * @param  string $name - header name
+     *
+     * @return string|string[]|null
+     */
+    public function getHeader($name) {
+        $name = strtolower($name);
+        return isset($this->headers[$name]) ? $this->headers[$name] : null;
+    }
+
+
+    /**
+     * Whether a header with the specified name was received.
+     *
+     * @param  string $name - header name
      *
      * @return bool
      */
     public function isHeader($name) {
         return isset($this->headers[strtolower($name)]);
-    }
-
-
-    /**
-     * Gibt den Header mit dem angegebenen Namen zurueck.
-     *
-     * @param  string $name - Name des Headers
-     *
-     * @return string|string[]
-     */
-    public function getHeader($name) {
-        return $this->headers[strtolower($name)];
     }
 }

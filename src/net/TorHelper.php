@@ -41,7 +41,7 @@ class TorHelper extends StaticClass {
     private static $logNotice;
 
     /**
-     * @todo Serverliste bei Fehlern dynamisch anpassen
+     * @todo on error dynamically reduce the server list
      *
      * @var string[] */
     private static $torMirrors = [
@@ -58,7 +58,7 @@ class TorHelper extends StaticClass {
 
 
     /**
-     * Initialisiert die Klasse.
+     * Initialization
      */
     private static function init() {
         if (self::$logDebug === null) {
@@ -71,9 +71,9 @@ class TorHelper extends StaticClass {
 
 
     /**
-     * Prueft, ob die uebergebene IP-Adresse ein aktueller Tor-Exit-Node ist.
+     * Whether the specified IP address is a known Tor exit node.
      *
-     * @param  string $ip - IP-Adresse
+     * @param  string $ip - IP address
      *
      * @return bool
      */
@@ -81,7 +81,7 @@ class TorHelper extends StaticClass {
         self::init();
         Assert::string($ip);
 
-        // TODO: mit Filter-Extension lokale Netze abfangen
+        // TODO: filter local subnets
         if ($ip == '127.0.0.1')
             return false;
 
@@ -91,9 +91,9 @@ class TorHelper extends StaticClass {
 
 
     /**
-     * Gibt die aktuellen Exit-Nodes zurueck.
+     * Return all currently known Tor exit nodes.
      *
-     * @return array - assoziatives Array mit den IP-Adressen aller Exit-Nodes
+     * @return array - associative array of IP addresses
      */
     private static function getExitNodes() {
         $cache = Cache::me(__CLASS__);
@@ -101,7 +101,7 @@ class TorHelper extends StaticClass {
 
         if ($nodes == null) {
 
-            // Einlesen der Nodes synchronisieren
+            // synchronize reading of the nodes
             synchronized(function() use ($cache, $key, &$nodes) {
                 $nodes = $cache->get($key);
 
@@ -112,12 +112,13 @@ class TorHelper extends StaticClass {
                     for ($i=0; $i < $size; ++$i) {
                         $request = new HttpRequest('http://'.self::$torMirrors[$i].'/ip_list_exit.php/Tor_ip_list_EXIT.csv');
                         try {
-                            // TODO: Warnung ausgeben und Reihenfolge aendern, wenn ein Server nicht antwortet
+                            // TODO: warn/update server list if a server doesn't respond
                             $response = (new CurlHttpClient())->send($request);
                             $status   = $response->getStatus();
 
                             if ($status != 200) {
-                                self::$logNotice && Logger::log('Could not get TOR exit nodes from '.self::$torMirrors[$i].', HTTP status '.$status.' ('.HttpResponse::$sc[$status]."),\n URL: ".$request->getUrl(), L_NOTICE);
+                                $description = isset(HttpResponse::$statusCodes[$status]) ? HttpResponse::$statusCodes[$status] : '?';
+                                self::$logNotice && Logger::log('Could not get TOR exit nodes from '.self::$torMirrors[$i].', HTTP status '.$status.' ('.$description."),\n URL: ".$request->getUrl(), L_NOTICE);
                                 continue;
                             }
                         }

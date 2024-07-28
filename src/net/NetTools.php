@@ -17,7 +17,7 @@ final class NetTools extends StaticClass {
 
 
     /**
-     * Return the host name of the internet host specified by a given IP address&#46;  Additionally checks the result
+     * Return the host name of the internet host specified by a given IP address.  Additionally checks the result
      * returned by the built-in PHP function for plausibility.
      *
      * @param  string $ipAddress - the host IP address
@@ -38,11 +38,11 @@ final class NetTools extends StaticClass {
 
 
     /**
-     * Gibt die IP-Adresse eines Hostnamens zurueck.
+     * Resolve the IP address of a host name.
      *
-     * @param  string $name - Hostname
+     * @param  string $name - host name
      *
-     * @return string - IP-Adresse oder der originale Hostname, wenn dieser nicht aufgeloest werden kann
+     * @return string - IP address or the passed host name if it can't be resolved
      */
     public static function getHostByName($name) {
         Assert::string($name);
@@ -53,10 +53,10 @@ final class NetTools extends StaticClass {
 
 
     /**
-     * Ob die IP-Adresse auf einen bekannten Proxy-Server weist.
+     * Whether an IP address points to a well-known proxy server.
      *
-     * @param  string $address                   - IP-Adresse
-     * @param  bool   $reverseResolve [optional] - ob die IP-Adresse rueck-aufgeloest und ueberprueft werden soll (default: false)
+     * @param  string $address                   - IP address
+     * @param  bool   $reverseResolve [optional] - whether to reverse-resolve the IP and to check the resulting host name (default: no)
      *
      * @return bool
      */
@@ -73,7 +73,7 @@ final class NetTools extends StaticClass {
             /** @var ConfigInterface $config */
             $config = self::di('config');
 
-            // Config einlesen
+            // read config
             $value = $config->get('proxys', null);
             foreach (explode(',', $value) as $value) {
                 $value = trim($value);
@@ -82,7 +82,7 @@ final class NetTools extends StaticClass {
                         $proxys[$value] = $value;
                     }
                     else {
-                        // TODO: Unterstuetzung fuer CIDR-Notation integrieren
+                        // TODO: support CIDR notation
                         $proxys['194.8.74.0'  ] = '194.8.74.0';
                         $proxys['194.8.74.1'  ] = '194.8.74.1';
                         $proxys['194.8.74.2'  ] = '194.8.74.2';

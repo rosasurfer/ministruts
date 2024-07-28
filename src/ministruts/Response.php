@@ -106,7 +106,7 @@ class Response extends Singleton {
 
 
     /**
-     * Send a "Location" header (redirect) pointing to the specified URI&#46;  Afterwards the script is terminated.
+     * Send a "Location" header (redirect) pointing to the specified URI.  Afterwards the script is terminated.
      *
      * @param  string $uri  - absolute or relative URI
      * @param  int    $type - redirect type: 301=SC_MOVED_PERMANENTLY or 302=SC_MOVED_TEMPORARILY
