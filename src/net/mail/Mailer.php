@@ -20,8 +20,7 @@ use function rosasurfer\ministruts\strStartsWithI;
  *
  * Mailer factory and abstract base class for mailer implementations.
  */
-abstract class Mailer extends CObject implements MailerInterface {
-
+abstract class Mailer extends CObject {
 
     /** @var array */
     protected $options;
@@ -64,9 +63,25 @@ abstract class Mailer extends CObject implements MailerInterface {
 
 
     /**
-     * Delay sending of the mail to the script shutdown phase&#46;  Can be used to not to block other more important tasks.
+     * Send an email. Sender and receiver addresses can be specified in simple or full format. The simple format
+     * can be specified with or without angle brackets.  If an empty sender is specified the mail is sent from the
+     * current user.
      *
-     * NOTE: Usage of this method is a poor man's approach and a last resort&#46;  A more professional way to decouple
+     * @param  string   $sender             - mail sender (From:), full format: "FirstName LastName <user@domain.tld>"
+     * @param  string   $receiver           - mail receiver (To:), full format: "FirstName LastName <user@domain.tld>"
+     * @param  string   $subject            - mail subject
+     * @param  string   $message            - mail body
+     * @param  string[] $headers [optional] - additional MIME headers (default: none)
+     *
+     * @return void
+     */
+    abstract public function sendMail($sender, $receiver, $subject, $message, array $headers = []);
+
+
+    /**
+     * Delay sending of the mail to the script shutdown phase.  Can be used to not to block other more important tasks.
+     *
+     * NOTE: Usage of this method is a poor man's approach and a last resort.  A more professional way to decouple
      *       sending of mail is using a regular message queue.
      *
      * @param  string   $sender             - mail sender
