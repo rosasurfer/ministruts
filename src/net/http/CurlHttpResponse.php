@@ -10,26 +10,26 @@ use rosasurfer\ministruts\core\exception\InvalidValueException;
 /**
  * CurlHttpResponse
  *
- * Stellt die Anwort auf einen von Curl gestellten HttpRequest dar.
+ * Represents the HTTP response to an HTTP request made by cURL.
  */
 class CurlHttpResponse extends HttpResponse {
 
 
     /** @var HeaderParser */
-    private $headerParser;
+    protected $headerParser;
 
-    /** @var int - HTTP-Statuscode */
-    private $status;
+    /** @var int - HTTP status code */
+    protected $status;
 
-    /** @var string - Content */
-    private $content;
+    /** @var string - content */
+    protected $content;
 
-    /** @var int - aktuelle Laenge des gelesenen Contents in Byte */
-    private $currentContentLength = 0;
+    /** @var int - length of the currently read content in bytes */
+    protected $currentContentLength = 0;
 
 
     /**
-     * Erzeugt eine neue Instanz.
+     * Constructor
      */
     public function __construct() {
         $this->headerParser = new HeaderParser();
@@ -37,9 +37,19 @@ class CurlHttpResponse extends HttpResponse {
 
 
     /**
-     * Setzt den HTTP-Status.
+     * {@inheritdoc}
      *
-     * @param  int $status - HTTP-Statuscode
+     * @return int
+     */
+    public function getStatus() {
+        return $this->status;
+    }
+
+
+    /**
+     * Set the HTTP status code.
+     *
+     * @param  int $status - status code
      *
      * @return $this
      */
@@ -53,31 +63,9 @@ class CurlHttpResponse extends HttpResponse {
 
 
     /**
+     * {@inheritdoc}
      *
-     */
-    public function getStatus() {
-        return $this->status;
-    }
-
-
-    /**
-     *
-     */
-    public function isHeader($name) {
-        return $this->headerParser->isHeader($name);
-    }
-
-
-    /**
-     *
-     */
-    public function getHeader($name) {
-        return $this->headerParser->getHeader($name);
-    }
-
-
-    /**
-     *
+     * @return array - all received headers
      */
     public function getHeaders() {
         return $this->headerParser->getHeaders();
@@ -85,12 +73,36 @@ class CurlHttpResponse extends HttpResponse {
 
 
     /**
-     * Callback fuer CurlHttpClient, dem die empfangenen Response-Header zeilenweise uebergeben werden.
+     * {@inheritdoc}
      *
-     * @param  resource $hCurl - das CURL-Handle des aktuellen Requests
-     * @param  string   $line  - vollstaendige Headerzeile, bestehend aus dem Namen, einem Doppelpunkt und den Daten
+     * @param  string $name - header name
      *
-     * @return int - Anzahl der bei diesem Methodenaufruf erhaltenen Bytes
+     * @return string|string[]|null - single header, array of multi-headers or NULL if no such header was received
+     */
+    public function getHeader($name) {
+        return $this->headerParser->getHeader($name);
+    }
+
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param  string $name - header name
+     *
+     * @return bool
+     */
+    public function isHeader($name) {
+        return $this->headerParser->isHeader($name);
+    }
+
+
+    /**
+     * Callback for CurlHttpClient, called with the received HTTP response headers (line by line).
+     *
+     * @param  resource $hCurl - curl handle of the processed HTTP request
+     * @param  string   $line  - a single full header line consisting of header name, colon and header value
+     *
+     * @return int - number of bytes read (the length of the received header line)
      */
     public function writeHeader($hCurl, $line) {
         $this->headerParser->parseLine($line);
@@ -99,12 +111,12 @@ class CurlHttpResponse extends HttpResponse {
 
 
     /**
-     * Callback fuer CurlHttpClient, dem der empfangene Content des HTTP-Requests chunk-weise uebergeben wird.
+     * Callback for CurlHttpClient, called with the received HTTP content (in chunks).
      *
-     * @param  resource $hCurl - das CURL-Handle des aktuellen Requests
-     * @param  string   $data  - die empfangenen Daten
+     * @param  resource $hCurl - curl handle of the processed HTTP request
+     * @param  string   $data  - chunk of received content data
      *
-     * @return int - Anzahl der bei diesem Methodenaufruf erhaltenen Bytes
+     * @return int - number of bytes read (the length of the received content chunk)
      */
     public function writeContent($hCurl, $data) {
         $this->content .= $data;
@@ -117,7 +129,9 @@ class CurlHttpResponse extends HttpResponse {
 
 
     /**
+     * {@inheritdoc}
      *
+     * @return string - content
      */
     public function getContent() {
         return (string)$this->content;

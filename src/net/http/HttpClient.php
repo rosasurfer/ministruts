@@ -10,12 +10,12 @@ use rosasurfer\ministruts\core\exception\IOException;
 
 
 /**
- * Basisklasse fuer konkrete HttpClients.
+ * Base class for concrete HTTP clients.
  */
 abstract class HttpClient extends CObject {
 
 
-    // Default-Einstellungen
+    // default settings
 
     /** @var int */
     protected $timeout = 30;
@@ -31,9 +31,19 @@ abstract class HttpClient extends CObject {
 
 
     /**
-     * Setzt den Verbindungs-Timeout.
+     * Get the current connection timeout.
      *
-     * @param  int $timeout - Timeout in Sekunden
+     * @return int - timeout in seconds
+     */
+    public function getTimeout() {
+        return $this->timeout;
+    }
+
+
+    /**
+     * Set the connection timeout.
+     *
+     * @param  int $timeout - timeout in seconds
      *
      * @return $this
      */
@@ -47,17 +57,17 @@ abstract class HttpClient extends CObject {
 
 
     /**
-     * Gibt den eingestellten Verbindungs-Timeout zurueck.
+     * Whether the instance currently follows received redirect headers.
      *
-     * @return int - Timeout in Sekunden
+     * @return bool
      */
-    public function getTimeout() {
-        return $this->timeout;
+    public function isFollowRedirects() {
+        return $this->followRedirects;
     }
 
 
     /**
-     * Ob Redirect-Headern gefolgt werden soll oder nicht.
+     * Whether to follow received redirect headers.
      *
      * @param  bool $follow
      *
@@ -71,17 +81,17 @@ abstract class HttpClient extends CObject {
 
 
     /**
-     * Gibt die aktuelle Redirect-Einstellung zurueck.
+     * Return the number of redirects the instance will follow.
      *
-     * @return bool
+     * @return int
      */
-    public function isFollowRedirects() {
-        return (bool) $this->followRedirects;
+    public function getMaxRedirects() {
+        return $this->maxRedirects;
     }
 
 
     /**
-     * Setzt die maximale Anzahl der Redirects, denen gefolgt werden soll.
+     * Set the number of redirects the instance will follow.
      *
      * @param  int $maxRedirects
      *
@@ -95,23 +105,13 @@ abstract class HttpClient extends CObject {
 
 
     /**
-     * Gibt die Anzahl der Redirects zurueck, denen gefolgt wird.
-     *
-     * @return int
-     */
-    public function getMaxRedirects() {
-        return $this->maxRedirects;
-    }
-
-
-    /**
-     * Fuehrt den uebergebenen Request aus und gibt die empfangene Antwort zurueck.
+     * Execute the passed {@link HttpRequest} and return the received {@link HttpResponse}.
      *
      * @param  HttpRequest $request
      *
      * @return HttpResponse
      *
-     * @throws IOException wenn ein Fehler auftritt
+     * @throws IOException in case of errors
      */
     abstract public function send(HttpRequest $request);
 }

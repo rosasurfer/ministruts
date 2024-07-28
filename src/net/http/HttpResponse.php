@@ -9,14 +9,14 @@ use rosasurfer\ministruts\core\CObject;
 /**
  * HttpResponse
  *
- * Abstrakte Basisklasse fuer HttpResponse-Implementierungen.
+ * Base class for concrete HTTP response implementations.
  *
- * TODO: toString()-Methode implementieren, die alle Header anzeigt
+ * @todo  implement HttpResponse::toString() containing all headers
  */
 abstract class HttpResponse extends CObject {
 
 
-    // Server status codes; see RFC 2068.
+    // HTTP status codes; @see RFC 2068.
 
     /**
      * @var int - Status code (100) indicating the client can continue.
@@ -246,10 +246,8 @@ abstract class HttpResponse extends CObject {
 
     /**
      * @var string[] - HTTP status code descriptions
-     *
-     * TODO: HttpResponse::$sc - unmoeglicher Name
      */
-    public static $sc = [
+    public static $statusCodes = [
         self::SC_CONTINUE                        => 'SC_CONTINUE'                       ,
         self::SC_SWITCHING_PROTOCOLS             => 'SC_SWITCHING_PROTOCOLS'            ,
         self::SC_OK                              => 'SC_OK'                             ,
@@ -294,25 +292,35 @@ abstract class HttpResponse extends CObject {
 
 
     /**
-     * Gibt den HTTP-Status zurueck.
+     * Return the received HTTP status code.
      *
-     * @return int - Statuscode
+     * @return int - status code
      */
     abstract public function getStatus();
 
 
     /**
-     * Gibt die erhaltenen Header zurueck.
+     * Return all received headers.
      *
-     * @return array - Array mit Headern
+     * @return array - associative array with headers
      */
     abstract public function getHeaders();
 
 
     /**
-     * Ob ein Header mit dem angegebenen Namen existiert.
+     * Return the received header with the specified name.
      *
-     * @param  string $name - Name des Headers
+     * @param  string $name - header name
+     *
+     * @return string|string[]|null - single header value, array of multi-header values or NULL if no such header was received
+     */
+    abstract public function getHeader($name);
+
+
+    /**
+     * Whether a header with the specified name was received.
+     *
+     * @param  string $name - header name
      *
      * @return bool
      */
@@ -320,19 +328,9 @@ abstract class HttpResponse extends CObject {
 
 
     /**
-     * Gibt den Header mit dem angegebenen Namen zurueck.
+     * Return the received HTTP response content.
      *
-     * @param  string $name - Name des Headers
-     *
-     * @return string|string[] - einzelner String oder String-Array mit den gefundenen Headern
-     */
-    abstract public function getHeader($name);
-
-
-    /**
-     * Gibt den Content des HttpResponse zurueck.
-     *
-     * @return string - Content
+     * @return string - content
      */
     abstract public function getContent();
 }
