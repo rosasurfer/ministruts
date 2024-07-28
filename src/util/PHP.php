@@ -27,7 +27,7 @@ use const rosasurfer\ministruts\WINDOWS;
 
 
 /**
- * PHP system-related functionality.
+ * PHP core related functionality
  */
 class PHP extends StaticClass {
 
@@ -46,8 +46,10 @@ class PHP extends StaticClass {
 
 
     /**
-     * Execute a process and return STDOUT&#46;  Replacement for shell_exec() wich suffers from a Windows bug where a DOS EOF
-     * character (0x1A = ASCII 26) in the STDOUT stream causes further reading to stop.
+     * Execute a process and return STDOUT.
+     *
+     * Replacement for shell_exec() wich suffers from a Windows bug where a DOS EOF character (0x1A = ASCII 26)
+     * in the STDOUT stream causes further reading to stop.
      *
      * - pOpen() suffers from the same bug
      * - passThru() does not capture STDERR
@@ -59,13 +61,10 @@ class PHP extends StaticClass {
      * @param  string[] $env      [optional] - if present the environment to *replace* the current one
      * @param  array    $options  [optional] - additional options controlling runtime behavior:                      <br>
      *          "stdout-passthrough" => bool:  Whether to additionally pass-through (print) the contents of STDOUT.  <br>
-     *                                         This option will not affect the return value.                         <br>
-     *                                         (default: no)                                                         <br>
+     *                                         This option will not affect the return value (default: no)            <br>
      *          "stderr-passthrough" => bool:  whether to additionally pass-through (print) the contents of STDERR.  <br>
-     *                                         This option will not affect the return value.                         <br>
-     *                                         (default: no)                                                         <br>
-     *
-     * @return string - contents of STDOUT
+     *                                         This option will not affect the return value (default: no)            <br>
+     * @return string - content of STDOUT
      */
     public static function execProcess($cmd, &$stderr=null, &$exitCode=null, $dir=null, $env=null, array $options=[]) {
         Assert::string($cmd, '$cmd');
@@ -88,15 +87,13 @@ class PHP extends StaticClass {
         ];
         $pipes = [];
 
-        $hProc = $ex = null;
+        $hProc = $match = null;
         try {
             $hProc = proc_open($cmd, $descriptors, $pipes, $dir, $env, ['bypass_shell'=>true]);
         }
-        catch (IRosasurferException $ex) {}
-        catch (\Throwable           $ex) { $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex); }
+        catch (\Throwable $ex) {
+            if (!$ex instanceof IRosasurferException) $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex);
 
-        if ($ex) {
-            $match = null;
             if (WINDOWS && preg_match('/proc_open\(\): CreateProcess failed, error code - ([0-9]+)/i', $ex->getMessage(), $match)) {
                 $error = Windows::errorToString((int) $match[1]);
                 if ($error != $match[1]) $ex->appendMessage($match[1].': '.$error);
@@ -152,10 +149,8 @@ class PHP extends StaticClass {
         $exitCode = proc_close($hProc);
         return $stdout;
 
-        /**
-         * @see  https://symfony.com/doc/current/components/process.html#getting-real-time-process-output
-         * @see  https://gonzalo123.com/2012/10/08/how-to-send-the-output-of-symfonys-process-component-to-a-node-js-server-in-real-time-with-socket-io/
-         */
+        // @see  https://symfony.com/doc/current/components/process.html#getting-real-time-process-output
+        // @see  https://gonzalo123.com/2012/10/08/how-to-send-the-output-of-symfonys-process-component-to-a-node-js-server-in-real-time-with-socket-io/
     }
 
 
@@ -404,9 +399,10 @@ class PHP extends StaticClass {
 
 
     /**
-     * Set the specified php.ini setting. Opposite to the built-in PHP function this method does not return the old
-     * value but a boolean success status. Used to detect assignment errors if the access level of the specified option
-     * doesn't allow a modification.
+     * Set the specified "php.ini" setting.
+     *
+     * Opposite to the built-in PHP function this method does not return the old value but a boolean success status.
+     * Used to detect assignment errors if the access level of the specified option doesn't allow modification.
      *
      * @param  string          $option
      * @param  bool|int|string $value

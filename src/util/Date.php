@@ -19,20 +19,20 @@ class Date extends StaticClass {
 
 
     /**
-     * Berechnet die Anzahl von Tagen zwischen zwei Zeitpunkten.
+     * Calculate the number of days between two dates.
      *
-     * @param  string $start - erster Zeitpunkt  (Format: yyyy-mm-dd)
-     * @param  string $end   - zweiter Zeitpunkt (Format: yyyy-mm-dd)
+     * @param  string $start - first date (format: yyyy-mm-dd)
+     * @param  string $end   - second date (format: yyyy-mm-dd)
      *
-     * @return int - Tage
+     * @return int - number of days
      */
     public static function diffDays($start, $end) {
         Assert::string($start, '$start');
-        Assert::string($end,   '$end');
+        Assert::string($end, '$end');
         if (Validator::isDateTime($start) === false) throw new InvalidValueException('Invalid parameter $start: "'.$start.'"');
         if (Validator::isDateTime($end) === false)   throw new InvalidValueException('Invalid parameter $end: "'.$end.'"');
 
-        $ts1 = strtotime($start.' GMT'); // ohne Angabe einer Zeitzone wird die lokale DST einkalkuliert
+        $ts1 = strtotime($start.' GMT');    // always GMT (w/o timezone PHP assumes local time and DST may distort the result)
         $ts2 = strtotime($end.' GMT');
 
         $diff = $ts2 - $ts1;
@@ -45,10 +45,10 @@ class Date extends StaticClass {
 
 
     /**
-     * Gibt eine Anzahl von Datumswerten zurueck.
+     * Return a range of dates.
      *
-     * @param  string $startDate - Startzeitpunkt (Format: yyyy-mm-dd)
-     * @param  int    $days      - Anzahl der zurueckzugebenden Werte
+     * @param  string $startDate - start date (format: yyyy-mm-dd)
+     * @param  int    $days      - number of dates to return
      *
      * @return array
      */
@@ -75,7 +75,7 @@ class Date extends StaticClass {
      * @param  string $date - initial date (format: yyyy-mm-dd)
      * @param  int    $days - number of days to add
      *
-     * @return string - reslting date
+     * @return string - resulting date
      */
     public static function addDays($date, $days) {
         if (Validator::isDateTime($date) === false) throw new InvalidValueException('Invalid parameter $date: '.$date);
