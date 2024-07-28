@@ -33,19 +33,18 @@ class SystemFiveLock extends BaseLock {
     /**
      * Constructor
      *
-     * Erzeugt fuer den angegebenen Schluessel eine neue Lock-Instanz.  Um ueber Prozess-/Threadgrenzen
-     * hinweg dieselbe Instanz ansprechen zu koennen, ist ein fest definierter, jedoch trotzdem eindeutiger
-     * Schluessel notwendig.  Es empfiehlt sich die Verwendung von Dateiname + Zeilen-Nr. der Code-Zeile,
-     * an der das Lock erzeugt wird.
+     * Creates a new lock for the specified key (mutex). To be able to address the same instance across process boundaries,
+     * it's recommended to use file name + code line where the lock is created as key (a fixed, but still unique value).
      *
-     * Example:
-     * --------
+     * @param  string $key - unique key (mutex) of the instance
+     *
+     * @throws RuntimeException if the current process already holds a lock for the specified key
+     *
+     * @example
+     * <pre>
+     *  &lt;?php
      *  $lock = new SystemFiveLock(__FILE__.'#'.__LINE__);
-     *
-     * @param  string $key - eindeutiger Schluessel der Instanz
-     *
-     * @throws RuntimeException wenn im aktuellen Prozess oder Thread bereits eine Lock-Instanz unter demselben Schluessel
-     *                          existiert
+     * </pre>
      */
     public function __construct($key) {
         Assert::string($key);
@@ -55,25 +54,25 @@ class SystemFiveLock extends BaseLock {
         $loglevel = Logger::getLogLevel(__CLASS__);
         self::$logDebug = ($loglevel <= L_DEBUG );
 
-        // use fTok() instead
+        // TODO: use fTok() instead
         $integer = $this->keyToId($key);
 
         $i      = 0;
-        $trials = 5;        // max. Anzahl akzeptabler Fehler, eine weitere Exception wird weitergereicht
+        $trials = 5;                                        // max. amount of errors before an exception is re-thrown
         $hSemaphore = $messages = null;
         do {
             $ex = null;
             try {
-                $hSemaphore = sem_get($integer, 1, 0666);       // Semaphore-Handle holen
+                $hSemaphore = sem_get($integer, 1, 0666);   // get semaphore handle
                 if (!is_resource($hSemaphore)) throw new RuntimeException('cannot get semaphore handle for key '.$integer);
                 sem_acquire($hSemaphore);
-                break;                                          // TODO: bei Last koennen sem_get() oder sem_acquire() scheitern
+                break;                                      // TODO: sem_get() and sem_acquire() may fail under load
             }
             catch (IRosasurferException $ex) {}
             catch (\Throwable           $ex) { $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex); }
             catch (\Exception           $ex) { $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex); }    // @phpstan-ignore-line
 
-            // TODO: Quellcode umschreiben (ext/sysvsem/sysvsem.c) und Fehler lokalisieren (vermutlich wird ein File-Limit ueberschritten)
+            // TODO: find bug and rewrite (most probably a file limit is hit), @see ext/sysvsem/sysvsem.c
             $message  = $ex->getMessage();
             $hexId    = dechex($integer);
             $prefixes = [
@@ -89,10 +88,10 @@ class SystemFiveLock extends BaseLock {
             if (++$i < $trials && strStartsWith($message, $prefixes)) {
                 self::$logDebug && Logger::log($message.', trying again ... ('.($i+1).')', L_DEBUG);
                 $messages[] = $message;
-                usleep(200000); // 200 msec. warten
+                usleep(200000);     // wait 200 msec
                 continue;
             }
-            // Endlosschleife verhindern
+            // prevent infinite loop
             throw $ex->addMessage('Giving up to get lock for key "'.$key.'" after '.$i.' trials'.($messages ? ', former errors:'.NL.join(NL, $messages) : ''));
         }
         while (true);
@@ -105,7 +104,7 @@ class SystemFiveLock extends BaseLock {
     /**
      * Destructor
      *
-     * Sorgt bei Zerstoerung der Instanz dafuer, dass ein evt. noch gehaltenes Lock freigegeben wird.
+     * Release any lock still held.
      */
     public function __destruct() {
         try {
@@ -117,19 +116,21 @@ class SystemFiveLock extends BaseLock {
 
 
     /**
-     * Whether the lock is aquired.
+     * Whether the lock is currently aquired.
      *
      * @return bool
      */
     public function isAquired() {
-        if (isset(self::$hSemaphores[$this->key]))
+        if (isset(self::$hSemaphores[$this->key])) {
             return is_resource(self::$hSemaphores[$this->key]);
+        }
         return false;
     }
 
 
     /**
-     * If called on an aquired lock the lock is released. If called on an already released lock the call does nothing.
+     * If called on an aquired lock the lock is released.
+     * If called on an already released lock the call does nothing.
      */
     public function release() {
         if ($this->isAquired()) {
@@ -140,13 +141,13 @@ class SystemFiveLock extends BaseLock {
 
 
     /**
-     * TODO: Replace with fTok()
-     *
      * Convert a key (string) to a unique numerical value (int).
      *
      * @param  string $key
      *
      * @return int - numerical value
+     *
+     * @todo   replace with fTok()
      */
     private function keyToId($key) {
         return (int) hexdec(substr(md5($key), 0, 7)) + strlen($key);

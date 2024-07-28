@@ -10,26 +10,25 @@ use rosasurfer\core\exception\RuntimeException;
 /**
  * Lock
  *
- * Delegate auf eine konkrete Lock-Implementierung.  Aus Sicht des User-Codes ist nur die Funktionalitaet
- * interessant, nicht wie das Lock konkret implementiert wird.
+ * Delegate to a specific lock implementation.
  */
 class Lock extends BaseLock {
 
 
-    /** @var string[] - Schluessel der im Moment gehaltenen Locks */
+    /** @var string[] - keys of all currently aquired locks */
     private static $lockedKeys;
 
-    /** @var ?BaseLock - aktuelle Implementierung der Instanz */
+    /** @var ?BaseLock - lock implementation */
     private $impl = null;
 
-    /** @var string - aktueller Schluessel der Instanz */
+    /** @var string - key of the locking implementation */
     private $key;
 
 
     /**
      * Constructor
      *
-     * @param  string $key - Schluessel, auf dem ein Lock gehalten werden soll
+     * @param  string $key - key a new lock should be aquired for
      */
     public function __construct($key) {
         Assert::string($key);
@@ -37,7 +36,7 @@ class Lock extends BaseLock {
 
         self::$lockedKeys[$key] = $this->key = $key;
 
-        // vorzugsweise SysVLock verwenden...
+        // prefer SysVLock...
         if (false && extension_loaded('sysvsem')) {     // @phpstan-ignore-line
             $this->impl = new SystemFiveLock($key);
         }
@@ -45,10 +44,10 @@ class Lock extends BaseLock {
             /** @var ConfigInterface $config */
             $config = $this->di('config');
 
-            // alternativ FileLock verwenden...
+            // fall-back to FileLock...
             $directory = $config->get('app.dir.tmp', null);
-            !$directory && $directory = ini_get('sys_temp_dir');
-            !$directory && $directory = sys_get_temp_dir();
+            if (!$directory) $directory = ini_get('sys_temp_dir');
+            if (!$directory) $directory = sys_get_temp_dir();
 
             $this->impl = new FileLock($directory.'/lock_'.md5($key));
         }
@@ -61,14 +60,16 @@ class Lock extends BaseLock {
      * @return bool
      */
     public function isAquired() {
-        if ($this->impl)
+        if ($this->impl) {
             return $this->impl->isAquired();
+        }
         return false;
     }
 
 
     /**
-     * If called on an aquired lock the lock is released. If called on an already released lock the call does nothing.
+     * If called on an aquired lock the lock is released.
+     * If called on an already released lock the call does nothing.
      */
     public function release() {
         if ($this->impl) {
@@ -81,7 +82,7 @@ class Lock extends BaseLock {
     /**
      * Destructor
      *
-     * Release the resources occupied by the instance.
+     * Release occupied resources.
      */
     public function __destruct() {
         try {
