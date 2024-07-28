@@ -12,12 +12,12 @@ class Validator extends StaticClass {
 
 
     /**
-     * Ob der uebergebene String eine syntaktisch gueltige IP-Adresse ist.
+     * Whether the passed string represents a valid IP address.
      *
-     * @param  string $string                 - der zu ueberpruefende String
-     * @param  bool   $returnBytes [optional] - Typ des Rueckgabewertes
-     *                                          FALSE: Boolean (default)
-     *                                          TRUE:  Array mit den Adressbytes oder FALSE, wenn der String keine gueltige IP-Adresse darstellt
+     * @param  string $string                 - string to validate
+     * @param  bool   $returnBytes [optional] - return type:
+     *                                          FALSE: boolean (default)
+     *                                          TRUE:  array with address parts or FALSE if the string doesn't represent a valid IP address
      * @return bool|array
      */
     public static function isIPAddress($string, $returnBytes = false) {
@@ -30,14 +30,14 @@ class Validator extends StaticClass {
 
             foreach ($bytes as $i => $byte) {
                 $b = (int) $byte;
-                if (!is_string($byte) || $b > 255)
+                if (!is_string($byte) || $b > 255) {
                     return false;
+                }
                 $bytes[$i] = $b;
             }
-
-            if ($bytes[0] == 0)
+            if ($bytes[0] == 0) {
                 return false;
-
+            }
             return $returnBytes ? $bytes : true;
         }
         return false;
@@ -45,9 +45,9 @@ class Validator extends StaticClass {
 
 
     /**
-     * Ob der uebergebene String eine syntaktisch gueltige IP-Adresse eines lokalen Netzwerks ist.
+     * Whether the passed string represents a valid LAN IP address.
      *
-     * @param  string $string - der zu ueberpruefende String
+     * @param  string $string
      *
      * @return bool
      */
@@ -64,22 +64,21 @@ class Validator extends StaticClass {
             if ($bytes[0]==192 && $bytes[1]==168)  // 192.168.0.0 - 192.168.255.255
                 return true;
         }
-
         return false;
     }
 
 
     /**
-     * Ob der uebergebene String eine syntaktisch gueltige IP-Adresse eines externen Netzwerks ist.
+     * Whether the passed string represents a valid WAN IP address.
      *
-     * @param  string $string - der zu ueberpruefende String
+     * @param  string $string
      *
      * @return bool
      */
     public static function isIPWanAddress($string) {
         $bytes = self::isIPAddress($string, true);
 
-        // Die Logik entspricht dem Gegenteil von self:: isIPLanAdress() + zusaetzlicher Tests.
+        // logic: opposite of isIPLanAddress() + additional tests
         if ($bytes) {
             if ($bytes[0] == 10)                   // 10.0.0.0 - 10.255.255.255
                 return false;
@@ -87,7 +86,7 @@ class Validator extends StaticClass {
             if ($bytes[0] == 127)                  // 127.0.0.0 - 127.255.255.255
                 return false;
 
-            if ($bytes[0]==169)                    // 169.0.0.0 - 169.255.255.255 !!! wem zugewiesen? niemandem?
+            if ($bytes[0]==169)                    // 169.0.0.0 - 169.255.255.255
                 return false;
 
             if ($bytes[0] == 172)                  // 172.16.0.0 - 172.31.255.255
@@ -97,21 +96,21 @@ class Validator extends StaticClass {
                 return ($bytes[1]!=168);
         }
 
-        // dieses TRUE ist eher spekulativ
+        // a more speculative TRUE
         return true;
     }
 
 
     /**
-     * Ob der uebergebene String ein gueltiges E-Mail-Adressmuster ist&#46;  Wildcards sind ? und *.
+     * Whether the passed string represents a valid email address pattern (supports wildcards "?" and "*").
      *
-     * @param  string $string - der zu ueberpruefende String
+     * @param  string $string
      *
      * @return bool
      */
     public static function isEmailAddressPattern($string) {
 
-        // TODO: Adressen in IP-Notation korrekt validieren -> root@[127.0.0.1]
+        // TODO: validate addresses in IP notation, e.g. "root@[127.0.0.1]"
 
         static $pattern = '/^[a-z0-9?*+-]+[a-z0-9?*_.+-]*@(([a-z0-9?*]+|[a-z0-9?*]+[a-z0-9?*-]+[a-z0-9?*]+)\.)*(\*|[a-z0-9?*][a-z0-9?*-]*[a-z0-9?*])\.(\*|[a-z?*]{2,4})$/';
         return is_string($string) && strlen($string) && preg_match($pattern, strtolower($string));
@@ -119,18 +118,18 @@ class Validator extends StaticClass {
 
 
     /**
-     * Ob der uebergebene String einen gueltigen Date/DateTime-Wert darstellt.
+     * Validates a string representing a date/time value and converts it to a Unix timestamp.
      *
-     * @param  string          $date              - der zu ueberpruefende String
-     * @param  string|string[] $format [optional] - Format, dem der String entsprechen soll. Sind mehrere angegeben, muss der String
-     *                                              mindestens einem davon entsprechen.
+     * @param  string          $date              - string to validate
+     * @param  string|string[] $format [optional] - string format required to match; if an array the string must match at least
+     *                                              one of the provided formats
      *
-     * @return int|bool - Timestamp oder FALSE, wenn der uebergebene Wert ungueltig ist
+     * @return int|bool - Unix timestamp or FALSE if the string doesn't match the specified format
      *
-     * Unterstuetzte Formate: 'Y-m-d [H:i[:s]]'
-     *                       'Y.m.d [H:i[:s]]'
-     *                       'd.m.Y [H:i[:s]]'
-     *                       'd/m/Y [H:i[:s]]'
+     * Supported date/time formats: "Y-m-d [H:i[:s]]"
+     *                              "Y.m.d [H:i[:s]]"
+     *                              "d.m.Y [H:i[:s]]"
+     *                              "d/m/Y [H:i[:s]]"
      */
     public static function isDateTime($date, $format='Y-m-d') {
         Assert::string($date, '$date');
@@ -145,19 +144,7 @@ class Validator extends StaticClass {
         }
         Assert::string($format, '$format');
 
-        /*
-        // !!! deaktiviert!!!: strPTime() haelt sich nicht 100% an das angegebene Format sondern versucht, intelligent zu sein
-        if (!WINDOWS) {
-            if     ($format == 'Y-m-d'      ) $data = strPTime($date, '%Y-%m-%d');
-            elseif ($format == 'Y-m-d H:i'  ) $data = strPTime($date, '%Y-%m-%d %H:%M');
-            elseif ($format == 'Y-m-d H:i:s') $data = strPTime($date, '%Y-%m-%d %H:%M:%S');
-            elseif ($format == 'd.m.Y'      ) $data = strPTime($date, '%d.%m.%Y');
-            elseif ($format == 'd.m.Y H:i'  ) $data = strPTime($date, '%d.%m.%Y %H:%M');
-            elseif ($format == 'd.m.Y H:i:s') $data = strPTime($date, '%d.%m.%Y %H:%M:%S');
-            else                              $data = strPTime($date, $format);
-            return ($data !== false && checkdate($data['tm_mon']+1, $data['tm_mday'], $data['tm_year']+1900) && $data['tm_sec'] <= 59 && $data['unparsed']=='');
-        }
-      */
+        // strptime() can't be used, as it doesn't strictly follow the specified format
         $year = $month = $day = $hour = $minute = $second = $m = null;
 
         if ($format == 'Y-m-d') {

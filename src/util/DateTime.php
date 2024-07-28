@@ -26,7 +26,7 @@ class DateTime extends \DateTime {
         try {
             $value = $this->format('l, d-M-Y H:i:s O (T)');                     // Monday, 13-Mar-2017 13:19:59 +0200 (EET)
             Assert::string($value);                                             // Ensure __toString() returns a string as otherwise...
-        }                                                                       // PHP will trigger a non-catchable fatal error.
+        }                                                                       // PHP <7.4 will trigger a non-catchable fatal error.
         catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }
         catch (\Exception $ex) { ErrorHandler::handleToStringException($ex); }  // @phpstan-ignore-line
 
