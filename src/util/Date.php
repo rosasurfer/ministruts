@@ -8,6 +8,8 @@ use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\log\Logger;
 
+use function rosasurfer\ministruts\strToTimestamp;
+
 use const rosasurfer\ministruts\DAYS;
 use const rosasurfer\ministruts\L_WARN;
 
@@ -29,8 +31,8 @@ class Date extends StaticClass {
     public static function diffDays($start, $end) {
         Assert::string($start, '$start');
         Assert::string($end, '$end');
-        if (Validator::isDateTime($start) === false) throw new InvalidValueException('Invalid parameter $start: "'.$start.'"');
-        if (Validator::isDateTime($end) === false)   throw new InvalidValueException('Invalid parameter $end: "'.$end.'"');
+        if (strToTimestamp($start) === false) throw new InvalidValueException('Invalid parameter $start: "'.$start.'"');
+        if (strToTimestamp($end) === false)   throw new InvalidValueException('Invalid parameter $end: "'.$end.'"');
 
         $ts1 = strtotime($start.' GMT');    // always GMT (w/o timezone PHP assumes local time and DST may distort the result)
         $ts2 = strtotime($end.' GMT');
@@ -54,9 +56,9 @@ class Date extends StaticClass {
      */
     public static function getDateRange($startDate, $days) {
         Assert::string($startDate, '$startDate');
-        Assert::int   ($days,      '$days');
-        if (Validator::isDateTime($startDate) === false) throw new InvalidValueException('Invalid parameter $startDate: "'.$startDate.'"');
-        if ($days < 0)                                   throw new InvalidValueException('Invalid parameter $days: '.$days);
+        Assert::int($days, '$days');
+        if (strToTimestamp($startDate) === false) throw new InvalidValueException('Invalid parameter $startDate: "'.$startDate.'"');
+        if ($days < 0)                            throw new InvalidValueException('Invalid parameter $days: '.$days);
 
         $range = [];
         $date  = new DateTime($startDate);
@@ -78,7 +80,7 @@ class Date extends StaticClass {
      * @return string - resulting date
      */
     public static function addDays($date, $days) {
-        if (Validator::isDateTime($date) === false) throw new InvalidValueException('Invalid parameter $date: '.$date);
+        if (strToTimestamp($date) === false) throw new InvalidValueException('Invalid parameter $date: '.$date);
         Assert::int($days, '$days');
 
         $parts = explode('-', $date);

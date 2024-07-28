@@ -15,7 +15,6 @@ use rosasurfer\ministruts\core\exception\RuntimeException;
 use rosasurfer\ministruts\core\lock\Lock;
 use rosasurfer\ministruts\struts\url\Url;
 use rosasurfer\ministruts\struts\url\VersionedUrl;
-use rosasurfer\ministruts\util\Validator;
 
 
 // Whether we run on a command line interface, on localhost and/or on Windows.
@@ -1160,6 +1159,156 @@ function strToBool($value) {
 
 
 /**
+ * Convert a string representing a date/time value to a Unix timestamp.
+ *
+ * @param  string          $string            - string to convert
+ * @param  string|string[] $format [optional] - date/time format required to match;
+ *                                              if an array the string must match at least one of the provided date/time formats
+ *
+ * @return int|bool - Unix timestamp or FALSE if the string doesn't match the specified format
+ *
+ * Supported date/time formats: "Y-m-d [H:i[:s]]" <br>
+ *                              "Y.m.d [H:i[:s]]" <br>
+ *                              "d.m.Y [H:i[:s]]" <br>
+ *                              "d/m/Y [H:i[:s]]" <br>
+ *
+ * @todo   rewrite to strToTimestamp() and strToDateTime()
+ */
+function strToTimestamp($string, $format = 'Y-m-d') {
+    Assert::string($string, '$string');
+    if (is_array($format)) {
+        foreach ($format as $value) {
+            $timestamp = ${__FUNCTION__}($string, $value);
+            if (is_int($timestamp)) {
+                return $timestamp;
+            }
+        }
+        return false;
+    }
+    Assert::string($format, '$format');
+
+    $year = $month = $day = $hour = $minute = $second = $m = null;
+
+    if ($format == 'Y-m-d') {
+        if (!preg_match('/^([0-9]{4})-([0-9]{2})-([0-9]{2})$/', $string, $m)) return false;
+        $year   = (int)$m[1];
+        $month  = (int)$m[2];
+        $day    = (int)$m[3];
+        $hour   = 0;
+        $minute = 0;
+        $second = 0;
+    }
+    elseif ($format == 'Y-m-d H:i') {
+        if (!preg_match('/^([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2})$/', $string, $m)) return false;
+        $year   = (int)$m[1];
+        $month  = (int)$m[2];
+        $day    = (int)$m[3];
+        $hour   = (int)$m[4];
+        $minute = (int)$m[5];
+        $second = 0;
+    }
+    elseif ($format == 'Y-m-d H:i:s') {
+        if (!preg_match('/^([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})$/', $string, $m)) return false;
+        $year   = (int)$m[1];
+        $month  = (int)$m[2];
+        $day    = (int)$m[3];
+        $hour   = (int)$m[4];
+        $minute = (int)$m[5];
+        $second = (int)$m[6];
+    }
+    elseif ($format == 'Y.m.d') {
+        if (!preg_match('/^([0-9]{4})\.([0-9]{2})\.([0-9]{2})$/', $string, $m)) return false;
+        $year   = (int)$m[1];
+        $month  = (int)$m[2];
+        $day    = (int)$m[3];
+        $hour   = 0;
+        $minute = 0;
+        $second = 0;
+    }
+    elseif ($format == 'Y.m.d H:i') {
+        if (!preg_match('/^([0-9]{4})\.([0-9]{2})\.([0-9]{2}) ([0-9]{2}):([0-9]{2})$/', $string, $m)) return false;
+        $year   = (int)$m[1];
+        $month  = (int)$m[2];
+        $day    = (int)$m[3];
+        $hour   = (int)$m[4];
+        $minute = (int)$m[5];
+        $second = 0;
+    }
+    elseif ($format == 'Y.m.d H:i:s') {
+        if (!preg_match('/^([0-9]{4})\.([0-9]{2})\.([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})$/', $string, $m)) return false;
+        $year   = (int)$m[1];
+        $month  = (int)$m[2];
+        $day    = (int)$m[3];
+        $hour   = (int)$m[4];
+        $minute = (int)$m[5];
+        $second = (int)$m[6];
+    }
+    elseif ($format == 'd.m.Y') {
+        if (!preg_match('/^([0-9]{2})\.([0-9]{2})\.([0-9]{4})$/', $string, $m)) return false;
+        $year   = (int)$m[3];
+        $month  = (int)$m[2];
+        $day    = (int)$m[1];
+        $hour   = 0;
+        $minute = 0;
+        $second = 0;
+    }
+    elseif ($format == 'd.m.Y H:i') {
+        if (!preg_match('/^([0-9]{2})\.([0-9]{2})\.([0-9]{4}) ([0-9]{2}):([0-9]{2})$/', $string, $m)) return false;
+        $day    = (int)$m[1];
+        $month  = (int)$m[2];
+        $year   = (int)$m[3];
+        $hour   = (int)$m[4];
+        $minute = (int)$m[5];
+        $second = 0;
+    }
+    elseif ($format == 'd.m.Y H:i:s') {
+        if (!preg_match('/^([0-9]{2})\.([0-9]{2})\.([0-9]{4}) ([0-9]{2}):([0-9]{2}):([0-9]{2})$/', $string, $m)) return false;
+        $day    = (int)$m[1];
+        $month  = (int)$m[2];
+        $year   = (int)$m[3];
+        $hour   = (int)$m[4];
+        $minute = (int)$m[5];
+        $second = (int)$m[6];
+    }
+    elseif ($format == 'd/m/Y') {
+        if (!preg_match('/^([0-9]{2})\/([0-9]{2})\/([0-9]{4})$/', $string, $m)) return false;
+        $year   = (int)$m[3];
+        $month  = (int)$m[2];
+        $day    = (int)$m[1];
+        $hour   = 0;
+        $minute = 0;
+        $second = 0;
+    }
+    elseif ($format == 'd/m/Y H:i') {
+        if (!preg_match('/^([0-9]{2})\/([0-9]{2})\/([0-9]{4}) ([0-9]{2}):([0-9]{2})$/', $string, $m)) return false;
+        $day    = (int)$m[1];
+        $month  = (int)$m[2];
+        $year   = (int)$m[3];
+        $hour   = (int)$m[4];
+        $minute = (int)$m[5];
+        $second = 0;
+    }
+    elseif ($format == 'd/m/Y H:i:s') {
+        if (!preg_match('/^([0-9]{2})\/([0-9]{2})\/([0-9]{4}) ([0-9]{2}):([0-9]{2}):([0-9]{2})$/', $string, $m)) return false;
+        $day    = (int)$m[1];
+        $month  = (int)$m[2];
+        $year   = (int)$m[3];
+        $hour   = (int)$m[4];
+        $minute = (int)$m[5];
+        $second = (int)$m[6];
+    }
+    else {
+        return false;
+    }
+
+    if (checkdate($month, $day, $year) && $hour < 24 && $minute < 60 && $second < 60) {
+        return mktime($hour, $minute, $second, $month, $day, $year);
+    }
+    return false;
+}
+
+
+/**
  * Reduce multiple consecutive white space characters in a string to a single one.
  *
  * @param  string $string               - string to process
@@ -1418,28 +1567,6 @@ function metatypeOf($name) {
     if (is_trait    ($name)) return 'trait';
 
     return '(unknown type)';
-}
-
-
-/**
- * Procedural replacement for rosasurfer\ministruts\util\Validator::isDateTime()
- *
- * Whether the specified string value represents a valid date or datetime value.
- *
- * @param  string          $string            - string value
- * @param  string|string[] $format [optional] - A valid date/datetime format. If multiple values are supplied whether the   <br>
- *                                              specified string fits at least one of them.                                 <br>
- *                                              Supported format strings: 'Y-m-d [H:i[:s]]'                                 <br>
- *                                                                        'Y.m.d [H:i[:s]]'                                 <br>
- *                                                                        'd.m.Y [H:i[:s]]'                                 <br>
- *                                                                        'd/m/Y [H:i[:s]]'                                 <br>
- *
- * @return int|bool - timestamp matching the string or FALSE if the string is not a valid date/datetime value
- *
- * @see \rosasurfer\ministruts\util\Validator::isDateTime()
- */
-function is_datetime($string, $format = 'Y-m-d') {
-    return Validator::isDateTime($string, $format);
 }
 
 
