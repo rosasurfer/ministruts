@@ -220,9 +220,9 @@ PROCESS_MAPPING_ERROR_SC_404;
 
 
     /**
-     * Wenn fuer das ActionMapping Methodenbeschraenkungen definiert sind, sicherstellen, dass der Request diese
-     * Beschraenkungen erfuellt.  Gibt TRUE zurueck, wenn die Verarbeitung fortgesetzt und der Zugriff gewaehrt werden
-     * soll werden soll, oder FALSE, wenn der Zugriff nicht gewaehrt wird und der Request beendet wurde.
+     * Ensure that the {@link Request} fulfils the method restrictions defined for the {@link ActionMapping}.
+     * Returns TRUE if access is granted and processing is to be continued, or FALSE if access is not granted
+     * and the request has been terminated.
      *
      * @param  Request       $request
      * @param  Response      $response
@@ -234,7 +234,7 @@ PROCESS_MAPPING_ERROR_SC_404;
         if ($mapping->isSupportedMethod($request->getMethod()))
             return true;
 
-        // Beschraenkung nicht erfuellt
+        // method not allowed
         $response->setStatus(HttpResponse::SC_METHOD_NOT_ALLOWED);
 
         if (isset($this->options['status-405']) && $this->options['status-405']=='pass-through')
@@ -242,13 +242,12 @@ PROCESS_MAPPING_ERROR_SC_404;
 
         header('HTTP/1.1 405 Method Not Allowed', true, HttpResponse::SC_METHOD_NOT_ALLOWED);
 
-        // konfiguriertes 405-Layout suchen
+        // check for a pre-configured 405 response and use it
         if ($forward = $this->module->findForward((string) HttpResponse::SC_METHOD_NOT_ALLOWED)) {
-            // falls vorhanden, einbinden...
             $this->processActionForward($request, $response, $forward);
         }
         else {
-            // ...andererseits einfache Fehlermeldung ausgeben
+            // otherwise generate one
             echo <<<PROCESS_METHOD_ERROR_SC_405
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
 <html><head>
@@ -266,9 +265,8 @@ PROCESS_METHOD_ERROR_SC_405;
 
 
     /**
-     * Wenn die Action Zugriffsbeschraenkungen hat, sicherstellen, dass der User Inhaber der angegebenen Rollen ist.
-     * Gibt TRUE zurueck, wenn die Verarbeitung fortgesetzt und der Zugriff gewaehrt werden soll, oder FALSE, wenn der
-     * Zugriff nicht gewaehrt wird und der Request beendet wurde.
+     * Ensure that the user fulfils the access restrictions defined for the {@link Action}. Returns TRUE if access is
+     * granted and processing is to be continued, or FALSE if access is not granted and the request has been terminated.
      *
      * @param  Request       $request
      * @param  Response      $response
@@ -295,13 +293,12 @@ PROCESS_METHOD_ERROR_SC_405;
 
 
     /**
-     * Erzeugt die ActionForm des angegebenen Mappings bzw. gibt sie zurueck.  Ist keine ActionForm konfiguriert,
-     * wird NULL zurueckgegeben.
+     * Return the {@link ActionForm} instance assigned to the passed {@link ActionMapping}.
      *
      * @param  Request       $request
      * @param  ActionMapping $mapping
      *
-     * @return ?ActionForm
+     * @return ?ActionForm - ActionForm or NULL if no ActionForm was configured
      */
     protected function processActionFormCreate(Request $request, ActionMapping $mapping) {
         $formClass = $mapping->getFormClassName();
@@ -331,19 +328,17 @@ PROCESS_METHOD_ERROR_SC_405;
         $request->setAttribute(ACTION_FORM_KEY, $form);
 
         // if the form has "session" scope also store it in the session
-        if ($mapping->isSessionScope())
+        if ($mapping->isSessionScope()) {
             $request->getSession()->setAttribute($formClass, $form);
-
+        }
         return $form;
     }
 
 
     /**
-     * Validiert die ActionForm, wenn entprechend konfiguriert.  Ist fuer das ActionMapping ein expliziter Forward
-     * konfiguriert, wird nach der Validierung auf diesen Forward weitergeleitet.  Ist kein expliziter Forward definiert,
-     * wird auf die konfigurierte "success" oder "error"-Resource weitergeleitet.  Gibt TRUE zurueck, wenn die
-     * Verarbeitung fortgesetzt werden soll, oder FALSE, wenn auf eine andere Resource weitergeleitet und der Request bereits
-     * beendet wurde.
+     * Validates the {@link ActionForm}, if configured. Forwards to an explicit forward (if configured for the {@link ActionMapping})
+     * or to the configured "success" or "error" resource (if no explicit forward is configured). Returns TRUE if processing is to be
+     * continued, or FALSE if the {@link Request} was forwarded to another resource and has already been completed.
      *
      * @param  Request       $request
      * @param  Response      $response
@@ -374,8 +369,8 @@ PROCESS_METHOD_ERROR_SC_405;
 
 
     /**
-     * Verarbeitet einen direkt im ActionMapping angegebenen ActionForward (wenn angegeben).  Gibt TRUE zurueck, wenn
-     * die Verarbeitung fortgesetzt werden soll, oder FALSE, wenn der Request bereits beendet wurde.
+     * Process an {@link ActionForward} defined in the {@link ActionMapping}. Returns TRUE if processing
+     * is to be continued, or FALSE if the {@link Request} has already been completed.
      *
      * @param  Request       $request
      * @param  Response      $response
@@ -394,10 +389,10 @@ PROCESS_METHOD_ERROR_SC_405;
 
 
     /**
-     * Erzeugt und gibt die Action zurueck, die fuer das angegebene Mapping konfiguriert wurde.
+     * Create and return the {@link Action} configured for the specified {@link ActionMapping}.
      *
      * @param  ActionMapping $mapping
-     * @param  ActionForm    $form [optional] - ActionForm, die konfiguriert wurde oder NULL
+     * @param  ?ActionForm   $form [optional] - ActionForm instance assigned to the mapping (default: none)
      *
      * @return Action
      */
@@ -409,41 +404,44 @@ PROCESS_METHOD_ERROR_SC_405;
 
 
     /**
-     * Uebergibt den Request zur Bearbeitung an die konfigurierte Action und gibt den von ihr
-     * zurueckgegebenen ActionForward zurueck.
+     * Passes the {@link Request} to the specified {@link Action} for execution and returns the resulting {@link ActionForward}.
+     * The method calls in this order:   <br>
+     * - {@link Action::executeBefore()} <br>
+     * - {@link Action::execute()}       <br>
+     * - {@link Action::executeAfter()}  <br>
      *
      * @param  Request  $request
      * @param  Response $response
      * @param  Action   $action
      *
-     * @return ?ActionForward
+     * @return ?ActionForward - ActionForward or NULL if the request has already been completed
      */
     protected function processActionExecute(Request $request, Response $response, Action $action) {
         $forward = $ex = null;
 
-        // Alles kapseln, damit Postprocessing-Hook auch nach Auftreten einer Exception aufgerufen
-        // werden kann (z.B. Transaction-Rollback o.ae.)
+        // wrap everything in try-catch, so Action::executeAfter() can be called after any errors
         try {
-            // allgemeinen Preprocessing-Hook aufrufen
+            // call pre-processing hook
             $forward = $action->executeBefore($request, $response);
 
-            // Action nur ausfuehren, wenn executeBefore() nicht schon Abbruch signalisiert hat
+            // call Action::execute() only if pre-processing hook doesn't signal request completion
             if ($forward === null) {
-                // TODO: implement dispatching for DispatchActions; as of now it must be done manually in execute()
+                // TODO: implement dispatch() for DispatchActions; as of now it must be done manually in execute()
                 $forward = $action->execute($request, $response);
             }
         }
-        catch (\Throwable $ex) {}           // auftretende Exceptions zwischenspeichern
+        catch (\Throwable $ex) {}           // keep exception for later usage
         catch (\Exception $ex) {}           // @phpstan-ignore-line
 
-        // falls statt eines ActionForwards ein String-Identifier zurueckgegeben wurde, diesen aufloesen
-        if (is_string($forward))
+        // convert a returned string identifier to an actual ActionForward
+        if (is_string($forward)) {
             $forward = $action->getMapping()->getForward($forward);
+        }
 
-        // allgemeinen Postprocessing-Hook aufrufen
+        // call post-processing hook
         $forward = $action->executeAfter($request, $response, $forward);
 
-        // jetzt aufgetretene Exception weiterreichen
+        // now re-throw any catched exceptions
         if ($ex) throw $ex;
 
         return $forward;
@@ -451,8 +449,8 @@ PROCESS_METHOD_ERROR_SC_405;
 
 
     /**
-     * Verarbeitet den von der Action zurueckgegebenen ActionForward.  Leitet auf die Resource weiter, die der
-     * ActionForward bezeichnet.
+     * Process the {@link ActionForward} returned from the {@link Action}. Forwards to
+     * the resource identified by the ActionForward.
      *
      * @param  Request       $request
      * @param  Response      $response
@@ -483,7 +481,7 @@ PROCESS_METHOD_ERROR_SC_405;
             $tile = $module->findTile($path);
 
             if (!$tile) {
-                // $path ist ein Dateiname, generische Tile erzeugen
+                // $path is a file name , create a generic Tile
                 $tilesClass = $module->getTilesClass();
                 /** @var Tile $tile */
                 $tile = new $tilesClass($this->module);

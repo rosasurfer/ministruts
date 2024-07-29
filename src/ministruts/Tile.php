@@ -4,7 +4,7 @@ namespace rosasurfer\ministruts;
 use rosasurfer\Application;
 use rosasurfer\core\CObject;
 use rosasurfer\core\exception\IllegalStateException;
-use rosasurfer\di\proxy\Request as RequestProxy;
+use rosasurfer\di\proxy\Request as Request;
 
 use function rosasurfer\strLeft;
 use function rosasurfer\strRightFrom;
@@ -14,46 +14,55 @@ use const rosasurfer\NL;
 
 /**
  * Tile
+ *
+ * A Tile describes a visual view fragment of the generated HTTP response. Like a tile at the wall the whole picture (view)
+ * is a composition of multiple arranged tiles.
+ *
+ * Tiles can be nested, each nested component is represented by another Tile instance.
+ *
+ * Tiles can be used to define layouts (a.k.a. templates) consisting of multiple arranged tiles. A layout can be
+ * extended. In an extended layout a single tile (view component) may be swapped by different view content at runtime.
  */
 class Tile extends CObject {
 
 
-    /** @var string - runtime generated name for anonymous tiles */
-    const GENERIC_NAME = 'generic';                     // TODO: make generic names unique
+    /**
+     * @var string - runtime generated name for anonymous tiles
+     *
+     * @todo  make generic names unique
+     */
+    const GENERIC_NAME = 'generic';
 
-    /** @var Module - Module, zu dem diese Tile gehoert */
+    /** @var Module - the Module this Tile belongs to */
     protected $module;
 
-    /** @var string - eindeutiger Name dieser Tile */
+    /** @var string - unique name of the Tile */
     protected $name;
 
-    /** @var string - vollstaendiger Dateiname dieser Tile */
+    /** @var string - full filename of the Tile */
     protected $fileName;
 
-    /** @var bool - whether the MVC push model is activated for the tile */
-    protected $pushModelSupport;
+    /** @var ?bool - whether the MVC push model is enabled for the Tile */
+    protected $pushModelSupport = null;
 
-    /** @var array<string, ?Tile> - nested tiles */
+    /** @var array<string, ?Tile> - nested Tiles */
     protected $nestedTiles = [];
 
-    /** @var array - additional tile properties */
+    /** @var array - additional Tile properties */
     protected $properties = [];
 
-    /**
-     * @var ?Tile - Die zur Laufzeit diese Tile-Instanz umgebende Instanz oder NULL, wenn diese Instanz das aeusserste
-     *              Fragment der Ausgabe darstellt.
-     */
+    /** @var ?Tile - parent instance containing this Tile or NULL if this Tile is the outermost fragment of the generated view */
     protected $parent;
 
-    /** @var bool - Ob diese Komponente noch modifiziert werden kann oder bereits vollstaendig konfiguriert ist. */
+    /** @var bool - whether this component can still be modified or configuration is frozen */
     protected $configured = false;
 
 
     /**
      * Constructor
      *
-     * @param  Module $module            - Module, zu dem diese Tile gehoert
-     * @param  Tile   $parent [optional] - die umgebende Instanz der Tile
+     * @param  Module $module            - the Module the Tile belongs to
+     * @param  ?Tile  $parent [optional] - parent instance of the Tile
      */
     public function __construct(Module $module, Tile $parent = null) {
         $this->module = $module;
@@ -62,7 +71,7 @@ class Tile extends CObject {
 
 
     /**
-     * Gibt den Namen dieser Tile zurueck.
+     * Return the name of the Tile.
      *
      * @return string
      */
@@ -72,7 +81,7 @@ class Tile extends CObject {
 
 
     /**
-     * Setzt den Namen dieser Tile.
+     * Set the name of the Tile
      *
      * @param  string $name
      *
@@ -87,8 +96,7 @@ class Tile extends CObject {
 
 
     /**
-     * Set the parent of this tile.  Called before rendering as a tile can have different parents if re-used in multiple
-     * places.
+     * Set the parent of the Tile.
      *
      * @param  self $parent
      *
@@ -101,7 +109,7 @@ class Tile extends CObject {
 
 
     /**
-     * Gibt den Pfad dieser Tile zurueck.
+     * Return the full filename of the Tile.
      *
      * @return string
      */
@@ -111,9 +119,9 @@ class Tile extends CObject {
 
 
     /**
-     * Setzt den Dateinamen dieser Tile.
+     * Set the full filename of the Tile.
      *
-     * @param  string $filename - vollstaendiger Dateiname
+     * @param  string $filename
      *
      * @return $this
      */
@@ -126,7 +134,7 @@ class Tile extends CObject {
 
 
     /**
-     * Whether the MVC push model is activated for the tile.
+     * Whether the MVC push model is enabled for the Tile.
      *
      * @return ?bool - configured state or NULL if the state is inherited from a surrounding element
      */
@@ -136,7 +144,7 @@ class Tile extends CObject {
 
 
     /**
-     * Enable/disable push model support for the tile.
+     * Enable/disable push model support for the Tile.
      *
      * @param  bool $state
      *
@@ -157,10 +165,10 @@ class Tile extends CObject {
 
 
     /**
-     * Speichert in der Tile unter dem angegebenen Namen eine Child-Tile.
+     * Store a child Tile under the specified name.
      *
-     * @param  string $name            - Name der Tile
-     * @param  ?Tile  $tile [optional] - die zu speichernde Tile oder NULL, wenn die Child-Deklaration abstrakt ist
+     * @param  string $name            - name of the Tile
+     * @param  ?Tile  $tile [optional] - Tile instance or NULL if the child declaration is abstract
      *
      * @return $this
      */
@@ -173,10 +181,10 @@ class Tile extends CObject {
 
 
     /**
-     * Speichert in der Tile unter dem angegebenen Namen eine zusaetzliche Eigenschaft.
+     * Store an additional property under the specified name.
      *
-     * @param  string $name  - Name der Eigenschaft
-     * @param  mixed  $value - der zu speichernde Wert
+     * @param  string $name  - property name
+     * @param  mixed  $value - property value (any value)
      *
      * @return $this
      */
@@ -189,10 +197,10 @@ class Tile extends CObject {
 
 
     /**
-     * Gibt die eigenen und die Properties der umgebenden Tile zurueck.  Eigene Properties ueberschreiben gleichnamige
-     * Properties der umgebenden Tile.
+     * Return all properties of the Tile itself and the properties of the surrounding Tile.
+     * The Tile's own properties overwrite properties of the same name in the surrounding Tile.
      *
-     * @return array - Properties
+     * @return array - properties
      */
     protected function getMergedProperties() {
         $parentProperties = $this->parent ? $this->parent->getMergedProperties() : [];
@@ -201,7 +209,7 @@ class Tile extends CObject {
 
 
     /**
-     * Whether this instance must be extended and can't be inserted into a view directly.
+     * Whether the instance must be extended before it can be inserted into a view.
      *
      * @return bool
      */
@@ -211,7 +219,7 @@ class Tile extends CObject {
 
 
     /**
-     * Friert die Konfiguration dieser Komponente ein.
+     * Freeze the configuration of this component. After the call the instance can't be modified anymore.
      *
      * @return $this
      *
@@ -236,7 +244,7 @@ class Tile extends CObject {
      * @return $this
      */
     public function render() {
-        $request     = RequestProxy::instance();
+        $request     = Request::instance();
         $namespace   = $this->module->getViewNamespace();
         $appUri      = $request->getApplicationBaseUri();
         $nestedTiles = $this->nestedTiles;
@@ -286,11 +294,13 @@ class Tile extends CObject {
 
 
 /**
- * Populate the function context with the passed properties and include the specified file. Prevents the view from accessing
- * the Tile instance (var $this is not available).
+ * Populate the function context with the passed properties and include the specified file.
+ * Prevents the view from accessing the Tile instance (var $this is not available).
  *
- * @_param  string $file   - name of the file to include
- * @_param  array  $values - values accessible to the view
+ * @@param string $file   - name of the file to include
+ * @@param array  $values - values accessible to the view
+ *
+ * @return void
  */
 function includeFile() {
     foreach (func_get_args()[1] as $__key__ => $__value__) {        // We can't use extract() as it skips variables with

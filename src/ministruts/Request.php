@@ -34,19 +34,19 @@ class Request extends CObject {
 
 
     /** @var string */
-    private $method;
+    protected $method;
 
     /** @var string */
-    private $hostUrl;
+    protected $hostUrl;
 
     /** @var string */
-    private $path;
+    protected $path;
 
     /** @var ?array - normalized structure of files uploaded with the request */
-    private $files = null;
+    protected $files = null;
 
     /** @var array - additional variables context */
-    private $attributes = [];
+    protected $attributes = [];
 
 
     /**
@@ -849,16 +849,16 @@ class Request extends CObject {
 
 
     /**
-     * Return a value stored in the request's variables context under the specified name.
+     * Return a value stored in the local variables context under the specified name.
      *
      * @param  string $name - attribute name
      *
      * @return mixed - attribute value or NULL if no value is stored under the specified name
      */
     public function getAttribute($name) {
-        Assert::string($name);
-        if (\key_exists($name, $this->attributes))
+        if (\key_exists($name, $this->attributes)) {
             return $this->attributes[$name];
+        }
         return null;
     }
 
@@ -874,7 +874,7 @@ class Request extends CObject {
 
 
     /**
-     * Store a value in the request's variables context. May be used to transfer data from controllers or {@link Action}s
+     * Store a value in the local variables context. May be used to transfer data from controllers or {@link Action}s
      * to views.
      *
      * @param  string $name  - name under which the value is stored
