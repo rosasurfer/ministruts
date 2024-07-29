@@ -23,10 +23,9 @@ use const rosasurfer\WINDOWS;
 /**
  * FrontController
  *
- * To avoid repeated parsing of the Struts XML configuration the FrontController instance is cached and re-used across
- * multiple HTTP requests (until cache invalidation). This means the instance is constantly serialized and unserialized.
- * Therefore the class implementation has to be "request safe" (similar to "thread safety" in other languages) and must
- * not hold variable runtime status.
+ * Represents the instantiated Struts XML configuration of the application. Cached and re-used across multiple HTTP requests.
+ * The implementation must be "request safe" (multiple requests use the same deserialized state), meaning it must not hold
+ * variable runtime status.
  */
 class FrontController extends Singleton {
 
@@ -59,13 +58,10 @@ class FrontController extends Singleton {
                 $config = self::di('config');
                 if (!$config) throw new RuntimeException('Application configuration not found');
 
-                $configDir  = $config['app.dir.config'];
+                $configDir = $config['app.dir.config'];
                 $configFile = str_replace('\\', '/', $configDir.'/struts-config.xml');
-                $dependency = new FileDependency($configFile);
-                if (!WINDOWS && !LOCALHOST)                                 // distinction dev/production?  TODO: non-sense
-                    $dependency->setMinValidity(1 * MINUTE);
 
-                // ...and cache it with a FileDependency
+                $dependency = new FileDependency($configFile);
                 $cache->set(static::class, $controller, Cache::EXPIRES_NEVER, $dependency);
             }
 

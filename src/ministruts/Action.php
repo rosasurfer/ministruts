@@ -5,6 +5,8 @@ use rosasurfer\core\CObject;
 
 
 /**
+ * Action
+ *
  * An Action contains the logic to execute a specific request and represents the interface to the business layer.
  */
 abstract class Action extends CObject {
@@ -19,8 +21,6 @@ abstract class Action extends CObject {
 
     /**
      * Constructor
-     *
-     * Create a new Action instance.
      *
      * @param  ActionMapping $mapping         - the mapping using the Action
      * @param  ActionForm    $form [optional] - user input of the request

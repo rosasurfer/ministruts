@@ -6,8 +6,10 @@ use rosasurfer\di\proxy\Request as RequestProxy;
 
 
 /**
- * An ActionForm encapsulates and represents the user input. It provides an interface for {@link Action}s and business layer
- * to access and validate this input.
+ * ActionForm
+ *
+ * An ActionForm encapsulates and represents interpreted user input. It provides an interface for {@link Action}s
+ * and business layer to access and validate this input.
  */
 abstract class ActionForm extends CObject {
 
@@ -18,7 +20,7 @@ abstract class ActionForm extends CObject {
     /** @var string [transient] - dispatch action key; populated if the Action handling the request is a DispatchAction */
     protected $actionKey;
 
-    /** @var string[] [transient] */
+    /** @var string[] */
     protected static $fileUploadErrors = [
         UPLOAD_ERR_OK         => 'Success (UPLOAD_ERR_OK)',
         UPLOAD_ERR_INI_SIZE   => 'Upload error, file too big (UPLOAD_ERR_INI_SIZE)',
@@ -34,7 +36,7 @@ abstract class ActionForm extends CObject {
     /**
      * Constructor
      *
-     * Create a new form instance for the current {@link Request}.
+     * Create a new instance with data from the passed {@link Request}.
      *
      * @param  Request $request
      */
@@ -48,33 +50,53 @@ abstract class ActionForm extends CObject {
      *
      * @param  Request $request
      *
-     * @example
+     * The framework expects the action key nested in an array named "submit". Write your HTML as follows:
      *
-     * MiniStruts expects the action key nested in an array named "submit". Write your HTML like so:
+     * @example
      * <pre>
      *  &lt;img type="submit" name="submit[action]" value="{action-key}" src=... /&gt;
      * </pre>
      */
     public function initActionKey(Request $request) {
         //
-        // PHP silently converts dots "." and spaces " " in top-level parameter names to underscores. This breaks a submit
-        // tag with an action key if the tag is an image tag as the HTML standard appends the clicked image coordinates.
+        // PHP breaks transmitted parameters by silently converting dots "." and spaces " " in parameter names to underscores.
+        // This especially breaks submit image elements, as the HTML standard appends the clicked image coordinates to the submit
+        // parameter.
         //
-        // - Workaround for browser-modified names, i.e. <img type="submit"... => select the name attribute as below:
-        //   <img type="submit" name="submit[action]" ...>
-        //   The browser will send "submit[action].x=123&submit[action].y=456" and PHP will discard the coordinates.
+        // HTML example:
+        //   <form action="/url">
+        //      <input type="text" name="foo.bar" value="baz">
+        //      <img type="submit" name="action" src="image.png">
+        //   </form>
         //
-        // - Workaround for all other parameter names with dots => wrap the name in a top-level array:
-        //   $_POST = array(
-        //       [action_x] => update                               // <img type="submit" name="action"... broken by PHP
-        //       [application_name] => foobar                       // regular custom parameters broken by PHP
-        //       [top_level_with_dots] => Array (                   // custom top-level parameters broken by PHP
-        //           [nested.level.with.dots] => custom-value       // custom wrapped parameters not broken by PHP
+        // Parameters sent by the browser:
+        //   GET /url?foo.bar=baz&action.x=123&action.y=456 HTTP/1.0
+        //
+        // Parameters after PHP input processing:
+        //   $_GET = array(
+        //       [foo_bar]  => baz                              // broken parameter name
+        //       [action_x] => 123                              // broken parameter name
+        //       [action_y] => 456                              // broken parameter name
+        //   )
+        //
+        // - Workaround for image submit elements (<img type="submit"...):
+        //   Specify the element's "name" attribute as follows: <img type="submit" name="submit[action]" ...>
+        //   The browser will send "?submit[action].x=123&submit[action].y=456". PHP will treat the parameter as an array
+        //   and discard the image coordinates, and the submit parameter name will stay unmodified.
+        //
+        // - Workaround for other parameters with dots or spaces:
+        //   Wrap the name in an array:
+        //   $_REQUEST = array(
+        //       [action_x]            => value                 // <img type="submit" name="action"...  => broken by PHP
+        //       [application_name]    => value                 // regular custom parameter             => broken by PHP
+        //       [top_level_with_dots] => Array (               // custom top-level parameter           => broken by PHP
+        //           [nested.level.with.dots] => value          // custom parameters wrapped in array   => not broken by PHP
         //       )
         //   )
         //
-        if (isset($_REQUEST['submit']['action']))
+        if (isset($_REQUEST['submit']['action'])) {
             $this->actionKey = $_REQUEST['submit']['action'];
+        }
     }
 
 
@@ -101,7 +123,7 @@ abstract class ActionForm extends CObject {
 
 
     /**
-     * Validate the form parameters syntactically.
+     * Validate passed form parameters syntactically.
      *
      * @return bool - whether the submitted parameters are valid
      */
@@ -109,15 +131,15 @@ abstract class ActionForm extends CObject {
 
 
     /**
-     * Prevent serialization of transient properties.                   // access level encoding
-     *                                                                  // ---------------------
-     * @return string[] - array of property names to serialize          // private:   "\0{className}\0{propertyName}"
-     */                                                                 // protected: "\0*\0{propertyName}"
-    public function __sleep() {                                         // public:    "{propertyName}"
-        $array = (array) $this;
-
-        unset($array["\0*\0request"  ]);
-        unset($array["\0*\0actionKey"]);
+     * Prevent serialization of transient properties.
+     *
+     * @return string[] - array of property names to serialize
+     */
+    public function __sleep() {                                         // access level encoding
+        $array = (array) $this;                                         // ---------------------
+                                                                        // private:   "\0{className}\0{propertyName}"
+        unset($array["\0*\0request"  ]);                                // protected: "\0*\0{propertyName}"
+        unset($array["\0*\0actionKey"]);                                // public:    "{propertyName}"
 
         foreach ($array as $name => $property) {
             if (is_object($property)) {

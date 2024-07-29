@@ -66,8 +66,8 @@ class Module extends CObject {
     ];
 
     /**
-     * Default action mapping of the module or NULL if undefined. Used when a request does not match any other action mapping
-     * (configurable).
+     * Default action mapping of the module or NULL if undefined. Used when a request does
+     * not match any other action mapping (configurable).
      *
      * @var ?ActionMapping
      */
@@ -105,7 +105,9 @@ class Module extends CObject {
 
 
     /**
-     * Create a new instance, read and parse the module's XML configuration (struts-config.xml).
+     * Constructor
+     *
+     * Creates a new instance, reads and parses the module's XML configuration ("struts-config.xml").
      *
      * @param  string $fileName - full name of the module's configuration file
      * @param  string $prefix   - module prefix
@@ -674,10 +676,10 @@ class Module extends CObject {
             $tile->setPushModelSupport($push == 'true');
         }
 
-        // process it's child nodes ...
+        // process it's child nodes
         $this->processTileProperties($tile, $tag);
 
-        // ...finally save the tile
+        // finally save the tile
         $this->addTile($tile);
         return $tile;
     }

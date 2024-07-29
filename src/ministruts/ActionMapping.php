@@ -151,7 +151,7 @@ class ActionMapping extends CObject {
 
 
     /**
-     * Set the HTTP methods the mapping will be able to handle.
+     * Set the HTTP methods the mapping will be allowed to handle.
      *
      * @param  string $method - HTTP method verb
      *
@@ -300,8 +300,8 @@ class ActionMapping extends CObject {
 
 
     /**
-     * Set the scope attribute of the mapping's {@link ActionForm}. The scope attribute identifies the storage location of
-     * the Actionform.
+     * Set the scope attribute of the mapping's {@link ActionForm}. The scope attribute
+     * identifies the storage location of the Actionform.
      *
      * @param  string $value - may be "request" or "session"
      *

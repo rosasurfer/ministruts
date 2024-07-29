@@ -5,10 +5,10 @@ namespace rosasurfer\di\proxy;
 /**
  * Request
  *
- * Proxy for the "request" implementation currently registered in the service container.
+ * A {@link Proxy} for the "request" implementation currently registered in the service container.
  *
- * Default implementations:                                             <br>
- * {@link \rosasurfer\ministruts\Request                              } <br>
+ * Default implementation: {@link \rosasurfer\ministruts\Request}
+ *
  * {@link \rosasurfer\ministruts\Request::getMethod()                 } <br>
  * {@link \rosasurfer\ministruts\Request::isGet()                     } <br>
  * {@link \rosasurfer\ministruts\Request::isPost()                    } <br>
