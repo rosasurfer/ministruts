@@ -153,6 +153,8 @@ class HttpSession extends Singleton {
      *
      * @param  string $key   - session key
      * @param  mixed  $value - value to store
+     *
+     * @return $this
      */
     public function setAttribute($key, $value) {
         Assert::string($key, '$key');
@@ -163,6 +165,7 @@ class HttpSession extends Singleton {
         else {
             $this->removeAttribute($key);
         }
+        return $this;
     }
 
 

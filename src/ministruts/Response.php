@@ -82,9 +82,12 @@ class Response extends Singleton {
      *
      * @param  string $key   - Schluessel, unter dem der Wert gespeichert wird
      * @param  mixed  $value - der zu speichernde Wert
+     *
+     * @return $this
      */
     public function setAttribute($key, $value) {
         $this->attributes[$key] = $value;
+        return $this;
     }
 
 

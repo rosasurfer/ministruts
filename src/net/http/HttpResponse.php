@@ -245,7 +245,7 @@ abstract class HttpResponse extends CObject {
     /**
      * @var string[] - HTTP status code descriptions
      */
-    public static $statusCodes = [
+    public static $sc = [
         self::SC_CONTINUE                        => 'SC_CONTINUE'                       ,
         self::SC_SWITCHING_PROTOCOLS             => 'SC_SWITCHING_PROTOCOLS'            ,
         self::SC_OK                              => 'SC_OK'                             ,
