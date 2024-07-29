@@ -21,7 +21,7 @@ trait ObjectTrait {
      * @param  string $method - name of the called method
      * @param  array  $args   - arguments passed to the method call
      *
-     * @return never
+     * @return mixed
      *
      * @throws RuntimeException
      */

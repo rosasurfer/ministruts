@@ -36,37 +36,37 @@ class Request extends CObject {
 
 
     /** @var string */
-    private $method;
+    protected $method;
 
     /** @var string */
-    private $path;
+    protected $path;
 
     /** @var string */
-    private $hostUrl;
+    protected $hostUrl;
 
     /** @var array */
-    private $_GET;
+    protected $_GET;
 
     /** @var array */
-    private $_POST;
+    protected $_POST;
 
     /** @var array */
-    private $_REQUEST;
+    protected $_REQUEST;
 
     /** @var ?ActionInput - all input */
-    private $allInput = null;
+    protected $allInput = null;
 
     /** @var ?ActionInput - GET input*/
-    private $getInput = null;
+    protected $getInput = null;
 
     /** @var ?ActionInput - POST input */
-    private $postInput = null;
+    protected $postInput = null;
 
     /** @var ?array - normalized array of files uploaded with the request */
-    private $files = null;
+    protected $files = null;
 
     /** @var array - additional variables context */
-    private $attributes = [];
+    protected $attributes = [];
 
 
     /**
@@ -776,7 +776,7 @@ class Request extends CObject {
 
 
     /**
-     * Store a value in the request's variables context. May be used to transfer data from controllers or {@link Action}s
+     * Store a value in the local variables context. May be used to transfer data from controllers or {@link Action}s
      * to views.
      *
      * @param  string $name  - name under which the value is stored

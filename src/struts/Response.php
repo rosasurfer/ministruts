@@ -21,7 +21,8 @@ use const rosasurfer\ministruts\CLI;
 /**
  * Response
  *
- * Wrapper fuer den HTTP-Response.
+ * An object representing the HTTP response to the current HTTP {@link Request}.
+ * Provides helper methods and an additional variables context with the life-time of the request.
  */
 class Response extends Singleton {
 
@@ -29,13 +30,12 @@ class Response extends Singleton {
     /** @var int - HTTP status code */
     protected $status = 0;
 
-    /** @var array - Attribute-Pool */
+    /** @var array - additional variables context */
     protected $attributes = [];
 
 
     /**
-     * Gibt die Singleton-Instanz dieser Klasse zurueck, wenn das Script im Kontext eines HTTP-Requestes aufgerufen
-     * wurde.  In allen anderen Faellen, z.B. bei Aufruf in der Konsole, wird NULL zurueckgegeben.
+     * Return the {@link \rosasurfer\ministruts\core\Singleton} instance of this class.
      *
      * @return static
      *
@@ -77,38 +77,36 @@ class Response extends Singleton {
 
 
     /**
-     * Speichert einen Wert unter dem angegebenen Schluessel im Response.
+     * Store a value in the local variables context.
      *
-     * @param  string $key   - Schluessel, unter dem der Wert gespeichert wird
-     * @param  mixed  $value - der zu speichernde Wert
+     * @param  string $name  - name under which the value is stored
+     * @param  mixed  $value - value to store
      *
      * @return $this
      */
-    public function setAttribute($key, $value) {
-        $this->attributes[$key] = $value;
+    public function setAttribute($name, $value) {
+        $this->attributes[$name] = $value;
         return $this;
     }
 
 
     /**
-     * Gibt den unter dem angegebenen Schluessel gespeicherten Wert zurueck oder NULL, wenn unter diesem
-     * Namen kein Wert existiert.
+     * Return a value stored in the local variables context under the specified name.
      *
-     * @param  string $key - Schluessel, unter dem der Wert gespeichert ist
+     * @param  string $name - attribute name
      *
-     * @return mixed - der gespeicherte Wert oder NULL
+     * @return mixed - attribute value or NULL if no value is stored under the specified name
      */
-    public function getAttribute($key) {
-        if (\key_exists($key, $this->attributes))
-            return $this->attributes[$key];
-
-        $value = null;
-        return $value;    // Referenz auf NULL
+    public function getAttribute($name) {
+        if (\key_exists($name, $this->attributes)) {
+            return $this->attributes[$name];
+        }
+        return null;
     }
 
 
     /**
-     * Send a "Location" header (redirect) pointing to the specified URI.  Afterwards the script is terminated.
+     * Send a "Location" header (redirect) pointing to the specified URI. Afterwards the script is terminated.
      *
      * @param  string $uri  - absolute or relative URI
      * @param  int    $type - redirect type (SC_MOVED_TEMPORARILY | SC_MOVED_PERMANENTLY)
@@ -132,7 +130,7 @@ class Response extends Singleton {
      *
      * @return string - absolute URL
      *
-     * TODO: rewrite as parse_url() fails at query parameters with colons, e.g. "/beanstalk-console?server=vm-centos:11300"
+     * @todo   rewrite because parse_url() fails at query parameters with colons, e.g. "/beanstalk-console?server=vm-centos:11300"
      */
     public static function relativeToAbsoluteUrl($rel, $base) {
         $relFragment = strRightFrom($rel, '#');

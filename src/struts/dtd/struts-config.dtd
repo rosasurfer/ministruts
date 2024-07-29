@@ -232,7 +232,7 @@
 
 
 <!--
-    The "tiles" element describes the set of available {@link Tile}s objects. Individual tiles are configured through nested
+    The "tiles" element describes the set of available {@link Tile} objects. Individual tiles are configured through nested
     "tile" elements.
 
     class      Class name of a {@link Tile} subclass used as the {@link Module}'s default tile implementation.

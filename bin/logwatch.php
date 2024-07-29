@@ -24,7 +24,11 @@ use const rosasurfer\ministruts\NL;
 use const rosasurfer\ministruts\WINDOWS;
 
 require(dirname(realpath(__FILE__)).'/../app/init.php');    // TODO: adjust to your project
-!CLI && exit(1|stderr('error: This script must be executed via CLI.'.NL));
+
+if (!CLI) {
+    stderr('error: This script must be executed via CLI.'.NL);
+    exit(1);
+}
 
 
 // --- configuration --------------------------------------------------------------------------------------------------------
