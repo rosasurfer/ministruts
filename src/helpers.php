@@ -315,6 +315,8 @@ function boolToStr($value) {
  * Print a message to STDOUT.
  *
  * @param  string $message
+ *
+ * @return void
  */
 function stdout($message) {
     Assert::string($message);
@@ -329,6 +331,8 @@ function stdout($message) {
  * Print a message to STDERR.
  *
  * @param  string $message
+ *
+ * @return void
  */
 function stderr($message) {
     Assert::string($message);
@@ -343,6 +347,8 @@ function stderr($message) {
  * Send an "X-Debug-???" header with a message. Each sent header name will end with a different and increasing number.
  *
  * @param  mixed $message
+ *
+ * @return void
  */
 function debugHeader($message) {
     if (CLI) return;
@@ -870,8 +876,7 @@ function strLeft($string, $length) {
  *                                             (default: FALSE)
  * @param  string $onNotFound     [optional] - string to return if the specified occurrence of the limiter is not found
  *                                             (default: the initial string)
- *
- *  strLeftTo('abccc', 'c', -99) => 'abccc'   // specified number of occurrences doesn't exist
+ * @return string
  *
  * @example
  * <pre>
@@ -879,7 +884,7 @@ function strLeft($string, $length) {
  *  strLeftTo('abcde', 'x')      => 'abcde'   // limiter not found
  *  strLeftTo('abccc', 'c',   3) => 'abcc'
  *  strLeftTo('abccc', 'c',  -3) => 'ab'
- *  strLeftTo('abccc', 'c', -99) => 'abccc'   // number of occurrences doesn't exist
+ *  strLeftTo('abccc', 'c', -99) => 'abccc'   // specified number of occurrences doesn't exist
  * </pre>
  */
 function strLeftTo($string, $limiter, $count=1, $includeLimiter=false, $onNotFound='') {
@@ -1721,6 +1726,8 @@ function pluralize($count, $singular='', $plural='s') {
  *
  * @param  \Closure $task             - task to execute (an anonymous function is implicitly casted)
  * @param  string   $mutex [optional] - mutex identifier (default: the calling line of code)
+ *
+ * @return void
  */
 function synchronized(\Closure $task, $mutex = null) {
     if (!isset($mutex)) {

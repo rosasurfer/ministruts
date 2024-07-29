@@ -127,6 +127,8 @@ class DocoptParser extends CObject {
      * @param  string    $version
      * @param  Pattern[] $argv
      * @param  string    $doc
+     *
+     * @return void
      */
     protected function handleSpecials($help, $version, $argv, $doc) {
         $hfound = $vfound = false;
@@ -154,6 +156,8 @@ class DocoptParser extends CObject {
 
     /**
      * @param  DocoptUserNotification $exception
+     *
+     * @return void
      */
     protected function handleExit(DocoptUserNotification $exception) {
         if ($this->exit) {

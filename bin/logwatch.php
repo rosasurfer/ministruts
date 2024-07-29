@@ -104,6 +104,8 @@ exit(0);
  * log entry as the mail body.
  *
  * @param  string $entry - a single log entry
+ *
+ * @return void
  */
 function processEntry($entry) {
     Assert::string($entry);
@@ -151,6 +153,8 @@ function processEntry($entry) {
  * Show the call syntax.
  *
  * @param  string $message [optional] - additional message to display (default: none)
+ *
+ * @return void
  */
 function help($message = null) {
     if (isset($message))

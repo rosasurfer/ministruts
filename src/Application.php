@@ -142,8 +142,9 @@ class Application extends CObject {
                 </pre>
             </div>
             <?php
-            if (!$phpInfoTask && !$phpInfoAfterConfigTask)
+            if (!$phpInfoTask && !$phpInfoAfterConfigTask) {
                 exit(0);
+            }
         }
 
         // execute "phpinfo" after-config task if enabled
@@ -205,6 +206,8 @@ class Application extends CObject {
 
     /**
      * Update the PHP configuration with user defined settings.
+     *
+     * @return void
      */
     protected function configurePhp() {
         register_shutdown_function(function() {
@@ -269,6 +272,8 @@ class Application extends CObject {
      *
      * @param  ConfigInterface $config  - application configuration
      * @param  string          $rootDir - application root directory
+     *
+     * @return void
      */
     protected function expandAppDirs(ConfigInterface $config, $rootDir) {
         Assert::string($rootDir, '$rootDir');
@@ -287,6 +292,8 @@ class Application extends CObject {
      *
      * @param  string[]|string[][] $dirs    - reference to an array of absolute or relative directory names
      * @param  string              $rootDir - application root directory
+     *
+     * @return void
      */
     protected function expandDirsRecursive(array &$dirs, $rootDir) {
         foreach ($dirs as &$dir) {
@@ -322,6 +329,7 @@ class Application extends CObject {
      *                        "ignore":    errors are ignored
      *                        "log":       errors are logged
      *                        "exception": errors are converted to exceptions and thrown back (default)
+     * @return void
      */
     protected function initErrorHandling($mode) {
         Assert::string($mode);
@@ -343,6 +351,7 @@ class Application extends CObject {
      * @param  string $mode - string representation of an exception handling mode:
      *                        "ignore": exceptions are ignored
      *                        "catch":  exceptions are catched and logged
+     * @return void
      */
     protected function initExceptionHandling($mode) {
         Assert::string($mode);
@@ -361,6 +370,8 @@ class Application extends CObject {
      * Replace an existing Composer class loader.
      *
      * @param  mixed $value - configuration value as passed to the framework loader
+     *
+     * @return void
      */
     protected function replaceComposer($value) {
         $enabled = false;                                           // default

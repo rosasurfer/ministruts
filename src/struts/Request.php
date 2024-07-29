@@ -610,6 +610,8 @@ class Request extends CObject {
 
     /**
      * Destroy the current session and it's data.
+     *
+     * @return void
      */
     public function destroySession() {
         if (session_status() == PHP_SESSION_ACTIVE) {
@@ -779,10 +781,13 @@ class Request extends CObject {
      *
      * @param  string $name  - name under which the value is stored
      * @param  mixed  $value - value to store
+     *
+     * @return $this
      */
     public function setAttribute($name, $value) {
         Assert::string($name);
         $this->attributes[$name] = $value;
+        return $this;
     }
 
 
@@ -790,6 +795,8 @@ class Request extends CObject {
      * Remove the value(s) with the specified name(s) from the request's variables context.
      *
      * @param  string ...$names - names of the values to remove
+     *
+     * @return void
      */
     public function removeAttributes(...$names) {
         foreach ($names as $name) {
@@ -805,6 +812,8 @@ class Request extends CObject {
      * @param  string $value              - cookie value
      * @param  int    $expires [optional] - timestamp when the cookie expires (default: when the browser is closed)
      * @param  string $path    [optional] - path the cookie will be available for (default: the application)
+     *
+     * @return $this
      */
     public function setCookie($name, $value, $expires = 0, $path = null) {
         Assert::string($name, '$name');
@@ -818,6 +827,7 @@ class Request extends CObject {
             $path = $this->getApplicationBaseUri();
         }
         \setcookie($name, $value, $expires, $path);
+        return $this;
     }
 
 
@@ -909,6 +919,8 @@ class Request extends CObject {
      *
      * @param  string|int $key     - message key
      * @param  ?string    $message - message; if NULL is passed the message for the specified key is removed
+     *
+     * @return $this
      */
     public function setActionMessage($key, $message) {
         if (!is_string($key) && !is_int($key)) throw new InvalidTypeException('Illegal type of parameter $key: '.gettype($key));    // @phpstan-ignore-line
@@ -920,6 +932,7 @@ class Request extends CObject {
         else {
             $this->attributes[ACTION_MESSAGES_KEY][$key] = $message;
         }
+        return $this;
     }
 
 
@@ -1013,6 +1026,8 @@ class Request extends CObject {
      *
      * @param  string|int $key     - error key
      * @param  ?string    $message - message; if NULL is passed the error for the specified key is removed
+     *
+     * @return $this
      */
     public function setActionError($key, $message) {
         if (!is_string($key) && !is_int($key)) throw new InvalidTypeException('Illegal type of parameter $key: '.gettype($key));    // @phpstan-ignore-line
@@ -1024,6 +1039,7 @@ class Request extends CObject {
         else {
             $this->attributes[ACTION_ERRORS_KEY][$key] = $message;
         }
+        return $this;
     }
 
 

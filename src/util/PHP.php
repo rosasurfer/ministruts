@@ -34,6 +34,8 @@ class PHP extends StaticClass {
 
     /**
      * Trigger execution of the garbage collector.
+     *
+     * @return void
      */
     public static function collectGarbage() {
         $wasEnabled = gc_enabled();
@@ -156,6 +158,8 @@ class PHP extends StaticClass {
 
     /**
      * Check PHP settings, print issues and call phpinfo().
+     *
+     * @return void
      *
      * PHP_INI_ALL    - entry can be set anywhere
      * PHP_INI_USER   - entry can be set in scripts and in .user.ini

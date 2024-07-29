@@ -63,6 +63,8 @@ class ClassLoader extends CObject {
      * Load the specified class.
      *
      * @param  string $class
+     *
+     * @return void
      */
     public function autoLoad($class) {
         $lowerClass = strtolower($class);

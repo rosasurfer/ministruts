@@ -28,6 +28,8 @@ if (!defined('rosasurfer\ministruts\struts\MODULE_KEY')) require(__DIR__.'/strut
  *
  * If the framework is used without Composer a class loader is required. If Composer is used this
  * class loader simply has no effect. The loader registers itself after already registered class loaders.
+ *
+ * @return void
  */
 function registerClassLoader() {
     static $done = false;

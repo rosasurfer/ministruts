@@ -293,6 +293,8 @@ class Tile extends CObject {
  *
  * @_param  string $file   - name of the file to include
  * @_param  array  $values - values accessible to the view
+ *
+ * @return void
  */
 function includeFile() {
     foreach (func_get_args()[1] as $__key__ => $__value__) {        // We can't use extract() as it skips variables with

@@ -118,6 +118,8 @@ class Logger extends StaticClass {
 
     /**
      * Initialize the Logger.
+     *
+     * @return void
      */
     private static function init() {
         static $initialized = false;
@@ -312,6 +314,8 @@ class Logger extends StaticClass {
      * @param  string|\Throwable $loggable - message or exception
      * @param  int               $level    - loglevel
      * @param  array             $context  - reference to the log context with additional data
+     *
+     * @return void
      */
     private static function invokePrintHandler($loggable, $level, array &$context) {
         $context['print.message'] = true;
@@ -342,6 +346,8 @@ class Logger extends StaticClass {
      * @param  string|\Throwable $loggable - message or exception
      * @param  int               $level    - loglevel
      * @param  array             $context  - reference to the log context with additional data
+     *
+     * @return void
      */
     private static function invokeErrorLogHandler($loggable, $level, array &$context) {
         $context['errorLog.message'] = true;
@@ -373,6 +379,8 @@ class Logger extends StaticClass {
      * @param  string|\Throwable $loggable - message or exception
      * @param  int               $level    - loglevel
      * @param  array             $context  - reference to the log context with additional data
+     *
+     * @return void
      */
     private static function invokeMailHandler($loggable, $level, array &$context) {
         $context['mail.message'] = true;
@@ -409,6 +417,8 @@ class Logger extends StaticClass {
      * @param  string|\Throwable $loggable - message or exception
      * @param  int               $level    - loglevel
      * @param  array             $context  - reference to the log context
+     *
+     * @return void
      */
     private static function composeCliMessage($loggable, $level, array &$context) {
         !isset($context['file'], $context['line']) && self::resolveCallerLocation($context);
@@ -475,6 +485,8 @@ class Logger extends StaticClass {
      * @param  string|\Throwable $loggable - message or exception
      * @param  int               $level    - loglevel
      * @param  array             $context  - reference to the log context
+     *
+     * @return void
      */
     private static function composeHtmlMessage($loggable, $level, array &$context) {
         !isset($context['file'], $context['line']) && self::resolveCallerLocation($context);
@@ -557,6 +569,8 @@ class Logger extends StaticClass {
      * @param  string|\Throwable $loggable - message or exception to log
      * @param  int               $level    - loglevel of the loggable
      * @param  array             $context  - reference to the log context
+     *
+     * @return void
      */
     private static function composeMailMessage($loggable, $level, array &$context) {
         !isset($context['cliMessage']) && self::composeCliMessage($loggable, $level, $context);
@@ -760,7 +774,9 @@ class Logger extends StaticClass {
      *
      * @param  array $context - reference to the log context
      *
-     * TODO: test with Closure and internal PHP functions
+     * @return void
+     *
+     * @todo   test with Closure and internal PHP functions
      */
     private static function resolveCaller(array &$context) {
         !isset($context['trace']) && self::generateTrace($context);
@@ -775,6 +791,8 @@ class Logger extends StaticClass {
      * resolved here.
      *
      * @param  array $context - reference to the log context
+     *
+     * @return void
      */
     private static function resolveCallerLocation(array &$context) {
         !isset($context['trace']) && self::generateTrace($context);
@@ -795,6 +813,8 @@ class Logger extends StaticClass {
      * Generate an internal stacktrace and store it under $context['trace'].
      *
      * @param  array $context - reference to the log context
+     *
+     * @return void
      */
     private static function generateTrace(array &$context) {
         $trace = ErrorHandler::getBetterTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), __FILE__, __LINE__);

@@ -75,6 +75,8 @@ class ErrorHandler extends StaticClass {
      * Setup error handling.
      *
      * @param  int $mode - error handling mode: [ERRORS_IGNORE | ERRORS_LOG | ERRORS_EXCEPTION]
+     *
+     * @return void
      */
     public static function setupErrorHandling($mode) {
         if (!in_array($mode, [self::ERRORS_IGNORE, self::ERRORS_LOG, self::ERRORS_EXCEPTION])) return;
@@ -94,6 +96,8 @@ class ErrorHandler extends StaticClass {
      * Setup exception handling.
      *
      * @param  int $mode - exception handling mode: [EXCEPTIONS_IGNORE | EXCEPTIONS_CATCH]
+     *
+     * @return void
      */
     public static function setupExceptionHandling($mode) {
         if (!in_array($mode, [self::EXCEPTIONS_IGNORE, self::EXCEPTIONS_CATCH])) return;
@@ -109,6 +113,8 @@ class ErrorHandler extends StaticClass {
     /**
      * Setup a script shutdown handler to handle fatal errors during shutdown. The callback should be
      * first on the shutdown function stack.
+     *
+     * @return void
      */
     protected static function setupShutdownHandler() {
         static $handlerRegistered = false;
@@ -224,6 +230,8 @@ class ErrorHandler extends StaticClass {
      * A handler for uncatched exceptions|errors. After the handler returns PHP terminates the script.
      *
      * @param  \Throwable $exception - the unhandled exception|error
+     *
+     * @return void
      */
     public static function handleException($exception) {
         //echof('ErrorHandler::handleException()  '.$exception->getMessage());
@@ -276,9 +284,13 @@ class ErrorHandler extends StaticClass {
                         echof('error log: '.(strlen($errorLog=ini_get('error_log')) ? $errorLog : 'web server'));
                     }
                 }
-                else echof('application error (see error log)');
+                else {
+                    echof('application error (see error log)');
+                }
             }
-            catch (\Throwable $thirdEx) { echof('application error (see error log)'); }
+            catch (\Throwable $thirdEx) {
+                echof('application error (see error log)');
+            }
         }
 
         // chain a previously active exception handler
@@ -325,13 +337,15 @@ class ErrorHandler extends StaticClass {
      * A manually called handler for exceptions raised in object::__toString(). It allows regular handling of exceptions thrown
      * from object::__toString() in PHP < 7.4, which is not possible in those versions due to an internal PHP design issue.
      *
-     * Behavior PHP < 7.4: Fatal error:  Method object::__toString() must not throw an exception in {file} on {line}.
+     * Behavior PHP <7.4: Fatal error:  Method object::__toString() must not throw an exception in {file} on {line}.
      *
      * @param  \Throwable $exception
      *
-     * @see  https://bugs.php.net/bug.php?id=53648
-     * @see  https://wiki.php.net/rfc/tostring_exceptions
-     * @see  https://github.com/symfony/symfony/blob/1c110fa1f7e3e9f5daba73ad52d9f7e843a7b3ff/src/Symfony/Component/Debug/ErrorHandler.php#L457-L489
+     * @return void
+     *
+     * @see    https://bugs.php.net/bug.php?id=53648
+     * @see    https://wiki.php.net/rfc/tostring_exceptions
+     * @see    https://github.com/symfony/symfony/blob/1c110fa1f7e3e9f5daba73ad52d9f7e843a7b3ff/src/Symfony/Component/Debug/ErrorHandler.php#L457-L489
      */
     public static function handleToStringException($exception) {
         //echof('ErrorHandler::handleToStringException()  '.$exception->getMessage());
@@ -689,6 +703,8 @@ class ErrorHandler extends StaticClass {
      *
      * @param  \Exception $exception - exception to modify
      * @param  array      $trace     - new stacktrace
+     *
+     * @return void
      */
     private static function setNewTrace(\Exception $exception, array $trace) {
         static $property = null;

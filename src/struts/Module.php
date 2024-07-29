@@ -178,6 +178,7 @@ class Module extends CObject {
      *
      * @param  string $prefix - the prefix of the main module is an empty string;
      *                          prefixes of non-main modules must not start but must end with a slash "/"
+     * @return $this
      *
      * @throws StrutsConfigException on configuration errors
      */
@@ -188,6 +189,7 @@ class Module extends CObject {
             if ($prefix[$len-1] != '/') throw new StrutsConfigException('Non-main module prefixes must end with a slash "/" character, found: "'.$prefix.'"');
         }
         $this->prefix = $prefix;
+        return $this;
     }
 
 
@@ -195,6 +197,8 @@ class Module extends CObject {
      * Set the default namespace used by the Module when looking up relative classnames.
      *
      * @param  SimpleXMLElement $xml - module configuration
+     *
+     * @return $this
      *
      * @throws StrutsConfigException on configuration errors
      */
@@ -218,6 +222,7 @@ class Module extends CObject {
             }
         }
         $this->imports[strtolower($namespace)] = $namespace;
+        return $this;
     }
 
 
@@ -225,6 +230,8 @@ class Module extends CObject {
      * Set the base directory used by the module when looking up file resources.
      *
      * @param  SimpleXMLElement $xml - module configuration
+     *
+     * @return $this
      *
      * @throws StrutsConfigException on configuration errors
      */
@@ -245,7 +252,7 @@ class Module extends CObject {
             if (!is_dir($location)) throw new StrutsConfigException('Resource location $config[app.dir.view]="'.$config['app.dir.view'].'" not found');
 
             $this->resourceLocations[] = realpath($location);
-            return;
+            return $this;
         }
 
         $locations = explode(',', (string) $xml['file-base']);
@@ -259,6 +266,7 @@ class Module extends CObject {
 
             $this->resourceLocations[] = realpath($location);
         }
+        return $this;
     }
 
 
@@ -266,6 +274,8 @@ class Module extends CObject {
      * Process all configured global {@link ActionForward}s.
      *
      * @param  SimpleXMLElement $xml - module configuration
+     *
+     * @return void
      *
      * @throws StrutsConfigException on configuration errors
      */
@@ -343,6 +353,8 @@ class Module extends CObject {
      * Process all configured {@link ActionMapping}s.
      *
      * @param  SimpleXMLElement $xml - module configuration
+     *
+     * @return void
      *
      * @throws StrutsConfigException on configuration errors
      */
@@ -554,6 +566,8 @@ class Module extends CObject {
      *
      * @param  SimpleXMLElement $xml - module configuration
      *
+     * @return void
+     *
      * @throws StrutsConfigException on configuration errors
      */
     protected function processTiles(SimpleXMLElement $xml) {
@@ -685,6 +699,8 @@ class Module extends CObject {
      * @param  Tile             $tile
      * @param  SimpleXMLElement $xml - module configuration
      *
+     * @return void
+     *
      * @throws StrutsConfigException on configuration errors
      */
     private function processTileProperties(Tile $tile, SimpleXMLElement $xml) {
@@ -751,6 +767,8 @@ class Module extends CObject {
      * @param  ActionForward $forward
      * @param  string        $alias [optional] - alias name of the forward
      *
+     * @return void
+     *
      * @throws StrutsConfigException on configuration errors
      */
     protected function addGlobalForward(ActionForward $forward, $alias = null) {
@@ -767,6 +785,8 @@ class Module extends CObject {
      * Add an {@link ActionMapping} to this module.
      *
      * @param  ActionMapping $mapping
+     *
+     * @return void
      *
      * @throws StrutsConfigException on configuration errors
      */
@@ -797,6 +817,8 @@ class Module extends CObject {
      *
      * @param  Tile   $tile
      * @param  string $alias [optional] - alias name of the tile
+     *
+     * @return void
      */
     protected function addTile(Tile $tile, $alias = null) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -804,8 +826,9 @@ class Module extends CObject {
         $name = $tile->getName();
         $this->tiles[$name] = $tile;
 
-        if (isset($alias))
+        if (isset($alias)) {
             $this->tiles[$alias] = $tile;
+        }
     }
 
 
@@ -865,6 +888,8 @@ class Module extends CObject {
      *
      * @param  SimpleXMLElement $xml - module configuration
      *
+     * @return void
+     *
      * @throws StrutsConfigException on configuration errors
      */
     protected function processImports(SimpleXMLElement $xml) {
@@ -901,6 +926,8 @@ class Module extends CObject {
      *
      * @param  SimpleXMLElement $xml - module configuration
      *
+     * @return void
+     *
      * @throws StrutsConfigException on configuration errors
      */
     protected function processController(SimpleXMLElement $xml) {
@@ -933,12 +960,15 @@ class Module extends CObject {
      *
      * @param  string $className
      *
+     * @return $this
+     *
      * @throws StrutsConfigException on configuration errors
      */
     protected function setRequestProcessorClass($className) {
         if ($this->configured)                                            throw new IllegalStateException('Configuration is frozen');
         if (!is_subclass_of($className, DEFAULT_REQUEST_PROCESSOR_CLASS)) throw new StrutsConfigException('Not a subclass of '.DEFAULT_REQUEST_PROCESSOR_CLASS.': '.$className);
         $this->requestProcessorClass = $className;
+        return $this;
     }
 
 
@@ -958,12 +988,16 @@ class Module extends CObject {
      *
      * @param  string $className
      *
+     * @return $this
+     *
      * @throws StrutsConfigException on configuration errors
      */
     protected function setRoleProcessorClass($className) {
         if ($this->configured)                                      throw new IllegalStateException('Configuration is frozen');
         if (!is_subclass_of($className, ROLE_PROCESSOR_BASE_CLASS)) throw new StrutsConfigException('Not a subclass of '.ROLE_PROCESSOR_BASE_CLASS.': '.$className);
+
         $this->roleProcessorClass = $className;
+        return $this;
     }
 
 
@@ -987,6 +1021,8 @@ class Module extends CObject {
      *
      * @param  string $className
      *
+     * @return $this
+     *
      * @throws StrutsConfigException on configuration errors
      */
     protected function setTilesClass($className) {
@@ -995,6 +1031,7 @@ class Module extends CObject {
         if (!is_subclass_of($className, Tile::class)) throw new StrutsConfigException('Not a subclass of '.Tile::class.': '.$className);
 
         $this->tilesClass = $className;
+        return $this;
     }
 
 
@@ -1014,6 +1051,8 @@ class Module extends CObject {
      *
      * @param  string $className
      *
+     * @return $this
+     *
      * @throws StrutsConfigException on configuration errors
      */
     protected function setMappingClass($className) {
@@ -1022,6 +1061,7 @@ class Module extends CObject {
         if (!is_subclass_of($className, DEFAULT_ACTION_MAPPING_CLASS)) throw new StrutsConfigException('Not a subclass of '.DEFAULT_ACTION_MAPPING_CLASS.': '.$className);
 
         $this->mappingClass = $className;
+        return $this;
     }
 
 
@@ -1041,6 +1081,8 @@ class Module extends CObject {
      *
      * @param  string $className
      *
+     * @return $this
+     *
      * @throws StrutsConfigException on configuration errors
      */
     protected function setForwardClass($className) {
@@ -1049,6 +1091,7 @@ class Module extends CObject {
         if (!is_subclass_of($className, DEFAULT_ACTION_FORWARD_CLASS)) throw new StrutsConfigException('Not a subclass of '.DEFAULT_ACTION_FORWARD_CLASS.': '.$className);
 
         $this->forwardClass = $className;
+        return $this;
     }
 
 

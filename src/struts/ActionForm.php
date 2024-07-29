@@ -61,6 +61,8 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
     /**
      * Read a submitted {@link DispatchAction} key.
      *
+     * @return void
+     *
      * The framework expects the action key nested in an array named "submit". Write your HTML as follows:
      *
      * @example

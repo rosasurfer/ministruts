@@ -5,7 +5,7 @@ namespace rosasurfer\ministruts\struts;
 
 use rosasurfer\ministruts\core\Singleton;
 use rosasurfer\ministruts\core\assert\Assert;
-use rosasurfer\ministruts\core\di\proxy\Request as RequestProxy;
+use rosasurfer\ministruts\core\di\proxy\Request as Request;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
@@ -81,9 +81,12 @@ class Response extends Singleton {
      *
      * @param  string $key   - Schluessel, unter dem der Wert gespeichert wird
      * @param  mixed  $value - der zu speichernde Wert
+     *
+     * @return $this
      */
     public function setAttribute($key, $value) {
         $this->attributes[$key] = $value;
+        return $this;
     }
 
 
@@ -109,9 +112,11 @@ class Response extends Singleton {
      *
      * @param  string $uri  - absolute or relative URI
      * @param  int    $type - redirect type (SC_MOVED_TEMPORARILY | SC_MOVED_PERMANENTLY)
+     *
+     * @return never
      */
     public function redirect($uri, $type = HttpResponse::SC_MOVED_TEMPORARILY) {
-        $currentUrl = RequestProxy::getUrl();
+        $currentUrl = Request::getUrl();
 
         $url = self::relativeToAbsoluteUrl($uri, $currentUrl);  // HTTP/1.1 requires an absolute 'Location' value
         header('Location: '.$url, true, $type);                 // set the header

@@ -296,6 +296,8 @@ class Config extends CObject implements ConfigInterface {
      *
      * @param  string $key
      * @param  mixed  $value
+     *
+     * @return void
      */
     protected function setProperty($key, $value) {
         // convert string representations of special values

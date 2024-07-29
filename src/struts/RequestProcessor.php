@@ -46,6 +46,8 @@ class RequestProcessor extends CObject {
      *
      * @param  Request  $request
      * @param  Response $response
+     *
+     * @return void
      */
     public function process(Request $request, Response $response) {
         // Start or continue a session (if applicable).
@@ -56,23 +58,27 @@ class RequestProcessor extends CObject {
         if (!$mapping) return;
 
         // Enforce the mapping's configured HTTP method restrictions. Generates an HTTP 405 error if the used method is not allowed.
-        if (!$this->processMethod($request, $response, $mapping))
+        if (!$this->processMethod($request, $response, $mapping)) {
             return;
+        }
 
         // Enforce the mapping's configured role restrictions.
-        if (!$this->processRoles($request, $response, $mapping))
+        if (!$this->processRoles($request, $response, $mapping)) {
             return;
+        }
 
         // Instantiate an ActionForm (a parameter wrapper for the request's user input).
         $form = $this->processActionFormCreate($request, $mapping);
 
         // if configured validate the ActionForm
-        if (!$this->processActionFormValidate($request, $response, $mapping, $form))
+        if (!$this->processActionFormValidate($request, $response, $mapping, $form)) {
             return;
+        }
 
         // If the mapping defines an ActionForward instead of an Action, process it and return if processing has finished.
-        if (!$this->processMappingForward($request, $response, $mapping))
+        if (!$this->processMappingForward($request, $response, $mapping)) {
             return;
+        }
 
         // Instantiate the configured Action.
         $action = $this->processActionCreate($mapping, $form);
@@ -91,6 +97,8 @@ class RequestProcessor extends CObject {
      * the session is restarted.
      *
      * @param  Request $request
+     *
+     * @return void
      */
     protected function processSession(Request $request) {
         $this->restoreActionForm($request);
@@ -384,6 +392,8 @@ PROCESS_METHOD_ERROR_SC_405;
      * @param  Request       $request
      * @param  Response      $response
      * @param  ActionForward $forward
+     *
+     * @return void
      */
     protected function processActionForward(Request $request, Response $response, ActionForward $forward) {
         $module = $this->module;
@@ -432,6 +442,8 @@ PROCESS_METHOD_ERROR_SC_405;
      * configured for a mapping, and will not be copied.
      *
      * @param  Request $request
+     *
+     * @return void
      */
     protected function storeActionForm(Request $request) {
         $form = $request->getAttribute(ACTION_FORM_KEY);
@@ -446,6 +458,8 @@ PROCESS_METHOD_ERROR_SC_405;
      * facades {@link \rosasurfer\ministruts\core\di\facade\Forms} and {@link \rosasurfer\ministruts\core\di\facade\Form::old()} as form of the previous request.
      *
      * @param  Request $request
+     *
+     * @return void
      */
     protected function restoreActionForm(Request $request) {
         if ($request->hasSessionId()) {
@@ -466,6 +480,8 @@ PROCESS_METHOD_ERROR_SC_405;
      * On the next HTML request the messages are restored and moved back to the new request.
      *
      * @param  Request $request
+     *
+     * @return void
      */
     protected function storeActionMessages(Request $request) {
         $errors = $request->getActionErrors();
@@ -491,6 +507,8 @@ PROCESS_METHOD_ERROR_SC_405;
      * Found ActionErrors (from the previous request) are converted to ActionMessages of the current request.
      *
      * @param  Request $request
+     *
+     * @return void
      */
     protected function restoreActionMessages(Request $request) {
         if ($request->hasSessionId()) {
