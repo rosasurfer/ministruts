@@ -29,8 +29,8 @@ use const rosasurfer\ministruts\NL;
 /**
  * Request
  *
- * An object representing the current HTTP request. Provides helper methods and an additional variables context with the
- * life-time of the request.
+ * An object representing the current HTTP request. Provides helper methods and an
+ * additional variables context with the life-time of the request.
  */
 class Request extends CObject {
 
@@ -174,7 +174,7 @@ class Request extends CObject {
      *
      * @return array - associative array of files
      *
-     * TODO: Convert the returned arrays to instances of UploadedFile.
+     * @todo   convert the returned arrays to instances of UploadedFile
      */
     public function getFiles() {
         if (!isset($this->files)) {
@@ -210,7 +210,7 @@ class Request extends CObject {
      *
      * @return ?array - array or NULL if no such file was uploaded
      *
-     * TODO: Convert the returned array to an instance of UploadedFile.
+     * @todo   convert the returned array to instance of UploadedFile
      */
     public function getFile($name) {
         Assert::string($name);
@@ -284,8 +284,8 @@ class Request extends CObject {
 
 
     /**
-     * Return the URI of the request (the value in the first line of the HTTP protocol). This value always starts
-     * with a slash "/".
+     * Return the URI of the request (the value in the first line of the HTTP protocol).
+     * This value always starts with a slash "/".
      *
      * @return string - URI: path + query string
      *
@@ -358,8 +358,8 @@ class Request extends CObject {
 
 
     /**
-     * Return the request's path fragment relative to the application's base URL. This value always starts with
-     * a slash "/".
+     * Return the request's path fragment relative to the application's base URL.
+     * This value always starts with a slash "/".
      *
      * @return string - path fragment: slash + module prefix + path (without query string)
      *
@@ -1053,7 +1053,7 @@ class Request extends CObject {
 
 
     /**
-     * Return the MiniStruts {@link ActionMapping} responsible for processing the current request.
+     * Return the {@link ActionMapping} responsible for processing the current request.
      *
      * @return ?ActionMapping - instance or NULL if the request doesn't match any of the configured mappings
      */
@@ -1063,7 +1063,7 @@ class Request extends CObject {
 
 
     /**
-     * Return the MiniStruts {@link Module} the current request is assigned to.
+     * Return the {@link Module} the current request is assigned to.
      *
      * @return ?Module - instance or NULL if the request doesn't match any of the configured modules
      */
@@ -1117,8 +1117,10 @@ class Request extends CObject {
             }
             Assert::string($string);
         }                                                                       // Ensure __toString() doesn't throw an exception as otherwise
-        catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }  // PHP < 7.4 will trigger a non-catchable fatal error.
-        return $string;                                                         // @see  https://bugs.php.net/bug.php?id=53648
+        catch (\Throwable $ex) {                                                // PHP <7.4 will trigger a non-catchable fatal error.
+            ErrorHandler::handleToStringException($ex);                         // @see  https://bugs.php.net/bug.php?id=53648
+        }
+        return $string;
     }
 
 

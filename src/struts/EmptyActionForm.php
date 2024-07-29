@@ -9,14 +9,13 @@ namespace rosasurfer\ministruts\struts;
  *
  * An empty default implementation automatically instantiated and assigned to an {@link ActionMapping} if no custom
  * {@link ActionForm} is configured. Ensures that view helpers can always resolve an actual {@link ActionForm} instance,
- * and don't have to deal with potential NULL pointer exceptions. Property getter {@link ActionForm::get()} and property
- * array access return NULL for all properties.
+ * and don't have to deal with potential NULL values. Property getters and array access of properties return NULL for all properties.
  */
 final class EmptyActionForm extends ActionForm {
 
 
     /**
-     * This implementation does nothing.
+     * This implementation intentionally does nothing.
      */
     protected function populate() {
     }

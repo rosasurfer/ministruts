@@ -27,7 +27,7 @@ class ActionForward extends CObject {
     const VALIDATION_SUCCESS_KEY = 'success';
 
     /** @var string - default identifier for looking up a forward after a failed form validation */
-    const VALIDATION_ERROR_KEY   = 'error';
+    const VALIDATION_ERROR_KEY = 'error';
 
 
     /** @var string */
@@ -44,20 +44,21 @@ class ActionForward extends CObject {
 
 
     /**
-     * Create a new instance with the specified properties.
+     * Constructor
      *
      * @param  string $name                    - logical forward name
      * @param  string $resource                - resource path
      * @param  bool   $redirect     [optional] - whether $resource is a redirect (default: no)
-     * @param  int    $redirectType [optional] - redirect type (default: SC_MOVED_TEMPORARILY (302))
+     * @param  int    $redirectType [optional] - redirect type (default: 302=SC_MOVED_TEMPORARILY)
      */
     public function __construct($name, $resource, $redirect=false, $redirectType=HttpResponse::SC_MOVED_TEMPORARILY) {
         $this->setName($name)
              ->setPath($resource)
              ->setRedirect($redirect);
 
-        if ($redirect)
+        if ($redirect) {
             $this->setRedirectType($redirectType);
+        }
     }
 
 
@@ -72,7 +73,7 @@ class ActionForward extends CObject {
 
 
     /**
-     * Set the forward's name.
+     * Set the forward's logical name.
      *
      * @param  string $name
      *
@@ -124,7 +125,7 @@ class ActionForward extends CObject {
 
 
     /**
-     * Set the forward's redirect status.
+     * Set the forward's redirect flag.
      *
      * @param  bool $status
      *
@@ -178,7 +179,7 @@ class ActionForward extends CObject {
         $value = (string) $value;
 
         // TODO: extend to process multiple parameters at once
-        $path      = $this->getPath();
+        $path = $this->getPath();
         $separator = (strpos($path, '?')!==false) ? '&' : '?';
         $this->setPath($path.$separator.$key.'='.str_replace([' ','#','&'], ['%20','%23','%26'], $value));
 

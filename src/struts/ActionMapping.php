@@ -150,7 +150,7 @@ class ActionMapping extends CObject {
 
 
     /**
-     * Set the HTTP methods the mapping will be able to handle.
+     * Set the HTTP methods the mapping will be allowed to handle.
      *
      * @param  string $method - HTTP method verb
      *

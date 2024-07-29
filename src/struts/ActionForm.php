@@ -11,7 +11,7 @@ use rosasurfer\ministruts\core\exception\IllegalAccessException;
 /**
  * ActionForm
  *
- * An {@link ActionForm} encapsulates and represents interpreted user input. It provides an interface for {@link Action}s
+ * An ActionForm encapsulates and represents interpreted user input. It provides an interface for {@link Action}s
  * and business layer to access and validate this input. Use {@link ActionInput} to access the raw input parameters.
  */
 abstract class ActionForm extends CObject implements \ArrayAccess {
@@ -39,7 +39,7 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
     /**
      * Constructor
      *
-     * Create a new form instance with data from the passed {@link Request}.
+     * Create a new instance with data from the passed {@link Request}.
      *
      * @param  Request $request
      */
@@ -61,7 +61,7 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
     /**
      * Read a submitted {@link DispatchAction} key.
      *
-     * MiniStruts expects the action key nested in an array named "submit". Write your HTML as follows:
+     * The framework expects the action key nested in an array named "submit". Write your HTML as follows:
      *
      * @example
      * <pre>
@@ -69,42 +69,42 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
      * </pre>
      */
     protected function initActionKey() {
-        /**
-         * PHP breaks transmitted parameters by silently converting dots "." and spaces " " in names to underscores. This
-         * especially breaks submit image elements, as the HTML standard appends the clicked image coordinates to the submit
-         * parameter.
-         *
-         * HTML example:
-         *   <form action="/url">
-         *      <input type="text" name="foo.bar" value="baz">
-         *      <img type="submit" name="action" src="image.png">
-         *   </form>
-         *
-         * Parameters sent by the browser:
-         *   GET /url?foo.bar=baz&action.x=123&action.y=456 HTTP/1.0
-         *
-         * Parameters after PHP input processing:
-         *   $_GET = array(
-         *       [foo_bar]  => baz                              // broken name
-         *       [action_x] => 123                              // broken name
-         *       [action_y] => 456                              // broken name
-         *   )
-         *
-         * - Workaround for image submit elements (<img type="submit"...):
-         *   Note the element's name attribute as follows: <img type="submit" name="submit[action]" ...>
-         *   The browser will send "?submit[action].x=123&submit[action].y=456". PHP will treat the parameter as an array
-         *   and discard the image coordinates, and the submit parameter name will stay unmodified.
-         *
-         * - Workaround for other parameters with dots or spaces:
-         *   Wrap the name in an array:
-         *   $_REQUEST = array(
-         *       [action_x]            => value                 // <img type="submit" name="action"...  => broken by PHP
-         *       [application_name]    => value                 // regular custom parameter             => broken by PHP
-         *       [top_level_with_dots] => Array (               // custom top-level parameter           => broken by PHP
-         *           [nested.level.with.dots] => value          // custom parameters wrapped in array   => not broken by PHP
-         *       )
-         *   )
-         */
+        //
+        // PHP breaks transmitted parameters by silently converting dots "." and spaces " " in parameter names to underscores.
+        // This especially breaks submit image elements, as the HTML standard appends the clicked image coordinates to the submit
+        // parameter.
+        //
+        // HTML example:
+        //   <form action="/url">
+        //      <input type="text" name="foo.bar" value="baz">
+        //      <img type="submit" name="action" src="image.png">
+        //   </form>
+        //
+        // Parameters sent by the browser:
+        //   GET /url?foo.bar=baz&action.x=123&action.y=456 HTTP/1.0
+        //
+        // Parameters after PHP input processing:
+        //   $_GET = array(
+        //       [foo_bar]  => baz                              // broken parameter name
+        //       [action_x] => 123                              // broken parameter name
+        //       [action_y] => 456                              // broken parameter name
+        //   )
+        //
+        // - Workaround for image submit elements (<img type="submit"...):
+        //   Specify the element's "name" attribute as follows: <img type="submit" name="submit[action]" ...>
+        //   The browser will send "?submit[action].x=123&submit[action].y=456". PHP will treat the parameter as an array
+        //   and discard the image coordinates, and the submit parameter name will stay unmodified.
+        //
+        // - Workaround for other parameters with dots or spaces:
+        //   Wrap the name in an array:
+        //   $_REQUEST = array(
+        //       [action_x]            => value                 // <img type="submit" name="action"...  => broken by PHP
+        //       [application_name]    => value                 // regular custom parameter             => broken by PHP
+        //       [top_level_with_dots] => Array (               // custom top-level parameter           => broken by PHP
+        //           [nested.level.with.dots] => value          // custom parameters wrapped in array   => not broken by PHP
+        //       )
+        //   )
+        //
         $params = $this->request->input()->all();
         if (isset($params['submit']['action'])) {
             $key = $params['submit']['action'];
@@ -136,7 +136,7 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
 
 
     /**
-     * Validate the form parameters syntactically.
+     * Validate passed form parameters syntactically.
      *
      * @return bool - whether the submitted parameters are valid
      */
@@ -144,13 +144,13 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
 
 
     /**
-     * Return the property with the specified name. If a getter for the property exists the getter is called. Otherwise
-     * the property is returned.
+     * Return the form property with the specified name. If a getter for the property exists the getter is called.
+     * Otherwise the property is returned.
      *
      * @param  string $name               - property name
-     * @param  mixed  $default [optional] - default value to return if the specified property was not found (default: none)
+     * @param  mixed  $default [optional] - default value to return if the specified property was not found (default: NULL)
      *
-     * @return mixed
+     * @return ?mixed
      */
     public function get($name, $default = null) {
         Assert::string($name);
@@ -190,8 +190,8 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
 
 
     /**
-     * Return the property with the specified name. If a getter for the property exists the getter is called. Otherwise
-     * the property is returned.
+     * Return the property with the specified name. If a getter for the property exists the getter is called.
+     * Otherwise the property is returned.
      *
      * @param  string $name
      *
@@ -203,12 +203,12 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
 
 
     /**
-     * Setting/modifying form properties is not allowed.
+     * Prevent modification of form properties.
      *
      * @param  string $name
      * @param  mixed  $value
      *
-     * $throws IllegalAccessException
+     * @throws IllegalAccessException
      */
     final public function offsetSet($name, $value) {
         throw new IllegalAccessException('Cannot set/modify ActionForm properties');
@@ -220,7 +220,7 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
      *
      * @param  string $name
      *
-     * $throws IllegalAccessException
+     * @throws IllegalAccessException
      */
     final public function offsetUnset($name) {
         throw new IllegalAccessException('Cannot set/modify ActionForm properties');

@@ -25,10 +25,9 @@ use const rosasurfer\ministruts\WINDOWS;
 /**
  * FrontController
  *
- * To avoid repeated parsing of the Struts XML configuration the FrontController instance is cached and re-used across
- * multiple HTTP requests (until cache invalidation). This means the instance is constantly serialized and unserialized.
- * Therefore the class implementation has to be "request safe" (similar to "thread safety" in other languages) and must
- * not hold variable runtime status.
+ * Represents the instantiated Struts XML configuration of the application. Cached and re-used across multiple HTTP requests.
+ * The implementation must be "request safe" (multiple requests use the same deserialized state), meaning it must not hold
+ * variable runtime status.
  */
 class FrontController extends Singleton {
 
@@ -50,8 +49,8 @@ class FrontController extends Singleton {
         // cache hit?
         $controller = $cache->get(static::class);
         if (!$controller) {
-            // synchronize parsing of the struts-config.xml                 // TODO: Don't lock on the config file because it can block
-            // $lock = new FileLock($configFile);                           //       concurrent reads, see Todo-File at locking.
+            // synchronize parsing of the struts-config.xml                 // TODO: Don't lock on the config file as it may block
+            // $lock = new FileLock($configFile);                           //       concurrent reads (@see Todo file)
             //                                                              //
             // $controller = $cache->get($class);                           // re-check after the lock is aquired
 
@@ -61,14 +60,11 @@ class FrontController extends Singleton {
                 $config = self::di('config');
                 if (!$config) throw new RuntimeException('Application configuration not found');
 
-                $configDir  = $config['app.dir.config'];
+                $configDir = $config['app.dir.config'];
                 $configFile = str_replace('\\', '/', $configDir.'/struts-config.xml');
-                $dependency = FileDependency::create([$configFile]);
-                if (!WINDOWS && !LOCALHOST) {                               // distinction dev/production?  TODO: non-sense
-                    $dependency->setMinValidity(1 * MINUTE);
-                }
 
                 // ...and cache it with a FileDependency
+                $dependency = FileDependency::create([$configFile]);
                 $cache->set(static::class, $controller, Cache::EXPIRES_NEVER, $dependency);
             }
 
@@ -115,10 +111,10 @@ class FrontController extends Singleton {
                 $this->modules[$prefix] = $module;
             }
         }
-        catch (IRosasurferException $ex) {}
-        catch (\Throwable           $ex) { $ex = new StrutsConfigException($ex->getMessage(), $ex->getCode(), $ex); }
-
-        if ($ex) throw $ex->appendMessage('Error instantiating Struts module from file "'.$file.'"');
+        catch (\Throwable $ex) {
+            if (!$ex instanceof IRosasurferException) $ex = new StrutsConfigException($ex->getMessage(), $ex->getCode(), $ex);
+            throw $ex->appendMessage('Error instantiating Struts module from file "'.$file.'"');
+        }
     }
 
 

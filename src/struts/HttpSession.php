@@ -5,7 +5,7 @@ namespace rosasurfer\ministruts\struts;
 
 use rosasurfer\ministruts\core\Singleton;
 use rosasurfer\ministruts\core\assert\Assert;
-use rosasurfer\ministruts\core\di\proxy\Request as RequestProxy;
+use rosasurfer\ministruts\core\di\proxy\Request as Request;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 use rosasurfer\ministruts\util\PHP;
 
@@ -52,7 +52,7 @@ class HttpSession extends Singleton {
         // limit session cookie to application path to support multiple projects per domain
         $params = session_get_cookie_params();
         session_set_cookie_params($params['lifetime'],
-                                  RequestProxy::getApplicationBaseUri(),
+                                  Request::getApplicationBaseUri(),
                                   $params['domain'  ],
                                   $params['secure'  ],
                                   $params['httponly']);
@@ -62,7 +62,7 @@ class HttpSession extends Singleton {
         try {
             session_start();                            // intentionally trigger an error if the session has already been started
         }
-        catch (\Throwable $ex) {// @phpstan-ignore-line // TODO: Is this check still needed?
+        catch (\Throwable $ex) {                        // @phpstan-ignore-line // TODO: Is this check still needed?
             if (!preg_match('/The session id contains illegal characters/i', $ex->getMessage())) throw $ex;
             session_regenerate_id();
         }
@@ -88,7 +88,7 @@ class HttpSession extends Singleton {
         if ($regenerateId) {
             session_regenerate_id(true);                                            // generate new id and delete the old file
         }
-        $request = RequestProxy::instance();
+        $request = Request::instance();
 
         $_SESSION = [];                                                             // empty the session
         $_SESSION['__SESSION_CREATED__'  ] = microtime(true);                       // initialize the session markers

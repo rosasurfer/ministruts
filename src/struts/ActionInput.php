@@ -10,8 +10,8 @@ use rosasurfer\ministruts\core\exception\IllegalAccessException;
 /**
  * ActionInput
  *
- * An object providing access to the current HTTP request's raw user input parameters. Use the {@link ActionForm} to access
- * the request's validated and interpreted input parameters.
+ * An object providing access to the current HTTP request's raw user input.
+ * Use {@link ActionForm} to access the request's validated and interpreted input.
  */
 class ActionInput extends CObject implements \ArrayAccess {
 
@@ -47,8 +47,7 @@ class ActionInput extends CObject implements \ArrayAccess {
      * array of raw input parameters.
      *
      * @param  string $name               - parameter name
-     * @param  string $default [optional] - value to return if the specified parameter was not transmitted
-     *                                      (default: none)
+     * @param  string $default [optional] - value to return if the specified parameter was not transmitted (default: none)
      * @return ?string
      */
     public function get($name, $default = null) {
@@ -90,8 +89,9 @@ class ActionInput extends CObject implements \ArrayAccess {
      * @return bool
      */
     public function has($name) {
-        if (\key_exists($name, $this->parameters))
+        if (\key_exists($name, $this->parameters)) {
             return !is_array($this->parameters[$name]);
+        }
         return false;
     }
 
@@ -105,8 +105,9 @@ class ActionInput extends CObject implements \ArrayAccess {
      * @return bool
      */
     public function hasArray($name) {
-        if (\key_exists($name, $this->parameters))
+        if (\key_exists($name, $this->parameters)) {
             return is_array($this->parameters[$name]);
+        }
         return false;
     }
 
@@ -131,33 +132,34 @@ class ActionInput extends CObject implements \ArrayAccess {
      * @return string|array|null - parameter or NULL if no such input parameter exists
      */
     public function offsetGet($name) {
-        if (\key_exists($name, $this->parameters))
+        if (\key_exists($name, $this->parameters)) {
             return $this->parameters[$name];
+        }
         return null;
     }
 
 
     /**
-     * Setting/modifying input parameters is not allowed.
+     * Prevent modification of input parameters.
      *
      * @param  string $name
      * @param  mixed  $value
      *
-     * $throws IllegalAccessException
+     * @throws IllegalAccessException
      */
     final public function offsetSet($name, $value) {
-        throw new IllegalAccessException('Cannot set/modify ActionInput parameters');
+        throw new IllegalAccessException('Cannot modify ActionInput parameters');
     }
 
 
     /**
-     * Unsetting input parameters is not allowed.
+     * Prevent modification of input parameters.
      *
      * @param  string $name
      *
-     * $throws IllegalAccessException
+     * @throws IllegalAccessException
      */
     final public function offsetUnset($name) {
-        throw new IllegalAccessException('Cannot set/modify ActionInput parameters');
+        throw new IllegalAccessException('Cannot modify ActionInput parameters');
     }
 }

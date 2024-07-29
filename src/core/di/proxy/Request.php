@@ -7,7 +7,7 @@ namespace rosasurfer\ministruts\core\di\proxy;
 /**
  * Request
  *
- * A {@link Proxy} for the "request" {@link \rosasurfer\ministruts\core\di\service\Service} currently registered in the service container.
+ * A {@link Proxy} for the "request" implementation currently registered in the service container.
  *
  * Default implementation: {@link \rosasurfer\ministruts\struts\Request}
  *
