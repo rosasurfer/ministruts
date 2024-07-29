@@ -1486,7 +1486,7 @@ function is_trait($name) {
  *
  * Complement for PHP's <tt>is_array()</tt> function adding support for {@link \ArrayAccess} parameters.
  *
- * @param  ?mixed $var
+ * @param  mixed $var
  *
  * @return bool
  */
