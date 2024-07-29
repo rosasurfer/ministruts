@@ -40,18 +40,18 @@ class Page extends Singleton {
     /**
      * Lookup and return a stored variable.
      *
-     * @param  string $name                - variable name
-     * @param  mixed  $altValue [optional] - value to return if no such variable exists (default: NULL)
+     * @param  string $name               - variable name
+     * @param  mixed  $default [optional] - value to return if no such variable exists (default: NULL)
      *
      * @return mixed - value
      */
-    public static function get($name, $altValue = null) {
+    public static function get($name, $default = null) {
         $page = self::me();
 
         if (\key_exists($name, $page->properties))
             return $page->properties[$name];
 
-        return $altValue;
+        return $default;
     }
 
 

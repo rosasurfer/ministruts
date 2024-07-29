@@ -36,7 +36,7 @@ final class Cache extends StaticClass {
      * Return the {@link Cache} implementation for the specified identifier. Multiple identifiers may represent different
      * cache implementations, e.g. APC cache, filesystem cache, MemCache...
      *
-     * @param  string $label [optional] - identifier
+     * @param  ?string $label [optional] - identifier
      *
      * @return CachePeer
      */

@@ -152,7 +152,7 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
      * @param  string $name               - property name
      * @param  mixed  $default [optional] - default value to return if the specified property was not found (default: NULL)
      *
-     * @return ?mixed
+     * @return mixed
      */
     public function get($name, $default = null) {
         Assert::string($name);

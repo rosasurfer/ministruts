@@ -30,7 +30,7 @@ class HttpRequest extends CObject {
      *
      * Create a new HttpRequest.
      *
-     * @param  string $url [optional] - URL (default: none)
+     * @param  ?string $url [optional] - URL (default: none)
      */
     public function __construct($url = null) {
         if (isset($url)) {
@@ -180,15 +180,17 @@ class HttpRequest extends CObject {
      *
      * @return string[] - array of name-value pairs or an empty array if no such headers were found
      */
-    public function getHeaders($names = null) {
-        if     (!isset($names))    $names = [];
-        elseif (is_string($names)) $names = [$names];
-        elseif (is_array($names)) {
+    public function getHeaders($names = []) {
+        if (is_string($names)) $names = [$names];
+
+        if (is_array($names)) {
             foreach ($names as $i => $name) {
                 Assert::string($name, '$names['.$i.']');
             }
         }
-        else throw new InvalidTypeException('Illegal type of parameter $names: '.gettype($names));
+        else {
+            throw new InvalidTypeException('Illegal type of parameter $names: '.gettype($names));
+        }
 
         // without a name return all headers
         if (!$names) {

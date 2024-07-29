@@ -29,8 +29,8 @@ use rosasurfer\ministruts\core\CObject;
 abstract class CachePeer extends CObject {
 
 
-    /** @var string */
-    protected $label;
+    /** @var ?string */
+    protected $label = null;
 
     /** @var string */
     protected $namespace;
@@ -90,14 +90,14 @@ abstract class CachePeer extends CObject {
      * Store a value under the specified key in the cache and overwrite an existing value. The stored value is automatically invalidated
      * after expiration of the specified time interval or on status change of the specified {@link \rosasurfer\ministruts\cache\monitor\Dependency}.
      *
-     * @param  string     $key                   - key
-     * @param  mixed      $value                 - value
-     * @param  int        $expires    [optional] - time interval in seconds for automatic invalidation (default: never)
-     * @param  Dependency $dependency [optional] - dependency object monitoring validity of the value (default: none)
+     * @param  string      $key                   - key
+     * @param  mixed       $value                 - value
+     * @param  int         $expires    [optional] - time interval in seconds for automatic invalidation (default: never)
+     * @param  ?Dependency $dependency [optional] - dependency object monitoring validity of the value (default: none)
      *
      * @return bool - success status
      */
-    abstract public function set($key, &$value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null);
+    abstract public function set($key, $value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null);
 
 
     /**
@@ -105,14 +105,14 @@ abstract class CachePeer extends CObject {
      * automatically invalidated after expiration of the specified time interval or on status change of the specified
      * {@link \rosasurfer\ministruts\cache\monitor\Dependency}.
      *
-     * @param  string     $key                   - key
-     * @param  mixed      $value                 - value
-     * @param  int        $expires    [optional] - time interval in seconds for automatic invalidation (default: never)
-     * @param  Dependency $dependency [optional] - dependency object monitoring validity of the value (default: none)
+     * @param  string      $key                   - key
+     * @param  mixed       $value                 - value
+     * @param  int         $expires    [optional] - time interval in seconds for automatic invalidation (default: never)
+     * @param  ?Dependency $dependency [optional] - dependency object monitoring validity of the value (default: none)
      *
      * @return bool - success status
      */
-    final public function add($key, &$value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null) {
+    final public function add($key, $value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null) {
         if ($this->isCached($key))
             return false;
         return $this->set($key, $value, $expires, $dependency);
@@ -124,14 +124,14 @@ abstract class CachePeer extends CObject {
      * value. The stored value is automatically invalidated after expiration of the specified time interval or on status
      * change of the specified {@link \rosasurfer\ministruts\cache\monitor\Dependency}.
      *
-     * @param  string     $key                   - key
-     * @param  mixed      $value                 - value
-     * @param  int        $expires    [optional] - time interval in seconds for automatic invalidation (default: never)
-     * @param  Dependency $dependency [optional] - dependency object monitoring validity of the value (default: none)
+     * @param  string      $key                   - key
+     * @param  mixed       $value                 - value
+     * @param  int         $expires    [optional] - time interval in seconds for automatic invalidation (default: never)
+     * @param  ?Dependency $dependency [optional] - dependency object monitoring validity of the value (default: none)
      *
      * @return bool - success status
      */
-    final public function replace($key, &$value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null) {
+    final public function replace($key, $value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null) {
         if (!$this->isCached($key))
             return false;
         return $this->set($key, $value, $expires, $dependency);

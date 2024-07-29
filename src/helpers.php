@@ -111,7 +111,7 @@ define('PHP_INI_ALL',    INI_ALL   );       // 7    flag            // entry can
  * Complement of PHP's <tt>array_filter()</tt> function adding support for {@link \Traversable} parameters.
  *
  * @param  array|\Traversable $input
- * @param  callable           $callback [optional]
+ * @param  ?callable          $callback [optional]
  * @param  int                $flags    [optional]
  *
  * @return array
@@ -627,10 +627,10 @@ function ini_get_bytes($option, $strict = true) {
  *
  * Inline replacement and shortcut for htmlspecialchars() using different default flags.
  *
- * @param  string $string
- * @param  int    $flags        [optional] - default: ENT_QUOTES|ENT_SUBSTITUTE|ENT_HTML5
- * @param  string $encoding     [optional] - default: 'UTF-8'
- * @param  bool   $doubleEncode [optional] - default: TRUE
+ * @param  string  $string
+ * @param  ?int    $flags        [optional] - default: ENT_QUOTES|ENT_SUBSTITUTE|ENT_HTML5
+ * @param  ?string $encoding     [optional] - default: 'UTF-8'
+ * @param  bool    $doubleEncode [optional] - default: TRUE
  *
  * @return string - converted string
  *
@@ -1533,7 +1533,7 @@ function is_trait($name) {
  *
  * Complement for PHP's <tt>is_array()</tt> function adding support for {@link \ArrayAccess} parameters.
  *
- * @param  ?mixed $var
+ * @param  mixed $var
  *
  * @return bool
  */
@@ -1725,7 +1725,7 @@ function pluralize($count, $singular='', $plural='s') {
  * Execute a task in a synchronized way. Emulates the Java keyword "synchronized".
  *
  * @param  \Closure $task             - task to execute (an anonymous function is implicitly casted)
- * @param  string   $mutex [optional] - mutex identifier (default: the calling line of code)
+ * @param  ?string  $mutex [optional] - mutex identifier (default: the calling line of code)
  *
  * @return void
  */

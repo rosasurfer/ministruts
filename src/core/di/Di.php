@@ -46,7 +46,7 @@ class Di extends CObject implements DiInterface {
     /**
      * Create a new instance and optionally load service definitions.
      *
-     * @param  string $configDir [optional] - directory to load service definitions from (default: no loading)
+     * @param  ?string $configDir [optional] - directory to load service definitions from (default: no loading)
      */
     public function __construct($configDir = null) {
         if (isset($configDir)) {
@@ -140,13 +140,11 @@ class Di extends CObject implements DiInterface {
      *
      * @return string|object - the same definition
      */
-    public function set($name, $definition, array $aliases=null) {
+    public function set($name, $definition, array $aliases = []) {
         $service = new Service($name, $definition);
 
-        if (isset($aliases)) {
-            foreach ($aliases as $alias) {
-                $service->addAlias($alias);
-            }
+        foreach ($aliases as $alias) {
+            $service->addAlias($alias);
         }
         $this->addService($service);
         return $definition;

@@ -17,7 +17,7 @@ trait DiAwareTrait {
      * Resolve a named service and return its implementation using the service locator pattern, or return the dependency injection
      * container of the {@link \rosasurfer\ministruts\Application}.
      *
-     * @param  string $name [optional] - service identifier (default: none to return the DI container)
+     * @param  ?string $name [optional] - service identifier (default: none to return the DI container)
      *
      * @return DiInterface|object|null
      */

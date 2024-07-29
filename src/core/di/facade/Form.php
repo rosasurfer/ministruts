@@ -41,9 +41,8 @@ class Form extends Facade {
      * Return the {@link \rosasurfer\ministruts\struts\ActionForm} instance assigned to the current HTTP request. Use the optional
      * parameter $type to distinguish between multiple {@link \rosasurfer\ministruts\struts\ActionForm}s in the same page.
      *
-     * @param  string $type [optional] - ensure the returned instance matches the specified class name, or return an
-     *                                   EmptyActionForm if this is not the case
-     *                                   (default: no type restriction)
+     * @param  ?string $type [optional] - ensure the returned instance matches the specified class name, or return an
+     *                                    EmptyActionForm if this is not the case (default: no type restriction)
      * @return ActionForm
      */
     public static function current($type = null) {
@@ -60,9 +59,8 @@ class Form extends Facade {
      * to the previous HTTP request. Otherwise return an {@link \rosasurfer\ministruts\struts\EmptyActionForm}. Use the optional parameter $type
      * to distinguish between multiple different {@link \\rosasurfer\ministruts\struts\ActionForm}s in the same page.
      *
-     * @param  string $type [optional] - ensure the returned instance matches the specified class name, or return an
-     *                                   EmptyActionForm if this is not the case
-     *                                   (default: no type restriction)
+     * @param  ?string $type [optional] - ensure the returned instance matches the specified class name, or return an
+     *                                    EmptyActionForm if this is not the case (default: no type restriction)
      * @return ActionForm
      */
     public static function old($type = null) {

@@ -16,12 +16,12 @@ class SingleMatch extends CObject {
     /** @var int */
     public $pos;
 
-    /** @var Pattern */
-    public $pattern;
+    /** @var ?Pattern */
+    public $pattern = null;
 
 
     /**
-     * @param  ?int    $pos
+     * @param  int     $pos
      * @param  Pattern $pattern [optional]
      */
     public function __construct($pos, Pattern $pattern = null) {

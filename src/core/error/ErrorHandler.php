@@ -144,7 +144,7 @@ class ErrorHandler extends StaticClass {
      *
      * @throws PHPError
      */
-    public static function handleError($level, $message, $file, $line, array $symbols = null) {
+    public static function handleError($level, $message, $file, $line, array $symbols = []) {
         //echof('ErrorHandler::handleError()  '.self::errorLevelToStr($level).': '.$message.', in '.$file.', line '.$line);
         if (!self::$errorHandlingMode) return false;
 

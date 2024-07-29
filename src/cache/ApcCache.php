@@ -18,8 +18,8 @@ class ApcCache extends CachePeer {
     /**
      * Constructor.
      *
-     * @param  string $label   [optional] - cache identifier (namespace, default: none)
-     * @param  array  $options [optional] - additional instantiation options (default: none)
+     * @param  ?string $label   [optional] - cache identifier (namespace, default: none)
+     * @param  array   $options [optional] - additional instantiation options (default: none)
      */
     public function __construct($label=null, array $options=[]) {
         $this->label     = $label;
@@ -108,7 +108,7 @@ class ApcCache extends CachePeer {
     /**
      *
      */
-    public function set($key, &$value, $expires=Cache::EXPIRES_NEVER, Dependency $dependency=null) {
+    public function set($key, $value, $expires=Cache::EXPIRES_NEVER, Dependency $dependency=null) {
         Assert::string($key,  '$key');
         Assert::int($expires, '$expires');
 

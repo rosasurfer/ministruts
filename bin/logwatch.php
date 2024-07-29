@@ -156,7 +156,7 @@ function processEntry($entry) {
 /**
  * Show the call syntax.
  *
- * @param  string $message [optional] - additional message to display (default: none)
+ * @param  ?string $message [optional] - additional message to display (default: none)
  *
  * @return void
  */

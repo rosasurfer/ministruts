@@ -249,8 +249,8 @@ abstract class PersistableObject extends CObject {
     /**
      * Return the value of a mapped column.
      *
-     * @param  string $column          - column name
-     * @param  string $type [optional] - column type (default: type as configured in the entity mapping)
+     * @param  string  $column          - column name
+     * @param  ?string $type [optional] - column type (default: type as configured in the entity mapping)
      *
      * @return mixed - column value
      */
@@ -259,9 +259,9 @@ abstract class PersistableObject extends CObject {
         $column  = strtolower($column);
         if (!isset($mapping['columns'][$column])) throw new RuntimeException('Not a mapped column "'.func_get_arg(0).'"');
 
-        $property      = &$mapping['columns'][$column];
-        $propertyName  =  $property['name'];
-        $propertyValue =  $this->$propertyName;             // the logical or physical column value
+        $property = &$mapping['columns'][$column];
+        $propertyName = $property['name'];
+        $propertyValue = $this->$propertyName;              // the logical or physical column value
 
         if ($propertyValue === null)
             return null;

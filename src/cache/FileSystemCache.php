@@ -148,7 +148,7 @@ final class FileSystemCache extends CachePeer {
     /**
      *
      */
-    public function set($key, &$value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null) {
+    public function set($key, $value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null) {
         Assert::string($key,  '$key');
         Assert::int($expires, '$expires');
 

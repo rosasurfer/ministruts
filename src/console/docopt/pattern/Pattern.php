@@ -20,7 +20,7 @@ abstract class Pattern extends CObject {
     protected $name;
 
     /** @var mixed */
-    public $value;
+    public $value = null;
 
     /** @var Pattern[] */
     public $children = [];
@@ -64,7 +64,7 @@ abstract class Pattern extends CObject {
     /**
      * Make pattern-tree tips point to same object if they are equal.
      *
-     * @param ?Pattern[] $unique [optional]
+     * @param Pattern[]|null $unique [optional]
      *
      * @return $this
      */

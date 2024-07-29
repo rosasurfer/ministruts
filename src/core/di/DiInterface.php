@@ -65,7 +65,7 @@ interface DiInterface extends \ArrayAccess, ContainerInterface {
      *
      * @return string|object - the same definition
      */
-    public function set($name, $definition, array $aliases=null);
+    public function set($name, $definition, array $aliases = []);
 
 
     /**

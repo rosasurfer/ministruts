@@ -34,9 +34,9 @@ class Inputs extends Facade {
      * If an array of parameters with that name has been transmitted it is ignored. Use {@link Inputs::getArray()} to access
      * an array of raw input parameters.
      *
-     * @param  string $name               - parameter name
-     * @param  string $default [optional] - value to return if the specified parameter was not transmitted
-     *                                      (default: none)
+     * @param  string  $name               - parameter name
+     * @param  ?string $default [optional] - value to return if the specified parameter was not transmitted (default: none)
+     *
      * @return ?string
      */
     public static function get($name, $default = null) {

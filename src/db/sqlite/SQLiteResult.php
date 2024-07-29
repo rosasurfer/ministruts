@@ -173,7 +173,7 @@ class SQLiteResult extends Result {
     /**
      * Return this result's internal SQLite3Result object.
      *
-     * @return \SQLite3Result - result handler or NULL for result-less queries
+     * @return ?\SQLite3Result - result handler or NULL for result-less queries
      */
     public function getInternalResult() {
         return $this->result;

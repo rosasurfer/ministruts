@@ -28,7 +28,7 @@ class FileSystem extends StaticClass {
      *                                          (default: 0775 = rwxrwxr x)                                                 <br>
      * @param  bool     $recursive [optional] - whether to automatically create specified sub-directories                   <br>
      *                                          (default: yes)                                                              <br>
-     * @param  resource $context   [optional]
+     * @param  ?resource $context  [optional]
      *
      * @return bool - success status
      */
@@ -58,9 +58,9 @@ class FileSystem extends StaticClass {
      * Copies a file. If the target directory does not exist try to create it. If the destination file already exists,
      * it will be overwritten.
      *
-     * @param  string   $source             - path to the source file
-     * @param  string   $destination        - destination file
-     * @param  resource $context [optional]
+     * @param  string    $source             - path to the source file
+     * @param  string    $destination        - destination file
+     * @param  ?resource $context [optional]
      *
      * @return bool - success status
      */

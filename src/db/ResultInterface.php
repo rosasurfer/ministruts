@@ -28,7 +28,7 @@ interface ResultInterface {
      * Fetch a single column from the result set.
      *
      * @param  string|int $column       [optional] - name or offset of the column to fetch from (default: 0)
-     * @param  int        $row          [optional] - row to fetch from, starting at 0 (default: the next row)
+     * @param  ?int       $row          [optional] - row to fetch from, starting at 0 (default: the next row)
      * @param  mixed      $onNull       [optional] - value to return if the cell value is NULL
      * @param  mixed      $onNoMoreRows [optional] - value to return if no more rows are available
      *
@@ -43,7 +43,7 @@ interface ResultInterface {
      * Fetch a single field from the result set as a string value.
      *
      * @param  string|int $column       [optional] - name or offset of the column to fetch from (default: 0)
-     * @param  int        $row          [optional] - row to fetch from, starting at 0 (default: the next row)
+     * @param  ?int       $row          [optional] - row to fetch from, starting at 0 (default: the next row)
      * @param  mixed      $onNull       [optional] - value to return if the cell value is NULL
      * @param  mixed      $onNoMoreRows [optional] - value to return if no more rows are available
      *
@@ -58,7 +58,7 @@ interface ResultInterface {
      * Fetch a single field from the result set as a boolean.
      *
      * @param  string|int $column       [optional] - name or offset of the column to fetch from (default: 0)
-     * @param  int        $row          [optional] - row to fetch from, starting at 0 (default: the next row)
+     * @param  ?int       $row          [optional] - row to fetch from, starting at 0 (default: the next row)
      * @param  mixed      $onNull       [optional] - value to return if the cell value is NULL
      * @param  mixed      $onNoMoreRows [optional] - value to return if no more rows are available
      *
@@ -76,7 +76,7 @@ interface ResultInterface {
      * Fetch a single field from the result set as an integer.
      *
      * @param  string|int $column       [optional] - name or offset of the column to fetch from (default: 0)
-     * @param  int        $row          [optional] - row to fetch from, starting at 0 (default: the next row)
+     * @param  ?int       $row          [optional] - row to fetch from, starting at 0 (default: the next row)
      * @param  mixed      $onNull       [optional] - value to return if the cell value is NULL
      * @param  mixed      $onNoMoreRows [optional] - value to return if no more rows are available
      *
@@ -94,7 +94,7 @@ interface ResultInterface {
      * Fetch a single field from the result set as a floating point value.
      *
      * @param  string|int $column       [optional] - name or offset of the column to fetch from (default: 0)
-     * @param  int        $row          [optional] - row to fetch from, starting at 0 (default: the next row)
+     * @param  ?int       $row          [optional] - row to fetch from, starting at 0 (default: the next row)
      * @param  mixed      $onNull       [optional] - value to return if the cell value is NULL
      * @param  mixed      $onNoMoreRows [optional] - value to return if no more rows are available
      *
@@ -155,7 +155,7 @@ interface ResultInterface {
     /**
      * Return the result's internal result object.
      *
-     * @return resource|object - result handle, handler or NULL for a result-less query
+     * @return resource|object|null - result handle, handler or NULL for a result-less query
      */
     public function getInternalResult();
 

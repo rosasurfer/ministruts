@@ -45,7 +45,7 @@ interface ConfigInterface extends \ArrayAccess, \Countable {
      *
      * @throws RuntimeException if the setting is not found and $default was not specified
      */
-    public function getBool($key, $options = null);
+    public function getBool($key, $options = []);
 
 
     /**
@@ -62,20 +62,20 @@ interface ConfigInterface extends \ArrayAccess, \Countable {
     /**
      * Return a plain text dump of the instance's preferences.
      *
-     * @param  array $options [optional] - array with dump options: <br>
-     *                                     'sort'     => SORT_ASC|SORT_DESC (default: unsorted) <br>
+     * @param  array $options [optional] - array with dump options:                               <br>
+     *                                     'sort'     => SORT_ASC|SORT_DESC (default: unsorted)   <br>
      *                                     'pad-left' => string             (default: no padding) <br>
      * @return string
      */
-    public function dump(array $options = null);
+    public function dump(array $options = []);
 
 
     /**
      * Return an array with "key-value" pairs of the config settings.
      *
-     * @param  array $options [optional] - array with export options: <br>
+     * @param  array $options [optional] - array with export options:                       <br>
      *                                     'sort' => SORT_ASC|SORT_DESC (default: unsorted) <br>
      * @return string[]
      */
-    public function export(array $options = null);
+    public function export(array $options = []);
 }

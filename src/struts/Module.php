@@ -765,7 +765,7 @@ class Module extends CObject {
      * instead of the forward's own name.
      *
      * @param  ActionForward $forward
-     * @param  string        $alias [optional] - alias name of the forward
+     * @param  ?string       $alias [optional] - alias name of the forward
      *
      * @return void
      *
@@ -815,8 +815,8 @@ class Module extends CObject {
     /**
      * Add a {@link Tile} to this module. If an alias is specified the tile is stored under both names (alias and tile name).
      *
-     * @param  Tile   $tile
-     * @param  string $alias [optional] - alias name of the tile
+     * @param  Tile    $tile
+     * @param  ?string $alias [optional] - alias name of the tile
      *
      * @return void
      */

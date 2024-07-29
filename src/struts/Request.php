@@ -653,15 +653,16 @@ class Request extends CObject {
      * @return string[] - associative array of header values
      */
     public function getHeaders($names = []) {
-        if (is_string($names)) {
-            $names = [$names];
-        }
-        elseif (is_array($names)) {
+        if (is_string($names)) $names = [$names];
+
+        if (is_array($names)) {
             foreach ($names as $i => $name) {
                 Assert::string($name, '$names['.$i.']');
             }
         }
-        else throw new InvalidTypeException('Invalid type of parameter $names: '.gettype($names));
+        else {
+            throw new InvalidTypeException('Invalid type of parameter $names: '.gettype($names));
+        }
 
         static $headers = null;
         static $fixHeaderNames = ['CDN'=>1, 'DNT'=>2, 'X-CDN'=>3];
@@ -808,10 +809,10 @@ class Request extends CObject {
     /**
      * Send a cookie.
      *
-     * @param  string $name               - cookie name
-     * @param  string $value              - cookie value
-     * @param  int    $expires [optional] - timestamp when the cookie expires (default: when the browser is closed)
-     * @param  string $path    [optional] - path the cookie will be available for (default: the application)
+     * @param  string  $name               - cookie name
+     * @param  string  $value              - cookie value
+     * @param  int     $expires [optional] - timestamp when the cookie expires (default: when the browser is closed)
+     * @param  ?string $path    [optional] - path the cookie will be available for (default: the application)
      *
      * @return $this
      */
@@ -855,7 +856,7 @@ class Request extends CObject {
     /**
      * Return the stored ActionMessage for the specified key, or the first ActionMessage if no key was given.
      *
-     * @param  string $key [optional]
+     * @param  ?string $key [optional]
      *
      * @return ?string - message
      */
@@ -889,7 +890,7 @@ class Request extends CObject {
     /**
      * Whether an ActionMessage exists for one of the specified keys, or for any key if no key was given.
      *
-     * @param  string|string[] $keys [optional] - message keys
+     * @param  string|string[]|null $keys [optional] - message keys
      *
      * @return bool
      */
@@ -964,7 +965,7 @@ class Request extends CObject {
     /**
      * Return the stored ActionError for the specified key, or the first ActionError if no key was given.
      *
-     * @param  string $key [optional]
+     * @param  ?string $key [optional]
      *
      * @return ?string - message
      */
@@ -996,7 +997,7 @@ class Request extends CObject {
     /**
      * Whether an ActionError exists for one of the specified keys, or for any key if no key was given.
      *
-     * @param  string|string[] $keys [optional] - error keys
+     * @param  string|string[]|null $keys [optional] - error keys
      *
      * @return bool
      */

@@ -24,8 +24,8 @@ final class ReferencePool extends CachePeer {
     /**
      * Constructor.
      *
-     * @param  string $label   [optional] - cache identifier (namespace, ignored for in-memory instances)
-     * @param  array  $options [optional] - additional instantiation options (default: none)
+     * @param  ?string $label   [optional] - cache identifier (namespace, ignored for in-memory instances)
+     * @param  array   $options [optional] - additional instantiation options (default: none)
      */
     public function __construct($label=null, array $options=[]) {
         $this->label   = $label;
@@ -86,8 +86,8 @@ final class ReferencePool extends CachePeer {
     /**
      *
      */
-    public function set($key, &$value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null) {
-        Assert::string($key,  '$key');
+    public function set($key, $value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null) {
+        Assert::string($key, '$key');
         Assert::int($expires, '$expires');
 
         // stored data: [created, value, expires, dependency]
