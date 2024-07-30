@@ -302,19 +302,19 @@ abstract class HttpResponse extends CObject {
     /**
      * Return all received headers.
      *
-     * @return string[] - associative array with headers
+     * @return array<string, string[]> - associative array of all received headers
      */
     abstract public function getHeaders();
 
 
     /**
-     * Return the received header with the specified name.
+     * Return the received header values with the specified name.
      *
      * @param  string $name - header name
      *
-     * @return string|string[]|null - single header value, array of multi-header values or NULL if no such header was received
+     * @return string[] - array of received header values, or an empty array if no such header was received
      */
-    abstract public function getHeader($name);
+    abstract public function getHeaderValues($name);
 
 
     /**

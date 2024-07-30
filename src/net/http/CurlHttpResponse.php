@@ -65,7 +65,7 @@ class CurlHttpResponse extends HttpResponse {
     /**
      * {@inheritdoc}
      *
-     * @return array - all received headers
+     * @return array<string, string[]> - associative array of all received headers
      */
     public function getHeaders() {
         return $this->headerParser->getHeaders();
@@ -77,10 +77,10 @@ class CurlHttpResponse extends HttpResponse {
      *
      * @param  string $name - header name
      *
-     * @return string|string[]|null - single header, array of multi-headers or NULL if no such header was received
+     * @return string[] - array of received header values; empty if no such header was received
      */
-    public function getHeader($name) {
-        return $this->headerParser->getHeader($name);
+    public function getHeaderValues($name) {
+        return $this->headerParser->getHeaderValues($name);
     }
 
 
@@ -100,12 +100,12 @@ class CurlHttpResponse extends HttpResponse {
      * Callback for CurlHttpClient, called with the received HTTP response headers (line by line).
      *
      * @param  resource $hCurl - curl handle of the processed HTTP request
-     * @param  string   $line  - a single full header line consisting of header name, colon and header value
+     * @param  string   $line  - a single line from the received header section
      *
-     * @return int - number of bytes read (the length of the received header line)
+     * @return int - number of bytes read (the length of the received line)
      */
     public function writeHeader($hCurl, $line) {
-        $this->headerParser->parseLine($line);
+        $this->headerParser->parseHeaderLine($line);
         return strlen($line);
     }
 

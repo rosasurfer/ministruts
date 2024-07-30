@@ -12,23 +12,23 @@ use rosasurfer\ministruts\core\CObject;
 class HeaderParser extends CObject {
 
 
-    /** @var string[] */
+    /** @var array<string, string[]> */
     protected $headers = [];
 
-    /** @var string */
-    protected $currentHeader;
+    /** @var ?string */
+    protected $lastName = null;
 
 
     /**
-     * Parse the passed header block.
+     * Parse the passed header section.
      *
      * @param  string $data - raw header data
      *
      * @return $this
      */
-    public function parseLines($data) {
+    public function parseHeaderSection($data) {
         foreach (explode("\n", $data) as $line) {
-            $this->parseLine($line);
+            $this->parseHeaderLine($line);
         }
         return $this;
     }
@@ -37,39 +37,27 @@ class HeaderParser extends CObject {
     /**
      * Parse a single header line.
      *
-     * @param  string $line - full header line consisting of headername, colon and header value
+     * @param  string $line - a single header from the header section
      *
      * @return $this
      */
-    public function parseLine($line) {
+    public function parseHeaderLine($line) {
         $line = trim($line, "\r\n");
 
         $matches = null;
-        if (preg_match('/^([\w-]+):\s+(.+)/', $line, $matches)) {
+        if (preg_match('/^([\w-]+):\s+(.+)/', $line, $matches)) {           // "header-name: header-value"
             $name = strtolower($matches[1]);
             $value = $matches[2];
-            $this->currentHeader = $name;
-
-            if (isset($this->headers[$name])) {
-                if (!is_array($this->headers[$name])) {
-                    $this->headers[$name] = [$this->headers[$name]];
-                }
-                $this->headers[$name][] = $value;
-            }
-            else {
-                $this->headers[$name] = $value;
+            $this->headers[$name][] = $value;
+            $this->lastName = $name;
+        }
+        else {
+            // an indented line marks the line-wrapped continuation of the previous header value
+            if (preg_match('/^\s+(.+)$/', $line, $matches) && $this->lastName !== null) {
+                $lastKey = sizeof($this->headers[$this->lastName]) - 1;
+                $this->headers[$this->lastName][$lastKey] .= $matches[1];   // remove line wrap and append to previous value
             }
         }
-        elseif (preg_match('/^\s+(.+)$/', $line, $matches) && $this->currentHeader !== null) {
-            if (is_array($this->headers[$this->currentHeader])) {
-                $lastKey = sizeof($this->headers[$this->currentHeader]) - 1;
-                $this->headers[$this->currentHeader][$lastKey] .= $matches[1];
-            }
-            else {
-                $this->headers[$this->currentHeader] .= $matches[1];
-            }
-        }
-
         return $this;
     }
 
@@ -77,7 +65,7 @@ class HeaderParser extends CObject {
     /**
      * Return all received headers.
      *
-     * @return array - associative array of headers
+     * @return array<string, string[]> - associative array of all received headers
      */
     public function getHeaders() {
         return $this->headers;
@@ -85,15 +73,15 @@ class HeaderParser extends CObject {
 
 
     /**
-     * Return the header with the specified name.
+     * Return the received header values with the specified name.
      *
      * @param  string $name - header name
      *
-     * @return string|string[]|null
+     * @return string[] - array of received header values, or an empty array if no such header was received
      */
-    public function getHeader($name) {
+    public function getHeaderValues($name) {
         $name = strtolower($name);
-        return $this->headers[$name] ?? null;
+        return $this->headers[$name] ?? [];
     }
 
 
