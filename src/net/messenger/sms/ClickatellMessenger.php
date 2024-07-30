@@ -20,7 +20,7 @@ class ClickatellMessenger extends Messenger {
     /**
      * {@inheritdoc}
      *
-     * @param  array $options
+     * @param  scalar[] $options
      */
     protected function __construct(array $options) {
         $this->options = $options;

@@ -52,9 +52,10 @@ abstract class LeafPattern extends Pattern {
      * @return array
      */
     public function match(array $left, array $collected = []) {
-        list ($pos, $match) = $this->singleMatch($left)->toArray();
-        if (!$match)
+        list($pos, $match) = $this->singleMatch($left)->toArray();
+        if (!$match) {
             return [false, $left, $collected];
+        }
 
         $left_ = $left;
         unset($left_[$pos]);

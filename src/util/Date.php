@@ -52,7 +52,7 @@ class Date extends StaticClass {
      * @param  string $startDate - start date (format: yyyy-mm-dd)
      * @param  int    $days      - number of dates to return
      *
-     * @return array
+     * @return string[]
      */
     public static function getDateRange($startDate, $days) {
         Assert::string($startDate, '$startDate');
@@ -61,7 +61,7 @@ class Date extends StaticClass {
         if ($days < 0)                            throw new InvalidValueException('Invalid parameter $days: '.$days);
 
         $range = [];
-        $date  = new DateTime($startDate);
+        $date = new DateTime($startDate);
 
         for ($i=0; $i < $days; ++$i) {
             $range[] = $date->format('Y-m-d');

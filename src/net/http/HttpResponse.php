@@ -302,7 +302,7 @@ abstract class HttpResponse extends CObject {
     /**
      * Return all received headers.
      *
-     * @return array - associative array with headers
+     * @return string[] - associative array with headers
      */
     abstract public function getHeaders();
 

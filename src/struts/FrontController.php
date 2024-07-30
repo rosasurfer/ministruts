@@ -121,7 +121,7 @@ class FrontController extends Singleton {
     /**
      * Process the current HTTP request and return the response wrapper.
      *
-     * @param  array $options [optional] - runtime options (default: none)
+     * @param  scalar[] $options [optional] - runtime options (default: none)
      *
      * @return Response - response wrapper
      */
@@ -189,8 +189,8 @@ FRONTCONTROLLER_PROCESS_REQUEST_ERROR_SC_404;
     /**
      * Get the {@link RequestProcessor} instance responsible for processing requests to the passed {@link Module}.
      *
-     * @param  Module $module
-     * @param  array  $options - processing runtime options
+     * @param  Module   $module
+     * @param  scalar[] $options - additional runtime options
      *
      * @return RequestProcessor
      */

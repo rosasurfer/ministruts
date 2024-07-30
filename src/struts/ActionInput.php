@@ -12,18 +12,20 @@ use rosasurfer\ministruts\core\exception\IllegalAccessException;
  *
  * An object providing access to the current HTTP request's raw user input.
  * Use {@link ActionForm} to access the request's validated and interpreted input.
+ *
+ * @implements \ArrayAccess<string, string|string[]>
  */
 class ActionInput extends CObject implements \ArrayAccess {
 
 
-    /** @var array */
+    /** @var array<string|string[]> */
     protected $parameters;
 
 
     /**
      * Constructor
      *
-     * @param  string[] $parameters
+     * @param  array<string|string[]> $parameters
      */
     public function __construct(array $parameters) {
         $this->parameters = $parameters;
@@ -33,7 +35,7 @@ class ActionInput extends CObject implements \ArrayAccess {
     /**
      * Return all raw input parameters.
      *
-     * @return array<string|mixed[]>
+     * @return array<string|string[]>
      */
     public function all() {
         return $this->parameters;
@@ -48,6 +50,7 @@ class ActionInput extends CObject implements \ArrayAccess {
      *
      * @param  string  $name               - parameter name
      * @param  ?string $default [optional] - value to return if the specified parameter was not transmitted (default: NULL)
+     *
      * @return ?string
      */
     public function get($name, $default = null) {
@@ -66,8 +69,8 @@ class ActionInput extends CObject implements \ArrayAccess {
      * Use {@link ActionInput::get()} to access a single raw input parameter.
      *
      * @param  string   $name               - parameter name
-     * @param  string[] $default [optional] - values to return if the specified parameter array was not transmitted
-     *                                        (default: empty array)
+     * @param  string[] $default [optional] - values to return if the specified parameter array was not transmitted (default: empty array)
+     *
      * @return string[]
      */
     public function getArray($name, array $default = []) {
@@ -129,7 +132,7 @@ class ActionInput extends CObject implements \ArrayAccess {
      *
      * @param  string $name
      *
-     * @return string|array|null - parameter or NULL if no such input parameter exists
+     * @return string|string[]|null - parameter or NULL if no such input parameter exists
      */
     public function offsetGet($name) {
         if (\key_exists($name, $this->parameters)) {

@@ -30,7 +30,7 @@ class Response extends Singleton {
     /** @var int - HTTP status code */
     protected $status = 0;
 
-    /** @var array - additional variables context */
+    /** @var mixed[] - additional variables context */
     protected $attributes = [];
 
 

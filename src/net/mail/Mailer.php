@@ -22,7 +22,7 @@ use function rosasurfer\ministruts\strStartsWithI;
  */
 abstract class Mailer extends CObject {
 
-    /** @var array */
+    /** @var scalar[] */
     protected $options;
 
     /** @var string */
@@ -32,7 +32,7 @@ abstract class Mailer extends CObject {
     /**
      * Constructor
      *
-     * @param  array $options [optional] - mailer options (default: none)
+     * @param  scalar[] $options [optional] - mailer options (default: none)
      */
     public function __construct(array $options = []) {
         $this->options = $options;
@@ -50,14 +50,15 @@ abstract class Mailer extends CObject {
     /**
      * Create and return a new instance.
      *
-     * @param  array $options [optional] - mailer options
+     * @param  scalar[] $options [optional] - mailer options
      *
      * @return Mailer
      */
     public static function create(array $options = []) {
         $class = PHPMailer::class;                          // default mailer
-        if (!empty($options['class']))
+        if (!empty($options['class'])) {
             $class = $options['class'];
+        }
         return new $class($options);
     }
 
@@ -144,7 +145,7 @@ abstract class Mailer extends CObject {
 
 
     /**
-     * Search for a given header and return its value. If the array contains multiple headers of that the last such
+     * Search for a given header and return its value. If the array contains multiple headers of that name the last such
      * header is returned.
      *
      * @param  string[] $headers - array of headers

@@ -50,7 +50,7 @@ class Tile extends CObject {
     /** @var array<string, ?Tile> - nested Tiles */
     protected $nestedTiles = [];
 
-    /** @var array - additional Tile properties */
+    /** @var mixed[] - additional Tile properties */
     protected $properties = [];
 
     /** @var ?Tile - parent instance containing this Tile or NULL if this Tile is the outermost fragment of the generated view */
@@ -202,7 +202,7 @@ class Tile extends CObject {
      * Return all properties of the Tile itself and the properties of the surrounding Tile.
      * The Tile's own properties overwrite properties of the same name in the surrounding Tile.
      *
-     * @return array - properties
+     * @return mixed[] - properties
      */
     protected function getMergedProperties() {
         $parentProperties = $this->parent ? $this->parent->getMergedProperties() : [];
