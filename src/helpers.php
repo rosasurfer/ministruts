@@ -391,11 +391,10 @@ function dump($var, $return=false, $flushBuffers=true) {
  * @param  mixed $var
  * @param  bool  $flushBuffers [optional] - whether to flush output buffers (default: yes)
  *
- * @return bool - always TRUE
+ * @return void
  */
 function echof($var, $flushBuffers = true) {
     print_p($var, false, $flushBuffers);
-    return true;
 }
 
 

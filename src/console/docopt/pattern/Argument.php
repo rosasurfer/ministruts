@@ -18,9 +18,9 @@ class Argument extends LeafPattern {
      * @return SingleMatch
      */
     public function singleMatch(array $left) {
-        foreach ($left as $n=>$pattern) {
+        foreach ($left as $i => $pattern) {
             if ($pattern instanceof Argument) {
-                return new SingleMatch($n, new Argument($this->name(), $pattern->value));
+                return new SingleMatch($i, new Argument($this->name(), $pattern->value));
             }
         }
         return new SingleMatch(null, null);

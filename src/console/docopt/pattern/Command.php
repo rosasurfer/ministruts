@@ -18,10 +18,10 @@ class Command extends Argument {
      * @return SingleMatch
      */
     public function singleMatch(array $left) {
-        foreach ($left as $n => $pattern) {
+        foreach ($left as $i => $pattern) {
             if ($pattern instanceof Argument) {
                 if ($pattern->value == $this->name()) {
-                    return new SingleMatch($n, new Command($this->name(), true));
+                    return new SingleMatch($i, new Command($this->name(), true));
                 }
                 else {
                     break;

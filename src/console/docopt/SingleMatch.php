@@ -13,18 +13,18 @@ use rosasurfer\ministruts\console\docopt\pattern\Pattern;
 class SingleMatch extends CObject {
 
 
-    /** @var int */
-    public $pos;
+    /** @var ?int */
+    public $pos = null;
 
     /** @var ?Pattern */
     public $pattern = null;
 
 
     /**
-     * @param  int     $pos
-     * @param  Pattern $pattern [optional]
+     * @param  ?int     $pos
+     * @param  ?Pattern $pattern
      */
-    public function __construct($pos, Pattern $pattern = null) {
+    public function __construct(?int $pos, ?Pattern $pattern) {
         $this->pos = $pos;
         $this->pattern = $pattern;
     }

@@ -653,15 +653,14 @@ class Request extends CObject {
      * @return string[] - associative array of header values
      */
     public function getHeaders($names = []) {
-        if (is_string($names)) $names = [$names];
-
         if (is_array($names)) {
             foreach ($names as $i => $name) {
                 Assert::string($name, '$names['.$i.']');
             }
         }
         else {
-            throw new InvalidTypeException('Invalid type of parameter $names: '.gettype($names));
+            Assert::string($names, '$names');
+            $names = [$names];
         }
 
         static $headers = null;
@@ -695,8 +694,9 @@ class Request extends CObject {
         }
 
         // return all or just the specified headers
-        if (!$names)
+        if (!$names) {
             return $headers;
+        }
         return \array_intersect_ukey($headers, \array_flip($names), 'strcasecmp');
     }
 
