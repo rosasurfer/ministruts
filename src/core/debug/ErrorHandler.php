@@ -61,6 +61,8 @@ class ErrorHandler extends StaticClass {
      * Setup global error handling.
      *
      * @param  int $mode - type of error handling: self::LOG_ERRORS | self::THROW_EXCEPTIONS
+     *
+     * @return void
      */
     public static function setupErrorHandling($mode) {
         if     ($mode === self::LOG_ERRORS      ) self::$errorMode = self::LOG_ERRORS;
@@ -74,6 +76,8 @@ class ErrorHandler extends StaticClass {
 
     /**
      * Setup global exception handling.
+     *
+     * @return void
      */
     public static function setupExceptionHandling() {
         set_exception_handler(__CLASS__.'::handleException');
@@ -83,6 +87,8 @@ class ErrorHandler extends StaticClass {
 
     /**
      * Setup a script shutdown handler.
+     *
+     * @return void
      */
     private static function setupShutdownHandler() {
         static $handlerRegistered = false;
@@ -138,8 +144,8 @@ class ErrorHandler extends StaticClass {
      * @param  int    $line               - line of file where the error occurred
      * @param  array  $context [optional] - symbols of the point where the error occurred (variable scope at error trigger time)
      *
-     * @return bool - TRUE,  if the error was successfully handled.
-     *                FALSE, if the error shall be processed as if no error handler was installed.
+     * @return bool - TRUE if the error was successfully handled.
+     *                FALSE if the error shall be processed as if no error handler was installed.
      *                The error handler must return FALSE to populate the internal PHP variable <tt>$php_errormsg</tt>.
      *
      * @throws PHPError
@@ -158,10 +164,10 @@ class ErrorHandler extends StaticClass {
         // Process errors according to their severity level.
         switch ($level) {
             // log non-critical errors and continue normally
-            case E_DEPRECATED     : return true(Logger::log($message, L_INFO,   $logContext));
-            case E_USER_DEPRECATED: return true(Logger::log($message, L_INFO,   $logContext));
-            case E_USER_NOTICE    : return true(Logger::log($message, L_NOTICE, $logContext));
-            case E_USER_WARNING   : return true(Logger::log($message, L_WARN,   $logContext));
+            case E_DEPRECATED     : { Logger::log($message, L_INFO,   $logContext); return true; }
+            case E_USER_DEPRECATED: { Logger::log($message, L_INFO,   $logContext); return true; }
+            case E_USER_NOTICE    : { Logger::log($message, L_NOTICE, $logContext); return true; }
+            case E_USER_WARNING   : { Logger::log($message, L_WARN,   $logContext); return true; }
         }
 
         // Wrap everything else in the matching PHPError exception.
@@ -183,7 +189,8 @@ class ErrorHandler extends StaticClass {
 
         // Handle the error according to the configuration.
         if (self::$errorMode == self::LOG_ERRORS) {
-            return true(Logger::log($exception, L_ERROR, $logContext));
+            Logger::log($exception, L_ERROR, $logContext);
+            return true;
         }
 
         /**
@@ -193,7 +200,8 @@ class ErrorHandler extends StaticClass {
          * ---------------------------
          */
         if (self::$inShutdown && $level==E_ERROR && preg_match(self::$oomRegExp, $message)) {
-            return true(Logger::log($message, L_FATAL, $logContext));           // logging the error is sufficient as there is no stacktrace anyway
+            Logger::log($message, L_FATAL, $logContext);    // logging the error is sufficient as there is no stacktrace anyway
+            return true;
         }
 
         /**
@@ -229,6 +237,8 @@ class ErrorHandler extends StaticClass {
      * the script.
      *
      * @param  \Exception|\Throwable $exception - the unhandled exception (PHP5) or throwable (PHP7)
+     *
+     * @return void
      */
     public static function handleException($exception) {
         $context = [
@@ -329,6 +339,8 @@ class ErrorHandler extends StaticClass {
      * PHP Fatal error:  Method object::__toString() must not throw an exception in {file} on {line}.
      *
      * @param  \Exception|\Throwable $exception - exception (PHP5) or throwable (PHP7)
+     *
+     * @return void
      *
      * @link   https://bugs.php.net/bug.php?id=53648
      */

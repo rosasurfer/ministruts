@@ -18,6 +18,8 @@ class Output extends CObject {
      * Write a message to STDOUT.
      *
      * @param  mixed $message
+     *
+     * @return void
      */
     public function out($message) {
         $message = printPretty($message, true);
@@ -32,6 +34,8 @@ class Output extends CObject {
      * Write a message to STDERR.
      *
      * @param  mixed $message
+     *
+     * @return void
      */
     public function error($message) {
         $message = printPretty($message, true);

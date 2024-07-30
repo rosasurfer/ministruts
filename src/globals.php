@@ -157,6 +157,8 @@ function dump($var, $return=false, $flushBuffers=true) {
  *
  * @param  mixed $var
  * @param  bool  $flushBuffers [optional] - whether to flush output buffers (default: TRUE)
+ *
+ * @return void
  */
 function echof($var, $flushBuffers = true) {
     \rosasurfer\echof($var, $flushBuffers);
@@ -171,7 +173,7 @@ function echof($var, $flushBuffers = true) {
  * @param  mixed $var
  * @param  bool  $flushBuffers [optional] - whether to flush output buffers (default: TRUE)
  *
- * @see    printPretty()
+ * @return void
  */
 function echoPre($var, $flushBuffers = true) {
     \rosasurfer\echoPre($var, $flushBuffers);
@@ -182,6 +184,8 @@ function echoPre($var, $flushBuffers = true) {
  * Print a message to STDOUT.
  *
  * @param  string $message
+ *
+ * @return void
  */
 function stdout($message) {
     \rosasurfer\stdout($message);
@@ -192,6 +196,8 @@ function stdout($message) {
  * Print a message to STDERR.
  *
  * @param  string $message
+ *
+ * @return void
  */
 function stderr($message) {
     \rosasurfer\stderr($message);
@@ -202,6 +208,8 @@ function stderr($message) {
  * Send an "X-Debug-???" header with a message. Each sent header name will end with a different and increasing number.
  *
  * @param  mixed $message
+ *
+ * @return void
  */
 function debugHeader($message) {
     \rosasurfer\debugHeader($message);
@@ -987,6 +995,8 @@ function pluralize($count, $singular='', $plural='s') {
  *
  * @param  \Closure $task             - task to execute (an anonymous function is implicitly casted)
  * @param  string   $mutex [optional] - mutex identifier (default: the calling line of code)
+ *
+ * @return void
  */
 function synchronized(\Closure $task, $mutex = null) {
     \rosasurfer\synchronized($task, $mutex);

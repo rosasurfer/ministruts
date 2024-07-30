@@ -44,6 +44,8 @@ class RequestProcessor extends CObject {
      *
      * @param  Request  $request
      * @param  Response $response
+     *
+     * @return void
      */
     public function process(Request $request, Response $response) {
         // Start or continue a session (if applicable).
@@ -57,23 +59,27 @@ class RequestProcessor extends CObject {
         if (!$mapping) return;
 
         // Enforce the mapping's configured HTTP method restrictions. Generates an HTTP 405 error if the used method is not allowed.
-        if (!$this->processMethod($request, $response, $mapping))
+        if (!$this->processMethod($request, $response, $mapping)) {
             return;
+        }
 
         // Enforce the mapping's configured role restrictions.
-        if (!$this->processRoles($request, $response, $mapping))
+        if (!$this->processRoles($request, $response, $mapping)) {
             return;
+        }
 
         // Instantiate an ActionForm (a parameter wrapper for the request's user input).
         $form = $this->processActionFormCreate($request, $mapping);
 
         // if configured validate the ActionForm
-        if ($form && !$this->processActionFormValidate($request, $response, $mapping, $form))
+        if ($form && !$this->processActionFormValidate($request, $response, $mapping, $form)) {
             return;
+        }
 
         // If the mapping defines an ActionForward instead of an Action, process it and return if processing has finished.
-        if (!$this->processMappingForward($request, $response, $mapping))
+        if (!$this->processMappingForward($request, $response, $mapping)) {
             return;
+        }
 
         // Instantiate the configured Action.
         $action = $this->processActionCreate($mapping, $form);
@@ -91,6 +97,8 @@ class RequestProcessor extends CObject {
      * Session handling according to the configuration.
      *
      * @param  Request $request
+     *
+     * @return void
      */
     protected function processSession(Request $request) {
         // former behavior: If a session id was transmitted the session was started automatically.
@@ -105,6 +113,8 @@ class RequestProcessor extends CObject {
      * At the next request the messages are restored and moved back to the new request.
      *
      * @param  Request $request
+     *
+     * @return void
      */
     protected function cacheActionMessages(Request $request) {
         $errors = $request->removeActionErrors();
@@ -132,6 +142,8 @@ class RequestProcessor extends CObject {
      * Found ActionErrors (from the previous request) are converted to ActionMessages of the current request.
      *
      * @param  Request $request
+     *
+     * @return void
      */
     protected function restoreCachedActionMessages(Request $request) {
         if ($request->hasSessionId()) {
@@ -455,6 +467,8 @@ PROCESS_METHOD_ERROR_SC_405;
      * @param  Request       $request
      * @param  Response      $response
      * @param  ActionForward $forward
+     *
+     * @return void
      */
     protected function processActionForward(Request $request, Response $response, ActionForward $forward) {
         $module = $this->module;

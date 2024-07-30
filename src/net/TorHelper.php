@@ -59,6 +59,8 @@ class TorHelper extends StaticClass {
 
     /**
      * Initialization
+     *
+     * @return void
      */
     private static function init() {
         if (self::$logDebug === null) {

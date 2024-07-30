@@ -46,6 +46,8 @@ class HttpSession extends Singleton {
 
     /**
      * Start and initialize the session.
+     *
+     * @return void
      */
     protected function init() {
         // limit session cookie to application path to support multiple projects per domain
@@ -84,6 +86,8 @@ class HttpSession extends Singleton {
      * Reset this session to a new and empty state.
      *
      * @param  bool $regenerateId - whether to generate a new session id and to delete an old session file
+     *
+     * @return void
      */
     public function reset($regenerateId) {
         Assert::bool($regenerateId);
@@ -173,6 +177,8 @@ class HttpSession extends Singleton {
      * Delete all session values stored under the specified key(s).
      *
      * @param  string|string[] $key - a single session key or an array of session keys
+     *
+     * @return void
      */
     public function removeAttribute($key) {
         if (is_array($key)) {

@@ -294,6 +294,8 @@ class Config extends CObject implements ConfigInterface {
      *
      * @param  string $key
      * @param  mixed  $value
+     *
+     * @return void
      */
     protected function setProperty($key, $value) {
         // convert string representations of special values
@@ -382,7 +384,7 @@ class Config extends CObject implements ConfigInterface {
             }
         }
 
-        // TODO: update the cache if the instance is a cached instance
+        // TODO: update the cache if the instance is cached
     }
 
 

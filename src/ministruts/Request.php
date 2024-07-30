@@ -69,6 +69,8 @@ class Request extends CObject {
      * Parse the specified query string and store parameters in $GET and $_REQUEST.
      *
      * @param  string $data - raw query string
+     *
+     * @return void
      */
     protected function parseQueryString($data) {
         $params = explode('&', $data);
@@ -706,6 +708,8 @@ class Request extends CObject {
 
     /**
      * Destroy the current session and it's data.
+     *
+     * @return void
      */
     public function destroySession() {
         if (session_status() == PHP_SESSION_ACTIVE) {
@@ -893,6 +897,8 @@ class Request extends CObject {
      * Remove the value(s) with the specified name(s) from the request's variables context.
      *
      * @param  string ...$names - names of the values to remove
+     *
+     * @return void
      */
     public function removeAttributes(...$names) {
         foreach ($names as $name) {

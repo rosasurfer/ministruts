@@ -273,6 +273,8 @@ class Module extends CObject {
      *
      * @param  SimpleXMLElement $xml - module configuration
      *
+     * @return void
+     *
      * @throws StrutsConfigException on configuration errors
      */
     protected function processGlobalForwards(SimpleXMLElement $xml) {
@@ -349,6 +351,8 @@ class Module extends CObject {
      * Process all configured {@link ActionMapping}s.
      *
      * @param  SimpleXMLElement $xml - module configuration
+     *
+     * @return void
      *
      * @throws StrutsConfigException on configuration errors
      */
@@ -567,6 +571,8 @@ class Module extends CObject {
      *
      * @param  SimpleXMLElement $xml - module configuration
      *
+     * @return void
+     *
      * @throws StrutsConfigException on configuration errors
      */
     protected function processTiles(SimpleXMLElement $xml) {
@@ -699,6 +705,8 @@ class Module extends CObject {
      * @param  Tile             $tile
      * @param  SimpleXMLElement $xml - module configuration
      *
+     * @return void
+     *
      * @throws StrutsConfigException on configuration errors
      */
     private function processTileProperties(Tile $tile, SimpleXMLElement $xml) {
@@ -765,6 +773,8 @@ class Module extends CObject {
      * @param  ActionForward $forward
      * @param  string        $alias [optional] - alias name of the forward
      *
+     * @return void
+     *
      * @throws StrutsConfigException on configuration errors
      */
     protected function addGlobalForward(ActionForward $forward, $alias = null) {
@@ -781,6 +791,8 @@ class Module extends CObject {
      * Add an {@link ActionMapping} to this module.
      *
      * @param  ActionMapping $mapping
+     *
+     * @return void
      *
      * @throws StrutsConfigException on configuration errors
      */
@@ -811,6 +823,8 @@ class Module extends CObject {
      *
      * @param  Tile   $tile
      * @param  string $alias [optional] - alias name of the tile
+     *
+     * @return void
      */
     protected function addTile(Tile $tile, $alias = null) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
@@ -818,8 +832,9 @@ class Module extends CObject {
         $name = $tile->getName();
         $this->tiles[$name] = $tile;
 
-        if (isset($alias))
+        if (isset($alias)) {
             $this->tiles[$alias] = $tile;
+        }
     }
 
 
@@ -879,6 +894,8 @@ class Module extends CObject {
      *
      * @param  SimpleXMLElement $xml - module configuration
      *
+     * @return void
+     *
      * @throws StrutsConfigException on configuration errors
      */
     protected function processImports(SimpleXMLElement $xml) {
@@ -914,6 +931,8 @@ class Module extends CObject {
      * Process the configured controller settings.
      *
      * @param  SimpleXMLElement $xml - module configuration
+     *
+     * @return void
      *
      * @throws StrutsConfigException on configuration errors
      */

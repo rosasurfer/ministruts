@@ -209,6 +209,8 @@ class Application extends CObject {
 
     /**
      * Update the PHP configuration with user defined settings.
+     *
+     * @return void
      */
     protected function configurePhp() {
         register_shutdown_function(function() {
@@ -275,6 +277,8 @@ class Application extends CObject {
      *
      * @param  ConfigInterface $config  - application configuration
      * @param  string          $rootDir - application root directory
+     *
+     * @return void
      */
     protected function expandAppDirs(ConfigInterface $config, $rootDir) {
         Assert::string($rootDir, '$rootDir');
@@ -293,6 +297,8 @@ class Application extends CObject {
      *
      * @param  string[]|string[][] $dirs    - reference to an array of absolute or relative directory names
      * @param  string              $rootDir - application root directory
+     *
+     * @return void
      */
     protected function expandDirsRecursive(array &$dirs, $rootDir) {
         foreach ($dirs as &$dir) {
@@ -329,6 +335,7 @@ class Application extends CObject {
      *                         "strict": errors are converted to instances of PHP ErrorExceptions and thrown
      *                         "weak":   errors are only logged
      *                         "ignore": errors are ignored
+     * @return void
      */
     protected function setupErrorHandling($value) {
         $mode = ErrorHandler::THROW_EXCEPTIONS;                     // strict (default if an invalid parameter was passed)
@@ -346,6 +353,8 @@ class Application extends CObject {
      * Setup the application's exception handling.
      *
      * @param  bool|int|string $value - configuration value as passed to the framework loader
+     *
+     * @return void
      */
     protected function setupExceptionHandling($value) {
         $enabled = true;                                            // TRUE (default if an invalid parameter was passed)
@@ -364,6 +373,8 @@ class Application extends CObject {
      * Map common definitions in namespace "\rosasurfer" to the global namespace.
      *
      * @param  mixed $value - configuration value as passed to the framework loader
+     *
+     * @return void
      */
     protected function loadGlobals($value) {
         $enabled = false;                                           // default
@@ -384,6 +395,8 @@ class Application extends CObject {
      * Replace an existing Composer class loader.
      *
      * @param  mixed $value - configuration value as passed to the framework loader
+     *
+     * @return void
      */
     protected function replaceComposer($value) {
         $enabled = false;                                           // default

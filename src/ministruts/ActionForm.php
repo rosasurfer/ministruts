@@ -50,6 +50,8 @@ abstract class ActionForm extends CObject {
      *
      * @param  Request $request
      *
+     * @return void
+     *
      * The framework expects the action key nested in an array named "submit". Write your HTML as follows:
      *
      * @example
