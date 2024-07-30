@@ -104,57 +104,42 @@ define('PHP_INI_ALL',    INI_ALL   );       // 7    flag            // entry can
 
 
 /**
+ * Whether the given index exists in an array-like variable.
+ *
+ * Complement of PHP's <tt>key_exists()</tt> function adding support for {@link \ArrayAccess} parameters.
+ *
+ * @param  int|string                                   $key
+ * @param  array<mixed>|\ArrayAccess<int|string, mixed> $array
+ *
+ * @return bool
+ */
+function key_exists($key, $array) {
+    if ($array instanceof \ArrayAccess) {
+        return $array->offsetExists($key);
+    }
+    return \array_key_exists($key, $array);
+}
+
+
+/**
  * Filters elements of an array-like variable using a callback function. Iterates over each value in the array passing it to
  * the callback function. If the function returns TRUE, the current value from the array is returned as part of the resulting
  * array. Array keys are preserved.
  *
  * Complement of PHP's <tt>array_filter()</tt> function adding support for {@link \Traversable} parameters.
  *
- * @param  array|\Traversable $input
- * @param  ?callable          $callback [optional]
- * @param  int                $flags    [optional]
+ * @param  iterable<mixed> $input
+ * @param  ?callable       $callback [optional]
+ * @param  int             $flags    [optional]
  *
- * @return array
+ * @return mixed[]
  */
 function array_filter($input, $callback=null, $flags=0) {
     $args = func_get_args();
-    if ($input instanceof \Traversable)
+    if ($input instanceof \Traversable) {
         $args[0] = iterator_to_array($input, true);
+    }
     return \array_filter(...$args);
-}
-
-
-/**
- * Whether the given index exists in an array-like variable.
- *
- * Complement of PHP's <tt>array_key_exists()</tt> function adding support for {@link \ArrayAccess} parameters.
- *
- * @param  mixed              $key
- * @param  array|\ArrayAccess $array
- *
- * @return bool
- */
-function array_key_exists($key, $array) {
-    if ($array instanceof \ArrayAccess)
-        return $array->offsetExists($key);
-    return \array_key_exists($key, $array);
-}
-
-
-/**
- * Alias of {@link rosasurfer\ministruts\array_key_exists()}.
- *
- * Whether the given index exists in an array-like variable.
- *
- * Complement of PHP's <tt>key_exists()</tt> function adding support for {@link \ArrayAccess} parameters.
- *
- * @param  mixed              $key
- * @param  array|\ArrayAccess $array
- *
- * @return bool
- */
-function key_exists($key, $array) {
-    return array_key_exists($key, $array);
 }
 
 
@@ -163,13 +148,13 @@ function key_exists($key, $array) {
  *
  * Complement of PHP's <tt>array_keys()</tt> function adding support for {@link \Traversable} parameters.
  *
- * @param  array|\Traversable $array
- * @param  mixed              $search [optional]
- * @param  bool               $strict [optional]
+ * @param  iterable<mixed> $array
+ * @param  mixed           $search [optional]
+ * @param  bool            $strict [optional]
  *
- * @return array
+ * @return array<int|string>
  */
-function array_keys($array, $search=null, $strict=false) {
+function array_keys(iterable $array, $search=null, $strict=false) {
     $args = func_get_args();
     if ($array instanceof \Traversable) {
         $args[0] = iterator_to_array($array, true);
@@ -185,16 +170,17 @@ function array_keys($array, $search=null, $strict=false) {
  *
  * Complement of PHP's <tt>array_merge()</tt> function adding support for {@link \Traversable} parameters.
  *
- * @param  array|\Traversable           $array1
- * @param  array<array|\Traversable> ...$arrays
+ * @param  iterable<mixed> $array1
+ * @param  iterable<mixed> ...$arrays
  *
- * @return array
+ * @return mixed[]
  */
-function array_merge($array1, ...$arrays) {
+function array_merge(iterable $array1, iterable ...$arrays) {
     $args = func_get_args();
     foreach ($args as $key => $arg) {
-        if ($arg instanceof \Traversable)
+        if ($arg instanceof \Traversable) {
             $args[$key] = iterator_to_array($arg, true);
+        }
     }
     return \array_merge(...$args);
 }
@@ -205,15 +191,16 @@ function array_merge($array1, ...$arrays) {
  *
  * Complement of PHP's <tt>in_array()</tt> function adding support for {@link \Traversable} parameters.
  *
- * @param  mixed              $needle
- * @param  array|\Traversable $haystack
- * @param  bool               $strict [optional]
+ * @param  mixed           $needle
+ * @param  iterable<mixed> $haystack
+ * @param  bool            $strict [optional]
  *
  * @return bool
  */
-function in_array($needle, $haystack, $strict = false) {
-    if ($haystack instanceof \Traversable)
+function in_array($needle, iterable $haystack, $strict = false) {
+    if ($haystack instanceof \Traversable) {
         $haystack = iterator_to_array($haystack, false);
+    }
     return \in_array($needle, $haystack, $strict);
 }
 
@@ -221,11 +208,11 @@ function in_array($needle, $haystack, $strict = false) {
 /**
  * Return the first element of an array-like variable without affecting the internal array pointer.
  *
- * @param  array|\Traversable $values
+ * @param  iterable<mixed> $values
  *
  * @return mixed - the first element or NULL if the array-like variable is empty
  */
-function first($values) {
+function first(iterable $values) {
     if ($values instanceof \Traversable) {
         $values = iterator_to_array($values, false);
     }
@@ -236,11 +223,11 @@ function first($values) {
 /**
  * Return the first key of an array-like variable without affecting the internal array pointer.
  *
- * @param  array|\Traversable $values
+ * @param  iterable<mixed> $values
  *
- * @return mixed - the first key or NULL if the array-like variable is empty
+ * @return int|string|null - the first key or NULL if the array-like variable is empty
  */
-function firstKey($values) {
+function firstKey(iterable $values) {
     if ($values instanceof \Traversable) {
         $values = iterator_to_array($values);
     }
@@ -253,16 +240,14 @@ function firstKey($values) {
 /**
  * Return the last element of an array-like variable without affecting the internal array pointer.
  *
- * @param  array|\Traversable $values
+ * @param  iterable<mixed> $values
  *
  * @return mixed - the last element or NULL if the array-like variable is empty
  */
-function last($values) {
+function last(iterable $values) {
     if ($values instanceof \Traversable) {
         $values = iterator_to_array($values, false);
     }
-    else Assert::isArray($values);
-
     return $values ? end($values) : null;
 }
 
@@ -270,18 +255,15 @@ function last($values) {
 /**
  * Return the last key of an array-like variable without affecting the internal array pointer.
  *
- * @param  array|\Traversable $values
+ * @param  iterable<mixed> $values
  *
- * @return mixed - the last key or NULL if the array-like variable is empty
+ * @return int|string|null - the last key or NULL if the array-like variable is empty
  */
-function lastKey($values) {
+function lastKey(iterable $values) {
     if ($values instanceof \Traversable) {
         $values = iterator_to_array($values);
     }
-    else Assert::isArray($values);
-
-    if (!$values)
-        return null;
+    if (!$values) return null;
     end($values);
     return key($values);
 }
@@ -1376,9 +1358,9 @@ function normalizeEOL($string, $mode = EOL_UNIX) {
  * Convert an object to an array.
  *
  * @param  object $object
- * @param  int    $access [optional] - access levels of the properties to return in the result
- *                                     (default: ACCESS_PUBLIC)
- * @return array
+ * @param  int    $access [optional] - access levels of the properties to return in the result (default: ACCESS_PUBLIC)
+ *
+ * @return array<string, mixed>
  */
 function objectToArray($object, $access = ACCESS_PUBLIC) {
     Assert::object($object, '$object');
@@ -1402,8 +1384,9 @@ function objectToArray($object, $access = ACCESS_PUBLIC) {
         else {                                      // private
             if ($access & ACCESS_PRIVATE) {
                 $publicName = strRightFrom($name, "\0", 2);
-                if (!\array_key_exists($publicName, $result))
+                if (!\key_exists($publicName, $result)) {
                     $result[$publicName] = $value;
+                }
             }
         }
     }
@@ -1418,7 +1401,7 @@ function objectToArray($object, $access = ACCESS_PUBLIC) {
  *
  * @return string
  */
-function typeOf($var) {
+function typeof($var) {
     return gettype($var);
 }
 
@@ -1692,10 +1675,10 @@ function getHostByAddress($ipAddress) {
  * Return a sorted copy of the specified array using the algorythm and parameters of {@link \ksort()}.
  * Opposite to ksort() this function will not modify the passed array.
  *
- * @param  array $values
- * @param  int   $sort_flags [optional]
+ * @param  mixed[] $values
+ * @param  int     $sort_flags [optional]
  *
- * @return array
+ * @return mixed[]
  */
 function ksortc(array $values, $sort_flags = SORT_REGULAR) {
     ksort($values, $sort_flags);
@@ -1814,9 +1797,9 @@ function asset($uri) {
 /**
  * Parse command line arguments and match them against the specified {@link https://docopt.org/#} syntax definition.
  *
- * @param  string               $doc                - help text, i.e. a syntax definition in Docopt language format
- * @param  string|string[]|null $args    [optional] - arguments to parse (default: the arguments passed in $_SERVER['argv'])
- * @param  array                $options [optional] - parser options (default: none)
+ * @param  string                     $doc                - help text, i.e. a syntax definition in Docopt language format
+ * @param  string|string[]|null       $args    [optional] - arguments to parse (default: the arguments passed in $_SERVER['argv'])
+ * @param  array<string, bool|string> $options [optional] - parser options (default: none)
  *
  * @return DocoptResult - the parsing result
  */

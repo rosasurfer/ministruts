@@ -32,7 +32,7 @@ class PHPError extends \ErrorException implements IRosasurferException {
 
 
     /**
-     * @return array
+     * @return array<string[]>
      */
     public function getBetterTrace() {
         $trace = $this->betterTrace;

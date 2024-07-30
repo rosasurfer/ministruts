@@ -65,7 +65,7 @@ class MySQLConnector extends Connector {
     /** @var ?string */
     protected $database = null;
 
-    /** @var string[] - connection options */
+    /** @var array<string, string> - connection options */
     protected $options = [];
 
     /** @var ?resource - internal connection handle */
@@ -86,14 +86,18 @@ class MySQLConnector extends Connector {
      *
      * Create a new MySQLConnector instance.
      *
-     * @param  array $options - MySQL connection options
+     * @param  array<string, string|string[]> $options - MySQL connection options
      */
     public function __construct(array $options) {
         if (isset($options['host'    ])) $this->setHost    ($options['host'    ]);
         if (isset($options['username'])) $this->setUsername($options['username']);
         if (isset($options['password'])) $this->setPassword($options['password']);
         if (isset($options['database'])) $this->setDatabase($options['database']);
-        if (isset($options['options' ])) $this->setOptions ($options['options' ]);
+        if (isset($options['options' ])) {
+            /** @var array<string, string> */
+            $moreOptions = $options['options'];
+            $this->setOptions($moreOptions);
+        }
     }
 
 
@@ -180,7 +184,7 @@ class MySQLConnector extends Connector {
     /**
      * Set additonal connection options.
      *
-     * @param  string[] $options
+     * @param  array<string, string> $options
      *
      * @return $this
      */

@@ -49,7 +49,7 @@ abstract class LeafPattern extends Pattern {
      * @param  Pattern[] $left
      * @param  Pattern[] $collected [optional]
      *
-     * @return array
+     * @return array{bool, Pattern[], Pattern[]}
      */
     public function match(array $left, array $collected = []) {
         list($pos, $match) = $this->singleMatch($left)->toArray();

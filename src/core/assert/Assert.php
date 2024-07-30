@@ -21,7 +21,7 @@ class Assert extends StaticClass {
      *
      * @param  mixed    $value
      * @param  string   $message [optional] - value identifier or description
-     * @param  array ...$args    [optional] - additional description arguments
+     * @param  mixed ...$args    [optional] - additional message arguments
      *
      * @return bool - whether the assertion is TRUE
      */
@@ -38,7 +38,7 @@ class Assert extends StaticClass {
      *
      * @param  mixed    $value
      * @param  string   $message [optional] - value identifier or description
-     * @param  array ...$args    [optional] - additional description arguments
+     * @param  mixed ...$args    [optional] - additional message arguments
      *
      * @return bool - whether the assertion is TRUE
      */
@@ -55,7 +55,7 @@ class Assert extends StaticClass {
      *
      * @param  mixed    $value
      * @param  string   $message [optional] - value identifier or description
-     * @param  array ...$args    [optional] - additional description arguments
+     * @param  mixed ...$args    [optional] - additional message arguments
      *
      * @return bool - whether the assertion is TRUE
      */
@@ -72,7 +72,7 @@ class Assert extends StaticClass {
      *
      * @param  mixed    $value
      * @param  string   $message [optional] - value identifier or description
-     * @param  array ...$args    [optional] - additional description arguments
+     * @param  mixed ...$args    [optional] - additional message arguments
      *
      * @return bool - whether the assertion is TRUE
      */
@@ -88,8 +88,8 @@ class Assert extends StaticClass {
      * Ensure that the passed value is a string.
      *
      * @param  mixed    $value
-     * @param  string   $message [optional]
-     * @param  array ...$args    [optional] - additional message arguments
+     * @param  string   $message [optional] - value identifier or description
+     * @param  mixed ...$args    [optional] - additional message arguments
      *
      * @return bool - whether the assertion is TRUE
      */
@@ -106,7 +106,7 @@ class Assert extends StaticClass {
      *
      * @param  mixed    $value
      * @param  string   $message [optional] - value identifier or description
-     * @param  array ...$args    [optional] - additional description arguments
+     * @param  mixed ...$args    [optional] - additional message arguments
      *
      * @return bool - whether the assertion is TRUE
      */
@@ -123,7 +123,7 @@ class Assert extends StaticClass {
      *
      * @param  mixed    $value
      * @param  string   $message [optional] - value identifier or description
-     * @param  array ...$args    [optional] - additional description arguments
+     * @param  mixed ...$args    [optional] - additional message arguments
      *
      * @return bool - whether the assertion is TRUE
      */
@@ -140,7 +140,7 @@ class Assert extends StaticClass {
      *
      * @param  mixed    $value
      * @param  string   $message [optional] - value identifier or description
-     * @param  array ...$args    [optional] - additional description arguments
+     * @param  mixed ...$args    [optional] - additional message arguments
      *
      * @return bool - whether the assertion is TRUE
      */
@@ -158,7 +158,7 @@ class Assert extends StaticClass {
      * @param  mixed    $objectOrClass
      * @param  string   $method
      * @param  string   $message [optional] - value identifier or description
-     * @param  array ...$args    [optional] - additional description arguments
+     * @param  mixed ...$args    [optional] - additional message arguments
      *
      * @return bool - whether the assertion is TRUE
      */
@@ -179,7 +179,7 @@ class Assert extends StaticClass {
      * @param  mixed    $value
      * @param  ?string  $type    [optional]
      * @param  string   $message [optional] - value identifier or description
-     * @param  array ...$args    [optional] - additional description arguments
+     * @param  mixed ...$args    [optional] - additional message arguments
      *
      * @return bool - whether the assertion is TRUE
      */
@@ -199,7 +199,7 @@ class Assert extends StaticClass {
      *
      * @param  mixed    $value
      * @param  string   $message [optional] - value identifier or description
-     * @param  array ...$args    [optional] - additional description arguments
+     * @param  mixed ...$args    [optional] - additional message arguments
      *
      * @return bool - whether the assertion is TRUE
      */
@@ -216,7 +216,7 @@ class Assert extends StaticClass {
      *
      * @param  mixed    $value
      * @param  string   $message [optional] - value identifier or description
-     * @param  array ...$args    [optional] - additional description arguments
+     * @param  mixed ...$args    [optional] - additional message arguments
      *
      * @return bool - whether the assertion is TRUE
      */
@@ -233,7 +233,7 @@ class Assert extends StaticClass {
      *
      * @param  mixed    $value
      * @param  string   $message [optional] - value identifier or description
-     * @param  array ...$args    [optional] - additional description arguments
+     * @param  mixed ...$args    [optional] - additional message arguments
      *
      * @return bool - whether the assertion is TRUE
      */
@@ -250,7 +250,7 @@ class Assert extends StaticClass {
      *
      * @param  mixed    $value
      * @param  string   $message [optional] - value identifier or description
-     * @param  array ...$args    [optional] - additional description arguments
+     * @param  mixed ...$args    [optional] - additional message arguments
      *
      * @return bool - whether the assertion is TRUE
      */
@@ -267,7 +267,7 @@ class Assert extends StaticClass {
      *
      * @param  mixed    $value
      * @param  string   $message [optional] - value identifier or description
-     * @param  array ...$args    [optional] - additional description arguments
+     * @param  mixed ...$args    [optional] - additional message arguments
      *
      * @return bool - whether the assertion is TRUE
      */
@@ -284,7 +284,7 @@ class Assert extends StaticClass {
      *
      * @param  mixed    $value
      * @param  string   $message [optional] - value identifier or description
-     * @param  array ...$args    [optional] - additional description arguments
+     * @param  mixed ...$args    [optional] - additional message arguments
      *
      * @return bool - whether the assertion is TRUE
      */
@@ -301,7 +301,7 @@ class Assert extends StaticClass {
      *
      * @param  mixed    $value
      * @param  string   $message [optional] - value identifier or description
-     * @param  array ...$args    [optional] - additional description arguments
+     * @param  mixed ...$args    [optional] - additional message arguments
      *
      * @return bool - whether the assertion is TRUE
      */
@@ -319,7 +319,7 @@ class Assert extends StaticClass {
      * @param  mixed    $value
      * @param  ?string  $type    [optional]
      * @param  string   $message [optional] - value identifier or description
-     * @param  array ...$args    [optional] - additional description arguments
+     * @param  mixed ...$args    [optional] - additional message arguments
      *
      * @return bool - whether the assertion is TRUE
      */
@@ -339,10 +339,10 @@ class Assert extends StaticClass {
     /**
      * Compose a "type assertion failed" error message.
      *
-     * @param  mixed  $value        - checked variable
-     * @param  string $expectedType - expected variable type
-     * @param  string $message      - variabe identifier or custom value description
-     * @param  array  $args         - additional description arguments
+     * @param  mixed   $value        - checked variable
+     * @param  string  $expectedType - expected variable type
+     * @param  string  $message      - variabe identifier or custom value description
+     * @param  mixed[] $args         - additional description arguments
      *
      * @return string - generated error message
      */
@@ -368,7 +368,7 @@ class Assert extends StaticClass {
     /**
      * Return a more readable version of a variable type.
      *
-     * @param  mixed  $value
+     * @param  mixed $value
      *
      * @return string
      */
@@ -380,7 +380,7 @@ class Assert extends StaticClass {
     /**
      * Return a more readable version of a variable.
      *
-     * @param  mixed  $value
+     * @param  mixed $value
      *
      * @return string
      */

@@ -61,7 +61,7 @@ class SQLiteConnector extends Connector {
     /** @var string - database file to connect to */
     protected $file;
 
-    /** @var string[] - configuration options */
+    /** @var array<string, string> - configuration options */
     protected $options = [];
 
     /** @var ?\SQLite3 - internal database handler instance */
@@ -85,11 +85,13 @@ class SQLiteConnector extends Connector {
      *
      * Create a new SQLiteConnector instance.
      *
-     * @param  array $options - SQLite connection options. See the class description for supported values.
+     * @param  array<string, string> $options - SQLite connection options. See the class description for supported values.
      */
     public function __construct(array $options) {
-        if (isset($options['file'])) $this->setFile($options['file']);
-        unset($options['file']);
+        if (isset($options['file'])) {
+            $this->setFile($options['file']);
+            unset($options['file']);
+        }
         $this->setOptions($options);
     }
 

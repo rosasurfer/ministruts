@@ -17,7 +17,7 @@ trait RosasurferExceptionTrait {
     /** @var string - better message */
     private $betterMessage;
 
-    /** @var array - better stacktrace */
+    /** @var array<string[]> - better stacktrace */
     private $betterTrace;
 
     /** @var string - better stacktrace as string */

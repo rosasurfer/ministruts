@@ -18,8 +18,8 @@ trait ObjectTrait {
     /**
      * A method catching otherwise fatal errors triggered by calls of non-existing or inaccessible instance methods.
      *
-     * @param  string $method - name of the called method
-     * @param  array  $args   - arguments passed to the method call
+     * @param  string  $method - name of the called method
+     * @param  mixed[] $args   - arguments passed to the method call
      *
      * @return mixed
      *
@@ -45,8 +45,8 @@ trait ObjectTrait {
     /**
      * Method catching otherwise fatal errors triggered by calls of non-existing or inaccessible static methods.
      *
-     * @param  string $method - name of the called method
-     * @param  array  $args   - arguments passed to the method call
+     * @param  string  $method - name of the called method
+     * @param  mixed[] $args   - arguments passed to the method call
      *
      * @return never
      *

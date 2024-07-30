@@ -14,17 +14,12 @@ use rosasurfer\ministruts\core\CObject;
  *
  * @example
  * <pre>
- *  &lt;?php
  *  CachePeer::set($key, $value, $expires);         // store a value in the cache
  *  CachePeer::add($key, $value, $expires);         // store a value only if it doesn't yet exist in the cache
  *  CachePeer::replace($key, $value, $expires);     // store a value only if it already exists in the cache
  *  $value = CachePeer::get($key);                  // retrieve a value from the cache
  *  CachePeer::drop($key);                          // delete a cached value
  * </pre>
- *
- * @see ApcCache
- * @see FileSystemCache
- * @see ReferencePool
  */
 abstract class CachePeer extends CObject {
 
@@ -35,7 +30,7 @@ abstract class CachePeer extends CObject {
     /** @var string */
     protected $namespace;
 
-    /** @var array */
+    /** @var array<string, scalar> */
     protected $options;
 
     /** @var ?ReferencePool */

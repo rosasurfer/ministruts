@@ -19,21 +19,21 @@ use const rosasurfer\ministruts\NL;
 /**
  * CurlHttpClient
  *
- * An HTTP client executing HTTP requests using cURL.
+ * An HTTP client executing HTTP requests using CURL.
  */
 class CurlHttpClient extends HttpClient {
 
 
-    /** @var ?resource - curl handle */
+    /** @var ?resource - CURL handle */
     protected $hCurl = null;
 
     /** @var int - counter of manual redirects (if "open_basedir" is enabled) */
     protected $manualRedirects = 0;
 
-    /** @var array - additional curl options */
+    /** @var mixed[] - additional CURL options */
     protected $options = [];
 
-    /** @var string[] - curl error descriptions */
+    /** @var string[] - CURL error descriptions */
     protected static $errors = [
         CURLE_OK                          => 'CURLE_OK',
         CURLE_UNSUPPORTED_PROTOCOL        => 'CURLE_UNSUPPORTED_PROTOCOL',
@@ -134,7 +134,7 @@ class CurlHttpClient extends HttpClient {
     /**
      * Constructor
      *
-     * @param  array $options [optional] - additional options (default: none)
+     * @param  mixed[] $options [optional] - additional CURL options (default: none)
      */
     public function __construct(array $options = []) {
         $this->options = $options;
@@ -144,7 +144,7 @@ class CurlHttpClient extends HttpClient {
     /**
      * Destructor
      *
-     * Close an open curl handle (if any).
+     * Close an open CURL handle (if any).
      */
     public function __destruct() {
         try {
@@ -221,12 +221,12 @@ class CurlHttpClient extends HttpClient {
 
 
     /**
-     * Create a curl options array for the current request.
+     * Create a CURL options array for the current request.
      *
      * @param  HttpRequest      $request
      * @param  CurlHttpResponse $response
      *
-     * @return array - resulting options
+     * @return mixed[] - resulting CURL options
      */
     protected function prepareCurlOptions(HttpRequest $request, CurlHttpResponse $response) {
         $options = $this->options;                                  // options passed to the constructor

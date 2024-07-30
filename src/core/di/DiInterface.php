@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\core\di;
 
-use rosasurfer\ministruts\core\di\service\ServiceInterface as Service;
+use rosasurfer\ministruts\core\di\service\ServiceInterface as IService;
 use rosasurfer\ministruts\core\di\service\ServiceNotFoundException;
 
 use Psr\Container\ContainerInterface;
@@ -13,6 +13,8 @@ use Psr\Container\ContainerInterface;
  * DiInterface
  *
  * Interface to be implemented by dependency injection containers.
+ *
+ * @extends \ArrayAccess<string, object>
  */
 interface DiInterface extends \ArrayAccess, ContainerInterface {
 
@@ -28,17 +30,17 @@ interface DiInterface extends \ArrayAccess, ContainerInterface {
 
 
     /**
-     * Resolve a named service and return its implementation.  This method always returns a new instance.
+     * Resolve a named service and return its implementation. This method always returns a new instance.
      *
      * @param  string   $name
-     * @param  array ...$params - variable list of custom parameters
+     * @param  mixed ...$args - instantiation arguments
      *
      * @return object
      *
      * @throws ServiceNotFoundException if the service was not found
      * @throws ContainerException       if the dependency could not be resolved
      */
-    public function create($name, ...$params);
+    public function create($name, ...$args);
 
 
     /**
@@ -73,7 +75,7 @@ interface DiInterface extends \ArrayAccess, ContainerInterface {
      *
      * @param  string $name - service identifier
      *
-     * @return Service|null - the removed service or NULL if no such service was found
+     * @return IService|null - the removed service or NULL if no such service was found
      */
     public function remove($name);
 }

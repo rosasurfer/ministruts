@@ -33,14 +33,15 @@ abstract class Singleton extends CObject {
     /**
      * Factory method for a {@link Singleton} instance of the specified class.
      *
-     * @param  string   $class  - class name
-     * @param  array ...$params - variable list of constructor parameters
+     * @param  string   $class - class name
+     * @param  mixed ...$args  - variable list of constructor arguments
      *
      * @return Singleton
      */
-    final protected static function getInstance($class, ...$params) {
-        if (isset(self::$instances[$class]))
+    final protected static function getInstance($class, ...$args) {
+        if (isset(self::$instances[$class])) {
             return self::$instances[$class];
+        }
 
         // set a marker to detect recursive method invocations
         static $currentCreations;
@@ -54,7 +55,7 @@ abstract class Singleton extends CObject {
         }
 
         // instantiate the class with the passed parameters
-        self::$instances[$class] = new $class(...$params);
+        self::$instances[$class] = new $class(...$args);
 
         // reset the marker for detecting recursive method invocations
         unset($currentCreations[$class]);

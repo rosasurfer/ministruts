@@ -31,8 +31,8 @@ final class FileSystemCache extends CachePeer {
     /**
      * Constructor.
      *
-     * @param  string $label              - cache identifier (namespace)
-     * @param  array  $options [optional] - additional instantiation options (default: none)
+     * @param  string                $label              - cache identifier (namespace)
+     * @param  array<string, scalar> $options [optional] - additional instantiation options (default: none)
      */
     public function __construct($label, array $options = []) {
         $this->label     = $label;
@@ -62,7 +62,7 @@ final class FileSystemCache extends CachePeer {
 
 
     /**
-     *
+     * {@inheritdoc}
      */
     public function isCached($key) {
         // The actual working horse. This method does not only check the key's existence, it also retrieves the value and
@@ -118,7 +118,7 @@ final class FileSystemCache extends CachePeer {
 
 
     /**
-     *
+     * {@inheritdoc}
      */
     public function get($key, $default = null) {
         if ($this->isCached($key))
@@ -128,7 +128,7 @@ final class FileSystemCache extends CachePeer {
 
 
     /**
-     *
+     * {@inheritdoc}
      */
     public function drop($key) {
         $fileName = $this->getFilePath($key);
@@ -146,7 +146,7 @@ final class FileSystemCache extends CachePeer {
 
 
     /**
-     *
+     * {@inheritdoc}
      */
     public function set($key, $value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null) {
         Assert::string($key,  '$key');
@@ -202,6 +202,7 @@ final class FileSystemCache extends CachePeer {
      *
      * @param  string $fileName - full filepath
      * @param  mixed  $value    - value to store
+     * @param  int    $expires  - expiration time in seconds for automatic invalidation (default: never)
      *
      * @return bool - success status
      */

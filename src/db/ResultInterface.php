@@ -19,7 +19,7 @@ interface ResultInterface {
      * @param  int $mode [optional] - Controls how the returned array is indexed. Can take one of the following values:
      *                                ARRAY_ASSOC, ARRAY_NUM, or ARRAY_BOTH (default).
      *
-     * @return ?array - array of columns or NULL if no more rows are available
+     * @return array<?scalar>|null - array of columns or NULL if no more rows are available
      */
     public function fetchRow($mode = ARRAY_BOTH);
 

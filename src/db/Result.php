@@ -46,7 +46,7 @@ abstract class Result extends CObject implements ResultInterface {
      * {@inheritdoc}
      */
     public function fetchColumn($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
-        // @phpstan-ignore booleanAnd.alwaysFalse (can be FALSE as the type is not enforced)
+        // @phpstan-ignore booleanAnd.alwaysFalse (type comes from PHPDoc)
         if (!is_int($column) && !is_string($column)) throw new InvalidTypeException('Illegal type of parameter $column: '.gettype($column));
         if (isset($row))                             throw new UnimplementedFeatureException('$row='.$row.' (!= NULL)');
 
@@ -63,13 +63,12 @@ abstract class Result extends CObject implements ResultInterface {
         if (!\key_exists($column, $row)) {
             if (is_int($column)) throw new InvalidValueException('Invalid parameter $column: '.$column.' (no such column)');
 
-            $row    = \array_change_key_case($row, CASE_LOWER);
+            $row = \array_change_key_case($row, CASE_LOWER);
             $column = strtolower($column);
             if (!\key_exists($column, $row)) throw new InvalidValueException('Invalid parameter $column: "'.$column.'" (no such column)');
         }
         $value = $row[$column];
-
-        return isset($value) ? $value : $onNull;
+        return $value ?? $onNull;
     }
 
 

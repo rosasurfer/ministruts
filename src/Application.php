@@ -8,7 +8,7 @@ use rosasurfer\ministruts\config\auto\DefaultConfig;
 use rosasurfer\ministruts\console\Command;
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\assert\Assert;
-use rosasurfer\ministruts\core\di\DiInterface;
+use rosasurfer\ministruts\core\di\DiInterface as Di;
 use rosasurfer\ministruts\core\di\auto\CliServiceContainer;
 use rosasurfer\ministruts\core\di\auto\WebServiceContainer;
 use rosasurfer\ministruts\core\error\ErrorHandler;
@@ -28,7 +28,7 @@ class Application extends CObject {
     /** @var ?ConfigInterface - the application's current default configuration */
     protected static $defaultConfig;
 
-    /** @var ?DiInterface - the application's current default DI container */
+    /** @var ?Di - the application's current default service container */
     protected static $defaultDi;
 
     /** @var Command[] - registered CLI commands */
@@ -38,7 +38,7 @@ class Application extends CObject {
     /**
      * Create and initialize a new MiniStruts application.
      *
-     * @param  array $options [optional] - array with any of the following options:
+     * @param  array<string, string> $options [optional] - array with any of the following options:
      *
      *        "app.dir.root"          - string:  The project's root directory.
      *                                           (default: the current directory)
@@ -71,7 +71,7 @@ class Application extends CObject {
         /** @var DefaultConfig $config */
         $config = $this->initDefaultConfig($options);
 
-        /** @var DiInterface $di */
+        /** @var Di di */
         $di = $this->initDefaultDi($config['app.dir.config']);
         $di->set('app', $this);
         $di->set('config', $config);
@@ -185,7 +185,7 @@ class Application extends CObject {
     /**
      * Run the application.
      *
-     * @param  array $options [optional] - additional execution options (default: none)
+     * @param  array<string, scalar> $options [optional] - additional execution options (default: none)
      *
      * @return Response|int - the HTTP response wrapper for a web application, or the error status for a CLI application
      */
@@ -241,7 +241,7 @@ class Application extends CObject {
     /**
      * Load and initialize a {@link \rosasurfer\ministruts\config\auto\DefaultConfig}.
      *
-     * @param  array $options - configuration options as passed to the framework loader
+     * @param  array<string, string> $options - configuration options as passed to the framework loader
      *
      * @return DefaultConfig
      */
@@ -310,11 +310,11 @@ class Application extends CObject {
 
 
     /**
-     * Load and initialize a default dependency injection container.
+     * Load and initialize a default service container.
      *
      * @param  string $serviceDir - directory with service configurations
      *
-     * @return DiInterface
+     * @return Di
      */
     protected function initDefaultDi($serviceDir) {
         $this->setDi($di = CLI ? new CliServiceContainer($serviceDir) : new WebServiceContainer($serviceDir));
@@ -416,10 +416,10 @@ class Application extends CObject {
 
 
     /**
-     * Return the default dependency injection container of the {@link Application}. This is the instance previously set
+     * Return the default service container of the {@link Application}. This is the instance previously set
      * with {@link Application::setDi()}.
      *
-     * @return ?DiInterface
+     * @return ?Di
      */
     public static function getDi() {
         return self::$defaultDi;
@@ -427,19 +427,20 @@ class Application extends CObject {
 
 
     /**
-     * Set a new default dependency injection container for the {@link Application}.
+     * Set a new default service container for the {@link Application}.
      *
-     * @param  DiInterface $di
+     * @param  Di $di
      *
-     * @return ?DiInterface - the previously registered default container
+     * @return ?Di - the previously registered default container
      */
-    final public static function setDi(DiInterface $di) {
+    final public static function setDi(Di $di) {
         $previous = self::$defaultDi;
+
         if (!$di->has('app') && $previous && $previous->has('app')) {
-            $di['app'] = $previous['app'];
+            $di->set('app', $previous->get('app'));
         }
         if (!$di->has('config') && self::$defaultConfig) {
-            $di['config'] = self::$defaultConfig;
+            $di->set('config', self::$defaultConfig);
         }
         self::$defaultDi = $di;
         return $previous;

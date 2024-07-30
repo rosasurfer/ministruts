@@ -8,6 +8,8 @@ use rosasurfer\ministruts\core\exception\RuntimeException;
 
 /**
  * Interface to be implemented by concrete configurations.
+ *
+ * @extends \ArrayAccess<string, mixed>
  */
 interface ConfigInterface extends \ArrayAccess, \Countable {
 
@@ -29,23 +31,17 @@ interface ConfigInterface extends \ArrayAccess, \Countable {
      * Return the config setting with the specified key as a boolean. Accepted boolean value representations are "1" and "0",
      * "true" and "false", "on" and "off", "yes" and "no" (case-insensitive).
      *
-     * @param  string         $key                - case-insensitive key
-     * @param  bool|int|array $options [optional] - additional options as supported by <tt>filter_var($var, FILTER_VALIDATE_BOOLEAN)</tt>, <br>
-     *                                              may be any of: <br>
-     *                   bool $default            - default value to return if the setting is not found <br>
-     *                   int  $flags              - flags as supported by <tt>filter_var($var, FILTER_VALIDATE_BOOLEAN)</tt>: <br>
-     *                                              FILTER_NULL_ON_FAILURE - return NULL instead of FALSE on failure <br>
-     *                  array $options            - multiple options are passed as elements of an array: <br>
-     *                                              <tt>$options[              <br>
-     *                                                  'default' => $default, <br>
-     *                                                  'flags'   => $flags    <br>
-     *                                              ]</tt>                     <br>
-     * @return ?bool - boolean value or NULL if the flag FILTER_NULL_ON_FAILURE is set and the setting does not represent
-     *                 a boolean value
+     * @param  string                  $key                - case-insensitive key
+     * @param  array<string, bool|int> $options [optional] - additional options, may be any of:                                                                  <br>
+     *                                                       'default' => bool      // default value to return if the setting is not found                       <br>
+     *                                                       'flags'   => int       // flags as supported by <tt>filter_var($var, FILTER_VALIDATE_BOOLEAN)</tt>, <br>
+     *                                                                              // e.g. FILTER_NULL_ON_FAILURE to return NULL instead of FALSE on failure    <br>
+     * @return ?bool - boolean value or NULL if the flag FILTER_NULL_ON_FAILURE is set
+     *                 and the setting does not represent a boolean value
      *
-     * @throws RuntimeException if the setting is not found and $default was not specified
+     * @throws RuntimeException if the setting is not found and no default value was specified
      */
-    public function getBool($key, $options = []);
+    public function getBool($key, array $options = []);
 
 
     /**
@@ -62,9 +58,9 @@ interface ConfigInterface extends \ArrayAccess, \Countable {
     /**
      * Return a plain text dump of the instance's preferences.
      *
-     * @param  array $options [optional] - array with dump options:                               <br>
-     *                                     'sort'     => SORT_ASC|SORT_DESC (default: unsorted)   <br>
-     *                                     'pad-left' => string             (default: no padding) <br>
+     * @param  array<string, int|string> $options [optional] - array with dump options, may be any of:                   <br>
+     *                                                         'sort'     => int: SORT_ASC|SORT_DESC (default: unsorted) <br>
+     *                                                         'pad-left' => string (default: no padding)                <br>
      * @return string
      */
     public function dump(array $options = []);
@@ -73,9 +69,9 @@ interface ConfigInterface extends \ArrayAccess, \Countable {
     /**
      * Return an array with "key-value" pairs of the config settings.
      *
-     * @param  array $options [optional] - array with export options:                       <br>
-     *                                     'sort' => SORT_ASC|SORT_DESC (default: unsorted) <br>
-     * @return string[]
+     * @param  array<string, int> $options [optional] - array with export options, may be:                    <br>
+     *                                                  'sort' => int: SORT_ASC|SORT_DESC (default: unsorted) <br>
+     * @return array<string, string>
      */
     public function export(array $options = []);
 }

@@ -38,7 +38,7 @@ abstract class Pattern extends CObject {
      * @param  Pattern[] $left
      * @param  Pattern[] $collected [optional]
      *
-     * @return mixed[]
+     * @return array{bool, Pattern[], Pattern[]}
      */
     abstract function match(array $left, array $collected = []);
 

@@ -62,7 +62,7 @@ class PostgresConnector extends Connector {
     /** @var int - DBMS version number */
     protected $versionNumber;
 
-    /** @var string[]|string[][] - connection options */
+    /** @var array<string, mixed> - connection options */
     protected $options = [];
 
     /** @var string[] - session variables */
@@ -86,7 +86,7 @@ class PostgresConnector extends Connector {
      *
      * Create a new PostgresConnector instance.
      *
-     * @param  array $options - PostgreSQL connection options
+     * @param  array<string, mixed> $options - PostgreSQL connection options
      */
     public function __construct(array $options) {
         $this->setOptions($options);
@@ -96,7 +96,7 @@ class PostgresConnector extends Connector {
     /**
      * Set connection options.
      *
-     * @param  string[] $options
+     * @param  array<string, mixed> $options
      *
      * @return $this
      */

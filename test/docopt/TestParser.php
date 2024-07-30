@@ -5,6 +5,7 @@ namespace rosasurfer\ministruts\test\docopt;
 
 use rosasurfer\ministruts\console\docopt\DocoptParser;
 use rosasurfer\ministruts\console\docopt\TokenIterator;
+use rosasurfer\ministruts\console\docopt\pattern\Option;
 use rosasurfer\ministruts\console\docopt\pattern\Pattern;
 use rosasurfer\ministruts\console\docopt\pattern\Required;
 
@@ -28,11 +29,13 @@ class TestParser extends DocoptParser {
     /**
      * Public wrapper for the protected method {@link DocoptParser::parseArgs()}.
      *
-     * @param  TokenIterator  $tokens
-     * @param  \ArrayIterator $options
-     * @param  bool           $optionsFirst [optional]
+     * @param  TokenIterator               $tokens
+     * @param  \ArrayIterator<int, Option> $options
+     * @param  bool                        $optionsFirst [optional]
      *
      * @return Pattern[]
+     *
+     * @see Option
      */
     public static function parseArgs(TokenIterator $tokens, \ArrayIterator $options, $optionsFirst = false) {
         return parent::parseArgs($tokens, $options, $optionsFirst);

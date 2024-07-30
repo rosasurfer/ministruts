@@ -13,11 +13,14 @@ use const rosasurfer\ministruts\NL;
  * DocoptResult
  *
  * Represents the parsing result of a {@link DocoptParser::parse()} call.
+ *
+ * @implements \ArrayAccess<string, bool|int|string[]|null>
+ * @implements \IteratorAggregate<string, bool|int|string[]|null>
  */
 class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
 
 
-    /** @var array<bool|int|string[]|null> */
+    /** @var array<string, bool|int|string[]|null> */
     protected $args;
 
     /** @var string */
@@ -35,10 +38,10 @@ class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
      *
      * Create a new Docopt parser result.
      *
-     * @param  array  $args                    - parsed arguments
-     * @param  string $usage                   - parsed usage block of the Docopt definition
-     * @param  int    $error        [optional] - the parsing result's error status (default: 0)
-     * @param  string $errorMessage [optional] - the parsing result's error message (default: none)
+     * @param  array<string, bool|int|string[]|null> $args                    - parsed arguments
+     * @param  string                                $usage                   - parsed usage block of the Docopt definition
+     * @param  int                                   $error        [optional] - the parsing result's error status (default: 0)
+     * @param  string                                $errorMessage [optional] - the parsing result's error message (default: none)
      */
     public function __construct(array $args, $usage, $error=0, $errorMessage='') {
         $this->args         = $args;
@@ -122,6 +125,8 @@ class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
     /**
      * @param  mixed $offset
      * @param  mixed $value
+     *
+     * @return void
      */
     public function offsetSet($offset, $value) {
         throw new IllegalAccessException('Modification of CLI parse results denied');
@@ -130,6 +135,8 @@ class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
 
     /**
      * @param  mixed $offset
+     *
+     * @return void
      */
     public function offsetUnset($offset) {
         throw new IllegalAccessException('Modification of CLI parse results denied');
@@ -137,7 +144,7 @@ class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
 
 
     /**
-     * @return \ArrayIterator
+     * @return \ArrayIterator<string, bool|int|string[]|null>
      */
     public function getIterator() {
         return new \ArrayIterator($this->args);

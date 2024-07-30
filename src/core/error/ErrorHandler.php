@@ -500,11 +500,11 @@ class ErrorHandler extends StaticClass {
      * Takes a regular PHP stacktrace and adjusts it to be more readable. Same as {@link \rosasurfer\ministruts\core\exception\RosasurferException::getBetterTrace()}
      * except that this method can be used with all PHP exceptions.
      *
-     * @param  array  $trace           - regular PHP stacktrace
-     * @param  string $file [optional] - name of the file where the stacktrace was generated
-     * @param  int    $line [optional] - line of the file where the stacktrace was generated
+     * @param  array<string[]> $trace           - regular PHP stacktrace
+     * @param  string          $file [optional] - name of the file where the stacktrace was generated
+     * @param  int             $line [optional] - line of the file where the stacktrace was generated
      *
-     * @return array - adjusted stacktrace
+     * @return array<string[]> - adjusted stacktrace
      *
      * @example
      * before: frame locations point to the called statement
@@ -530,7 +530,7 @@ class ErrorHandler extends StaticClass {
         // fix a missing first line if $file matches (e.g. with \SimpleXMLElement)
         if ($file!='unknown' && $line) {
             if (isset($trace[0]['file']) && $trace[0]['file']==$file) {
-                if (isset($trace[0]['line']) && $trace[0]['line']===0) {
+                if (isset($trace[0]['line']) && $trace[0]['line']=='0') {
                     $trace[0]['line'] = $line;
                 }
             }
@@ -603,8 +603,8 @@ class ErrorHandler extends StaticClass {
     /**
      * Return a formatted and more readable version of a stacktrace.
      *
-     * @param  array  $trace             - stacktrace
-     * @param  string $indent [optional] - indent formatted lines by this value (default: no indenting)
+     * @param  array<string[]> $trace             - stacktrace
+     * @param  string          $indent [optional] - indent formatted lines by this value (default: no indenting)
      *
      * @return string
      */
@@ -648,8 +648,8 @@ class ErrorHandler extends StaticClass {
     /**
      * Return a stack frame's full method name similar to the constant __METHOD__. Used for generating a formatted stacktrace.
      *
-     * @param  array $frame                - frame
-     * @param  bool  $nsToLower [optional] - whether to return the namespace part in lower case (default: unmodified)
+     * @param  string[] $frame                - frame
+     * @param  bool     $nsToLower [optional] - whether to return the namespace part in lower case (default: unmodified)
      *
      * @return string - method name (without trailing parentheses)
      */
@@ -678,18 +678,18 @@ class ErrorHandler extends StaticClass {
      * Remove all frames from a stacktrace following the specified file and line (used to remove frames of this error handler from a PHP
      * error converted to an exception).
      *
-     * @param array  $trace - stacktrace to process
-     * @param string $file  - filename where the error was triggered
-     * @param int    $line  - line number where the error was triggered
+     * @param array<string[]> $trace - stacktrace to process
+     * @param string          $file  - filename where the error was triggered
+     * @param int             $line  - line number where the error was triggered
      *
-     * @return array
+     * @return array<string[]>
      */
     private static function removeFrames(array $trace, $file, $line) {
         $result = $trace;
         $size = sizeof($trace);
 
         for ($i=0; $i < $size; $i++) {
-            if (isset($trace[$i]['file'], $trace[$i]['line']) && $trace[$i]['file']===$file && $trace[$i]['line']===$line) {
+            if (isset($trace[$i]['file'], $trace[$i]['line']) && $trace[$i]['file']===$file && $trace[$i]['line']==$line) {
                 $result = array_slice($trace, $i+1);
                 break;
             }
@@ -701,8 +701,8 @@ class ErrorHandler extends StaticClass {
     /**
      * Set the stacktrace of an {@link \Exception}.
      *
-     * @param  \Exception $exception - exception to modify
-     * @param  array      $trace     - new stacktrace
+     * @param  \Exception      $exception - exception to modify
+     * @param  array<string[]> $trace     - new stacktrace
      *
      * @return void
      */

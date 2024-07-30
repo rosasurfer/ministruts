@@ -18,12 +18,12 @@ class ApcCache extends CachePeer {
     /**
      * Constructor.
      *
-     * @param  ?string $label   [optional] - cache identifier (namespace, default: none)
-     * @param  array   $options [optional] - additional instantiation options (default: none)
+     * @param  ?string               $label   [optional] - cache identifier (namespace, default: none)
+     * @param  array<string, scalar> $options [optional] - additional instantiation options (default: none)
      */
     public function __construct($label=null, array $options=[]) {
         $this->label     = $label;
-        $this->namespace = $label ?: md5($this->di('config')['app.dir.root']);
+        $this->namespace = $label ?? md5($this->di('config')['app.dir.root']);
         $this->options   = $options;
     }
 

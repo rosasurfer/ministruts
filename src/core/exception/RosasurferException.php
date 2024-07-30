@@ -31,7 +31,7 @@ class RosasurferException extends \Exception implements RosasurferExceptionInter
 	/**
      * Return the stack trace of the exception in a more readable way.
      *
-     * @return array
+     * @return array<string[]>
      */
     public function getBetterTrace() {
         $betterTrace = $this->betterTrace;

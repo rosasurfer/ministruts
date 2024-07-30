@@ -73,7 +73,12 @@ class MySQLResult extends Result {
 
 
     /**
+     * {@inheritdoc}
      *
+     * @param  int $mode [optional] - Controls how the returned array is indexed. Can take one of the following values:
+     *                                ARRAY_ASSOC, ARRAY_NUM, or ARRAY_BOTH (default).
+     *
+     * @return array<?scalar>|null - array of columns or NULL if no more rows are available
      */
     public function fetchRow($mode = ARRAY_BOTH) {
         if (!is_resource($this->hResult) || $this->nextRowIndex < 0)

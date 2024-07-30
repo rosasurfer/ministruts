@@ -9,6 +9,8 @@ use rosasurfer\ministruts\core\exception\RuntimeException;
 
 /**
  * An EntityMapping is an object encapsulating meta information about how to map a PHP class to a database table.
+ *
+ * @implements \Iterator<string, scalar[]>
  */
 class EntityMapping extends CObject implements \Iterator {
 
@@ -16,7 +18,7 @@ class EntityMapping extends CObject implements \Iterator {
     /** @var string - the entity's class name */
     protected $className;
 
-    /** @var array - mapping information */
+    /** @var array<string, string|array<scalar[]>> - mapping information */
     protected $mapping;
 
     /** @var PropertyMapping[] - property mapping instances */
@@ -40,10 +42,10 @@ class EntityMapping extends CObject implements \Iterator {
      *
      * Create a new EntityMapping.
      *
-     * @param  array $mapping - mapping information
+     * @param  array<string, string|array<scalar[]>> $mapping - mapping information
      */
     public function __construct(array $mapping) {
-        $this->mapping   = $mapping;
+        $this->mapping = $mapping;
         $this->className = $mapping['class'];
     }
 
@@ -76,12 +78,12 @@ class EntityMapping extends CObject implements \Iterator {
      * @return ?PropertyMapping - mapping or NULL if no such property exists
      */
     public function getProperty($name) {
-        if (!isset($this->mapping['properties'][$name]))
+        if (!isset($this->mapping['properties'][$name])) {
             return null;
-
-        if (!isset($this->properties[$name]))
+        }
+        if (!isset($this->properties[$name])) {
             $this->properties[$name] = new PropertyMapping($this, $this->mapping['properties'][$name]);
-
+        }
         return $this->properties[$name];
     }
 
@@ -127,6 +129,8 @@ class EntityMapping extends CObject implements \Iterator {
 
     /**
      * Reset the current iterator position.
+     *
+     * @return void
      */
     public function rewind() {
         if ($this->iteratorKeys === null) {
@@ -139,7 +143,7 @@ class EntityMapping extends CObject implements \Iterator {
     /**
      * Return the property mapping at the current iterator position.
      *
-     * @return array
+     * @return scalar[]
      */
     public function current() {
         $key = $this->iteratorKeys[$this->iteratorPosition];
@@ -159,6 +163,8 @@ class EntityMapping extends CObject implements \Iterator {
 
     /**
      * Set the current iterator position to the next element index.
+     *
+     * @return void
      */
     public function next() {
         ++$this->iteratorPosition;

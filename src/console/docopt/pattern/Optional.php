@@ -11,10 +11,12 @@ class Optional extends BranchPattern {
 
 
     /**
+     * {@inheritdoc}
+     *
      * @param  Pattern[] $left
      * @param  Pattern[] $collected [optional]
      *
-     * @return array
+     * @return array{bool, Pattern[], Pattern[]}
      */
     public function match(array $left, array $collected = []) {
         foreach ($this->children as $pattern) {

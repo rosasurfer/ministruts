@@ -19,7 +19,6 @@ use rosasurfer\ministruts\core\di\service\ServiceNotFoundException;
  * The design principle is determined at runtime from the called DI resolver method.
  *
  * <pre>
- *  &lt;?php
  *  $di = new Di();                                         // creating a new container
  *  $di = $this->di();                                      // getting the default container in a class context
  *  $di = Application::getDi();                             // getting the default container in a non-class context
@@ -95,6 +94,8 @@ class Di extends CObject implements DiInterface {
 
 
     /**
+     * {@inheritdoc}
+     *
      * @param  string $name - service identifier
      *
      * @return bool
@@ -105,21 +106,27 @@ class Di extends CObject implements DiInterface {
 
 
     /**
+     * {@inheritdoc}
+     *
      * @param  string   $name
-     * @param  array ...$params - variable list of custom parameters
+     * @param  mixed ...$args - instantiation arguments
      *
      * @return object
      */
-    public function create($name, ...$params) {
+    public function create($name, ...$args) {
         if (!isset($this->services[$name])) throw new ServiceNotFoundException('Service "'.$name.'" not found.');
         try {
-            return $this->services[$name]->resolve(true, $params);
+            return $this->services[$name]->resolve(true, $args);
         }
-        catch (\Throwable $ex) { throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex); }
+        catch (\Throwable $ex) {
+            throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex);
+        }
     }
 
 
     /**
+     * {@inheritdoc}
+     *
      * @param  string $name
      *
      * @return object
@@ -129,13 +136,17 @@ class Di extends CObject implements DiInterface {
         try {
             return $this->services[$name]->resolve(false);
         }
-        catch (\Throwable $ex) { throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex); }
+        catch (\Throwable $ex) {
+            throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex);
+        }
     }
 
 
     /**
+     * {@inheritdoc}
+     *
      * @param  string        $name               - service identifier
-     * @param  string|object $definition         - a class name, an instance or a Closure acting as an instance factory
+     * @param  string|object $definition         - a class name, an instance or a \Closure acting as an instance factory
      * @param  string[]      $aliases [optional] - service identifier aliases (default: none)
      *
      * @return string|object - the same definition
@@ -152,9 +163,11 @@ class Di extends CObject implements DiInterface {
 
 
     /**
+     * {@inheritdoc}
+     *
      * @param  string $name - service identifier
      *
-     * @return ?IService - the removed service wrapper or NULL if no such service was found
+     * @return IService|null - the removed service wrapper or NULL if no such service was found
      */
     public function remove($name) {
         $service = null;

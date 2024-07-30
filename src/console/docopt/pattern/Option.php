@@ -95,6 +95,6 @@ class Option extends LeafPattern {
      * @return string
      */
     public function name() {
-        return $this->long ?: $this->short;
+        return $this->long ?? $this->short;
     }
 }

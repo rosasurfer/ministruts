@@ -11,6 +11,8 @@ use rosasurfer\ministruts\core\di\DiAwareTrait;
 
 /**
  * TokenIterator
+ *
+ * @extends \ArrayIterator<int, string>
  */
 class TokenIterator extends \ArrayIterator {
 
@@ -22,6 +24,8 @@ class TokenIterator extends \ArrayIterator {
 
 
     /**
+     * Constructor
+     *
      * @param  string|string[] $source
      * @param  string          $tokenError [optional] - classname of token errors used for error output
      *                                                  (default: "DocoptUserNotification")

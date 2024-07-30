@@ -31,7 +31,7 @@ class SingleMatch extends CObject {
 
 
     /**
-     * @return array
+     * @return array{?int, ?Pattern}
      */
     public function toArray() {
         return [$this->pos, $this->pattern];

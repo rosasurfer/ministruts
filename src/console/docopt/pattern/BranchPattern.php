@@ -29,6 +29,8 @@ abstract class BranchPattern extends Pattern {
 
 
     /**
+     * {@inheritdoc}
+     *
      * @param  string[] $types [optional]
      *
      * @return Pattern[]
@@ -41,16 +43,5 @@ abstract class BranchPattern extends Pattern {
             $flat = array_merge($flat, $c->flat($types));
         }
         return $flat;
-    }
-
-
-    /**
-     * @param  Pattern[] $left
-     * @param  Pattern[] $collected [optional]
-     *
-     * @return array
-     */
-    public function match(array $left, array $collected = []) {
-        throw new \RuntimeException("Unsupported");
     }
 }

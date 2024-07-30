@@ -56,10 +56,10 @@ use const rosasurfer\ministruts\NL;
 class Config extends CObject implements ConfigInterface {
 
 
-    /** @var bool[] - config file names and their existence status */
+    /** @var array<string, bool> - config file names and their existence status */
     protected $files = [];
 
-    /** @var array - tree structure of config values */
+    /** @var array<string, mixed> - tree structure of config values */
     protected $properties = [];
 
 
@@ -201,47 +201,26 @@ class Config extends CObject implements ConfigInterface {
 
 
     /**
-     * Return the config setting with the specified key as a boolean. Accepted boolean value representations are "1" and "0",
-     * "true" and "false", "on" and "off", "yes" and "no" (case-insensitive).
-     *
-     * @param  string         $key                - case-insensitive key
-     * @param  bool|int|array $options [optional] - additional options as supported by <tt>filter_var($var, FILTER_VALIDATE_BOOLEAN)</tt>, <br>
-     *                                              may be any of:                                                                         <br>
-     *                   bool $default            - default value to return if the setting does not exist                                  <br>
-     *                   int  $flags              - flags as supported by <tt>filter_var($var, FILTER_VALIDATE_BOOLEAN)</tt>:              <br>
-     *                                              FILTER_NULL_ON_FAILURE - return NULL instead of FALSE on failure                       <br>
-     *                  array $options            - multiple options are passed as elements of an array:                                   <br>
-     *                                              <tt>$options[                                                                          <br>
-     *                                                  'default' => $default,                                                             <br>
-     *                                                  'flags'   => $flags                                                                <br>
-     *                                              ]</tt>                                                                                 <br>
-     * @return ?bool - boolean value or NULL if the flag FILTER_NULL_ON_FAILURE is set and the setting does not represent
-     *                 a boolean value
-     *
-     * @throws RuntimeException if the setting does not exist and no default value was specified
+     * {@inheritdoc}
      */
-    public function getBool($key, $options = []) {
+    public function getBool($key, array $options = []) {
         Assert::string($key, '$key');
         $notFound = false;
         $value = $this->getProperty($key, $notFound);
 
         if ($notFound) {
-            if (is_bool($options))
-                return $options;
-            if (is_array($options) && \key_exists('default', $options))
+            if (\key_exists('default', $options)) {
                 return (bool) $options['default'];
+            }
             throw new RuntimeException('No configuration found for key "'.$key.'"');
         }
 
         $flags = 0;
-        if (is_int($options)) {
-            $flags = $options;
-        }
-        else if (is_array($options) && \key_exists('flags', $options)) {
-            Assert::int($options['flags'], 'option "flags"');
+        if (\key_exists('flags', $options)) {
+            Assert::int($options['flags'], '$options[flags]');
             $flags = $options['flags'];
         }
-        if ($flags & FILTER_NULL_ON_FAILURE && ($value===null || $value===''))  // crap-PHP considers NULL and '' as valid strict booleans
+        if ($flags & FILTER_NULL_ON_FAILURE && ($value===null || $value===''))  // crappy PHP considers NULL and '' as valid strict booleans
             return null;
         return filter_var($value, FILTER_VALIDATE_BOOLEAN, $flags);
     }
@@ -433,11 +412,8 @@ class Config extends CObject implements ConfigInterface {
 
 
     /**
-     * Return a plain text dump of the instance's preferences.
+     * {@inheritdoc}
      *
-     * @param  array $options [optional] - array with dump options:                               <br>
-     *                                     'sort'     => SORT_ASC|SORT_DESC (default: unsorted)   <br>
-     *                                     'pad-left' => string             (default: no padding) <br>
      * @return string
      */
     public function dump(array $options = []) {
@@ -491,11 +467,11 @@ class Config extends CObject implements ConfigInterface {
     /**
      * Dump the tree structure of a node into a flat format and return it.
      *
-     * @param  string[] $node         [in ]
-     * @param  array    $values       [in ]
-     * @param  int      $maxKeyLength [out]
+     * @param  string[]             $node         [in ]
+     * @param  array<string, mixed> $values       [in ]
+     * @param  int                  $maxKeyLength [out]
      *
-     * @return array
+     * @return array<string, ?scalar>
      */
     private function dumpNode(array $node, array $values, &$maxKeyLength) {
         $result = [];
@@ -523,11 +499,9 @@ class Config extends CObject implements ConfigInterface {
 
 
     /**
-     * Return an array with "key-value" pairs of the config settings.
+     * {@inheritdoc}
      *
-     * @param  array $options [optional] - array with export options:                       <br>
-     *                                     'sort' => SORT_ASC|SORT_DESC (default: unsorted) <br>
-     * @return string[]
+     * @return array<string, string>
      */
     public function export(array $options = []) {
         $maxKeyLength = null;
@@ -561,8 +535,9 @@ class Config extends CObject implements ConfigInterface {
                         $value = '"'.$value.'"';
                         break;
                     default:
-                        if (strContains($value, '#'))
+                        if (strContains($value, '#')) {
                             $value = '"'.$value.'"';
+                        }
                 }
             }
         }

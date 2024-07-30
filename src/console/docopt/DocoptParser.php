@@ -57,7 +57,7 @@ class DocoptParser extends CObject {
      *
      * Create a new Docopt command line argument parser.
      *
-     * @param  array $options [optional]
+     * @param  array<string, bool|string> $options [optional]
      */
     public function __construct(array $options = []) {
         foreach ($options as $name => $value) {
@@ -188,12 +188,12 @@ class DocoptParser extends CObject {
     /**
      * Parse arguments.
      *
-     * If options_first: argv ::= [ long | shorts ]* [ argument ]* [ '--' [ argument ]* ] ;
-     * else:             argv ::= [ long | shorts | argument ]* [ '--' [ argument ]* ] ;
+     * If $optionsFirst=true: argv ::= [ long | shorts ]* [ argument ]* [ '--' [ argument ]* ] ;
+     * else:                  argv ::= [ long | shorts | argument ]* [ '--' [ argument ]* ] ;
      *
-     * @param  TokenIterator  $tokens
-     * @param  \ArrayIterator $options
-     * @param  bool           $optionsFirst [optional]
+     * @param  TokenIterator               $tokens
+     * @param  \ArrayIterator<int, Option> $options
+     * @param  bool                        $optionsFirst [optional]
      *
      * @return Pattern[]
      */
@@ -205,7 +205,7 @@ class DocoptParser extends CObject {
                 while ($tokens->current() !== null) {
                     $parsed[] = new Argument(null, $tokens->move());
                 }
-                return $parsed;                             // @phpstan-ignore-line FIXME: refactor using iterator->valid()
+                return $parsed;                             // @phpstan-ignore deadCode.unreachable (refactor using iterator->valid())
             }
             elseif (strStartsWith($tokens->current(), '--')) {
                 $parsed = array_merge($parsed, static::parseLong($tokens, $options));
@@ -222,14 +222,14 @@ class DocoptParser extends CObject {
                 $parsed[] = new Argument(null, $tokens->move());
             }
         }
-        return $parsed;
+        return $parsed;                                     // @phpstan-ignore deadCode.unreachable (refactor using iterator->valid())
     }
 
 
     /**
      * @param  string $doc
      *
-     * @return \ArrayIterator
+     * @return \ArrayIterator<int, Option>
      */
     protected static function parseDefaults($doc) {
         $defaults = [];
@@ -254,8 +254,8 @@ class DocoptParser extends CObject {
 
 
     /**
-     * @param  string         $source
-     * @param  \ArrayIterator $options
+     * @param  string                      $source
+     * @param  \ArrayIterator<int, Option> $options
      *
      * @return Required
      */
@@ -266,7 +266,7 @@ class DocoptParser extends CObject {
             $error = $tokens->getTokenError();
             throw new $error('Unexpected ending: '.join(' ', $tokens->left()));
         }
-        return new Required($result);
+        return new Required($result);                       // @phpstan-ignore deadCode.unreachable (refactor using iterator->valid())
     }
 
 
@@ -291,8 +291,8 @@ class DocoptParser extends CObject {
     /**
      * expr ::= seq ( '|' seq )* ;
      *
-     * @param  TokenIterator  $tokens
-     * @param  \ArrayIterator $options
+     * @param  TokenIterator               $tokens
+     * @param  \ArrayIterator<int, Option> $options
      *
      * @return Either|Pattern[]
      */
@@ -305,14 +305,14 @@ class DocoptParser extends CObject {
         if (sizeof($seq) > 1) $result = [new Required($seq)];
         else                  $result = $seq;
 
-        while ($tokens->current() == '|') {
+        while ($tokens->current() == '|') {                 // @phpstan-ignore while.alwaysTrue (refactor using iterator->valid())
             $tokens->move();
             $seq = static::parseSequence($tokens, $options);
             if (sizeof($seq) > 1) $result[] = new Required($seq);
             else                  $result   = array_merge($result, $seq);
         }
 
-        if (sizeof($result) > 1)
+        if (sizeof($result) > 1)                            // @phpstan-ignore deadCode.unreachable (refactor using iterator->valid())
             return new Either($result);
         return $result;
     }
@@ -321,8 +321,8 @@ class DocoptParser extends CObject {
     /**
      * seq ::= ( atom [ '...' ] )* ;
      *
-     * @param  TokenIterator  $tokens
-     * @param  \ArrayIterator $options
+     * @param  TokenIterator               $tokens
+     * @param  \ArrayIterator<int, Option> $options
      *
      * @return Pattern[]
      */
@@ -346,8 +346,8 @@ class DocoptParser extends CObject {
     /**
      * shorts ::= '-' ( chars )* [ [ ' ' ] chars ] ;
      *
-     * @param  TokenIterator  $tokens
-     * @param  \ArrayIterator $options
+     * @param  TokenIterator               $tokens
+     * @param  \ArrayIterator<int, Option> $options
      *
      * @return Option[]
      */
@@ -386,7 +386,7 @@ class DocoptParser extends CObject {
                 $value = null;
                 if ($o->argcount != 0) {
                     if ($left == '') {
-                        if ($tokens->current()===null || $tokens->current()=='--') {
+                        if ($tokens->current()===null || $tokens->current()=='--') {    // @phpstan-ignore identical.alwaysFalse (refactor using iterator->valid())
                             $error = $tokens->getTokenError();
                             throw new $error($short.' requires an argument');
                         }
@@ -410,8 +410,8 @@ class DocoptParser extends CObject {
     /**
      * long ::= '--' chars [ ( ' ' | '=' ) chars ] ;
      *
-     * @param  TokenIterator  $tokens
-     * @param  \ArrayIterator $options
+     * @param  TokenIterator               $tokens
+     * @param  \ArrayIterator<int, Option> $options
      *
      * @return Option[]
      */
@@ -468,7 +468,7 @@ class DocoptParser extends CObject {
                 if (isset($value)) throw new $tokenError($o->long.' must not have an argument');
             }
             else if ($value === null) {
-                if ($tokens->current()===null || $tokens->current()=='--')
+                if ($tokens->current()===null || $tokens->current()=='--')      // @phpstan-ignore identical.alwaysFalse (refactor using iterator->valid())
                     throw new $tokenError($o->long.' requires an argument');
                 $value = $tokens->move();
             }
@@ -483,8 +483,8 @@ class DocoptParser extends CObject {
     /**
      * atom ::= '(' expr ')' | '[' expr ']' | 'options' | long | shorts | argument | command ;
      *
-     * @param  TokenIterator  $tokens
-     * @param  \ArrayIterator $options
+     * @param  TokenIterator               $tokens
+     * @param  \ArrayIterator<int, Option> $options
      *
      * @return Pattern[]
      */

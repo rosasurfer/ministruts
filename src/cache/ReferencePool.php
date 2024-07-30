@@ -17,15 +17,15 @@ use rosasurfer\ministruts\core\assert\Assert;
 final class ReferencePool extends CachePeer {
 
 
-    /** @var array - array with references: [$key, $value] */
+    /** @var array<string, mixed> */
     private $pool;
 
 
     /**
      * Constructor.
      *
-     * @param  ?string $label   [optional] - cache identifier (namespace, ignored for in-memory instances)
-     * @param  array   $options [optional] - additional instantiation options (default: none)
+     * @param  ?string               $label   [optional] - cache identifier (namespace, ignored for in-memory instances)
+     * @param  array<string, scalar> $options [optional] - additional instantiation options (default: none)
      */
     public function __construct($label=null, array $options=[]) {
         $this->label   = $label;
@@ -44,7 +44,7 @@ final class ReferencePool extends CachePeer {
 
 
     /**
-     *
+     * {@inheritdoc}
      */
     public function isCached($key) {
         if (!isset($this->pool[$key]))
@@ -62,7 +62,7 @@ final class ReferencePool extends CachePeer {
 
 
     /**
-     *
+     * {@inheritdoc}
      */
     public function get($key, $default = null) {
         if ($this->isCached($key))
@@ -72,7 +72,7 @@ final class ReferencePool extends CachePeer {
 
 
     /**
-     *
+     * {@inheritdoc}
      */
     public function drop($key) {
         if (isset($this->pool[$key])) {
@@ -84,7 +84,7 @@ final class ReferencePool extends CachePeer {
 
 
     /**
-     *
+     * {@inheritdoc}
      */
     public function set($key, $value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null) {
         Assert::string($key, '$key');

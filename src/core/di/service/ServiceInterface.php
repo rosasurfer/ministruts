@@ -58,10 +58,10 @@ interface ServiceInterface {
     /**
      * Resolve the service.
      *
-     * @param  bool  $factory    [optional] - whether to return a new instance (default: no)
-     * @param  array $parameters [optional] - additional parameters of a factory call (default: none)
+     * @param  bool    $factory [optional] - whether to return a new instance (default: no)
+     * @param  mixed[] $args [optional]    - additional instantiation arguments of a factory call (default: none)
      *
      * @return object
      */
-    public function resolve($factory=false, $parameters=[]);
+    public function resolve($factory=false, $args=[]);
 }

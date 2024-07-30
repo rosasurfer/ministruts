@@ -48,6 +48,8 @@ class Service implements ServiceInterface {
 
 
     /**
+     * {@inheritdoc}
+     *
      * @return string
      */
     public function getName() {
@@ -56,6 +58,8 @@ class Service implements ServiceInterface {
 
 
     /**
+     * {@inheritdoc}
+     *
      * @return string|object $definition - a class name, an instance or a Closure acting as an instance factory
      */
     public function getDefinition() {
@@ -64,7 +68,7 @@ class Service implements ServiceInterface {
 
 
     /**
-     * Return the service's alias names.
+     * {@inheritdoc}
      *
      * @return string[] - list of aliases (including the original name)
      */
@@ -74,7 +78,7 @@ class Service implements ServiceInterface {
 
 
     /**
-     * Add an alias name for the service.
+     * {@inheritdoc}
      *
      * @param  string $name - alias name
      *
@@ -88,26 +92,28 @@ class Service implements ServiceInterface {
 
 
     /**
-     * @param  bool  $factory    [optional] - whether to return a new instance (default: no)
-     * @param  array $parameters [optional] - additional parameters of a factory call (default: none)
+     * {@inheritdoc}
+     *
+     * @param  bool    $factory [optional] - whether to return a new instance (default: no)
+     * @param  mixed[] $args [optional]    - additional instantiation arguments of a factory call (default: none)
      *
      * @return object
      */
-    public function resolve($factory=false, $parameters=[]) {
+    public function resolve($factory=false, $args=[]) {
         if (!$factory && $this->instance) {
             return $this->instance;
         }
 
         $instance = null;
         $definition = $this->definition;
-        !$factory && $parameters = [];
+        if (!$factory) $args = [];
 
-        if (is_string($definition)) {                       // plain strings are class names without parameters
+        if (is_string($definition)) {                       // a string is a class name without parameters
             if (!is_class($definition)) throw new ClassNotFoundException('Cannot resolve service "'.$this->name.'" (unknown class "'.$definition.'")');
-            $instance = new $definition(...$parameters);
+            $instance = new $definition(...$args);
         }
         else if (is_object($definition)) {                  // objects may be a \Closure or an already resolved instance
-            $instance = $definition instanceof \Closure ? $definition(...$parameters) : $definition;
+            $instance = $definition instanceof \Closure ? $definition(...$args) : $definition;
         }
 
         if (!$factory) {

@@ -73,7 +73,7 @@ interface RosasurferExceptionInterface {
     /**
      * Return the stack trace of the exception.
      *
-     * @return array
+     * @return array<string[]>
      */
 	public function getTrace();
 
@@ -89,7 +89,7 @@ interface RosasurferExceptionInterface {
 	/**
      * Return the stack trace of the exception in a more readable way.
      *
-     * @return array
+     * @return array<string[]>
      */
     public function getBetterTrace();
 

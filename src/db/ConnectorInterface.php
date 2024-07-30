@@ -15,7 +15,7 @@ interface ConnectorInterface {
     /**
      * Constructor.
      *
-     * @param  array $options - connector-specific configuration options
+     * @param  array<string, mixed> $options - connector-specific configuration options
      */
     public function __construct(array $options);
 

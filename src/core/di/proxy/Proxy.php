@@ -50,15 +50,15 @@ abstract class Proxy extends StaticClass {
     /**
      * Forward static method calls to the object instance behind the proxy.
      *
-     * @param  string $method - method name
-     * @param  array  $args   - arguments passed to the method call
+     * @param  string  $method - method name
+     * @param  mixed[] $args   - arguments passed to the method call
      *
      * @return mixed
      */
     public static function __callStatic($method, array $args) {
-        if (substr($method, 0, 2) == '__')
-            throw new IllegalAccessException('Cannot forward to internal method '.get_class(static::instance()).'::'.$method.'()');
-
+        if (substr($method, 0, 2) == '__') {
+            throw new IllegalAccessException('Cannot call internal method '.get_class(static::instance()).'::'.$method.'()');
+        }
         $instance = static::instance();
         return $instance->$method(...$args);
     }

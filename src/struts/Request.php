@@ -881,7 +881,7 @@ class Request extends CObject {
      * @return string[]
      */
     public function getActionMessages() {
-        $messages = $this->getAttribute(ACTION_MESSAGES_KEY) ?: [];
+        $messages = $this->getAttribute(ACTION_MESSAGES_KEY) ?? [];
         $errors = $this->getActionErrors();
         return \array_merge($messages, $errors);
     }
@@ -945,7 +945,7 @@ class Request extends CObject {
      * @return string[] - the removed ActionMessages
      */
     public function removeActionMessages(...$keys) {
-        $messages = $this->getAttribute(ACTION_MESSAGES_KEY) ?: [];
+        $messages = $this->getAttribute(ACTION_MESSAGES_KEY) ?? [];
         $removed = [];
 
         foreach ($keys as $key) {
@@ -990,7 +990,7 @@ class Request extends CObject {
      * @return string[]
      */
     public function getActionErrors() {
-        return $this->getAttribute(ACTION_ERRORS_KEY) ?: [];
+        return $this->getAttribute(ACTION_ERRORS_KEY) ?? [];
     }
 
 
@@ -1052,7 +1052,7 @@ class Request extends CObject {
      * @return string[] - the removed ActionErrors
      */
     public function removeActionErrors(...$keys) {
-        $errors = $this->getAttribute(ACTION_ERRORS_KEY) ?: [];
+        $errors = $this->getAttribute(ACTION_ERRORS_KEY) ?? [];
         $removed = [];
 
         foreach ($keys as $key) {

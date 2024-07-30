@@ -242,7 +242,7 @@ class Logger extends StaticClass {
      *
      * @param  string|object $loggable           - a string or an object implementing <tt>__toString()</tt>
      * @param  int           $level              - loglevel
-     * @param  array         $context [optional] - logging context with additional data
+     * @param  mixed[]       $context [optional] - logging context with additional data
      *
      * @return bool - success status
      */
@@ -283,16 +283,14 @@ class Logger extends StaticClass {
                 if ($level == L_FATAL) $printHandler = 'printHandlerFatal';
                 else                   $printHandler = 'printHandlerNonFatal';
 
-                self::${$printHandler} && self::invokePrintHandler   ($loggable, $level, $context);
-                self::$errorLogHandler && self::invokeErrorLogHandler($loggable, $level, $context);
-                self::$mailHandler     && self::invokeMailHandler    ($loggable, $level, $context);
+                if (self::${$printHandler}) self::invokePrintHandler   ($loggable, $level, $context);
+                if (self::$errorLogHandler) self::invokeErrorLogHandler($loggable, $level, $context);
+                if (self::$mailHandler    ) self::invokeMailHandler    ($loggable, $level, $context);
             }
             $isActive = false;                                                  // unlock the section
         }
-        catch (\Throwable $logException) {}
-
-        if ($logException) {
-            // If the call comes from our framework's exception handler (that's \rosasurfer\ministruts\core\error\ErrorHandler::handleException())
+        catch (\Throwable $logException) {
+            // If the call comes from our framework's exception handler (@link \rosasurfer\ministruts\core\error\ErrorHandler::handleException())
             // a failed logging is already handled. If the call comes from user-land code make sure the message doesn't get
             // lost and is logged to the PHP default error log.
             if (!isset($context['unhandled-exception'])) {
@@ -313,7 +311,7 @@ class Logger extends StaticClass {
      *
      * @param  string|\Throwable $loggable - message or exception
      * @param  int               $level    - loglevel
-     * @param  array             $context  - reference to the log context with additional data
+     * @param  mixed[]           $context  - reference to the log context with additional data
      *
      * @return void
      */
@@ -345,7 +343,7 @@ class Logger extends StaticClass {
      *
      * @param  string|\Throwable $loggable - message or exception
      * @param  int               $level    - loglevel
-     * @param  array             $context  - reference to the log context with additional data
+     * @param  mixed[]           $context  - reference to the log context with additional data
      *
      * @return void
      */
@@ -378,7 +376,7 @@ class Logger extends StaticClass {
      *
      * @param  string|\Throwable $loggable - message or exception
      * @param  int               $level    - loglevel
-     * @param  array             $context  - reference to the log context with additional data
+     * @param  mixed[]           $context  - reference to the log context with additional data
      *
      * @return void
      */
@@ -416,7 +414,7 @@ class Logger extends StaticClass {
      *
      * @param  string|\Throwable $loggable - message or exception
      * @param  int               $level    - loglevel
-     * @param  array             $context  - reference to the log context
+     * @param  mixed[]           $context  - reference to the log context
      *
      * @return void
      */
@@ -484,7 +482,7 @@ class Logger extends StaticClass {
      *
      * @param  string|\Throwable $loggable - message or exception
      * @param  int               $level    - loglevel
-     * @param  array             $context  - reference to the log context
+     * @param  mixed[]           $context  - reference to the log context
      *
      * @return void
      */
@@ -568,7 +566,7 @@ class Logger extends StaticClass {
      *
      * @param  string|\Throwable $loggable - message or exception to log
      * @param  int               $level    - loglevel of the loggable
-     * @param  array             $context  - reference to the log context
+     * @param  mixed[]           $context  - reference to the log context
      *
      * @return void
      */
@@ -613,7 +611,7 @@ class Logger extends StaticClass {
      *
      * @param  string|\Throwable $loggable - message or exception to log
      * @param  int               $level    - loglevel of the loggable
-     * @param  array             $context  - reference to the log context
+     * @param  mixed[]           $context  - reference to the log context
      * @param  bool              $html     - whether to get an HTML (true) or a CLI (false) representation
      *
      * @return string - message details (ending with a line break) or an empty string if not applicable
@@ -653,7 +651,7 @@ class Logger extends StaticClass {
     /**
      * @param  string|\Throwable $loggable - message or exception to log
      * @param  int               $level    - loglevel of the loggable
-     * @param  array             $context  - reference to the log context
+     * @param  mixed[]           $context  - reference to the log context
      * @param  bool              $html     - whether to get an HTML (true) or a CLI (false) representation
      *
      * @return string - trace details (ending with a line break) or an empty string if not applicable
@@ -699,7 +697,7 @@ class Logger extends StaticClass {
     /**
      * @param  string|\Throwable $loggable - message or exception to log
      * @param  int               $level    - loglevel of the loggable
-     * @param  array             $context  - reference to the log context
+     * @param  mixed[]           $context  - reference to the log context
      * @param  bool              $html     - whether to get an HTML (true) or a CLI (false) representation
      *
      * @return string - request details (ending with a line break) or an empty string if not applicable
@@ -724,7 +722,7 @@ class Logger extends StaticClass {
     /**
      * @param  string|\Throwable $loggable - message or exception to log
      * @param  int               $level    - loglevel of the loggable
-     * @param  array             $context  - reference to the log context
+     * @param  mixed[]           $context  - reference to the log context
      * @param  bool              $html     - whether to get an HTML (true) or a CLI (false) representation
      *
      * @return string - session details (ending with a line break) or an empty string if not applicable
@@ -750,7 +748,7 @@ class Logger extends StaticClass {
     /**
      * @param  string|\Throwable $loggable - message or exception to log
      * @param  int               $level    - loglevel of the loggable
-     * @param  array             $context  - reference to the log context
+     * @param  mixed[]           $context  - reference to the log context
      * @param  bool              $html     - whether to get an HTML (true) or a CLI (false) representation
      *
      * @return string - server details (ending with a line break) or an empty string if not applicable
@@ -772,7 +770,7 @@ class Logger extends StaticClass {
      * Resolve the class scope the logger was called from and store it under $context['class']. For log messages from the ErrorHandler
      * this context field will be pre-populated. For log messages from user-land the field may be empty and is resolved here.
      *
-     * @param  array $context - reference to the log context
+     * @param  mixed[] $context - reference to the log context
      *
      * @return void
      *
@@ -790,7 +788,7 @@ class Logger extends StaticClass {
      * from the ErrorHandler these context fields are pre-populated. For log messages from user-land the fields may be empty and are
      * resolved here.
      *
-     * @param  array $context - reference to the log context
+     * @param  mixed[] $context - reference to the log context
      *
      * @return void
      */
@@ -812,7 +810,7 @@ class Logger extends StaticClass {
     /**
      * Generate an internal stacktrace and store it under $context['trace'].
      *
-     * @param  array $context - reference to the log context
+     * @param  mixed[] $context - reference to the log context
      *
      * @return void
      */

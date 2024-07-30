@@ -10,6 +10,7 @@ use rosasurfer\ministruts\core\exception\IllegalStateException;
 use rosasurfer\ministruts\core\exception\InvalidTypeException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 use rosasurfer\ministruts\db\ConnectorInterface as IConnector;
+use rosasurfer\ministruts\db\orm\meta\PropertyMapping;
 
 use function rosasurfer\ministruts\is_class;
 use function rosasurfer\ministruts\strEndsWith;
@@ -48,13 +49,13 @@ abstract class PersistableObject extends CObject {
     /**
      * Magic method providing default get/set implementations for mapped properties.
      *
-     * @param  string $method - name of the called and undefined method
-     * @param  array  $args   - arguments passed to the method call
+     * @param  string  $method - name of the undefined method
+     * @param  mixed[] $args   - arguments passed to the method call
      *
-     * @return mixed - return value of the intercepted virtual method
+     * @return mixed - return value of the intercepted call
      */
     public function __call($method, array $args) {
-        $dao     = $this->dao();
+        $dao = $this->dao();
         $mapping = $dao->getMapping();
         $methodL = strtolower($method);
 
@@ -166,11 +167,12 @@ abstract class PersistableObject extends CObject {
         }
 
         // The relation is not yet fetched, the property is NULL or holds a physical foreign-key value.
-        $type           = $relation['type'];                            // related class name
+        /** @var string $type */
+        $type = $relation['type'];                                      // related class name
         /** @var DAO $relatedDao */
-        $relatedDao     = $type::dao();
+        $relatedDao = $type::dao();
         $relatedMapping = $relatedDao->getMapping();
-        $relatedTable   = $relatedMapping['table'];
+        $relatedTable = $relatedMapping['table'];
 
         if ($value === null) {
             if (isset($relation['column'])) {                           // a local column with a foreign-key value of NULL
@@ -213,6 +215,7 @@ abstract class PersistableObject extends CObject {
                             where j.'.$refColumn.' = '.$keyValue;
             }
             if ($isCollection) {                                                        // default result sorting
+                /** @var string $relatedIdColumn */
                 $relatedIdColumn = $relatedMapping['identity']['column'];               // the related identity column
                 $sql .= ' order by r.'.$relatedIdColumn;                                // sort by identity
             }
@@ -511,24 +514,24 @@ abstract class PersistableObject extends CObject {
     /**
      * Perform the actual insertion of a data record representing the instance.
      *
-     * @param  array $values - record values
+     * @param  array<string, ?scalar> $values - record values
      *
-     * @return mixed - the inserted record's identity value
+     * @return int - the inserted record's identity value
      */
     private function doInsert(array $values) {
         $db       = $this->db();
         $mapping  = $this->dao()->getMapping();
         $table    = $mapping['table'];
+        /** @var string $idColumn */
         $idColumn = $mapping['identity']['column'];
-        $id       = null;
-        if  (isset($values[$idColumn])) $id = $values[$idColumn];
-        else unset($values[$idColumn]);
+
+        $id = $values[$idColumn] ?? null;
+        unset($values[$idColumn]);
 
         // translate column values
-        foreach ($values as &$value) {
-            $value = $db->escapeLiteral($value);
+        foreach ($values as $i => $value) {
+            $values[$i] = $db->escapeLiteral($value);
         }
-        unset($value);
 
         // create SQL statement
         $sql = 'insert into '.$table.' ('.join(', ', \array_keys($values)).')
@@ -551,7 +554,7 @@ abstract class PersistableObject extends CObject {
     /**
      * Perform the actual update and write modifications of the instance to the storage mechanism.
      *
-     * @param  array $changes - modifications
+     * @param  array<string, ?scalar> $changes - modifications
      *
      * @return bool - success status
      */
@@ -577,6 +580,7 @@ abstract class PersistableObject extends CObject {
         // create SQL
         $sql = 'update '.$table.' set';                                     // update table
         foreach ($changes as $name => $value) {                             //    set ...
+            /** @var PropertyMapping $mapping */
             $mapping     = $entity->getProperty($name);                     //        ...
             $columnName  = $mapping->getColumn();                           //        ...
             $columnValue = $mapping->convertToDBValue($value, $db);         //        column1 = value1,
@@ -632,14 +636,14 @@ abstract class PersistableObject extends CObject {
      * Populate this instance with the specified record values. Called during execution of {@link Worker::makeObject()} and
      * {@link PersistableObject::reload()}.
      *
-     * @param  array $row - array with column values (typically a database record)
+     * @param  array<string, ?scalar> $row - array with column values (typically a database record)
      *
      * @return $this
      */
     private function populate(array $row) {
-        $row     = \array_change_key_case($row, CASE_LOWER);
+        $row = \array_change_key_case($row, CASE_LOWER);
         $mapping = $this->dao()->getMapping();
-        $dbType  = $this->dao()->db()->getType();
+        $dbType = $this->dao()->db()->getType();
 
         foreach ($mapping['columns'] as $column => &$property) {
             $propertyName = $property['name'];
@@ -663,15 +667,13 @@ abstract class PersistableObject extends CObject {
                 }
 
                 switch ($propertyType) {
-                    case 'origin' : $this->$propertyName =             $row[$column]; break;
-
+                    case 'origin' : $this->$propertyName = $row[$column]; break;
                     case 'bool'   :
                     case 'boolean':
                         if ($dbType == 'pgsql') {
                             if      ($row[$column] == 't') $row[$column] = 1;
                             else if ($row[$column] == 'f') $row[$column] = 0;
-                        }
-                                    $this->$propertyName = (bool)(int) $row[$column]; break;
+                        };          $this->$propertyName = (bool)(int) $row[$column]; break;
                     case 'int'    :
                     case 'integer': $this->$propertyName =       (int) $row[$column]; break;
                     case 'float'  :
@@ -698,8 +700,8 @@ abstract class PersistableObject extends CObject {
      * Create a new instance and populate it with the specified properties. This method is called by the ORM to transform
      * database query result records to instances of the respective entity class.
      *
-     * @param  string $class - entity class name
-     * @param  array  $row   - array with property values (a result row from a database query)
+     * @param  string                 $class - entity class name
+     * @param  array<string, ?scalar> $row   - array with property values (a result row from a database query)
      *
      * @return PersistableObject
      */
