@@ -12,6 +12,7 @@ use function rosasurfer\echoPre;
 use function rosasurfer\ini_get_bool;
 use function rosasurfer\ini_get_bytes;
 use function rosasurfer\ini_get_int;
+use function rosasurfer\json_decode;
 use function rosasurfer\php_byte_value;
 use function rosasurfer\stderr;
 use function rosasurfer\strContains;
@@ -320,9 +321,9 @@ class PHP extends StaticClass {
         // ----------
         /*PHP_INI_SYSTEM*/ if (ini_get('enable_dl'))                                                                 $issues[] = 'Warn:  enable_dl is not Off';
         if (!extension_loaded('ctype'))                                                                              $issues[] = 'Warn:  ctype extension is not loaded  [functionality]';
-        if (!extension_loaded('iconv'))                                                                              $issues[] = 'Warn:  iconv extension is not loaded  [functionality]';
         if (!extension_loaded('json'))                                                                               $issues[] = 'Warn:  JSON extension is not loaded  [functionality]';
-        if (!extension_loaded('pcntl')   && !WINDOWS && CLI) /*never loaded in a web server context*/                $issues[] = 'Warn:  PCNTL extension is not loaded  [functionality]';
+        if (!extension_loaded('iconv'))                                                                              $issues[] = 'Info:  iconv extension is not loaded  [functionality]';
+        if (!extension_loaded('pcntl')   && !WINDOWS && CLI) /*never loaded in a web server context*/                $issues[] = 'Info:  PCNTL extension is not loaded  [functionality]';
         if (!extension_loaded('sysvsem') && !WINDOWS)                                                                $issues[] = 'Info:  System-V Semaphore extension is not loaded  [functionality]';
 
         // check Composer defined dependencies
@@ -364,9 +365,9 @@ class PHP extends StaticClass {
             //}
         }
         elseif (extension_loaded('zend opcache')) {
-            /*PHP_INI_ALL   */ if (!ini_get('opcache.enable'))                                                       $issues[] = 'Warn:  opcache.enable is not On [performance]';
+            /*PHP_INI_ALL   */ if (!ini_get('opcache.enable'))                                                       $issues[] = 'Info:  opcache.enable is not On [performance]';
         }
-        else                                                                                                         $issues[] = 'Warn:  No opcode cache found [performance]';
+        else                                                                                                         $issues[] = 'Info:  No opcode cache found [performance]';
 
         // show results followed by phpinfo()
         if (!CLI) {

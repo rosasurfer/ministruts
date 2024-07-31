@@ -741,8 +741,8 @@ function isRelativePath($path) {
  *
  * @return string - encoded value
  *
- * Note: Since version 7.3 PHP supports the flag JSON_THROW_ON_ERROR to change the default behavior on errors.
- *       No need for additional helpers anymore.
+ * Note: PHP 7.3 introduced the flag JSON_THROW_ON_ERROR to change the default behavior on errors.
+ *       From there on this helper is not needed anymore.
  *
  * @see  https://github.com/alexeyshockov/php-json-wrapper
  */
@@ -763,8 +763,8 @@ function json_encode($value, $options=0, $depth=512) {
  *
  * @return mixed - decoded value
  *
- * Note: Since version 7.3 PHP supports the flag JSON_THROW_ON_ERROR to change the default behavior on errors.
- *       No need for additional helpers anymore.
+ * Note: PHP 7.3 introduced the flag JSON_THROW_ON_ERROR to change the default behavior on errors.
+ *       From there on this helper is not needed anymore.
  *
  * @see  https://github.com/alexeyshockov/php-json-wrapper
  */
