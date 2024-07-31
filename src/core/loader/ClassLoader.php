@@ -14,21 +14,11 @@ use const rosasurfer\ministruts\ROOT_DIR;
 class ClassLoader extends CObject {
 
 
-    /** @var string[] - class map */
-    private $classMap;
+    /** @var ?string[] - class map */
+    protected $classMap = null;
 
     /** @var bool - whether this instance is registered */
-    private $registered;
-
-
-    /**
-     * Constructor
-     */
-    public function __construct() {
-        // initialize a case-insensitive class map
-        $classMap = require(ROOT_DIR.'/vendor/composer/autoload_classmap.php');
-        $this->classMap = \array_change_key_case($classMap, CASE_LOWER);
-    }
+    protected $registered;
 
 
     /**
@@ -38,8 +28,7 @@ class ClassLoader extends CObject {
      */
     public function register() {
         if (!$this->registered) {
-            spl_autoload_register([$this, 'autoLoad'], true, false);
-            $this->registered = true;
+            $this->registered = spl_autoload_register([$this, 'autoLoad'], true, false);
         }
         return $this;
     }
@@ -67,6 +56,12 @@ class ClassLoader extends CObject {
      * @return void
      */
     public function autoLoad($class) {
+        if (!isset($this->classMap)) {
+            // initialize a case-insensitive class map
+            $classMap = require(ROOT_DIR.'/vendor/composer/autoload_classmap.php');
+            $this->classMap = \array_change_key_case($classMap, CASE_LOWER);
+        }
+
         $lowerClass = strtolower($class);
 
         if (isset($this->classMap[$lowerClass])) {

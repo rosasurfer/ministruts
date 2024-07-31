@@ -7,10 +7,8 @@ use rosasurfer\ministruts\core\di\DiAwareTrait;
 
 
 /**
- * Base class of all "rosasurfer" classes. Other classes may use {@link ObjectTrait} and/or {@link \rosasurfer\ministruts\core\di\DiAwareTrait}
- * directly to provide the same functionality.
- *
- * Note: Since PHP 7.2 "object" is a keyword and can't be used as a class name.
+ * Base class of all "rosasurfer" classes. Other classes may use {@link \rosasurfer\ministruts\core\ObjectTrait} and/or
+ * {@link \rosasurfer\ministruts\core\di\DiAwareTrait} directly to provide the same functionality.
  */
 class CObject {
 

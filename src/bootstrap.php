@@ -33,23 +33,24 @@ if (!defined('rosasurfer\ministruts\struts\MODULE_KEY')) require(__DIR__.'/strut
  */
 function registerClassLoader() {
     static $done = false;
-    if ($done) return;
+    if (!$done) {
+        // tmp. register a bootstrap loader for class "rosasurfer\ministruts\core\loader\ClassLoader"
+        $bootstrap = function($class) {
+            switch ($class) {
+                case CObject     ::class: require(__DIR__.'/core/CObject.php'           ); break;
+                case ObjectTrait ::class: require(__DIR__.'/core/ObjectTrait.php'       ); break;
+                case DiAwareTrait::class: require(__DIR__.'/core/di/DiAwareTrait.php'   ); break;
+                case ClassLoader ::class: require(__DIR__.'/core/loader/ClassLoader.php'); break;
+            }
+        };
+        spl_autoload_register($bootstrap, true, true);
 
-    // register a bootstrap loader for class rosasurfer\ministruts\core\loader\ClassLoader
-    $bootstrap = function($class) {
-        switch ($class) {
-            case CObject     ::class: require(__DIR__.'/core/CObject.php'           ); break;
-            case ObjectTrait ::class: require(__DIR__.'/core/ObjectTrait.php'       ); break;
-            case DiAwareTrait::class: require(__DIR__.'/core/di/DiAwareTrait.php'   ); break;
-            case ClassLoader ::class: require(__DIR__.'/core/loader/ClassLoader.php'); break;
-        }
-    };
-    spl_autoload_register($bootstrap, true, true);
+        // instantiate and register the framework's class loader
+        (new ClassLoader())->register();
 
-    // instantiate and register the framework's class loader
-    (new ClassLoader())->register();
-    spl_autoload_unregister($bootstrap);
-
+        // remove the tmp. bootstrap loader
+        spl_autoload_unregister($bootstrap);
+    }
     $done = true;
 }
 registerClassLoader();
