@@ -46,11 +46,11 @@ class SimpleXMLElement extends \SimpleXMLElement {
         /** @var SimpleXMLElement $xml */
         $xml = $ex = null;
         try {
-            $xml = new static(...func_get_args());                      // @phpstan-ignore-line since PHP 8.0 the constructor is not final anymore
+            $xml = new static(...func_get_args());
         }
         catch (IRosasurferException $ex) {}
         catch (\Throwable           $ex) { $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex); }
-        catch (\Exception           $ex) { $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex); }    // @phpstan-ignore-line
+        catch (\Exception           $ex) { $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex); }    // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
 
         finally {
             restore_error_handler();

@@ -202,17 +202,17 @@ class Config extends CObject implements ConfigInterface {
      * Return the config setting with the specified key as a boolean. Accepted boolean value representations are "1" and "0",
      * "true" and "false", "on" and "off", "yes" and "no" (case-insensitive).
      *
-     * @param  string         $key                - case-insensitive key
-     * @param  bool|int|array $options [optional] - additional options as supported by <tt>filter_var($var, FILTER_VALIDATE_BOOLEAN)</tt>, <br>
-     *                                              may be any of: <br>
-     *                   bool $default            - default value to return if the setting does not exist <br>
-     *                   int  $flags              - flags as supported by <tt>filter_var($var, FILTER_VALIDATE_BOOLEAN)</tt>: <br>
-     *                                              FILTER_NULL_ON_FAILURE - return NULL instead of FALSE on failure <br>
-     *                  array $options            - multiple options are passed as elements of an array: <br>
-     *                                              <tt>$options[              <br>
-     *                                                  'default' => $default, <br>
-     *                                                  'flags'   => $flags    <br>
-     *                                              ]</tt>                     <br>
+     * @param  string              $key                - case-insensitive key
+     * @param  bool|int|array|null $options [optional] - additional options as supported by <tt>filter_var($var, FILTER_VALIDATE_BOOLEAN)</tt>, <br>
+     *                                                   may be any of: <br>
+     *                        bool $default            - default value to return if the setting does not exist <br>
+     *                        int  $flags              - flags as supported by <tt>filter_var($var, FILTER_VALIDATE_BOOLEAN)</tt>: <br>
+     *                                                   FILTER_NULL_ON_FAILURE - return NULL instead of FALSE on failure <br>
+     *                       array $options            - multiple options are passed as elements of an array: <br>
+     *                                                   <tt>$options[              <br>
+     *                                                       'default' => $default, <br>
+     *                                                       'flags'   => $flags    <br>
+     *                                                   ]</tt>                     <br>
      * @return ?bool - boolean value or NULL if the flag FILTER_NULL_ON_FAILURE is set and the setting does not represent
      *                 a boolean value
      *
@@ -433,9 +433,9 @@ class Config extends CObject implements ConfigInterface {
     /**
      * Return a plain text dump of the instance's preferences.
      *
-     * @param  array $options [optional] - array with dump options: <br>
-     *                                     'sort'     => SORT_ASC|SORT_DESC (default: unsorted) <br>
-     *                                     'pad-left' => string             (default: no padding) <br>
+     * @param  ?array $options [optional] - array with dump options: <br>
+     *                                      'sort'     => SORT_ASC|SORT_DESC (default: unsorted) <br>
+     *                                      'pad-left' => string             (default: no padding) <br>
      * @return string
      */
     public function dump(array $options = null) {
@@ -523,8 +523,8 @@ class Config extends CObject implements ConfigInterface {
     /**
      * Return an array with "key-value" pairs of the config settings.
      *
-     * @param  array $options [optional] - array with export options: <br>
-     *                                     'sort' => SORT_ASC|SORT_DESC (default: unsorted) <br>
+     * @param  ?array $options [optional] - array with export options: <br>
+     *                                      'sort' => SORT_ASC|SORT_DESC (default: unsorted) <br>
      * @return string[]
      */
     public function export(array $options = null) {

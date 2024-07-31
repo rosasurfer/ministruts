@@ -314,7 +314,7 @@ class Logger extends StaticClass {
             // validate parameters
             if (!is_string($loggable)) {
                 Assert::hasMethod($loggable, '__toString', '$loggable');
-                if (!$loggable instanceof \Throwable && !$loggable instanceof \Exception) { // @phpstan-ignore-line
+                if (!$loggable instanceof \Throwable && !$loggable instanceof \Exception) { // @phpstan-ignore instanceof.alwaysFalse (PHP5 compatibility)
                     $loggable = (string) $loggable;
                 }
             }
@@ -353,7 +353,7 @@ class Logger extends StaticClass {
 
         }
         catch (\Throwable $ex) {}
-        catch (\Exception $ex) {}       // @phpstan-ignore-line
+        catch (\Exception $ex) {}       // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
 
         if ($ex) {
             // If the call comes from our framework's exception handler \rosasurfer\core\debug\ErrorHandler::handleException()
@@ -486,7 +486,7 @@ class Logger extends StaticClass {
                             self::log('Unexpected HTTP status code '.$status.' ('.$description.') for URL: '.$request->getUrl(), L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
                         }
                         catch (\Throwable $ex) {}   // intentionally eat it
-                        catch (\Exception $ex) {}   // @phpstan-ignore-line
+                        catch (\Exception $ex) {}   // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
                         continue;
                     }
                     if (strStartsWithI($content, 'ERR: 113')) {
@@ -523,7 +523,7 @@ class Logger extends StaticClass {
                             self::log('Unexpected HTTP status code '.$status.' ('.$description.') for URL: '.$request->getUrl(), L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
                         }
                         catch (\Throwable $ex) {}   // intentionally eat it
-                        catch (\Exception $ex) {}   // @phpstan-ignore-line
+                        catch (\Exception $ex) {}   // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
                         continue;
                     }
                 }

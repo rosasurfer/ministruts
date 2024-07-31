@@ -82,7 +82,7 @@ abstract class DAO extends Singleton {
     /**
      * Find all matching records and convert them to instances of the entity class.
      *
-     * @param  string $query [optional] - SQL query with optional ORM syntax; without a query all instances are returned
+     * @param  ?string $query [optional] - SQL query with optional ORM syntax; without a query all instances are returned
      *
      * @return PersistableObject[]
      */
@@ -118,7 +118,7 @@ abstract class DAO extends Singleton {
     /**
      * Get all matching records (at least one) and convert them to instances of the entity class.
      *
-     * @param  string $query [optional] - SQL query with optional ORM syntax; without a query all instances are returned
+     * @param  ?string $query [optional] - SQL query with optional ORM syntax; without a query all instances are returned
      *
      * @return PersistableObject[] - at least one instance
      *
@@ -174,7 +174,7 @@ abstract class DAO extends Singleton {
             return $result;
         }
         catch (\Throwable $ex) { $this->db()->rollback(); throw $ex; }
-        catch (\Exception $ex) { $this->db()->rollback(); throw $ex; }  // @phpstan-ignore-line
+        catch (\Exception $ex) { $this->db()->rollback(); throw $ex; }  // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
     }
 
 

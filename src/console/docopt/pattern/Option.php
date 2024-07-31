@@ -10,19 +10,19 @@ use rosasurfer\console\docopt\SingleMatch;
 class Option extends LeafPattern {
 
 
-    /** @var string */
-    public $short;
+    /** @var ?string */
+    public $short = null;
 
-    /** @var string */
-    public $long;
+    /** @var ?string */
+    public $long = null;
 
     /** @var int */
     public $argcount;
 
 
     /**
-     * @param  string           $short    [optional]
-     * @param  string           $long     [optional]
+     * @param  ?string          $short    [optional]
+     * @param  ?string          $long     [optional]
      * @param  int              $argcount [optional]
      * @param  bool|string|null $value    [optional]
      */

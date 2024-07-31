@@ -52,7 +52,7 @@ class FrontController extends Singleton {
             //                                                              //
             // $controller = $cache->get($class);                           // re-check after the lock is aquired
 
-            if (!$controller) {                                             // @phpstan-ignore-line
+            if (!$controller) {                                             // @phpstan-ignore booleanNot.alwaysTrue (TODO: keep for caching fix)
                 $controller = self::getInstance(static::class);
 
                 $config = self::di('config');
@@ -110,7 +110,7 @@ class FrontController extends Singleton {
         }
         catch (IRosasurferException $ex) {}
         catch (\Throwable           $ex) { $ex = new StrutsConfigException($ex->getMessage(), $ex->getCode(), $ex); }
-        catch (\Exception           $ex) { $ex = new StrutsConfigException($ex->getMessage(), $ex->getCode(), $ex); }   // @phpstan-ignore-line
+        catch (\Exception           $ex) { $ex = new StrutsConfigException($ex->getMessage(), $ex->getCode(), $ex); }   // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
 
         if ($ex) throw $ex->addMessage('Error instantiating Struts module from file "'.$file.'"');
     }

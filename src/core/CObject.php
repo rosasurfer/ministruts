@@ -30,7 +30,7 @@ class CObject {
             Assert::string($value);                                             // Ensure __toString() returns a string as otherwise...
         }                                                                       // PHP will trigger a non-catchable fatal error.
         catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }
-        catch (\Exception $ex) { ErrorHandler::handleToStringException($ex); }  // @phpstan-ignore-line
+        catch (\Exception $ex) { ErrorHandler::handleToStringException($ex); }  // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
 
         return $value;
     }

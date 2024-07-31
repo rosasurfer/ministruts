@@ -16,8 +16,8 @@ class ApcCache extends CachePeer {
     /**
      * Constructor.
      *
-     * @param  string $label   [optional] - cache identifier (namespace, default: none)
-     * @param  array  $options [optional] - additional instantiation options (default: none)
+     * @param  ?string $label   [optional] - cache identifier (namespace, default: none)
+     * @param  array   $options [optional] - additional instantiation options (default: none)
      */
     public function __construct($label=null, array $options=[]) {
         $this->label     = $label;

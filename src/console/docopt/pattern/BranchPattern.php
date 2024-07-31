@@ -11,7 +11,7 @@ abstract class BranchPattern extends Pattern {
 
 
     /**
-     * @param  Pattern|Pattern[] $children [optional]
+     * @param  Pattern|Pattern[]|null $children [optional]
      */
     public function __construct($children = null) {
         if (!$children) {

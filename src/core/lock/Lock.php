@@ -37,7 +37,7 @@ class Lock extends BaseLock {
         self::$lockedKeys[$key] = $this->key = $key;
 
         // prefer SysVLock...
-        if (false && extension_loaded('sysvsem')) {     // @phpstan-ignore-line
+        if (false && extension_loaded('sysvsem')) {     // @phpstan-ignore booleanAnd.leftAlwaysFalse (TODO: fix bugs)
             $this->impl = new SystemFiveLock($key);
         }
         else {
@@ -89,6 +89,6 @@ class Lock extends BaseLock {
             $this->release();
         }
         catch (\Throwable $ex) { throw ErrorHandler::handleDestructorException($ex); }
-        catch (\Exception $ex) { throw ErrorHandler::handleDestructorException($ex); }  // @phpstan-ignore-line
+        catch (\Exception $ex) { throw ErrorHandler::handleDestructorException($ex); }  // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
     }
 }

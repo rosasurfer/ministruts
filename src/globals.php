@@ -350,9 +350,9 @@ function ini_get_bytes($option, $strict = true) {
  * Inline replacement and shortcut for htmlspecialchars() using different default flags.
  *
  * @param  string $string
- * @param  int    $flags        [optional] - default: ENT_QUOTES|ENT_SUBSTITUTE|ENT_HTML5
- * @param  string $encoding     [optional] - default: ini_get("default_charset")
- * @param  bool   $doubleEncode [optional] - default: TRUE
+ * @param  ?int    $flags        [optional] - default: ENT_QUOTES|ENT_SUBSTITUTE|ENT_HTML5
+ * @param  ?string $encoding     [optional] - default: ini_get("default_charset")
+ * @param  bool    $doubleEncode [optional] - default: TRUE
  *
  * @return string - converted string
  *
@@ -994,7 +994,7 @@ function pluralize($count, $singular='', $plural='s') {
  * Execute a task in a synchronized way. Emulates the Java keyword "synchronized".
  *
  * @param  \Closure $task             - task to execute (an anonymous function is implicitly casted)
- * @param  string   $mutex [optional] - mutex identifier (default: the calling line of code)
+ * @param  ?string  $mutex [optional] - mutex identifier (default: the calling line of code)
  *
  * @return void
  */
@@ -1050,9 +1050,9 @@ function asset($uri) {
 /**
  * Parse command line arguments and match them against the specified {@link http://docopt.org} syntax definition.
  *
- * @param  string          $doc                - help text, i.e. a syntax definition in docopt language format
- * @param  string|string[] $args    [optional] - arguments to parse (default: the arguments passed in $_SERVER['args'])
- * @param  array           $options [optional] - parser options (default: none)
+ * @param  string               $doc                - help text, i.e. a syntax definition in docopt language format
+ * @param  string|string[]|null $args    [optional] - arguments to parse (default: the arguments passed in $_SERVER['args'])
+ * @param  array                $options [optional] - parser options (default: none)
  *
  * @return DocoptResult - the parsing result
  */

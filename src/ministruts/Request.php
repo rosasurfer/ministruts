@@ -910,10 +910,10 @@ class Request extends CObject {
     /**
      * Send a cookie.
      *
-     * @param  string $name               - cookie name
-     * @param  string $value              - cookie value
-     * @param  int    $expires [optional] - timestamp when the cookie expires (default: when the browser is closed)
-     * @param  string $path    [optional] - path the cookie will be available for (default: the application)
+     * @param  string  $name               - cookie name
+     * @param  string  $value              - cookie value
+     * @param  int     $expires [optional] - timestamp when the cookie expires (default: when the browser is closed)
+     * @param  ?string $path    [optional] - path the cookie will be available for (default: the application)
      *
      * @return $this
      */
@@ -958,7 +958,7 @@ class Request extends CObject {
     /**
      * Return the stored ActionMessage for the specified key, or the first ActionMessage if no key was given.
      *
-     * @param  string $key [optional]
+     * @param  ?string $key [optional]
      *
      * @return ?string - message
      */
@@ -992,7 +992,7 @@ class Request extends CObject {
     /**
      * Whether an ActionMessage exists for one of the specified keys, or for any key if no key was given.
      *
-     * @param  string|string[] $keys [optional] - message keys
+     * @param  string|string[]|null $keys [optional] - message keys
      *
      * @return bool
      */
@@ -1026,7 +1026,7 @@ class Request extends CObject {
      * @return $this
      */
     public function setActionMessage($key, $message) {
-        if (!is_string($key) && !is_int($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.gettype($key));    // @phpstan-ignore-line
+        if (!is_string($key) && !is_int($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.gettype($key));    // @phpstan-ignore booleanAnd.alwaysFalse (types come from PHPDoc)
         Assert::nullOrString($message, '$message');
 
         if (!isset($message)) {
@@ -1067,7 +1067,7 @@ class Request extends CObject {
     /**
      * Return the stored ActionError for the specified key, or the first ActionError if no key was given.
      *
-     * @param  string $key [optional]
+     * @param  ?string $key [optional]
      *
      * @return ?string - message
      */
@@ -1099,7 +1099,7 @@ class Request extends CObject {
     /**
      * Whether an ActionError exists for one of the specified keys, or for any key if no key was given.
      *
-     * @param  string|string[] $keys [optional] - error keys
+     * @param  string|string[]|null $keys [optional] - error keys
      *
      * @return bool
      */
@@ -1133,7 +1133,7 @@ class Request extends CObject {
      * @return $this
      */
     public function setActionError($key, $message) {
-        if (!is_string($key) && !is_int($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.gettype($key));    // @phpstan-ignore-line
+        if (!is_string($key) && !is_int($key)) throw new IllegalTypeException('Illegal type of parameter $key: '.gettype($key));    // @phpstan-ignore booleanAnd.alwaysFalse (types come from PHPDoc)
         Assert::nullOrString($message, '$message');
 
         if (!isset($message)) {
@@ -1240,7 +1240,7 @@ class Request extends CObject {
             Assert::string($string);                                            // Ensure __toString() returns a string as otherwise
         }                                                                       // PHP will trigger a non-catchable fatal error.
         catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }
-        catch (\Exception $ex) { ErrorHandler::handleToStringException($ex); }  // @phpstan-ignore-line
+        catch (\Exception $ex) { ErrorHandler::handleToStringException($ex); }  // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
 
         return $string;
     }

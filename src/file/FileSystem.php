@@ -21,12 +21,12 @@ class FileSystem extends StaticClass {
      * all specified sub-directories. It will set default permissions a bit more restrictive and will *not* emit a warning if a
      * directory already exists.
      *
-     * @param  string   $path                 - directory name                                                              <br>
-     * @param  int      $mode      [optional] - permission mode to set if the directory is created on non-Windows systems   <br>
-     *                                          (default: 0775 = rwxrwxr x)                                                 <br>
-     * @param  bool     $recursive [optional] - whether to automatically create specified sub-directories                   <br>
-     *                                          (default: yes)                                                              <br>
-     * @param  resource $context   [optional]
+     * @param  string    $path                 - directory name                                                              <br>
+     * @param  int       $mode      [optional] - permission mode to set if the directory is created on non-Windows systems   <br>
+     *                                           (default: 0775 = rwxrwxr x)                                                 <br>
+     * @param  bool      $recursive [optional] - whether to automatically create specified sub-directories                   <br>
+     *                                           (default: yes)                                                              <br>
+     * @param  ?resource $context   [optional]
      *
      * @return bool - success status
      */
@@ -43,7 +43,7 @@ class FileSystem extends StaticClass {
             }
             catch (IRosasurferException $ex) {}
             catch (\Throwable           $ex) { $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex); }
-            catch (\Exception           $ex) { $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex); }    // @phpstan-ignore-line
+            catch (\Exception           $ex) { $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex); }    // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
 
             throw $ex->addMessage('Cannot create directory "'.$path.'"');
         }

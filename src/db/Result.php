@@ -37,15 +37,15 @@ abstract class Result extends CObject implements ResultInterface {
             $this->release();
         }
         catch (\Throwable $ex) { throw ErrorHandler::handleDestructorException($ex); }
-        catch (\Exception $ex) { throw ErrorHandler::handleDestructorException($ex); }  // @phpstan-ignore-line
+        catch (\Exception $ex) { throw ErrorHandler::handleDestructorException($ex); }  // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
     }
 
 
     /**
-     *
+     * {@inheritdoc}
      */
     public function fetchColumn($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
-        if (!is_int($column) && !is_string($column)) {                                  // @phpstan-ignore-line
+        if (!is_int($column) && !is_string($column)) {                                  // @phpstan-ignore booleanAnd.alwaysFalse (types come from PHPDoc)
             throw new IllegalTypeException('Illegal type of parameter $column: '.gettype($column));
         }
         if (isset($row)) throw new UnimplementedFeatureException('$row='.$row.' (!= NULL)');

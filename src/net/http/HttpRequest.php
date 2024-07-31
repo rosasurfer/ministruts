@@ -28,7 +28,7 @@ class HttpRequest extends CObject {
      *
      * Create a new HttpRequest.
      *
-     * @param  string $url [optional] - URL (default: none)
+     * @param  ?string $url [optional] - URL (default: none)
      */
     public function __construct($url = null) {
         if (isset($url)) {
@@ -173,8 +173,8 @@ class HttpRequest extends CObject {
     /**
      * Return the request headers with the specified names.  This method returns a key-value pair for each found header.
      *
-     * @param  string|string[] $names [optional] - one or more header names (case is ignored)
-     *                                             (default: without a name all headers are returned)
+     * @param  string|string[]|null $names [optional] - one or more header names (case is ignored)
+     *                                                  (default: without a name all headers are returned)
      *
      * @return string[] - array of name-value pairs or an empty array if no such headers were found
      */

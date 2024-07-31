@@ -87,7 +87,7 @@ class SMTPMailer extends Mailer {
             $this->disconnect();
         }
         catch (\Throwable $ex) { throw ErrorHandler::handleDestructorException($ex); }
-        catch (\Exception $ex) { throw ErrorHandler::handleDestructorException($ex); }  // @phpstan-ignore-line
+        catch (\Exception $ex) { throw ErrorHandler::handleDestructorException($ex); }  // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
     }
 
 

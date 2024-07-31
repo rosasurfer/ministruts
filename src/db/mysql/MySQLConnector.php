@@ -223,7 +223,7 @@ class MySQLConnector extends Connector {
         }
         catch (IRosasurferException $ex) {}
         catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
-        catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }   // @phpstan-ignore-line
+        catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }   // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
 
         if ($ex) throw $ex->addMessage('Can not connect to MySQL server on "'.$host.'"');
 
@@ -276,7 +276,7 @@ class MySQLConnector extends Connector {
             }
             catch (IRosasurferException $ex) {}
             catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), mysql_errno($this->hConnection), $ex); }
-            catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), mysql_errno($this->hConnection), $ex); }  // @phpstan-ignore-line
+            catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), mysql_errno($this->hConnection), $ex); }  // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
             if ($ex) throw $ex->addMessage('Can not select database "'.$this->database.'"');
         }
         return $this;
@@ -422,7 +422,7 @@ class MySQLConnector extends Connector {
         }
         catch (IRosasurferException $ex) {}
         catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), mysql_errno($this->hConnection), $ex); }
-        catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), mysql_errno($this->hConnection), $ex); }  // @phpstan-ignore-line
+        catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), mysql_errno($this->hConnection), $ex); }  // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
         if ($ex) throw $ex->addMessage('Database: '.$this->getConnectionDescription().NL.'SQL: "'.$sql.'"');
 
         // track last_insert_id

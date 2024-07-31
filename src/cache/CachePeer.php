@@ -88,10 +88,10 @@ abstract class CachePeer extends CObject {
      * Store a value under the specified key in the cache and overwrite an existing value. The stored value is automatically invalidated
      * after expiration of the specified time interval or on status change of the specified {@link \rosasurfer\cache\monitor\Dependency}.
      *
-     * @param  string     $key                   - key
-     * @param  mixed      $value                 - value
-     * @param  int        $expires    [optional] - time interval in seconds for automatic invalidation (default: never)
-     * @param  Dependency $dependency [optional] - dependency object monitoring validity of the value (default: none)
+     * @param  string      $key                   - key
+     * @param  mixed       $value                 - value
+     * @param  int         $expires    [optional] - time interval in seconds for automatic invalidation (default: never)
+     * @param  ?Dependency $dependency [optional] - dependency object monitoring validity of the value (default: none)
      *
      * @return bool - success status
      */
@@ -103,10 +103,10 @@ abstract class CachePeer extends CObject {
      * automatically invalidated after expiration of the specified time interval or on status change of the specified
      * {@link \rosasurfer\cache\monitor\Dependency}.
      *
-     * @param  string     $key                   - key
-     * @param  mixed      $value                 - value
-     * @param  int        $expires    [optional] - time interval in seconds for automatic invalidation (default: never)
-     * @param  Dependency $dependency [optional] - dependency object monitoring validity of the value (default: none)
+     * @param  string      $key                   - key
+     * @param  mixed       $value                 - value
+     * @param  int         $expires    [optional] - time interval in seconds for automatic invalidation (default: never)
+     * @param  ?Dependency $dependency [optional] - dependency object monitoring validity of the value (default: none)
      *
      * @return bool - success status
      */
@@ -122,10 +122,10 @@ abstract class CachePeer extends CObject {
      * value. The stored value is automatically invalidated after expiration of the specified time interval or on status
      * change of the specified {@link \rosasurfer\cache\monitor\Dependency}.
      *
-     * @param  string     $key                   - key
-     * @param  mixed      $value                 - value
-     * @param  int        $expires    [optional] - time interval in seconds for automatic invalidation (default: never)
-     * @param  Dependency $dependency [optional] - dependency object monitoring validity of the value (default: none)
+     * @param  string      $key                   - key
+     * @param  mixed       $value                 - value
+     * @param  int         $expires    [optional] - time interval in seconds for automatic invalidation (default: never)
+     * @param  ?Dependency $dependency [optional] - dependency object monitoring validity of the value (default: none)
      *
      * @return bool - success status
      */

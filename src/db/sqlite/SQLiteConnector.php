@@ -143,7 +143,7 @@ class SQLiteConnector extends Connector {
         }
         catch (IRosasurferException $ex) {}
         catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
-        catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }   // @phpstan-ignore-line
+        catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }   // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
 
         if ($ex) {
             $file = $this->file;
@@ -155,7 +155,7 @@ class SQLiteConnector extends Connector {
                 }
             }
             else {
-                $what = ($flags & SQLITE3_OPEN_CREATE) ? 'create' : 'find'; // @phpstan-ignore-line
+                $what = ($flags & SQLITE3_OPEN_CREATE) ? 'create' : 'find'; // @phpstan-ignore ternary.alwaysFalse (keep for testing)
                 isRelativePath($file) && $where=' in "'.getcwd().'"';
             }
             throw $ex->addMessage('Cannot '.$what.' database file "'.$file.'"'.$where);
@@ -321,7 +321,7 @@ class SQLiteConnector extends Connector {
         }
         catch (IRosasurferException $ex) {}
         catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
-        catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }   // @phpstan-ignore-line
+        catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }   // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
         if ($ex) throw $ex->addMessage('Database: '.$this->file.NL.'SQL: "'.$sql.'"');
 
         // track last_insert_id

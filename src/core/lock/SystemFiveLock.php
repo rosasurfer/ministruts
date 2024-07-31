@@ -70,7 +70,7 @@ class SystemFiveLock extends BaseLock {
             }
             catch (IRosasurferException $ex) {}
             catch (\Throwable           $ex) { $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex); }
-            catch (\Exception           $ex) { $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex); }    // @phpstan-ignore-line
+            catch (\Exception           $ex) { $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex); }    // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
 
             // TODO: find bug and rewrite (most probably a file limit is hit), @see ext/sysvsem/sysvsem.c
             $message  = $ex->getMessage();
@@ -111,7 +111,7 @@ class SystemFiveLock extends BaseLock {
             $this->release();
         }
         catch (\Throwable $ex) { throw ErrorHandler::handleDestructorException($ex); }
-        catch (\Exception $ex) { throw ErrorHandler::handleDestructorException($ex); }  // @phpstan-ignore-line
+        catch (\Exception $ex) { throw ErrorHandler::handleDestructorException($ex); }  // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
     }
 
 

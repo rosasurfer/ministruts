@@ -142,7 +142,7 @@ class ErrorHandler extends StaticClass {
      * @param  string $message            - error message
      * @param  string $file               - name of file where the error occurred
      * @param  int    $line               - line of file where the error occurred
-     * @param  array  $context [optional] - symbols of the point where the error occurred (variable scope at error trigger time)
+     * @param  ?array $context [optional] - symbols of the point where the error occurred (variable scope at error trigger time)
      *
      * @return bool - TRUE if the error was successfully handled.
      *                FALSE if the error shall be processed as if no error handler was installed.
@@ -256,7 +256,7 @@ class ErrorHandler extends StaticClass {
             Logger::log($exception, L_FATAL, $context);         // log with the highest level
         }
         catch (\Throwable $second) {}
-        catch (\Exception $second) {}                           // @phpstan-ignore-line
+        catch (\Exception $second) {}                           // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
 
         if ($second)  {
             // secondary exception: the application is crashing, last try to log
@@ -297,7 +297,7 @@ class ErrorHandler extends StaticClass {
                 else echoPre('application error (see error log)');
             }
             catch (\Throwable $third) { echoPre('application error (see error log)'); }
-            catch (\Exception $third) { echoPre('application error (see error log)'); }     // @phpstan-ignore-line
+            catch (\Exception $third) { echoPre('application error (see error log)'); }     // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
         }
     }
 

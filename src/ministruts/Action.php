@@ -23,7 +23,7 @@ abstract class Action extends CObject {
      * Constructor
      *
      * @param  ActionMapping $mapping         - the mapping using the Action
-     * @param  ActionForm    $form [optional] - user input of the request
+     * @param  ?ActionForm   $form [optional] - user input of the request
      */
     public function __construct(ActionMapping $mapping, ActionForm $form = null) {
         $this->mapping = $mapping;
@@ -76,9 +76,9 @@ abstract class Action extends CObject {
      * Special care needs to be taken in regard to sending of additional headers because at the time of invocation request
      * processing may have been already finished.
      *
-     * @param  Request       $request
-     * @param  Response      $response
-     * @param  ActionForward $forward [optional] - original ActionForward as returned by Action::execute()
+     * @param  Request        $request
+     * @param  Response       $response
+     * @param  ?ActionForward $forward [optional] - original ActionForward as returned by Action::execute()
      *
      * @return ?ActionForward - original or modified ActionForward (e.g. a route with added query parameters)
      */

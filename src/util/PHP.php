@@ -54,16 +54,16 @@ class PHP extends StaticClass {
      * - pOpen() suffers from the same bug
      * - passThru() does not capture STDERR
      *
-     * @param  string   $cmd                 - external command to execute
-     * @param  string   $stderr   [optional] - if present a variable the contents of STDERR will be written to
-     * @param  int      $exitCode [optional] - if present a variable the commands's exit code will be written to
-     * @param  string   $dir      [optional] - if present the initial working directory for the command
-     * @param  string[] $env      [optional] - if present the environment to *replace* the current one
-     * @param  array    $options  [optional] - additional options controlling runtime behavior:                      <br>
-     *          "stdout-passthrough" => bool:  Whether to additionally pass-through (print) the contents of STDOUT.  <br>
-     *                                         This option will not affect the return value (default: no)            <br>
-     *          "stderr-passthrough" => bool:  whether to additionally pass-through (print) the contents of STDERR.  <br>
-     *                                         This option will not affect the return value (default: no)            <br>
+     * @param  string        $cmd                 - external command to execute
+     * @param  ?string       $stderr   [optional] - if present a variable the contents of STDERR will be written to
+     * @param  ?int          $exitCode [optional] - if present a variable the commands's exit code will be written to
+     * @param  ?string       $dir      [optional] - if present the initial working directory for the command
+     * @param  string[]|null $env      [optional] - if present the environment to *replace* the current one
+     * @param  array         $options  [optional] - additional options controlling runtime behavior:                      <br>
+     *               "stdout-passthrough" => bool:  Whether to additionally pass-through (print) the contents of STDOUT.  <br>
+     *                                              This option will not affect the return value (default: no)            <br>
+     *               "stderr-passthrough" => bool:  whether to additionally pass-through (print) the contents of STDERR.  <br>
+     *                                              This option will not affect the return value (default: no)            <br>
      * @return string - content of STDOUT
      */
     public static function execProcess($cmd, &$stderr=null, &$exitCode=null, $dir=null, $env=null, array $options=[]) {
@@ -93,7 +93,7 @@ class PHP extends StaticClass {
         }
         catch (IRosasurferException $ex) {}
         catch (\Throwable           $ex) { $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex); }
-        catch (\Exception           $ex) { $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex); }    // @phpstan-ignore-line
+        catch (\Exception           $ex) { $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex); }    // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
 
         if ($ex) {
             $match = null;

@@ -234,7 +234,7 @@ class PostgresConnector extends Connector {
                 break;
             }
             catch (\Throwable $ex) {}
-            catch (\Exception $ex) {}                   // @phpstan-ignore-line
+            catch (\Exception $ex) {}                   // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
 
             if (strContainsI($ex->getMessage(), 'current transaction is aborted, commands ignored until end of transaction block')) {
                 if ($this->transactionLevel > 0) {
@@ -267,7 +267,7 @@ class PostgresConnector extends Connector {
         }
         catch (IRosasurferException $ex) {}
         catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
-        catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }   // @phpstan-ignore-line
+        catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }   // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
         if ($ex) throw $ex->addMessage('Cannot connect to PostgreSQL server with connection string: "'.$connStr.'"');
 
         $this->setConnectionOptions();
@@ -459,7 +459,7 @@ class PostgresConnector extends Connector {
         }
         catch (IRosasurferException $ex) {}
         catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
-        catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }   // @phpstan-ignore-line
+        catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }   // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
 
         if ($ex) throw $ex->addMessage('Database: '.$this->getConnectionDescription().NL.'SQL: "'.$sql.'"');
 
@@ -573,7 +573,7 @@ class PostgresConnector extends Connector {
                     $this->lastInsertId = $this->query('select lastVal()')->fetchInt();
                 }
                 catch (\Throwable $ex) {}
-                catch (\Exception $ex) {}   // @phpstan-ignore-line
+                catch (\Exception $ex) {}   // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
 
                 if ($ex) {
                     if (stripos($ex->getMessage(), 'ERROR:  lastval is not yet defined in this session') === false)

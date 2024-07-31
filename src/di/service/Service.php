@@ -43,7 +43,7 @@ class Service implements ServiceInterface {
         $this->name       = $name;
         $this->aliases[]  = $name;
 
-        if (!is_string($definition) && !is_object($definition)) {   // @phpstan-ignore-line
+        if (!is_string($definition) && !is_object($definition)) {   // @phpstan-ignore booleanAnd.alwaysFalse (types come from PHPDoc)
             throw new IllegalTypeException('Illegal type of parameter $definition: '.gettype($definition));
         }
         $this->definition = $definition;

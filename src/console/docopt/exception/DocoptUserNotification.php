@@ -17,8 +17,8 @@ class DocoptUserNotification extends RuntimeException {
 
 
     /**
-     * @param string $message [optional]
-     * @param int    $status  [optional]
+     * @param ?string $message [optional]
+     * @param int     $status  [optional]
      */
     public function __construct($message=null, $status=1) {
         parent::__construct($message);

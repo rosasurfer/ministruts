@@ -44,7 +44,7 @@ class Di extends CObject implements DiInterface {
     /**
      * Create a new instance and optionally load service definitions.
      *
-     * @param  string $configDir [optional] - directory to load service definitions from (default: no loading)
+     * @param  ?string $configDir [optional] - directory to load service definitions from (default: no loading)
      */
     public function __construct($configDir = null) {
         if (isset($configDir)) {
@@ -114,7 +114,7 @@ class Di extends CObject implements DiInterface {
             return $this->services[$name]->resolve(true, $params);
         }
         catch (\Throwable $ex) { throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex); }
-        catch (\Exception $ex) { throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex); }    // @phpstan-ignore-line
+        catch (\Exception $ex) { throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex); }    // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
     }
 
 
@@ -129,14 +129,14 @@ class Di extends CObject implements DiInterface {
             return $this->services[$name]->resolve(false);
         }
         catch (\Throwable $ex) { throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex); }
-        catch (\Exception $ex) { throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex); }    // @phpstan-ignore-line
+        catch (\Exception $ex) { throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex); }    // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
     }
 
 
     /**
      * @param  string        $name               - service identifier
      * @param  string|object $definition         - a class name, an instance or a Closure acting as an instance factory
-     * @param  string[]      $aliases [optional] - service identifier aliases (default: none)
+     * @param  string[]|null $aliases [optional] - service identifier aliases (default: none)
      *
      * @return string|object - the same definition
      */

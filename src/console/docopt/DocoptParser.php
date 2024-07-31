@@ -68,8 +68,8 @@ class DocoptParser extends CObject {
     /**
      * Parse command line arguments and match them against the specified {@link http://docopt.org} syntax definition.
      *
-     * @param  string         $doc
-     * @param  string|mixed[] $args [optional]
+     * @param  string              $doc
+     * @param  string|mixed[]|null $args [optional]
      *
      * @return DocoptResult
      */
@@ -200,7 +200,7 @@ class DocoptParser extends CObject {
                 while ($tokens->current() !== null) {
                     $parsed[] = new Argument(null, $tokens->move());
                 }
-                return $parsed;                     // @phpstan-ignore-line
+                return $parsed;                     // @phpstan-ignore deadCode.unreachable (TODO: refactor to use Iterator->valid())
             }
             elseif (strStartsWith($tokens->current(), '--')) {
                 $parsed = array_merge($parsed, static::parseLong($tokens, $options));

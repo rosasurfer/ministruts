@@ -73,6 +73,6 @@ class TokenIterator extends \ArrayIterator {
         while (($token=$this->move()) !== null) {
             $left[] = $token;
         }
-        return $left;           // @phpstan-ignore-line
+        return $left;           // @phpstan-ignore deadCode.unreachable (TODO: refactor to use Iterator->valid())
     }
 }

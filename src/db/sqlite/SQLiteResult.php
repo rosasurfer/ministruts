@@ -68,16 +68,21 @@ class SQLiteResult extends Result {
 
 
     /**
-     * Fetch the next row from the result set.
+     * {@inheritdoc}
      *
      * The types of the values of the returned array are mapped from SQLite3 types as follows:                  <br>
      *  - Integers are mapped to int if they fit into the range PHP_INT_MIN...PHP_INT_MAX, otherwise to string. <br>
      *  - Floats are mapped to float.                                                                           <br>
      *  - NULL values are mapped to NULL.                                                                       <br>
      *  - Strings and blobs are mapped to string.                                                               <br>
+     *
+     * @param  int $mode [optional] - Controls how the returned array is indexed. Can take one of the following values:
+     *                                ARRAY_ASSOC, ARRAY_NUM, or ARRAY_BOTH (default).
+     *
+     * @return ?array - array of columns or NULL if no more rows are available
      */
     public function fetchRow($mode = ARRAY_BOTH) {
-        if (!$this->result || $this->nextRowIndex < 0)        // no automatic result reset()
+        if (!$this->result || $this->nextRowIndex < 0)          // no automatic result reset()
             return null;
 
         switch ($mode) {
@@ -91,10 +96,11 @@ class SQLiteResult extends Result {
             $this->nextRowIndex++;
         }
         else {
-            if ($this->numRows === null)                       // update $numRows on-the-fly if not yet happened
+            if ($this->numRows === null) {                      // update $numRows on-the-fly if not yet happened
                 $this->numRows = $this->nextRowIndex;
-            $row                = null;                        // prevent fetchArray() to trigger an automatic reset()
-            $this->nextRowIndex = -1;                          // on second $row == null
+            }
+            $row = null;                                        // prevent fetchArray() to trigger an automatic reset()
+            $this->nextRowIndex = -1;                           // on second $row == null
         }
         return $row;
     }
@@ -140,7 +146,7 @@ class SQLiteResult extends Result {
             while ($this->fetchRow());                          // loop from current position to the end
 
             // we hit the end
-            if ($this->numRows) {                               // @phpstan-ignore-line
+            if ($this->numRows) {                               // @phpstan-ignore if.alwaysFalse (it's not)
                 $this->result->reset();                         // back to start
                 $this->nextRowIndex = 0;
                 while ($previous--) {                           // loop back to former position
@@ -171,7 +177,7 @@ class SQLiteResult extends Result {
     /**
      * Return this result's internal SQLite3Result object.
      *
-     * @return \SQLite3Result - result handler or NULL for result-less queries
+     * @return ?\SQLite3Result - result handler or NULL for result-less queries
      */
     public function getInternalResult() {
         return $this->result;

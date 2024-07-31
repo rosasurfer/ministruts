@@ -443,7 +443,7 @@ PROCESS_METHOD_ERROR_SC_405;
             }
         }
         catch (\Throwable $ex) {}           // keep exception for later usage
-        catch (\Exception $ex) {}           // @phpstan-ignore-line
+        catch (\Exception $ex) {}           // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
 
         // convert a returned string identifier to an actual ActionForward
         if (is_string($forward)) {

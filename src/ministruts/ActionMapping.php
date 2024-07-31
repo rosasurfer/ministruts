@@ -505,8 +505,8 @@ class ActionMapping extends CObject {
      * name. First the lookup tries to find a local forward of the specified name. If no such forward is found global
      * forwards are checked. This method throws an exception if a name was specified but no such forward was found.
      *
-     * @param  string $name [optional] - logical name; can be "self" to return a redirect forward to the mapping itself
-     *                                   (default: none)
+     * @param  ?string $name [optional] - logical name; can be "self" to return a redirect forward to the mapping itself
+     *                                    (default: none)
      *
      * @return ?ActionForward - ActionForward or NULL if no name was specified and no forward is configured
      *
