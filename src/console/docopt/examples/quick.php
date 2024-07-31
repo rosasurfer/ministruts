@@ -18,5 +18,5 @@ DOCOPT;
 $result = docopt($doc, null, ['version'=>'0.1.1rc']);
 
 foreach ($result as $key => $value) {
-    echof($key.': '.json_encode($value).(($type=gettype($value))=='NULL' ? '':" ($type)"));
+    echof($key.': '.json_encode($value, JSON_THROW_ON_ERROR).(($type=gettype($value))=='NULL' ? '':" ($type)"));
 }

@@ -28,5 +28,5 @@ DOCOPT;
 $result = docopt($doc);
 
 foreach ($result as $key => $value) {
-    echof($key.': '.json_encode($value).(($type=gettype($value))=='NULL' ? '':" ($type)"));
+    echof($key.': '.json_encode($value, JSON_THROW_ON_ERROR).(($type=gettype($value))=='NULL' ? '':" ($type)"));
 }

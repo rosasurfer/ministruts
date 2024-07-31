@@ -61,7 +61,7 @@ class PythonFixturesTest extends TestCase {
             foreach (array_slice(explode('$', $body), 1) as $testCase) {
                 $testCase = trim($testCase);
                 list($argv, $expected) = explode("\n", $testCase, 2);
-                $expected = json_decode($expected, true);
+                $expected = json_decode($expected, true, 512, JSON_THROW_ON_ERROR);
 
                 $name = "$i: $argv";
                 $args = explode(' ', $argv, 2);

@@ -325,7 +325,7 @@ class PHP extends StaticClass {
         if ($config) {
             $appRoot = $config['app.dir.root'];
             if (is_file($file=$appRoot.'/composer.json') && extension_loaded('json')) {
-                $composer = json_decode(file_get_contents($file), true);
+                $composer = json_decode(file_get_contents($file), true, 512, JSON_THROW_ON_ERROR);
                 if (isset($composer['require']) && is_array($composer['require'])) {
                     foreach ($composer['require'] as $name => $v) {
                         $name = trim(strtolower($name));
