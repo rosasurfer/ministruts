@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 include(__DIR__.'/../../src/load.php');
 include(__DIR__.'/DynamicReturnType.php');

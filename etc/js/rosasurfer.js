@@ -2,7 +2,7 @@
 
 
 /**
- * Polyfills and objects extensions.
+ * Polyfills
  */
 if (!Array.from) { Array.from = (function() {
     var toStr = Object.prototype.toString;
@@ -160,7 +160,7 @@ var rosasurfer = {
      *
      * @param  string url [optional] - URL to get query parameters from (default: the current page location)
      *
-     * @return array - {key1: value1, key2: value2, ..., keyN: valueN}
+     * @return object - {key1: value1, key2: value2, ..., keyN: valueN}
      */
     getQueryParameters: function getQueryParameters(url) {
         var pos, query;
@@ -285,14 +285,27 @@ var rosasurfer = {
             else if (arg.constructor) type = arg.constructor.name || arg.constructor.toString();
             else                      type = ''+ arg;
 
-            if (type.startsWith('[object ')) {              // [object HTMLAnchorElement]
+            if (type.startsWith('[object ')) {                      // [object HTMLAnchorElement]
                 type = type.slice(8, -1);
             }
-            else if (type.startsWith('function ')) {        // function HTMLAnchorElement() { [native code] }
-                type = type.slice(9, type.indexOf('('));
+            else if (type.startsWith('function')) {                 // function HTMLAnchorElement() { [native code] }
+                var name = type.slice(8, type.indexOf('(')).trim(); // function( param1, param2... ) { <custom code> }
+                type = name.length ? name : 'function';
             }
         }
         return type;
+    },
+
+
+    /**
+     * Whether a variable is defined.
+     *
+     * @param  mixed arg
+     *
+     * @return bool
+     */
+    isDefined: function isDefined(arg) {
+        return (typeof(arg) != 'undefined');
     },
 
     
