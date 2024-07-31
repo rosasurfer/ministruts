@@ -4,14 +4,14 @@
     "type":        "library",
     "license":     "WTFPL",
     "authors": [{
-        "name":  "Peter Walther",
+        "name":  "Peter Walther test",
         "email": "ministruts@rosasurfer.com"
     }],
     "config": {
         "optimize-autoloader": true
     },
     "require": {
-        "php":          "5.6 - 7.1",
+        "php":           "^5.6",
         "ext-ctype":     "*",
         "ext-filter":    "*",
         "ext-json":      "*",
