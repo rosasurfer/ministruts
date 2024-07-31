@@ -172,7 +172,7 @@ class MySQLResult extends Result {
 
 
     /**
-     *
+     * {@inheritdoc}
      */
     public function release() {
         if (is_resource($this->hResult)) {

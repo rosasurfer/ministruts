@@ -212,7 +212,7 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     *
+     * {@inheritdoc}
      */
     public function escapeIdentifier($name) {
         Assert::string($name);
@@ -221,7 +221,7 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     *
+     * {@inheritdoc}
      */
     public function escapeLiteral($value) {
         // bug or feature: SQLite3::escapeString(null) => empty string instead of NULL
@@ -238,7 +238,7 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     *
+     * {@inheritdoc}
      */
     public function escapeString($value) {
         // bug or feature: SQLite3::escapeString(null) => empty string instead of NULL

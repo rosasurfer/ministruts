@@ -103,6 +103,8 @@ class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
 
 
     /**
+     * {@inheritdoc}
+     *
      * @param  mixed $offset
      *
      * @return bool
@@ -113,6 +115,8 @@ class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
 
 
     /**
+     * {@inheritdoc}
+     *
      * @param  mixed $offset
      *
      * @return bool|int|string[]|null
@@ -123,6 +127,8 @@ class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
 
 
     /**
+     * {@inheritdoc}
+     *
      * @param  mixed $offset
      * @param  mixed $value
      *
@@ -134,6 +140,8 @@ class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
 
 
     /**
+     * {@inheritdoc}
+     *
      * @param  mixed $offset
      *
      * @return void
@@ -144,6 +152,8 @@ class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
 
 
     /**
+     * {@inheritdoc}
+     *
      * @return \ArrayIterator<string, bool|int|string[]|null>
      */
     public function getIterator() {

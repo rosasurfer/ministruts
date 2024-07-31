@@ -160,7 +160,7 @@ class SQLiteResult extends Result {
 
 
     /**
-     *
+     * {@inheritdoc}
      */
     public function release() {
         if ($this->result) {

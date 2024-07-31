@@ -29,7 +29,7 @@ class RosasurferException extends \Exception implements RosasurferExceptionInter
 
 
 	/**
-     * Return the stack trace of the exception in a more readable way.
+     * {@inheritdoc}
      *
      * @return array<string[]>
      */

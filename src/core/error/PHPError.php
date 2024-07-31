@@ -32,6 +32,8 @@ class PHPError extends \ErrorException implements IRosasurferException {
 
 
     /**
+     * {@inheritdoc}
+     *
      * @return array<string[]>
      */
     public function getBetterTrace() {

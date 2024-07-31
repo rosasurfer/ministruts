@@ -367,28 +367,6 @@ class Application extends CObject {
 
 
     /**
-     * Replace an existing Composer class loader.
-     *
-     * @param  mixed $value - configuration value as passed to the framework loader
-     *
-     * @return void
-     */
-    protected function replaceComposer($value) {
-        $enabled = false;                                           // default
-        if (is_bool($value) || is_int($value)) {
-            $enabled = (bool) $value;
-        }
-        elseif (is_string($value)) {
-            $value   = trim(strtolower($value));
-            $enabled = ($value=='1' || $value=='on' || $value=='true');
-        }
-        if ($enabled) {
-            // replace Composer
-        }
-    }
-
-
-    /**
      * Return the current default configuration of the {@link Application}. This is the configuration previously set
      * with {@link Application::setConfig()}.
      *

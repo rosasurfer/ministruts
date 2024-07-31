@@ -162,7 +162,7 @@ class PostgresResult extends Result {
 
 
     /**
-     *
+     * {@inheritdoc}
      */
     public function release() {
         if ($this->hResult) {
