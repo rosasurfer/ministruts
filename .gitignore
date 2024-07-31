@@ -30,4 +30,5 @@ vendor/
 config.*properties
 !config.dist.properties
 
+/etc/httpd/cgi-bin/php.ini
 /php-error.log
