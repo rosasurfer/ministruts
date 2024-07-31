@@ -28,7 +28,7 @@ define('rosasurfer\_NUL_DEVICE', _WINDOWS ? 'nul' : '/dev/null');
 const CLI        = _CLI;
 /** @var bool    - whether we run on a webserver's localhost */
 const LOCALHOST  = _LOCALHOST;
-/** @var bool    - whether we run on MacOS */                       // constant declarations improve IDE code completion
+/** @var bool    - whether we run on MacOS */                       // constant declarations improve IDE auto-completion
 const MACOS      = _MACOS;
 /** @var bool    - whether we run on Windows */
 const WINDOWS    = _WINDOWS;
