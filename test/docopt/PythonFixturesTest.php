@@ -33,7 +33,7 @@ class PythonFixturesTest extends TestCase {
     }
 
     /**
-     *
+     * @return array<array{string, string, mixed}>
      */
     public function dataProvider(): array {
         $filename = __DIR__.'/../fixtures/docopt.txt';

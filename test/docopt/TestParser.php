@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace rosasurfer\ministruts\test\docopt;
 
 use rosasurfer\ministruts\console\docopt\DocoptParser;
+use rosasurfer\ministruts\console\docopt\OptionIterator;
 use rosasurfer\ministruts\console\docopt\TokenIterator;
-use rosasurfer\ministruts\console\docopt\pattern\Option;
 use rosasurfer\ministruts\console\docopt\pattern\Pattern;
 use rosasurfer\ministruts\console\docopt\pattern\Required;
 
@@ -29,15 +29,13 @@ class TestParser extends DocoptParser {
     /**
      * Public wrapper for the protected method {@link DocoptParser::parseArgs()}.
      *
-     * @param  TokenIterator               $tokens
-     * @param  \ArrayIterator<int, Option> $options
-     * @param  bool                        $optionsFirst [optional]
+     * @param  TokenIterator  $tokens
+     * @param  OptionIterator $options
+     * @param  bool           $optionsFirst [optional]
      *
      * @return Pattern[]
-     *
-     * @see Option
      */
-    public static function parseArgs(TokenIterator $tokens, \ArrayIterator $options, $optionsFirst = false) {
+    public static function parseArgs(TokenIterator $tokens, OptionIterator $options, $optionsFirst = false) {
         return parent::parseArgs($tokens, $options, $optionsFirst);
     }
 
@@ -46,7 +44,7 @@ class TestParser extends DocoptParser {
      *
      * @param  string $doc
      *
-     * @return \ArrayIterator
+     * @return OptionIterator
      */
     public static function parseDefaults($doc) {
         return parent::parseDefaults($doc);
@@ -56,11 +54,11 @@ class TestParser extends DocoptParser {
      * Public wrapper for the protected method {@link DocoptParser::parsePattern()}.
      *
      * @param  string         $source
-     * @param  \ArrayIterator $options
+     * @param  OptionIterator $options
      *
      * @return Required
      */
-    public static function parsePattern($source, \ArrayIterator $options) {
+    public static function parsePattern($source, OptionIterator $options) {
         return parent::parsePattern($source, $options);
     }
 

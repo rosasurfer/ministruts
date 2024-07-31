@@ -191,13 +191,13 @@ class DocoptParser extends CObject {
      * If $optionsFirst=true: argv ::= [ long | shorts ]* [ argument ]* [ '--' [ argument ]* ] ;
      * else:                  argv ::= [ long | shorts | argument ]* [ '--' [ argument ]* ] ;
      *
-     * @param  TokenIterator               $tokens
-     * @param  \ArrayIterator<int, Option> $options
-     * @param  bool                        $optionsFirst [optional]
+     * @param  TokenIterator  $tokens
+     * @param  OptionIterator $options
+     * @param  bool           $optionsFirst [optional]
      *
      * @return Pattern[]
      */
-    protected static function parseArgs(TokenIterator $tokens, \ArrayIterator $options, $optionsFirst = false) {
+    protected static function parseArgs(TokenIterator $tokens, OptionIterator $options, $optionsFirst = false) {
         $parsed = [];
 
         while ($tokens->current() !== null) {
@@ -229,7 +229,7 @@ class DocoptParser extends CObject {
     /**
      * @param  string $doc
      *
-     * @return \ArrayIterator<int, Option>
+     * @return OptionIterator
      */
     protected static function parseDefaults($doc) {
         $defaults = [];
@@ -249,17 +249,17 @@ class DocoptParser extends CObject {
             }
             $defaults = array_merge($defaults, $options);
         }
-        return new \ArrayIterator($defaults);
+        return new OptionIterator($defaults);
     }
 
 
     /**
-     * @param  string                      $source
-     * @param  \ArrayIterator<int, Option> $options
+     * @param  string         $source
+     * @param  OptionIterator $options
      *
      * @return Required
      */
-    protected static function parsePattern($source, \ArrayIterator $options) {
+    protected static function parsePattern($source, OptionIterator $options) {
         $tokens = TokenIterator::fromPattern($source);
         $result = static::parseExpression($tokens, $options);
         if ($tokens->current() !== null) {
@@ -291,12 +291,12 @@ class DocoptParser extends CObject {
     /**
      * expr ::= seq ( '|' seq )* ;
      *
-     * @param  TokenIterator               $tokens
-     * @param  \ArrayIterator<int, Option> $options
+     * @param  TokenIterator  $tokens
+     * @param  OptionIterator $options
      *
      * @return Either|Pattern[]
      */
-    protected static function parseExpression(TokenIterator $tokens, \ArrayIterator $options) {
+    protected static function parseExpression(TokenIterator $tokens, OptionIterator $options) {
         $seq = static::parseSequence($tokens, $options);
         if ($tokens->current() != '|')
             return $seq;
@@ -321,12 +321,12 @@ class DocoptParser extends CObject {
     /**
      * seq ::= ( atom [ '...' ] )* ;
      *
-     * @param  TokenIterator               $tokens
-     * @param  \ArrayIterator<int, Option> $options
+     * @param  TokenIterator  $tokens
+     * @param  OptionIterator $options
      *
      * @return Pattern[]
      */
-    protected static function parseSequence(TokenIterator $tokens, \ArrayIterator $options) {
+    protected static function parseSequence(TokenIterator $tokens, OptionIterator $options) {
         $result = [];
         $not = [null, '', ']', ')', '|'];
         while (!in_array($tokens->current(), $not, true)) {
@@ -346,12 +346,12 @@ class DocoptParser extends CObject {
     /**
      * shorts ::= '-' ( chars )* [ [ ' ' ] chars ] ;
      *
-     * @param  TokenIterator               $tokens
-     * @param  \ArrayIterator<int, Option> $options
+     * @param  TokenIterator  $tokens
+     * @param  OptionIterator $options
      *
      * @return Option[]
      */
-    protected static function parseShort(TokenIterator $tokens, \ArrayIterator $options) {
+    protected static function parseShort(TokenIterator $tokens, OptionIterator $options) {
         $token = $tokens->move();
 
         if (strpos($token, '-') !== 0 || strpos($token, '--') === 0)
@@ -410,12 +410,12 @@ class DocoptParser extends CObject {
     /**
      * long ::= '--' chars [ ( ' ' | '=' ) chars ] ;
      *
-     * @param  TokenIterator               $tokens
-     * @param  \ArrayIterator<int, Option> $options
+     * @param  TokenIterator  $tokens
+     * @param  OptionIterator $options
      *
      * @return Option[]
      */
-    protected static function parseLong(TokenIterator $tokens, \ArrayIterator $options) {
+    protected static function parseLong(TokenIterator $tokens, OptionIterator $options) {
         $tokenError = $tokens->getTokenError();
         $token      = $tokens->move();
         $exploded   = explode('=', $token, 2);
@@ -483,12 +483,12 @@ class DocoptParser extends CObject {
     /**
      * atom ::= '(' expr ')' | '[' expr ']' | 'options' | long | shorts | argument | command ;
      *
-     * @param  TokenIterator               $tokens
-     * @param  \ArrayIterator<int, Option> $options
+     * @param  TokenIterator  $tokens
+     * @param  OptionIterator $options
      *
      * @return Pattern[]
      */
-    protected static function parseAtom(TokenIterator $tokens, \ArrayIterator $options) {
+    protected static function parseAtom(TokenIterator $tokens, OptionIterator $options) {
         $tokenError = $tokens->getTokenError();
         $token      = $tokens->current();
         $result     = [];

@@ -6,6 +6,7 @@ namespace rosasurfer\ministruts\test\docopt;
 use PHPUnit\Framework\TestCase;
 
 use rosasurfer\ministruts\console\docopt\DocoptResult;
+use rosasurfer\ministruts\console\docopt\OptionIterator;
 use rosasurfer\ministruts\console\docopt\TokenIterator;
 use rosasurfer\ministruts\console\docopt\exception\DocoptFormatError;
 use rosasurfer\ministruts\console\docopt\pattern\Argument;
@@ -115,7 +116,7 @@ class PythonPortedTest extends TestCase {
      *
      */
     public function testParseArgv(): void {
-        $o = new \ArrayIterator([new Option('-h'), new Option('-v', '--verbose'), new Option('-f', '--file', 1)]);
+        $o = new OptionIterator([new Option('-h'), new Option('-v', '--verbose'), new Option('-f', '--file', 1)]);
         $ts = function($src) {
             return new TokenIterator($src);
         };
@@ -165,7 +166,7 @@ class PythonPortedTest extends TestCase {
      *
      */
     public function testParsePattern(): void {
-        $o = new \ArrayIterator([new Option('-h'), new Option('-v', '--verbose'), new Option('-f', '--file', 1)]);
+        $o = new OptionIterator([new Option('-h'), new Option('-v', '--verbose'), new Option('-f', '--file', 1)]);
 
         $this->assertEquals(
             TestParser::parsePattern('[ -h ]', $o),
@@ -193,7 +194,7 @@ class PythonPortedTest extends TestCase {
             new OneOrMore(new Argument('N'))))))
         );
         $this->assertEquals(
-            TestParser::parsePattern('(N [M | (K | L)] | O P)', new \ArrayIterator([])),
+            TestParser::parsePattern('(N [M | (K | L)] | O P)', new OptionIterator([])),
             new Required(new Required(new Either(new Required(new Argument('N'),
             new Optional(new Either(new Argument('M'), new Required(
             new Either(new Argument('K'), new Argument('L')))))),
