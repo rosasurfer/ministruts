@@ -3,13 +3,17 @@
 declare(strict_types=1);
 
 /**
- * CLI version of the application's phpinfo() task accessible at "http://{application}/{any-url}?__phpinfo__".
+ * CLI version of the framework's phpinfo() task.
  *
- * Checks PHP runtime configuration and reports found issues.
+ * Checks the PHP runtime configuration and reports found issues.
  */
-$dir = dirname(realpath(__FILE__));                             // TODO: adjust init file to your project
-if (!is_file($initFile = $dir.'/../app/init.php')) $initFile = $dir.'/../src/load.php';
-require($initFile);
+if (!is_file($autoload = __DIR__.'/../vendor/autoload.php')) {
+    echo "File \"$autoload\" not found".PHP_EOL;
+    exit(1);
+}
 
+require($autoload);
+
+echo PHP_EOL;
 \rosasurfer\ministruts\util\PHP::phpinfo();
 echo PHP_EOL.'loaded php.ini: "'.php_ini_loaded_file().'"'.PHP_EOL;

@@ -5,7 +5,11 @@ declare(strict_types=1);
 use function rosasurfer\ministruts\docopt;
 use function rosasurfer\ministruts\echof;
 
-require(dirname(realpath(__FILE__)).'/../../../../src/load.php');
+if (!is_file($autoload = __DIR__.'/../../../../vendor/autoload.php')) {
+    echo "File \"$autoload\" not found".PHP_EOL;
+    exit(1);
+}
+require($autoload);
 
 $doc = <<<DOCOPT
 Usage: {:cmd:}  --help
