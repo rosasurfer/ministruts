@@ -313,11 +313,11 @@ class ErrorHandler extends StaticClass {
      * script is terminated. If the script is not in the shutdown phase this method ignores the exception and regular
      * exception handling takes over. For an example see this package's README file.
      *
-     * @param  \Exception|\Throwable $exception - exception (PHP5) or throwable (PHP7)
+     * @param  \Exception|\Throwable $exception - exception (PHP5) or throwable (PHP7+)
      *
      * @return \Exception|\Throwable - the same exception or throwable
      *
-     * @link   http://php.net/manual/en/language.oop5.decon.php
+     * @link   https://www.php.net/manual/en/language.oop5.decon.php#language.oop5.decon.destructor
      */
     public static function handleDestructorException($exception) {
         if (self::$inShutdown) {
