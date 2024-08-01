@@ -285,30 +285,39 @@ class Tile extends CObject {
             echo ($this->parent ? NL:'').'<!-- #begin: '.$tileHint.' -->'.NL;
         }
 
-        includeFile($this->fileName, $nestedTiles + $properties);
+        $this->includeFile($this->fileName, $nestedTiles + $properties);
 
         if ($tileHint) {
             echo NL.'<!-- #end: '.$tileHint.' -->'.NL;
         }
         return $this;
     }
-}
 
 
-/**
- * Populate the function context with the passed properties and include the specified file.
- * Prevents the view from accessing the Tile instance (var $this is not available).
- *
- * @@param string $file   - name of the file to include
- * @@param array  $values - values accessible to the view
- *
- * @return void
- */
-function includeFile() {
-    foreach (func_get_args()[1] as $__key__ => $__value__) {        // We can't use extract() as it skips variables with
-        $$__key__ = $__value__;                                     // irregular names (e.g. with dots).
-    }                                                               // Surprisingly foreach is even faster.
-    unset($__key__, $__value__);
+    /**
+     * Include the specified file in an scope isolated way (no access to $this/self),
+     * and populate it with the passed properties.
+     *
+     * @param  string  $file       - name of the view file to include
+     * @param  mixed[] $properties - property values accessible to the view
+     *
+     * @return void
+     */
+    protected function includeFile($file, array $properties) {
+        static $includeFile = null;
+        if (!$includeFile) {
+            // define scope isolated Closure
+            $includeFile = \Closure::bind(static function() {
+                foreach (func_get_args()[1] as $__name13ae1dbf8af83a86 => $__value13ae1dbf8af83a86) {
+                    $$__name13ae1dbf8af83a86 = $__value13ae1dbf8af83a86;        // We can't use extract() as it skips variables with
+                }                                                               // irregular names (e.g. with dots).
+                unset($__name13ae1dbf8af83a86, $__value13ae1dbf8af83a86);       // Surprisingly foreach() is even faster.
 
-    include(func_get_args()[0]);
+                include(func_get_args()[0]);
+            }, null, null);
+        }
+
+        // include the file
+        $includeFile($file, $properties);
+    }
 }
