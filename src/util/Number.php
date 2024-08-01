@@ -27,7 +27,7 @@ class Number extends StaticClass {
      * @return string
      */
     public static function formatMoney($value, $decimals=2, $decimalsSeparator='.', $thousandsSeparator='') {
-        if (!is_int($value) && !is_float($value)) throw new InvalidTypeException('Invalid type of parameter $value: '.gettype($value));     // @phpstan-ignore-line
+        if (!is_int($value) && !is_float($value)) throw new InvalidTypeException('Invalid type of parameter $value: '.gettype($value));     // @phpstan-ignore booleanAnd.alwaysFalse (types come from PHPDoc)
         Assert::int   ($decimals,           '$decimals');
         Assert::string($decimalsSeparator,  '$decimalsSeparator');
         Assert::string($thousandsSeparator, '$thousandsSeparator');

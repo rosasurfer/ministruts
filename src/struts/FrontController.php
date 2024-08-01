@@ -54,7 +54,7 @@ class FrontController extends Singleton {
             //                                                              //
             // $controller = $cache->get($class);                           // re-check after the lock is aquired
 
-            if (!$controller) {                                             // @phpstan-ignore-line
+            if (!$controller) {                                             // @phpstan-ignore booleanNot.alwaysTrue (TODO: fix cache)
                 $controller = self::getInstance(static::class);
 
                 $config = self::di('config');

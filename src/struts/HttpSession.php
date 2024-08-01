@@ -64,7 +64,7 @@ class HttpSession extends Singleton {
         try {
             session_start();                            // intentionally trigger an error if the session has already been started
         }
-        catch (\Throwable $ex) {                        // @phpstan-ignore-line // TODO: Is this check still needed?
+        catch (\Throwable $ex) {                        // @phpstan-ignore catch.neverThrown (TODO: Is this check still needed?)
             if (!preg_match('/The session id contains illegal characters/i', $ex->getMessage())) throw $ex;
             session_regenerate_id();
         }

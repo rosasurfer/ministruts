@@ -924,7 +924,7 @@ class Request extends CObject {
      * @return $this
      */
     public function setActionMessage($key, $message) {
-        if (!is_string($key) && !is_int($key)) throw new InvalidTypeException('Illegal type of parameter $key: '.gettype($key));    // @phpstan-ignore-line
+        if (!is_string($key) && !is_int($key)) throw new InvalidTypeException('Illegal type of parameter $key: '.gettype($key));    // @phpstan-ignore booleanAnd.alwaysFalse (types come from PHPDoc)
         Assert::nullOrString($message, '$message');
 
         if (!isset($message)) {
@@ -1031,7 +1031,7 @@ class Request extends CObject {
      * @return $this
      */
     public function setActionError($key, $message) {
-        if (!is_string($key) && !is_int($key)) throw new InvalidTypeException('Illegal type of parameter $key: '.gettype($key));    // @phpstan-ignore-line
+        if (!is_string($key) && !is_int($key)) throw new InvalidTypeException('Illegal type of parameter $key: '.gettype($key));    // @phpstan-ignore booleanAnd.alwaysFalse (types come from PHPDoc)
         Assert::nullOrString($message, '$message');
 
         if (!isset($message)) {
