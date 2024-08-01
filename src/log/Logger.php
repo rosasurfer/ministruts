@@ -130,8 +130,9 @@ class Logger extends StaticClass {
 
         // resolve application default loglevel (fall-back to the built-in default)
         $logLevel = $config->get('log.level', '');
-        if (is_array($logLevel))
+        if (is_array($logLevel)) {
             $logLevel = isset($logLevel['']) ? $logLevel[''] : '';
+        }
         $logLevel = self::logLevelToId($logLevel) ?: self::DEFAULT_LOGLEVEL;
         self::$appLogLevel = $logLevel;
 

@@ -82,7 +82,7 @@ class Di extends CObject implements DiInterface {
             return false;
 
         foreach (include($file) as $name => $definition) {
-            $aliases = null;
+            $aliases = [];
             if (is_array($definition)) {
                 $aliases = $definition;
                 $definition = array_shift($aliases);
