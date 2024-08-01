@@ -168,7 +168,7 @@ class Application extends CObject {
 
 
     /**
-     * Register {@link \rosasurfer\ministruts\console\Command} with the application for execution in CLI mode. An already registered command
+     * Register {@link Command} with the application for execution in CLI mode. An already registered command
      * with the same name as the one to add will be overwritten.
      *
      * @param  Command $command
@@ -239,7 +239,7 @@ class Application extends CObject {
 
 
     /**
-     * Load and initialize a {@link \rosasurfer\ministruts\config\auto\DefaultConfig}.
+     * Load and initialize a {@link DefaultConfig}.
      *
      * @param  array<string, string> $options - configuration options as passed to the framework loader
      *

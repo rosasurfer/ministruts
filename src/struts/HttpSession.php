@@ -23,7 +23,7 @@ class HttpSession extends Singleton {
 
 
     /**
-     * Return the {@link \rosasurfer\ministruts\core\Singleton} instance.
+     * Return the {@link Singleton} instance.
      *
      * @return static
      *

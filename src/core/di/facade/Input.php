@@ -91,7 +91,7 @@ class Input extends Facade {
 
 
     /**
-     * Return the {@link \rosasurfer\ministruts\struts\ActionInput} instance assigned to the current HTTP request.
+     * Return the {@link ActionInput} instance assigned to the current HTTP request.
      *
      * @return ActionInput
      */
@@ -101,7 +101,7 @@ class Input extends Facade {
 
 
     /**
-     * If the current request is a result of an HTTP redirect return the {@link \rosasurfer\ministruts\struts\ActionInput} instance
+     * If the current request is a result of an HTTP redirect return the {@link ActionInput} instance
      * assigned to the previous one. If the current request is not a result of an HTTP redirect return an empty instance.
      *
      * @return ActionInput

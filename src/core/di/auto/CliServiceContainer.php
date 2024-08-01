@@ -12,7 +12,7 @@ use rosasurfer\ministruts\core\di\service\Service;
 /**
  * Default dependency injector automatically created for command-line applications.
  *
- * A variant of the standard dependency injector {@link \rosasurfer\ministruts\core\di\Di} suitable for CLI applications. Registers CLI related
+ * A variant of the standard dependency injector {@link Di} suitable for CLI applications. Registers CLI related
  * services provided by the framework and user-defined services loaded from the file "{app.dir.config}/services.php".
  */
 class CliServiceContainer extends Di {

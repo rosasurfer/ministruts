@@ -83,7 +83,7 @@ abstract class CachePeer extends CObject {
 
     /**
      * Store a value under the specified key in the cache and overwrite an existing value. The stored value is automatically invalidated
-     * after expiration of the specified time interval or on status change of the specified {@link \rosasurfer\ministruts\cache\monitor\Dependency}.
+     * after expiration of the specified time interval or on status change of the specified {@link Dependency}.
      *
      * @param  string      $key                   - key
      * @param  mixed       $value                 - value
@@ -98,7 +98,7 @@ abstract class CachePeer extends CObject {
     /**
      * Store a value in the cache only if there's no other value yet stored under the same key. The stored value is
      * automatically invalidated after expiration of the specified time interval or on status change of the specified
-     * {@link \rosasurfer\ministruts\cache\monitor\Dependency}.
+     * {@link Dependency}.
      *
      * @param  string      $key                   - key
      * @param  mixed       $value                 - value
@@ -117,7 +117,7 @@ abstract class CachePeer extends CObject {
     /**
      * Store a value in the cache only if there's already another value stored under the same key. Overwrites the existing
      * value. The stored value is automatically invalidated after expiration of the specified time interval or on status
-     * change of the specified {@link \rosasurfer\ministruts\cache\monitor\Dependency}.
+     * change of the specified {@link Dependency}.
      *
      * @param  string      $key                   - key
      * @param  mixed       $value                 - value

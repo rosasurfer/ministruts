@@ -138,7 +138,7 @@ class Module extends CObject {
 
 
     /**
-     * Read and validate the module configuration, and convert it to a {@link \rosasurfer\ministruts\file\xml\SimpleXMLElement} instance.
+     * Read and validate the module configuration, and convert it to a {@link SimpleXMLElement} instance.
      *
      * @param  string $fileName - full filename
      *

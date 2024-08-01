@@ -13,8 +13,8 @@ use const rosasurfer\ministruts\struts\ACTION_FORM_KEY;
 /**
  * Form
  *
- * A {@link Facade} for accessing the properties of the {@link \rosasurfer\ministruts\struts\ActionForm} assigned to the current HTTP request,
- * and for accessing the properties of the {@link \rosasurfer\ministruts\struts\ActionForm} assigned to the previous HTTP request if the current
+ * A {@link Facade} for accessing the properties of the {@link ActionForm} assigned to the current HTTP request,
+ * and for accessing the properties of the {@link ActionForm} assigned to the previous HTTP request if the current
  * request is a result of an HTTP redirect.
  *
  * The Form facade is used to access either one or the other form's properties. The {@link Forms} facade is used to access properties
@@ -24,7 +24,7 @@ class Form extends Facade {
 
 
     /**
-     * Return the current HTTP request's {@link \rosasurfer\ministruts\struts\ActionForm} property with the specified name.
+     * Return the current HTTP request's {@link ActionForm} property with the specified name.
      *
      * @param  string $name               - property name
      * @param  mixed  $default [optional] - default value to return if the specified property was not found (default: none)
@@ -38,8 +38,8 @@ class Form extends Facade {
 
 
     /**
-     * Return the {@link \rosasurfer\ministruts\struts\ActionForm} instance assigned to the current HTTP request. Use the optional
-     * parameter $type to distinguish between multiple {@link \rosasurfer\ministruts\struts\ActionForm}s in the same page.
+     * Return the {@link ActionForm} instance assigned to the current HTTP request. Use the optional
+     * parameter $type to distinguish between multiple {@link ActionForm}s in the same page.
      *
      * @param  ?string $type [optional] - ensure the returned instance matches the specified class name, or return an
      *                                    EmptyActionForm if this is not the case (default: no type restriction)
@@ -55,9 +55,9 @@ class Form extends Facade {
 
 
     /**
-     * If the current request is a result of an HTTP redirect return the {@link \\rosasurfer\ministruts\struts\ActionForm} instance assigned
-     * to the previous HTTP request. Otherwise return an {@link \rosasurfer\ministruts\struts\EmptyActionForm}. Use the optional parameter $type
-     * to distinguish between multiple different {@link \\rosasurfer\ministruts\struts\ActionForm}s in the same page.
+     * If the current request is a result of an HTTP redirect return the {@link ActionForm} instance assigned
+     * to the previous HTTP request. Otherwise return an {@link EmptyActionForm}. Use the optional parameter $type
+     * to distinguish between multiple different {@link ActionForm}s in the same page.
      *
      * @param  ?string $type [optional] - ensure the returned instance matches the specified class name, or return an
      *                                    EmptyActionForm if this is not the case (default: no type restriction)
