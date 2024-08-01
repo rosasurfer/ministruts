@@ -78,6 +78,8 @@ final class FileLock extends BaseLock {
         try {
             $this->release();
         }
-        catch (\Throwable $ex) { throw ErrorHandler::handleDestructorException($ex); }
+        catch (\Throwable $ex) {
+            throw ErrorHandler::handleDestructorException($ex);
+        }
     }
 }

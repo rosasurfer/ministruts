@@ -30,7 +30,9 @@ abstract class Connector extends CObject implements ConnectorInterface {
                 $this->disconnect();
             }
         }
-        catch (\Throwable $ex) { throw ErrorHandler::handleDestructorException($ex); }
+        catch (\Throwable $ex) {
+            throw ErrorHandler::handleDestructorException($ex);
+        }
     }
 
 

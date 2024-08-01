@@ -311,15 +311,11 @@ class ErrorHandler extends StaticClass {
      *
      * @param  \Throwable $exception
      *
-     * @return \Throwable - the same exception|error
+     * @return \Throwable - the same exception
      *
-     * @link   https://php.net/manual/en/language.oop5.decon.php
+     * @link   https://www.php.net/manual/en/language.oop5.decon.php#language.oop5.decon.destructor
      */
     public static function handleDestructorException($exception) {
-        // Handle destructor exceptions during shutdown differently. Otherwise such exceptions will cause fatal errors.
-        //
-        // @link  https://php.net/manual/en/language.oop5.decon.php
-        // @see   self::handleDestructorException()
         if (self::$inScriptShutdown) {
             $currentHandler = set_exception_handler(function() {});
             restore_exception_handler();
