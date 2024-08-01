@@ -151,6 +151,7 @@ class ErrorHandler extends StaticClass {
      * @throws PHPError
      */
     public static function handleError($level, $message, $file, $line, array $context = null) {
+        //echoPre(__METHOD__);
         //echoPre(DebugHelper::errorLevelToStr($level).': $message='.$message.', $file='.$file.', $line='.$line);
 
         // Ignore suppressed errors and errors not covered by the current reporting level.
@@ -241,6 +242,7 @@ class ErrorHandler extends StaticClass {
      * @return void
      */
     public static function handleException($exception) {
+        //echoPre(__METHOD__.'(): '.$exception->getMessage());
         $context = [
             'class'               => __CLASS__,
             'file'                => $exception->getFile(),     // If the location is not preset the logger will resolve this
@@ -332,11 +334,20 @@ class ErrorHandler extends StaticClass {
 
 
     /**
-     * Manually called handler for exceptions occurring in object::__toString() methods. This allows regular handling of
-     * exceptions thrown from object::__toString() which otherwise is not possible due to an internal PHP design issue.
+     * Manually called handler for exceptions occurring in object::__toString(). It allows custom handling
+     * of such exceptions in PHP < 7.4 which otherwise may cause uncatchable fatal errors.
      *
-     * Current PHP behavior:
-     * PHP Fatal error:  Method object::__toString() must not throw an exception in {file} on {line}.
+     * __toString() behavior PHP < 7.4:                                                         <br>
+     * --------------------------------                                                         <br>
+     * - errors are passed to a custom error handler                                            <br>
+     * - exceptions thrown from a custom error handler are passed to a custom exception handler <br>
+     * - exceptions thrown from PHP cause uncatchable fatal errors                              <br>
+     *                                                                                          <br>
+     * __toString() behavior PHP 7.4+:                                                          <br>
+     * -------------------------------                                                          <br>
+     * - errors are passed to a custom error handler                                            <br>
+     * - all thrown exceptions are passed to a custom exception handler                         <br>
+     *
      *
      * @param  \Exception|\Throwable $exception - exception (PHP5) or throwable (PHP7)
      *

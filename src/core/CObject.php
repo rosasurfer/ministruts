@@ -18,7 +18,8 @@ class CObject {
 
 
     /**
-     * Return a human-readable version of the instance.
+     * Return a human-readable version of the instance. See {@link ErrorHandler::handleToStringException()}
+     * for a description of the special exception handling.
      *
      * @return string
      */
@@ -27,9 +28,9 @@ class CObject {
 
         try {
             $value = print_r($this, true);
-            Assert::string($value);                                             // Ensure __toString() returns a string as otherwise...
-        }                                                                       // PHP will trigger a non-catchable fatal error.
-        catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }
+            Assert::string($value);
+        }                                                                       // Ensure __toString() returns a string as otherwise...
+        catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }  // PHP may trigger a non-catchable fatal error.
         catch (\Exception $ex) { ErrorHandler::handleToStringException($ex); }  // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
 
         return $value;
