@@ -23,8 +23,10 @@ trait DiAwareTrait {
      */
     protected static function di($name = null) {
         $di = Application::getDi();
-        if ($di && isset($name))
+
+        if ($di && isset($name)) {
             return $di->get($name);
+        }
         return $di;
     }
 }

@@ -6,7 +6,6 @@ namespace rosasurfer\ministruts\struts\url;
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\di\proxy\Request;
-use rosasurfer\ministruts\core\error\ErrorHandler;
 
 use const rosasurfer\ministruts\CLI;
 
@@ -56,24 +55,19 @@ class Url extends CObject {
 
 
     /**
-     * Return a text presentation of this instance.  This is the absolute URI reference to include in a HTML page to link
-     * to the resource.
+     * Return a text presentation of this instance.  This is the absolute URI reference to include
+     * in a HTML page to link to the resource.
      *
      * @return string
      */
     public function __toString() {
-        $uri = '';
-        try {
-            $uri = $this->appRelativeUri;
-            if ($this->parameters) {
-                if (strpos($uri, '?') === false) $uri .= '?';
-                else                             $uri .= '&';
-                $uri .= http_build_query($this->parameters, '', '&');
-            }
-            $uri = Request::getApplicationBaseUri().$uri;
-            Assert::string($uri);
-        }                                                                       // Ensure __toString() doesn't throw an exception as otherwise
-        catch (\Throwable $ex) { ErrorHandler::handleToStringException($ex); }  // PHP < 7.4 will trigger a non-catchable fatal error.
-        return $uri;                                                            // @see  https://bugs.php.net/bug.php?id=53648
+        $uri = $this->appRelativeUri;
+        if ($this->parameters) {
+            if (strpos($uri, '?') === false) $uri .= '?';
+            else                             $uri .= '&';
+            $uri .= http_build_query($this->parameters, '', '&');
+        }
+        $uri = Request::getApplicationBaseUri().$uri;
+        return $uri;
     }
 }

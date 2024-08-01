@@ -6,7 +6,6 @@ namespace rosasurfer\ministruts\struts;
 use rosasurfer\ministruts\config\ConfigInterface;
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\assert\Assert;
-use rosasurfer\ministruts\core\error\ErrorHandler;
 use rosasurfer\ministruts\core\exception\IllegalStateException;
 use rosasurfer\ministruts\core\exception\InvalidTypeException;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
@@ -1111,31 +1110,24 @@ class Request extends CObject {
      * @return string
      */
     public function __toString() {
-        $string = '';
-        try {
-            // request
-            $string = $_SERVER['REQUEST_METHOD'].' '.$_SERVER['REQUEST_URI'].' '.$_SERVER['SERVER_PROTOCOL'].NL;
+        // request
+        $string = $_SERVER['REQUEST_METHOD'].' '.$_SERVER['REQUEST_URI'].' '.$_SERVER['SERVER_PROTOCOL'].NL;
 
-            // headers
-            $headers = $this->getHeaders();
-            $maxLen = 0;
-            foreach ($headers as $key => $value) {
-                $maxLen = max(strlen($key), $maxLen);
-            }
-            $maxLen++;                                                          // add one char for ':'
-            foreach ($headers as $key => $value) {
-                $string .= str_pad($key.':', $maxLen).' '.$value.NL;
-            }
+        // headers
+        $headers = $this->getHeaders();
+        $maxLen = 0;
+        foreach ($headers as $key => $value) {
+            $maxLen = max(strlen($key), $maxLen);
+        }
+        $maxLen++;                                                          // add one char for ':'
+        foreach ($headers as $key => $value) {
+            $string .= str_pad($key.':', $maxLen).' '.$value.NL;
+        }
 
-            // content (request body)
-            $content = $this->getContent();
-            if (strlen($content)) {
-                $string .= NL.substr($content, 0, 2048).NL;                     // limit the request body to 2048 bytes
-            }
-            Assert::string($string);
-        }                                                                       // Ensure __toString() doesn't throw an exception as otherwise
-        catch (\Throwable $ex) {                                                // PHP <7.4 will trigger a non-catchable fatal error.
-            ErrorHandler::handleToStringException($ex);                         // @see  https://bugs.php.net/bug.php?id=53648
+        // content (request body)
+        $content = $this->getContent();
+        if (strlen($content)) {
+            $string .= NL.substr($content, 0, 2048).NL;                     // limit the request body to 2048 bytes
         }
         return $string;
     }
