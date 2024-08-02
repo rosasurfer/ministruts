@@ -51,7 +51,7 @@ class Application extends CObject {
      *                                        (default: the current directory)
      *
      *        "app.error.level"    - int:     Error reporting level, e.g. E_ALL & ~E_STRICT
-     *                                        (default: runtime default level)
+     *                                        (default: no change)
      *
      *        "app.error.on-error" - string:  Error handling mode, one of:
      *                                        "ignore":    PHP errors and exceptions are ignored.

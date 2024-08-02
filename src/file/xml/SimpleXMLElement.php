@@ -36,10 +36,10 @@ class SimpleXMLElement extends \SimpleXMLElement {
      */
     public static function from($data, $options=0, $dataIsUri=false, $ns='', $nsIsPrefix=false) {
         $errors = [];
-        $origHandler = null;                                                // prevent Eclipse PDT validation error
+        $origHandler = null;
         $origHandler = set_error_handler(function($level, $message, $file, $line, $context=null) use (&$errors, &$origHandler) {
             if ($origHandler && in_array($level, [E_DEPRECATED, E_USER_DEPRECATED, E_USER_NOTICE, E_USER_WARNING])) {
-                return call_user_func($origHandler, ...func_get_args());    // a possibly static handler must be invoked with call_user_func()
+                return ($origHandler)(...func_get_args());
             }
             $errors[] = func_get_args();
             return true;
@@ -62,7 +62,7 @@ class SimpleXMLElement extends \SimpleXMLElement {
             }
             if ($origHandler) {
                 foreach ($errors as $error) {
-                    call_user_func($origHandler, ...$error);                // pass errors on to the original handler
+                    ($origHandler)(...$error);              // pass errors on to the original handler
                 }
             }
         }

@@ -135,7 +135,7 @@ class ErrorHandler extends StaticClass {
      * @throws PHPError
      */
     public static function handleError($level, $message, $file, $line, array $symbols = []) {
-        //echof('ErrorHandler::handleError()  '.self::errorLevelToStr($level).': '.$message.', in '.$file.', line '.$line);
+        //echof('ErrorHandler::handleError() '.self::errorLevelToStr($level).': '.$message.', in '.$file.', line '.$line);
         if (!self::$errorHandling) return false;
 
         // anonymous function to chain a previously active handler
@@ -204,14 +204,14 @@ class ErrorHandler extends StaticClass {
          *
          * @see  https://stackoverflow.com/questions/25584494/php-set-exception-handler-not-working-for-error-thrown-in-set-error-handler-cal
          */
-        //$trace = $error->getBetterTrace();
-        //if ($trace) {                                                           // after a fatal error the trace may be empty
-        //    $function = self::getFrameMethod($trace[0]);
+        //$trace = $error->getTrace();
+        //if ($trace) {                                                 // after a fatal error the trace may be empty
+        //    $function = self::getStackFrameMethod($trace[0]);
         //    if ($function=='require' || $function=='require_once') {
-        //        $currentHandler = set_exception_handler(function() {});
+        //        $currentHandler = set_exception_handler(null);
         //        restore_exception_handler();
-        //        $currentHandler && call_user_func($currentHandler, $error);     // a possibly static handler must be invoked with call_user_func()
-        //        return (bool)$currentHandler;                                   // PHP will terminate the script anyway.
+        //        $currentHandler && ($currentHandler)($error);
+        //        return (bool)$currentHandler;
         //    }
         //}
 
@@ -229,7 +229,7 @@ class ErrorHandler extends StaticClass {
      */
     public static function handleException(\Throwable $exception) {
         if (!self::$exceptionHandling) return;
-        //echof('ErrorHandler::handleException()  '.$exception->getMessage());
+        //echof('ErrorHandler::handleException() '.$exception->getMessage());
 
         // prevent exceptions to be thrown from the handler itself (causes uncatchable fatal errors)
         try {
@@ -276,8 +276,8 @@ class ErrorHandler extends StaticClass {
             $msg2 .= $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
             $msg2 .= ErrorHandler::getAdjustedTraceAsString($second, $indent);
 
-            $msg  = $msg1 . NL;
-            $msg .= $indent . 'followed by' . NL;
+            $msg  = $msg1.NL;
+            $msg .= $indent.'followed by'.NL;
             $msg .= $msg2;
 
             // log everything to the system logger (never throws an error)
@@ -285,10 +285,14 @@ class ErrorHandler extends StaticClass {
             if (WINDOWS) {
                 $msg = str_replace(NL, PHP_EOL, $msg);
             }
+            error_log($msg, ERROR_LOG_DEFAULT);
+
             if (CLI) {
                 echo $msg;
             }
-            error_log($msg, ERROR_LOG_DEFAULT);
+            else {
+                // TODO
+            }
         }
         catch (\Throwable $ex) {}                                               // intentionally eat it
     }
@@ -308,7 +312,7 @@ class ErrorHandler extends StaticClass {
      *
      * @return \Throwable - the same exception
      *
-     * @link   https://www.php.net/manual/en/language.oop5.decon.php#language.oop5.decon.destructor
+     * @link  https://www.php.net/manual/en/language.oop5.decon.php#language.oop5.decon.destructor
      */
     public static function handleDestructorException($exception) {
         if (self::$inShutdown) {
@@ -409,22 +413,22 @@ class ErrorHandler extends StaticClass {
             E_STRICT            => 'E_STRICT',                  //  2048
         ];
 
-        $setLevels = $notsetLevels = [];
+        $set = $notset = [];
 
         foreach ($allLevels as $level => $description) {
             if ($flag & $level) {
-                $setLevels[] = $description;
+                $set[] = $description;
             }
             else {
-                $notsetLevels[] = $description;
+                $notset[] = $description;
             }
         }
 
-        if (sizeof($setLevels) < sizeof($notsetLevels)) {
-            $result = $setLevels ? join(' | ', $setLevels) : '0';
+        if (sizeof($set) < sizeof($notset)) {
+            $result = $set ? join(' | ', $set) : '0';
         }
         else {
-            $result = join(' & ~', ['E_ALL', ...$notsetLevels]);
+            $result = join(' & ~', ['E_ALL', ...$notset]);
         }
         return $result;
     }
@@ -461,7 +465,6 @@ class ErrorHandler extends StaticClass {
                             $msg .= 'namespace error';
                             break 2;
                     };
-                    // no break
                 default:
                     $msg .= 'parser error';
             }
@@ -508,11 +511,11 @@ class ErrorHandler extends StaticClass {
     /**
      * Takes a regular PHP stacktrace and adjusts it to be more readable.
      *
-     * @param  array<string[]> $trace           - regular PHP stacktrace
-     * @param  string          $file [optional] - name of the file where the stacktrace was generated
-     * @param  int             $line [optional] - line of the file where the stacktrace was generated
+     * @param  stackframe[] $trace           - regular PHP stacktrace
+     * @param  string       $file [optional] - name of the file where the stacktrace was generated
+     * @param  int          $line [optional] - line of the file where the stacktrace was generated
      *
-     * @return array<string[]> - adjusted stacktrace
+     * @return stackframe[] - adjusted stacktrace
      *
      * @example
      * before: frame locations point to the called statement
@@ -555,7 +558,7 @@ class ErrorHandler extends StaticClass {
             if (isset($trace[$i-1]['line'])) $trace[$i]['line'] = $trace[$i-1]['line'];
             else                       unset($trace[$i]['line']);
 
-            $trace[$i]['__ministruts_adjusted__'] = '1';
+            $trace[$i]['__ministruts_adjusted__'] = 1;
         }
 
         // add location details from parameters to frame[0] only if they differ from the old values (now in frame[1])
@@ -608,9 +611,9 @@ class ErrorHandler extends StaticClass {
     /**
      * Return a formatted and more readable version of a stacktrace.
      *
-     * @param  array<string[]> $trace             - stacktrace
-     * @param  string          $indent [optional] - indent formatted lines by this value (default: no indenting)
-     * @param  ?ContentFilter  $filter [optional] - the content filter to apply (default: none)
+     * @param  stackframe[]   $trace             - stacktrace
+     * @param  string         $indent [optional] - indent formatted lines by this value (default: no indenting)
+     * @param  ?ContentFilter $filter [optional] - the content filter to apply (default: none)
      *
      * @return string
      */
@@ -624,7 +627,6 @@ class ErrorHandler extends StaticClass {
         $callLen = $lineLen = 0;
 
         for ($i=0; $i < $size; $i++) {              // align FILE and LINE
-            /** @var array{file?:string, line?:string, class:string, function:string, type:string} $frame */
             $frame = &$trace[$i];
 
             $call = self::getStackFrameMethod($frame, true);
@@ -666,8 +668,8 @@ class ErrorHandler extends StaticClass {
     /**
      * Return a stack frame's full method name similar to the constant __METHOD__. Used for generating a formatted stacktrace.
      *
-     * @param  string[] $frame                - stack frame
-     * @param  bool     $nsToLower [optional] - whether to return the namespace part in lower case (default: unmodified)
+     * @param  stackframe $frame                - stack frame
+     * @param  bool       $nsToLower [optional] - whether to return the namespace part in lower case (default: unmodified)
      *
      * @return string - method name without trailing parentheses
      */
@@ -696,11 +698,11 @@ class ErrorHandler extends StaticClass {
      * Shift all frames from the beginning of a stacktrace up to and including the specified file and line.
      * Effectively, this brings the stacktrace in line with the specified file location.
      *
-     * @param array<string[]> $trace - stacktrace to process
-     * @param string          $file  - filename where an error was triggered
-     * @param int             $line  - line number where an error was triggered
+     * @param stackframe[] $trace - stacktrace to process
+     * @param string       $file  - filename where an error was triggered
+     * @param int          $line  - line number where an error was triggered
      *
-     * @return array<string[]>
+     * @return stackframe[]
      */
     public static function shiftStackFramesByLocation(array $trace, string $file, int $line) {
         $result = $trace;
@@ -754,10 +756,10 @@ class ErrorHandler extends StaticClass {
     /**
      * Set the properties of an {@link \Exception}.
      *
-     * @param  \Exception      $exception       - exception to modify
-     * @param  array<string[]> $trace           - stacktrace
-     * @param  string          $file [optional] - filename of the error location (default: unchanged)
-     * @param  int             $line [optional] - line number of the error location (default: unchanged)
+     * @param  \Exception   $exception       - exception to modify
+     * @param  stackframe[] $trace           - stacktrace
+     * @param  string       $file [optional] - filename of the error location (default: unchanged)
+     * @param  int          $line [optional] - line number of the error location (default: unchanged)
      *
      * @return void
      */
