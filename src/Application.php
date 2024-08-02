@@ -3,8 +3,7 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts;
 
-use rosasurfer\ministruts\config\ConfigInterface;
-use rosasurfer\ministruts\config\auto\DefaultConfig;
+use rosasurfer\ministruts\config\Config;
 use rosasurfer\ministruts\console\Command;
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\assert\Assert;
@@ -17,6 +16,8 @@ use rosasurfer\ministruts\log\Logger;
 use rosasurfer\ministruts\struts\FrontController;
 use rosasurfer\ministruts\struts\Response;
 use rosasurfer\ministruts\util\PHP;
+use rosasurfer\ministruts\core\exception\IllegalStateException;
+use rosasurfer\ministruts\core\exception\InvalidTypeException;
 
 
 /**
@@ -25,10 +26,13 @@ use rosasurfer\ministruts\util\PHP;
 class Application extends CObject {
 
 
-    /** @var ?ConfigInterface - the application's current default configuration */
+    /** @var self - the application itself */
+    protected static self $instance;
+
+    /** @var ?Config - the application's default configuration */
     protected static $defaultConfig;
 
-    /** @var ?Di - the application's current default service container */
+    /** @var ?Di - the application's default service container */
     protected static $defaultDi;
 
     /** @var Command[] - registered CLI commands */
@@ -40,35 +44,34 @@ class Application extends CObject {
      *
      * @param  array<string, string> $options [optional] - array with any of the following options:
      *
-     *        "app.dir.root"          - string:  The project's root directory.
-     *                                           (default: the current directory)
+     *        "app.dir.root"       - string:  The project's root directory.
+     *                                        (default: the current directory)
      *
-     *        "app.dir.config"        - string:  The project's configuration location as a directory or a file.
-     *                                           (default: the current directory)
+     *        "app.dir.config"     - string:  The project's configuration location (directory or file path).
+     *                                        (default: the current directory)
      *
-     *        "app.handle-errors"     - string:  How to handle regular PHP errors: If set to "exception" errors are converted
-     *                                           to ErrorExceptions and thrown. If set to "log" errors are only logged and
-     *                                           execution continues. If set to "ignore" the application must implement its
-     *                                           own error handling mechanism.
-     *                                           (default: "exception")
+     *        "app.error.level"    - int:     Error reporting level, e.g. E_ALL & ~E_STRICT
+     *                                        (default: runtime default level)
      *
-     *        "app.handle-exceptions" - string:  How to handle PHP exceptions: If set to "catch" exceptions are catched and handled
-     *                                           by the framework's exception handler. If set to "ignore" the application must
-     *                                           implement its own exception handling mechanism.
-     *                                           (default: "catch")
+     *        "app.error.on-error" - string:  Error handling mode, one of:
+     *                                        "ignore":    PHP errors and exceptions are ignored.
+     *                                        "log":       PHP errors and exceptions are logged but execution continues. Exceptions terminate
+     *                                                     the script.
+     *                                        "exception": PHP errors are converted to exceptions, both are logged and both terminate the
+     *                                                     script (default).
      *
      * All further options are added to the application's configuration as regular config values.
      */
     public function __construct(array $options = []) {
-        // set default values
-        if (!isset($options['app.handle-errors'    ])) $options['app.handle-errors'    ] = 'exception';
-        if (!isset($options['app.handle-exceptions'])) $options['app.handle-exceptions'] = 'catch';
+        if (isset(self::$instance)) throw new IllegalStateException('Cannot create more than one Application instance');
+        self::$instance = $this;
 
-        // setup the configuration
-        $this->initErrorHandling    ($options['app.handle-errors'    ]);
-        $this->initExceptionHandling($options['app.handle-exceptions']);
+        // setup error handling
+        $errorLevel = $options['app.error.level'   ] ?? error_reporting();
+        $errorMode  = $options['app.error.on-error'] ?? 'exception';
+        $this->initErrorHandling($errorLevel, $errorMode);
 
-        /** @var DefaultConfig $config */
+        /** @var Config $config */
         $config = $this->initDefaultConfig($options);
 
         /** @var Di di */
@@ -76,100 +79,17 @@ class Application extends CObject {
         $di->set('app', $this);
         $di->set('config', $config);
 
-        // TODO: Application options must be validated manually as services/config are not available until this point.
+        // adjust runtime behavior
+        $this->configure();
 
-        // check "app.id"
-        $appId = $config->get('app.id', null);
-        if (!$appId) $config->set('app.id', substr(md5($config['app.dir.root']), 0, 16));
-
-        // check for PHP admin tasks if the remote IP has allowance
-        // __phpinfo__             : show PHP config at start of script
-        // __config__ + __phpinfo__: show PHP config after loading of the application configuration
-        // __cache__               : show cache admin interface
-        $phpInfoTask = $phpInfoAfterConfigTask = $configInfoTask = $cacheInfoTask = false;
-
-        if (isset($_GET['__phpinfo__']) || isset($_GET['__config__']) || isset($_GET['__cache__'])) {
-            if (self::isAdminIP()) {
-                foreach ($_GET as $param => $v) {
-                    if ($param == '__phpinfo__') {
-                        if ($configInfoTask) {
-                            $phpInfoTask = false;
-                            $phpInfoAfterConfigTask = true;
-                        }
-                        else {
-                            $phpInfoTask = true;
-                        }
-                        break;                                    // stop parsing after "__phpinfo__"
-                    }
-                    if ($param == '__config__') {
-                        $configInfoTask = true;
-                    }
-                    else if ($param == '__cache__') {
-                        $cacheInfoTask = true;
-                        break;                                    // stop parsing after "__cache__"
-                    }
-                }
-            }
-        }
-
-        // load further php.ini settings from the configuration
-        $this->configurePhp();
-
-        // execute "config-info" task if enabled
-        if ($configInfoTask) {
-            $configFiles = $config->getMonitoredFiles();
-            $files = [];
-            foreach ($configFiles as $file => $exists) {
-                $files[] = ($exists ? 'OK':'? ').'   '.$file;
-            }
-            ?>
-            <div align="left" style="display:initial; visibility:initial; clear:both;
-                                     position:relative; z-index:4294967295; top:initial; left:initial;
-                                     width:initial; height:initial;
-                                     margin:0; padding:4px;
-                                     font:normal normal 12px/normal arial,helvetica,sans-serif;
-                                     color:black; background-color:white">
-                <pre style="margin-bottom:24px"><?=
-                    'Application configuration files:'.NL
-                   .'--------------------------------'.NL
-                   .join(NL, $files)                  .NL
-                                                      .NL
-                                                      .NL
-                   .'Application configuration:'      .NL
-                   .'--------------------------'      .NL
-                   . print_r($config->dump(['sort'=>SORT_ASC]), true)
-                   ?>
-                </pre>
-            </div>
-            <?php
-            if (!$phpInfoTask && !$phpInfoAfterConfigTask) {
-                exit(0);
-            }
-        }
-
-        // execute "phpinfo" after-config task if enabled
-        if ($phpInfoTask || $phpInfoAfterConfigTask) {
-            PHP::phpinfo();
-            exit(0);
-        }
-
-        // execute "cache-info" task if enabled
-        if ($cacheInfoTask) {
-            //include(ROOT_DIR.'/src/debug/apc.php'); // TODO: not yet implemented
-        }
-
-        // enforce mission-critical requirements
-        if (!php_ini_loaded_file()) {
-            echof('application error (see error log'.(self::isAdminIP() ? ': '.(strlen($errorLog=ini_get('error_log')) ? $errorLog : (CLI ? 'STDERR':'web server')):'').')');
-            error_log('Error: No "php.ini" configuration file was loaded.');
-            exit(1);
-        }
+        // check for and execute specified admin tasks (needs admin rights)
+        $this->checkAdminTasks();
     }
 
 
     /**
      * Register {@link Command} with the application for execution in CLI mode. An already registered command
-     * with the same name as the one to add will be overwritten.
+     * with the same name will be overwritten.
      *
      * @param  Command $command
      *
@@ -205,12 +125,101 @@ class Application extends CObject {
 
 
     /**
-     * Update the PHP configuration with user defined settings.
+     * Initialize error handling.
+     *
+     * @param mixed $level - error reporting level
+     * @param mixed $mode  - error handling: "ignore | log | exception"
      *
      * @return void
      */
-    protected function configurePhp() {
+    protected function initErrorHandling($level, $mode) {
+        if (is_string($level)) {
+            if (!strIsDigits($level)) throw new InvalidValueException('Invalid parameter $level: "'.$level.'" (not numeric)');
+            $level = (int)$level;
+        }
+        if (!is_int($level))   throw new InvalidTypeException('Invalid type of parameter $level: '.gettype($level).' (numeric expected)');
+        if (!is_string($mode)) throw new InvalidTypeException('Invalid type of parameter $mode: '.gettype($mode).' (string expected)');
+
+        switch ($mode) {
+            case 'ignore':    $iMode = ErrorHandler::MODE_IGNORE;    break;
+            case 'log':       $iMode = ErrorHandler::MODE_LOG;       break;
+            case 'exception': $iMode = ErrorHandler::MODE_EXCEPTION; break;
+            default:
+                throw new InvalidValueException('Invalid parameter $mode: "'.$mode.'"');
+        }
+        ErrorHandler::setupErrorHandling($level, $iMode);
+    }
+
+
+    /**
+     * Load and initialize a default configuration.
+     *
+     * @param  array<string, string> $options - configuration options as passed to the framework loader
+     *
+     * @return Config
+     */
+    protected function initDefaultConfig(array $options) {
+        $config = Config::createFrom($options['app.dir.config'] ?? getcwd());
+        $this->setConfig($config);
+        unset($options['app.dir.config']);
+
+        $rootDir = $options['app.dir.root'] ?? getcwd();
+        unset($options['app.dir.root']);
+
+        // copy remaining config options to the config
+        foreach ($options as $name => $value) {
+            $config->set($name, $value);
+        }
+
+        // set root directory and expand relative app directories
+        $config->set('app.dir.root', $rootDir);
+        $this->expandAppDirs($config, $rootDir);
+
+        return $config;
+    }
+
+
+    /**
+     * Load and initialize a default service container.
+     *
+     * @param  string $serviceDir - directory with service configurations
+     *
+     * @return Di
+     */
+    protected function initDefaultDi($serviceDir) {
+        $this->setDi($di = CLI ? new CliServiceContainer($serviceDir) : new WebServiceContainer($serviceDir));
+        return $di;
+    }
+
+
+    /**
+     * Adjust the application's runtime behavior.
+     *
+     * @return void
+     */
+    protected function configure() {
+        $config = self::$defaultConfig;
+        if (!$config) return;
+
+        // ensure we have an "app.id"
+        $appId = $config->get('app.id', null);
+        if (!$appId) $config->set('app.id', substr(md5($config['app.dir.root']), 0, 16));
+
+        // enforce mission-critical PHP requirements
+        if (!php_ini_loaded_file()) {
+            $errorLog = '';
+            if (self::isAdminIP()) {
+                $errorLog = ': '.(ini_get('error_log') ?: (CLI ? 'STDERR':'web server'));
+            }
+            echof("application error (see error log$errorLog)");
+            error_log('Error: No "php.ini" configuration file was loaded.');
+            exit(1);
+        }
+
+        // log excessive memory consumption
         register_shutdown_function(function() {
+            if (!self::$defaultConfig) return;
+
             $warnLimit = php_byte_value(self::$defaultConfig->get('log.warn.memory_limit', PHP_INT_MAX));
             $usedBytes = memory_get_peak_usage(true);
             if ($usedBytes > $warnLimit) {
@@ -239,43 +248,76 @@ class Application extends CObject {
 
 
     /**
-     * Load and initialize a {@link DefaultConfig}.
+     * Check for and execute specified admin tasks (needs admin rights).
+     * To not interfer with the application the script will be terminated if any task was executed.
      *
-     * @param  array<string, string> $options - configuration options as passed to the framework loader
-     *
-     * @return DefaultConfig
+     * @return void
      */
-    protected function initDefaultConfig(array $options) {
-        $configLocation = isset($options['app.dir.config']) ? $options['app.dir.config'] : getcwd();
+    protected function checkAdminTasks() {
+        // __phpinfo__             : show the PHP configuration
+        // __config__ + __phpinfo__: show the PHP and the application configuration
+        // __cache__               : show the cache admin interface
+        $cacheInfoTask  = isset($_GET['__cache__'  ]);
+        $phpInfoTask    = isset($_GET['__phpinfo__']) && !$cacheInfoTask;   // the cache task can't be combined with any other task
+        $configInfoTask = isset($_GET['__config__' ]) && !$cacheInfoTask;
 
-        $this->setConfig($config = new DefaultConfig($configLocation));
-        unset($options['app.dir.config']);
+        if ($configInfoTask || $phpInfoTask || $cacheInfoTask) {
+            $config = self::$defaultConfig;
+            if ($config && self::isAdminIP()) {
+                // execute "config-info" task if enabled
+                if ($configInfoTask) {
+                    $configFiles = $config->getMonitoredFiles();
+                    $files = [];
+                    foreach ($configFiles as $file => $exists) {
+                        $files[] = ($exists ? 'OK':'? ').'   '.$file;
+                    }
+                    ?>
+                    <div align="left" style="display:initial; visibility:initial; clear:both;
+                                             position:relative; z-index:4294967295; top:initial; left:initial;
+                                             width:initial; height:initial;
+                                             margin:0; padding:4px;
+                                             font:normal normal 12px/normal arial,helvetica,sans-serif;
+                                             color:black; background-color:white">
+                        <pre style="margin-bottom:24px"><?=
+                            'Application configuration files:'.NL
+                           .'--------------------------------'.NL
+                           .join(NL, $files)                  .NL
+                                                              .NL
+                                                              .NL
+                           .'Application configuration:'      .NL
+                           .'--------------------------'      .NL
+                           . print_r($config->dump(['sort'=>SORT_ASC]), true)
+                           ?>
+                        </pre>
+                    </div>
+                    <?php
+                    if (!$phpInfoTask) exit(0);
+                }
 
-        $rootDir = isset($options['app.dir.root']) ? $options['app.dir.root'] : getcwd();
-        unset($options['app.dir.root']);
+                // execute "phpinfo" task if enabled
+                if ($phpInfoTask) {
+                    PHP::phpinfo();
+                    exit(0);
+                }
 
-        // copy remaining config options to the DefaultConfig
-        foreach ($options as $name => $value) {
-            $config->set($name, $value);
+                // execute "cache-info" task if enabled
+                if ($cacheInfoTask) {
+                    // TODO: include(ROOT_DIR.'/src/debug/apc.php');
+                }
+            }
         }
-
-        // set root directory and expand relative app directories
-        $config->set('app.dir.root', $rootDir);
-        $this->expandAppDirs($config, $rootDir);
-
-        return $config;
     }
 
 
     /**
      * Expand relative "app.dir.*" values by the specified root directory.
      *
-     * @param  ConfigInterface $config  - application configuration
-     * @param  string          $rootDir - application root directory
+     * @param  Config $config  - application configuration
+     * @param  string $rootDir - application root directory
      *
      * @return void
      */
-    protected function expandAppDirs(ConfigInterface $config, $rootDir) {
+    protected function expandAppDirs(Config $config, $rootDir) {
         Assert::string($rootDir, '$rootDir');
         if (!strlen($rootDir) || isRelativePath($rootDir)) throw new InvalidValueException('Invalid config option "app.dir.root": "'.$rootDir.'" (not an absolute path)');
 
@@ -310,67 +352,10 @@ class Application extends CObject {
 
 
     /**
-     * Load and initialize a default service container.
-     *
-     * @param  string $serviceDir - directory with service configurations
-     *
-     * @return Di
-     */
-    protected function initDefaultDi($serviceDir) {
-        $this->setDi($di = CLI ? new CliServiceContainer($serviceDir) : new WebServiceContainer($serviceDir));
-        return $di;
-    }
-
-
-    /**
-     * Initialize handling of internal PHP errors. Controls whether errors are ignored, logged or converted to exceptions.
-     *
-     * @param  string $mode - string representation of an error handling mode:
-     *                        "ignore":    errors are ignored
-     *                        "log":       errors are logged
-     *                        "exception": errors are converted to exceptions and thrown back (default)
-     * @return void
-     */
-    protected function initErrorHandling($mode) {
-        Assert::string($mode);
-
-        switch ($mode) {
-            case 'ignore':    $iMode = ErrorHandler::ERRORS_IGNORE;    break;
-            case 'log':       $iMode = ErrorHandler::ERRORS_LOG;       break;
-            case 'exception': $iMode = ErrorHandler::ERRORS_EXCEPTION; break;
-            default:
-                throw new InvalidValueException('Invalid error handling mode: "'.$mode.'"');
-        }
-        ErrorHandler::setupErrorHandling($iMode);
-    }
-
-
-    /**
-     * Initialize handling of uncatched exceptions. Controls whether exceptions are ignored or catched.
-     *
-     * @param  string $mode - string representation of an exception handling mode:
-     *                        "ignore": exceptions are ignored
-     *                        "catch":  exceptions are catched and logged
-     * @return void
-     */
-    protected function initExceptionHandling($mode) {
-        Assert::string($mode);
-
-        switch ($mode) {
-            case 'ignore': $iMode = ErrorHandler::EXCEPTIONS_IGNORE; break;
-            case 'catch':  $iMode = ErrorHandler::EXCEPTIONS_CATCH;  break;
-            default:
-                throw new InvalidValueException('Invalid exception handling mode: "'.$mode.'"');
-        }
-        ErrorHandler::setupExceptionHandling($iMode);
-    }
-
-
-    /**
      * Return the current default configuration of the {@link Application}. This is the configuration previously set
      * with {@link Application::setConfig()}.
      *
-     * @return ?ConfigInterface
+     * @return ?Config
      */
     public static function getConfig() {
         return self::$defaultConfig;
@@ -380,15 +365,17 @@ class Application extends CObject {
     /**
      * Set a new default configuration for the {@link Application}.
      *
-     * @param  ConfigInterface $configuration
+     * @param  Config $configuration
      *
-     * @return ?ConfigInterface - the previously registered default configuration
+     * @return ?Config - the previously registered default configuration
      */
-    final public static function setConfig(ConfigInterface $configuration) {
+    final public static function setConfig(Config $configuration) {
         $previous = self::$defaultConfig;
         self::$defaultConfig = $configuration;
-        if (self::$defaultDi)
+
+        if (isset(self::$defaultDi)) {
             self::$defaultDi->set('config', $configuration);
+        }
         return $previous;
     }
 
@@ -434,15 +421,17 @@ class Application extends CObject {
      * @return bool
      */
     public static function isAdminIP() {
-        if (!isset($_SERVER['REMOTE_ADDR']))
+        if (!isset($_SERVER['REMOTE_ADDR'])) {
             return false;
+        }
 
-        static $whiteList; if (!$whiteList) {
+        static $whiteList = null;
+        if (!$whiteList) {
             $ips = ['127.0.0.1', $_SERVER['SERVER_ADDR']];
 
-            if (!self::$defaultConfig)
+            if (!self::$defaultConfig) {
                 return in_array($_SERVER['REMOTE_ADDR'], $ips);
-
+            }
             $values = self::$defaultConfig->get('admin.ip.whitelist', []);
             if (!is_array($values)) $values = [$values];
             $whiteList = \array_keys(\array_flip(\array_merge($ips, $values)));

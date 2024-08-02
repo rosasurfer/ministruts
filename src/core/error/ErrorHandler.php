@@ -3,11 +3,10 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\core\error;
 
-use rosasurfer\ministruts\Application;
 use rosasurfer\ministruts\core\StaticClass;
-use rosasurfer\ministruts\core\assert\Assert;
-use rosasurfer\ministruts\core\exception\RosasurferExceptionInterface as IRosasurferException;
+use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\log\Logger;
+use rosasurfer\ministruts\log\filter\ContentFilterInterface as ContentFilter;
 
 use function rosasurfer\ministruts\echof;
 use function rosasurfer\ministruts\ini_get_bool;
@@ -21,6 +20,7 @@ use function rosasurfer\ministruts\true;
 
 use const rosasurfer\ministruts\CLI;
 use const rosasurfer\ministruts\ERROR_LOG_DEFAULT;
+use const rosasurfer\ministruts\KB;
 use const rosasurfer\ministruts\L_ERROR;
 use const rosasurfer\ministruts\L_FATAL;
 use const rosasurfer\ministruts\L_INFO;
@@ -28,32 +28,27 @@ use const rosasurfer\ministruts\L_NOTICE;
 use const rosasurfer\ministruts\L_WARN;
 use const rosasurfer\ministruts\MB;
 use const rosasurfer\ministruts\NL;
+use const rosasurfer\ministruts\WINDOWS;
 
 
 /**
- * A global handler for internal PHP errors and uncatched exceptions.
+ * A handler for unhandled PHP errors and exceptions.
  */
 class ErrorHandler extends StaticClass {
 
 
-    /** @var int - ignore internal PHP errors */
-    const ERRORS_IGNORE = 1;
+    /** @var int - ignore PHP errors and exceptions */
+    const MODE_IGNORE = 1;
 
-    /** @var int - log internal PHP errors */
-    const ERRORS_LOG = 2;
+    /** @var int - log PHP errors and exceptions */
+    const MODE_LOG = 2;
 
-    /** @var int - convert internal PHP errors to ErrorExceptions and throw them back */
-    const ERRORS_EXCEPTION = 4;
-
-    /** @var int - ignore exceptions */
-    const EXCEPTIONS_IGNORE = 8;
-
-    /** @var int - catch and log exceptions */
-    const EXCEPTIONS_CATCH = 16;
+    /** @var int - convert PHP errors to exceptions, log both */
+    const MODE_EXCEPTION = 3;
 
 
     /** @var int - the configured error handling mode */
-    protected static $errorHandlingMode = 0;
+    protected static $errorHandling = 0;
 
     /** @var ?callable - a previously active error handler (if any) */
     protected static $prevErrorHandler = null;
@@ -65,54 +60,49 @@ class ErrorHandler extends StaticClass {
     protected static $prevExceptionHandler = null;
 
     /** @var bool - whether the script is in the shutdown phase */
-    protected static $inScriptShutdown = false;
+    protected static $inShutdown = false;
 
-    /** @var ?string - memory block reserved for detection of out-of-memory errors */
+    /** @var ?string - memory block reserved for handling out-of-memory errors */
     protected static $oomEmergencyMemory = null;
 
 
     /**
      * Setup error handling.
      *
-     * @param  int $mode - error handling mode: [ERRORS_IGNORE | ERRORS_LOG | ERRORS_EXCEPTION]
+     * @param  int $level - error reporting level
+     * @param  int $mode  - error handling mode, one of [MODE_IGNORE | MODE_LOG | MODE_EXCEPTION]
      *
      * @return void
      */
-    public static function setupErrorHandling($mode) {
-        if (!in_array($mode, [self::ERRORS_IGNORE, self::ERRORS_LOG, self::ERRORS_EXCEPTION])) return;
+    public static function setupErrorHandling(int $level, int $mode) {
+        if ($level < self::MODE_IGNORE || $level > self::MODE_EXCEPTION) {
+            throw new InvalidValueException('Invalid parameter $mode: '.$mode);
+        }
 
-        if ($mode == self::ERRORS_IGNORE) {
-            self::$errorHandlingMode = 0;
+        switch ($mode) {
+            case self::MODE_IGNORE:
+                self::$errorHandling = 0;
+                self::$exceptionHandling = false;
+                break;
+
+            case self::MODE_LOG:
+            case self::MODE_EXCEPTION:
+                self::$errorHandling = $mode;
+                self::$prevErrorHandler = set_error_handler(__CLASS__.'::handleError');
+
+                self::$exceptionHandling = true;
+                self::$prevExceptionHandler = set_exception_handler(__CLASS__.'::handleException');
+
+                error_reporting($level);
+                break;
         }
-        else {
-            self::$errorHandlingMode = $mode;
-            self::$prevErrorHandler = set_error_handler(__CLASS__.'::handleError');
-            self::setupShutdownHandler();
-        }
+        self::setupShutdownHandler();                               // always setup a shutdown hook
     }
 
 
     /**
-     * Setup exception handling.
-     *
-     * @param  int $mode - exception handling mode: [EXCEPTIONS_IGNORE | EXCEPTIONS_CATCH]
-     *
-     * @return void
-     */
-    public static function setupExceptionHandling($mode) {
-        if (!in_array($mode, [self::EXCEPTIONS_IGNORE, self::EXCEPTIONS_CATCH])) return;
-        self::$exceptionHandling = ($mode != self::EXCEPTIONS_IGNORE);
-
-        if (self::$exceptionHandling) {
-            self::$prevExceptionHandler = set_exception_handler(__CLASS__.'::handleException');
-            self::setupShutdownHandler();
-        }
-    }
-
-
-    /**
-     * Setup a script shutdown handler to handle fatal errors during shutdown. The callback should be
-     * first on the shutdown function stack.
+     * Setup a script shutdown handler to handle errors not passed to a registered error handler.
+     * The callback should be first on the shutdown function stack.
      *
      * @return void
      */
@@ -120,18 +110,18 @@ class ErrorHandler extends StaticClass {
         static $handlerRegistered = false;
 
         if (!$handlerRegistered) {
-            register_shutdown_function(__CLASS__.'::onScriptShutdown');
-            self::$oomEmergencyMemory = str_repeat('*', 1*MB);          // allocate some memory for OOM error detection
+            register_shutdown_function(__CLASS__.'::onShutdown');
+            self::$oomEmergencyMemory = str_repeat('*', 500*KB);    // allocate some memory for OOM handling
             $handlerRegistered = true;
         }
     }
 
 
     /**
-     * A handler for internal PHP errors. Errors are handled if covered by the currently active error reporting level. They are either
+     * A handler for PHP errors. Errors are handled if covered by the active error reporting level. They are either
      * logged or converted to {@link PHPError} exceptions and thrown back.
      *
-     * Errors of level E_DEPRECATED, E_USER_DEPRECATED, E_USER_NOTICE or E_USER_WARNING are never thrown back as exceptions.
+     * Errors of level E_DEPRECATED, E_USER_DEPRECATED, E_USER_NOTICE or E_USER_WARNING are just logged and never thrown back.
      *
      * @param  int                  $level              - error severity level
      * @param  string               $message            - error message
@@ -139,68 +129,72 @@ class ErrorHandler extends StaticClass {
      * @param  int                  $line               - line of file where the error occurred
      * @param  array<string, mixed> $symbols [optional] - symbol table at the point of the error
      *
-     * @return bool - TRUE  if the error was handled and PHP should call error_clear_last()
+     * @return bool - TRUE  if the error was handled and PHP should call error_clear_last();
      *                FALSE if the error was not handled and PHP should not call error_clear_last()
      *
      * @throws PHPError
      */
     public static function handleError($level, $message, $file, $line, array $symbols = []) {
         //echof('ErrorHandler::handleError()  '.self::errorLevelToStr($level).': '.$message.', in '.$file.', line '.$line);
-        if (!self::$errorHandlingMode) return false;
+        if (!self::$errorHandling) return false;
 
         // anonymous function to chain a previously active handler
         $args = func_get_args();
-        $prevErrorHandler = function() use ($args) {                        // a possibly static handler must be invoked with call_user_func()
+        $prevErrorHandler = function() use ($args) {
             if (self::$prevErrorHandler) {
-                call_user_func(self::$prevErrorHandler, ...$args);
+                (self::$prevErrorHandler)(...$args);
             }
             return true;                                                    // tell PHP to call error_clear_last()
         };
 
-        // ignore suppressed errors and errors not covered by the current reporting level
-        $reportingLevel = error_reporting();
+        // ignore suppressed errors and errors not covered by the active reporting level
+        $reportingLevel = error_reporting();                                // since PHP8 some errors are not silenceable anymore
         if (!$reportingLevel)            return $prevErrorHandler();        // the @ operator was specified
         if (!($reportingLevel & $level)) return $prevErrorHandler();        // the error is not covered by the active reporting level
 
         // convert error to a PHPError exception
-        $message = 'PHP '.self::errorLevelDescr($level).': '.strLeftTo($message, ' (this will throw an Error in a future version of PHP)', -1);
+        $message = strLeftTo($message, ' (this will throw an Error in a future version of PHP)', -1);
         $error = new PHPError($message, 0, $level, $file, $line);
-        $trace = self::removeFrames($error->getTrace(), $file, $line);
-        self::setNewTrace($error, $trace);                                  // let the stacktrace point to the trigger statement
+        $trace = self::shiftStackFramesByLocation($error->getTrace(), $file, $line);
+        self::setExceptionProperties($error, $trace);                       // let the stacktrace point to the trigger statement
 
         // handle the error accordingly
-        $alwaysLog = ($level & (E_DEPRECATED|E_USER_DEPRECATED|E_USER_NOTICE|E_USER_WARNING));
+        $alwaysLog = ($level & (E_DEPRECATED | E_USER_DEPRECATED | E_USER_NOTICE | E_USER_WARNING));
 
-        if (self::$errorHandlingMode == self::ERRORS_LOG || $alwaysLog) {   // only log the error
-        switch ($level) {
-                case E_DEPRECATED:
-                case E_USER_DEPRECATED: $logLevel = L_INFO;   break;
-                case E_USER_NOTICE:     $logLevel = L_NOTICE; break;
-                case E_USER_WARNING:    $logLevel = L_WARN;   break;
-                default:                $logLevel = L_ERROR;
+        if (self::$errorHandling == self::MODE_LOG || $alwaysLog) {         // only log the error
+            $error->prependMessage('PHP ' . self::errorLevelDescr($level) . ': ');
+            switch ($level) {
+                case E_NOTICE           : $logLevel = L_NOTICE; break;
+                case E_WARNING          : $logLevel = L_WARN;   break;
+                case E_ERROR            : $logLevel = L_ERROR;  break;
+                case E_RECOVERABLE_ERROR: $logLevel = L_ERROR;  break;
+                case E_CORE_WARNING     : $logLevel = L_WARN;   break;
+                case E_CORE_ERROR       : $logLevel = L_ERROR;  break;
+                case E_COMPILE_WARNING  : $logLevel = L_WARN;   break;
+                case E_COMPILE_ERROR    : $logLevel = L_ERROR;  break;
+                case E_PARSE            : $logLevel = L_ERROR;  break;
+                case E_USER_NOTICE      : $logLevel = L_NOTICE; break;
+                case E_USER_WARNING     : $logLevel = L_WARN;   break;
+                case E_USER_ERROR       : $logLevel = L_ERROR;  break;
+                case E_USER_DEPRECATED  : $logLevel = L_INFO;   break;
+                case E_DEPRECATED       : $logLevel = L_INFO;   break;
+                case E_STRICT           : $logLevel = L_NOTICE; break;
+
+                default: $logLevel = L_ERROR;
             }
             Logger::log($error, $logLevel, [
-                'class' => isset($trace[0]['class']) ? $trace[0]['class'] : '',
-                'file'  => $error->getFile(),
-                'line'  => $error->getLine(),
+                'file'          => $file,
+                'line'          => $line,
+                'error-handler' => true,
             ]);
             return $prevErrorHandler();
         }
 
-        // throw back everything as an exception
-        // There are rare cases were throwing an exception from the error handler causes even more errors.
-
-        // fatal out-of-memory errors                                       // TODO: remove this duplicate check
-        if (self::$inScriptShutdown && preg_match('/^Allowed memory size of ([0-9]+) bytes exhausted/', $message)) {
-            $context = [
-                'file'            => $file,
-                'line'            => $line,
-                'unhandled-error' => true,
-            ];
-            return true(Logger::log($message, L_FATAL, $context));          // logging the message is sufficient as there is no stacktrace anyway
-        }
+        // throw back the error as an exception
 
         /**
+         * TODO: There are rare cases were throwing an exception from the error handler causes even more errors.
+         *
          * Errors triggered by require() or require_once():
          * ------------------------------------------------
          * Problem:  PHP errors triggered by require() or require_once() are non-catchable errors and do not follow regular
@@ -210,93 +204,93 @@ class ErrorHandler extends StaticClass {
          *
          * @see  https://stackoverflow.com/questions/25584494/php-set-exception-handler-not-working-for-error-thrown-in-set-error-handler-cal
          */
-        $trace = $error->getBetterTrace();
-        if ($trace) {                                                           // after a fatal error the trace may be empty
-            $function = self::getFrameMethod($trace[0]);
-            if ($function=='require' || $function=='require_once') {
-                $currentHandler = set_exception_handler(function() {});
-                restore_exception_handler();
-                $currentHandler && call_user_func($currentHandler, $error);     // a possibly static handler must be invoked with call_user_func()
-                return (bool)$currentHandler;                                   // PHP will terminate the script anyway.
-            }
-        }
+        //$trace = $error->getBetterTrace();
+        //if ($trace) {                                                           // after a fatal error the trace may be empty
+        //    $function = self::getFrameMethod($trace[0]);
+        //    if ($function=='require' || $function=='require_once') {
+        //        $currentHandler = set_exception_handler(function() {});
+        //        restore_exception_handler();
+        //        $currentHandler && call_user_func($currentHandler, $error);     // a possibly static handler must be invoked with call_user_func()
+        //        return (bool)$currentHandler;                                   // PHP will terminate the script anyway.
+        //    }
+        //}
 
         // now throw back everything else
-        throw $error;
+        throw $error->prependMessage('PHP Error: ');
     }
 
 
     /**
-     * A handler for uncatched exceptions|errors. After the handler returns PHP terminates the script.
+     * A handler for uncatched exceptions. After the handler returns PHP terminates the script.
      *
-     * @param  \Throwable $exception - the unhandled exception|error
+     * @param \Throwable $exception - the unhandled throwable
      *
      * @return void
      */
-    public static function handleException($exception) {
-        //echof('ErrorHandler::handleException()  '.$exception->getMessage());
+    public static function handleException(\Throwable $exception) {
         if (!self::$exceptionHandling) return;
+        //echof('ErrorHandler::handleException()  '.$exception->getMessage());
 
-        // Exceptions thrown from the exception handler itself will not be passed back to the handler but
-        // cause an uncatchable fatal error. To prevent this they are handled explicitly.
-        $secondEx = null;
+        // prevent exceptions to be thrown from the handler itself (causes uncatchable fatal errors)
         try {
             Logger::log($exception, L_FATAL, [
-                'file'            => $exception->getFile(),
-                'line'            => $exception->getLine(),
-                'unhandled-error' => true,
+                'file'          => $exception->getFile(),
+                'line'          => $exception->getLine(),
+                'error-handler' => true,
             ]);
-        }
-        catch (\Throwable $secondEx) {}
 
-        if ($secondEx)  {
-            // secondary exception: the logger itself crashed, last chance to log
+            // chain a previously active handler
+            if (self::$prevExceptionHandler) {
+                (self::$prevExceptionHandler)($exception);
+            }
+        }
+        catch (\Throwable $second) {
+            self::handleExceptionOnException($exception, $second);
+        }
+    }
+
+
+    /**
+     * Process exceptions thrown inside the exception handler. Called if {@link Logger} or other chained exception handlers fail
+     * and throw exceptions by themself. In such a case both exceptions are logged to the default log with only limited details.
+     *
+     * ATTENTION: If this method is reached something in the previous error handling went seriously wrong. Therefore this method
+     *            should better not rely on external dependencies.
+     *
+     * @param  \Throwable $first  - primary exception
+     * @param  \Throwable $second - secondary exception
+     *
+     * @return void
+     */
+    private static function handleExceptionOnException(\Throwable $first, \Throwable $second): void {
+        try {
+            // last chance to log something
             $indent = ' ';
-            $msg2  = '[FATAL] Unhandled '.trim(self::getBetterMessage($secondEx)).NL;
-            $file2 = $secondEx->getFile();
-            $line2 = $secondEx->getLine();
-            $msg2 .= $indent.'in '.$file2.' on line '.$line2.NL.NL;
-            $msg2 .= $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
-            $msg2 .= self::getBetterTraceAsString($secondEx, $indent);
-
-            // primary (the causing) exception
-            $msg1  = $indent.'Unhandled '.trim(self::getBetterMessage($exception)).NL;
-            $file1 = $exception->getFile();
-            $line1 = $exception->getLine();
-            $msg1 .= $indent.'in '.$file1.' on line '.$line1.NL.NL;
+            $msg1  = trim(ErrorHandler::getVerboseMessage($first, $indent));
+            $msg1  = $indent.'[FATAL] Unhandled '.$msg1.NL.$indent.'in '.$first->getFile().' on line '.$first->getLine().NL.NL;
             $msg1 .= $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
-            $msg1 .= self::getBetterTraceAsString($exception, $indent);
+            $msg1 .= ErrorHandler::getAdjustedTraceAsString($first, $indent);
 
-            $msg  = $msg2.NL;
-            $msg .= $indent.'caused by'.NL;
-            $msg .= $msg1;
-            $msg  = str_replace(chr(0), '\0', $msg);                    // replace NUL bytes which mess up the logfile
+            $msg2  = trim(ErrorHandler::getVerboseMessage($second, $indent));
+            $msg2  = $indent.$msg2.NL.$indent.'in '.$second->getFile().' on line '.$second->getLine().NL.NL;
+            $msg2 .= $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
+            $msg2 .= ErrorHandler::getAdjustedTraceAsString($second, $indent);
 
-            if (CLI) echo $msg.NL;                                      // full second exception
-            error_log(trim($msg), ERROR_LOG_DEFAULT);
-        }
+            $msg  = $msg1 . NL;
+            $msg .= $indent . 'followed by' . NL;
+            $msg .= $msg2;
 
-        if (!CLI) {                                                     // web interface: prevent an empty page
-            try {
-                if (Application::isAdminIP() || ini_get_bool('display_errors')) {
-                    if ($secondEx) {                                    // full second exception, full log location
-                        echof($secondEx);
-                        echof(NL.NL.'error log: '.(strlen($errorLog=ini_get('error_log')) ? $errorLog : 'web server'));
-                    }
-                }
-                else {
-                    echof('application error (see error log)');
-                }
+            // log everything to the system logger (never throws an error)
+            $msg = str_replace(chr(0), '\0', $msg);                             // replace NUL bytes which mess up the logfile
+            if (WINDOWS) {
+                $msg = str_replace(NL, PHP_EOL, $msg);
             }
-            catch (\Throwable $thirdEx) {
-                echof('application error (see error log)');
+            if (CLI) {
+                echo $msg;
             }
+            error_log($msg, ERROR_LOG_DEFAULT);
         }
-
-        // chain a previously active exception handler
-        if (self::$prevExceptionHandler) {
-            call_user_func(self::$prevExceptionHandler, $exception);    // a possibly static handler must be invoked with call_user_func()
-        }
+        catch (\Throwable $ex) {}                                               // intentionally eat it
     }
 
 
@@ -304,10 +298,11 @@ class ErrorHandler extends StaticClass {
      * Manually called handler for exceptions occurring in object destructors.
      *
      * Attempting to throw an exception from a destructor during script shutdown causes a fatal error which is not catchable
-     * by an installed error handler. Therefore this method must be called manually from object destructors if an exception
-     * occurred. If the script is in the shutdown phase the exception is passed on to the regular exception handler and the
-     * script is terminated. If the script is not in the shutdown phase this method ignores the exception and regular
-     * exception handling takes over. For an example see this package's README file.
+     * by an installed error handler. Therefore this method must be called manually from destructors if an exception occurred.
+     * If the script is in the shutdown phase the exception is passed on to the regular exception handler and the script is
+     * terminated. If the script is not in the shutdown phase this method does nothing.
+     *
+     * For an example see this package's README file.
      *
      * @param  \Throwable $exception
      *
@@ -316,15 +311,15 @@ class ErrorHandler extends StaticClass {
      * @link   https://www.php.net/manual/en/language.oop5.decon.php#language.oop5.decon.destructor
      */
     public static function handleDestructorException($exception) {
-        if (self::$inScriptShutdown) {
+        if (self::$inShutdown) {
             $currentHandler = set_exception_handler(function() {});
             restore_exception_handler();
 
             if ($currentHandler) {
-                call_user_func($currentHandler, $exception);    // A possibly static handler must be invoked with call_user_func().
-                exit(1);                                        // Calling exit() is the only way to prevent the immediately following
-            }                                                   // non-catchable fatal error. However, calling exit() in a destructor will
-        }                                                       // also prevent execution of any remaining shutdown routines.
+                ($currentHandler)($exception);      // Calling exit() is the only way to prevent the immediately following
+                exit(1);                            // non-catchable fatal error. However, calling exit() in a destructor will
+            }                                       // also prevent execution of any remaining shutdown logic.
+        }
         return $exception;
     }
 
@@ -332,13 +327,14 @@ class ErrorHandler extends StaticClass {
     /**
      * A handler executed when the script shuts down.
      *
-     * @return mixed
+     * @return void
      */
     public static function onScriptShutdown() {
-        self::$inScriptShutdown = true;
+        self::$inShutdown = true;
 
-        // Errors showing up here haven't been passed to an installed error handler, e.g. "out-of-memory" errors.
-        if ($error = error_get_last()) {
+        // Errors showing up here (e.g. "out-of-memory" errors) haven't been passed to an installed error handler.
+        $error = error_get_last();
+        if ($error) {
             // release the reserved memory, so preg_match() survives a potential OOM condition
             self::$oomEmergencyMemory = $match = null;
 
@@ -351,7 +347,7 @@ class ErrorHandler extends StaticClass {
             $currentHandler = set_error_handler(null);
             restore_error_handler();
             if ($currentHandler) {
-                call_user_func($currentHandler, ...array_values($error));
+                ($currentHandler)(...array_values($error));
             }
         }
     }
@@ -364,9 +360,7 @@ class ErrorHandler extends StaticClass {
      *
      * @return string
      */
-    public static function errorLevelDescr($level) {
-        Assert::int($level);
-
+    public static function errorLevelDescr(int $level) {
         static $levels = [
             E_ERROR             => 'Error',                     //     1
             E_WARNING           => 'Warning',                   //     2
@@ -384,7 +378,7 @@ class ErrorHandler extends StaticClass {
             E_DEPRECATED        => 'Deprecated',                //  8192
             E_USER_DEPRECATED   => 'User Deprecated',           // 16384
         ];
-        return isset($levels[$level]) ? $levels[$level] : '(unknown)';
+        return $levels[$level] ?? '(unknown)';
     }
 
 
@@ -395,69 +389,114 @@ class ErrorHandler extends StaticClass {
      *
      * @return string
      */
-    public static function errorLevelToStr($flag) {
-        Assert::int($flag);
-
-        $levels = [
-            E_ERROR             => 'E_ERROR',                   //     1
-            E_WARNING           => 'E_WARNING',                 //     2
-            E_PARSE             => 'E_PARSE',                   //     4
+    public static function errorLevelToStr(int $flag): string {
+        // ordered by human-readable priorities (for conversion to string)
+        $allLevels = [
             E_NOTICE            => 'E_NOTICE',                  //     8
-            E_CORE_ERROR        => 'E_CORE_ERROR',              //    16
-            E_CORE_WARNING      => 'E_CORE_WARNING',            //    32
-            E_COMPILE_ERROR     => 'E_COMPILE_ERROR',           //    64
-            E_COMPILE_WARNING   => 'E_COMPILE_WARNING',         //   128
-            E_USER_ERROR        => 'E_USER_ERROR',              //   256
-            E_USER_WARNING      => 'E_USER_WARNING',            //   512
-            E_USER_NOTICE       => 'E_USER_NOTICE',             //  1024
-            E_STRICT            => 'E_STRICT',                  //  2048
+            E_WARNING           => 'E_WARNING',                 //     2
+            E_ERROR             => 'E_ERROR',                   //     1
             E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',       //  4096
-            E_DEPRECATED        => 'E_DEPRECATED',              //  8192
+            E_CORE_WARNING      => 'E_CORE_WARNING',            //    32
+            E_CORE_ERROR        => 'E_CORE_ERROR',              //    16
+            E_COMPILE_WARNING   => 'E_COMPILE_WARNING',         //   128
+            E_COMPILE_ERROR     => 'E_COMPILE_ERROR',           //    64
+            E_PARSE             => 'E_PARSE',                   //     4
+            E_USER_NOTICE       => 'E_USER_NOTICE',             //  1024
+            E_USER_WARNING      => 'E_USER_WARNING',            //   512
+            E_USER_ERROR        => 'E_USER_ERROR',              //   256
             E_USER_DEPRECATED   => 'E_USER_DEPRECATED',         // 16384
+            E_DEPRECATED        => 'E_DEPRECATED',              //  8192
+            E_STRICT            => 'E_STRICT',                  //  2048
         ];
 
-        if      (!$flag)                                                       $levels = ['0'];                         //     0
-        else if (($flag &  E_ALL)                  ==  E_ALL)                  $levels = ['E_ALL'];                     // 32767
-        else if (($flag & (E_ALL & ~E_DEPRECATED)) == (E_ALL & ~E_DEPRECATED)) $levels = ['E_ALL & ~E_DEPRECATED'];     // 24575
-        else {
-            foreach ($levels as $key => $v) {
-                if ($flag & $key) continue;
-                unset($levels[$key]);
+        $setLevels = $notsetLevels = [];
+
+        foreach ($allLevels as $level => $description) {
+            if ($flag & $level) {
+                $setLevels[] = $description;
+            }
+            else {
+                $notsetLevels[] = $description;
             }
         }
-        return join('|', $levels);
+
+        if (sizeof($setLevels) < sizeof($notsetLevels)) {
+            $result = $setLevels ? join(' | ', $setLevels) : '0';
+        }
+        else {
+            $result = join(' & ~', ['E_ALL', ...$notsetLevels]);
+        }
+        return $result;
     }
 
 
     /**
-     * Return the message of an exception in a more readable way. Same as {@link \rosasurfer\ministruts\core\exception\RosasurferException::getBetterMessage()}
-     * except that this method can be used with all PHP throwables.
+     * Return a readable representation of the specified LibXML errors.
      *
-     * @param  \Throwable $exception
-     * @param  string     $indent [optional] - indent all lines by the specified value (default: no indentation)
+     * @param  \LibXMLError[] $errors - array of LibXML errors, e.g. as returned by <tt>libxml_get_errors()</tt>
+     * @param  string[]       $lines  - the XML causing the errors split by line
+     *
+     * @return string - readable error representation or an empty string if parameter $errors is empty
+     */
+    public static function libxmlErrorsToStr(array $errors, array $lines): string {
+        $msg = '';
+
+        foreach ($errors as $error) {
+            $msg .= 'line '.$error->line.': ';
+
+            switch ($error->level) {
+                case LIBXML_ERR_NONE:
+                    break;
+                case LIBXML_ERR_WARNING:
+                    $msg .= 'parser warning';
+                    break;
+                case LIBXML_ERR_ERROR:
+                    // @see  https://gnome.pages.gitlab.gnome.org/libxml2/devhelp/libxml2-xmlerror.html#xmlParserErrors
+                    switch ($error->code) {
+                        case 201:
+                        case 202:
+                        case 203:
+                        case 204:
+                        case 205:
+                            $msg .= 'namespace error';
+                            break 2;
+                    };
+                    // no break
+                default:
+                    $msg .= 'parser error';
+            }
+            $msg .= ': '.trim($error->message)             .NL;
+            $msg .= ($lines[$error->line - 1] ?? '')       .NL;
+            $msg .= str_repeat(' ', $error->column - 1).'^'.NL.NL;
+        }
+
+        return trim($msg);
+    }
+
+
+    /**
+     * Return a more verbose version of a {@link \Throwable}'s message. The resulting message has the classname of the throwable
+     * and in case of {@link \ErrorException}s also the severity level of the error prepended to the original message.
+     *
+     * @param  \Throwable     $throwable         - throwable
+     * @param  string         $indent [optional] - indent all lines by the specified value (default: no indentation)
+     * @param  ?ContentFilter $filter [optional] - the content filter to apply (default: none)
      *
      * @return string - message
      */
-    public static function getBetterMessage($exception, $indent = '') {
-        Assert::throwable($exception, '$exception');
-
-        $message = trim($exception->getMessage());
-
-        if ($exception instanceof PHPError) {
-            $type = '';
+    public static function getVerboseMessage(\Throwable $throwable, string $indent = '', ContentFilter $filter = null): string {
+        $message = trim($throwable->getMessage());
+        if ($filter) {
+            $message = $filter->filterString($message);
         }
-        else {
-            $class     = get_class($exception);
-            $namespace = strtolower(strLeftTo($class, '\\', -1, true, ''));
-            $basename  = simpleClassName($class);
-            $type      = $namespace.$basename;
-            $message   = (strlen($message) ? ': ':'').$message;
 
-            if ($exception instanceof \ErrorException) {            // a PHP error exception not created by the framework
-                $type .= '('.self::errorLevelDescr($exception->getSeverity()).')';
+        if (!$throwable instanceof PHPError) {              // PHP errors are verbose enough
+            $class = get_class($throwable);
+            if ($throwable instanceof \ErrorException) {    // a PHP error not created by this ErrorHandler
+                $class .= '('.self::errorLevelDescr($throwable->getSeverity()).')';
             }
+            $message = $class.(strlen($message) ? ': ':'').$message;
         }
-        $message = $type.$message;
 
         if (strlen($indent)) {
             $message = str_replace(NL, NL.$indent, normalizeEOL($message));
@@ -467,8 +506,7 @@ class ErrorHandler extends StaticClass {
 
 
     /**
-     * Takes a regular PHP stacktrace and adjusts it to be more readable. Same as {@link \rosasurfer\ministruts\core\exception\RosasurferException::getBetterTrace()}
-     * except that this method can be used with all PHP exceptions.
+     * Takes a regular PHP stacktrace and adjusts it to be more readable.
      *
      * @param  array<string[]> $trace           - regular PHP stacktrace
      * @param  string          $file [optional] - name of the file where the stacktrace was generated
@@ -493,16 +531,16 @@ class ErrorHandler extends StaticClass {
      *  {main}          # line 26, file: /var/www/phalcon/vokuro/public/index.php
      * </pre>
      */
-    public static function getBetterTrace(array $trace, $file='unknown', $line=0) {
+    public static function getAdjustedTrace(array $trace, string $file = 'unknown', int $line = 0): array {
         // check if the stacktrace is already adjusted
-        if (isset($trace[0]['__ministruts_adjusted__'])) return $trace;
+        if (isset($trace[0]['__ministruts_adjusted__'])) {
+            return $trace;
+        }
 
         // fix a missing first line if $file matches (e.g. with \SimpleXMLElement)
-        if ($file!='unknown' && $line) {
-            if (isset($trace[0]['file']) && $trace[0]['file']==$file) {
-                if (isset($trace[0]['line']) && $trace[0]['line']=='0') {
-                    $trace[0]['line'] = $line;
-                }
+        if ($file != 'unknown' && $line) {
+            if (($trace[0]['file'] ?? null)==$file && ($trace[0]['line'] ?? 0)==0) {
+                $trace[0]['line'] = $line;
             }
         }
 
@@ -510,14 +548,14 @@ class ErrorHandler extends StaticClass {
         $trace[] = ['function' => '{main}'];
 
         // move fields FILE and LINE to the end by one position
-        for ($i=sizeof($trace); $i--;) {
+        for ($i = sizeof($trace); $i--;) {
             if (isset($trace[$i-1]['file'])) $trace[$i]['file'] = $trace[$i-1]['file'];
             else                       unset($trace[$i]['file']);
 
             if (isset($trace[$i-1]['line'])) $trace[$i]['line'] = $trace[$i-1]['line'];
             else                       unset($trace[$i]['line']);
 
-            $trace[$i]['__ministruts_adjusted__'] = true;
+            $trace[$i]['__ministruts_adjusted__'] = '1';
         }
 
         // add location details from parameters to frame[0] only if they differ from the old values (now in frame[1])
@@ -531,8 +569,9 @@ class ErrorHandler extends StaticClass {
 
         // remove the last frame (the one appended for the main script) if it now points to an unknown location (the PHP core)
         $size = sizeof($trace);
-        !isset($trace[$size-1]['file']) && \array_pop($trace);
-
+        if (!isset($trace[$size-1]['file'])) {
+            array_pop($trace);
+        }
         return $trace;
 
         // TODO: fix wrong stack frames originating from calls to virtual static functions
@@ -544,27 +583,23 @@ class ErrorHandler extends StaticClass {
 
 
     /**
-     * Return the stacktrace of an exception in a more readable way as a string. The returned string contains nested exceptions.
-     * Same as {@link \rosasurfer\ministruts\core\exception\RosasurferException::getBetterTraceAsString()} except that this method can be used with
-     * all PHP throwables.
+     * Return the adjusted stacktrace of an exception as a string. The returned string contains infos about nested exceptions.
      *
-     * @param  \Throwable $exception
-     * @param  string     $indent [optional] - indent the resulting lines by the specified value (default: no indentation)
+     * @param  \Throwable     $throwable         - any throwable
+     * @param  string         $indent [optional] - indent the resulting lines by the specified value (default: no indentation)
+     * @param  ?ContentFilter $filter [optional] - the content filter to apply (default: none)
      *
      * @return string - readable stacktrace
      */
-    public static function getBetterTraceAsString($exception, $indent = '') {
-        Assert::throwable($exception, '$exception');
+    public static function getAdjustedTraceAsString(\Throwable $throwable, string $indent = '', ContentFilter $filter = null): string {
+        $trace  = self::getAdjustedTrace($throwable->getTrace(), $throwable->getFile(), $throwable->getLine());
+        $result = self::formatStackTrace($trace, $indent, $filter);
 
-        if ($exception instanceof IRosasurferException) $trace = $exception->getBetterTrace();
-        else                                            $trace = self::getBetterTrace($exception->getTrace(), $exception->getFile(), $exception->getLine());
-        $result = self::formatTrace($trace, $indent);
-
-        if ($cause = $exception->getPrevious()) {
+        if ($cause = $throwable->getPrevious()) {
             // recursively add stacktraces of nested exceptions
-            $message = trim(self::getBetterMessage($cause, $indent));
+            $message = trim(self::getVerboseMessage($cause, $indent, $filter));
             $result .= NL.$indent.'caused by'.NL.$indent.$message.NL.NL;
-            $result .= self::{__FUNCTION__}($cause, $indent);                 // recursion
+            $result .= self::getAdjustedTraceAsString($cause, $indent, $filter);
         }
         return $result;
     }
@@ -575,41 +610,54 @@ class ErrorHandler extends StaticClass {
      *
      * @param  array<string[]> $trace             - stacktrace
      * @param  string          $indent [optional] - indent formatted lines by this value (default: no indenting)
+     * @param  ?ContentFilter  $filter [optional] - the content filter to apply (default: none)
      *
      * @return string
      */
-    public static function formatTrace(array $trace, $indent = '') {
+    public static function formatStackTrace(array $trace, string $indent = '', ContentFilter $filter = null): string {
+        // TODO: if the trace contains frame arguments moderate the arguments using a provided filter
+
         $config  = self::di('config');
         $appRoot = $config ? $config['app.dir.root'] : null;
         $result  = '';
-
-        $size = sizeof($trace);
+        $size    = sizeof($trace);
         $callLen = $lineLen = 0;
 
-        for ($i=0; $i < $size; $i++) {               // align FILE and LINE
+        for ($i=0; $i < $size; $i++) {              // align FILE and LINE
+            /** @var array{file?:string, line?:string, class:string, function:string, type:string} $frame */
             $frame = &$trace[$i];
 
-            $call = self::getFrameMethod($frame, true);
-
-            if ($call!='{main}' && !strEndsWith($call, '{closure}'))
-                $call.='()';
+            $call = self::getStackFrameMethod($frame, true);
+            if ($call != '{main}' && !strEndsWith($call, '{closure}')) {
+                $call .= '()';
+            }
             $callLen = max($callLen, strlen($call));
             $frame['call'] = $call;
 
             $frame['line'] = isset($frame['line']) ? ' # line '.$frame['line'].',' : '';
             $lineLen = max($lineLen, strlen($frame['line']));
 
-            if (isset($frame['file']))                 $frame['file'] = ' file: '.(!$appRoot ? $frame['file'] : strRightFrom($frame['file'], $appRoot.DIRECTORY_SEPARATOR, 1, false, $frame['file']));
-            elseif (strStartsWith($call, 'phalcon\\')) $frame['file'] = ' [php-phalcon]';
-            else                                       $frame['file'] = ' [php]';
+            if (isset($frame['file'])) {
+                $frame['file'] = ' file: '.(!$appRoot ? $frame['file'] : strRightFrom($frame['file'], $appRoot.DIRECTORY_SEPARATOR, 1, false, $frame['file']));
+            }
+            elseif (strStartsWith($call, 'phalcon\\')) {
+                $frame['file'] = ' [php-phalcon]';
+            }
+            else {
+                $frame['file'] = ' [php]';
+            }
         }
+
         if ($appRoot) {
             $trace[] = ['call'=>'', 'line'=>'', 'file'=>' file base: '.$appRoot];
             $i++;
         }
 
         for ($i=0; $i < $size; $i++) {
-            $result .= $indent.str_pad($trace[$i]['call'], $callLen).' '.str_pad($trace[$i]['line'], $lineLen).$trace[$i]['file'].NL;
+            $call = $trace[$i]['call'];
+            $file = $trace[$i]['file'];
+            $line = $trace[$i]['line'];
+            $result .= $indent.str_pad($call, $callLen).' '.str_pad($line, $lineLen).$file.NL;
         }
         return $result;
     }
@@ -618,12 +666,12 @@ class ErrorHandler extends StaticClass {
     /**
      * Return a stack frame's full method name similar to the constant __METHOD__. Used for generating a formatted stacktrace.
      *
-     * @param  string[] $frame                - frame
+     * @param  string[] $frame                - stack frame
      * @param  bool     $nsToLower [optional] - whether to return the namespace part in lower case (default: unmodified)
      *
-     * @return string - method name (without trailing parentheses)
+     * @return string - method name without trailing parentheses
      */
-    public static function getFrameMethod(array $frame, $nsToLower = false) {
+    public static function getStackFrameMethod(array $frame, bool $nsToLower = false): string {
         $class = $function = '';
 
         if (isset($frame['function'])) {
@@ -631,12 +679,12 @@ class ErrorHandler extends StaticClass {
 
             if (isset($frame['class'])) {
                 $class = $frame['class'];
-                if ($nsToLower && is_int($pos=strrpos($class, '\\'))) {
+                if ($nsToLower && is_int($pos = strrpos($class, '\\'))) {
                     $class = strtolower(substr($class, 0, $pos)).substr($class, $pos);
                 }
                 $class = $class.$frame['type'];
             }
-            elseif ($nsToLower && is_int($pos=strrpos($function, '\\'))) {
+            elseif ($nsToLower && is_int($pos = strrpos($function, '\\'))) {
                 $function = strtolower(substr($function, 0, $pos)).substr($function, $pos);
             }
         }
@@ -645,22 +693,22 @@ class ErrorHandler extends StaticClass {
 
 
     /**
-     * Remove all frames from a stacktrace following the specified file and line (used to remove frames of this error handler from a PHP
-     * error converted to an exception).
+     * Shift all frames from the beginning of a stacktrace up to and including the specified file and line.
+     * Effectively, this brings the stacktrace in line with the specified file location.
      *
      * @param array<string[]> $trace - stacktrace to process
-     * @param string          $file  - filename where the error was triggered
-     * @param int             $line  - line number where the error was triggered
+     * @param string          $file  - filename where an error was triggered
+     * @param int             $line  - line number where an error was triggered
      *
      * @return array<string[]>
      */
-    private static function removeFrames(array $trace, $file, $line) {
+    public static function shiftStackFramesByLocation(array $trace, string $file, int $line) {
         $result = $trace;
         $size = sizeof($trace);
 
-        for ($i=0; $i < $size; $i++) {
-            if (isset($trace[$i]['file'], $trace[$i]['line']) && $trace[$i]['file']===$file && $trace[$i]['line']==$line) {
-                $result = array_slice($trace, $i+1);
+        for ($i = 0; $i < $size; $i++) {
+            if (isset($trace[$i]['file'], $trace[$i]['line']) && $trace[$i]['file'] == $file && $trace[$i]['line'] == $line) {
+                $result = array_slice($trace, $i + 1);
                 break;
             }
         }
@@ -669,19 +717,69 @@ class ErrorHandler extends StaticClass {
 
 
     /**
-     * Set the stacktrace of an {@link \Exception}.
+     * Shift all frames from the beginning of a stacktrace pointing to the specified method.
      *
-     * @param  \Exception      $exception - exception to modify
-     * @param  array<string[]> $trace     - new stacktrace
+     * @param  \Exception $exception - exception to modify
+     * @param  string     $method    - method name
+     *
+     * @return int - number of removed frames
+     */
+    public static function shiftStackFramesByMethod(\Exception $exception, string $method): int {
+        $trace  = $exception->getTrace();
+        $size   = sizeof($trace);
+        $file   = $exception->getFile();
+        $line   = $exception->getLine();
+        $method = strtolower($method);
+        $count  = 0;
+
+        while ($size > 0) {
+            if (isset($trace[0]['function'])) {
+                if (strtolower($trace[0]['function']) == $method) {
+                    $frame = array_shift($trace);
+                    $file = $frame['file'] ?? 'Unknown';
+                    $line = $frame['line'] ?? 0;
+                    $size--;
+                    $count++;
+                    continue;
+                }
+            }
+            break;
+        }
+
+        self::setExceptionProperties($exception, $trace, $file, $line);
+        return $count;
+    }
+
+
+    /**
+     * Set the properties of an {@link \Exception}.
+     *
+     * @param  \Exception      $exception       - exception to modify
+     * @param  array<string[]> $trace           - stacktrace
+     * @param  string          $file [optional] - filename of the error location (default: unchanged)
+     * @param  int             $line [optional] - line number of the error location (default: unchanged)
      *
      * @return void
      */
-    private static function setNewTrace(\Exception $exception, array $trace) {
-        static $property = null;
-        if (!$property) {
-            $property = new \ReflectionProperty(\Exception::class, 'trace');
-            $property->setAccessible(true);
+    private static function setExceptionProperties(\Exception $exception, array $trace, string $file = '', int $line = 0) {
+        static $traceProperty = null;
+        if (!$traceProperty) {
+            $traceProperty = new \ReflectionProperty(\Exception::class, 'trace');
+            $traceProperty->setAccessible(true);
         }
-        $property->setValue($exception, $trace);
+        static $fileProperty = null;
+        if (!$fileProperty) {
+            $fileProperty = new \ReflectionProperty(\Exception::class, 'file');
+            $fileProperty->setAccessible(true);
+        }
+        static $lineProperty = null;
+        if (!$lineProperty) {
+            $lineProperty = new \ReflectionProperty(\Exception::class, 'line');
+            $lineProperty->setAccessible(true);
+        }
+
+        $traceProperty->setValue($exception, $trace);
+        if (func_num_args() > 2) $fileProperty->setValue($exception, $file);
+        if (func_num_args() > 3) $lineProperty->setValue($exception, $line);
     }
 }

@@ -3,40 +3,13 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\core\exception;
 
-use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\error\ErrorHandler;
-
-use const rosasurfer\ministruts\NL;
 
 
 /**
  * A trait adding the behavior of a {@link RosasurferException} to any custom {@link \Throwable}.
  */
 trait RosasurferExceptionTrait {
-
-    /** @var string - better message */
-    private $betterMessage;
-
-    /** @var array<string[]> - better stacktrace */
-    private $betterTrace;
-
-    /** @var string - better stacktrace as string */
-    private $betterTraceAsString;
-
-
-    /**
-     * Add a message to the exception's existing message. Used to enrich the exception with additional data.
-     *
-     * @param  string $message
-     *
-     * @return $this
-     */
-    public function appendMessage($message) {
-        if (strlen($message)) {
-            $this->message = trim(trim($this->message).NL.$message);
-        }
-        return $this;
-    }
 
 
     /**
@@ -47,9 +20,7 @@ trait RosasurferExceptionTrait {
      *
      * @return $this
      */
-    public function setCode($code) {
-        Assert::int($code);
-
+    public function setCode(int $code): self {
         if (!isset($this->code)) {
             $this->code = $code;
         }
@@ -58,26 +29,32 @@ trait RosasurferExceptionTrait {
 
 
     /**
-     * Return the message of the exception in a more readable way.
+     * Prepend a message to the exception's existing message. Used to enrich the exception with additional data.
      *
-     * @return string
+     * @param  string $message
+     *
+     * @return $this
      */
-    public function getBetterMessage() {
-        if (!$this->betterMessage)
-            $this->betterMessage = ErrorHandler::getBetterMessage($this);
-        return $this->betterMessage;
+    public function prependMessage(string $message): self {
+        if (strlen($message)) {
+            $this->message = trim($message.$this->message);
+        }
+        return $this;
     }
 
 
     /**
-     * Return the stacktrace of the exception in a more readable way as a string. The returned string contains nested exceptions.
+     * Append a message to the exception's existing message. Used to enrich the exception with additional data.
      *
-     * @return string
+     * @param  string $message
+     *
+     * @return $this
      */
-    public function getBetterTraceAsString() {
-        if (!$this->betterTraceAsString)
-            $this->betterTraceAsString = ErrorHandler::getBetterTraceAsString($this);
-        return $this->betterTraceAsString;
+    public function appendMessage(string $message): self {
+        if (strlen($message)) {
+            $this->message = trim($this->message.$message);
+        }
+        return $this;
     }
 
 
@@ -86,7 +63,7 @@ trait RosasurferExceptionTrait {
      *
      * @return string
      */
-    public function __toString() {
-        return $this->getBetterMessage();
+    public function __toString(): string {
+        return ErrorHandler::getVerboseMessage($this);
     }
 }

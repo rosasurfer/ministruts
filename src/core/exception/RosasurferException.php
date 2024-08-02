@@ -5,11 +5,10 @@ namespace rosasurfer\ministruts\core\exception;
 
 use rosasurfer\ministruts\core\ObjectTrait;
 use rosasurfer\ministruts\core\di\DiAwareTrait;
-use rosasurfer\ministruts\core\error\ErrorHandler;
 
 
 /**
- * Base class for all "rosasurfer" exceptions.
+ * Base class for all "rosasurfer" exceptions. Provides some additional convenient helpers.
  */
 class RosasurferException extends \Exception implements RosasurferExceptionInterface {
 
@@ -23,40 +22,7 @@ class RosasurferException extends \Exception implements RosasurferExceptionInter
      * @param  int         $code    [optional] - exception identifier (typically an application error id)
      * @param  ?\Throwable $cause   [optional] - another throwable causing this throwable
      */
-    public function __construct($message='', $code=0, $cause=null) {
+    public function __construct(string $message='', int $code=0, ?\Throwable $cause=null) {
         parent::__construct($message, $code, $cause);
-    }
-
-
-	/**
-     * {@inheritdoc}
-     *
-     * @return array<string[]>
-     */
-    public function getBetterTrace() {
-        $betterTrace = $this->betterTrace;
-
-        if (!$betterTrace) {
-            // transform the original stacktrace into a better one
-            $betterTrace = ErrorHandler::getBetterTrace($this->getTrace(), $this->getFile(), $this->getLine());
-
-            /*
-            // if the exception was thrown in a magic "__set()" shift frames until we reach the erroneous assignment
-            while (strtolower($trace[0]['function']) == '__set') {
-                \array_shift($trace);
-            }
-
-            // if the exception was thrown in a magic "__call()" shift frames until we reach the erroneous call
-            if (strtolower($trace[0]['function']) == '__call') {
-                while (strtolower($trace[0]['function']) == '__call') {
-                    \array_shift($trace);
-                }
-                \array_shift($trace);                              // that's one level more than for "__set()"
-            }
-            */
-
-            $this->betterTrace = $betterTrace;
-        }
-        return $betterTrace;
     }
 }

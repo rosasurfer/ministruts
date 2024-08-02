@@ -444,23 +444,23 @@ class Logger extends StaticClass {
             // append an existing context exception
             if (isset($context['exception'])) {
                 $exception   = $context['exception'];
-                $msg         = $indent.trim(ErrorHandler::getBetterMessage($exception, $indent));
+                $msg         = $indent.trim(ErrorHandler::getVerboseMessage($exception, $indent));
                 $cliMessage .= NL.$msg.NL.NL;
                 $traceStr    = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
-                $traceStr   .= ErrorHandler::getBetterTraceAsString($exception, $indent);
+                $traceStr   .= ErrorHandler::getAdjustedTraceAsString($exception, $indent);
                 $cliMessage .= NL.$traceStr;
             }
             elseif (isset($context['trace'])) {
                 // otherwise append the internal stacktrace
                 $traceStr    = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
-                $traceStr   .= ErrorHandler::formatTrace($context['trace'], $indent);
+                $traceStr   .= ErrorHandler::formatStackTrace($context['trace'], $indent);
                 $cliMessage .= NL.$traceStr;
             }
         }
         else {
             // $loggable is an exception
             $type = '';
-            $msg  = trim(ErrorHandler::getBetterMessage($loggable, $indent));
+            $msg  = trim(ErrorHandler::getVerboseMessage($loggable, $indent));
             if (isset($context['unhandled-exception'])) {
                 $type = 'Unhandled ';
                 if ($loggable instanceof PHPError) {
@@ -470,7 +470,7 @@ class Logger extends StaticClass {
             }
             $cliMessage  = '['.strtoupper(self::$logLevels[$level]).'] '.$type.$msg.NL.$indent.'in '.$file.' on line '.$line.NL;
             $traceStr    = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
-            $traceStr   .= ErrorHandler::getBetterTraceAsString($loggable, $indent);
+            $traceStr   .= ErrorHandler::getAdjustedTraceAsString($loggable, $indent);
             $cliMessage .= NL.$traceStr;
         }
 
@@ -515,23 +515,23 @@ class Logger extends StaticClass {
             // append an existing context exception
             if (isset($context['exception'])) {
                 $exception = $context['exception'];
-                $msg       = ErrorHandler::getBetterMessage($exception);
+                $msg       = ErrorHandler::getVerboseMessage($exception);
                 $html     .= '<br/>'.nl2br(hsc($msg)).'<br/><br/>';
                 $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
-                $traceStr .= ErrorHandler::getBetterTraceAsString($exception, $indent);
+                $traceStr .= ErrorHandler::getAdjustedTraceAsString($exception, $indent);
                 $html     .= print_p($traceStr, true, false);
             }
             elseif (isset($context['trace'])) {
                 // otherwise append the internal stacktrace
                 $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
-                $traceStr .= ErrorHandler::formatTrace($context['trace'], $indent);
+                $traceStr .= ErrorHandler::formatStackTrace($context['trace'], $indent);
                 $html     .= '<br style="clear:both"/><br/>'.print_p($traceStr, true, false).'<br/>';
             }
         }
         else {
             // $loggable is an exception
             $type = '';
-            $msg  = trim(ErrorHandler::getBetterMessage($loggable));
+            $msg  = trim(ErrorHandler::getVerboseMessage($loggable));
             if (isset($context['unhandled-exception'])) {
                 $type = 'Unhandled ';
                 if ($loggable instanceof PHPError) {
@@ -542,7 +542,7 @@ class Logger extends StaticClass {
             $html     .= '<span style="white-space:nowrap"><span style="font-weight:bold">['.strtoupper(self::$logLevels[$level]).']</span> <span style="white-space:pre; line-height:8px">'.nl2br(hsc($type.$msg)).'</span></span><br/><br/>';
             $html     .= 'in <span style="font-weight:bold">'.$file.'</span> on line <span style="font-weight:bold">'.$line.'</span><br/>';
             $traceStr  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
-            $traceStr .= ErrorHandler::getBetterTraceAsString($loggable, $indent);
+            $traceStr .= ErrorHandler::getAdjustedTraceAsString($loggable, $indent);
             $html     .= '<br style="clear:both"/><br/>'.print_p($traceStr, true, false).'<br/>';
         }
 
@@ -631,7 +631,7 @@ class Logger extends StaticClass {
             $msg = str_replace(NL, NL.$indent, normalizeEOL($msg));
         }
         else {
-            $msg = trim(ErrorHandler::getBetterMessage($loggable, $indent));
+            $msg = trim(ErrorHandler::getVerboseMessage($loggable, $indent));
             if (isset($context['unhandled-exception'])) {
                 if ($loggable instanceof PHPError) $msg = 'Unhandled PHP Error:'.strRightFrom($msg, ':');
                 else                               $msg = 'Unhandled '.$msg;
@@ -668,11 +668,11 @@ class Logger extends StaticClass {
             if (isset($context['exception'])) {
                 /** @var \Throwable $exception */
                 $exception = $context['exception'];
-                $msg       = $indent.trim(ErrorHandler::getBetterMessage($exception, $indent)).NL.NL;
+                $msg       = $indent.trim(ErrorHandler::getVerboseMessage($exception, $indent)).NL.NL;
                 $html && $msg ='<br/>'.nl2br(hsc($msg));
 
                 $trace  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
-                $trace .= ErrorHandler::getBetterTraceAsString($exception, $indent);
+                $trace .= ErrorHandler::getAdjustedTraceAsString($exception, $indent);
                 $html && $trace = '<br style="clear:both"/><br/>'.print_p($trace, true, false).'<br/>'.NL;
                 $trace  = $msg.$trace;
             }
@@ -680,7 +680,7 @@ class Logger extends StaticClass {
                 // otherwise process the internal stacktrace
                 !isset($context['trace']) && self::generateTrace($context);
                 $trace  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
-                $trace .= ErrorHandler::formatTrace($context['trace'], $indent);
+                $trace .= ErrorHandler::formatStackTrace($context['trace'], $indent);
                 $html && $trace = '<br style="clear:both"/><br/>'.print_p($trace, true, false).'<br/>'.NL;
             }
         }
@@ -688,7 +688,7 @@ class Logger extends StaticClass {
             // process the exception's stacktrace
             $exception = $loggable;
             $trace  = $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
-            $trace .= ErrorHandler::getBetterTraceAsString($exception, $indent);
+            $trace .= ErrorHandler::getAdjustedTraceAsString($exception, $indent);
             $html && $trace = '<br style="clear:both"/><br/>'.print_p($trace, true, false).'<br/>'.NL;
         }
         return $context[$key] = $trace;
@@ -816,7 +816,7 @@ class Logger extends StaticClass {
      * @return void
      */
     private static function generateTrace(array &$context) {
-        $trace = ErrorHandler::getBetterTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), __FILE__, __LINE__);
+        $trace = ErrorHandler::getAdjustedTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), __FILE__, __LINE__);
         $LoggerLog = strtolower(__CLASS__.'::log');
 
         foreach ($trace as $i => $frame) {

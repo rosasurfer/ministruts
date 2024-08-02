@@ -17,10 +17,11 @@ use function rosasurfer\ministruts\strStartsWith;
 
 use const rosasurfer\ministruts\ERROR_LOG_DEFAULT;
 use const rosasurfer\ministruts\NL;
+use const rosasurfer\ministruts\CLI;
 
 
 /**
- * General configuration mechanism via property files.
+ * A configuration mechanism using Java-like property files.
  *
  * File format: <br>
  * Settings are defined as "key = value" pairs. Enclosing white space and empty lines are ignored. Subkeys can be used to
@@ -87,6 +88,65 @@ class Config extends CObject implements ConfigInterface {
 
             $this->files[$file] = $isFile && $this->loadFile($file);
         }
+    }
+
+
+    /**
+     * Create a new instance with a standard set of configuration files from a directory in the following order:
+     *
+     *  - a versioned/distributable configuration: "config.dist.properties"
+     *  - a CLI specific configuration if on CLI:  "config.cli.properties"
+     *  - one custom configuration, either
+     *    (1) a custom file if specified or:       parameter $location
+     *    (2) an enviroment specific file or:      "config.$_SERVER[APP_ENVIRONMENT].properties"
+     *    (3) the default custom configuration:    "config.properties"
+     *
+     * New config settings override existing settings with the same key.
+     *
+     * @param  string $location - Directory or a custom configuration file. The directory part of $location is used
+     *                            for all non-custom configuration files.
+     * @return static
+     */
+    public static function createFrom($location) {
+        Assert::string($location);
+
+        // collect applicable config files
+        $configDir = $configFile = null;
+
+        if (is_file($location)) {
+            $configFile = realpath($location);
+            $configDir  = dirname($configFile);
+        }
+        else if (is_dir($location)) {
+            $configDir = realpath($location);
+        }
+        else throw new InvalidValueException('Location not found: "'.$location.'"');
+
+        // versioned/distributable config file
+        $files[] = $configDir.'/config.dist.properties';
+
+        // runtime environment
+        if (CLI) $files[] = $configDir.'/config.cli.properties';
+
+        // application environment: user or staging configuration
+        if ($configFile)                              $files[] = $configFile;                           // explicit
+        else if (!empty($_SERVER['APP_ENVIRONMENT'])) $files[] = $configDir.'/config.'.$_SERVER['APP_ENVIRONMENT'].'.properties';
+        else                                          $files[] = $configDir.'/config.properties';       // default
+
+        // load all files (do not pass a provided $baseDir but apply it manually in the next step)
+        $instance = new static($files);
+
+        // set "app.dir.config" to the directory of the most recently added file
+        end($instance->files);
+        $file = key($instance->files);
+        $instance->set('app.dir.config', dirname($file));
+
+        // create FileDependency and cache the instance
+        //$dependency = FileDependency::create(\array_keys($instance->files));
+        //$dependency->setMinValidity(60 * SECONDS);
+        //$cache->set('config', $config, Cache::EXPIRES_NEVER, $dependency);
+
+        return $instance;
     }
 
 

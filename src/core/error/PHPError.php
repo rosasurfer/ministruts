@@ -10,7 +10,7 @@ use rosasurfer\ministruts\core\exception\RosasurferExceptionTrait;
 
 
 /**
- * An exception representing a PHP error.
+ * An exception representing a PHP error. Provides some additional convenient helpers.
  */
 class PHPError extends \ErrorException implements IRosasurferException {
 
@@ -26,43 +26,7 @@ class PHPError extends \ErrorException implements IRosasurferException {
      * @param  string $file     - the name of the file where the error occurred
      * @param  int    $line     - the line number in the file where the error occurred
      */
-    public function __construct($message, $code, $severity, $file, $line) {
+    public function __construct(string $message, int $code, int $severity, string $file, int $line) {
         parent::__construct($message, $code, $severity, $file, $line, null);
-    }
-
-
-    /**
-     * {@inheritdoc}
-     *
-     * @return array<string[]>
-     */
-    public function getBetterTrace() {
-        $trace = $this->betterTrace;
-
-        if (!$trace) {
-            // transform the original stacktrace into a better one
-            $trace = ErrorHandler::getBetterTrace($this->getTrace(), $this->getFile(), $this->getLine());
-
-            /*
-            // if the error was triggered by include/require/_once: fix the next frame, it's wrong
-            if (sizeof($trace) > 1) {
-                $function = ErrorHandler::getFrameMethod($trace[0]);
-                if ($function=='include' || $function=='include_once' || $function=='require' || $function=='require_once') {
-                    if (isset($trace[0]['file']) && isset($trace[1]['file'])) {
-                        if ($trace[0]['file'] == $trace[1]['file']) {
-                            if (isset($trace[0]['line']) && isset($trace[1]['line'])) {
-                                if ($trace[0]['line'] == $trace[1]['line']) {
-                                    unset($trace[0]['file'], $trace[0]['line']);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            */
-
-            $this->betterTrace = $trace;
-        }
-        return $trace;
     }
 }
