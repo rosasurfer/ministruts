@@ -261,27 +261,40 @@ class Config extends CObject implements ConfigInterface {
 
 
     /**
-     * {@inheritdoc}
+     * Return the config setting with the specified key as a boolean. Accepted strict boolean value representations are "1" and "0",
+     * "true" and "false", "on" and "off", "yes" and "no" (case-insensitive).
+     *
+     * @param  string  $key                - case-insensitive key
+     * @param  bool    $default [optional] - value to return if the config setting does not exist (default: exception)
+     * @param  bool    $strict  [optional] - whether to validate a found value strictly:
+     *                                       FALSE - returns true only for "1", "true", "on" and "yes", and false otherwise (default)
+     *                                       TRUE  - as above but false is returned only for "0", "false", "off" and "no", and null
+     *                                               is returned for all other values
+     *
+     * @return ?bool - boolean value or NULL if the found setting does not represent a requested strict boolean value
+     *
+     * @throws RuntimeException if the setting is not found and no default value was specified
      */
-    public function getBool($key, array $options = []) {
-        Assert::string($key, '$key');
+    public function getBool(string $key, bool $default = false, bool $strict = false) {
         $notFound = false;
         $value = $this->getProperty($key, $notFound);
 
         if ($notFound) {
-            if (\key_exists('default', $options)) {
-                return (bool) $options['default'];
+            // key not found: return a passed default value
+            if (func_num_args() > 1) {
+                return $default;
             }
             throw new RuntimeException('No configuration found for key "'.$key.'"');
         }
 
+        // key found: validate it as a boolean
         $flags = 0;
-        if (\key_exists('flags', $options)) {
-            Assert::int($options['flags'], '$options[flags]');
-            $flags = $options['flags'];
+        if ($strict) {
+            if ($value===null || $value==='') {             // PHP considers NULL and '' strict boolean values
+                return null;
+            }
+            $flags = FILTER_NULL_ON_FAILURE;
         }
-        if ($flags & FILTER_NULL_ON_FAILURE && ($value===null || $value===''))  // crappy PHP considers NULL and '' as valid strict booleans
-            return null;
         return filter_var($value, FILTER_VALIDATE_BOOLEAN, $flags);
     }
 

@@ -28,20 +28,21 @@ interface ConfigInterface extends \ArrayAccess, \Countable {
 
 
     /**
-     * Return the config setting with the specified key as a boolean. Accepted boolean value representations are "1" and "0",
+     * Return the config setting with the specified key as a boolean. Accepted strict boolean value representations are "1" and "0",
      * "true" and "false", "on" and "off", "yes" and "no" (case-insensitive).
      *
-     * @param  string                  $key                - case-insensitive key
-     * @param  array<string, bool|int> $options [optional] - additional options, may be any of:                                                                  <br>
-     *                                                       'default' => bool      // default value to return if the setting is not found                       <br>
-     *                                                       'flags'   => int       // flags as supported by <tt>filter_var($var, FILTER_VALIDATE_BOOLEAN)</tt>, <br>
-     *                                                                              // e.g. FILTER_NULL_ON_FAILURE to return NULL instead of FALSE on failure    <br>
-     * @return ?bool - boolean value or NULL if the flag FILTER_NULL_ON_FAILURE is set
-     *                 and the setting does not represent a boolean value
+     * @param  string  $key                - case-insensitive key
+     * @param  bool    $default [optional] - value to return if the config setting does not exist (default: exception)
+     * @param  bool    $strict  [optional] - whether to validate a found value strictly:
+     *                                       FALSE - returns true only for "1", "true", "on" and "yes", and false otherwise (default)
+     *                                       TRUE  - as above but false is returned only for "0", "false", "off" and "no", and null
+     *                                               is returned for all other values
+     *
+     * @return ?bool - boolean value or NULL if the found setting does not represent a requested strict boolean value
      *
      * @throws RuntimeException if the setting is not found and no default value was specified
      */
-    public function getBool($key, array $options = []);
+    public function getBool(string $key, bool $default = false, bool $strict = false);
 
 
     /**
