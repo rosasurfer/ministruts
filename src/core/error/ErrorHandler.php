@@ -77,7 +77,7 @@ class ErrorHandler extends StaticClass {
      * @return void
      */
     public static function setupErrorHandling(int $level, int $mode) {
-        if ($level < self::MODE_IGNORE || $level > self::MODE_EXCEPTION) {
+        if ($mode < self::MODE_IGNORE || $mode > self::MODE_EXCEPTION) {
             throw new InvalidValueException('Invalid parameter $mode: '.$mode);
         }
 
@@ -335,7 +335,7 @@ class ErrorHandler extends StaticClass {
      *
      * @return void
      */
-    public static function onScriptShutdown() {
+    public static function onShutdown() {
         self::$inShutdown = true;
 
         // Errors showing up here (e.g. "out-of-memory" errors) haven't been passed to an installed error handler.
