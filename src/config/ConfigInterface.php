@@ -29,15 +29,15 @@ interface ConfigInterface extends \ArrayAccess, \Countable {
      *
      * @param  string              $key                - case-insensitive key
      * @param  bool|int|array|null $options [optional] - additional options as supported by <tt>filter_var($var, FILTER_VALIDATE_BOOLEAN)</tt>, <br>
-     *                                                   may be any of: <br>
-     *                        bool $default            - default value to return if the setting is not found <br>
-     *                        int  $flags              - flags as supported by <tt>filter_var($var, FILTER_VALIDATE_BOOLEAN)</tt>: <br>
-     *                                                   FILTER_NULL_ON_FAILURE - return NULL instead of FALSE on failure <br>
-     *                       array $options            - multiple options are passed as elements of an array: <br>
-     *                                                   <tt>$options[              <br>
-     *                                                       'default' => $default, <br>
-     *                                                       'flags'   => $flags    <br>
-     *                                                   ]</tt>                     <br>
+     *                                                   may be any of:                                                                         <br>
+     *                        bool $default            - default value to return if the setting is not found                                    <br>
+     *                        int  $flags              - flags as supported by <tt>filter_var($var, FILTER_VALIDATE_BOOLEAN)</tt>:              <br>
+     *                                                   FILTER_NULL_ON_FAILURE - return NULL instead of FALSE on failure                       <br>
+     *                       array $options            - multiple options are passed as elements of an array:                                   <br>
+     *                                                   <tt>[                                                                                  <br>
+     *                                                       'default' => $default,                                                             <br>
+     *                                                       'flags'   => $flags                                                                <br>
+     *                                                   ]</tt>                                                                                 <br>
      * @return ?bool - boolean value or NULL if the flag FILTER_NULL_ON_FAILURE is set and the setting does not represent
      *                 a boolean value
      *
