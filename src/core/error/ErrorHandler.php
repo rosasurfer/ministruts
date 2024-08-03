@@ -33,6 +33,8 @@ use const rosasurfer\ministruts\WINDOWS;
 
 /**
  * A handler for unhandled PHP errors and exceptions.
+ *
+ * @phpstan-type stackframe array{file?:string, line?:int, class?:string, type?:string, function?:string, object?:object, args?:mixed[], __ministruts_adjusted__?:int}
  */
 class ErrorHandler extends StaticClass {
 

@@ -40,7 +40,6 @@ parameters:
     - rosasurfer\ministruts\struts\ActionForm
 
   typeAliases:
-    stackframe: 'array{file?:string, line?:int, class?:string, type?:string, function?:string, object?:object, args?:mixed[], __ministruts_adjusted__?:int}'
 
   ignoreErrors:
     # skip broken PHPStan checks

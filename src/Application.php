@@ -355,7 +355,7 @@ class Application extends CObject {
      * Return the current default configuration of the {@link Application}. This is the configuration previously set
      * with {@link Application::setConfig()}.
      *
-     * @return ?Config
+     * @return Config|null
      */
     public static function getConfig() {
         return self::$defaultConfig;
