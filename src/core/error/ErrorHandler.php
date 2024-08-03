@@ -33,8 +33,6 @@ use const rosasurfer\ministruts\WINDOWS;
 
 /**
  * A handler for unhandled PHP errors and exceptions.
- *
- * @phpstan-type stackframe array{file?:string, line?:int, class?:string, type?:string, function?:string, object?:object, args?:mixed[], __ministruts_adjusted__?:int}
  */
 class ErrorHandler extends StaticClass {
 
@@ -271,12 +269,12 @@ class ErrorHandler extends StaticClass {
             $msg1  = trim(ErrorHandler::getVerboseMessage($first, $indent));
             $msg1  = $indent.'[FATAL] Unhandled '.$msg1.NL.$indent.'in '.$first->getFile().' on line '.$first->getLine().NL.NL;
             $msg1 .= $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
-            $msg1 .= ErrorHandler::getAdjustedTraceAsString($first, $indent);
+            $msg1 .= ErrorHandler::getAdjustedStackTraceAsString($first, $indent);
 
             $msg2  = trim(ErrorHandler::getVerboseMessage($second, $indent));
             $msg2  = $indent.$msg2.NL.$indent.'in '.$second->getFile().' on line '.$second->getLine().NL.NL;
             $msg2 .= $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
-            $msg2 .= ErrorHandler::getAdjustedTraceAsString($second, $indent);
+            $msg2 .= ErrorHandler::getAdjustedStackTraceAsString($second, $indent);
 
             $msg  = $msg1.NL;
             $msg .= $indent.'followed by'.NL;
@@ -536,7 +534,7 @@ class ErrorHandler extends StaticClass {
      *  {main}          # line 26, file: /var/www/phalcon/vokuro/public/index.php
      * </pre>
      */
-    public static function getAdjustedTrace(array $trace, string $file = 'unknown', int $line = 0): array {
+    public static function getAdjustedStackTrace(array $trace, string $file = 'unknown', int $line = 0): array {
         // check if the stacktrace is already adjusted
         if (isset($trace[0]['__ministruts_adjusted__'])) {
             return $trace;
@@ -596,15 +594,15 @@ class ErrorHandler extends StaticClass {
      *
      * @return string - readable stacktrace
      */
-    public static function getAdjustedTraceAsString(\Throwable $throwable, string $indent = '', ContentFilter $filter = null): string {
-        $trace  = self::getAdjustedTrace($throwable->getTrace(), $throwable->getFile(), $throwable->getLine());
+    public static function getAdjustedStackTraceAsString(\Throwable $throwable, string $indent = '', ContentFilter $filter = null): string {
+        $trace  = self::getAdjustedStackTrace($throwable->getTrace(), $throwable->getFile(), $throwable->getLine());
         $result = self::formatStackTrace($trace, $indent, $filter);
 
         if ($cause = $throwable->getPrevious()) {
             // recursively add stacktraces of nested exceptions
             $message = trim(self::getVerboseMessage($cause, $indent, $filter));
             $result .= NL.$indent.'caused by'.NL.$indent.$message.NL.NL;
-            $result .= self::getAdjustedTraceAsString($cause, $indent, $filter);
+            $result .= self::getAdjustedStackTraceAsString($cause, $indent, $filter);
         }
         return $result;
     }

@@ -24,9 +24,6 @@ use const rosasurfer\ministruts\NL;
  */
 class SystemFiveLock extends BaseLock {
 
-    /** @var bool */
-    private static $logDebug;
-
     /** @var resource[] - semaphore handles */
     private static $hSemaphores = [];
 
@@ -46,7 +43,6 @@ class SystemFiveLock extends BaseLock {
      *
      * @example
      * <pre>
-     *  &lt;?php
      *  $lock = new SystemFiveLock(__FILE__.'#'.__LINE__);
      * </pre>
      */
@@ -54,9 +50,6 @@ class SystemFiveLock extends BaseLock {
         Assert::string($key);
         if (\key_exists($key, self::$hSemaphores)) throw new RuntimeException('Dead-lock detected: already holding a lock for key "'.$key.'"');
         self::$hSemaphores[$key] = null;
-
-        $loglevel = Logger::getLogLevel(__CLASS__);
-        self::$logDebug = ($loglevel <= L_DEBUG );
 
         // TODO: use fTok() instead
         $integer = $this->keyToId($key);
@@ -89,7 +82,7 @@ class SystemFiveLock extends BaseLock {
                     'sem_acquire(): failed to acquire key 0x'.$hexId.': Identifier removed',
                 ];
                 if (++$i < $trials && strStartsWith($message, $prefixes)) {
-                    self::$logDebug && Logger::log($message.', trying again ... ('.($i+1).')', L_DEBUG);
+                    Logger::log($message.', trying again ... ('.($i+1).')', L_DEBUG);
                     $messages[] = $message;
                     usleep(200000);     // wait 200 msec
                     continue;

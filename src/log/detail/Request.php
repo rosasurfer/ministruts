@@ -3,9 +3,13 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\log\detail;
 
+use Throwable;
+
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\exception\IllegalStateException;
-use rosasurfer\ministruts\core\exception\InvalidTypeException;
+use rosasurfer\ministruts\log\filter\ContentFilterInterface as ContentFilter;
+
+use function rosasurfer\ministruts\strLeftTo;
 
 use const rosasurfer\ministruts\CLI;
 use const rosasurfer\ministruts\NL;
@@ -14,26 +18,31 @@ use const rosasurfer\ministruts\NL;
 /**
  * Request
  *
- * An object to stringify the current HTTP request.
+ * An object to stringify details of the current HTTP request.
  */
-final class Request extends CObject {
+class Request extends CObject {
 
+    /** @var array<string, string> - all request headers (no multi-field headers) */
+    protected array $headers;
 
-    /** @var ?array<string, string> - request headers */
-    private $headers = null;
+    /** @var array<string, string[]> - normalized metadata of uploaded files */
+    protected array $files;
 
-    /** @var ?array<string, string[]> - normalized metadata of uploaded files */
-    private $files = null;
+    /** @var string - request body */
+    protected string $content;
 
-    /** @var ?string - request body */
-    private $content = null;
+    /** @var string - host URL */
+    protected string $hostUrl;
 
-    /** @var ?self */
-    private static $instance = null;
+    /** @var string - remote IP of the request */
+    protected string $remoteIP;
+
+    /** @var self */
+    protected static self $instance;
 
 
     /**
-     * Create a new instance.
+     * Constructor
      */
     private function __construct() {
         if (CLI) throw new IllegalStateException('Cannot read HTTP request in CLI mode');
@@ -41,38 +50,55 @@ final class Request extends CObject {
 
 
     /**
-     * Return all headers with the specified name as an associative array of header values (in transmitted order).
-     *
-     * @param  string|string[] $names [optional] - one or more header names (default: all headers)
+     * Return all headers as an associative array of header values. Source is the $_SERVER array,
+     * any raw multi-field headers are already combined into a single header line by PHP.
      *
      * @return array<string, string> - associative array of header values
      */
-    private function getHeaders($names = []) {
-        if (is_string($names)) {
-            $names = [$names];
-        }
-        elseif (!is_array($names)) throw new InvalidTypeException('Invalid type of parameter $names: '.gettype($names));
-
+    protected function getNormalizedHeaders(): array {
         if (!isset($this->headers)) {
-            $fixHeaderNames = ['CDN'=>1, 'DNT'=>2, 'X-CDN'=>3];
+            $contentNames = [
+                'CONTENT_TYPE'   => 'Content-Type',
+                'CONTENT_LENGTH' => 'Content-Length',
+                'CONTENT_MD5'    => 'Content-MD5',
+            ];
+            $fixNames = [
+                'CDN'   => 'CDN',
+                'DNT'   => 'DNT',
+                'X-CDN' => 'X-CDN',
+            ];
             $headers = [];
 
             foreach ($_SERVER as $name => $value) {
                 while (substr($name, 0, 9) == 'REDIRECT_') {
                     $name = substr($name, 9);
-                    if (isset($_SERVER[$name])) continue 2;
+                    if (isset($_SERVER[$name])) {
+                        continue 2;
+                    }
                 }
                 if (substr($name, 0, 5) == 'HTTP_') {
                     $name = substr($name, 5);
-                    if (!isset($fixHeaderNames[$name]))
-                        $name = str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower($name))));
-                    $headers[$name] = $value;
+                    if (!isset($contentNames[$name])) {
+                        if (!isset($fixNames[$name])) {
+                            $name = str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower($name))));
+                        }
+                        $headers[$name] = $value;
+                    }
+                }
+            }
+
+            foreach ($contentNames as $name => $value) {
+                if (isset($_SERVER[$name])) {
+                    $headers[$contentNames[$name]] = $_SERVER[$name];
                 }
             }
 
             if (!isset($headers['Authorization'])) {
-                if (isset($_SERVER['PHP_AUTH_USER'])) {
-                    $passwd = isset($_SERVER['PHP_AUTH_PW']) ? $_SERVER['PHP_AUTH_PW'] : '';
+                if (isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
+                    $headers['Authorization'] = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
+                }
+                elseif (isset($_SERVER['PHP_AUTH_USER'])) {
+                    $passwd = $_SERVER['PHP_AUTH_PW'] ?? '';
                     $headers['Authorization'] = 'Basic '.base64_encode($_SERVER['PHP_AUTH_USER'].':'.$passwd);
                 }
                 elseif (isset($_SERVER['PHP_AUTH_DIGEST'])) {
@@ -81,31 +107,40 @@ final class Request extends CObject {
             }
             $this->headers = $headers;
         }
-
-        // return all or just the specified headers
-        if (!$names)
-            return $this->headers;
-        return array_intersect_ukey($this->headers, array_flip($names), 'strcasecmp');
+        return $this->headers;
     }
 
 
     /**
-     * Return a single value of the specified header/s. If multiple headers are specified or multiple headers have been
-     * transmitted, return all values as one comma-separated value (in transmission order).
+     * Return the received headers with the specified names as an associative array of header values.
+     * Any received multi-field headers are combined into a single header line.
      *
-     * @param  string|string[] $names - one or multiple header names
+     * @param  string[] $names [optional] - zero or more header names (default: return all received headers)
      *
-     * @return ?string - value or NULL if no such headers have been transmitted
+     * @return array<string, string> - associative array of header values
      */
-    private function getHeaderValue($names) {
-        if (is_string($names)) {
-            $names = [$names];
+    public function getHeaders(array $names = []): array {
+        $allHeaders = $this->getNormalizedHeaders();
+        if (!$names) {
+            return $allHeaders;
         }
-        elseif (!is_array($names)) throw new InvalidTypeException('Invalid type of parameter $names: '.gettype($names));
+        return array_intersect_ukey($allHeaders, array_flip($names), 'strcasecmp');
+    }
 
-        $headers = $this->getHeaders($names);
-        if ($headers)
-            return join(',', $headers);
+
+    /**
+     * Return the received value of the header with the specified name.
+     *
+     * @param  string $name - header name
+     *
+     * @return ?string - received header value, or NULL if no such header was received
+     */
+    public function getHeaderValue(string $name) {
+        $header = $this->getHeaders([$name]);
+
+        foreach ($header as $value) {
+            return $value;
+        }
         return null;
     }
 
@@ -116,10 +151,10 @@ final class Request extends CObject {
      *
      * @return array<string, string[]> - associative array of files
      */
-    private function getFiles() {
+    public function getFiles() {
         if (!isset($this->files)) {
-            $normalizeLevel = null;
-            $normalizeLevel = function(array $file) use (&$normalizeLevel) {
+            $normalizeArrayLevel = null;
+            $normalizeArrayLevel = static function(array $file) use (&$normalizeArrayLevel) {
                 if (isset($file['name']) && is_array($file['name'])) {
                     $properties = array_keys($file);
                     $normalized = [];
@@ -127,7 +162,7 @@ final class Request extends CObject {
                         foreach ($properties as $property) {
                             $normalized[$name][$property] = $file[$property][$name];
                         }
-                        $normalized[$name] = $normalizeLevel($normalized[$name]);
+                        $normalized[$name] = $normalizeArrayLevel($normalized[$name]);
                     }
                     $file = $normalized;
                 }
@@ -136,7 +171,7 @@ final class Request extends CObject {
 
             $this->files = [];
             foreach ($_FILES as $key => $file) {
-                $this->files[$key] = $normalizeLevel($file);
+                $this->files[$key] = $normalizeArrayLevel($file);
             }
         }
         return $this->files;
@@ -144,24 +179,41 @@ final class Request extends CObject {
 
 
     /**
-     * Return the content of the request (the body). For file uploads the method doesn't return the real binary content.
+     * Return the content of the request (the body). For file uploads the method doesn't return the uploaded content.
      * Instead it returns available metadata.
+     *
+     * @param  ?ContentFilter $filter [optional] - the content filter to apply (default: none)
      *
      * @return string - request body or metadata
      */
-    private function getContent() {
+    public function getContent(ContentFilter $filter = null): string {
         if (!isset($this->content)) {
             $content = '';
-            if ($this->getContentType() == 'multipart/form-data') {
-                // file upload
-                if ($_POST) {                                           // php://input is not available with enctype="multipart/form-data"
-                    $content .= '$_POST => '.print_r($_POST, true).NL;
-                }
-                $content .= '$_FILES => '.print_r($this->getFiles(), true);
+
+            if ($_POST) {
+                $post = $filter ? $filter->filterValues($_POST) : $_POST;
+                $content .= '$_POST => '.trim(print_r($post, true)).NL;
             }
             else {
-                // regular request body
-                $content .= file_get_contents('php://input');
+                $input = file_get_contents('php://input');  // not available with content type 'multipart/form-data'
+
+                if (is_string($input) && strlen($input)) {
+                    if ($filter && $this->getContentType()=='application/json') {
+                        try {
+                            $values = json_decode($input, true, 512, JSON_BIGINT_AS_STRING | JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR);
+                            if (is_array($values)) {
+                                $values = $filter->filterValues($values);
+                                $input = json_encode($values, JSON_THROW_ON_ERROR);
+                            }
+                        }
+                        catch (Throwable $th) {}            // intentionally eat it
+                    }
+                    $content .= trim($input).NL;
+                }
+            }
+
+            if ($_FILES) {
+                $content .= '$_FILES => '.trim(print_r($this->getFiles(), true)).NL;
             }
             $this->content = $content;
         }
@@ -170,19 +222,19 @@ final class Request extends CObject {
 
 
     /**
-     * Return the "Content-Type" header of the request. If multiple "Content-Type" headers have been transmitted the first
-     * one is returned.
+     * Return the "Content-Type" header of the request. If a list of "Content-Type" headers has been
+     * received the first one is returned.
      *
-     * @return ?string - "Content-Type" header or NULL if no "Content-Type" header was transmitted
+     * @return ?string - "Content-Type" header value, or NULL if no "Content-Type" header was received
      */
-    private function getContentType() {
+    public function getContentType(): ?string {
         $contentType = $this->getHeaderValue('Content-Type');
 
         if ($contentType) {
-            $headers     = explode(',', $contentType, 2);
-            $contentType = array_shift($headers);
+            $values = explode(',', $contentType, 2);
+            $contentType = array_shift($values);
 
-            $values      = explode(';', $contentType, 2);
+            $values = explode(';', $contentType, 2);
             $contentType = trim(array_shift($values));
         }
         return $contentType;
@@ -190,43 +242,181 @@ final class Request extends CObject {
 
 
     /**
-     * Return a readable string representation of the instance.
+     * Return the remote IP address the request was made from.
      *
-     * @return string
+     * @return string - IP address or an empty string if the IP address is unknown
      */
-    public function __toString() {
-        // request
-        $string = $_SERVER['REQUEST_METHOD'].' '.$_SERVER['REQUEST_URI'].' '.$_SERVER['SERVER_PROTOCOL'].NL;
+    public static function getRemoteIP(): string {
+        $request = self::instance();
 
-        // headers
-        $headers = $this->getHeaders();
-        $maxLen = 0;
-        foreach ($headers as $key => $value) {
-            $maxLen = max(strlen($key), $maxLen);
+        if (!isset($request->remoteIP)) {
+                              // nginx proxy                // apache proxy                     // no proxy
+            $addr = $_SERVER['HTTP_X_REAL_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '';
+            $request->remoteIP = trim(explode(',', $addr, 2)[0]);
         }
-        $maxLen++;                                                  // add one char for ':'
-        foreach ($headers as $key => $value) {
-            $string .= str_pad($key.':', $maxLen).' '.$value.NL;
-        }
-
-        // content (request body)
-        $content = $this->getContent();
-        if (strlen($content)) {
-            $string .= NL.substr($content, 0, 2048).NL;             // limit the request body to 2048 bytes
-        }
-        return $string;
+        return $request->remoteIP;
     }
 
 
     /**
-     * Return the data of the instance (there can be only one).
+     * Return the remote host name the request was made from.
+     *
+     * @return string - host name or an empty string if the name cannot be resolved
+     */
+    public static function getRemoteHost(): string {
+        $request = self::instance();
+
+        $ip = $request->getRemoteIP();
+        $host = @gethostbyaddr($ip);            // intentionally suppress DNS resolver errors
+        if ($host === $ip) {
+            $host = false;
+        }
+        return $host ?: '';
+    }
+
+
+    /**
+     * Return the host name the request was made to (the value of the received "Host" header).
+     *
+     * @return string - host name, e.g. "a.domain.tld"
+     */
+    public function getHostName(): string {
+        // nginx doesn't set $_SERVER[SERVER_NAME] automatically to $_SERVER[HTTP_HOST]
+        if (!empty($_SERVER['HTTP_HOST'])) {
+            $hostname = strtolower(trim($_SERVER['HTTP_HOST']));
+            $hostname = strLeftTo($hostname, ':');
+            if (strlen($hostname) > 0) {
+                return $hostname;
+            }
+        }
+        return $_SERVER['SERVER_NAME'];
+    }
+
+
+    /**
+     * Return the root URL of the server the request was made to.
+     * This value ends with a slash "/".
+     *
+     * @param  ?ContentFilter $filter [optional] - the content filter to apply (default: none)
+     *
+     * @return string - root URL: protocol + hostname + port + "/" <br/>
+     *                  e.g. "https://a.domain.tld/"
+     */
+    public function getHostUrl(ContentFilter $filter = null): string {
+        if (!isset($this->hostUrl)) {
+            $protocol = $this->isSecure() ? 'https':'http';
+            $host     = $this->getHostName();
+            $port     = ':'.$_SERVER['SERVER_PORT'];
+            if ($protocol.$port=='http:80' || $protocol.$port=='https:443') {
+                $port = '';
+            }
+            $this->hostUrl = $protocol.'://'.$host.$port.'/';
+        }
+        return $filter ? $filter->filterUri($this->hostUrl) : $this->hostUrl;
+    }
+
+
+    /**
+     * Return the URI of the request (i.e. the value in the first line of the HTTP protocol).
+     * This value starts with a slash "/".
+     *
+     * @param  ?ContentFilter $filter [optional] - the content filter to apply (default: none)
+     *
+     * @return string - URI: path + query-string + anchor <br/>
+     *                  e.g. "/path/application/module/foo/bar.html?key=value"
+     */
+    public function getUri(ContentFilter $filter = null): string {
+        $uri = $_SERVER['REQUEST_URI'] ?? '';
+        return $filter ? $filter->filterUri($uri) : $uri;
+    }
+
+
+    /**
+     * Return the full URL of the request.
+     *
+     * @param  ?ContentFilter $filter [optional] - the content filter to apply (default: none)
+     *
+     * @return string - full URL: protocol + hostname + port + path + query-string + anchor <br/>
+     *                  e.g. "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
+     */
+    public static function getUrl(ContentFilter $filter = null): string {
+        $request = self::instance();
+        $hostUrl = $request->getHostUrl($filter);
+        $uri     = $request->getUri($filter);
+        return $hostUrl.substr($uri, 1);
+    }
+
+
+    /**
+     * Whether the request was made over a secure connection (HTTPS).
+     *
+     * @return bool
+     */
+    public function isSecure(): bool {
+        return (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) != 'off');
+    }
+
+
+    /**
+     * Return a readable string representation of the current HTTP request.
+     *
+     * @param  ?ContentFilter $filter [optional] - the content filter to apply (default: none)
      *
      * @return string
      */
-    public static function current() {
-        if (!self::$instance) {
-            self::$instance = new self();
+    public static function stringify(ContentFilter $filter = null): string {
+        $request = self::instance();
+
+        // request
+        $method   = $_SERVER['REQUEST_METHOD' ] ?? '';
+        $protocol = $_SERVER['SERVER_PROTOCOL'] ?? '';
+        $uri      = $request->getUri($filter);
+        $result = "$method $uri $protocol".NL;
+
+        // headers
+        $headers = $request->getHeaders();
+        if ($filter) {
+            if (isset($headers['Referer'])) {
+                $headers['Referer'] = $filter->filterUri($headers['Referer']);
+            }
+            if (isset($headers['Cookie'])) {
+                $cookies = explode('; ', $headers['Cookie']);
+                foreach ($cookies as $i => $cookie) {
+                    $args = explode('=', $cookie, 2);
+                    if (sizeof($args) > 1) {
+                        $cookies[$i] = $args[0].'='.$filter->filterValue($args[0], $args[1]);
+                    }
+                }
+                $headers['Cookie'] = join('; ', $cookies);
+            }
         }
-        return (string) self::$instance;
+
+        $maxLen = 0;
+        foreach ($headers as $name => $value) {
+            $maxLen = max(strlen($name), $maxLen);
+        }
+        $maxLen++;                                                  // plus one char for the colon ':'
+        foreach ($headers as $name => $value) {
+            $result .= str_pad($name.':', $maxLen).' '.$value.NL;
+        }
+
+        // content (request body)
+        $content = $request->getContent($filter);
+        if (strlen($content)) {
+            $result .= NL.trim(substr($content, 0, 2048)).NL;       // limit the request body to 2048 bytes
+        }
+
+        return $result;
+    }
+
+
+    /**
+     * Return the object instance (there can be only one).
+     *
+     * @return self
+     */
+    public static function instance(): self {
+        self::$instance ??= new self();
+        return self::$instance;
     }
 }
