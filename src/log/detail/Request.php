@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace rosasurfer\ministruts\log\context;
+namespace rosasurfer\ministruts\log\detail;
 
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\exception\IllegalStateException;
@@ -12,11 +12,11 @@ use const rosasurfer\ministruts\NL;
 
 
 /**
- * Request data
+ * Request
  *
  * An object to stringify the current HTTP request.
  */
-final class RequestData extends CObject {
+final class Request extends CObject {
 
 
     /** @var ?array<string, string> - request headers */

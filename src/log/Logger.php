@@ -12,7 +12,7 @@ use rosasurfer\ministruts\core\error\ErrorHandler;
 use rosasurfer\ministruts\core\error\PHPError;
 use rosasurfer\ministruts\core\exception\IllegalStateException;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
-use rosasurfer\ministruts\log\context\RequestData;
+use rosasurfer\ministruts\log\detail\Request as RequestDetails;
 use rosasurfer\ministruts\net\mail\Mailer;
 
 use function rosasurfer\ministruts\echof;
@@ -711,7 +711,7 @@ class Logger extends StaticClass {
 
         if (!CLI) {
             $indent  = ' ';
-            $data = 'Request:'.NL.'--------'.NL.trim(RequestData::current());
+            $data = 'Request:'.NL.'--------'.NL.trim(RequestDetails::current());
             $data = $indent.str_replace(NL, NL.$indent, normalizeEOL($data)).NL;
 
             $html && $data = '<br style="clear:both"/><br/>'.print_p($data, true, false).'<br/>'.NL;
