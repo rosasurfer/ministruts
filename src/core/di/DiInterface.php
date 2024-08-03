@@ -44,7 +44,7 @@ interface DiInterface extends \ArrayAccess, ContainerInterface {
 
 
     /**
-     * Resolve a named service and return its implementation.  This method always returns the same instance.
+     * Resolve a named service and return its implementation. This method always returns the same instance.
      *
      * @param  string $name
      *

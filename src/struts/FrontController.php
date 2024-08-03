@@ -58,8 +58,6 @@ class FrontController extends Singleton {
                 $controller = self::getInstance(static::class);
 
                 $config = self::di('config');
-                if (!$config) throw new RuntimeException('Application configuration not found');
-
                 $configDir = $config['app.dir.config'];
                 $configFile = str_replace('\\', '/', $configDir.'/struts-config.xml');
 

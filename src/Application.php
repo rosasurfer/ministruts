@@ -22,6 +22,8 @@ use rosasurfer\ministruts\core\exception\InvalidTypeException;
 
 /**
  * A class representing the application instance.
+ *
+ * TODO: support creation of multiple instances for testing
  */
 class Application extends CObject {
 
@@ -29,11 +31,11 @@ class Application extends CObject {
     /** @var self - the application itself */
     protected static self $instance;
 
-    /** @var ?Config - the application's default configuration */
-    protected static $defaultConfig;
+    /** @var ?Config - the application's main configuration */
+    protected static $config = null;
 
-    /** @var ?Di - the application's default service container */
-    protected static $defaultDi;
+    /** @var ?Di - the application's service container */
+    protected static $di = null;
 
     /** @var Command[] - registered CLI commands */
     private $commands;
@@ -72,10 +74,10 @@ class Application extends CObject {
         $this->initErrorHandling($errorLevel, $errorMode);
 
         /** @var Config $config */
-        $config = $this->initDefaultConfig($options);
+        $config = $this->initConfig($options);
 
         /** @var Di di */
-        $di = $this->initDefaultDi($config['app.dir.config']);
+        $di = $this->initDi($config['app.dir.config']);
         $di->set('app', $this);
         $di->set('config', $config);
 
@@ -152,42 +154,44 @@ class Application extends CObject {
 
 
     /**
-     * Load and initialize a default configuration.
+     * Load and initialize the main configuration.
      *
      * @param  array<string, string> $options - configuration options as passed to the framework loader
      *
      * @return Config
      */
-    protected function initDefaultConfig(array $options) {
+    protected function initConfig(array $options) {
         $config = Config::createFrom($options['app.dir.config'] ?? getcwd());
         $this->setConfig($config);
         unset($options['app.dir.config']);
 
+        // set root directory
         $rootDir = $options['app.dir.root'] ?? getcwd();
+        $config->set('app.dir.root', $rootDir);
         unset($options['app.dir.root']);
 
-        // copy remaining config options to the config
+        // expand relative app directories
+        $this->expandAppDirs($config, $rootDir);
+
+        // add remaining options to the config
         foreach ($options as $name => $value) {
             $config->set($name, $value);
         }
-
-        // set root directory and expand relative app directories
-        $config->set('app.dir.root', $rootDir);
-        $this->expandAppDirs($config, $rootDir);
-
         return $config;
     }
 
 
     /**
-     * Load and initialize a default service container.
+     * Load and initialize the service container.
      *
-     * @param  string $serviceDir - directory with service configurations
+     * @param  string $directory - directory with service configurations
      *
      * @return Di
      */
-    protected function initDefaultDi($serviceDir) {
-        $this->setDi($di = CLI ? new CliServiceContainer($serviceDir) : new WebServiceContainer($serviceDir));
+    protected function initDi($directory) {
+        $class = CLI ? CliServiceContainer::class : WebServiceContainer::class;
+        $di = new $class($directory);
+        $this->setDi($di);
         return $di;
     }
 
@@ -198,7 +202,7 @@ class Application extends CObject {
      * @return void
      */
     protected function configure() {
-        $config = self::$defaultConfig;
+        $config = self::$config;
         if (!$config) return;
 
         // ensure we have an "app.id"
@@ -218,9 +222,9 @@ class Application extends CObject {
 
         // log excessive memory consumption
         register_shutdown_function(function() {
-            if (!self::$defaultConfig) return;
+            if (!self::$config) return;
 
-            $warnLimit = php_byte_value(self::$defaultConfig->get('log.warn.memory_limit', PHP_INT_MAX));
+            $warnLimit = php_byte_value(self::$config->get('log.warn.memory_limit', PHP_INT_MAX));
             $usedBytes = memory_get_peak_usage(true);
             if ($usedBytes > $warnLimit) {
                 Logger::log('Memory consumption exceeded '.prettyBytes($warnLimit).' (peak usage: '.prettyBytes($usedBytes).')', L_WARN, ['class' => __CLASS__]);
@@ -262,7 +266,7 @@ class Application extends CObject {
         $configInfoTask = isset($_GET['__config__' ]) && !$cacheInfoTask;
 
         if ($configInfoTask || $phpInfoTask || $cacheInfoTask) {
-            $config = self::$defaultConfig;
+            $config = self::$config;
             if ($config && self::isAdminIP()) {
                 // execute "config-info" task if enabled
                 if ($configInfoTask) {
@@ -352,63 +356,52 @@ class Application extends CObject {
 
 
     /**
-     * Return the current default configuration of the {@link Application}. This is the configuration previously set
-     * with {@link Application::setConfig()}.
-     *
-     * @return Config|null
-     */
-    public static function getConfig() {
-        return self::$defaultConfig;
-    }
-
-
-    /**
-     * Set a new default configuration for the {@link Application}.
+     * Set the {@link Application}'s main configuration.
      *
      * @param  Config $configuration
      *
-     * @return ?Config - the previously registered default configuration
+     * @return $this
      */
-    final public static function setConfig(Config $configuration) {
-        $previous = self::$defaultConfig;
-        self::$defaultConfig = $configuration;
+    protected function setConfig(Config $configuration) {
+        $previous = self::$config;
+        self::$config = $configuration;
 
-        if (isset(self::$defaultDi)) {
-            self::$defaultDi->set('config', $configuration);
+        if (isset(self::$di)) {
+            self::$di->set('config', $configuration);
         }
-        return $previous;
+        return $this;
     }
 
 
     /**
-     * Return the default service container of the {@link Application}. This is the instance previously set
-     * with {@link Application::setDi()}.
-     *
-     * @return ?Di
-     */
-    public static function getDi() {
-        return self::$defaultDi;
-    }
-
-
-    /**
-     * Set a new default service container for the {@link Application}.
+     * Set the {@link Application}s service container.
      *
      * @param  Di $di
      *
-     * @return ?Di - the previously registered default container
+     * @return $this
      */
-    final public static function setDi(Di $di) {
-        $previous = self::$defaultDi;
+    protected function setDi(Di $di) {
+        $previous = self::$di;
 
-        if (!$di->has('app') && $previous && $previous->has('app')) {
-            $di->set('app', $previous->get('app'));
+        if (!$di->has('app')) {
+            $di->set('app', $this);
         }
-        if (!$di->has('config') && self::$defaultConfig) {
-            $di->set('config', self::$defaultConfig);
+        if (!$di->has('config') && self::$config) {
+            $di->set('config', self::$config);
         }
-        self::$defaultDi = $di;
-        return $previous;
+        self::$di = $di;
+        return $this;
+    }
+
+
+    /**
+     * Return the {@link Application}'s service container. This method should be used to access the application's
+     * service container from a non-class context (i.e. from procedural code).
+     *
+     * @return Di
+     */
+    public static function getDi() {
+        return self::$di;
     }
 
 
@@ -429,10 +422,10 @@ class Application extends CObject {
         if (!$whiteList) {
             $ips = ['127.0.0.1', $_SERVER['SERVER_ADDR']];
 
-            if (!self::$defaultConfig) {
+            if (!self::$config) {
                 return in_array($_SERVER['REMOTE_ADDR'], $ips);
             }
-            $values = self::$defaultConfig->get('admin.ip.whitelist', []);
+            $values = self::$config->get('admin.ip.whitelist', []);
             if (!is_array($values)) $values = [$values];
             $whiteList = \array_keys(\array_flip(\array_merge($ips, $values)));
         }

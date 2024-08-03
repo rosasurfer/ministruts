@@ -4,27 +4,32 @@ declare(strict_types=1);
 namespace rosasurfer\ministruts\core\di;
 
 use rosasurfer\ministruts\Application;
+use rosasurfer\ministruts\core\exception\RuntimeException;
 
 
 /**
- * A trait adding the behavior "dependency injection awareness" to any class. Used to access dependencies in the dependency
- * container of the {@link Application}. Any class can easily be made dependency aware.
+ * DiAwareTrait
+ *
+ * A trait adding the behavior "service locator awareness" to any class. Used to access dependencies in
+ * the {@link Application}'s service container. Any class can easily be made service aware.
  */
 trait DiAwareTrait {
 
 
     /**
-     * Resolve a named service and return its implementation using the service locator pattern, or return the dependency injection
-     * container of the {@link Application}.
+     * Return the {@link Application}'s service container, or resolve a named service and return its implementation.
+     * This method should be used to access services and the application's service container from a class-context.
      *
-     * @param  ?string $name [optional] - service identifier (default: none to return the DI container)
+     * @param  ?string $name [optional] - service identifier (default: none to return the service container)
      *
-     * @return DiInterface|object|null
+     * @return DiInterface|object
      */
     protected static function di($name = null) {
         $di = Application::getDi();
+        // @phpstan-ignore booleanNot.alwaysFalse ($di may be NULL in the application's bootstrap phase)
+        if (!$di) throw new RuntimeException('Service container not yet initialized');
 
-        if ($di && isset($name)) {
+        if (isset($name)) {
             return $di->get($name);
         }
         return $di;

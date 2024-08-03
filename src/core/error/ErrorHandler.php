@@ -623,7 +623,7 @@ class ErrorHandler extends StaticClass {
         // TODO: if the trace contains frame arguments moderate the arguments using a provided filter
 
         $config  = self::di('config');
-        $appRoot = $config ? $config['app.dir.root'] : null;
+        $appRoot = $config['app.dir.root'];
         $result  = '';
         $size    = sizeof($trace);
         $callLen = $lineLen = 0;
