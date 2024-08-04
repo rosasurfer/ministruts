@@ -56,7 +56,7 @@ class LogMessage extends CObject {
         if (!is_string($loggable)) {
             if (!is_object($loggable))                   throw new InvalidTypeException('Illegal type of parameter $loggable: '.gettype($loggable).' (expected string|object)');
             if (!method_exists($loggable, '__toString')) throw new InvalidTypeException('Illegal type of parameter $loggable: '.get_class($loggable).' (expected object implementing "__toString()")');
-            if (!$loggable instanceof \Throwable) {
+            if (!$loggable instanceof Throwable) {
                 $loggable = (string)$loggable;
             }
         }

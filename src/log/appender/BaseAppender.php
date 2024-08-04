@@ -65,6 +65,7 @@ abstract class BaseAppender extends CObject implements AppenderInterface {
         $this->sessionDetails = (bool) filter_var($options['details']['session'] ?? false, FILTER_VALIDATE_BOOLEAN);
         $this->serverDetails  = (bool) filter_var($options['details']['server' ] ?? false, FILTER_VALIDATE_BOOLEAN);
 
+        // read a configured content filter
         /** @var ?string $class */
         $class = $options['filter'] ?? null;
         if (!is_null($class)) {

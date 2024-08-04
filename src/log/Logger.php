@@ -47,7 +47,6 @@ use const rosasurfer\ministruts\L_WARN;
  *
  * TODO: Logger::resolveCaller() - test with Closure and internal PHP functions
  * TODO: implement \Psr\Log\LoggerInterface and remove static crap
- * TODO: support full email address format as in "Joe Blow <address@domain.tld>"
  */
 class Logger extends StaticClass {
 

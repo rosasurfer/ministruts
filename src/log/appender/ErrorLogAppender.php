@@ -1,0 +1,178 @@
+<?php
+declare(strict_types=1);
+
+namespace rosasurfer\ministruts\log\appender;
+
+use rosasurfer\ministruts\log\LogMessage;
+use rosasurfer\ministruts\log\detail\Request;
+
+use function rosasurfer\ministruts\isRelativePath;
+
+use const rosasurfer\ministruts\CLI;
+use const rosasurfer\ministruts\ERROR_LOG_DEFAULT;
+use const rosasurfer\ministruts\ERROR_LOG_FILE;
+use const rosasurfer\ministruts\ERROR_LOG_SAPI;
+use const rosasurfer\ministruts\NL;
+use const rosasurfer\ministruts\WINDOWS;
+
+
+/**
+ * ErrorLogAppender
+ *
+ * A log appender passing log messages via "error_log()" to the PHP system logger.
+ */
+class ErrorLogAppender extends BaseAppender {
+
+    /** @var int - log destination type */
+    protected int $destinationType = ERROR_LOG_DEFAULT;
+
+    /** @var string - log destination filename */
+    protected string $destinationFile;
+
+    /** @var bool - whether to aggregate multiple messages per process */
+    protected bool $aggregateMessages;
+
+    /** @var LogMessage[] - collected messages */
+    protected array $messages = [];
+
+
+    /**
+     * Constructor
+     *
+     * Create and initialize a new instance.
+     *
+     * @param  mixed[] $options - configuration options
+     */
+    public function __construct(array $options) {
+        parent::__construct($options);
+
+        /** @var ?string $filepath */
+        $filepath = $options['filepath'] ?? null;
+
+        if (!is_string($filepath) || empty($filepath)) {
+            $this->destinationType = ERROR_LOG_DEFAULT;
+            $this->destinationFile = '';
+        }
+        else {
+            $this->destinationType = ERROR_LOG_FILE;
+            if (isRelativePath($filepath)) {
+                // convert to absolute path as the current PHP working directory is not fix
+                $config = $this->di('config');
+                $filepath = $config['app.dir.root']."/$filepath";
+            }
+            $this->destinationFile = $filepath;
+        }
+
+        // initialize message aggregation
+        $this->aggregateMessages = (bool)filter_var($options['aggregate-messages'] ?? false, FILTER_VALIDATE_BOOLEAN);
+        if ($this->aggregateMessages) {
+            register_shutdown_function(function() {
+                // add a nested handler to include log entries triggered during shutdown itself
+                register_shutdown_function(function() {
+                    $messages = $this->messages;
+                    $this->messages = [];
+                    $this->processMessages($messages);
+                });
+            });
+        }
+    }
+
+
+    /**
+     * Pass on a log message to the PHP system logger.
+     *
+     * @param  LogMessage $message
+     *
+     * @return bool - Whether logging should continue with the next registered appender. Returning FALSE interrupts the chain.
+     */
+    public function appendMessage(LogMessage $message): bool {
+        // filter messages below the active loglevel
+        if ($message->getLogLevel() < $this->logLevel) {
+            return true;
+        }
+
+        // skip output on STDERR if the print appender is active
+        if ($this->toSTDERR() && \key_exists('print', $this->options)) {
+            return true;
+        }
+
+        // if aggregation is enabled only collect messages
+        $this->messages[] = $message;
+        if ($this->aggregateMessages) {
+            return true;
+        }
+
+        // process/reset collected messages
+        $messages = $this->messages;
+        $this->messages = [];
+        return $this->processMessages($messages);
+    }
+
+
+    /**
+     * Process the passed log messages.
+     *
+     * @param  LogMessage[] $messages
+     *
+     * @return bool - Whether logging should continue with the next registered appender. Returning FALSE interrupts the chain.
+     */
+    protected function processMessages(array $messages): bool {
+        if (!$messages) return true;
+        $msg = '';
+
+        foreach ($messages as $i => $message) {
+            if ($i > 0) {
+                $msg .= NL.NL.' followed by'.NL;
+            }
+            $msg .= $message->getMessageDetails(false, $this->filter);
+
+            if ($this->traceDetails && $detail = $message->getTraceDetails(false, $this->filter)) {
+                $msg .= NL.$detail;
+            }
+        }
+        if (sizeof($messages) > 1) $msg .= NL;
+
+        if ($this->requestDetails && $detail = $message->getRequestDetails(false, $this->filter)) $msg .= NL.$detail;
+        if ($this->sessionDetails && $detail = $message->getSessionDetails(false, $this->filter)) $msg .= NL.$detail;
+        if ($this->serverDetails  && $detail = $message->getServerDetails (false, $this->filter)) $msg .= NL.$detail;
+
+        $msg .= NL.$message->getCallDetails(false, false);
+        $msg = trim($msg).NL;
+
+        if (!$this->toSTDERR()) {
+            $msg  = (CLI ? 'CLI' : Request::getRemoteIP()).' '.$msg;
+            $msg .= NL.str_repeat('-', 150);
+        }
+
+        $msg = str_replace(chr(0), '\0', $msg);                 // replace NUL bytes which mess up the logfile
+        if (WINDOWS) $msg = str_replace(NL, PHP_EOL, $msg);     // prevent a mixed EOL file format on Windows
+
+        if ($this->destinationType == ERROR_LOG_DEFAULT) {
+            error_log($msg, $this->destinationType);
+        }
+        elseif ($this->destinationType == ERROR_LOG_FILE) {
+            error_log(date('[d-M-Y H:i:s T] ').$msg.PHP_EOL, $this->destinationType, $this->destinationFile);
+        }
+
+        // with ERROR_LOG_DEFAULT ini_get("error_log") controls whether a message is sent to syslog, a file or the SAPI logger
+        // -------------------------------------------------------------------------------------------------------------------
+        // (empty):      Errors are sent to the SAPI logger, e.g. the Appache error log or STDERR in CLI mode.
+        // "syslog":     Errors are sent to the system logger. On Unix this is syslog(3), and on Windows it's the event log.
+        // "<filepath>": Name of the file where errors should be logged.
+        return true;
+    }
+
+
+    /**
+     * Whether the appender logs to STDERR. Used to prevent duplicate screen output from both this and the display appender.
+     *
+     * @return bool
+     */
+    protected function toSTDERR(): bool {
+        if (CLI) {
+            $iniSetting = !empty(ini_get('error_log'));
+            return (($this->destinationType == ERROR_LOG_DEFAULT && !$iniSetting) || $this->destinationType == ERROR_LOG_SAPI);
+        }
+        return false;
+    }
+}
