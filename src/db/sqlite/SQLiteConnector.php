@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\db\sqlite;
 
+use Throwable;
+
 use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\RosasurferExceptionInterface as IRosasurferException;
@@ -140,15 +142,15 @@ class SQLiteConnector extends Connector {
     public function connect() {
         if (!class_exists('SQLite3')) throw new RuntimeException('Undefined class \SQLite3 (sqlite3 extension is not available)');
 
+        /** @var int $flags */
         $flags = SQLITE3_OPEN_READWRITE;                                        // available flags:
-        $ex = null;                                                             // 1: SQLITE3_OPEN_READONLY
-        try {                                                                   // 2: SQLITE3_OPEN_READWRITE
-            $this->sqlite = new \SQLite3($this->file, $flags);                  // 4: SQLITE3_OPEN_CREATE
-        }
-        catch (IRosasurferException $ex) {}
-        catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
-
-        if ($ex) {
+        try {                                                                   // 1: SQLITE3_OPEN_READONLY
+            $this->sqlite = new \SQLite3($this->file, $flags);                  // 2: SQLITE3_OPEN_READWRITE
+        }                                                                       // 4: SQLITE3_OPEN_CREATE
+        catch (Throwable $ex) {
+            if (!$ex instanceof IRosasurferException) {
+                $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex);
+            }
             $file = $this->file;
             $what = $where = null;
             if (file_exists($file)) {
@@ -157,7 +159,7 @@ class SQLiteConnector extends Connector {
                     $where = ' (directory)';
             }
             else {
-                $what = ($flags & SQLITE3_OPEN_CREATE) ? 'create' : 'find';     // @phpstan-ignore ternary.alwaysFalse (keep for testing)
+                $what = ($flags & SQLITE3_OPEN_CREATE) ? 'create' : 'find';
                 isRelativePath($file) && $where=' in "'.getcwd().'"';
             }
             throw $ex->appendMessage('Cannot '.$what.' database file "'.$file.'"'.$where);
@@ -315,15 +317,18 @@ class SQLiteConnector extends Connector {
             $this->connect();
 
         // execute statement
-        $result = $ex = false;
+        $result = false;
         try {
             if ($this->skipResults) $result = $this->sqlite->exec($sql);        // TRUE on success, FALSE on error
             else                    $result = $this->sqlite->query($sql);       // bug: always SQLite3Result, never boolean
             if (!$result) throw new DatabaseException('Error '.$this->sqlite->lastErrorCode().', '.$this->sqlite->lastErrorMsg());
         }
-        catch (IRosasurferException $ex) {}
-        catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
-        if ($ex) throw $ex->appendMessage('Database: '.$this->file.NL.'SQL: "'.$sql.'"');
+        catch (Throwable $ex) {
+            if (!$ex instanceof IRosasurferException) {
+                $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex);
+            }
+            throw $ex->appendMessage("Database: $this->file".NL."SQL: \"$sql\"");
+        }
 
         // track last_insert_id
         $this->lastInsertId = $this->sqlite->lastInsertRowID();

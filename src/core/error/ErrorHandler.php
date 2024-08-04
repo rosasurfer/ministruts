@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\core\error;
 
+use Throwable;
+
 use rosasurfer\ministruts\core\StaticClass;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\log\Logger;
@@ -223,11 +225,11 @@ class ErrorHandler extends StaticClass {
     /**
      * A handler for uncatched exceptions. After the handler returns PHP terminates the script.
      *
-     * @param \Throwable $exception - the unhandled throwable
+     * @param  Throwable $exception - the unhandled throwable
      *
      * @return void
      */
-    public static function handleException(\Throwable $exception) {
+    public static function handleException(Throwable $exception) {
         if (!self::$exceptionHandling) return;
         //echof('ErrorHandler::handleException() '.$exception->getMessage());
 
@@ -244,7 +246,7 @@ class ErrorHandler extends StaticClass {
                 (self::$prevExceptionHandler)($exception);
             }
         }
-        catch (\Throwable $second) {
+        catch (Throwable $second) {
             self::handleExceptionOnException($exception, $second);
         }
     }
@@ -257,12 +259,12 @@ class ErrorHandler extends StaticClass {
      * ATTENTION: If this method is reached something in the previous error handling went seriously wrong. Therefore this method
      *            should better not rely on external dependencies.
      *
-     * @param  \Throwable $first  - primary exception
-     * @param  \Throwable $second - secondary exception
+     * @param  Throwable $first  - primary exception
+     * @param  Throwable $second - secondary exception
      *
      * @return void
      */
-    private static function handleExceptionOnException(\Throwable $first, \Throwable $second): void {
+    private static function handleExceptionOnException(Throwable $first, Throwable $second): void {
         try {
             // last chance to log something
             $indent = ' ';
@@ -294,7 +296,7 @@ class ErrorHandler extends StaticClass {
                 // TODO
             }
         }
-        catch (\Throwable $ex) {}                                               // intentionally eat it
+        catch (Throwable $ex) {}                                                // intentionally eat it
     }
 
 
@@ -308,9 +310,9 @@ class ErrorHandler extends StaticClass {
      *
      * For an example see this package's README file.
      *
-     * @param  \Throwable $exception
+     * @param  Throwable $exception
      *
-     * @return \Throwable - the same exception
+     * @return Throwable - the same exception
      *
      * @link  https://www.php.net/manual/en/language.oop5.decon.php#language.oop5.decon.destructor
      */
@@ -478,16 +480,16 @@ class ErrorHandler extends StaticClass {
 
 
     /**
-     * Return a more verbose version of a {@link \Throwable}'s message. The resulting message has the classname of the throwable
+     * Return a more verbose version of a {@link Throwable}'s message. The resulting message has the classname of the throwable
      * and in case of {@link \ErrorException}s also the severity level of the error prepended to the original message.
      *
-     * @param  \Throwable     $throwable         - throwable
+     * @param  Throwable      $throwable         - throwable
      * @param  string         $indent [optional] - indent all lines by the specified value (default: no indentation)
      * @param  ?ContentFilter $filter [optional] - the content filter to apply (default: none)
      *
      * @return string - message
      */
-    public static function getVerboseMessage(\Throwable $throwable, string $indent = '', ContentFilter $filter = null): string {
+    public static function getVerboseMessage(Throwable $throwable, string $indent = '', ContentFilter $filter = null): string {
         $message = trim($throwable->getMessage());
         if ($filter) {
             $message = $filter->filterString($message);
@@ -588,13 +590,13 @@ class ErrorHandler extends StaticClass {
     /**
      * Return the adjusted stacktrace of an exception as a string. The returned string contains infos about nested exceptions.
      *
-     * @param  \Throwable     $throwable         - any throwable
+     * @param  Throwable      $throwable         - any throwable
      * @param  string         $indent [optional] - indent the resulting lines by the specified value (default: no indentation)
      * @param  ?ContentFilter $filter [optional] - the content filter to apply (default: none)
      *
      * @return string - readable stacktrace
      */
-    public static function getAdjustedStackTraceAsString(\Throwable $throwable, string $indent = '', ContentFilter $filter = null): string {
+    public static function getAdjustedStackTraceAsString(Throwable $throwable, string $indent = '', ContentFilter $filter = null): string {
         $trace  = self::getAdjustedStackTrace($throwable->getTrace(), $throwable->getFile(), $throwable->getLine());
         $result = self::formatStackTrace($trace, $indent, $filter);
 

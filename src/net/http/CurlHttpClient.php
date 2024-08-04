@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\net\http;
 
+use Throwable;
+
 use rosasurfer\ministruts\core\error\ErrorHandler;
 use rosasurfer\ministruts\core\exception\IOException;
 use rosasurfer\ministruts\log\Logger;
@@ -154,7 +156,7 @@ class CurlHttpClient extends HttpClient {
                 curl_close($hTmp);
             }
         }
-        catch (\Throwable $ex) {
+        catch (Throwable $ex) {
             throw ErrorHandler::handleDestructorException($ex);
         }
     }

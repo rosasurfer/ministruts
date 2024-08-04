@@ -3,11 +3,13 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\core\exception;
 
+use Throwable;
+
 
 /**
  * An interface defining common functionality for all "rosasurfer" exceptions.
  */
-interface RosasurferExceptionInterface extends \Throwable {
+interface RosasurferExceptionInterface extends Throwable {
 
     /**
      * Set the error code of an exception. Used to enrich the exception with additional data.

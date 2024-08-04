@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\core\di;
 
+use Throwable;
+
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\di\service\Service;
@@ -118,7 +120,7 @@ class Di extends CObject implements DiInterface {
         try {
             return $this->services[$name]->resolve(true, $args);
         }
-        catch (\Throwable $ex) {
+        catch (Throwable $ex) {
             throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex);
         }
     }
@@ -136,7 +138,7 @@ class Di extends CObject implements DiInterface {
         try {
             return $this->services[$name]->resolve(false);
         }
-        catch (\Throwable $ex) {
+        catch (Throwable $ex) {
             throw new ContainerException($ex->getMessage(), $ex->getCode(), $ex);
         }
     }

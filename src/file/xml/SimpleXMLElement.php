@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\file\xml;
 
+use Throwable;
+
 use rosasurfer\ministruts\core\ObjectTrait;
 use rosasurfer\ministruts\core\di\DiAwareTrait;
 use rosasurfer\ministruts\core\exception\RosasurferExceptionInterface as IRosasurferException;
@@ -49,8 +51,10 @@ class SimpleXMLElement extends \SimpleXMLElement {
         try {
             $xml = new static(...func_get_args());
         }
-        catch (\Throwable $ex) {
-            if (!$ex instanceof IRosasurferException) $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex);
+        catch (Throwable $ex) {
+            if (!$ex instanceof IRosasurferException) {
+                $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex);
+            }
         }
         finally {
             restore_error_handler();

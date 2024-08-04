@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\db;
 
+use Throwable;
+
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\error\ErrorHandler;
 use rosasurfer\ministruts\core\exception\InvalidTypeException;
@@ -38,7 +40,7 @@ abstract class Result extends CObject implements ResultInterface {
         try {
             $this->release();
         }
-        catch (\Throwable $ex) {
+        catch (Throwable $ex) {
             throw ErrorHandler::handleDestructorException($ex);
         }
     }

@@ -6,6 +6,8 @@ declare(strict_types=1);
  */
 namespace rosasurfer\ministruts;
 
+use Throwable;
+
 use rosasurfer\ministruts\console\docopt\DocoptParser;
 use rosasurfer\ministruts\console\docopt\DocoptResult;
 use rosasurfer\ministruts\core\assert\Assert;
@@ -1468,7 +1470,7 @@ function is_class($name) {
     try {
         return class_exists($name, true);
     }
-    catch (\Throwable $ex) {}   // faulty class loaders must not block the script from continuation
+    catch (Throwable $ex) {}    // faulty class loaders must not block the script from continuation
 
     return class_exists($name, false);
 }
@@ -1486,7 +1488,7 @@ function is_interface($name) {
     try {
         return interface_exists($name, true);
     }
-    catch (\Throwable $ex) {}   // faulty class loaders must not block the script from continuation
+    catch (Throwable $ex) {}    // faulty class loaders must not block the script from continuation
 
     return interface_exists($name, false);
 }
@@ -1504,7 +1506,7 @@ function is_trait($name) {
     try {
         return trait_exists($name, true);
     }
-    catch (\Throwable $ex) {}   // faulty class loaders must not block the script from continuation
+    catch (Throwable $ex) {}    // faulty class loaders must not block the script from continuation
 
     return trait_exists($name, false);
 }

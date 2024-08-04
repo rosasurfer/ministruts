@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\core\assert;
 
+use Throwable;
 use rosasurfer\ministruts\core\StaticClass;
 
 use function rosasurfer\ministruts\strContains;
@@ -145,8 +146,8 @@ class Assert extends StaticClass {
      * @return bool - whether the assertion is TRUE
      */
     public static function throwable($value, $message = '', ...$args) {
-        if (!$value instanceof \Throwable) {
-            throw new InvalidTypeException(static::illegalTypeMessage($value, '\Throwable', $message, $args));
+        if (!$value instanceof Throwable) {
+            throw new InvalidTypeException(static::illegalTypeMessage($value, 'Throwable', $message, $args));
         }
         return true;
     }

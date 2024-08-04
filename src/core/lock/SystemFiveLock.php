@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\core\lock;
 
+use Throwable;
+
 use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\error\ErrorHandler;
 use rosasurfer\ministruts\core\exception\RosasurferExceptionInterface as IRosasurferException;
@@ -65,7 +67,7 @@ class SystemFiveLock extends BaseLock {
                 sem_acquire($hSemaphore);
                 break;                                      // TODO: sem_get() and sem_acquire() may fail under load
             }
-            catch (\Throwable $ex) {
+            catch (Throwable $ex) {
                 if (!$ex instanceof IRosasurferException) $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex);
 
                 // TODO: find bug and rewrite (most probably a file limit is hit), @see ext/sysvsem/sysvsem.c
@@ -107,7 +109,7 @@ class SystemFiveLock extends BaseLock {
         try {
             $this->release();
         }
-        catch (\Throwable $ex) {
+        catch (Throwable $ex) {
             throw ErrorHandler::handleDestructorException($ex);
         }
     }

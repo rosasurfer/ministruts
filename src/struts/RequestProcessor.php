@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\struts;
 
+use Throwable;
+
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 use rosasurfer\ministruts\net\http\HttpResponse;
@@ -366,7 +368,7 @@ PROCESS_METHOD_ERROR_SC_405;
                 $forward = $action->execute($request, $response);
             }
         }
-        catch (\Throwable $ex) {}               // keep exception for later usage
+        catch (Throwable $ex) {}               // keep exception for later use
 
         // convert a returned string identifier to an actual ActionForward
         if (is_string($forward)) {

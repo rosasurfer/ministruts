@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\db\orm;
 
+use Throwable;
+
 use rosasurfer\ministruts\core\Singleton;
 use rosasurfer\ministruts\core\exception\ClassNotFoundException;
 use rosasurfer\ministruts\core\exception\InvalidTypeException;
@@ -175,7 +177,7 @@ abstract class DAO extends Singleton {
             $this->db()->commit();
             return $result;
         }
-        catch (\Throwable $ex) {
+        catch (Throwable $ex) {
             $this->db()->rollback();
             throw $ex;
         }

@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\file;
 
+use Throwable;
+
 use rosasurfer\ministruts\core\StaticClass;
 use rosasurfer\ministruts\core\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
@@ -39,14 +41,15 @@ class FileSystem extends StaticClass {
             $args = [$path, $mode, $recursive];
             func_num_args() > 3 && $args[] = $context;
 
-            $ex = null;
             try {
                 return \mkdir(...$args);                // unpack arguments as mkdir() will not accept $context = null
             }
-            catch (IRosasurferException $ex) {}
-            catch (\Throwable           $ex) { $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex); }
-
-            throw $ex->appendMessage('Cannot create directory "'.$path.'"');
+            catch (Throwable $ex) {
+                if (!$ex instanceof IRosasurferException) {
+                    $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex);
+                }
+                throw $ex->appendMessage("Cannot create directory \"$path\"");
+            }
         }
         return true;
     }

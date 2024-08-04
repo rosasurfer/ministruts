@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\core\lock;
 
+use Throwable;
+
 use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\error\ErrorHandler;
 use rosasurfer\ministruts\core\exception\RuntimeException;
@@ -78,7 +80,7 @@ final class FileLock extends BaseLock {
         try {
             $this->release();
         }
-        catch (\Throwable $ex) {
+        catch (Throwable $ex) {
             throw ErrorHandler::handleDestructorException($ex);
         }
     }

@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\struts;
 
+use Throwable;
+
 use rosasurfer\ministruts\cache\Cache;
 use rosasurfer\ministruts\cache\monitor\FileDependency;
 use rosasurfer\ministruts\config\ConfigInterface;
@@ -109,9 +111,9 @@ class FrontController extends Singleton {
                 $this->modules[$prefix] = $module;
             }
         }
-        catch (\Throwable $ex) {
+        catch (Throwable $ex) {
             if (!$ex instanceof IRosasurferException) $ex = new StrutsConfigException($ex->getMessage(), $ex->getCode(), $ex);
-            throw $ex->appendMessage('Error instantiating Struts module from file "'.$file.'"');
+            throw $ex->appendMessage("Error instantiating Struts module from file \"$file\"");
         }
     }
 

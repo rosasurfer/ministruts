@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\db\mysql;
 
+use Throwable;
+
 use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\RosasurferExceptionInterface as IRosasurferException;
@@ -227,9 +229,10 @@ class MySQLConnector extends Connector {
             $this->hConnection = mysql_connect($host, $user, $pass, true/*, $flags=2*/);
             if (!$this->hConnection) throw new DatabaseException(error_get_last()['message']);
         }
-        catch (IRosasurferException $ex) {}
-        catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
-        if ($ex) throw $ex->appendMessage('Can not connect to MySQL server on "'.$host.'"');
+        catch (Throwable $ex) {
+            if (!$ex instanceof IRosasurferException) $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex);
+            throw $ex->appendMessage("Can not connect to MySQL server on \"$host\"");
+        }
 
         $this->setConnectionOptions();
         $this->selectDatabase();
@@ -277,9 +280,9 @@ class MySQLConnector extends Connector {
                     throw new DatabaseException(mysql_error($this->hConnection), mysql_errno($this->hConnection));
                 }
             }
-            catch (\Throwable $ex) {
+            catch (Throwable $ex) {
                 if (!$ex instanceof IRosasurferException) $ex = new DatabaseException($ex->getMessage(), mysql_errno($this->hConnection), $ex);
-                throw $ex->appendMessage('Can not select database "'.$this->database.'"');
+                throw $ex->appendMessage("Can not select database \"$this->database\"");
             }
         }
         return $this;
@@ -423,9 +426,12 @@ class MySQLConnector extends Connector {
             $result = mysql_query($sql, $this->hConnection);
             if (!$result) throw new DatabaseException('SQL-Error '.mysql_errno($this->hConnection).': '.mysql_error($this->hConnection), mysql_errno($this->hConnection));
         }
-        catch (IRosasurferException $ex) {}
-        catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), mysql_errno($this->hConnection), $ex); }
-        if ($ex) throw $ex->appendMessage('Database: '.$this->getConnectionDescription().NL.'SQL: "'.$sql.'"');
+        catch (Throwable $ex) {
+            if (!$ex instanceof IRosasurferException) {
+                $ex = new DatabaseException($ex->getMessage(), mysql_errno($this->hConnection), $ex);
+            }
+            throw $ex->appendMessage('Database: '.$this->getConnectionDescription().NL."SQL: \"$sql\"");
+        }
 
         // track last_insert_id
         $affected = 0;
