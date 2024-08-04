@@ -236,7 +236,7 @@ class PostgresConnector extends Connector {
             catch (\Throwable $ex) {}
             catch (\Exception $ex) {}                   // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
 
-            if (strContainsI($ex->getMessage(), 'current transaction is aborted, commands ignored until end of transaction block')) {
+            if ($ex && strContainsI($ex->getMessage(), 'current transaction is aborted, commands ignored until end of transaction block')) {
                 if ($this->transactionLevel > 0) {
                     $this->transactionLevel = 1;        // immediately skip nested transactions
                     $this->rollback();
