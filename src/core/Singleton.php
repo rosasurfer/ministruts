@@ -64,5 +64,5 @@ abstract class Singleton extends CObject {
     /**
      * Prevent cloning of {@link Singleton} instances.
      */
-    final private function __clone() {}
+    final protected function __clone() {}           // since PHP8.0 private functions can't be final anymore
 }
