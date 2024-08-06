@@ -6,7 +6,7 @@ use Psr\Container\ContainerExceptionInterface;
 
 
 /**
- * NotFoundException
+ * ContainerException
  */
 class ContainerException extends RuntimeException implements ContainerExceptionInterface {
 }
