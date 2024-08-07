@@ -666,7 +666,6 @@ class Module extends CObject {
             $filePath = $this->findFile($file);
             if (!$filePath) throw new StrutsConfigException('<tile name="'.$name.'" file="'.$file.'": File not found.');
 
-            /** @var Tile $tile */
             $tile = new $this->tilesClass($this);
             $tile->setName($name);
             $tile->setFileName($filePath);

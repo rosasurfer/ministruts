@@ -25,7 +25,7 @@ trait ObjectTrait {
      *
      * @throws RuntimeException
      */
-    public function __get(string $property) {
+    public function __get($property) {
         $ex = new RuntimeException('Read access to undefined property '.static::class.'::$'.$property);
         ErrorHandler::shiftStackFramesByMethod($ex, __FUNCTION__);
         throw $ex;
@@ -42,7 +42,7 @@ trait ObjectTrait {
      *
      * @throws RuntimeException
      */
-    public function __set(string $property, $value): void {
+    public function __set($property, $value) {
         $ex = new RuntimeException('Write access to undefined property '.static::class.'::$'.$property);
         ErrorHandler::shiftStackFramesByMethod($ex, __FUNCTION__);
         throw $ex;
