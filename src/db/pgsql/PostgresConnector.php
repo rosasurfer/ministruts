@@ -258,12 +258,21 @@ class PostgresConnector extends Connector {
         if (!function_exists('\pg_connect')) throw new RuntimeException('Undefined function pg_connect() (pgsql extension is not available)');
 
         $connStr = $this->getConnectionString();
-        $ex = null;
 
+        if (PHP_VERSION_ID < 70000) ini_set('track_errors', 1);         // removed in PHP 8.0
+        else                        error_clear_last();                 // available since PHP 7.0
+        $php_errormsg = '';                                             // not available since PHP 8.0 (php.ini "track_errors" was removed)
+
+        $ex = null;
         try {
-            error_clear_last();
             $this->hConnection = pg_connect($connStr, PGSQL_CONNECT_FORCE_NEW);
-            if (!$this->hConnection) throw new DatabaseException(error_get_last()['message']);
+
+            if (!$this->hConnection) {                                  // error handling may be set to "log" only
+                if (PHP_VERSION_ID >= 70000 && ($error = error_get_last())) {
+                    $php_errormsg = $error['message'];
+                }
+                throw new DatabaseException($php_errormsg);
+            }
         }
         catch (IRosasurferException $ex) {}
         catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }

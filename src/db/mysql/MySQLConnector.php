@@ -214,12 +214,21 @@ class MySQLConnector extends Connector {
         $user = $this->username;
         $pass = $this->password;
 
+        if (PHP_VERSION_ID < 70000) ini_set('track_errors', 1);         // removed in PHP 8.0
+        else                        error_clear_last();                 // available since PHP 7.0
+        $php_errormsg = '';                                             // not available since PHP 8.0 (php.ini "track_errors" was removed)
+
         // connect
         $ex = null;
         try {                                                           // flags: CLIENT_FOUND_ROWS = 2
-            error_clear_last();
             $this->hConnection = mysql_connect($host, $user, $pass, true/*, $flags=2*/);
-            if (!$this->hConnection) throw new DatabaseException(error_get_last()['message']);
+
+            if (!$this->hConnection) {                                  // error handling may be set to "log" only
+                if (PHP_VERSION_ID >= 70000 && ($error = error_get_last())) {
+                    $php_errormsg = $error['message'];
+                }
+                throw new DatabaseException($php_errormsg);
+            }
         }
         catch (IRosasurferException $ex) {}
         catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }

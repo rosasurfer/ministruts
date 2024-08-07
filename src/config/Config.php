@@ -73,7 +73,9 @@ class Config extends CObject implements ConfigInterface {
         if (is_string($files)) $files = [$files];
         else Assert::isArray($files);
 
-        $this->files = [];
+        if (PHP_VERSION_ID < 70000) {
+            ini_set('track_errors', 1);             // removed in PHP 8.0
+        }
 
         // check and load existing files
         foreach ($files as $i => $file) {
@@ -141,24 +143,35 @@ class Config extends CObject implements ConfigInterface {
      * @return string - line comment or an empty string if the line has no comment
      */
     private function getLineComment($value) {
-        error_clear_last();
+        $php_errormsg = '';                         // not available since PHP 8.0 (php.ini "track_errors" was removed)
+
+        if (PHP_VERSION_ID >= 70000) {
+            error_clear_last();                     // available since PHP 7.0
+        }
+
         $tokens = token_get_all('<?php '.$value);
-        $error  = error_get_last();
+
+        if (PHP_VERSION_ID >= 70000) {
+            if ($error = error_get_last()) {
+                $php_errormsg = $error['message'];
+            }
+        }
 
         // Don't use trigger_error() as it will enter an infinite loop if the same config is accessed again.
-        if ($error && !strStartsWith($error['message'], 'Unterminated comment starting line')) {                // that's /*...
+        if (strlen($php_errormsg) && !strStartsWith($php_errormsg, 'Unterminated comment starting line')) {         // that's /*...
             error_log(__METHOD__.'()  Unexpected token_get_all() error for $value: '.$value, ERROR_LOG_DEFAULT);
         }
 
         $lastToken = end($tokens);
 
-        if (!is_array($lastToken) || token_name($lastToken[0])!='T_COMMENT')
+        if (!is_array($lastToken) || token_name($lastToken[0])!='T_COMMENT') {
             return '';
+        }
 
         $comment = $lastToken[1];
-        if ($comment[0] == '#')
+        if ($comment[0] == '#') {
             return $comment;
-
+        }
         return $this->{__FUNCTION__}(substr($comment, 1));
     }
 
