@@ -12,7 +12,7 @@ use rosasurfer\ministruts\core\exception\InvalidValueException;
 /**
  * BaseAppender
  *
- * Implements base functionality of log appenders.
+ * Implements common functionality of all log appenders.
  */
 abstract class BaseAppender extends CObject implements AppenderInterface {
 
@@ -22,8 +22,8 @@ abstract class BaseAppender extends CObject implements AppenderInterface {
     /** @var bool - whether the appender is enabled */
     protected bool $enabled;
 
-    /** @var int - loglevel */
-    protected int $logLevel;
+    /** @var int - the appender's loglevel (may differ from application loglevel) */
+    protected int $logLevel = 0;
 
     /** @var bool - whether stacktrace details will be logged by this instance */
     protected bool $traceDetails = false;

@@ -39,9 +39,9 @@ use const rosasurfer\ministruts\L_WARN;
  * @example
  * <pre>
  *  $config = $this->di('config');
- *  $config['log.level.default']              = L_WARN;     // set the default application loglevel to L_WARN
- *  $config['log.level.class.ClassA']         = L_DEBUG;    // set loglevel for class "ClassA" to L_DEBUG
- *  $config['log.level.class.foo\bar\ClassB'] = L_ERROR;    // set loglevel for class "foo\bar\ClassB" to L_ERROR
+ *  $config['log.level.default']              = L_WARN;         // set the application's default loglevel to L_WARN
+ *  $config['log.level.class.ClassA']         = L_DEBUG;        // set the loglevel for class "ClassA" to L_DEBUG
+ *  $config['log.level.class.foo\bar\ClassB'] = L_ERROR;        // set the loglevel for class "foo\bar\ClassB" to L_ERROR
  * </pre>
  *
  *
@@ -64,7 +64,7 @@ class Logger extends StaticClass {
         L_FATAL  => 'Fatal' ,
     ];
 
-    /** @var int - configured application loglevel */
+    /** @var int - the application's default loglevel */
     private static $appLogLevel;
 
     /** @var ?LogAppender - print appender if enabled */

@@ -32,7 +32,29 @@ use const rosasurfer\ministruts\WINDOWS;
 /**
  * MailAppender
  *
- * A log appender which sends email notifications for qualifying log messages.
+ * A log appender which sends email notifications for qualifying log messages. The appender is configured
+ * via config key "log.appender.mail". All configuration options except field "receivers" are optional.
+ *
+ * @example
+ * <pre>
+ *  $config = $this->di('config');
+ *  $options = $config['log.appender.mail'];
+ *  $appender = new MailAppender($options);
+ *
+ *  Option fields:
+ *  --------------
+ *  'enabled'            = (bool)                // whether the appender is enabled (default: FALSE)
+ *  'loglevel'           = (int|string)          // appender loglevel if different from application loglevel (default: application loglevel)
+ *  'details.trace'      = (bool)                // whether a stacktrace is attached to log messages (default: FALSE)
+ *  'details.request'    = (bool)                // whether HTTP request details are attached to log messages from the web interface (default: FALSE)
+ *  'details.session'    = (bool)                // whether HTTP session details are attached to log messages from the web interface (default: FALSE)
+ *  'details.server'     = (bool)                // whether server details are attached to log messages from the CLI interface (default: FALSE)
+ *  'filter'             = <classname>           // content filter to apply to the resulting output (default: no filter)
+ *  'aggregate-messages' = (bool)                // whether to collect all messages per HTTP request/CLI call (default: FALSE)
+ *  'sender'             = <email-address>       // sender address of log messages (default: php.ini setting 'sendmail_from')
+ *  'receivers'          = array<email-address>  // one or more receiver addresses (required)
+ *  'headers'            = array<string>         // additional MIME headers, e.g. "CC: John Doe <copy-to-john@domain.tld>" (default: none)
+ * </pre>
  */
 class MailAppender extends BaseAppender {
 
@@ -62,14 +84,14 @@ class MailAppender extends BaseAppender {
     public function __construct(array $options) {
         parent::__construct($options);
 
-        // sender
+        // sender (optional)
         $sender = $options['sender'] ?? null;
         if (is_string($sender)) {
             $sender = $this->parseAddress($sender);
             if (!$sender) throw new InvalidValueException("Invalid parameter \$options[sender]: \"$sender\"");
         }
-        elseif (!is_null($sender)) {
-            throw new InvalidValueException('Invalid parameter $options[sender]: '.(is_scalar($sender) ? "\"$sender\"" : '('.gettype($sender).')'));
+        if (!is_null($sender)) {
+            throw new InvalidTypeException('Invalid type of parameter $options[sender]: ('.gettype($sender).')');
         }
         else {
             $sender = ini_get('sendmail_from');
@@ -82,12 +104,13 @@ class MailAppender extends BaseAppender {
         }
         $this->sender = $sender;
 
-        // receivers
+        // receivers (required)
         $receivers = $options['receivers'] ?? [];
         if (!is_array($receivers)) throw new InvalidTypeException('Invalid type of parameter $options[receivers]: '.gettype($receivers).' (array expected)');
+        if (!$receivers)           throw new InvalidValueException('Invalid parameter $options[receivers]: (empty)');
 
         foreach ($receivers as $i => $value) {
-            if (!is_string($value)) throw new InvalidValueException("Invalid parameter \$options[receivers][$i]: ".(is_scalar($value) ? "\"$value\"" : '('.gettype($value).')'));
+            if (!is_string($value)) throw new InvalidTypeException("Invalid type of parameter \$options[receivers][$i]: (".gettype($value).")");
             $receiver = $this->parseAddress($value);
             if (!$receiver) throw new InvalidValueException("Invalid parameter \$options[receivers][$i]: \"$value\"");
             $this->receivers[] = $receiver;
@@ -98,7 +121,8 @@ class MailAppender extends BaseAppender {
         if (!is_array($headers)) throw new InvalidTypeException('Invalid type of parameter $options[headers]: '.gettype($headers).' (array expected)');
 
         foreach ($headers as $i => $value) {
-            if (!preg_match('/^[a-z]+(-[a-z]+)*:/i', $value)) throw new InvalidValueException("Invalid parameter \$options[headers][$i]: ".(is_scalar($value) ? "\"$value\"" : '('.gettype($value).')'));
+            if (!is_string($value)) throw new InvalidTypeException("Invalid type of parameter \$options[headers][$i]: (".gettype($value).")");
+            if (!preg_match('/^[a-z]+(-[a-z]+)*:/i', $value)) throw new InvalidValueException("Invalid parameter \$options[headers][$i]: \"$value\"");
             $this->headers[] = $value;
         }
 
