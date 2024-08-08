@@ -9,12 +9,12 @@
     }],
     "config": {
         "platform": {
-            "php": "7.3"
+            "php": "7.4"
         },
         "optimize-autoloader": true
     },
     "require": {
-        "php":           "7.3 - 8",
+        "php":           "7.4 - 8",
         "ext-ctype":     "*",
         "ext-filter":    "*",
         "ext-json":      "*",
