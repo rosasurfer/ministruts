@@ -34,7 +34,7 @@ interface AppenderInterface {
      *
      * @return bool
      */
-    public static function isDefaultEnabled(): bool;
+    public static function getDefaultEnabled(): bool;
 
 
     /**
@@ -42,7 +42,7 @@ interface AppenderInterface {
      *
      * @return bool
      */
-    public static function isDefaultTraceDetails(): bool;
+    public static function getDefaultTraceDetails(): bool;
 
 
     /**
@@ -50,7 +50,7 @@ interface AppenderInterface {
      *
      * @return bool
      */
-    public static function isDefaultRequestDetails(): bool;
+    public static function getDefaultRequestDetails(): bool;
 
 
     /**
@@ -58,7 +58,7 @@ interface AppenderInterface {
      *
      * @return bool
      */
-    public static function isDefaultSessionDetails(): bool;
+    public static function getDefaultSessionDetails(): bool;
 
 
     /**
@@ -66,5 +66,13 @@ interface AppenderInterface {
      *
      * @return bool
      */
-    public static function isDefaultServerDetails(): bool;
+    public static function getDefaultServerDetails(): bool;
+
+
+    /**
+     * Return the default "aggregate-messages" status of the appender if not explicitely configured.
+     *
+     * @return bool
+     */
+    public static function getDefaultAggregation(): bool;
 }

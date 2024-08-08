@@ -66,17 +66,8 @@ class Logger extends StaticClass {
     /** @var int - the application's default loglevel */
     private static $appLogLevel;
 
-    /** @var ?LogAppender - print appender if enabled */
-    private static ?LogAppender $printAppender = null;
-
-    /** @var ?LogAppender - errorlog appender if enabled */
-    private static ?LogAppender $errorLogAppender = null;
-
-    /** @var ?LogAppender - mail appender if enabled */
-    private static ?LogAppender $mailAppender = null;
-
-    /** @var string[] - config ids of enabled appenders */
-    private static array $enabledAppenders = [];
+    /** @var LogAppender[] - enabled appenders and their ids */
+    private static array $logAppenders = [];
 
 
     /**
@@ -101,16 +92,16 @@ class Logger extends StaticClass {
 
         // initialize log appenders
         if (self::isAppenderEnabled($id = 'print')) {
-            self::$printAppender = new PrintAppender($config["log.appender.$id"] ?? []);
-            self::$enabledAppenders[] = $id;
+            self::$logAppenders[$id] = new PrintAppender($config["log.appender.$id"] ?? []);
         }
         if (self::isAppenderEnabled($id = 'errorlog')) {
-            self::$errorLogAppender = new ErrorLogAppender($config["log.appender.$id"] ?? []);
-            self::$enabledAppenders[] = $id;
+            // the ErrorLogAppender needs to know the status of the PrintAppender
+            $options = $config["log.appender.$id"] ?? [];
+            $options += ['print.enabled' => isset(self::$logAppenders['print'])];
+            self::$logAppenders[$id] = new ErrorLogAppender($options);
         }
         if (self::isAppenderEnabled($id = 'mail')) {
-            self::$mailAppender = new MailAppender($config["log.appender.$id"] ?? []);
-            self::$enabledAppenders[] = $id;
+            self::$logAppenders[$id] = new MailAppender($config["log.appender.$id"] ?? []);
         }
 
         $initialized = true;
@@ -130,9 +121,9 @@ class Logger extends StaticClass {
         if (!$config) $config = self::di('config');
 
         switch ($id) {
-            case 'print':    return $config->getBool("log.appender.$id.enabled", null, true) ?? PrintAppender::isDefaultEnabled();
-            case 'errorlog': return $config->getBool("log.appender.$id.enabled", null, true) ?? ErrorLogAppender::isDefaultEnabled();
-            case 'mail':     return $config->getBool("log.appender.$id.enabled", null, true) ?? MailAppender::isDefaultEnabled();
+            case 'print':    return $config->getBool("log.appender.$id.enabled", null, true) ?? PrintAppender::getDefaultEnabled();
+            case 'errorlog': return $config->getBool("log.appender.$id.enabled", null, true) ?? ErrorLogAppender::getDefaultEnabled();
+            case 'mail':     return $config->getBool("log.appender.$id.enabled", null, true) ?? MailAppender::getDefaultEnabled();
         }
         return $config->getBool("log.appender.$id.enabled", false);
     }
@@ -145,10 +136,10 @@ class Logger extends StaticClass {
      * @param  int                  $level              - loglevel
      * @param  array<string, mixed> $context [optional] - logging context with additional data (default: none)
      *
-     * @return void
+     * @return bool - success status
      */
     public static function log($loggable, int $level, array $context = []) {
-        // lock the method and prevent recursive calls
+        // prevent recursive calls
         static $recursion = false;
         if ($recursion) throw new IllegalStateException('Recursive call detected, aborting...');
         $recursion = true;
@@ -160,16 +151,15 @@ class Logger extends StaticClass {
         if ($level >= self::$appLogLevel) {
             $message = new LogMessage($loggable, $level, $context);
 
-            /** @var bool continue */
-            $continue = true;
-            $context += array_flip(self::$enabledAppenders);        // let appenders know the status of each other (not a good design)
-            if ($continue && self::$printAppender)    $continue = self::$printAppender->appendMessage($message);
-            if ($continue && self::$errorLogAppender) $continue = self::$errorLogAppender->appendMessage($message);
-            if ($continue && self::$mailAppender)     $continue = self::$mailAppender->appendMessage($message);
+            foreach (self::$logAppenders as $appender) {
+                if (!$appender->appendMessage($message)) {
+                    break;
+                }
+            }
         }
 
-        // unlock the method
         $recursion = false;
+        return true;
     }
 
 

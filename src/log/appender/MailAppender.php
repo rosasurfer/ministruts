@@ -50,7 +50,7 @@ use const rosasurfer\ministruts\WINDOWS;
  *  'details.session'    = (bool)                // whether HTTP session details are attached to log messages from the web interface (default: FALSE)
  *  'details.server'     = (bool)                // whether server details are attached to log messages from the CLI interface (default: FALSE)
  *  'filter'             = {classname}           // content filter to apply to the resulting output (default: no filter)
- *  'aggregate-messages' = (bool)                // whether to collect all messages per HTTP request/CLI call (default: FALSE)
+ *  'aggregate-messages' = (bool)                // whether to collect messages per HTTP request/CLI call (default: FALSE)
  *  'sender'             = {email-address}       // sender address of log messages (default: php.ini setting 'sendmail_from')
  *  'receivers'          = {email-address}[]     // one or more receiver addresses (required)
  *  'headers'            = string[]              // additional MIME headers, e.g. "CC: John Doe &lt;copy-to-john@domain.tld&gt;" (default: none)
@@ -67,7 +67,7 @@ class MailAppender extends BaseAppender {
     /** @var string[] - additional mail headers, if any */
     protected array $headers = [];
 
-    /** @var bool - whether to aggregate multiple messages per process */
+    /** @var bool - whether to aggregate multiple messages per request or process */
     protected bool $aggregateMessages;
 
     /** @var LogMessage[] - collected messages */
@@ -127,7 +127,7 @@ class MailAppender extends BaseAppender {
         }
 
         // initialize message aggregation
-        $this->aggregateMessages = (bool)filter_var($options['aggregate-messages'] ?? false, FILTER_VALIDATE_BOOLEAN);
+        $this->aggregateMessages = filter_var($options['aggregate-messages'] ?? false, FILTER_VALIDATE_BOOLEAN);
         if ($this->aggregateMessages) {
             register_shutdown_function(function() {
                 // add a nested handler to include log entries triggered during shutdown itself

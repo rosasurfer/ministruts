@@ -19,8 +19,8 @@ use const rosasurfer\ministruts\WINDOWS;
 /**
  * ErrorLogAppender
  *
- * A log appender passing log messages via "error_log()" to the PHP system logger.
- * The appender is configured via config key "log.appender.errorlog". All configuration options are optional.
+ * A log appender passing log messages via "error_log()" to the PHP system logger. The appender is configured via config
+ * key "log.appender.errorlog". All configuration options are optional, for defaults see the self::getDefault*() methods.
  *
  * @example
  * <pre>
@@ -30,15 +30,15 @@ use const rosasurfer\ministruts\WINDOWS;
  *
  *  Option fields:
  *  --------------
- *  'enabled'            = (bool)        // whether the appender is enabled (default: FALSE)
+ *  'enabled'            = (bool)        // whether the appender is enabled (default: yes)
  *  'loglevel'           = (int|string)  // appender loglevel if different from application loglevel (default: application loglevel)
- *  'details.trace'      = (bool)        // whether a stacktrace is attached to log messages (default: FALSE)
- *  'details.request'    = (bool)        // whether HTTP request details are attached to log messages from the web interface (default: FALSE)
- *  'details.session'    = (bool)        // whether HTTP session details are attached to log messages from the web interface (default: FALSE)
- *  'details.server'     = (bool)        // whether server details are attached to log messages from the CLI interface (default: FALSE)
- *  'filter'             = {classname}   // content filter to apply to the resulting output (default: no filter)
- *  'filepath'           = {filename}    // file name; absolute or relative to $config['app.dir.root'] (default: php.ini setting 'error_log')
- *  'aggregate-messages' = (bool)        // whether to group all messages per HTTP request/CLI call (default: FALSE)
+ *  'details.trace'      = (bool)        // whether a stacktrace is attached to log messages (default: yes)
+ *  'details.request'    = (bool)        // whether HTTP request details are attached to log messages from the web interface (default: yes)
+ *  'details.session'    = (bool)        // whether HTTP session details are attached to log messages from the web interface (default: yes)
+ *  'details.server'     = (bool)        // whether server details are attached to log messages from the CLI interface (default: no)
+ *  'filter'             = {classname}   // content filter to apply to the resulting output (default: none)
+ *  'filepath'           = {filename}    // file name; absolute or relative to $config['app.dir.root'] (default: php.ini setting "error_log")
+ *  'aggregate-messages' = (bool)        // whether to group messages per HTTP request/CLI call (default: see self::getDefaultAggregation())
  * </pre>
  */
 class ErrorLogAppender extends BaseAppender {
@@ -49,7 +49,7 @@ class ErrorLogAppender extends BaseAppender {
     /** @var string - log destination filename */
     protected string $destinationFile;
 
-    /** @var bool - whether to aggregate multiple messages per process */
+    /** @var bool - whether to aggregate multiple messages per request or process */
     protected bool $aggregateMessages;
 
     /** @var LogMessage[] - collected messages */
@@ -84,7 +84,7 @@ class ErrorLogAppender extends BaseAppender {
         }
 
         // initialize message aggregation
-        $this->aggregateMessages = (bool)filter_var($options['aggregate-messages'] ?? false, FILTER_VALIDATE_BOOLEAN);
+        $this->aggregateMessages = filter_var($options['aggregate-messages'] ?? static::getDefaultAggregation(), FILTER_VALIDATE_BOOLEAN);
         if ($this->aggregateMessages) {
             register_shutdown_function(function() {
                 // add a nested handler to include log entries triggered during shutdown itself
@@ -111,9 +111,11 @@ class ErrorLogAppender extends BaseAppender {
             return true;
         }
 
-        // skip output on STDERR if the print appender is active
-        if ($this->toSTDERR() && \key_exists('print', $this->options)) {
-            return true;
+        // prevent duplicated output on STDERR if the print appender is active
+        if ($this->toSTDERR()) {
+            if ($this->options['print.enabled'] ?? false) {
+                return true;
+            }
         }
 
         // if aggregation is enabled only collect messages
@@ -194,5 +196,35 @@ class ErrorLogAppender extends BaseAppender {
             return (($this->destinationType == ERROR_LOG_DEFAULT && !$iniSetting) || $this->destinationType == ERROR_LOG_SAPI);
         }
         return false;
+    }
+
+
+    /**
+     * Return the default "enabled" status of the appender if not explicitely configured.
+     *
+     * @return bool
+     */
+    public static function getDefaultEnabled(): bool {
+        return true;
+    }
+
+
+    /**
+     * Return the default "details.request" status of the appender if not explicitely configured.
+     *
+     * @return bool
+     */
+    public static function getDefaultRequestDetails(): bool {
+        return true;
+    }
+
+
+    /**
+     * Return the default "details.session" status of the appender if not explicitely configured.
+     *
+     * @return bool
+     */
+    public static function getDefaultSessionDetails(): bool {
+        return true;
     }
 }

@@ -18,8 +18,8 @@ use const rosasurfer\ministruts\NL;
  * PrintAppender
  *
  * A log appender displaying log messages either on STDOUT/STDERR (CLI) or as part of the HTTP response (web interface)
- * The appender is configured via config key "log.appender.print". All configuration options are optional, for defaults see the
- * self::isDefault*() methods.
+ * The appender is configured via config key "log.appender.print". All configuration options are optional, for defaults
+ * see the self::getDefault*() methods.
  *
  * @example
  * <pre>
@@ -29,7 +29,7 @@ use const rosasurfer\ministruts\NL;
  *
  *  Option fields:
  *  --------------
- *  'enabled'         = (bool)          // whether the appender is enabled (default: see self::isDefaultEnabled())
+ *  'enabled'         = (bool)          // whether the appender is enabled (default: see self::getDefaultEnabled())
  *  'loglevel'        = (int|string)    // appender loglevel if different from application loglevel (default: application loglevel)
  *  'details.trace'   = (bool)          // whether a stacktrace is attached to log messages (default: yes)
  *  'details.request' = (bool)          // whether HTTP request details are attached to log messages from the web interface (default: yes)
@@ -117,7 +117,7 @@ class PrintAppender extends BaseAppender {
      *
      * @return bool
      */
-    public static function isDefaultEnabled(): bool {
+    public static function getDefaultEnabled(): bool {
         // default: enabled on CLI, php.ini setting "display_errors=On" or white-listed web access
         return CLI || ini_get_bool('display_errors') || Application::isAdminIP();
     }
@@ -128,7 +128,7 @@ class PrintAppender extends BaseAppender {
      *
      * @return bool
      */
-    public static function isDefaultRequestDetails(): bool {
+    public static function getDefaultRequestDetails(): bool {
         return true;
     }
 }

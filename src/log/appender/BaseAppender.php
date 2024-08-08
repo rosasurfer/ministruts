@@ -8,6 +8,8 @@ use rosasurfer\ministruts\log\filter\ContentFilterInterface as ContentFilter;
 use rosasurfer\ministruts\log\Logger;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 
+use const rosasurfer\ministruts\CLI;
+
 
 /**
  * BaseAppender
@@ -60,10 +62,10 @@ abstract class BaseAppender extends CObject implements AppenderInterface {
         $this->logLevel = $logLevel;
 
         // read configured message details
-        $this->traceDetails   = (bool) filter_var($options['details']['trace'  ] ?? static::isDefaultTraceDetails(),   FILTER_VALIDATE_BOOLEAN);
-        $this->requestDetails = (bool) filter_var($options['details']['request'] ?? static::isDefaultRequestDetails(), FILTER_VALIDATE_BOOLEAN);
-        $this->sessionDetails = (bool) filter_var($options['details']['session'] ?? static::isDefaultSessionDetails(), FILTER_VALIDATE_BOOLEAN);
-        $this->serverDetails  = (bool) filter_var($options['details']['server' ] ?? static::isDefaultServerDetails(),  FILTER_VALIDATE_BOOLEAN);
+        $this->traceDetails   = filter_var($options['details']['trace'  ] ?? static::getDefaultTraceDetails(),   FILTER_VALIDATE_BOOLEAN);
+        $this->requestDetails = filter_var($options['details']['request'] ?? static::getDefaultRequestDetails(), FILTER_VALIDATE_BOOLEAN);
+        $this->sessionDetails = filter_var($options['details']['session'] ?? static::getDefaultSessionDetails(), FILTER_VALIDATE_BOOLEAN);
+        $this->serverDetails  = filter_var($options['details']['server' ] ?? static::getDefaultServerDetails(),  FILTER_VALIDATE_BOOLEAN);
 
         // read a configured content filter
         /** @var ?string $class */
@@ -82,7 +84,7 @@ abstract class BaseAppender extends CObject implements AppenderInterface {
      *
      * @return bool
      */
-    public static function isDefaultEnabled(): bool {
+    public static function getDefaultEnabled(): bool {
         return false;
     }
 
@@ -92,7 +94,7 @@ abstract class BaseAppender extends CObject implements AppenderInterface {
      *
      * @return bool
      */
-    public static function isDefaultTraceDetails(): bool {
+    public static function getDefaultTraceDetails(): bool {
         return true;
     }
 
@@ -102,7 +104,7 @@ abstract class BaseAppender extends CObject implements AppenderInterface {
      *
      * @return bool
      */
-    public static function isDefaultRequestDetails(): bool {
+    public static function getDefaultRequestDetails(): bool {
         return false;
     }
 
@@ -112,7 +114,7 @@ abstract class BaseAppender extends CObject implements AppenderInterface {
      *
      * @return bool
      */
-    public static function isDefaultSessionDetails(): bool {
+    public static function getDefaultSessionDetails(): bool {
         return false;
     }
 
@@ -122,7 +124,17 @@ abstract class BaseAppender extends CObject implements AppenderInterface {
      *
      * @return bool
      */
-    public static function isDefaultServerDetails(): bool {
+    public static function getDefaultServerDetails(): bool {
         return false;
+    }
+
+
+    /**
+     * Return the default "aggregate-messages" status of the appender if not explicitely configured.
+     *
+     * @return bool
+     */
+    public static function getDefaultAggregation(): bool {
+        return !CLI;
     }
 }
