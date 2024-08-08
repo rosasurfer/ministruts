@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\core;
 
+use rosasurfer\ministruts\core\error\ErrorHandler;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 
 use function rosasurfer\ministruts\simpleClassName;
 use function rosasurfer\ministruts\strLeftTo;
-use rosasurfer\ministruts\core\error\ErrorHandler;
 
 
 /**
@@ -60,19 +60,9 @@ trait ObjectTrait {
      * @throws RuntimeException
      */
     public function __call($method, array $args) {
-        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-        $class = '{unknown_class}';
-
-        foreach ($trace as $frame) {
-            if (strtolower($frame['function']) !== '__call') {
-                $class     = $frame['class'];
-                $namespace = strLeftTo($class, '\\', -1, true, '');
-                $basename  = simpleClassName($class);
-                $class     = strtolower($namespace).$basename;
-                break;
-            }
-        }
-        throw new RuntimeException('Call of undefined or inaccessible method '.$class.'->'.$method.'()');
+        $ex = new RuntimeException('Call of undefined or inaccessible method '.static::class.'->'.$method.'()');
+        ErrorHandler::shiftStackFramesByMethod($ex, __FUNCTION__);
+        throw $ex;
     }
 
 
@@ -82,12 +72,13 @@ trait ObjectTrait {
      * @param  string  $method - name of the called method
      * @param  mixed[] $args   - arguments passed to the method call
      *
-     * @return never
+     * @return mixed
      *
      * @throws RuntimeException
      */
     public static function __callStatic($method, array $args) {
-        // TODO: adjust error message according to stacktrace
-        throw new RuntimeException('Call of undefined or inaccessible method '.static::class.'::'.$method.'()');
+        $ex = new RuntimeException('Call of undefined or inaccessible method '.static::class.'::'.$method.'()');
+        ErrorHandler::shiftStackFramesByMethod($ex, __FUNCTION__);
+        throw $ex;
     }
 }

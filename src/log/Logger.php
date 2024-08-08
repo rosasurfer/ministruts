@@ -45,8 +45,7 @@ use const rosasurfer\ministruts\L_WARN;
  * </pre>
  *
  *
- * TODO: Logger::resolveCaller() - test with Closure and internal PHP functions
- * TODO: implement \Psr\Log\LoggerInterface and remove static crap
+ * @TODO: implement \Psr\Log\LoggerInterface and remove static crap
  */
 class Logger extends StaticClass {
 
