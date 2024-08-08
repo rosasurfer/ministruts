@@ -256,8 +256,8 @@ class ErrorHandler extends StaticClass {
      * Process exceptions thrown inside the exception handler. Called if {@link Logger} or other chained exception handlers fail
      * and throw exceptions by themself. In such a case both exceptions are logged to the default log with only limited details.
      *
-     * ATTENTION: If this method is reached something in the previous error handling went seriously wrong. Therefore this method
-     *            should better not rely on external dependencies.
+     * Note: If this method is reached something in the previous error handling went seriously wrong. Therefore this method should
+     *       not use excessive external dependencies.
      *
      * @param  Throwable $first  - primary exception
      * @param  Throwable $second - secondary exception
