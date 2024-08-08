@@ -49,11 +49,11 @@ use const rosasurfer\ministruts\WINDOWS;
  *  'details.request'    = (bool)                // whether HTTP request details are attached to log messages from the web interface (default: FALSE)
  *  'details.session'    = (bool)                // whether HTTP session details are attached to log messages from the web interface (default: FALSE)
  *  'details.server'     = (bool)                // whether server details are attached to log messages from the CLI interface (default: FALSE)
- *  'filter'             = <classname>           // content filter to apply to the resulting output (default: no filter)
+ *  'filter'             = {classname}           // content filter to apply to the resulting output (default: no filter)
  *  'aggregate-messages' = (bool)                // whether to collect all messages per HTTP request/CLI call (default: FALSE)
- *  'sender'             = <email-address>       // sender address of log messages (default: php.ini setting 'sendmail_from')
- *  'receivers'          = array<email-address>  // one or more receiver addresses (required)
- *  'headers'            = array<string>         // additional MIME headers, e.g. "CC: John Doe <copy-to-john@domain.tld>" (default: none)
+ *  'sender'             = {email-address}       // sender address of log messages (default: php.ini setting 'sendmail_from')
+ *  'receivers'          = {email-address}[]     // one or more receiver addresses (required)
+ *  'headers'            = string[]              // additional MIME headers, e.g. "CC: John Doe &lt;copy-to-john@domain.tld&gt;" (default: none)
  * </pre>
  */
 class MailAppender extends BaseAppender {

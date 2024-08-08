@@ -265,7 +265,7 @@ class Config extends CObject implements ConfigInterface {
      * "true" and "false", "on" and "off", "yes" and "no" (case-insensitive).
      *
      * @param  string  $key                - case-insensitive key
-     * @param  bool    $default [optional] - value to return if the config setting does not exist (default: exception)
+     * @param  ?bool   $default [optional] - value to return if the config setting does not exist (default: exception)
      * @param  bool    $strict  [optional] - whether to validate a found value strictly:
      *                                       FALSE - returns true only for "1", "true", "on" and "yes", and false otherwise (default)
      *                                       TRUE  - as above but false is returned only for "0", "false", "off" and "no", and null
@@ -275,7 +275,7 @@ class Config extends CObject implements ConfigInterface {
      *
      * @throws RuntimeException if the setting is not found and no default value was specified
      */
-    public function getBool(string $key, bool $default = false, bool $strict = false) {
+    public function getBool(string $key, ?bool $default = false, bool $strict = false) {
         $notFound = false;
         $value = $this->getProperty($key, $notFound);
 

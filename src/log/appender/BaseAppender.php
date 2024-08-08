@@ -49,7 +49,7 @@ abstract class BaseAppender extends CObject implements AppenderInterface {
     public function __construct(array $options) {
         // read activation status
         $this->options = $options;
-        $this->enabled = (bool) filter_var($options['enabled'] ?? false, FILTER_VALIDATE_BOOLEAN);
+        $this->enabled = true;                          // TRUE if instantiated (explicit or implicit, no need to double-check)
 
         // read a configured appender loglevel
         $logLevel = 0;
@@ -60,10 +60,10 @@ abstract class BaseAppender extends CObject implements AppenderInterface {
         $this->logLevel = $logLevel;
 
         // read configured message details
-        $this->traceDetails   = (bool) filter_var($options['details']['trace'  ] ?? false, FILTER_VALIDATE_BOOLEAN);
-        $this->requestDetails = (bool) filter_var($options['details']['request'] ?? false, FILTER_VALIDATE_BOOLEAN);
-        $this->sessionDetails = (bool) filter_var($options['details']['session'] ?? false, FILTER_VALIDATE_BOOLEAN);
-        $this->serverDetails  = (bool) filter_var($options['details']['server' ] ?? false, FILTER_VALIDATE_BOOLEAN);
+        $this->traceDetails   = (bool) filter_var($options['details']['trace'  ] ?? static::isDefaultTraceDetails(),   FILTER_VALIDATE_BOOLEAN);
+        $this->requestDetails = (bool) filter_var($options['details']['request'] ?? static::isDefaultRequestDetails(), FILTER_VALIDATE_BOOLEAN);
+        $this->sessionDetails = (bool) filter_var($options['details']['session'] ?? static::isDefaultSessionDetails(), FILTER_VALIDATE_BOOLEAN);
+        $this->serverDetails  = (bool) filter_var($options['details']['server' ] ?? static::isDefaultServerDetails(),  FILTER_VALIDATE_BOOLEAN);
 
         // read a configured content filter
         /** @var ?string $class */
@@ -74,5 +74,55 @@ abstract class BaseAppender extends CObject implements AppenderInterface {
             }
             $this->filter = new $class();
         }
+    }
+
+
+    /**
+     * Return the default "enabled" status of the appender if not explicitely configured.
+     *
+     * @return bool
+     */
+    public static function isDefaultEnabled(): bool {
+        return false;
+    }
+
+
+    /**
+     * Return the default "details.trace" status of the appender if not explicitely configured.
+     *
+     * @return bool
+     */
+    public static function isDefaultTraceDetails(): bool {
+        return true;
+    }
+
+
+    /**
+     * Return the default "details.request" status of the appender if not explicitely configured.
+     *
+     * @return bool
+     */
+    public static function isDefaultRequestDetails(): bool {
+        return false;
+    }
+
+
+    /**
+     * Return the default "details.session" status of the appender if not explicitely configured.
+     *
+     * @return bool
+     */
+    public static function isDefaultSessionDetails(): bool {
+        return false;
+    }
+
+
+    /**
+     * Return the default "details.server" status of the appender if not explicitely configured.
+     *
+     * @return bool
+     */
+    public static function isDefaultServerDetails(): bool {
+        return false;
     }
 }

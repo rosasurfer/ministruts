@@ -265,6 +265,7 @@ class ErrorHandler extends StaticClass {
      * @return void
      */
     private static function handleExceptionOnException(Throwable $first, Throwable $second): void {
+        //echof('ErrorHandler::handleExceptionOnException() '.$second->getMessage());
         try {
             // last chance to log something
             $indent = ' ';
@@ -278,9 +279,9 @@ class ErrorHandler extends StaticClass {
             $msg2 .= $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
             $msg2 .= ErrorHandler::getAdjustedStackTraceAsString($second, $indent);
 
-            $msg  = $msg1.NL;
+            $msg  = $msg1.NL.NL;
             $msg .= $indent.'followed by'.NL;
-            $msg .= $msg2;
+            $msg .= $msg2.NL;
 
             // log everything to the system logger (never throws an error)
             $msg = str_replace(chr(0), '\0', $msg);                             // replace NUL bytes which mess up the logfile
@@ -594,7 +595,7 @@ class ErrorHandler extends StaticClass {
      * @param  string         $indent [optional] - indent the resulting lines by the specified value (default: no indentation)
      * @param  ?ContentFilter $filter [optional] - the content filter to apply (default: none)
      *
-     * @return string - readable stacktrace
+     * @return string - string representation ending with an EOL marker
      */
     public static function getAdjustedStackTraceAsString(Throwable $throwable, string $indent = '', ContentFilter $filter = null): string {
         $trace  = self::getAdjustedStackTrace($throwable->getTrace(), $throwable->getFile(), $throwable->getLine());
@@ -617,7 +618,7 @@ class ErrorHandler extends StaticClass {
      * @param  string         $indent [optional] - indent formatted lines by this value (default: no indenting)
      * @param  ?ContentFilter $filter [optional] - the content filter to apply (default: none)
      *
-     * @return string
+     * @return string - string representation ending with an EOL marker
      */
     public static function formatStackTrace(array $trace, string $indent = '', ContentFilter $filter = null): string {
         // TODO: if the trace contains frame arguments moderate the arguments using a provided filter

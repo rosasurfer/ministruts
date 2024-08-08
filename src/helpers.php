@@ -525,26 +525,19 @@ function numf($number, $decimals=0, $decimalSeparator='.', $thousandsSeparator='
  * @return ?bool - boolean value or NULL if the setting doesn't exist
  */
 function ini_get_bool($option, $strict = true) {
-    $value = ini_get($option);
+    $value = \ini_get($option);
 
     if ($value === false) return null;      // setting doesn't exist
-    if ($value === '')    return false;     // setting is NULL (unset)
+    if ($value === '')    return false;     // setting is empty or NULL (unset)
 
-    switch (strtolower($value)) {
-        case '1'    :
-        case 'on'   :
-        case 'true' :
-        case 'yes'  : return true;
+    $flags = $strict ? FILTER_NULL_ON_FAILURE : 0;
+    /** @var ?bool $result */
+    $result = \filter_var($value, FILTER_VALIDATE_BOOLEAN, $flags);
 
-        case '0'    :
-        case 'off'  :
-        case 'false':
-        case 'no'   :
-        case 'none' : return false;
+    if ($result === null) {
+        throw new InvalidValueException("Invalid \"php.ini\" setting for strict type boolean: \"$option\" = \"$value\"");
     }
-    if ($strict) throw new InvalidValueException('Invalid "php.ini" setting for type boolean: "'.$option.'" = "'.$value.'"');
-
-    return (bool)(int)$value;
+    return $result;
 }
 
 
@@ -561,16 +554,16 @@ function ini_get_bool($option, $strict = true) {
  * @return ?int - integer value or NULL if the setting doesn't exist
  */
 function ini_get_int($option, $strict = true) {
-    $value = ini_get($option);
+    $value = \ini_get($option);
 
     if ($value === false) return null;      // setting doesn't exist
-    if ($value === '')    return 0;         // setting is NULL (unset)
+    if ($value === '')    return 0;         // setting is empty or NULL (unset)
 
     $iValue = (int)$value;
 
-    if ($strict && $value!==(string)$iValue)
-        throw new InvalidValueException('Invalid "php.ini" setting for type integer: "'.$option.'" = "'.$value.'"');
-
+    if ($strict && $value!==(string)$iValue) {
+        throw new InvalidValueException("Invalid \"php.ini\" setting for strict type int: \"$option\" = \"$value\"");
+    }
     return $iValue;
 }
 
@@ -588,17 +581,17 @@ function ini_get_int($option, $strict = true) {
  * @return ?int - integer value or NULL if the setting doesn't exist
  */
 function ini_get_bytes($option, $strict = true) {
-    $value = ini_get($option);
+    $value = \ini_get($option);
 
     if ($value === false) return null;      // setting doesn't exist
-    if ($value === '')    return 0;         // setting is NULL (unset)
+    if ($value === '')    return 0;         // setting is empty or NULL (unset)
 
     $result = 0;
     try {
         $result = php_byte_value($value);
     }
     catch (InvalidValueException $ex) {
-        if ($strict) throw new InvalidValueException('Invalid "php.ini" setting for PHP byte value: "'.$option.'" = "'.$value.'"', 0, $ex);
+        if ($strict) throw new InvalidValueException("Invalid \"php.ini\" setting for PHP byte value: \"$option\" = \"$value\"", 0, $ex);
         $result = (int)$value;
     }
     return $result;

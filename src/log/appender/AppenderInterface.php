@@ -27,4 +27,44 @@ interface AppenderInterface {
      * @return bool - Whether logging should continue with the next registered appender. Returning FALSE interrupts the chain.
      */
     public function appendMessage(LogMessage $message): bool;
+
+
+    /**
+     * Return the default "enabled" status of the appender if not explicitely configured.
+     *
+     * @return bool
+     */
+    public static function isDefaultEnabled(): bool;
+
+
+    /**
+     * Return the default "details.trace" status of the appender if not explicitely configured.
+     *
+     * @return bool
+     */
+    public static function isDefaultTraceDetails(): bool;
+
+
+    /**
+     * Return the default "details.request" status of the appender if not explicitely configured.
+     *
+     * @return bool
+     */
+    public static function isDefaultRequestDetails(): bool;
+
+
+    /**
+     * Return the default "details.session" status of the appender if not explicitely configured.
+     *
+     * @return bool
+     */
+    public static function isDefaultSessionDetails(): bool;
+
+
+    /**
+     * Return the default "details.server" status of the appender if not explicitely configured.
+     *
+     * @return bool
+     */
+    public static function isDefaultServerDetails(): bool;
 }

@@ -100,17 +100,17 @@ class Logger extends StaticClass {
         if (!$logLevel)          $logLevel = self::DEFAULT_LOGLEVEL;
         self::$appLogLevel = $logLevel;
 
-        // initialize configured log appenders
+        // initialize log appenders
         if (self::isAppenderEnabled($id = 'print')) {
-            self::$printAppender = new PrintAppender($config["log.appender.$id"]);
+            self::$printAppender = new PrintAppender($config["log.appender.$id"] ?? []);
             self::$enabledAppenders[] = $id;
         }
         if (self::isAppenderEnabled($id = 'errorlog')) {
-            self::$errorLogAppender = new ErrorLogAppender($config["log.appender.$id"]);
+            self::$errorLogAppender = new ErrorLogAppender($config["log.appender.$id"] ?? []);
             self::$enabledAppenders[] = $id;
         }
         if (self::isAppenderEnabled($id = 'mail')) {
-            self::$mailAppender = new MailAppender($config["log.appender.$id"]);
+            self::$mailAppender = new MailAppender($config["log.appender.$id"] ?? []);
             self::$enabledAppenders[] = $id;
         }
 
@@ -126,10 +126,15 @@ class Logger extends StaticClass {
      * @return bool
      */
     private static function isAppenderEnabled(string $id): bool {
-        /** @var ?Config $config */
+        /** @var Config|null $config */
         static $config = null;
         if (!$config) $config = self::di('config');
 
+        switch ($id) {
+            case 'print':    return $config->getBool("log.appender.$id.enabled", null, true) ?? PrintAppender::isDefaultEnabled();
+            case 'errorlog': return $config->getBool("log.appender.$id.enabled", null, true) ?? ErrorLogAppender::isDefaultEnabled();
+            case 'mail':     return $config->getBool("log.appender.$id.enabled", null, true) ?? MailAppender::isDefaultEnabled();
+        }
         return $config->getBool("log.appender.$id.enabled", false);
     }
 
@@ -145,9 +150,9 @@ class Logger extends StaticClass {
      */
     public static function log($loggable, int $level, array $context = []) {
         // lock the method and prevent recursive calls
-        static $isActive = false;
-        if ($isActive) throw new IllegalStateException('Recursive call detected, aborting...');
-        $isActive = true;
+        static $recursion = false;
+        if ($recursion) throw new IllegalStateException('Recursive call detected, aborting...');
+        $recursion = true;
 
         self::init();
         if (!isset(self::$logLevels[$level])) throw new InvalidValueException("Invalid parameter \$level: $level (not a loglevel)");
@@ -165,7 +170,7 @@ class Logger extends StaticClass {
         }
 
         // unlock the method
-        $isActive = false;
+        $recursion = false;
     }
 
 

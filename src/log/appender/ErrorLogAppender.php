@@ -36,8 +36,8 @@ use const rosasurfer\ministruts\WINDOWS;
  *  'details.request'    = (bool)        // whether HTTP request details are attached to log messages from the web interface (default: FALSE)
  *  'details.session'    = (bool)        // whether HTTP session details are attached to log messages from the web interface (default: FALSE)
  *  'details.server'     = (bool)        // whether server details are attached to log messages from the CLI interface (default: FALSE)
- *  'filter'             = <classname>   // content filter to apply to the resulting output (default: no filter)
- *  'filepath'           = <filename>    // file name; absolute or relative to $config['app.dir.root'] (default: php.ini setting 'error_log')
+ *  'filter'             = {classname}   // content filter to apply to the resulting output (default: no filter)
+ *  'filepath'           = {filename}    // file name; absolute or relative to $config['app.dir.root'] (default: php.ini setting 'error_log')
  *  'aggregate-messages' = (bool)        // whether to group all messages per HTTP request/CLI call (default: FALSE)
  * </pre>
  */

@@ -149,6 +149,7 @@ class Application extends CObject {
             default:
                 throw new InvalidValueException('Invalid parameter $mode: "'.$mode.'"');
         }
+
         ErrorHandler::setupErrorHandling($level, $iMode);
     }
 
@@ -407,11 +408,17 @@ class Application extends CObject {
 
     /**
      * Whether the current remote IP address is white-listed for admin access. 127.0.0.1 and the web server's IP
-     * address are always white-listed. More IP addresses can be white-listed per configuration:
-     *
-     *  "admin.ip.whitelist.<name> = <ip-address>"
+     * address are always white-listed. More IP addresses can be white-listed via configuration.
      *
      * @return bool
+     *
+     * @example
+     * <pre>
+     *  configuration example:
+     *  ----------------------
+     *  admin.ip-whitelist.a-name       = <ip-address>      // the 'name' field is an arbitrary value
+     *  admin.ip-whitelist.another-name = <ip-address>
+     * </pre>
      */
     public static function isAdminIP() {
         if (!isset($_SERVER['REMOTE_ADDR'])) {
@@ -419,16 +426,13 @@ class Application extends CObject {
         }
 
         static $whiteList = null;
-        if (!$whiteList) {
-            $ips = ['127.0.0.1', $_SERVER['SERVER_ADDR']];
-
-            if (!self::$config) {
-                return in_array($_SERVER['REMOTE_ADDR'], $ips);
-            }
-            $values = self::$config->get('admin.ip.whitelist', []);
-            if (!is_array($values)) $values = [$values];
-            $whiteList = \array_keys(\array_flip(\array_merge($ips, $values)));
+        if (!$whiteList && self::$config) {
+            $values = self::$config->get('admin.ip-whitelist', []);
+            if (!\is_array($values)) $values = [$values];
+            $whiteList = \array_values($values);
         }
-        return in_array($_SERVER['REMOTE_ADDR'], $whiteList);
+        $list = \array_merge($whiteList ?? [], ['127.0.0.1', $_SERVER['SERVER_ADDR']]);
+
+        return \in_array($_SERVER['REMOTE_ADDR'], $list);
     }
 }
