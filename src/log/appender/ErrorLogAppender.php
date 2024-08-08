@@ -20,7 +20,7 @@ use const rosasurfer\ministruts\WINDOWS;
  * ErrorLogAppender
  *
  * A log appender passing log messages via "error_log()" to the PHP system logger. The appender is configured via config
- * key "log.appender.errorlog". All configuration options are optional, for defaults see the self::getDefault*() methods.
+ * key "log.appender.errorlog". All configuration options are optional. For defaults see the getDefault*() methods.
  *
  * @example
  * <pre>
@@ -31,14 +31,14 @@ use const rosasurfer\ministruts\WINDOWS;
  *  Option fields:
  *  --------------
  *  'enabled'            = (bool)        // whether the appender is enabled (default: yes)
- *  'loglevel'           = (int|string)  // appender loglevel if different from application loglevel (default: application loglevel)
+ *  'loglevel'           = (int|string)  // appender loglevel (default: application loglevel)
  *  'details.trace'      = (bool)        // whether a stacktrace is attached to log messages (default: yes)
  *  'details.request'    = (bool)        // whether HTTP request details are attached to log messages from the web interface (default: yes)
  *  'details.session'    = (bool)        // whether HTTP session details are attached to log messages from the web interface (default: yes)
  *  'details.server'     = (bool)        // whether server details are attached to log messages from the CLI interface (default: no)
  *  'filter'             = {classname}   // content filter to apply to the resulting output (default: none)
- *  'filepath'           = {filename}    // file name; absolute or relative to $config['app.dir.root'] (default: php.ini setting "error_log")
  *  'aggregate-messages' = (bool)        // whether to group messages per HTTP request/CLI call (default: see self::getDefaultAggregation())
+ *  'filepath'           = {filename}    // log filename; absolute or relative to $config['app.dir.root'] (default: php.ini setting "error_log")
  * </pre>
  */
 class ErrorLogAppender extends BaseAppender {

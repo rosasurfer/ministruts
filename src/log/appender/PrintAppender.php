@@ -18,8 +18,8 @@ use const rosasurfer\ministruts\NL;
  * PrintAppender
  *
  * A log appender displaying log messages either on STDOUT/STDERR (CLI) or as part of the HTTP response (web interface)
- * The appender is configured via config key "log.appender.print". All configuration options are optional, for defaults
- * see the self::getDefault*() methods.
+ * The appender is configured via config key "log.appender.print". All configuration options are optional. For defaults
+ * see the getDefault*() methods.
  *
  * @example
  * <pre>
@@ -29,13 +29,13 @@ use const rosasurfer\ministruts\NL;
  *
  *  Option fields:
  *  --------------
- *  'enabled'         = (bool)          // whether the appender is enabled (default: see self::getDefaultEnabled())
- *  'loglevel'        = (int|string)    // appender loglevel if different from application loglevel (default: application loglevel)
- *  'details.trace'   = (bool)          // whether a stacktrace is attached to log messages (default: yes)
- *  'details.request' = (bool)          // whether HTTP request details are attached to log messages from the web interface (default: yes)
- *  'details.session' = (bool)          // whether HTTP session details are attached to log messages from the web interface (default: no)
- *  'details.server'  = (bool)          // whether server details are attached to log messages from the CLI interface (default: no)
- *  'filter'          = {classname}     // content filter to apply to the resulting output (default: none)
+ *  'enabled'         = (bool)        // whether the appender is enabled (default: see self::getDefaultEnabled())
+ *  'loglevel'        = (int|string)  // appender loglevel (default: application loglevel)
+ *  'details.trace'   = (bool)        // whether a stacktrace is attached to log messages (default: yes)
+ *  'details.request' = (bool)        // whether HTTP request details are attached to log messages from the web interface (default: yes)
+ *  'details.session' = (bool)        // whether HTTP session details are attached to log messages from the web interface (default: no)
+ *  'details.server'  = (bool)        // whether server details are attached to log messages from the CLI interface (default: no)
+ *  'filter'          = {classname}   // content filter to apply to the resulting output (default: none)
  * </pre>
  */
 class PrintAppender extends BaseAppender {

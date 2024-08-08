@@ -32,8 +32,8 @@ use const rosasurfer\ministruts\WINDOWS;
 /**
  * MailAppender
  *
- * A log appender which sends email notifications for qualifying log messages. The appender is configured
- * via config key "log.appender.mail". All configuration options except field "receivers" are optional.
+ * A log appender which sends email notifications for qualifying log messages. The appender is configured via config key
+ * "log.appender.mail". All configuration options except "receiver" are optional. For defaults see the getDefault*() methods.
  *
  * @example
  * <pre>
@@ -43,17 +43,17 @@ use const rosasurfer\ministruts\WINDOWS;
  *
  *  Option fields:
  *  --------------
- *  'enabled'            = (bool)                // whether the appender is enabled (default: FALSE)
- *  'loglevel'           = (int|string)          // appender loglevel if different from application loglevel (default: application loglevel)
- *  'details.trace'      = (bool)                // whether a stacktrace is attached to log messages (default: FALSE)
- *  'details.request'    = (bool)                // whether HTTP request details are attached to log messages from the web interface (default: FALSE)
- *  'details.session'    = (bool)                // whether HTTP session details are attached to log messages from the web interface (default: FALSE)
- *  'details.server'     = (bool)                // whether server details are attached to log messages from the CLI interface (default: FALSE)
- *  'filter'             = {classname}           // content filter to apply to the resulting output (default: no filter)
- *  'aggregate-messages' = (bool)                // whether to collect messages per HTTP request/CLI call (default: FALSE)
- *  'sender'             = {email-address}       // sender address of log messages (default: php.ini setting 'sendmail_from')
- *  'receivers'          = {email-address}[]     // one or more receiver addresses (required)
- *  'headers'            = string[]              // additional MIME headers, e.g. "CC: John Doe &lt;copy-to-john@domain.tld&gt;" (default: none)
+ *  'enabled'            = (bool)           // whether the appender is enabled (default: no)
+ *  'loglevel'           = (int|string)     // appender loglevel (default: application loglevel)
+ *  'details.trace'      = (bool)           // whether a stacktrace is attached to log messages (default: yes)
+ *  'details.request'    = (bool)           // whether HTTP request details are attached to log messages from the web interface (default: yes)
+ *  'details.session'    = (bool)           // whether HTTP session details are attached to log messages from the web interface (default: yes)
+ *  'details.server'     = (bool)           // whether server details are attached to log messages from the CLI interface (default: no)
+ *  'filter'             = {classname}      // content filter to apply to the resulting output (default: none)
+ *  'aggregate-messages' = (bool)           // whether to group messages per HTTP request/CLI call (default: see self::getDefaultAggregation())
+ *  'sender'             = {email-address}  // sender address of log messages (default: php.ini setting "sendmail_from")
+ *  'receiver'           = {email-address}  // required: one or more receiver addresses separated by comma ","
+ *  'headers'            = string[]         // zero or more additional MIME headers, e.g. "CC: user@domain.tld" (default: none)
  * </pre>
  */
 class MailAppender extends BaseAppender {
@@ -104,17 +104,25 @@ class MailAppender extends BaseAppender {
         }
         $this->sender = $sender;
 
-        // receivers (required)
-        $receivers = $options['receivers'] ?? [];
-        if (!is_array($receivers)) throw new InvalidTypeException('Invalid type of parameter $options[receivers]: '.gettype($receivers).' (array expected)');
-        if (!$receivers)           throw new InvalidValueException('Invalid parameter $options[receivers]: (empty)');
+        // receiver (required)
+        $receivers = $options['receiver'] ?? [];
+        if (!is_array($receivers)) {
+            $receivers = [$receivers];
+        }
+        if (!$receivers) throw new InvalidValueException('Missing parameter $options[receiver]: (empty)');
 
         foreach ($receivers as $i => $value) {
-            if (!is_string($value)) throw new InvalidTypeException("Invalid type of parameter \$options[receivers][$i]: (".gettype($value).")");
-            $receiver = $this->parseAddress($value);
-            if (!$receiver) throw new InvalidValueException("Invalid parameter \$options[receivers][$i]: \"$value\"");
-            $this->receivers[] = $receiver;
+            if (!is_string($value)) throw new InvalidTypeException("Invalid type of parameter \$options[receiver][$i]: (".gettype($value).")");
+            foreach (explode(',', $value) as $segment) {
+                $segment = trim($segment);
+                if (strlen($segment)) {
+                    $receiver = $this->parseAddress($segment);
+                    if (!$receiver) throw new InvalidValueException("Invalid parameter \$options[receiver][$i]: \"$value\"");
+                    $this->receivers[] = $receiver;
+                }
+            }
         }
+        if (!$this->receivers) throw new InvalidValueException('Missing parameter $options[receiver]: (empty)');
 
         // additional MIME headers (optional)
         $headers = $options['headers'] ?? [];
@@ -127,7 +135,7 @@ class MailAppender extends BaseAppender {
         }
 
         // initialize message aggregation
-        $this->aggregateMessages = filter_var($options['aggregate-messages'] ?? false, FILTER_VALIDATE_BOOLEAN);
+        $this->aggregateMessages = filter_var($options['aggregate-messages'] ?? static::getDefaultAggregation(), FILTER_VALIDATE_BOOLEAN);
         if ($this->aggregateMessages) {
             register_shutdown_function(function() {
                 // add a nested handler to include log entries triggered during shutdown itself
@@ -190,11 +198,11 @@ class MailAppender extends BaseAppender {
 
                 if ($message->isSentByErrorHandler() || !$message->getException()) {
                     switch ($logLevel) {
-                        case L_DEBUG:  $type = 'message'; break;
-                        case L_INFO:   $type = 'message'; break;
-                        case L_NOTICE: $type = 'message'; break;
-                        case L_WARN:   $type = 'message'; break;
-                        case L_ERROR:  $type = 'error';   break;
+                        case L_DEBUG:
+                        case L_INFO:
+                        case L_NOTICE:
+                        case L_WARN:  $type = 'message'; break;
+                        case L_ERROR: $type = 'error';   break;
                         case L_FATAL:
                             $type = $message->isSentByErrorHandler() ? 'Unhandled exception' : 'error';
                             break;
@@ -410,5 +418,25 @@ class MailAppender extends BaseAppender {
             }
         }
         return $result;
+    }
+
+
+    /**
+     * Return the default "details.request" status of the appender if not explicitely configured.
+     *
+     * @return bool
+     */
+    public static function getDefaultRequestDetails(): bool {
+        return true;
+    }
+
+
+    /**
+     * Return the default "details.session" status of the appender if not explicitely configured.
+     *
+     * @return bool
+     */
+    public static function getDefaultSessionDetails(): bool {
+        return true;
     }
 }
