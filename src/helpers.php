@@ -412,20 +412,19 @@ function print_p($var, $return=false, $flushBuffers=true) {
     if (!CLI) {
         $str = '<div align="left"
                      style="display:initial; visibility:initial; clear:both;
-                     position:relative; z-index:4294967295; top:initial; left:initial;
+                     position:relative; top:initial; left:initial; z-index:4294967295;
                      float:left; width:initial; height:initial;
                      margin:0; padding:0; border-width:0;
                      color:inherit; background-color:inherit">
-                    <pre style="width:initial; height:initial; margin:0; padding:0; border-width:0;
-                                color:inherit; background-color:inherit; white-space:pre; line-height:12px;
-                                font:normal normal 12px/normal \'Courier New\',courier,serif">'.hsc($str).'</pre>
+                   <pre style="width:initial; height:initial; margin:0; padding:0; border-width:0;
+                        color:inherit; background-color:inherit; white-space:pre; line-height:12px;
+                        font:normal normal 12px/normal \'Courier New\',courier,serif">'.hsc($str).'</pre>
                 </div>';
     }
-    if (!strEndsWith($str, NL))
+    if (!strEndsWith($str, NL)) {
         $str .= NL;
-
-    if ($return)
-        return $str;
+    }
+    if ($return) return $str;
 
     echo $str;
     $flushBuffers && ob_get_level() && ob_flush();

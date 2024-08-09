@@ -172,8 +172,12 @@ class LogMessage extends CObject {
         $sLogLevel = Logger::logLevelDescription($this->logLevel);
 
         if ($html) {
-            $msg  = '<span style="white-space:nowrap"><span style="font-weight:bold">['.strtoupper($sLogLevel).']</span> <span style="white-space:pre; line-height:8px">'.nl2br(hsc($msg)).'</span></span><br/><br/>';
-            $msg .= 'in <span style="font-weight:bold">'.$file.'</span> on line <span style="font-weight:bold">'.$line.'</span><br/>'.NL;
+            $msg  = '<span style="white-space:nowrap">
+                        <span style="font-weight:bold">['.strtoupper($sLogLevel).']</span> <span style="white-space:pre; line-height:8px">'.nl2br(hsc($msg)).'</span>
+                     </span>
+                     <br/>
+                     <br/>
+                     in <span style="font-weight:bold">'.$file.'</span> on line <span style="font-weight:bold">'.$line.'</span><br/>'.NL;
         }
         else {
             $msg = $indent.'['.strtoupper($sLogLevel).'] '.$msg.NL. $indent.'in '.$file.' on line '.$line.NL;
@@ -206,7 +210,7 @@ class LogMessage extends CObject {
             $detail  = $indent.'Stacktrace:'.NL .$indent.'-----------'.NL;
             $detail .= ErrorHandler::getAdjustedStackTraceAsString($this->exception, $indent, $filter);
             if ($html) {
-                $detail = '<br style="clear:both"/><br/>'.print_p($detail, true, false).'<br/>'.NL;
+                $detail = '<br style="clear:both"/><br/>'.print_p($detail, true, false).NL;
             }
         }
         else {
@@ -214,7 +218,7 @@ class LogMessage extends CObject {
             if (isset($this->context['exception'])) {
                 /** @var Throwable $exception */
                 $exception = $this->context['exception'];
-                $msg = $indent . trim(ErrorHandler::getVerboseMessage($exception, $indent, $filter)).NL.NL;
+                $msg = $indent.trim(ErrorHandler::getVerboseMessage($exception, $indent, $filter)).NL.NL;
                 if ($html) {
                     $msg = '<br/>'.nl2br(hsc($msg));
                 }
@@ -222,7 +226,7 @@ class LogMessage extends CObject {
                 $detail  = $indent.'Stacktrace:'.NL .$indent.'-----------'.NL;
                 $detail .= ErrorHandler::getAdjustedStackTraceAsString($exception, $indent, $filter);
                 if ($html) {
-                    $detail = '<br style="clear:both"/><br/>'.print_p($detail, true, false).'<br/>'.NL;
+                    $detail = '<br style="clear:both"/><br/>'.print_p($detail, true, false).NL;
                 }
                 $detail = $msg.$detail;
             }
@@ -236,7 +240,7 @@ class LogMessage extends CObject {
                 $detail  = $indent.'Stacktrace:'.NL .$indent.'-----------'.NL;
                 $detail .= ErrorHandler::formatStackTrace($stacktrace, $indent, $filter);
                 if ($html) {
-                    $detail = '<br style="clear:both"/><br/>'.print_p($detail, true, false).'<br/>'.NL;
+                    $detail = '<br style="clear:both"/><br/>'.print_p($detail, true, false).NL;
                 }
             }
         }
@@ -268,7 +272,7 @@ class LogMessage extends CObject {
             $detail = 'Request:'.NL .'--------'.NL .trim(Request::stringify());
             $detail = $indent.str_replace(NL, NL.$indent, normalizeEOL($detail)).NL;
             if ($html) {
-                $detail = '<br style="clear:both"/><br/>'.print_p($detail, true, false).'<br/>'.NL;
+                $detail = '<br style="clear:both"/><br/>'.print_p($detail, true, false).NL;
             }
         }
         return $this->context[$key] = $detail;
@@ -303,7 +307,7 @@ class LogMessage extends CObject {
             $header = 'Session:'.NL . '--------'.NL;
             $detail = $indent.str_replace(NL, NL.$indent, normalizeEOL($header.$detail)).NL;
             if ($html) {
-                $detail = '<br style="clear:both"/><br/>'.print_p($detail, true, false).'<br/>'.NL;
+                $detail = '<br style="clear:both"/><br/>'.print_p($detail, true, false).NL;
             }
         }
         return $this->context[$key] = $detail;
@@ -334,7 +338,7 @@ class LogMessage extends CObject {
         $detail = 'Server:'.NL .'-------'.NL .print_r($values, true);
         $detail = $indent.str_replace(NL, NL.$indent, normalizeEOL(trim($detail))).NL;
         if ($html) {
-            $detail = '<br style="clear:both"/><br/>'.print_p($detail, true, false).'<br/>'.NL;
+            $detail = '<br style="clear:both"/><br/>'.print_p($detail, true, false).NL;
         }
         return $this->context[$key] = $detail;
     }
@@ -388,7 +392,7 @@ class LogMessage extends CObject {
         $detail = $indent.str_replace(NL, NL.$indent, normalizeEOL(trim($detail))).NL;
 
         if ($html) {
-            $detail = '<br style="clear:both"/><br/>'.print_p($detail, true, false).'<br/>'.NL;
+            $detail = '<br style="clear:both"/><br/>'.print_p($detail, true, false).NL;
         }
         return $this->context[$key] = $detail;
     }

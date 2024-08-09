@@ -86,23 +86,25 @@ class PrintAppender extends BaseAppender {
         }
         else {
             // break out of unfortunate HTML tags
-            $divId = md5('ministruts').'-'.++$this->msgCounterHtml;         // $divId is always unique
-            $html  = "<a attr1=\"\" attr2=\'\'></a></meta></title></head></script></img></input></select></textarea></label></li></ul></font></pre></tt></code></small></i></b></span></div>
-                      <div id='$divId'
-                           align='left'
-                           style='display:initial; visibility:initial; clear:both;
-                           position:relative; z-index:4294967295; top:initial; left:initial;
+            $divId = md5('ministruts').'-'.++$this->msgCounterHtml;         // each $divId is unique
+            $html  = '<a attr1="" attr2=\'\'></a></meta></title></head></script></img></input></select></textarea></label></li></ul></font></pre></tt></code></small></i></b></span></div>
+                      <div id="'.$divId.'"
+                           align="left"
+                           style="display:initial; visibility:initial; clear:both;
+                           position:relative; top:initial; left:initial; z-index:4294967295;
                            float:left; width:initial; height:initial
                            margin:0; padding:4px; border-width:0;
-                           font:normal normal 10px/normal arial,helvetica,sans-serif; line-height:12px;
-                           color:black; background-color:#ccc'>
-                          $msg
-                      </div>";
+                           font:normal normal 12px/normal arial,helvetica,sans-serif; line-height:12px;
+                           color:black; background-color:lightgray">
+                         '.$msg.'
+                      </div>';
             // add some JavaScript to make sure multiple log messages are not covered by other (probably dynamic) content
-            $html .= "<script>
-                          var bodies = document.getElementsByTagName('body');
-                          bodies && bodies.length && bodies[0].appendChild(document.getElementById('$divId'));
-                      </script>";
+            $html .= '<script>
+                          var bodies = document.getElementsByTagName("body");
+                          if (bodies && bodies.length) {
+                             bodies[0].appendChild(document.getElementById("'.$divId.'"));
+                          }
+                      </script>';
             echo $html.NL;
         }
         $this->msgCounter++;
