@@ -152,8 +152,6 @@ class ErrorLogAppender extends BaseAppender {
                 $msg .= NL.$detail;
             }
         }
-        if (sizeof($messages) > 1) $msg .= NL;
-
         if ($this->requestDetails && $detail = $message->getRequestDetails(false, $this->filter)) $msg .= NL.$detail;
         if ($this->sessionDetails && $detail = $message->getSessionDetails(false, $this->filter)) $msg .= NL.$detail;
         if ($this->serverDetails  && $detail = $message->getServerDetails (false, $this->filter)) $msg .= NL.$detail;

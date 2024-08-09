@@ -86,26 +86,56 @@ class PrintAppender extends BaseAppender {
         }
         else {
             // break out of unfortunate HTML tags
-            $divId = md5('ministruts').'-'.++$this->msgCounterHtml;         // each $divId is unique
-            $html  = '<a attr1="" attr2=\'\'></a></meta></title></head></script></img></input></select></textarea></label></li></ul></font></pre></tt></code></small></i></b></span></div>
-                      <div id="'.$divId.'"
-                           align="left"
-                           style="display:initial; visibility:initial; clear:both;
-                           position:relative; top:initial; left:initial; z-index:4294967295;
-                           float:left; width:initial; height:initial
-                           margin:0; padding:4px; border-width:0;
-                           font:normal normal 12px/normal arial,helvetica,sans-serif; line-height:12px;
-                           color:black; background-color:lightgray">
-                         '.$msg.'
-                      </div>';
-            // add some JavaScript to make sure multiple log messages are not covered by other (probably dynamic) content
-            $html .= '<script>
-                          var bodies = document.getElementsByTagName("body");
-                          if (bodies && bodies.length) {
-                             bodies[0].appendChild(document.getElementById("'.$divId.'"));
-                          }
-                      </script>';
-            echo $html.NL;
+            if ($this->msgCounterHtml == 0) {
+                echo '<a attr1="" attr2=\'\'></a></meta></title></head></script></img></input></select></textarea></label></li></ul></font></pre></tt></code></small></i></b></span></div>'.NL;
+            }
+            // the id of each message DIV is unique
+            $divId = md5('ministruts').'-'.++$this->msgCounterHtml;
+
+            echo <<<HTML_SNIPPET
+            <div id="$divId"
+                 align="left"
+                 style="display:initial; visibility:initial; clear:both;
+                 position:relative; top:initial; left:initial; z-index:4294967295;
+                 float:left; width:initial; height:initial
+                 margin:0; padding:4px; border-width:0;
+                 font:normal normal 12px/normal arial,helvetica,sans-serif; line-height:12px;
+                 color:black; background-color:lightgray">
+               $msg
+            </div>
+            HTML_SNIPPET;
+
+            // some JavaScript to move messages to the top of the page (if JS is not available messages show up inline)
+            echo <<<JAVASCRIPT_SNIPPET
+            <script>
+                var container = window.ministrutsContainer;
+                if (!container) {
+                    container = window.ministrutsContainer = document.createElement('div');
+                    container.setAttribute('id', 'ministruts.print-appender');
+                    container.style.position        = 'absolute';
+                    container.style.top             = '6px';
+                    container.style.left            = '6px';
+                    container.style.zIndex          = '4294967295';
+                    container.style.padding         = '6px';
+                    container.style.textAlign       = 'left';
+                    container.style.font            = 'normal normal 12px/1.1em arial,helvetica,sans-serif';
+                    container.style.color           = 'black';
+                    container.style.backgroundColor = 'lightgray';
+                    //
+                    var bodies = document.getElementsByTagName('body');
+                    if (bodies && bodies.length) {
+                        bodies[0].appendChild(container);
+                    }
+                    else {
+                        container = window.ministrutsContainer = null; 
+                    }
+                }
+                if (container) {
+                    var logMsg = document.getElementById('$divId');
+                    if (logMsg) container.appendChild(logMsg);
+                }
+            </script>
+            JAVASCRIPT_SNIPPET;
         }
         $this->msgCounter++;
 
