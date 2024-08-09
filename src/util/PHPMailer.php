@@ -1,12 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace rosasurfer\ministruts\net\mail;
+namespace rosasurfer\ministruts\util;
 
+use rosasurfer\ministruts\config\ConfigInterface as Config;
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 
+use function rosasurfer\ministruts\normalizeEOL;
 use function rosasurfer\ministruts\strContains;
 use function rosasurfer\ministruts\strEndsWith;
 use function rosasurfer\ministruts\strLeft;
@@ -14,13 +16,16 @@ use function rosasurfer\ministruts\strLeftTo;
 use function rosasurfer\ministruts\strRightFrom;
 use function rosasurfer\ministruts\strStartsWithI;
 
+use const rosasurfer\ministruts\EOL_WINDOWS;
+use const rosasurfer\ministruts\WINDOWS;
+
 
 /**
- * Mailer
+ * PHPMailer
  *
- * Mailer factory and abstract base class for mailer implementations.
+ * A mailer sending email using the built-in PHP function mail().
  */
-abstract class Mailer extends CObject {
+class PHPMailer extends CObject {
 
     /** @var scalar[] */
     protected $options;
@@ -32,7 +37,7 @@ abstract class Mailer extends CObject {
     /**
      * Constructor
      *
-     * @param  scalar[] $options [optional] - mailer options (default: none)
+     * @param  mixed[] $options [optional] - mailer configuration
      */
     public function __construct(array $options = []) {
         $this->options = $options;
@@ -48,35 +53,122 @@ abstract class Mailer extends CObject {
 
 
     /**
-     * Create and return a new instance.
-     *
-     * @param  scalar[] $options [optional] - mailer options
-     *
-     * @return Mailer
-     */
-    public static function create(array $options = []) {
-        $class = PHPMailer::class;                          // default mailer
-        if (!empty($options['class'])) {
-            $class = $options['class'];
-        }
-        return new $class($options);
-    }
-
-
-    /**
      * Send an email. Sender and receiver addresses can be specified in simple or full format. The simple format
-     * can be specified with or without angle brackets.  If an empty sender is specified the mail is sent from the
+     * can be specified with or without angle brackets. If an empty sender is specified the mail is sent from the
      * current user.
      *
-     * @param  string   $sender             - mail sender (From:), full format: "FirstName LastName <user@domain.tld>"
+     * @param  ?string  $sender             - mail sender (From:), full format: "FirstName LastName <user@domain.tld>"
      * @param  string   $receiver           - mail receiver (To:), full format: "FirstName LastName <user@domain.tld>"
      * @param  string   $subject            - mail subject
      * @param  string   $message            - mail body
      * @param  string[] $headers [optional] - additional MIME headers (default: none)
      *
-     * @return void
+     * @return bool
      */
-    abstract public function sendMail($sender, $receiver, $subject, $message, array $headers = []);
+    public function sendMail($sender, $receiver, $subject, $message, array $headers = []) {
+        // delay sending to the script's shutdown if configured (e.g. as not to block other tasks)
+        if (!empty($this->options['send-later'])) {
+            return $this->sendLater($sender, $receiver, $subject, $message, $headers);
+        }
+        /** @var Config $config */
+        $config = $this->di('config');
+
+        // first validate the additional headers
+        foreach ($headers as $i => $header) {
+            Assert::string($header, '$headers['.$i.']');
+            if (!preg_match('/^[a-z]+(-[a-z]+)*:/i', $header)) {
+                throw new InvalidValueException('Invalid parameter $headers['.$i.']: "'.$header.'"');
+            }
+        }
+
+        // auto-complete sender if not specified
+        if (!isset($sender)) {
+            $sender = $config->get('mail.from', ini_get('sendmail_from'));
+            if (!strlen($sender)) {
+                $sender = strtolower(get_current_user().'@'.$this->hostName);
+            }
+        }
+
+        // Return-Path: (invisible sender)
+        Assert::string($sender, '$sender');
+        $returnPath = self::parseAddress($sender);
+        if (!$returnPath)                  throw new InvalidValueException('Invalid parameter $sender: '.$sender);
+        $value = $this->removeHeader($headers, 'Return-Path');
+        if (strlen($value)) {
+            $returnPath = self::parseAddress($value);
+            if (!$returnPath)              throw new InvalidValueException('Invalid header "Return-Path: '.$value.'"');
+        }
+
+        // From: (visible sender)
+        $from = self::parseAddress($sender);
+        if (!$from)                        throw new InvalidValueException('Invalid parameter $sender: '.$sender);
+        $value = $this->removeHeader($headers, 'From');
+        if (strlen($value)) {
+            $from = self::parseAddress($value);
+            if (!$from)                    throw new InvalidValueException('Invalid header "From: '.$value.'"');
+        }
+        $from = $this->encodeNonAsciiChars($from);
+
+        // RCPT: (receiving mailbox)
+        Assert::string($receiver, '$receiver');
+        $rcpt = self::parseAddress($receiver);
+        if (!$rcpt)                        throw new InvalidValueException('Invalid parameter $receiver: '.$receiver);
+        $forced = $config->get('mail.forced-receiver', '');
+        Assert::string($forced, 'config value "mail.forced-receiver"');
+        if (strlen($forced)) {
+            $rcpt = self::parseAddress($forced);
+            if (!$rcpt)                    throw new InvalidValueException('Invalid config value "mail.forced-receiver": '.$forced);
+        }
+
+        // To: (visible receiver)
+        $to = self::parseAddress($receiver);
+        if (!$to)                          throw new InvalidValueException('Invalid parameter $receiver: '.$receiver);
+        $value = $this->removeHeader($headers, 'To');
+        if (strlen($value)) {
+            $to = self::parseAddress($value);
+            if (!$to)                      throw new InvalidValueException('Invalid header "To: '.$value.'"');
+        }
+        $to = $this->encodeNonAsciiChars($to);
+
+        // Subject:
+        Assert::string($subject, '$subject');
+        $subject = $this->encodeNonAsciiChars(trim($subject));
+
+        // encode remaining headers (must be ASCII chars only)
+        foreach ($headers as $i => &$header) {
+            $pattern = '/^([a-z]+(?:-[a-z]+)*): *(.*)/i';
+            $match = null;
+            if (!preg_match($pattern, $header, $match)) throw new InvalidValueException('Invalid parameter $headers['.$i.']: "'.$header.'"');
+            $name   = $match[1];
+            $value  = $this->encodeNonAsciiChars(trim($match[2]));
+            $header = $name.': '.$value;
+        }
+        unset($header);
+
+        // add more needed headers
+        $headers[] = 'X-Mailer: Microsoft Office Outlook 11';               // save us from Hotmail junk folder
+        $headers[] = 'X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2900.2180';
+        $headers[] = 'Content-Type: text/plain; charset=utf-8';             // ASCII is a subset of UTF-8
+        $headers[] = 'From: '.trim($from['name'].' <'.$from['address'].'>');
+        if ($rcpt != $to)                                                   // on Linux mail() always adds another "To:" header (same as RCPT),
+            $headers[] = 'To: '.trim($to['name'].' <'.$to['address'].'>');  // on Windows only if $headers is missing one
+
+        // mail body
+        Assert::string($message, '$message');
+        $message = str_replace(chr(0), '\0', $message);                     // replace NUL bytes which destroy the mail
+        $message = normalizeEOL($message, EOL_WINDOWS);                     // multiple lines must be separated by CRLF
+
+        // TODO: wrap long lines into several shorter ones                  // max 998 chars per RFC but e.g. FastMail only accepts 990
+                                                                            // @see https://tools.ietf.org/html/rfc2822 see 2.1 General description
+        $oldSendmail_from = ini_get('sendmail_from');
+        WINDOWS && PHP::ini_set('sendmail_from', $returnPath['address']);
+        $receiver = trim($rcpt['name'].' <'.$rcpt['address'].'>');
+
+        mail($receiver, $subject, $message, join(EOL_WINDOWS, $headers), '-f '.$returnPath['address']);
+
+        WINDOWS && PHP::ini_set('sendmail_from', $oldSendmail_from);
+        return true;
+    }
 
 
     /**
@@ -118,7 +210,7 @@ abstract class Mailer extends CObject {
      *
      * @return ?string[] - aray with name and address part or NULL if the specified address is invalid
      */
-    public static function parseAddress($value) {
+    public function parseAddress($value) {
         Assert::string($value);
         $value = trim($value);
 
@@ -160,15 +252,16 @@ abstract class Mailer extends CObject {
         // reversely iterate over the array to find the last of duplicate headers
         for (end($headers); key($headers)!==null; prev($headers)){
             $header = current($headers);
-            if (strStartsWithI($header, $name.':'))
+            if (strStartsWithI($header, $name.':')) {
                 return trim(substr($header, strlen($name)+1));
+            }
         }
         return null;
     }
 
 
     /**
-     * Remove a given header from the array and return its value. If the array contains multiple headers of that name
+     * Remove the given header from the array and return its value. If the array contains multiple headers of that name
      * all such headers are removed and the last removed one is returned.
      *
      * @param  string[] $headers - reference to an array of headers
