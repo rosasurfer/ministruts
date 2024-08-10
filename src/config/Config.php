@@ -58,10 +58,10 @@ class Config extends CObject implements ConfigInterface {
 
 
     /** @var array<string, bool> - config file names and their existence status */
-    protected $files = [];
+    protected array $files = [];
 
     /** @var array<string, mixed> - tree structure of config values */
-    protected $properties = [];
+    protected array $properties = [];
 
 
     /**
@@ -70,23 +70,24 @@ class Config extends CObject implements ConfigInterface {
      * Create a new instance and load the specified property files. Settings of all files are merged, later settings
      * override earlier (already existing) ones.
      *
-     * @param  string|string[] $files - a single or multiple configuration file names
+     * @param  string[] $files - one or more configuration file names
      */
-    public function __construct($files) {
-        if (is_string($files)) $files = [$files];
-        else Assert::isArray($files);
-
+    public function __construct(array $files) {
         $this->files = [];
 
         // check and load existing files
         foreach ($files as $i => $file) {
-            Assert::string($file, '$files['.$i.']');
+            Assert::string($file, "\$files[$i]");
 
-            $isFile = is_file($file);
-            if      ($isFile)               $file = realpath($file);
-            else if (isRelativePath($file)) $file = getcwd().PATH_SEPARATOR.$file;
-
-            $this->files[$file] = $isFile && $this->loadFile($file);
+            $success = false;
+            if (is_file($file)) {
+                $file = realpath($file);
+                $success = $this->loadFile($file);
+            }
+            elseif (isRelativePath($file)) {
+                $file = getcwd().PATH_SEPARATOR.$file;
+            }
+            $this->files[$file] = $success;
         }
     }
 
@@ -107,7 +108,7 @@ class Config extends CObject implements ConfigInterface {
      *                            for all non-custom configuration files.
      * @return static
      */
-    public static function createFrom($location) {
+    public static function createFrom(string $location): self {
         Assert::string($location);
 
         // collect applicable config files
@@ -157,7 +158,7 @@ class Config extends CObject implements ConfigInterface {
      *
      * @return bool - success status
      */
-    protected function loadFile($filename) {
+    protected function loadFile(string $filename): bool {
         $lines = file($filename, FILE_IGNORE_NEW_LINES);            // don't use FILE_SKIP_EMPTY_LINES to have correct line
                                                                     // numbers for error messages
         if ($lines && strStartsWith($lines[0], "\xEF\xBB\xBF")) {
@@ -202,10 +203,10 @@ class Config extends CObject implements ConfigInterface {
      *
      * @return string - line comment or an empty string if the line has no comment
      */
-    private function getLineComment($value) {
+    private function getLineComment(string $value): string {
         error_clear_last();
         $tokens = token_get_all('<?php '.$value);
-        $error  = error_get_last();
+        $error = error_get_last();
 
         // Don't use trigger_error() as it will enter an infinite loop if the same config is accessed again.
         if ($error && !strStartsWith($error['message'], 'Unterminated comment starting line')) {                // that's /*...
@@ -214,25 +215,24 @@ class Config extends CObject implements ConfigInterface {
 
         $lastToken = end($tokens);
 
-        if (!is_array($lastToken) || token_name($lastToken[0])!='T_COMMENT')
+        if (!is_array($lastToken) || token_name($lastToken[0])!='T_COMMENT') {
             return '';
-
+        }
         $comment = $lastToken[1];
-        if ($comment[0] == '#')
+        if ($comment[0] == '#') {
             return $comment;
-
-        return $this->{__FUNCTION__}(substr($comment, 1));
+        }
+        return $this->getLineComment(substr($comment, 1));
     }
 
 
     /**
-     * Return the names of the monitored configuration files. The resulting array will contain names of existing and (still)
-     * non-existing files.
+     * Return the names of the monitored configuration files. The returned array will contain
+     * names of existing and non-existing files, together with their status (loaded/not loaded).
      *
-     * @return bool[] - array with elements "file-name" => (bool)status or an empty array if the configuration is not
-     *                  based on files
+     * @return array<string, bool>
      */
-    public function getMonitoredFiles() {
+    public function getMonitoredFiles(): array {
         return $this->files;
     }
 
@@ -245,15 +245,12 @@ class Config extends CObject implements ConfigInterface {
      *
      * @return mixed - config setting
      */
-    public function get($key, $default = null) {
-        Assert::string($key, '$key');
-        // TODO: a numerically indexed property array will have integer keys
-
+    public function get(string $key, $default = null) {
         $notFound = false;
         $value = $this->getProperty($key, $notFound);
 
         if ($notFound) {
-            if (func_num_args() == 1) throw new RuntimeException('No configuration found for key "'.$key.'"');
+            if (func_num_args() == 1) throw new RuntimeException("No configuration found for key \"$key\"");
             return $default;
         }
         return $value;
@@ -275,7 +272,7 @@ class Config extends CObject implements ConfigInterface {
      *
      * @throws RuntimeException if the setting is not found and no default value was specified
      */
-    public function getBool(string $key, ?bool $default = false, bool $strict = false) {
+    public function getBool(string $key, ?bool $default=false, bool $strict=false): ?bool {
         $notFound = false;
         $value = $this->getProperty($key, $notFound);
 
@@ -307,8 +304,7 @@ class Config extends CObject implements ConfigInterface {
      *
      * @return $this
      */
-    public function set($key, $value) {
-        Assert::string($key, '$key');
+    public function set(string $key, $value): self {
         $this->setProperty($key, $value);
         return $this;
     }
@@ -323,7 +319,7 @@ class Config extends CObject implements ConfigInterface {
      * @return mixed - Property value (including NULL) or NULL if no such property was found. If NULL is returned the flag
      *                 $notFound must be checked to find out whether the property was found.
      */
-    protected function getProperty($key, &$notFound) {
+    protected function getProperty(string $key, bool &$notFound) {
         $properties  = $this->properties;
         $subkeys     = $this->parseSubkeys(strtolower($key));
         $subKeysSize = sizeof($subkeys);
@@ -331,10 +327,12 @@ class Config extends CObject implements ConfigInterface {
 
         for ($i=0; $i < $subKeysSize; ++$i) {
             $subkey = trim($subkeys[$i]);
-            if (!is_array($properties) || !\key_exists($subkey, $properties))
+            if (!is_array($properties) || !\key_exists($subkey, $properties)) {
                 break;                                      // not found
-            if ($i+1 == $subKeysSize)                       // return at the last subkey
-                return $properties[$subkey];
+            }
+            if ($i+1 == $subKeysSize) {
+                return $properties[$subkey];                // return at the last subkey
+            }
             $properties = $properties[$subkey];             // go to the next sublevel
         }
 
@@ -351,26 +349,26 @@ class Config extends CObject implements ConfigInterface {
      *
      * @return void
      */
-    protected function setProperty($key, $value) {
+    protected function setProperty(string $key, $value): void {
         // convert string representations of special values
         if (is_string($value)) {
             switch (strtolower($value)) {
-                case  'null' :
+                case 'null':
                 case '(null)':
                     $value = null;
                     break;
 
-                case  'true' :
+                case 'true':
                 case '(true)':
-                case  'on'   :
-                case  'yes'  :
+                case 'on':
+                case 'yes':
                     $value = true;
                     break;
 
-                case  'false' :
+                case 'false':
                 case '(false)':
-                case  'off'   :
-                case  'no'    :
+                case 'off':
+                case 'no':
                     $value = false;
                     break;
 
@@ -382,13 +380,13 @@ class Config extends CObject implements ConfigInterface {
         }
 
         // set the property depending on the existing data structure
-        $properties  = &$this->properties;
-        $subkeys     =  $this->parseSubkeys(strtolower($key));
-        $subkeysSize =  sizeof($subkeys);
+        $properties = &$this->properties;
+        $subkeys = $this->parseSubkeys(strtolower($key));
+        $subkeysSize = sizeof($subkeys);
 
         for ($i=0; $i < $subkeysSize; ++$i) {
             $subkey = trim($subkeys[$i]);
-            if (!strlen($subkey)) throw new InvalidValueException('Invalid parameter $key: '.$key);
+            if (!strlen($subkey)) throw new InvalidValueException("Invalid parameter \$key: $key");
 
             if ($i+1 < $subkeysSize) {
                 // not yet the last subkey
@@ -410,8 +408,9 @@ class Config extends CObject implements ConfigInterface {
                         $properties[$subkey] = [$value];                    // create a new array value
                     }
                     else {
-                        if (!is_array($properties[$subkey]))                // make the existing value the array root value
+                        if (!is_array($properties[$subkey])) {              // make the existing value the array root value
                             $properties[$subkey] = ['' => $properties[$subkey]];
+                        }
                         $properties[$subkey][] = $value;                    // add an array value
                     }
                 }
@@ -449,9 +448,9 @@ class Config extends CObject implements ConfigInterface {
      *
      * @return string[] - array of subkeys
      */
-    protected function parseSubkeys($key) {
-        $k          = $key;
-        $subkeys    = [];
+    protected function parseSubkeys(string $key): array {
+        $k = $key;
+        $subkeys = [];
         $quoteChars = ["'", '"'];                       // single and double quotes
 
         while (true) {
@@ -460,12 +459,12 @@ class Config extends CObject implements ConfigInterface {
             foreach ($quoteChars as $char) {
                 if (strpos($k, $char) === 0) {          // subkey starts with a quote char
                     $pos = strpos($k, $char, 1);        // find the ending quote char
-                    if ($pos === false) throw new InvalidValueException('Invalid parameter $key: '.$key);
+                    if ($pos === false) throw new InvalidValueException("Invalid parameter \$key: $key");
                     $subkeys[] = substr($k, 1, $pos-1);
-                    $k         = trim(substr($k, $pos+1));
-                    if (!strlen($k))                    // last subkey or next char is a key separator
-                        break 2;
-                    if (strpos($k, '.') !== 0) throw new InvalidValueException('Invalid parameter $key: '.$key);
+                    $k = trim(substr($k, $pos+1));
+                    if (!strlen($k)) break 2;           // last subkey or next char is a key separator
+
+                    if (strpos($k, '.') !== 0) throw new InvalidValueException("Invalid parameter \$key: $key");
                     $k = substr($k, 1);
                     continue 2;
                 }
@@ -478,7 +477,7 @@ class Config extends CObject implements ConfigInterface {
                 break;
             }
             $subkeys[] = trim(substr($k, 0, $pos));
-            $k         = substr($k, $pos+1);            // next subkey
+            $k = substr($k, $pos+1);                    // next subkey
         }
         return $subkeys;
     }
@@ -487,9 +486,11 @@ class Config extends CObject implements ConfigInterface {
     /**
      * {@inheritdoc}
      *
+     * @param  array<string, int|string> $options [optional]
+     *
      * @return string
      */
-    public function dump(array $options = []) {
+    public function dump(array $options = []): string {
         $lines = [];
         $maxKeyLength = 0;
         $values = $this->dumpNode([], $this->properties, $maxKeyLength);
@@ -509,24 +510,25 @@ class Config extends CObject implements ConfigInterface {
             elseif (is_bool($value)) $value = ($value ? '(true)' : '(false)');
             elseif (is_string($value)) {
                 switch (strtolower($value)) {
-                    case  'null'  :
-                    case '(null)' :
-                    case  'true'  :
-                    case '(true)' :
-                    case  'false' :
+                    case 'null':
+                    case '(null)':
+                    case 'true':
+                    case '(true)':
+                    case 'false':
                     case '(false)':
-                    case  'on'    :
-                    case  'off'   :
-                    case  'yes'   :
-                    case  'no'    :
-                        $value = '"'.$value.'"';
+                    case 'on':
+                    case 'off':
+                    case 'yes':
+                    case 'no':
+                        $value = "\"$value\"";
                         break;
                     default:
-                        if (strContains($value, '#'))
-                            $value = '"'.$value.'"';
+                        if (strContains($value, '#')) {
+                            $value = "\"$value\"";
+                        }
                 }
             }
-            $value = str_pad($key, $maxKeyLength, ' ', STR_PAD_RIGHT).' = '.$value;
+            $value = str_pad($key, $maxKeyLength, ' ', STR_PAD_RIGHT)." = $value";
         }
         unset($value);
         $lines += $values;
@@ -546,7 +548,7 @@ class Config extends CObject implements ConfigInterface {
      *
      * @return array<string, ?scalar>
      */
-    private function dumpNode(array $node, array $values, &$maxKeyLength) {
+    private function dumpNode(array $node, array $values, int &$maxKeyLength): array {
         $result = [];
 
         foreach ($values as $subkey => $value) {
@@ -554,13 +556,13 @@ class Config extends CObject implements ConfigInterface {
                 $sSubkey = $subkey;
             }
             else {
-                $sSubkey = '"'.$subkey.'"';
+                $sSubkey = "\"$subkey\"";
             }
-            $key          = join('.', \array_merge($node, $sSubkey=='' ? [] : [$sSubkey]));
+            $key = join('.', \array_merge($node, $sSubkey=='' ? [] : [$sSubkey]));
             $maxKeyLength = max(strlen($key), $maxKeyLength);
 
-            if (is_array($value)) {
-                $result += $this->{__FUNCTION__}(\array_merge($node, [$subkey]), $value, $maxKeyLength);
+            if (is_array($value)) {             // recursion
+                $result += $this->dumpNode(\array_merge($node, [$subkey]), $value, $maxKeyLength);
             }
             else {
                 $result[$key] = $value;
@@ -574,9 +576,11 @@ class Config extends CObject implements ConfigInterface {
     /**
      * {@inheritdoc}
      *
+     * @param  array<string, int> $options [optional]
+     *
      * @return array<string, string>
      */
-    public function export(array $options = []) {
+    public function export(array $options = []): array {
         $maxKeyLength = null;
         $values = $this->dumpNode([], $this->properties, $maxKeyLength);
 
@@ -595,21 +599,21 @@ class Config extends CObject implements ConfigInterface {
             elseif (is_bool($value)) $value = ($value ? '(true)' : '(false)');
             elseif (is_string($value)) {
                 switch (strtolower($value)) {
-                    case  'null'  :
-                    case '(null)' :
-                    case  'true'  :
-                    case '(true)' :
-                    case  'false' :
+                    case 'null':
+                    case '(null)':
+                    case 'true':
+                    case '(true)':
+                    case 'false':
                     case '(false)':
-                    case  'on'    :
-                    case  'off'   :
-                    case  'yes'   :
-                    case  'no'    :
-                        $value = '"'.$value.'"';
+                    case 'on':
+                    case 'off':
+                    case 'yes':
+                    case 'no':
+                        $value = "\"$value\"";
                         break;
                     default:
                         if (strContains($value, '#')) {
-                            $value = '"'.$value.'"';
+                            $value = "\"$value\"";
                         }
                 }
             }
@@ -627,11 +631,9 @@ class Config extends CObject implements ConfigInterface {
      *
      * @return bool
      */
-    public function offsetExists($key) {
-        Assert::string($key);
+    public function offsetExists($key): bool {
         $notFound = false;
         $this->getProperty($key, $notFound);
-
         return !$notFound;
     }
 
@@ -668,8 +670,10 @@ class Config extends CObject implements ConfigInterface {
      * Unset the config setting with the specified key.
      *
      * @param  string $key - case-insensitive key
+     *
+     * @return void
      */
-    public function offsetUnset($key) {
+    public function offsetUnset($key): void {
         $this->set($key, null);
     }
 
@@ -679,7 +683,7 @@ class Config extends CObject implements ConfigInterface {
      *
      * @return int
      */
-    public function count() {
+    public function count(): int {
         return sizeof($this->properties);
     }
 }

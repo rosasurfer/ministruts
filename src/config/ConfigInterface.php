@@ -24,7 +24,7 @@ interface ConfigInterface extends \ArrayAccess, \Countable {
      *
      * @throws RuntimeException if the setting is not found and no default value was specified
      */
-    public function get($key, $default = null);
+    public function get(string $key, $default = null);
 
 
     /**
@@ -42,7 +42,7 @@ interface ConfigInterface extends \ArrayAccess, \Countable {
      *
      * @throws RuntimeException if the setting is not found and no default value was specified
      */
-    public function getBool(string $key, ?bool $default = false, bool $strict = false);
+    public function getBool(string $key, ?bool $default=false, bool $strict=false): ?bool;
 
 
     /**
@@ -53,7 +53,7 @@ interface ConfigInterface extends \ArrayAccess, \Countable {
      *
      * @return $this
      */
-    public function set($key, $value);
+    public function set(string $key, $value): self;
 
 
     /**
@@ -64,7 +64,7 @@ interface ConfigInterface extends \ArrayAccess, \Countable {
      *                                                         'pad-left' => string (default: no padding)                <br>
      * @return string
      */
-    public function dump(array $options = []);
+    public function dump(array $options = []): string;
 
 
     /**
@@ -74,5 +74,5 @@ interface ConfigInterface extends \ArrayAccess, \Countable {
      *                                                  'sort' => int: SORT_ASC|SORT_DESC (default: unsorted) <br>
      * @return array<string, string>
      */
-    public function export(array $options = []);
+    public function export(array $options = []): array;
 }
