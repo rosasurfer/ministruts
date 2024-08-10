@@ -11,13 +11,12 @@ use rosasurfer\ministruts\core\di\DiInterface as Di;
 use rosasurfer\ministruts\core\di\auto\CliServiceContainer;
 use rosasurfer\ministruts\core\di\auto\WebServiceContainer;
 use rosasurfer\ministruts\core\error\ErrorHandler;
+use rosasurfer\ministruts\core\exception\IllegalStateException;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\log\Logger;
 use rosasurfer\ministruts\struts\FrontController;
 use rosasurfer\ministruts\struts\Response;
 use rosasurfer\ministruts\util\PHP;
-use rosasurfer\ministruts\core\exception\IllegalStateException;
-use rosasurfer\ministruts\core\exception\InvalidTypeException;
 
 
 /**
@@ -38,7 +37,7 @@ class Application extends CObject {
     protected static $di = null;
 
     /** @var Command[] - registered CLI commands */
-    private $commands;
+    private array $commands;
 
 
     /**
@@ -97,7 +96,7 @@ class Application extends CObject {
      *
      * @return $this
      */
-    public function addCommand(Command $command) {
+    public function addCommand(Command $command): self {
         $this->commands[$command->getName()] = $command;
         $command->freeze();
         return $this;
@@ -134,13 +133,13 @@ class Application extends CObject {
      *
      * @return void
      */
-    protected function initErrorHandling($level, $mode) {
+    protected function initErrorHandling($level, $mode): void {
         if (is_string($level)) {
-            if (!strIsDigits($level)) throw new InvalidValueException('Invalid parameter $level: "'.$level.'" (not numeric)');
+            if (!strIsDigits($level)) throw new InvalidValueException("Invalid parameter \$level: \"$level\" (not numeric)");
             $level = (int)$level;
         }
-        if (!is_int($level))   throw new InvalidTypeException('Invalid type of parameter $level: '.gettype($level).' (numeric expected)');
-        if (!is_string($mode)) throw new InvalidTypeException('Invalid type of parameter $mode: '.gettype($mode).' (string expected)');
+        Assert::int($level, '$level');
+        Assert::string($mode, '$mode');
 
         switch ($mode) {
             case 'ignore':    $iMode = ErrorHandler::MODE_IGNORE;    break;
@@ -149,7 +148,6 @@ class Application extends CObject {
             default:
                 throw new InvalidValueException('Invalid parameter $mode: "'.$mode.'"');
         }
-
         ErrorHandler::setupErrorHandling($level, $iMode);
     }
 
@@ -161,7 +159,7 @@ class Application extends CObject {
      *
      * @return Config
      */
-    protected function initConfig(array $options) {
+    protected function initConfig(array $options): Config {
         $config = Config::createFrom($options['app.dir.config'] ?? getcwd());
         $this->setConfig($config);
         unset($options['app.dir.config']);
@@ -183,13 +181,13 @@ class Application extends CObject {
 
 
     /**
-     * Load and initialize the service container.
+     * Load and initialize the dependency/service container.
      *
      * @param  string $directory - directory with service configurations
      *
      * @return Di
      */
-    protected function initDi($directory) {
+    protected function initDi(string $directory): Di {
         $class = CLI ? CliServiceContainer::class : WebServiceContainer::class;
         $di = new $class($directory);
         $this->setDi($di);
@@ -202,11 +200,11 @@ class Application extends CObject {
      *
      * @return void
      */
-    protected function configure() {
+    protected function configure(): void {
         $config = self::$config;
         if (!$config) return;
 
-        // ensure we have an "app.id"
+        // ensure that we have an "app.id"
         $appId = $config->get('app.id', null);
         if (!$appId) $config->set('app.id', substr(md5($config['app.dir.root']), 0, 16));
 
@@ -222,7 +220,7 @@ class Application extends CObject {
         }
 
         // log excessive memory consumption
-        register_shutdown_function(function() {
+        register_shutdown_function(static function() {
             if (!self::$config) return;
 
             $warnLimit = php_byte_value(self::$config->get('log.warn.memory_limit', PHP_INT_MAX));
@@ -258,9 +256,9 @@ class Application extends CObject {
      *
      * @return void
      */
-    protected function checkAdminTasks() {
+    protected function checkAdminTasks(): void {
         // __phpinfo__             : show the PHP configuration
-        // __config__ + __phpinfo__: show the PHP and the application configuration
+        // __config__ + __phpinfo__: show the application configuration followed by the PHP configuration
         // __cache__               : show the cache admin interface
         $cacheInfoTask  = isset($_GET['__cache__'  ]);
         $phpInfoTask    = isset($_GET['__phpinfo__']) && !$cacheInfoTask;   // the cache task can't be combined with any other task
@@ -322,9 +320,8 @@ class Application extends CObject {
      *
      * @return void
      */
-    protected function expandAppDirs(Config $config, $rootDir) {
-        Assert::string($rootDir, '$rootDir');
-        if (!strlen($rootDir) || isRelativePath($rootDir)) throw new InvalidValueException('Invalid config option "app.dir.root": "'.$rootDir.'" (not an absolute path)');
+    protected function expandAppDirs(Config $config, string $rootDir): void {
+        if (!strlen($rootDir) || isRelativePath($rootDir)) throw new InvalidValueException("Invalid config option \"app.dir.root\" = \"$rootDir\" (not an absolute path)");
 
         $rootDir = rtrim(str_replace('\\', '/', $rootDir), '/');
         $dirs = $config->get('app.dir', []);
@@ -340,16 +337,18 @@ class Application extends CObject {
      * @param  string[]|string[][] $dirs    - reference to an array of absolute or relative directory names
      * @param  string              $rootDir - application root directory
      *
-     * @return void
+     * @return void - the passed array is modified
      */
-    protected function expandDirsRecursive(array &$dirs, $rootDir) {
+    protected function expandDirsRecursive(array &$dirs, string $rootDir): void {
         foreach ($dirs as &$dir) {
             if (is_array($dir)) {
-                $this->{__FUNCTION__}($dir, $rootDir);
+                $this->expandDirsRecursive($dir, $rootDir);
                 continue;
             }
-            if (isRelativePath($dir))
-                $dir = $rootDir.'/'.$dir;
+            Assert::string($dir, '$dir');
+            if (isRelativePath($dir)) {
+                $dir = "$rootDir/$dir";
+            }
             if (is_dir($dir)) $dir = realpath($dir);
         }
         unset($dir);
@@ -363,7 +362,7 @@ class Application extends CObject {
      *
      * @return $this
      */
-    protected function setConfig(Config $configuration) {
+    protected function setConfig(Config $configuration): self {
         $previous = self::$config;
         self::$config = $configuration;
 
@@ -375,13 +374,13 @@ class Application extends CObject {
 
 
     /**
-     * Set the {@link Application}s service container.
+     * Set the {@link Application}s dependency/service container.
      *
      * @param  Di $di
      *
      * @return $this
      */
-    protected function setDi(Di $di) {
+    protected function setDi(Di $di): self {
         $previous = self::$di;
 
         if (!$di->has('app')) {
@@ -396,19 +395,19 @@ class Application extends CObject {
 
 
     /**
-     * Return the {@link Application}'s service container. This method should be used to access the application's
-     * service container from a non-class context (i.e. from procedural code).
+     * Return the {@link Application}'s dependency/service container. This method should be used to access
+     * the container from a non-class context (i.e. from procedural code).
      *
      * @return Di
      */
-    public static function getDi() {
+    public static function getDi(): Di {
         return self::$di;
     }
 
 
     /**
-     * Whether the current remote IP address is white-listed for admin access. 127.0.0.1 and the web server's IP
-     * address are always white-listed. More IP addresses can be white-listed via configuration.
+     * Whether the current remote IP is white-listed for admin access. 127.0.0.1 and the server's own IP
+     * are always white-listed. More IP addresses can be white-listed via configuration.
      *
      * @return bool
      *
@@ -420,7 +419,7 @@ class Application extends CObject {
      *  admin.ip-whitelist.another-name = <ip-address>
      * </pre>
      */
-    public static function isAdminIP() {
+    public static function isAdminIP(): bool {
         if (!isset($_SERVER['REMOTE_ADDR'])) {
             return false;
         }
