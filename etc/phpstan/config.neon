@@ -10,7 +10,10 @@ parameters:
   level:      7                                     # a rule level on the command line overrides this hardcoded value
 
   bootstrapFiles:                                   # API stubs of unloaded PHP extensions
-    - stubs.php
+    - symbols.php
+
+  stubFiles:
+    - stubs/test.stub
 
   scanFiles:                                        # additional non-autoloaded files to scan for symbols
 

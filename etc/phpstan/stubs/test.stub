@@ -1,0 +1,10 @@
+<?php
+declare(strict_types=1);
+
+
+/**
+ * @param  string $path
+ *
+ * @return string
+ */
+function realpath(string $path): string {}
