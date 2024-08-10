@@ -407,7 +407,7 @@ PROCESS_METHOD_ERROR_SC_405;
             if (isset(parse_url($path)['host'])) {                  // an external URI
                 $url = $path;
             }
-            else if ($path[0] == '/') {                             // an application-relative URI
+            elseif ($path[0] == '/') {                              // an application-relative URI
                 $appUri = $request->getApplicationBaseUri();
                 $url = $appUri.ltrim($path, '/');
             }

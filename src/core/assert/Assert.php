@@ -165,10 +165,10 @@ class Assert extends StaticClass {
      */
     public static function hasMethod($objectOrClass, $method, $message = '', ...$args) {
         if (!method_exists($objectOrClass, $method)) {
-            if      (is_string($objectOrClass)) $value = $objectOrClass;
-            else if (is_object($objectOrClass)) $value = get_class($objectOrClass);
-            else                                $value = static::valueToStr($objectOrClass);
-            throw new InvalidTypeException(static::illegalTypeMessage($value, 'object or class with method "'.$method.'"()', $message, $args));
+            if     (is_string($objectOrClass)) $value = $objectOrClass;
+            elseif (is_object($objectOrClass)) $value = get_class($objectOrClass);
+            else                               $value = static::valueToStr($objectOrClass);
+            throw new InvalidTypeException(static::illegalTypeMessage($value, "object or class with method \"$method()\"", $message, $args));
         }
         return true;
     }

@@ -467,9 +467,9 @@ class DocoptParser extends CObject {
             if ($o->argcount == 0) {
                 if (isset($value)) throw new $tokenError($o->long.' must not have an argument');
             }
-            else if ($value === null) {
-                if ($tokens->current()===null || $tokens->current()=='--')      // @phpstan-ignore identical.alwaysFalse (refactor using iterator->valid())
-                    throw new $tokenError($o->long.' requires an argument');
+            elseif ($value === null) {
+                // @phpstan-ignore identical.alwaysFalse (refactor using iterator->valid())
+                if ($tokens->current()===null || $tokens->current()=='--') throw new $tokenError($o->long.' requires an argument');
                 $value = $tokens->move();
             }
             if ($tokens->getTokenError() == DocoptUserNotification::class) {

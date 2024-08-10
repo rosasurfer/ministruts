@@ -476,11 +476,12 @@ class MySQLConnector extends Connector {
     public function commit() {
         if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
 
-        if      (!$this->isConnected())    trigger_error('Not connected', E_USER_WARNING);
-        else if (!$this->transactionLevel) trigger_error('No database transaction to commit', E_USER_WARNING);
+        if     (!$this->isConnected())    trigger_error('Not connected', E_USER_WARNING);
+        elseif (!$this->transactionLevel) trigger_error('No database transaction to commit', E_USER_WARNING);
         else {
-            if ($this->transactionLevel == 1)
+            if ($this->transactionLevel == 1) {
                 $this->execute('commit');
+            }
             $this->transactionLevel--;
         }
         return $this;
@@ -496,11 +497,12 @@ class MySQLConnector extends Connector {
     public function rollback() {
         if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
 
-        if      (!$this->isConnected())    trigger_error('Not connected', E_USER_WARNING);
-        else if (!$this->transactionLevel) trigger_error('No database transaction to roll back', E_USER_WARNING);
+        if     (!$this->isConnected())    trigger_error('Not connected', E_USER_WARNING);
+        elseif (!$this->transactionLevel) trigger_error('No database transaction to roll back', E_USER_WARNING);
         else {
-            if ($this->transactionLevel == 1)
+            if ($this->transactionLevel == 1) {
                 $this->execute('rollback');
+            }
             $this->transactionLevel--;
         }
         return $this;

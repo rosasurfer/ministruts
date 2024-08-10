@@ -215,7 +215,7 @@ class Module extends CObject {
             if ($namespace == '\\') {           // that's again the global namespace
                 $namespace = '';
             }
-            else if (strlen($namespace)) {
+            elseif (strlen($namespace)) {
                 if (!$this->isValidNamespace($namespace)) throw new StrutsConfigException('<struts-config namespace="'.$xml['namespace'].'": Invalid module namespace');
                 if (strStartsWith($namespace, '\\')) $namespace  = substr($namespace, 1);
                 if (!strEndsWith($namespace, '\\'))  $namespace .= '\\';
@@ -413,7 +413,7 @@ class Module extends CObject {
                 $forward = new $this->forwardClass('generic', $redirect, true, $redirectType);
                 $mapping->setForward($forward);
             }
-            else if (isset($tag['redirect-type'])) throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'": The "redirect" attribute must be specified if "redirect-type" is defined.');
+            elseif (isset($tag['redirect-type'])) throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'": The "redirect" attribute must be specified if "redirect-type" is defined.');
 
             // attribute forward="%LogicalName" #IMPLIED
             if (isset($tag['forward'])) {
@@ -593,7 +593,7 @@ class Module extends CObject {
                 if ($namespace == '\\') {
                     $namespace = '';
                 }
-                else if (strlen($namespace)) {
+                elseif (strlen($namespace)) {
                     if (!$this->isValidNamespace($namespace)) throw new StrutsConfigException('<tiles namespace="'.$tiles['namespace'].'": Invalid namespace');
                     if (strStartsWith($namespace, '\\')) $namespace  = substr($namespace, 1);
                     if (!strEndsWith($namespace, '\\'))  $namespace .= '\\';

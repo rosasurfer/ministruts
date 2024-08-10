@@ -196,21 +196,21 @@ class PostgresConnector extends Connector {
             $port        = pg_port($this->hConnection);
             $db          = pg_dbname($this->hConnection);
             $path        = $this->getSchemaSearchPath();
-            $description = $host.':'.$port.'/'.$db.' (schema search path: '.$path.')';
+            $description = "$host:$port/$db (schema search path: $path)";
         }
         else {
-            if      (isset($options['hostaddr'])) $host = $options['hostaddr'];
-            else if (isset($options['host'    ])) $host = $options['host'    ];
-            else                                  $host = '';
+            if     (isset($options['hostaddr'])) $host = $options['hostaddr'];
+            elseif (isset($options['host'    ])) $host = $options['host'    ];
+            else                                 $host = '';
 
-            if (isset($options['port'])) $port = ':'.$options['port'];
+            if (isset($options['port'])) $port = ":$options[port]";
             else                         $port = '';
 
-            if      (isset($options['dbname'])) $db = $options['dbname'];
-            else if (isset($options['user'  ])) $db = $options['user'  ];
-            else                                $db = '';
+            if     (isset($options['dbname'])) $db = $options['dbname'];
+            elseif (isset($options['user'  ])) $db = $options['user'  ];
+            else                               $db = '';
 
-            $description = $host.$port.'/'.$db;
+            $description = "$host$port/$db";
         }
         return $description;
     }
@@ -505,13 +505,14 @@ class PostgresConnector extends Connector {
      * @return $this
      */
     public function commit() {
-        if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
+        if ($this->transactionLevel < 0) throw new RuntimeException("Negative transaction nesting level detected: $this->transactionLevel");
 
-        if      (!$this->isConnected())    trigger_error('Not connected', E_USER_WARNING);
-        else if (!$this->transactionLevel) trigger_error('No database transaction to commit', E_USER_WARNING);
+        if     (!$this->isConnected())    trigger_error('Not connected', E_USER_WARNING);
+        elseif (!$this->transactionLevel) trigger_error('No database transaction to commit', E_USER_WARNING);
         else {
-            if ($this->transactionLevel == 1)
+            if ($this->transactionLevel == 1) {
                 $this->execute('commit');
+            }
             $this->transactionLevel--;
         }
         return $this;
@@ -525,17 +526,18 @@ class PostgresConnector extends Connector {
      * @return $this
      */
     public function rollback() {
-        if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
+        if ($this->transactionLevel < 0) throw new RuntimeException("Negative transaction nesting level detected: $this->transactionLevel");
 
         if (!$this->isConnected()) {
             trigger_error('Not connected', E_USER_WARNING);
         }
-        else if (!$this->transactionLevel) {
+        elseif (!$this->transactionLevel) {
             //trigger_error('No database transaction to roll back', E_USER_WARNING);
         }
         else {
-            if ($this->transactionLevel == 1)
+            if ($this->transactionLevel == 1) {
                 $this->execute('rollback');
+            }
             $this->transactionLevel--;
         }
         return $this;

@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\core\di\service;
 
+use Closure;
+
 use rosasurfer\ministruts\core\exception\ClassNotFoundException;
 
 use function rosasurfer\ministruts\is_class;
@@ -112,8 +114,8 @@ class Service implements ServiceInterface {
             if (!is_class($definition)) throw new ClassNotFoundException('Cannot resolve service "'.$this->name.'" (unknown class "'.$definition.'")');
             $instance = new $definition(...$args);
         }
-        else if (is_object($definition)) {                  // objects may be a \Closure or an already resolved instance
-            $instance = $definition instanceof \Closure ? $definition(...$args) : $definition;
+        elseif (is_object($definition)) {                   // objects may be a Closure or an already resolved instance
+            $instance = $definition instanceof Closure ? $definition(...$args) : $definition;
         }
 
         if (!$factory) {

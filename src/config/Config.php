@@ -118,7 +118,7 @@ class Config extends CObject implements ConfigInterface {
             $configFile = realpath($location);
             $configDir  = dirname($configFile);
         }
-        else if (is_dir($location)) {
+        elseif (is_dir($location)) {
             $configDir = realpath($location);
         }
         else throw new InvalidValueException('Location not found: "'.$location.'"');
@@ -130,9 +130,9 @@ class Config extends CObject implements ConfigInterface {
         if (CLI) $files[] = $configDir.'/config.cli.properties';
 
         // application environment: user or staging configuration
-        if ($configFile)                              $files[] = $configFile;                           // explicit
-        else if (!empty($_SERVER['APP_ENVIRONMENT'])) $files[] = $configDir.'/config.'.$_SERVER['APP_ENVIRONMENT'].'.properties';
-        else                                          $files[] = $configDir.'/config.properties';       // default
+        if ($configFile)                             $files[] = $configFile;                            // explicit
+        elseif (!empty($_SERVER['APP_ENVIRONMENT'])) $files[] = $configDir.'/config.'.$_SERVER['APP_ENVIRONMENT'].'.properties';
+        else                                         $files[] = $configDir.'/config.properties';        // default
 
         // load all files (do not pass a provided $baseDir but apply it manually in the next step)
         $instance = new static($files);
@@ -419,15 +419,15 @@ class Config extends CObject implements ConfigInterface {
                     if (!\key_exists($subkey, $properties)) {
                         $properties[$subkey] = $value;                      // store the value regularily
                     }
-                    else if (!is_array($properties[$subkey])) {
+                    elseif (!is_array($properties[$subkey])) {
                         $properties[$subkey] = $value;                      // override the existing value
                     }
 
                     // modification of an array value
-                    else if ($value === null) {
+                    elseif ($value === null) {
                         $properties[$subkey] = $value;                      // set the array to NULL, don't remove the key
                     }
-                    else if (is_array($value)) {
+                    elseif (is_array($value)) {
                         $properties[$subkey] = $value;                      // replace the array
                     }
                     else {
@@ -499,7 +499,7 @@ class Config extends CObject implements ConfigInterface {
             if ($options['sort'] == SORT_ASC) {
                 ksort($values, SORT_NATURAL);
             }
-            else if ($options['sort'] == SORT_DESC) {
+            elseif ($options['sort'] == SORT_DESC) {
                 krsort($values, SORT_NATURAL);
             }
         }
@@ -588,7 +588,7 @@ class Config extends CObject implements ConfigInterface {
             if ($options['sort'] == SORT_ASC) {
                 ksort($values, SORT_NATURAL);
             }
-            else if ($options['sort'] == SORT_DESC) {
+            elseif ($options['sort'] == SORT_DESC) {
                 krsort($values, SORT_NATURAL);
             }
         }

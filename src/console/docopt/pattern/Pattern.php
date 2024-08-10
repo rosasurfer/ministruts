@@ -172,7 +172,7 @@ abstract class Pattern extends CObject {
                         $groups[] = array_merge([$c], $children);
                     }
                 }
-                else if ($child instanceof OneOrMore) {
+                elseif ($child instanceof OneOrMore) {
                     $groups[] = array_merge($child->children, $child->children, $children);
                 }
                 else {

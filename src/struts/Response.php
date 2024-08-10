@@ -165,9 +165,9 @@ class Response extends Singleton {
             // a query only w/o anchor
             if ($rel[0] == '?') {
                 $query = '?'.$relParts['query'];
-                if      (isset($relParts ['fragment'])) $fragment = '#'.$relParts['fragment'];
-                else if (isset($baseParts['fragment'])) $fragment = '#'.$baseParts['fragment'];
-                else                                    $fragment = '';
+                if     (isset($relParts ['fragment'])) $fragment = "#$relParts[fragment]";
+                elseif (isset($baseParts['fragment'])) $fragment = "#$baseParts[fragment]";
+                else                                   $fragment = '';
                 return strLeftTo($base, '?').$query.$fragment;
             }
 

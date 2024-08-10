@@ -1299,7 +1299,7 @@ function normalizeEOL(string $string, string $mode = EOL_UNIX): string {
     if ($mode==EOL_MAC || $mode==EOL_NETSCAPE || $mode==EOL_WINDOWS) {
         $string = str_replace(EOL_UNIX, $mode, $string);
     }
-    else if ($mode != EOL_UNIX) {
+    elseif ($mode != EOL_UNIX) {
         throw new InvalidValueException("Invalid parameter \$mode: \"$mode\"");
     }
     return $string;
@@ -1324,18 +1324,16 @@ function objectToArray(object $object, int $access = ACCESS_PUBLIC): array {
                 $array[$name] = $value;
             }
         }
-        else if ($name[1] == '*') {                 // protected
+        elseif ($name[1] == '*') {                  // protected
             if ($access & ACCESS_PROTECTED) {
                 $publicName = substr($name, 3);
                 $array[$publicName] = $value;
             }
         }
-        else {                                      // private
-            if ($access & ACCESS_PRIVATE) {
-                $publicName = strRightFrom($name, "\0", 2);
-                if (!\key_exists($publicName, $array)) {
-                    $array[$publicName] = $value;
-                }
+        elseif ($access & ACCESS_PRIVATE) {         // private
+            $publicName = strRightFrom($name, "\0", 2);
+            if (!\key_exists($publicName, $array)) {
+                $array[$publicName] = $value;
             }
         }
     }

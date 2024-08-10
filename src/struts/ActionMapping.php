@@ -423,7 +423,7 @@ class ActionMapping extends CObject {
         if (isset($this->forwards[$name])) {
             $forward = $this->forwards[$name];
         }
-        else if (strCompareI($name, ActionForward::SELF)) {
+        elseif (strCompareI($name, ActionForward::SELF)) {
             $name = ActionForward::SELF;
             $path = $this->path;
             $class = $this->module->getForwardClass();

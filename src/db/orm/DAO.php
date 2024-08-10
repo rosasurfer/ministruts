@@ -234,34 +234,34 @@ abstract class DAO extends Singleton {
 
                 // any association using a mandatory or optional join table
                 if ($assoc=='many-to-many' || isset($property['join-table'])) {
-                    if (!isset($property['join-table']))                       throw new RuntimeException('Missing attribute "join-table"="{table_name}" in relation [name="'.$name.'"  assoc="'.$assoc.'"...] of entity class "'.$mapping['class'].'"');
+                    if (!isset($property['join-table']))                      throw new RuntimeException('Missing attribute "join-table"="{table_name}" in relation [name="'.$name.'"  assoc="'.$assoc.'"...] of entity class "'.$mapping['class'].'"');
                     if (!isset($property['key']))
                         $property['key'] = $mapping['identity']['name'];
-                    else if (!isset($mapping['properties'][$property['key']])) throw new RuntimeException('Illegal attribute "key"="'.$property['key'].'" in relation [name="'.$name.'"  assoc="'.$assoc.'"...] of entity class "'.$mapping['class'].'"');
-                    if (!isset($property['ref-column']))                       throw new RuntimeException('Missing attribute "ref-column"="{'.$property['join-table'].'.column_name}" in relation [name="'.$name.'"  assoc="'.$assoc.'"...] of entity class "'.$mapping['class'].'"');
-                    if (!isset($property['fk-ref-column']))                    throw new RuntimeException('Missing attribute "fk-ref-column"="{'.$property['join-table'].'.column_name}" in relation [name="'.$name.'"  assoc="'.$assoc.'"...] of entity class "'.$mapping['class'].'"');
+                    elseif (!isset($mapping['properties'][$property['key']])) throw new RuntimeException('Illegal attribute "key"="'.$property['key'].'" in relation [name="'.$name.'"  assoc="'.$assoc.'"...] of entity class "'.$mapping['class'].'"');
+                    if (!isset($property['ref-column']))                      throw new RuntimeException('Missing attribute "ref-column"="{'.$property['join-table'].'.column_name}" in relation [name="'.$name.'"  assoc="'.$assoc.'"...] of entity class "'.$mapping['class'].'"');
+                    if (!isset($property['fk-ref-column']))                   throw new RuntimeException('Missing attribute "fk-ref-column"="{'.$property['join-table'].'.column_name}" in relation [name="'.$name.'"  assoc="'.$assoc.'"...] of entity class "'.$mapping['class'].'"');
                 }
 
                 // one-to-one (using no optional join table)
-                else if ($assoc == 'one-to-one') {
+                elseif ($assoc == 'one-to-one') {
                     if (!isset($property['column'])) {
                         if (!isset($property['key']))
                             $property['key'] = $mapping['identity']['name'];
-                        else if (!isset($mapping['properties'][$property['key']])) throw new RuntimeException('Illegal attribute "key"="'.$property['key'].'" in relation [name="'.$name.'"  assoc="'.$assoc.'"...] of entity class "'.$mapping['class'].'"');
-                        if (!isset($property['ref-column']))                       throw new RuntimeException('Missing attribute "ref-column"="{column_name}" in relation [name="'.$name.'"  assoc="'.$assoc.'"...] of entity class "'.$mapping['class'].'"');
+                        elseif (!isset($mapping['properties'][$property['key']])) throw new RuntimeException('Illegal attribute "key"="'.$property['key'].'" in relation [name="'.$name.'"  assoc="'.$assoc.'"...] of entity class "'.$mapping['class'].'"');
+                        if (!isset($property['ref-column']))                      throw new RuntimeException('Missing attribute "ref-column"="{column_name}" in relation [name="'.$name.'"  assoc="'.$assoc.'"...] of entity class "'.$mapping['class'].'"');
                     }
                 }
 
                 // one-to-many (using no optional join table)
-                else if ($assoc == 'one-to-many') {
+                elseif ($assoc == 'one-to-many') {
                     if (!isset($property['key']))
                         $property['key'] = $mapping['identity']['name'];
-                    else if (!isset($mapping['properties'][$property['key']])) throw new RuntimeException('Illegal attribute "key"="'.$property['key'].'" in relation [name="'.$name.'"  assoc="'.$assoc.'"...] of entity class "'.$mapping['class'].'"');
-                    if (!isset($property['ref-column']))                       throw new RuntimeException('Missing attribute "ref-column"="{column_name}" in relation [name="'.$name.'"  assoc="'.$assoc.'"...] of entity class "'.$mapping['class'].'"');
+                    elseif (!isset($mapping['properties'][$property['key']])) throw new RuntimeException('Illegal attribute "key"="'.$property['key'].'" in relation [name="'.$name.'"  assoc="'.$assoc.'"...] of entity class "'.$mapping['class'].'"');
+                    if (!isset($property['ref-column']))                      throw new RuntimeException('Missing attribute "ref-column"="{column_name}" in relation [name="'.$name.'"  assoc="'.$assoc.'"...] of entity class "'.$mapping['class'].'"');
                 }
 
                 // many-to-one (using no optional join table)
-                else if ($assoc == 'many-to-one') {
+                elseif ($assoc == 'many-to-one') {
                     if (!isset($property['column'])) throw new RuntimeException('Missing attribute "column"="{column_name}" in relation [name="'.$name.'"  assoc="'.$assoc.'"...] of entity class "'.$mapping['class'].'"');
                 }
                 else                                 throw new RuntimeException('Illegal attribute "assoc"="'.$assoc.'" in relation [name="'.$name.'"...] of entity class "'.$mapping['class'].'"');

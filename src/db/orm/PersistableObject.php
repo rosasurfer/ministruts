@@ -93,8 +93,8 @@ abstract class PersistableObject extends CObject {
                 $object = $this->$name;
                 $this->$name = $object->getObjectId();
             }
-            else if (is_array($this->$name)) {                      // property access level encoding
-                $protected = "\0*\0".$name;                         // ------------------------------
+            elseif (is_array($this->$name)) {                       // property access level encoding
+                $protected = "\0*\0$name";                          // ------------------------------
                 $public = $name;                                    // private:   "\0{className}\0{propertyName}"
                 unset($array[$protected], $array[$public]);         // protected: "\0*\0{propertyName}"
             }                                                       // public:    "{propertyName}"
@@ -162,7 +162,7 @@ abstract class PersistableObject extends CObject {
             if (!$this->isPersistent())
                 return $emptyResult;
         }
-        else if ($value === false) {                                    // relation is fetched and marked as empty
+        elseif ($value === false) {                                     // relation is fetched and marked as empty
             return $emptyResult;
         }
 
@@ -228,7 +228,7 @@ abstract class PersistableObject extends CObject {
                 $fkName   = $relation['foreign-key'];                                   // the used foreign-key property
                 $fkColumn = $relatedMapping['properties'][$fkName]['column'];           // the used foreign-key column
             }
-            else if (isset($relation['column'])) {                      // a local column referencing the foreign key
+            elseif (isset($relation['column'])) {                       // a local column referencing the foreign key
                 if (!isset($relation['ref-column']))                    // default foreign-key is identity
                     $relation['ref-column'] = $relatedMapping['identity']['column'];
                 $fkColumn = $relation['ref-column'];                    // the used foreign-key column
@@ -237,9 +237,9 @@ abstract class PersistableObject extends CObject {
                 $fkColumn = $relatedMapping['identity']['column'];      // the used foreign-key column is identity
             }
             $fkValue = $relatedDao->escapeLiteral($value);
-            $sql = 'select r.*
-                        from '.$relatedTable.' r
-                        where r.'.$fkColumn.' = '.$fkValue;
+            $sql = "select r.*
+                        from $relatedTable r
+                        where r.$fkColumn = $fkValue";
         }
 
         if (!$isCollection) $value = $relatedDao->find($sql);           // => PersistableObject
@@ -541,8 +541,8 @@ abstract class PersistableObject extends CObject {
         if ($id) {
             $db->execute($sql);
         }
-        else if ($db->supportsInsertReturn()) {
-            $id = $db->query($sql.' returning '.$idColumn)->fetchInt();
+        elseif ($db->supportsInsertReturn()) {
+            $id = $db->query("$sql returning $idColumn")->fetchInt();
         }
         else {
             $id = $db->execute($sql)->lastInsertId();
@@ -671,15 +671,16 @@ abstract class PersistableObject extends CObject {
                     case 'bool'   :
                     case 'boolean':
                         if ($dbType == 'pgsql') {
-                            if      ($row[$column] == 't') $row[$column] = 1;
-                            else if ($row[$column] == 'f') $row[$column] = 0;
-                        };          $this->$propertyName = (bool)(int) $row[$column]; break;
+                            if     ($row[$column] == 't') $row[$column] = 1;
+                            elseif ($row[$column] == 'f') $row[$column] = 0;
+                        };
+                        $this->$propertyName = (bool)(int) $row[$column]; break;
                     case 'int'    :
-                    case 'integer': $this->$propertyName =       (int) $row[$column]; break;
+                    case 'integer': $this->$propertyName =    (int) $row[$column]; break;
                     case 'float'  :
-                    case 'double' : $this->$propertyName =     (float) $row[$column]; break;
-                    case 'string' : $this->$propertyName =    (string) $row[$column]; break;
-                  //case 'array'  : $this->$propertyName =   strlen($row[$column]) ? explode(',', $row[$column]):[]; break;
+                    case 'double' : $this->$propertyName =  (float) $row[$column]; break;
+                    case 'string' : $this->$propertyName = (string) $row[$column]; break;
+                  //case 'array'  : $this->$propertyName = strlen($row[$column]) ? explode(',', $row[$column]):[]; break;
                   //case DateTime::class: $this->$propertyName = new DateTime($row[$column]); break;
 
                     default:

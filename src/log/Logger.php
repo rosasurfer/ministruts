@@ -85,9 +85,9 @@ class Logger extends StaticClass {
         $value = $config['log.level.default'] ?? '';
         $logLevel = 0;
 
-        if (is_string($value))   $logLevel = self::strToLogLevel($value);
-        else if (is_int($value)) $logLevel = self::isLogLevel($value) ? $value : 0;
-        if (!$logLevel)          $logLevel = self::DEFAULT_LOGLEVEL;
+        if (is_string($value))  $logLevel = self::strToLogLevel($value);
+        elseif (is_int($value)) $logLevel = self::isLogLevel($value) ? $value : 0;
+        if (!$logLevel)         $logLevel = self::DEFAULT_LOGLEVEL;
         self::$appLogLevel = $logLevel;
 
         // initialize log appenders
