@@ -581,7 +581,7 @@ class Config extends CObject implements ConfigInterface {
      * @return array<string, string>
      */
     public function export(array $options = []): array {
-        $maxKeyLength = null;
+        $maxKeyLength = 0;
         $values = $this->dumpNode([], $this->properties, $maxKeyLength);
 
         if (isset($options['sort'])) {
