@@ -18,7 +18,6 @@ use function rosasurfer\ministruts\strEndsWith;
 use function rosasurfer\ministruts\strLeftTo;
 use function rosasurfer\ministruts\strRightFrom;
 use function rosasurfer\ministruts\strStartsWith;
-use function rosasurfer\ministruts\true;
 
 use const rosasurfer\ministruts\CLI;
 use const rosasurfer\ministruts\ERROR_LOG_DEFAULT;

@@ -56,6 +56,31 @@ class FileSystem extends StaticClass {
 
 
     /**
+     * Whether a directory is considered empty.
+     *
+     * @param  string   $dirname
+     * @param  string[] $ignore - directory entries to ignore during the check, e.g. ".git" (default: none)
+     *
+     * @return bool
+     */
+    public static function isDirEmpty(string $dirname, array $ignore = []): bool {
+        $isEmpty = true;
+        $hDir = openDir($dirname);
+        while (($entry = readDir($hDir)) !== false) {
+            if ($entry=='.' || $entry=='..') {
+                continue;
+            }
+            if (!in_array($entry, $ignore)) {
+                $isEmpty = false;
+                break;
+            }
+        }
+        closeDir($hDir);
+        return $isEmpty;
+    }
+
+
+    /**
      * Drop-in replacement for the built-in PHP function {@link \copy()}.
      *
      * Copies a file. If the target directory does not exist try to create it. If the destination file already exists,

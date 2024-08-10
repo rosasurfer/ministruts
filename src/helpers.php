@@ -6,6 +6,7 @@ declare(strict_types=1);
  */
 namespace rosasurfer\ministruts;
 
+use Closure;
 use Throwable;
 
 use rosasurfer\ministruts\console\docopt\DocoptParser;
@@ -108,14 +109,14 @@ define('PHP_INI_ALL',    INI_ALL   );       // 7    flag            // entry can
 /**
  * Whether the given index exists in an array-like variable.
  *
- * Complement of PHP's <tt>key_exists()</tt> function adding support for {@link \ArrayAccess} parameters.
+ * Complement of PHP's <tt>key_exists()</tt> function adding support for {@link \ArrayAccess} arguments.
  *
- * @param  int|string                                   $key
- * @param  array<mixed>|\ArrayAccess<int|string, mixed> $array
+ * @param  int|string                              $key
+ * @param  mixed[]|\ArrayAccess<int|string, mixed> $array
  *
  * @return bool
  */
-function key_exists($key, $array) {
+function key_exists($key, $array): bool {
     if ($array instanceof \ArrayAccess) {
         return $array->offsetExists($key);
     }
@@ -128,7 +129,7 @@ function key_exists($key, $array) {
  * the callback function. If the function returns TRUE, the current value from the array is returned as part of the resulting
  * array. Array keys are preserved.
  *
- * Complement of PHP's <tt>array_filter()</tt> function adding support for {@link \Traversable} parameters.
+ * Complement of PHP's <tt>array_filter()</tt> function adding support for {@link \Traversable} arguments.
  *
  * @param  iterable<mixed> $input
  * @param  ?callable       $callback [optional]
@@ -136,7 +137,7 @@ function key_exists($key, $array) {
  *
  * @return mixed[]
  */
-function array_filter($input, $callback=null, $flags=0) {
+function array_filter(iterable $input, ?callable $callback = null, int $flags = 0): array {
     $args = func_get_args();
     if ($input instanceof \Traversable) {
         $args[0] = iterator_to_array($input, true);
@@ -148,7 +149,7 @@ function array_filter($input, $callback=null, $flags=0) {
 /**
  * Return all or a subset of the keys of an array-like variable.
  *
- * Complement of PHP's <tt>array_keys()</tt> function adding support for {@link \Traversable} parameters.
+ * Complement of PHP's <tt>array_keys()</tt> function adding support for {@link \Traversable} arguments.
  *
  * @param  iterable<mixed> $array
  * @param  mixed           $search [optional]
@@ -156,7 +157,7 @@ function array_filter($input, $callback=null, $flags=0) {
  *
  * @return array<int|string>
  */
-function array_keys(iterable $array, $search=null, $strict=false) {
+function array_keys(iterable $array, $search = null, bool $strict = false): array {
     $args = func_get_args();
     if ($array instanceof \Traversable) {
         $args[0] = iterator_to_array($array, true);
@@ -170,14 +171,14 @@ function array_keys(iterable $array, $search=null, $strict=false) {
  * previous one. Values with the same string keys will overwrite the previous one. Numeric keys will be renumbered and values
  * with the same numeric keys will not overwrite the previous one.
  *
- * Complement of PHP's <tt>array_merge()</tt> function adding support for {@link \Traversable} parameters.
+ * Complement of PHP's <tt>array_merge()</tt> function adding support for {@link \Traversable} arguments.
  *
- * @param  iterable<mixed> $array1
+ * @param  iterable<mixed> $array
  * @param  iterable<mixed> ...$arrays
  *
  * @return mixed[]
  */
-function array_merge(iterable $array1, iterable ...$arrays) {
+function array_merge(iterable $array, iterable ...$arrays): array {
     $args = func_get_args();
     foreach ($args as $key => $arg) {
         if ($arg instanceof \Traversable) {
@@ -191,7 +192,7 @@ function array_merge(iterable $array1, iterable ...$arrays) {
 /**
  * Checks if a value exists in an array-like variable.
  *
- * Complement of PHP's <tt>in_array()</tt> function adding support for {@link \Traversable} parameters.
+ * Complement of PHP's <tt>in_array()</tt> function adding support for {@link \Traversable} arguments.
  *
  * @param  mixed           $needle
  * @param  iterable<mixed> $haystack
@@ -199,7 +200,7 @@ function array_merge(iterable $array1, iterable ...$arrays) {
  *
  * @return bool
  */
-function in_array($needle, iterable $haystack, $strict = false) {
+function in_array($needle, iterable $haystack, bool $strict = false): bool {
     if ($haystack instanceof \Traversable) {
         $haystack = iterator_to_array($haystack, false);
     }
@@ -233,9 +234,11 @@ function firstKey(iterable $values) {
     if ($values instanceof \Traversable) {
         $values = iterator_to_array($values);
     }
-    if (!$values) return null;
-    reset($values);
-    return key($values);
+    if ($values) {
+        reset($values);
+        return key($values);
+    }
+    return null;
 }
 
 
@@ -265,30 +268,37 @@ function lastKey(iterable $values) {
     if ($values instanceof \Traversable) {
         $values = iterator_to_array($values);
     }
-    if (!$values) return null;
-    end($values);
-    return key($values);
+    if ($values) {
+        end($values);
+        return key($values);
+    }
+    return null;
 }
 
 
 /**
- * Convert a value to a boolean and return the human-readable string "true" or "false".
+ * Convert a value to a boolean and return the string "true" or "false".
  *
- * @param  mixed $value - value interpreted as a boolean
+ * @param  mixed $value - value to interpret
  *
  * @return string
  */
-function boolToStr($value) {
+function boolToStr($value): string {
     if (is_string($value)) {
         $value = trim(strtolower($value));
         switch ($value) {
-            case 'true' :
-            case 'on'   :
-            case 'yes'  : return 'true';
+            case 'true':
+            case 'on':
+            case 'yes': return 'true';
 
             case 'false':
-            case 'off'  :
-            case 'no'   : return 'false';
+            case 'off':
+            case 'no':  return 'false';
+
+            default:
+                if (is_numeric($value)) {
+                    $value = (float) $value;
+                }
         }
     }
     return $value ? 'true':'false';
@@ -302,9 +312,7 @@ function boolToStr($value) {
  *
  * @return void
  */
-function stdout($message) {
-    Assert::string($message);
-
+function stdout(string $message): void {
     $hStream = CLI ? \STDOUT : fopen('php://stdout', 'a');
     fwrite($hStream, $message);
     if (!CLI) fclose($hStream);
@@ -318,9 +326,7 @@ function stdout($message) {
  *
  * @return void
  */
-function stderr($message) {
-    Assert::string($message);
-
+function stderr(string $message): void {
     $hStream = CLI ? \STDERR : fopen('php://stderr', 'a');
     fwrite($hStream, $message);
     if (!CLI) fclose($hStream);
@@ -328,13 +334,13 @@ function stderr($message) {
 
 
 /**
- * Send an "X-Debug-???" header with a message. Each sent header name will end with a different and increasing number.
+ * Send an "X-Debug-???" header with a message. Each sent header name will end with an increasing number.
  *
  * @param  mixed $message
  *
  * @return void
  */
-function debugHeader($message) {
+function debugHeader($message): void {
     if (CLI) return;
 
     if (!is_string($message)) {
@@ -343,7 +349,8 @@ function debugHeader($message) {
     }
 
     static $i = 0;
-    header('X-Debug-'.++$i.': '.str_replace(["\r", "\n"], ['\r', '\n'], $message));
+    $i++;
+    header("X-Debug-$i: ".str_replace(["\r", "\n"], ['\r', '\n'], $message));
 }
 
 
@@ -357,7 +364,7 @@ function debugHeader($message) {
  *
  * @return ?string - string if the result is to be returned, NULL otherwise
  */
-function dump($var, $return=false, $flushBuffers=true) {
+function dump($var, bool $return = false, bool $flushBuffers = true): ?string {
     if ($return) ob_start();
     var_dump($var);
     if ($return) return ob_get_clean();
@@ -370,20 +377,20 @@ function dump($var, $return=false, $flushBuffers=true) {
 /**
  * Alias of print_p($var, false, $flushBuffers)
  *
- * Outputs a variable in a formatted and pretty way. Output always ends with a line feed.
+ * Outputs a variable in a formatted and pretty way. Output always ends with a EOL marker.
  *
  * @param  mixed $var
  * @param  bool  $flushBuffers [optional] - whether to flush output buffers (default: yes)
  *
  * @return void
  */
-function echof($var, $flushBuffers = true) {
+function echof($var, bool $flushBuffers = true): void {
     print_p($var, false, $flushBuffers);
 }
 
 
 /**
- * Prints a variable in a pretty way. Output always ends with a line feed.
+ * Prints a variable in a formatted and pretty way. Output always ends with a EOL marker.
  *
  * @param  mixed $var                     - variable
  * @param  bool  $return       [optional] - TRUE,  if the result is to be returned as a string <br>
@@ -392,7 +399,7 @@ function echof($var, $flushBuffers = true) {
  *
  * @return ?string - string if the result is to be returned, NULL otherwise
  */
-function print_p($var, $return=false, $flushBuffers=true) {
+function print_p($var, bool $return = false, bool $flushBuffers = true): ?string {
     if (is_object($var) && method_exists($var, '__toString') && !$var instanceof \SimpleXMLElement) {
         $str = (string) $var;
     }
@@ -440,7 +447,7 @@ function print_p($var, $return=false, $flushBuffers=true) {
  *
  * @return string - formatted byte value
  */
-function prettyBytes($value, $decimals = 1) {
+function prettyBytes($value, int $decimals = 1): string {
     if (!is_int($value)) {
         if (is_string($value)) {
             if (!strIsNumeric($value)) throw new InvalidValueException('Invalid parameter $value: "'.$value.'" (non-numeric)');
@@ -475,7 +482,7 @@ function prettyBytes($value, $decimals = 1) {
  *
  * @return int - converted byte value
  */
-function php_byte_value($value) {
+function php_byte_value($value): int {
     if (is_int($value)) return $value;
     Assert::string($value);
     if (!strlen($value)) return 0;
@@ -506,7 +513,7 @@ function php_byte_value($value) {
  *
  * @return string - formatted number
  */
-function numf($number, $decimals=0, $decimalSeparator='.', $thousandsSeparator=',') {
+function numf(float $number, int $decimals = 0, string $decimalSeparator = '.', string $thousandsSeparator = ','): string {
     return number_format($number, $decimals, $decimalSeparator, $thousandsSeparator);
 }
 
@@ -523,7 +530,7 @@ function numf($number, $decimals=0, $decimalSeparator='.', $thousandsSeparator='
  *
  * @return ?bool - boolean value or NULL if the setting doesn't exist
  */
-function ini_get_bool($option, $strict = true) {
+function ini_get_bool(string $option, bool $strict = true): ?bool {
     $value = \ini_get($option);
 
     if ($value === false) return null;      // setting doesn't exist
@@ -531,7 +538,7 @@ function ini_get_bool($option, $strict = true) {
 
     $flags = $strict ? FILTER_NULL_ON_FAILURE : 0;
     /** @var ?bool $result */
-    $result = \filter_var($value, FILTER_VALIDATE_BOOLEAN, $flags);
+    $result = filter_var($value, FILTER_VALIDATE_BOOLEAN, $flags);
 
     if ($result === null) {
         throw new InvalidValueException("Invalid \"php.ini\" setting for strict type boolean: \"$option\" = \"$value\"");
@@ -552,7 +559,7 @@ function ini_get_bool($option, $strict = true) {
  *
  * @return ?int - integer value or NULL if the setting doesn't exist
  */
-function ini_get_int($option, $strict = true) {
+function ini_get_int(string $option, bool $strict = true): ?int {
     $value = \ini_get($option);
 
     if ($value === false) return null;      // setting doesn't exist
@@ -560,7 +567,7 @@ function ini_get_int($option, $strict = true) {
 
     $iValue = (int)$value;
 
-    if ($strict && $value!==(string)$iValue) {
+    if ($strict && $value !== (string)$iValue) {
         throw new InvalidValueException("Invalid \"php.ini\" setting for strict type int: \"$option\" = \"$value\"");
     }
     return $iValue;
@@ -579,7 +586,7 @@ function ini_get_int($option, $strict = true) {
  *
  * @return ?int - integer value or NULL if the setting doesn't exist
  */
-function ini_get_bytes($option, $strict = true) {
+function ini_get_bytes(string $option, bool $strict = true): ?int {
     $value = \ini_get($option);
 
     if ($value === false) return null;      // setting doesn't exist
@@ -603,7 +610,7 @@ function ini_get_bytes($option, $strict = true) {
  * Inline replacement and shortcut for htmlspecialchars() using different default flags.
  *
  * @param  string  $string
- * @param  ?int    $flags        [optional] - default: ENT_QUOTES|ENT_SUBSTITUTE|ENT_HTML5
+ * @param  ?int    $flags        [optional] - default: ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5
  * @param  ?string $encoding     [optional] - default: 'UTF-8'
  * @param  bool    $doubleEncode [optional] - default: TRUE
  *
@@ -611,9 +618,9 @@ function ini_get_bytes($option, $strict = true) {
  *
  * @see   \htmlspecialchars()
  */
-function hsc($string, $flags=null, $encoding=null, $doubleEncode=true) {
-    if ($flags    === null) $flags = ENT_QUOTES|ENT_SUBSTITUTE|ENT_HTML5;
-    if ($encoding === null) $encoding = 'UTF-8';
+function hsc(string $string, ?int $flags = null, ?string $encoding = null, bool $doubleEncode = true): string {
+    if (!isset($flags))    $flags = ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5;
+    if (!isset($encoding)) $encoding = 'UTF-8';
 
     return htmlspecialchars($string, $flags, $encoding, $doubleEncode);
 }
@@ -624,7 +631,7 @@ function hsc($string, $flags=null, $encoding=null, $doubleEncode=true) {
  *
  * @return bool
  */
-function isLittleEndian() {
+function isLittleEndian(): bool {
     return (pack('S', 1) == "\x01\x00");
 }
 
@@ -636,51 +643,47 @@ function isLittleEndian() {
  *
  * @return bool
  */
-function isRelativePath($path) {
-    Assert::string($path);
-
-    if (WINDOWS)
+function isRelativePath(string $path): bool {
+    if (WINDOWS) {
         return !preg_match('/^[a-z]:/i', $path);
-
-    if (strlen($path) && $path[0]=='/')
+    }
+    if (strlen($path) && $path[0]=='/') {
         return false;
-
+    }
     return true;                // an empty string cannot be considered absolute, so it's interpreted as relative
 }
 
 
 /**
- * Functional replacement for ($stringA === $stringB).
+ * Functional replacement for ($a === $b).
  *
- * @param  ?string $stringA
- * @param  ?string $stringB
+ * @param  ?string $a
+ * @param  ?string $b
  * @param  bool    $ignoreCase [optional] - default: no
  *
  * @return bool
  */
-function strCompare($stringA, $stringB, $ignoreCase = false) {
-    Assert::nullOrString($stringA, '$stringA');
-    Assert::nullOrString($stringB, '$stringB');
-
+function strCompare(?string $a, ?string $b, bool $ignoreCase = false): bool {
     if ($ignoreCase) {
-        if ($stringA===null || $stringB===null)
-            return ($stringA === $stringB);
-        return (strtolower($stringA) === strtolower($stringB));
+        if (isset($a, $b)) {
+            $a = strtolower($a);
+            $b = strtolower($b);
+        }
     }
-    return ($stringA === $stringB);
+    return ($a === $b);
 }
 
 
 /**
- * Functional replacement for ($stringA === $stringB) ignoring upper/lower case differences.
+ * Functional replacement for ($a === $b) ignoring case differences.
  *
- * @param  string $stringA
- * @param  string $stringB
+ * @param  ?string $a
+ * @param  ?string $b
  *
  * @return bool
  */
-function strCompareI($stringA, $stringB) {
-    return strCompare($stringA, $stringB, true);
+function strCompareI(?string $a, ?string $b): bool {
+    return strCompare($a, $b, true);
 }
 
 
@@ -693,37 +696,33 @@ function strCompareI($stringA, $stringB) {
  *
  * @return bool
  */
-function strContains($haystack, $needle, $ignoreCase = false) {
-    Assert::nullOrString($haystack, '$haystack');
-    Assert::string      ($needle,   '$needle');
-
-    $haystackLen = strlen($haystack);
-    $needleLen   = strlen($needle);
-
-    if (!$haystackLen || !$needleLen)
+function strContains(string $haystack, string $needle, bool $ignoreCase = false): bool {
+    if (!strlen($haystack) || !strlen($needle)) {
         return false;
-
-    if ($ignoreCase)
+    }
+    if ($ignoreCase) {
         return (stripos($haystack, $needle) !== false);
+    }
     return (strpos($haystack, $needle) !== false);
 }
 
 
 /**
- * Whether a string contains a substring ignoring upper/lower case differences.
+ * Whether a string contains a substring ignoring case differences.
  *
  * @param  string $haystack
  * @param  string $needle
  *
  * @return bool
  */
-function strContainsI($haystack, $needle) {
+function strContainsI(string $haystack, string $needle) : bool {
     return strContains($haystack, $needle, true);
 }
 
 
 /**
- * Whether a string starts with a substring. If multiple prefixes are specified whether the string starts with one of them.
+ * Whether a string starts with a substring. If multiple prefixes are given, whether the string
+ * starts with one of them.
  *
  * @param  string          $string
  * @param  string|string[] $prefix                - one or more prefixes
@@ -731,45 +730,44 @@ function strContainsI($haystack, $needle) {
  *
  * @return bool
  */
-function strStartsWith($string, $prefix, $ignoreCase = false) {
+function strStartsWith(string $string, $prefix, bool $ignoreCase = false): bool {
     if (is_array($prefix)) {
         foreach ($prefix as $p) {
-            if (strStartsWith($string, $p, $ignoreCase)) return true;
+            if (strStartsWith($string, $p, $ignoreCase)) {
+                return true;
+            }
         }
         return false;
     }
+    Assert::string($prefix, '$prefix');
 
-    Assert::nullOrString($string, '$string');
-    Assert::string      ($prefix, '$prefix');
-
-    $stringLen = strlen($string);
-    $prefixLen = strlen($prefix);
-
-    if (!$stringLen || !$prefixLen)
+    if (!strlen($string) || !strlen($prefix)) {
         return false;
-
-    if ($ignoreCase)
+    }
+    if ($ignoreCase) {
         return (stripos($string, $prefix) === 0);
+    }
     return (strpos($string, $prefix) === 0);
 }
 
 
 /**
- * Whether a string starts with a substring ignoring upper/lower case differences.
- * If multiple prefixes are specified whether the string starts with one of them.
+ * Whether a string starts with a substring ignoring case differences. If multiple prefixes
+ * are given, whether the string starts with one of them.
  *
  * @param  string          $string
  * @param  string|string[] $prefix - one or more prefixes
  *
  * @return bool
  */
-function strStartsWithI($string, $prefix) {
+function strStartsWithI(string $string, $prefix): bool  {
     return strStartsWith($string, $prefix, true);
 }
 
 
 /**
- * Whether a string ends with a substring. If multiple suffixes are specified whether the string ends with one of them.
+ * Whether a string ends with a substring. If multiple suffixes are given, whether the string
+ * ends with one of them.
  *
  * @param  string          $string
  * @param  string|string[] $suffix                - one or more suffixes
@@ -777,48 +775,50 @@ function strStartsWithI($string, $prefix) {
  *
  * @return bool
  */
-function strEndsWith($string, $suffix, $ignoreCase = false) {
+function strEndsWith(string $string, $suffix, bool $ignoreCase = false): bool {
     if (is_array($suffix)) {
         foreach ($suffix as $s) {
-            if (strEndsWith($string, $s, $ignoreCase)) return true;
+            if (strEndsWith($string, $s, $ignoreCase)) {
+                return true;
+            }
         }
         return false;
     }
-    Assert::nullOrString($string, '$string');
-    Assert::string      ($suffix, '$suffix');
+    Assert::string($suffix, '$suffix');
 
     $stringLen = strlen($string);
     $suffixLen = strlen($suffix);
 
-    if (!$stringLen || !$suffixLen)
+    if (!$stringLen || !$suffixLen) {
         return false;
-
-    if ($ignoreCase)
-        return (($stringLen-$suffixLen) === strripos($string, $suffix));
-    return (($stringLen-$suffixLen) === strrpos($string, $suffix));
+    }
+    if ($ignoreCase) {
+        return (strripos($string, $suffix) === $stringLen-$suffixLen);
+    }
+    return (strrpos($string, $suffix) === $stringLen-$suffixLen);
 }
 
 
 /**
- * Whether a string ends with a substring ignoring upper/lower case differences. If multiple suffixes are specified whether
- * the string ends with one of them.
+ * Whether a string ends with a substring ignoring case differences. If multiple suffixes
+ * are given, whether the string ends with one of them.
  *
  * @param  string          $string
  * @param  string|string[] $suffix - one or more suffixes
  *
  * @return bool
  */
-function strEndsWithI($string, $suffix) {
+function strEndsWithI(string $string, $suffix): bool {
     return strEndsWith($string, $suffix, true);
 }
 
 
 /**
- * Return a left part of a string.
+ * Return the left part of a string.
  *
  * @param  string $string - initial string
- * @param  int    $length - greater than/equal to zero: length of the returned substring<br>
- *                          lower than zero:            all except the specified number of right characters
+ * @param  int    $length - positive: number of returned left characters <br>
+ *                          negative: all except the specified number of right characters
  *
  * @return string - substring
  *
@@ -828,10 +828,7 @@ function strEndsWithI($string, $suffix) {
  *  strLeft('abcde', -1) => 'abcd'
  * </pre>
  */
-function strLeft($string, $length) {
-    Assert::string($string, '$string');
-    Assert::int   ($length, '$length');
-
+function strLeft(string $string, int $length): string {
     return substr($string, 0, $length);
 }
 
@@ -841,14 +838,12 @@ function strLeft($string, $length) {
  *
  * @param  string $string                    - initial string
  * @param  string $limiter                   - limiting substring (one or more characters)
- * @param  int    $count          [optional] - positive: the specified occurrence of the limiting substring from the start
- *                                                       of the string<br>
- *                                             negative: the specified occurrence of the limiting substring from the end of
- *                                                       the string<br>
- *                                             zero:     an empty string is returned<br>
+ * @param  int    $count          [optional] - positive: occurrence of the limiting substring counted from the start of the string <br>
+ *                                             negative: occurrence of the limiting substring counted from the end of the string   <br>
+ *                                             0:        an empty string is returned                                               <br>
  *                                             (default: 1 = the first occurrence)
- * @param  bool   $includeLimiter [optional] - whether to include the limiting substring in the returned result
- *                                             (default: FALSE)
+ * @param  bool   $includeLimiter [optional] - whether to include the limiter in the returned result
+ *                                             (default: no)
  * @param  string $onNotFound     [optional] - string to return if the specified occurrence of the limiter is not found
  *                                             (default: the initial string)
  * @return string
@@ -856,17 +851,13 @@ function strLeft($string, $length) {
  * @example
  * <pre>
  *  strLeftTo('abcde', 'd')      => 'abc'
- *  strLeftTo('abcde', 'x')      => 'abcde'   // limiter not found
+ *  strLeftTo('abcde', 'x')      => 'abcde'    // limiter not found
  *  strLeftTo('abccc', 'c',   3) => 'abcc'
  *  strLeftTo('abccc', 'c',  -3) => 'ab'
- *  strLeftTo('abccc', 'c', -99) => 'abccc'   // specified number of occurrences doesn't exist
+ *  strLeftTo('abccc', 'c', -99) => 'abccc'    // specified number of occurrences not found
  * </pre>
  */
-function strLeftTo($string, $limiter, $count=1, $includeLimiter=false, $onNotFound='') {
-    Assert::string($string,         '$string');
-    Assert::string($limiter,        '$limiter');
-    Assert::int   ($count,          '$count');
-    Assert::bool  ($includeLimiter, '$includeLimiter');
+function strLeftTo(string $string, string $limiter, int $count=1, bool $includeLimiter=false, string $onNotFound=''): string {
     if (!strlen($limiter)) throw new InvalidValueException('Invalid limiting substring: "" (empty)');
 
     if ($count > 0) {
@@ -874,13 +865,15 @@ function strLeftTo($string, $limiter, $count=1, $includeLimiter=false, $onNotFou
         while ($count) {
             $offset = $pos + 1;
             $pos = strpos($string, $limiter, $offset);
-            if ($pos === false)                                      // not found
+            if ($pos === false) {                                   // not found
                 return func_num_args() > 4 ? $onNotFound : $string;
+            }
             $count--;
         }
         $result = substr($string, 0, $pos);
-        if ($includeLimiter)
+        if ($includeLimiter) {
             $result .= $limiter;
+        }
         return $result;
     }
 
@@ -889,16 +882,19 @@ function strLeftTo($string, $limiter, $count=1, $includeLimiter=false, $onNotFou
         $pos = $len;
         while ($count) {
             $offset = $pos - $len - 1;
-            if ($offset < -$len)                                     // not found
+            if ($offset < -$len) {                                  // not found
                 return func_num_args() > 4 ? $onNotFound : $string;
+            }
             $pos = strrpos($string, $limiter, $offset);
-            if ($pos === false)                                      // not found
+            if ($pos === false) {                                   // not found
                 return func_num_args() > 4 ? $onNotFound : $string;
+            }
             $count++;
         }
         $result = substr($string, 0, $pos);
-        if ($includeLimiter)
+        if ($includeLimiter) {
             $result .= $limiter;
+        }
         return $result;
     }
 
@@ -908,11 +904,11 @@ function strLeftTo($string, $limiter, $count=1, $includeLimiter=false, $onNotFou
 
 
 /**
- * Return a right part of a string.
+ * Return the right part of a string.
  *
  * @param  string $string - initial string
- * @param  int    $length - greater than/equal to zero: length of the returned substring<br>
- *                          lower than zero:            all except the specified number of left characters
+ * @param  int    $length - positive: number of returned right characters <br>
+ *                          negative: all except the specified number of left characters
  *
  * @return string - substring
  *
@@ -922,10 +918,7 @@ function strLeftTo($string, $limiter, $count=1, $includeLimiter=false, $onNotFou
  *  strRight('abcde', -2) => 'cde'
  * </pre>
  */
-function strRight($string, $length) {
-    Assert::string($string, '$string');
-    Assert::int   ($length, '$length');
-
+function strRight(string $string, int $length): string {
     if (!$length) return '';
 
     $result = substr($string, -$length);
@@ -938,32 +931,26 @@ function strRight($string, $length) {
  *
  * @param  string $string                    - initial string
  * @param  string $limiter                   - limiting substring (one or more characters)
- * @param  int    $count          [optional] - positive: the specified occurrence of the limiting substring counted from the
- *                                                       start of the string<br>
- *                                             negative: the specified occurrence of the limiting substring counted from the
- *                                                       end of the string<br>
- *                                             zero:     the initial string is returned<br>
+ * @param  int    $count          [optional] - positive: occurrence of the limiting substring counted from the start of the string <br>
+ *                                             negative: occurrence of the limiting substring counted from the end of the string   <br>
+ *                                             0:        the initial string is returned                                            <br>
  *                                             (default: 1 = the first occurrence)
- * @param  bool   $includeLimiter [optional] - whether to include the limiting substring in the returned result
- *                                             (default: FALSE)
- * @param  string $onNotFound     [optional] - value to return if the specified occurrence of the limiting substring is not found
+ * @param  bool   $includeLimiter [optional] - whether to include the limiter in the returned result
+ *                                             (default: no)
+ * @param  string $onNotFound     [optional] - string to return if the specified occurrence of the limiter is not found
  *                                             (default: empty string)
  *
- * @return string - right part of the initial string or the $onNotFound value
+ * @return string
  *
  * @example
  * <pre>
  *  strRightFrom('abc_abc', 'c')     => '_abc'
- *  strRightFrom('abcabc',  'x')     => ''             // limiter not found
+ *  strRightFrom('abcabc',  'x')     => ''          // limiter not found
  *  strRightFrom('abc_abc', 'a',  2) => 'bc'
  *  strRightFrom('abc_abc', 'b', -2) => 'c_abc'
  * </pre>
  */
-function strRightFrom($string, $limiter, $count=1, $includeLimiter=false, $onNotFound='') {
-    Assert::string($string,         '$string');
-    Assert::string($limiter,        '$limiter');
-    Assert::int   ($count,          '$count');
-    Assert::bool  ($includeLimiter, '$includeLimiter');
+function strRightFrom(string $string, string $limiter, int $count=1, bool $includeLimiter=false, string $onNotFound=''): string {
     if (!strlen($limiter)) throw new InvalidValueException('Illegal limiting substring: "" (empty)');
 
     if ($count > 0) {
@@ -971,14 +958,16 @@ function strRightFrom($string, $limiter, $count=1, $includeLimiter=false, $onNot
         while ($count) {
             $offset = $pos + 1;
             $pos = strpos($string, $limiter, $offset);
-            if ($pos === false)                                      // not found
+            if ($pos === false) {                                   // not found
                 return func_num_args() > 4 ? $onNotFound : '';
+            }
             $count--;
         }
-        $pos   += strlen($limiter);
+        $pos += strlen($limiter);
         $result = ($pos >= strlen($string)) ? '' : substr($string, $pos);
-        if ($includeLimiter)
+        if ($includeLimiter) {
             $result = $limiter.$result;
+        }
         return $result;
     }
 
@@ -987,17 +976,20 @@ function strRightFrom($string, $limiter, $count=1, $includeLimiter=false, $onNot
         $pos = $len;
         while ($count) {
             $offset = $pos - $len - 1;
-            if ($offset < -$len)                                     // not found
+            if ($offset < -$len) {                                  // not found
                 return func_num_args() > 4 ? $onNotFound : '';
+            }
             $pos = strrpos($string, $limiter, $offset);
-            if ($pos === false)                                      // not found
+            if ($pos === false) {                                   // not found
                 return func_num_args() > 4 ? $onNotFound : '';
+            }
             $count++;
         }
-        $pos   += strlen($limiter);
+        $pos += strlen($limiter);
         $result = ($pos >= strlen($string)) ? '' : substr($string, $pos);
-        if ($includeLimiter)
+        if ($includeLimiter) {
             $result = $limiter.$result;
+        }
         return $result;
     }
 
@@ -1009,156 +1001,126 @@ function strRightFrom($string, $limiter, $count=1, $includeLimiter=false, $onNot
 /**
  * Whether a string is wrapped in single or double quotes.
  *
- * @param  string $value
+ * @param  string $string
  *
  * @return bool
  */
-function strIsQuoted($value) {
-    if (!is_string($value))
-        return false;
-    return (strlen($value) > 1 && (strIsSingleQuoted($value) || strIsDoubleQuoted($value)));
+function strIsQuoted(string $string): bool {
+    $len = strlen($string);
+    if ($len > 1) {
+        return (strIsSingleQuoted($string) || strIsDoubleQuoted($string));
+    }
+    return false;
 }
 
 
 /**
  * Whether a string is wrapped in single quotes.
  *
- * @param  string $value
+ * @param  string $string
  *
  * @return bool
  */
-function strIsSingleQuoted($value) {
-    if (!is_string($value))
-        return false;
-    $len = strlen($value);
-    return ($len > 1 && $value[0]=="'" && $value[--$len]=="'");
+function strIsSingleQuoted(string $string): bool {
+    $len = strlen($string);
+    if ($len > 1) {
+        return ($string[0]=="'" && $string[--$len]=="'");
+    }
+    return false;
 }
 
 
 /**
  * Whether a string is wrapped in double quotes.
  *
- * @param  string $value
+ * @param  string $string
  *
  * @return bool
  */
-function strIsDoubleQuoted($value) {
-    if (!is_string($value))
-        return false;
-    $len = strlen($value);
-    return ($len > 1 && $value[0]=='"' && $value[--$len]=='"');
+function strIsDoubleQuoted(string $string): bool {
+    $len = strlen($string);
+    if ($len > 1) {
+        return ($string[0]=='"' && $string[--$len]=='"');
+    }
+    return false;
 }
 
 
 /**
  * Whether a string consists only of digits (0-9).
  *
- * @param  scalar $value
+ * @param  string $string
  *
  * @return bool
  */
-function strIsDigits($value) {
-    return ctype_digit($value);
+function strIsDigits(string $string): bool {
+    return ctype_digit($string);
 }
 
 
 /**
- * Whether a string represents a valid integer value, i.e. consists of only digits and optionally a leading "-" (minus) character.
- *
- * @param  scalar $value
- *
- * @return bool
- */
-function strIsInteger($value) {
-    if (is_int($value))
-        return true;
-
-    if (!is_string($value))
-        return false;
-
-    return ($value === (string)(int)$value);
-}
-
-
-/**
- * Whether a string consists only of numerical characters and represents a valid numerical value. Opposite to the
- * built-in PHP function is_numeric() this function returns FALSE if the string begins with non-numerical characters
+ * Whether a string consists only of numerical characters and represents a valid numerical value. Unlike the built-in
+ * PHP function is_numeric() this function returns FALSE if the string begins with non-numerical characters
  * (e.g. white space).
  *
- * @param  scalar $value
+ * @param  string $string
  *
  * @return bool
  */
-function strIsNumeric($value) {
-    if (is_int($value) || is_float($value))
-        return true;
-
-    if (!is_string($value))
-        return false;
-
-    if (!is_numeric($value))
-        return false;
-    return ctype_graph($value);
+function strIsNumeric(string $string): bool {
+    if (is_numeric($string)) {
+        return ctype_graph($string);
+    }
+    return false;
 }
 
 
 /**
- * Convert a boolean representation to a boolean.
+ * Interpret a string as a boolean.
  *
- * @param  mixed $value - boolean representation
+ * @param  string $string            - string
+ * @param  bool   $strict [optional] - whether to apply strict interpretation rules:
+ *                                     FALSE - returns TRUE only for "1", "true", "on" and "yes", and FALSE otherwise (default)
+ *                                     TRUE  - as above but FALSE is returned only for "0", "false", "off" and "no", and NULL
+ *                                             is returned for all other values
  *
- * @return ?bool - Boolean or NULL if the parameter doesn't represent a boolean. The accepted values of a boolean's
- *                 numerical string representation (integer or float) are 0 (zero) and 1 (one).
+ * @return ?bool - boolean value or NULL if the string does not represent a requested strict boolean value
  */
-function strToBool($value) {
-    if (is_bool($value)) return $value;
-
-    if (is_int($value) || is_float($value)) {
-        if (!$value)
-            return false;
-        return ($value==1.) ? true : null;
+function strToBool(string $string, bool $strict = false): ?bool {
+    $flags = 0;
+    if ($strict) {
+        if ($string === '') {               // PHP considers NULL and '' strict boolean values
+            return null;
+        }
+        $flags = FILTER_NULL_ON_FAILURE;
     }
-    if (!is_string($value)) return null;
-
-    switch (strtolower($value)) {
-        case 'true' :
-        case 'on'   :
-        case 'yes'  : return true;
-        case 'false':
-        case 'off'  :
-        case 'no'   : return false;
-    }
-
-    if (strIsNumeric($value)) {
-        $value = (float) $value;               // skip leading zeros of numeric strings
-        if (!$value)      return false;
-        if ($value == 1.) return true;
-    }
-    return null;
+    return filter_var($string, FILTER_VALIDATE_BOOLEAN, $flags);
 }
 
 
 /**
- * Convert a string representing a date/time value to a Unix timestamp.
+ * Parse a string representing a date/time value and convert it to a Unix timestamp.
  *
- * @param  string          $string            - string to convert
- * @param  string|string[] $format [optional] - date/time format required to match;
- *                                              if an array the string must match at least one of the provided date/time formats
+ * @param  string          $string            - string to parse
+ * @param  string|string[] $format [optional] - date/time format the string is required to match (default: 'Y-m-d')
+ *                                              if an array the string must match at least one of the provided formats
  *
- * @return int|bool - Unix timestamp or FALSE if the string doesn't match the specified format
+ * @return int|bool - Unix timestamp or FALSE if the string doesn't match the specified format(s)
  *
- * Supported date/time formats: "Y-m-d [H:i[:s]]" <br>
- *                              "Y.m.d [H:i[:s]]" <br>
- *                              "d.m.Y [H:i[:s]]" <br>
- *                              "d/m/Y [H:i[:s]]" <br>
- *
- * @todo   rewrite to strToTimestamp() and strToDateTime()
+ * <pre>
+ *  Supported format strings:
+ *  'Y-m-d [H:i[:s]]'
+ *  'Y.m.d [H:i[:s]]'
+ *  'd.m.Y [H:i[:s]]'
+ *  'd/m/Y [H:i[:s]]'
+ * </pre>
  */
-function strToTimestamp($string, $format = 'Y-m-d') {
-    Assert::string($string, '$string');
+function strToTimestamp(string $string, $format = 'Y-m-d') {
+    // TODO: rewrite and add strToDateTime()
+
     if (is_array($format)) {
         foreach ($format as $value) {
-            $timestamp = ${__FUNCTION__}($string, $value);
+            $timestamp = strToTimestamp($string, $value);
             if (is_int($timestamp)) {
                 return $timestamp;
             }
@@ -1289,17 +1251,15 @@ function strToTimestamp($string, $format = 'Y-m-d') {
 
 
 /**
- * Reduce multiple consecutive white space characters in a string to a single one.
+ * Collapse multiple consecutive white space characters in a string to a single one.
  *
  * @param  string $string               - string to process
  * @param  bool   $joinLines [optional] - whether to return a single line result (default: yes)
- * @param  string $separator [optional] - the separator to use for joining (default: space " ")
+ * @param  string $separator [optional] - the separator to use for joining (default: space character " ")
  *
  * @return string
  */
-function strCollapseWhiteSpace($string, $joinLines=true, $separator=' ') {
-    Assert::string($string, '$string');
-
+function strCollapseWhiteSpace(string $string, bool $joinLines=true, string $separator=' '): string {
     $string = normalizeEOL($string);
     if ($joinLines) {
         $string = str_replace(EOL_UNIX, $separator, $string);
@@ -1309,7 +1269,7 @@ function strCollapseWhiteSpace($string, $joinLines=true, $separator=' ') {
 
 
 /**
- * Normalize line endings of a string. If the string contains mixed line endings the number of lines of the original and the
+ * Normalize EOL markers in a string. If the string contains mixed line endings the number of lines of the passed and the
  * resulting string may differ. Netscape line endings are honored only if all line endings are Netscape format (no mixed mode).
  *
  * @param  string $string          - string to normalize
@@ -1320,9 +1280,7 @@ function strCollapseWhiteSpace($string, $joinLines=true, $separator=' ') {
  *                                   EOL_WINDOWS:  line endings are converted to Windows format  "\r\n"         <br>
  * @return string
  */
-function normalizeEOL($string, $mode = EOL_UNIX) {
-    Assert::string($string, '$string');
-    Assert::string($mode,   '$mode');
+function normalizeEOL(string $string, string $mode = EOL_UNIX): string {
     $done = false;
 
     if (strContains($string, EOL_NETSCAPE)) {
@@ -1332,17 +1290,17 @@ function normalizeEOL($string, $mode = EOL_UNIX) {
             str_replace(EOL_UNIX, '.', $tmp, $count2);
             if ($count1 == $count2) {
                 $string = $tmp;            // only Netscape => OK
-                $done   = true;
+                $done = true;
             }
         }
     }
     if (!$done) $string = str_replace([EOL_WINDOWS, EOL_MAC], EOL_UNIX, $string);
 
-    if ($mode===EOL_MAC || $mode===EOL_NETSCAPE || $mode===EOL_WINDOWS) {
+    if ($mode==EOL_MAC || $mode==EOL_NETSCAPE || $mode==EOL_WINDOWS) {
         $string = str_replace(EOL_UNIX, $mode, $string);
     }
-    else if ($mode !== EOL_UNIX) {
-        throw new InvalidValueException('Invalid parameter $mode: "'.$mode.'"');
+    else if ($mode != EOL_UNIX) {
+        throw new InvalidValueException("Invalid parameter \$mode: \"$mode\"");
     }
     return $string;
 }
@@ -1356,35 +1314,32 @@ function normalizeEOL($string, $mode = EOL_UNIX) {
  *
  * @return array<string, mixed>
  */
-function objectToArray($object, $access = ACCESS_PUBLIC) {
-    Assert::object($object, '$object');
-    Assert::int   ($access, '$access');
-
+function objectToArray(object $object, int $access = ACCESS_PUBLIC): array {
     $source = (array)$object;
-    $result = [];
+    $array = [];
 
     foreach ($source as $name => $value) {
         if ($name[0] != "\0") {                     // public
             if ($access & ACCESS_PUBLIC) {
-                $result[$name] = $value;
+                $array[$name] = $value;
             }
         }
         else if ($name[1] == '*') {                 // protected
             if ($access & ACCESS_PROTECTED) {
                 $publicName = substr($name, 3);
-                $result[$publicName] = $value;
+                $array[$publicName] = $value;
             }
         }
         else {                                      // private
             if ($access & ACCESS_PRIVATE) {
                 $publicName = strRightFrom($name, "\0", 2);
-                if (!\key_exists($publicName, $result)) {
-                    $result[$publicName] = $value;
+                if (!\key_exists($publicName, $array)) {
+                    $array[$publicName] = $value;
                 }
             }
         }
     }
-    return $result;
+    return $array;
 }
 
 
@@ -1395,44 +1350,8 @@ function objectToArray($object, $access = ACCESS_PUBLIC) {
  *
  * @return string
  */
-function typeof($var) {
+function typeof($var): string {
     return gettype($var);
-}
-
-
-/**
- * Whether a directory is considered empty.
- *
- * (a directory with just '.svn' or '.git' is empty)
- *
- * @param  string          $dirname
- * @param  string|string[] $ignore - one or more directory entries to intentionally ignore during the check, e.g. ".git"
- *                                   (default: none)
- * @return bool
- */
-function is_dir_empty($dirname, $ignore = []) {
-    if (!is_dir($dirname))
-        return false;
-
-    if (!is_array($ignore))
-        $ignore = [$ignore];
-    $ignored = \array_unique(\array_merge(['.', '..'], $ignore));   // always ignore pseudo directories '.' and '..'
-
-    foreach (scandir($dirname) as $entry) {
-        if (!in_array($entry, $ignored))
-            return false;
-    }
-
-    /*
-    // TODO: for better performance
-    $hDir = openDir($dir);
-    while (($entry = readDir($hDir)) !== false) {
-        if ($entry=='.' || $entry=='..')
-            continue;
-    }
-    closeDir($hDir);
-    */
-    return true;
 }
 
 
@@ -1443,62 +1362,63 @@ function is_dir_empty($dirname, $ignore = []) {
  *
  * @return ?string - the same name or NULL if a component of that name doesn't exist or couldn't be loaded
  */
-function autoload($name) {
-    if (class_exists($name, true) || interface_exists($name, true) || trait_exists($name, true))
+function autoload(string $name): ?string {
+    if (class_exists($name, true) || interface_exists($name, true) || trait_exists($name, true)) {
         return $name;
+    }
     return null;
 }
 
 
 /**
- * Whether the specified class exists (loaded or not) and is not an interface or a trait. Identical to
- * <pre>class_exists($name, true)</pre> except it also returnes FALSE if auto loading triggers an exception.
+ * Whether the specified class exists (loaded or not) and is not an interface or a trait. Same as
+ * <pre>class_exists($name, true)</pre> but suppresses auto loading errors.
  *
  * @param  string $name - class name
  *
  * @return bool
  */
-function is_class($name) {
+function is_class(string $name): bool {
     try {
         return class_exists($name, true);
     }
-    catch (Throwable $ex) {}    // faulty class loaders must not block the script from continuation
+    catch (Throwable $ex) {}            // faulty class loaders may interrupt the script
 
     return class_exists($name, false);
 }
 
 
 /**
- * Whether the specified interface exists (loaded or not) and is not a class or a trait. Identical to
- * <pre>interface_exists($name, true)</pre> except it also returnes FALSE if auto loading triggers an exception.
+ * Whether the specified interface exists (loaded or not) and is not a class or a trait. Same as
+ * <pre>interface_exists($name, true)</pre> but suppresses auto loading errors.
  *
  * @param  string $name - interface name
  *
  * @return bool
  */
-function is_interface($name) {
+function is_interface(string $name): bool {
     try {
         return interface_exists($name, true);
     }
-    catch (Throwable $ex) {}    // faulty class loaders must not block the script from continuation
+    catch (Throwable $ex) {}            // faulty class loaders may interrupt the script
 
     return interface_exists($name, false);
 }
 
 
 /**
- * Whether the specified trait exists (loaded or not) and is not a class or an interface. Identical to
- * <pre>trait_exists($name, true)</pre> except it also returnes FALSE if auto loading triggers an exception.
+ * Whether the specified trait exists (loaded or not) and is not a class or an interface. Same as
+ * <pre>trait_exists($name, true)</pre> but suppresses auto loading errors.
  *
  * @param  string $name - trait name
  *
  * @return bool
  */
-function is_trait($name) {
+function is_trait(string $name): bool {
     try {
         return trait_exists($name, true);
     }
-    catch (Throwable $ex) {}    // faulty class loaders must not block the script from continuation
+    catch (Throwable $ex) {}            // faulty class loaders may interrupt the script
 
     return trait_exists($name, false);
 }
@@ -1507,41 +1427,43 @@ function is_trait($name) {
 /**
  * Whether a variable can be used like an array.
  *
- * Complement for PHP's <tt>is_array()</tt> function adding support for {@link \ArrayAccess} parameters.
+ * Complement for PHP's <tt>is_array()</tt> function adding support for {@link \ArrayAccess} arguments.
  *
  * @param  mixed $var
  *
  * @return bool
  */
-function is_array_like($var) {
+function is_array_like($var): bool {
     return \is_array($var) || $var instanceof \ArrayAccess;
 }
 
 
 /**
- * Return the simple name of a class name (i.e. the base name).
+ * Return the simple name of a class (i.e. the base name).
  *
  * @param  string|object $class - class name or instance
  *
  * @return string
  */
 function simpleClassName($class) {
-    if (is_object($class)) $class = get_class($class);
-    else                   Assert::string($class);
+    if (is_object($class)) {
+        $class = get_class($class);
+    }
+    else Assert::string($class);
+
     return strRightFrom($class, '\\', -1, false, $class);
 }
 
 
 /**
- * Return one of the metatypes "class", "interface" or "trait" for an object type identifier.
+ * Return one of the meta types "class", "interface" or "trait" for a component identifier.
  *
  * @param  string $name - name
  *
- * @return string metatype
+ * @return string - meta type
  */
-function metatypeOf($name) {
-    Assert::string($name);
-    if ($name == '') throw new InvalidValueException('Invalid parameter $name: ""');
+function metatypeOf(string $name): string {
+    if ($name == '') throw new InvalidValueException('Invalid parameter $name: "" (empty)');
 
     if (is_class    ($name)) return 'class';
     if (is_interface($name)) return 'interface';
@@ -1552,111 +1474,18 @@ function metatypeOf($name) {
 
 
 /**
- * Functional equivalent of the value TRUE.
- *
- * @param  mixed $value [optional] - ignored
- *
- * @return bool - TRUE
- */
-function true($value = null) {
-    return true;
-}
-
-
-/**
- * Return $value or $altValue if $value evaluates to TRUE. Functional equivalent of ternary test for TRUE.
- *
- * @param  mixed $value
- * @param  mixed $altValue
- *
- * @return mixed
- */
-function ifTrue($value, $altValue) {
-    return $value ? $altValue : $value;
-}
-
-
-/**
- * Functional equivalent of the value FALSE.
- *
- * @param  mixed $value [optional] - ignored
- *
- * @return bool - FALSE
- */
-function false($value = null) {
-    return false;
-}
-
-
-/**
- * Return $value or $altValue if $value evaluates to FALSE. Functional equivalent of ternary test for FALSE.
- *
- * @param  mixed $value
- * @param  mixed $altValue
- *
- * @return mixed
- */
-function ifFalse($value, $altValue) {
-    return !$value ? $altValue : $value;
-}
-
-
-/**
- * Functional equivalent of the value NULL.
- *
- * @param  mixed $value [optional] - ignored
- *
- * @return NULL
- */
-function null($value = null) {
-    return null;
-}
-
-
-/**
- * Return $value or $altValue if $value is strictly NULL. Functional equivalent of ternary test for NULL.
- *
- * @param  mixed $value
- * @param  mixed $altValue
- *
- * @return mixed
- *
- * @see    is_null()
- */
-function ifNull($value, $altValue) {
-    return ($value===null) ? $altValue : $value;
-}
-
-
-/**
- * Return $value or $altValue if $value is empty. Functional equivalent of ternary test for empty().
- *
- * @param  mixed $value
- * @param  mixed $altValue
- *
- * @return mixed
- *
- * @see    empty()
- */
-function ifEmpty($value, $altValue) {
-    return empty($value) ? $altValue : $value;
-}
-
-
-/**
  * Return the host name of the internet host specified by a given IP address.
  *
  * @param  string $ipAddress - the host IP address
  *
  * @return string - the host name on success, or the unmodified IP address on resolver error
  */
-function getHostByAddress($ipAddress) {
-    Assert::string($ipAddress);
-    if ($ipAddress == '') throw new InvalidValueException('Invalid parameter $ipAddress: "'.$ipAddress.'"');
+function getHostByAddress(string $ipAddress): string {
+    if ($ipAddress == '') throw new InvalidValueException('Invalid parameter $ipAddress: "" (empty)');
 
     $result = \gethostbyaddr($ipAddress);
 
-    if ($result === false) throw new InvalidValueException('Invalid parameter $ipAddress: "'.$ipAddress.'"');
+    if ($result === false) throw new InvalidValueException("Invalid parameter \$ipAddress: \"$ipAddress\"");
 
     if ($result==='localhost' && !strStartsWith($ipAddress, '127.')) {
         $result = $ipAddress;
@@ -1667,15 +1496,15 @@ function getHostByAddress($ipAddress) {
 
 /**
  * Return a sorted copy of the specified array using the algorythm and parameters of {@link \ksort()}.
- * Opposite to ksort() this function will not modify the passed array.
+ * Unlike the PHP function this function will not modify the passed array.
  *
  * @param  mixed[] $values
- * @param  int     $sort_flags [optional]
+ * @param  int     $flags [optional]
  *
  * @return mixed[]
  */
-function ksortc(array $values, $sort_flags = SORT_REGULAR) {
-    ksort($values, $sort_flags);
+function ksortc(array $values, int $flags = SORT_REGULAR): array {
+    ksort($values, $flags);
     return $values;
 }
 
@@ -1689,10 +1518,10 @@ function ksortc(array $values, $sort_flags = SORT_REGULAR) {
  *
  * @return string
  */
-function pluralize($count, $singular='', $plural='s') {
-    Assert::int($count, '$count');
-    if (abs($count) == 1)
+function pluralize(int $count, string $singular='', string $plural='s'): string {
+    if (abs($count) == 1) {
         return $singular;
+    }
     return $plural;
 }
 
@@ -1700,12 +1529,12 @@ function pluralize($count, $singular='', $plural='s') {
 /**
  * Execute a task in a synchronized way. Emulates the Java keyword "synchronized".
  *
- * @param  \Closure $task             - task to execute (an anonymous function is implicitly casted)
- * @param  ?string  $mutex [optional] - mutex identifier (default: the calling line of code)
+ * @param  Closure $task             - task to execute (an anonymous function is implicitly casted)
+ * @param  ?string $mutex [optional] - mutex identifier (default: the calling line of code)
  *
  * @return void
  */
-function synchronized(\Closure $task, $mutex = null) {
+function synchronized(Closure $task, ?string $mutex = null): void {
     if (!isset($mutex)) {
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
         $mutex = $trace[0]['file'].'#'.$trace[0]['line'];
@@ -1722,13 +1551,13 @@ function synchronized(\Closure $task, $mutex = null) {
 
 
 /**
- * Lookup and return a {@link \rosasurfer\ministruts\struts\url\Url} helper for the named {@link \rosasurfer\ministruts\struts\ActionMapping}.
+ * Lookup and return a {@link Url} helper for the named {@link \rosasurfer\ministruts\struts\ActionMapping}.
  *
  * @param  string $name - route name
  *
  * @return Url
  */
-function route($name) {
+function route(string $name): Url {
     $path = $query = $hash = null;
 
     $pos = strpos($name, '#');
@@ -1743,7 +1572,7 @@ function route($name) {
     }
 
     $mapping = Request::getModule()->getMapping($name);
-    if (!$mapping) throw new RuntimeException('Route "'.$name.'" not found');
+    if (!$mapping) throw new RuntimeException("Route \"$name\" not found");
 
     $path = $mapping->getPath();
     if ($path[0] == '/') {
@@ -1757,9 +1586,9 @@ function route($name) {
 
 
 /**
- * Return a {@link \rosasurfer\ministruts\struts\url\Url} helper for the given URI. An URI starting with a slash "/" is interpreted
- * as relative to the application's base URI. An URI not starting with a slash is interpreted as relative to the application
- * {@link \rosasurfer\ministruts\struts\Module}'s base URI (the module the current request belongs to).<br>
+ * Return a {@link Url} helper for the given URI. An URI starting with a slash "/" is interpreted as relative
+ * to the application's base URI. An URI not starting with a slash is interpreted as relative to the application
+ * {@link Module}'s base URI (the module the current request belongs to).
  *
  * Procedural equivalent of <tt>new \rosasurfer\ministruts\struts\url\Url($uri)</tt>.
  *
@@ -1767,15 +1596,15 @@ function route($name) {
  *
  * @return Url
  */
-function url($uri) {
+function url(string $uri): Url {
     return new Url($uri);
 }
 
 
 /**
- * Return a version-aware URL helper for the given URI {@link \rosasurfer\ministruts\struts\url\VersionedUrl}. An URI starting with a slash "/"
- * is interpreted as relative to the application's base URI. An URI not starting with a slash is interpreted as relative to the application
- * {@link \rosasurfer\ministruts\struts\Module}'s base URI (the module the current request belongs to).<br>
+ * Return a version-aware URL helper for the given URI {@link VersionedUrl}. An URI starting with a slash "/"
+ * is interpreted as relative to the application's base URI. An URI not starting with a slash is interpreted as
+ * relative to the application {@link Module}'s base URI (the module the current request belongs to).
  *
  * Procedural equivalent of <tt>new \rosasurfer\ministruts\struts\url\VersionedUrl($uri)</tt>.
  *
@@ -1783,7 +1612,7 @@ function url($uri) {
  *
  * @return VersionedUrl
  */
-function asset($uri) {
+function asset(string $uri): VersionedUrl {
     return new VersionedUrl($uri);
 }
 
@@ -1797,7 +1626,7 @@ function asset($uri) {
  *
  * @return DocoptResult - the parsing result
  */
-function docopt($doc, $args=null, array $options=[]) {
+function docopt(string $doc, $args=null, array $options=[]): DocoptResult {
     $parser = new DocoptParser($options);
     return $parser->parse($doc, $args);
 }

@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\db;
 
+use UnexpectedValueException;
+
 use const rosasurfer\ministruts\ARRAY_BOTH;
 
 
@@ -59,17 +61,17 @@ interface ResultInterface {
      *
      * @param  string|int $column       [optional] - name or offset of the column to fetch from (default: 0)
      * @param  ?int       $row          [optional] - row to fetch from, starting at 0 (default: the next row)
-     * @param  mixed      $onNull       [optional] - value to return if the cell value is NULL
-     * @param  mixed      $onNoMoreRows [optional] - value to return if no more rows are available
+     * @param  ?bool      $onNull       [optional] - value to return if the cell value is NULL
+     * @param  ?bool      $onNoMoreRows [optional] - value to return if no more rows are available
      *
-     * @return bool - boolean value of a single cell or $onNull if the cell value is NULL
+     * @return ?bool - boolean value or $onNull if the cell value is NULL
      *
-     * @throws NoMoreRecordsException    if no more rows are available and parameter $onNoMoreRows was not set.
-     * @throws \UnexpectedValueException if the cell value is not NULL and does not represent a boolean. Accepted string
-     *                                   representations are "true" and "false", "on" and "off", "yes" and "no", and
-     *                                   numerical representations.
+     * @throws NoMoreRecordsException   if no more rows are available and parameter $onNoMoreRows was not set.
+     * @throws UnexpectedValueException if the cell value is not NULL and does not represent a boolean. Accepted string
+     *                                  representations are "true" and "false", "on" and "off", "yes" and "no", and
+     *                                  numerical values.
      */
-    public function fetchBool($column=0, $row=null, $onNull=null, $onNoMoreRows=null);
+    public function fetchBool($column=0, ?int $row=null, ?bool $onNull=null, ?bool $onNoMoreRows=null);
 
 
     /**
@@ -82,10 +84,10 @@ interface ResultInterface {
      *
      * @return int - integer value of a single cell or $onNull if the cell value is NULL
      *
-     * @throws NoMoreRecordsException    if no more rows are available and parameter $onNoMoreRows was not set.
-     * @throws \UnexpectedValueException if the cell value is not NULL and does not represent an integer. The accepted
-     *                                   floating point values must have a fractional part equal to 0 (zero).
-     *                                   Use <tt>self::fetchFloat()</tt> to interpret more floating point values as integer.
+     * @throws NoMoreRecordsException   if no more rows are available and parameter $onNoMoreRows was not set.
+     * @throws UnexpectedValueException if the cell value is not NULL and does not represent an integer. The accepted
+     *                                  floating point values must have a fractional part equal to 0 (zero).
+     *                                  Use <tt>self::fetchFloat()</tt> to interpret more floating point values as integer.
      */
     public function fetchInt($column=0, $row=null, $onNull=null, $onNoMoreRows=null);
 
@@ -100,8 +102,8 @@ interface ResultInterface {
      *
      * @return float - floating point value of a single cell or $onNull if the cell value is NULL
      *
-     * @throws NoMoreRecordsException    if no more rows are available and parameter $onNoMoreRows was not set.
-     * @throws \UnexpectedValueException if the cell value is not NULL and does not represent a floating point value.
+     * @throws NoMoreRecordsException   if no more rows are available and parameter $onNoMoreRows was not set.
+     * @throws UnexpectedValueException if the cell value is not NULL and does not represent a floating point value.
      */
     public function fetchFloat($column=0, $row=null, $onNull=null, $onNoMoreRows=null);
 

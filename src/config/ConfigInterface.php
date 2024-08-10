@@ -33,9 +33,9 @@ interface ConfigInterface extends \ArrayAccess, \Countable {
      *
      * @param  string  $key                - case-insensitive key
      * @param  ?bool   $default [optional] - value to return if the config setting does not exist (default: exception)
-     * @param  bool    $strict  [optional] - whether to validate a found value strictly:
-     *                                       FALSE - returns true only for "1", "true", "on" and "yes", and false otherwise (default)
-     *                                       TRUE  - as above but false is returned only for "0", "false", "off" and "no", and null
+     * @param  bool    $strict  [optional] - whether to apply strict interpretation rules:
+     *                                       FALSE - returns TRUE only for "1", "true", "on" and "yes", and FALSE otherwise (default)
+     *                                       TRUE  - as above but FALSE is returned only for "0", "false", "off" and "no", and NULL
      *                                               is returned for all other values
      *
      * @return ?bool - boolean value or NULL if the found setting does not represent a requested strict boolean value

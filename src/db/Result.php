@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace rosasurfer\ministruts\db;
 
 use Throwable;
+use UnexpectedValueException;
 
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\error\ErrorHandler;
@@ -95,18 +96,19 @@ abstract class Result extends CObject implements ResultInterface {
     /**
      * {@inheritdoc}
      */
-    public function fetchBool($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
+    public function fetchBool($column=0, ?int $row=null, ?bool $onNull=null, ?bool $onNoMoreRows=null): ?bool {
         if (func_num_args() < 4) $value = $this->fetchColumn($column, $row, null);
         else                     $value = $this->fetchColumn($column, $row, null, $onNoMoreRows);
 
         if (is_bool($value)) return $value;
         if (!isset($value))  return $onNull;
 
-        $bValue = strToBool($value);
+        $value = (string) $value;
+        $bValue = strToBool($value, true);
 
         if (!isset($bValue)) {
-            if (!strIsNumeric($value)) throw new \UnexpectedValueException('unexpected numerical value for a boolean: "'.$value.'"');
-            $bValue = (bool)(float) $value;        // skip leading zeros of numeric strings
+            if (!is_numeric($value)) throw new UnexpectedValueException("unexpected value for a boolean: \"$value\"");
+            $bValue = (bool)(float) $value;
         }
         return $bValue;
     }
@@ -126,7 +128,7 @@ abstract class Result extends CObject implements ResultInterface {
             $iValue = (int) $value;
             if ($iValue == $value)
                 return $iValue;
-            throw new \UnexpectedValueException('unexpected float value: "'.$value.'" (not an integer)');
+            throw new UnexpectedValueException('unexpected float value: "'.$value.'" (not an integer)');
         }
 
         if (strIsNumeric($value)) {
@@ -135,7 +137,7 @@ abstract class Result extends CObject implements ResultInterface {
             if ($iValue == $fValue)
                 return $iValue;
         }
-        throw new \UnexpectedValueException('unexpected string value: "'.$value.'" (not an integer)');
+        throw new UnexpectedValueException('unexpected string value: "'.$value.'" (not an integer)');
     }
 
 
@@ -149,7 +151,7 @@ abstract class Result extends CObject implements ResultInterface {
         if (is_float($value)) return $value;
         if (!isset($value))   return $onNull;
 
-        if (!strIsNumeric($value)) throw new \UnexpectedValueException('unexpected string value: "'.$value.'" (not a float)');
+        if (!strIsNumeric($value)) throw new UnexpectedValueException('unexpected string value: "'.$value.'" (not a float)');
         return (float) $value;                 // skip leading zeros of numeric strings
     }
 

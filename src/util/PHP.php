@@ -407,8 +407,8 @@ class PHP extends StaticClass {
     /**
      * Set the specified "php.ini" setting.
      *
-     * Opposite to the built-in PHP function this method does not return the old value but a boolean success status.
-     * Used to detect assignment errors if the access level of the specified option doesn't allow modification.
+     * Unlike the built-in PHP function ini_set() this method does not return the old value but a boolean success status.
+     * Used to detect assignment errors if the access level of the specified option doesn't allow a modification.
      *
      * @param  string          $option
      * @param  bool|int|string $value
