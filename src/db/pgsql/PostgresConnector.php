@@ -259,7 +259,7 @@ class PostgresConnector extends Connector {
 
         $connStr = $this->getConnectionString();
 
-        if (PHP_VERSION_ID < 70000) ini_set('track_errors', 1);         // removed in PHP 8.0
+        if (PHP_VERSION_ID < 70000) ini_set('track_errors', '1');       // removed in PHP 8.0
         else                        error_clear_last();                 // available since PHP 7.0
         $php_errormsg = '';                                             // not available since PHP 8.0 (php.ini "track_errors" was removed)
 

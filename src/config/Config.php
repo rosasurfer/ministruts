@@ -74,7 +74,7 @@ class Config extends CObject implements ConfigInterface {
         else Assert::isArray($files);
 
         if (PHP_VERSION_ID < 70000) {
-            ini_set('track_errors', 1);             // removed in PHP 8.0
+            ini_set('track_errors', '1');           // removed in PHP 8.0
         }
 
         // check and load existing files
