@@ -6,27 +6,27 @@
 #  @see https://phpstan.org/config-reference
 #
 parameters:
-  phpVersion: 70400                                 # assume this PHP version if running under a different one
-  level:      7                                     # a rule level on the command line overrides this hardcoded value
+  phpVersion: 70400                             # assume this PHP version if running under a different one
+  level:      7                                 # default rule level, a rule level on the command line overrides this value
 
-  bootstrapFiles:                                   # API stubs of unloaded PHP extensions
-    - symbols.php
+  bootstrapFiles:                               # initialize the PHP runtime before PHPStan runs (executed as regular PHP)
 
-  stubFiles:
-    - stubs/test.stub
+  scanFiles:                                    # scanned for additional symbols, not analyzed (e.g. stubs for unavailable PHP extensions)
+    - symbols/php-extensions.php
 
-  scanFiles:                                        # additional non-autoloaded files to scan for symbols
+  stubFiles:                                    # custom PHPDoc annotations overriding 3rd-party userland typing
 
-  paths:                                            # paths on the command line override these hardcoded values
+  paths:                                        # analyzed paths, paths on the command line override these values
     - ../../bin
     - ../../src
     - ../../test
+    - extension
 
   excludePaths:
-    - ../../etc
     - ../../vendor
+    - .tmp
 
-  dynamicConstantNames:                             # dynamic constants with values depending on the environment
+  dynamicConstantNames:                         # dynamic constants with values depending on the environment
     - rosasurfer\ministruts\_CLI
     - rosasurfer\ministruts\_LOCALHOST
     - rosasurfer\ministruts\_MACOS
@@ -55,3 +55,9 @@ parameters:
     maximumNumberOfProcesses: 4
   tmpDir:       .tmp
   tipsOfTheDay: false
+
+
+services:
+  - class: rosasurfer\ministruts\phpstan\CoreFunctionReturnType
+    tags:
+      - phpstan.broker.dynamicFunctionReturnTypeExtension

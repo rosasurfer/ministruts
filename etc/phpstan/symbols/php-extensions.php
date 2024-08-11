@@ -1097,14 +1097,3 @@ namespace {
         }
     }
 }
-
-
-namespace rosasurfer\ministruts\config {
-
-    /**
-     * @param  string $path
-     *
-     * @return string
-     */
-    function _realpath(string $path): string {}
-}

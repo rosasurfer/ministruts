@@ -35,7 +35,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "rosasurfer\\ministruts\\test\\": "test"
+            "rosasurfer\\ministruts\\phpstan\\": "etc/phpstan/extension",
+            "rosasurfer\\ministruts\\test\\":    "test"
         }
     },
     "extra": {
