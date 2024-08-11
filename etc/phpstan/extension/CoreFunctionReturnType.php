@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace rosasurfer\ministruts\phpstan;
+namespace rosasurfer\ministruts\phpstan\extension;
 
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\FunctionReflection;
@@ -23,22 +23,34 @@ use PhpParser\Node\Expr\FuncCall;
  */
 class CoreFunctionReturnType implements DynamicFunctionReturnTypeExtension {
 
+    /** @var array<string, Type> */
+    protected array $supportedFunctions;
+
+
+    /**
+     * Constructor
+     */
+    public function __construct() {
+        $this->supportedFunctions = [
+            'file_get_contents' => new StringType(),        // string|false => string|throws
+            'realpath'          => new StringType(),        // string|false => string|throws
+        ];
+    }
+
     /**
      *
      */
     public function isFunctionSupported(FunctionReflection $function): bool {
-        $supportedFunctions = ['realpath'];
-        return in_array($function->getName(), $supportedFunctions, true);
+        $name = $function->getName();
+        return isset($this->supportedFunctions[$name]);
     }
 
     /**
      *
      */
     public function getTypeFromFunctionCall(FunctionReflection $function, FuncCall $call, Scope $scope): Type {
-        switch ($function->getName()) {
-            case 'realpath': return new StringType();                   // string|false => string|throws
-        }
-        return $this->getOriginalReturnType($function, $call, $scope);
+        $name = $function->getName();
+        return $this->supportedFunctions[$name] ?? $this->getOriginalReturnType($function, $call, $scope);
     }
 
     /**
@@ -49,9 +61,7 @@ class CoreFunctionReturnType implements DynamicFunctionReturnTypeExtension {
         $args = $call->args;
         $variants = $function->getVariants();
 
-        // select the matching function signature
         $signature = ParametersAcceptorSelector::selectFromArgs($scope, $args, $variants);
-
         return $signature->getReturnType();
     }
 }

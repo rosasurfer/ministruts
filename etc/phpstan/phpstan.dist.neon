@@ -58,6 +58,6 @@ parameters:
 
 
 services:
-  - class: rosasurfer\ministruts\phpstan\CoreFunctionReturnType
+  - class: rosasurfer\ministruts\phpstan\extension\CoreFunctionReturnType
     tags:
       - phpstan.broker.dynamicFunctionReturnTypeExtension
