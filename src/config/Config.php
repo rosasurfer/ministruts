@@ -140,6 +140,7 @@ class Config extends CObject implements ConfigInterface {
 
         // set "app.dir.config" to the directory of the most recently added file
         end($instance->files);
+        /** @var string $file */
         $file = key($instance->files);
         $instance->set('app.dir.config', dirname($file));
 
@@ -596,8 +597,10 @@ class Config extends CObject implements ConfigInterface {
 
         foreach ($values as &$value) {
             // convert special values to their string representation
-            if     (!isset($value))  $value = '(null)';
-            elseif (is_bool($value)) $value = ($value ? '(true)' : '(false)');
+            if     (!isset($value))    $value = '(null)';
+            elseif (is_bool($value))   $value = ($value ? '(true)' : '(false)');
+            elseif (is_int($value))    $value = (string) $value;
+            elseif (is_float($value))  $value = (string) $value;
             elseif (is_string($value)) {
                 switch (strtolower($value)) {
                     case 'null':
@@ -621,6 +624,8 @@ class Config extends CObject implements ConfigInterface {
         }
         unset($value);
 
+        /** @var array<string, string> $values */
+        $values = $values;
         return $values;
     }
 

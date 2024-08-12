@@ -13,8 +13,8 @@ use PHPStan\Type\Type;
 use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Type\NullType;
-use function rosasurfer\ministruts\echof;
-use function rosasurfer\ministruts\print_p;
+
+use function PHPStan\dumpType;
 
 
 /**
@@ -37,9 +37,11 @@ class CoreFunctionReturnType implements DynamicFunctionReturnTypeExtension {
         $null = new NullType();
 
         $this->supportedFunctions = [
-            'fopen'        => $bool,        // resource|false       => resource
-            'ob_get_clean' => $bool,        // string|false         => string
-            'preg_replace' => $null,        // string|string[]|null => string|string[]
+            'file'         => $bool,        // array|false       => array
+            'fopen'        => $bool,        // resource|false    => resource
+            'getcwd'       => $bool,        // string|false      => string
+            'ob_get_clean' => $bool,        // string|false      => string
+            'preg_replace' => $null,        // string|array|null => string|array
         ];
     }
 
@@ -58,7 +60,7 @@ class CoreFunctionReturnType implements DynamicFunctionReturnTypeExtension {
         $name = $function->getName();
 
         if ($name == 'preg_replace') {
-            // it seems the extension is skipped
+            // it seems the extension is skipped for this fucntion
             \file_put_contents('phpstan-extension.log', __METHOD__.'()  '.$name.PHP_EOL, FILE_APPEND);
         }
 

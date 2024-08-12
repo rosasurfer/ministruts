@@ -861,11 +861,14 @@ class Request extends CObject {
      */
     public function getActionMessage($key = null) {
         Assert::nullOrString($key);
-        $messages = $this->getAttribute(ACTION_MESSAGES_KEY);
+
+        /** @var string[] $messages */
+        $messages = $this->getAttribute(ACTION_MESSAGES_KEY) ?? [];
 
         if (!isset($key)) {                             // return the first one
-            if ($messages)
+            if ($messages) {
                 return first($messages);
+            }
         }
         elseif (\key_exists($key, $messages)) {         // return the specified one
             return $messages[$key];
@@ -970,11 +973,14 @@ class Request extends CObject {
      */
     public function getActionError($key = null) {
         Assert::nullOrString($key);
-        $errors = $this->getAttribute(ACTION_ERRORS_KEY);
+
+        /** @var string[] $errors */
+        $errors = $this->getAttribute(ACTION_ERRORS_KEY) ?? [];
 
         if (!isset($key)) {                             // return the first one
-            if ($errors)
+            if ($errors) {
                 return first($errors);
+            }
         }
         elseif (\key_exists($key, $errors)) {           // return the specified one
             return $errors[$key];

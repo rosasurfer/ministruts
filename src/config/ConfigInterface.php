@@ -3,13 +3,14 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\config;
 
+use ArrayAccess;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 
 
 /**
  * Interface to be implemented by concrete configurations.
  *
- * @extends \ArrayAccess<string, mixed>
+ * @extends ArrayAccess<string, mixed>
  */
 interface ConfigInterface extends \ArrayAccess, \Countable {
 

@@ -26,6 +26,7 @@ use rosasurfer\ministruts\util\PHP;
  */
 class Application extends CObject {
 
+    const CLI = false;
 
     /** @var self - the application itself */
     protected static self $instance;
@@ -75,8 +76,9 @@ class Application extends CObject {
         /** @var Config $config */
         $config = $this->initConfig($options);
 
-        /** @var Di di */
-        $di = $this->initDi($config['app.dir.config']);
+        /** @var string $configDir */
+        $configDir = $config['app.dir.config'];
+        $di = $this->initDi($configDir);
         $di->set('app', $this);
         $di->set('config', $config);
 
@@ -229,24 +231,6 @@ class Application extends CObject {
                 Logger::log('Memory consumption exceeded '.prettyBytes($warnLimit).' (peak usage: '.prettyBytes($usedBytes).')', L_WARN, ['class' => __CLASS__]);
             }
         });
-        /*
-        ini_set('arg_separator.output'    , '&amp;'                );
-        ini_set('default_mimetype'        , 'text/html'            );
-        ini_set('default_charset'         , 'UTF-8'                );
-        ini_set('ignore_repeated_errors'  ,  0                     );
-        ini_set('ignore_repeated_source'  ,  0                     );
-        ini_set('ignore_user_abort'       ,  1                     );
-        ini_set('display_errors'          , (int)(CLI || LOCALHOST));
-        ini_set('display_startup_errors'  , (int)(CLI || LOCALHOST));
-        ini_set('log_errors'              ,  1                     );
-        ini_set('log_errors_max_len'      ,  0                     );
-        ini_set('html_errors'             ,  0                     );
-        ini_set('session.use_cookies'     ,  1                     );
-        ini_set('session.use_trans_sid'   ,  0                     );
-        ini_set('session.cookie_httponly' ,  1                     );
-        ini_set('session.referer_check'   , ''                     );
-        ini_set('zend.detect_unicode'     ,  1                     );     // BOM header recognition
-        */
     }
 
 
@@ -395,7 +379,7 @@ class Application extends CObject {
 
 
     /**
-     * Return the {@link Application}'s dependency/service container. This method should be used to access
+     * Return the {@link Application}'s dependency container. This method should be used to access
      * the container from a non-class context (i.e. from procedural code).
      *
      * @return ?Di

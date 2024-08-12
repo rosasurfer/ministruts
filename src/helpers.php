@@ -6,9 +6,11 @@ declare(strict_types=1);
  */
 namespace rosasurfer\ministruts;
 
+use ArrayAccess;
 use Closure;
 use ErrorException;
 use Throwable;
+use Traversable;
 
 use rosasurfer\ministruts\console\docopt\DocoptParser;
 use rosasurfer\ministruts\console\docopt\DocoptResult;
@@ -112,17 +114,19 @@ define('PHP_INI_ALL',    INI_ALL   );       // 7    flag            // entry can
  * the callback function. If the function returns TRUE, the current value from the array is returned as part of the resulting
  * array. Array keys are preserved.
  *
- * Complement of PHP's <tt>array_filter()</tt> function adding support for {@link \Traversable} arguments.
+ * Complement of PHP's <tt>array_filter()</tt> function adding support for {@link Traversable} arguments.
  *
- * @param  iterable<mixed> $input
- * @param  ?callable       $callback [optional]
- * @param  int             $flags    [optional]
+ * @template T of mixed
  *
- * @return mixed[]
+ * @param  iterable<T> $input
+ * @param  ?callable   $callback [optional]
+ * @param  int         $flags    [optional]
+ *
+ * @return array<T>
  */
 function array_filter(iterable $input, ?callable $callback = null, int $flags = 0): array {
     $args = func_get_args();
-    if ($input instanceof \Traversable) {
+    if ($input instanceof Traversable) {
         $args[0] = iterator_to_array($input, true);
     }
     return \array_filter(...$args);
@@ -132,7 +136,7 @@ function array_filter(iterable $input, ?callable $callback = null, int $flags = 
 /**
  * Return all or a subset of the keys of an array-like variable.
  *
- * Complement of PHP's <tt>array_keys()</tt> function adding support for {@link \Traversable} arguments.
+ * Complement of PHP's <tt>array_keys()</tt> function adding support for {@link Traversable} arguments.
  *
  * @param  iterable<mixed> $array
  * @param  mixed           $search [optional]
@@ -142,7 +146,7 @@ function array_filter(iterable $input, ?callable $callback = null, int $flags = 
  */
 function array_keys(iterable $array, $search = null, bool $strict = false): array {
     $args = func_get_args();
-    if ($array instanceof \Traversable) {
+    if ($array instanceof Traversable) {
         $args[0] = iterator_to_array($array, true);
     }
     return \array_keys(...$args);
@@ -154,17 +158,20 @@ function array_keys(iterable $array, $search = null, bool $strict = false): arra
  * previous one. Values with the same string keys will overwrite the previous one. Numeric keys will be renumbered and values
  * with the same numeric keys will not overwrite the previous one.
  *
- * Complement of PHP's <tt>array_merge()</tt> function adding support for {@link \Traversable} arguments.
+ * Complement of PHP's <tt>array_merge()</tt> function adding support for {@link Traversable} arguments.
  *
- * @param  iterable<mixed> $array
- * @param  iterable<mixed> ...$arrays
+ * @template T1 of mixed
+ * @template T2 of mixed
  *
- * @return mixed[]
+ * @param  iterable<T1> $array
+ * @param  iterable<T2> ...$arrays
+ *
+ * @return array<T1|T2>
  */
 function array_merge(iterable $array, iterable ...$arrays): array {
     $args = func_get_args();
     foreach ($args as $key => $arg) {
-        if ($arg instanceof \Traversable) {
+        if ($arg instanceof Traversable) {
             $args[$key] = iterator_to_array($arg, true);
         }
     }
@@ -305,12 +312,14 @@ function echof($var, bool $flushBuffers = true): void {
 /**
  * Return the first element of an array-like variable without affecting the internal array pointer.
  *
- * @param  iterable<mixed> $values
+ * @template T of mixed
  *
- * @return mixed - the first element or NULL if the array-like variable is empty
+ * @param  iterable<T> $values
+ *
+ * @return ?T - the first element or NULL if the array-like variable is empty
  */
 function first(iterable $values) {
-    if ($values instanceof \Traversable) {
+    if ($values instanceof Traversable) {
         $values = iterator_to_array($values, false);
     }
     return $values ? reset($values) : null;
@@ -325,7 +334,7 @@ function first(iterable $values) {
  * @return int|string|null - the first key or NULL if the array-like variable is empty
  */
 function firstKey(iterable $values) {
-    if ($values instanceof \Traversable) {
+    if ($values instanceof Traversable) {
         $values = iterator_to_array($values);
     }
     if ($values) {
@@ -382,7 +391,7 @@ function hsc(string $string, ?int $flags = null, ?string $encoding = null, bool 
 /**
  * Checks if a value exists in an array-like variable.
  *
- * Complement of PHP's <tt>in_array()</tt> function adding support for {@link \Traversable} arguments.
+ * Complement of PHP's <tt>in_array()</tt> function adding support for {@link Traversable} arguments.
  *
  * @param  mixed           $needle
  * @param  iterable<mixed> $haystack
@@ -391,7 +400,7 @@ function hsc(string $string, ?int $flags = null, ?string $encoding = null, bool 
  * @return bool
  */
 function in_array($needle, iterable $haystack, bool $strict = false): bool {
-    if ($haystack instanceof \Traversable) {
+    if ($haystack instanceof Traversable) {
         $haystack = iterator_to_array($haystack, false);
     }
     return \in_array($needle, $haystack, $strict);
@@ -585,13 +594,13 @@ function isRelativePath(string $path): bool {
  *
  * Complement of PHP's <tt>key_exists()</tt> function adding support for {@link \ArrayAccess} arguments.
  *
- * @param  int|string                              $key
- * @param  mixed[]|\ArrayAccess<int|string, mixed> $array
+ * @param  int|string                             $key
+ * @param  mixed[]|ArrayAccess<int|string, mixed> $array
  *
  * @return bool
  */
 function key_exists($key, $array): bool {
-    if ($array instanceof \ArrayAccess) {
+    if ($array instanceof ArrayAccess) {
         return $array->offsetExists($key);
     }
     return \array_key_exists($key, $array);
@@ -602,10 +611,12 @@ function key_exists($key, $array): bool {
  * Return a sorted copy of the specified array using the algorythm and parameters of {@link \ksort()}.
  * Unlike the PHP function this function will not modify the passed array.
  *
- * @param  mixed[] $values
- * @param  int     $flags [optional]
+ * @template T of mixed
  *
- * @return mixed[]
+ * @param  array<T> $values
+ * @param  int      $flags [optional]
+ *
+ * @return array<T>
  */
 function ksortc(array $values, int $flags = SORT_REGULAR): array {
     ksort($values, $flags);
@@ -616,12 +627,14 @@ function ksortc(array $values, int $flags = SORT_REGULAR): array {
 /**
  * Return the last element of an array-like variable without affecting the internal array pointer.
  *
- * @param  iterable<mixed> $values
+ * @template T of mixed
  *
- * @return mixed - the last element or NULL if the array-like variable is empty
+ * @param  iterable<T> $values
+ *
+ * @return ?T - the last element or NULL if the array-like variable is empty
  */
 function last(iterable $values) {
-    if ($values instanceof \Traversable) {
+    if ($values instanceof Traversable) {
         $values = iterator_to_array($values, false);
     }
     return $values ? end($values) : null;
@@ -636,7 +649,7 @@ function last(iterable $values) {
  * @return int|string|null - the last key or NULL if the array-like variable is empty
  */
 function lastKey(iterable $values) {
-    if ($values instanceof \Traversable) {
+    if ($values instanceof Traversable) {
         $values = iterator_to_array($values);
     }
     if ($values) {
