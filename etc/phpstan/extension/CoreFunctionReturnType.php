@@ -58,7 +58,7 @@ class CoreFunctionReturnType implements DynamicFunctionReturnTypeExtension {
         $name = $function->getName();
 
         if ($name == 'preg_replace') {
-            // seems the extension is skipped for this one
+            // it seems the extension is skipped
             \file_put_contents('phpstan-extension.log', __METHOD__.'()  '.$name.PHP_EOL, FILE_APPEND);
         }
 
