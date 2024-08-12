@@ -9,6 +9,8 @@ use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 use rosasurfer\ministruts\net\http\HttpResponse;
 
+use function rosasurfer\ministruts\preg_replace;
+
 
 /**
  * RequestProcessor

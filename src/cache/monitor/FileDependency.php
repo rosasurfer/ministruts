@@ -7,6 +7,7 @@ use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 
 use function rosasurfer\ministruts\isRelativePath;
+use function rosasurfer\ministruts\realpath;
 
 
 /**

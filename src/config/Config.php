@@ -9,6 +9,7 @@ use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 
 use function rosasurfer\ministruts\isRelativePath;
+use function rosasurfer\ministruts\realpath;
 use function rosasurfer\ministruts\stderr;
 use function rosasurfer\ministruts\strContains;
 use function rosasurfer\ministruts\strIsQuoted;

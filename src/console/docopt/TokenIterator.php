@@ -8,6 +8,8 @@ use rosasurfer\ministruts\console\docopt\exception\DocoptUserNotification;
 use rosasurfer\ministruts\core\ObjectTrait;
 use rosasurfer\ministruts\core\di\DiAwareTrait;
 
+use function rosasurfer\ministruts\preg_replace;
+
 
 /**
  * TokenIterator

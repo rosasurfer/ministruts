@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use rosasurfer\ministruts\console\docopt\DocoptResult;
 
 use function rosasurfer\ministruts\docopt;
+use function rosasurfer\ministruts\preg_replace;
 
 
 /**

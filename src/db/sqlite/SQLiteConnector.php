@@ -13,6 +13,7 @@ use rosasurfer\ministruts\db\Connector;
 use rosasurfer\ministruts\db\DatabaseException;
 
 use function rosasurfer\ministruts\isRelativePath;
+use function rosasurfer\ministruts\realpath;
 
 use const rosasurfer\ministruts\NL;
 
@@ -155,7 +156,7 @@ class SQLiteConnector extends Connector {
             $what = $where = null;
             if (file_exists($file)) {
                 $what = 'open';
-                if (is_dir($file=realpath($file)))
+                if (is_dir($file = realpath($file)))
                     $where = ' (directory)';
             }
             else {

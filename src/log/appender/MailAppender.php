@@ -10,6 +10,7 @@ use rosasurfer\ministruts\log\LogMessage;
 use rosasurfer\ministruts\log\detail\Request;
 
 use function rosasurfer\ministruts\normalizeEOL;
+use function rosasurfer\ministruts\realpath;
 use function rosasurfer\ministruts\strContains;
 use function rosasurfer\ministruts\strEndsWith;
 use function rosasurfer\ministruts\strLeftTo;

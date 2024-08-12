@@ -7,6 +7,7 @@ declare(strict_types=1);
 namespace rosasurfer\ministruts;
 
 use Closure;
+use ErrorException;
 use Throwable;
 
 use rosasurfer\ministruts\console\docopt\DocoptParser;
@@ -107,24 +108,6 @@ define('PHP_INI_ALL',    INI_ALL   );       // 7    flag            // entry can
 
 
 /**
- * Whether the given index exists in an array-like variable.
- *
- * Complement of PHP's <tt>key_exists()</tt> function adding support for {@link \ArrayAccess} arguments.
- *
- * @param  int|string                              $key
- * @param  mixed[]|\ArrayAccess<int|string, mixed> $array
- *
- * @return bool
- */
-function key_exists($key, $array): bool {
-    if ($array instanceof \ArrayAccess) {
-        return $array->offsetExists($key);
-    }
-    return \array_key_exists($key, $array);
-}
-
-
-/**
  * Filters elements of an array-like variable using a callback function. Iterates over each value in the array passing it to
  * the callback function. If the function returns TRUE, the current value from the array is returned as part of the resulting
  * array. Array keys are preserved.
@@ -190,21 +173,132 @@ function array_merge(iterable $array, iterable ...$arrays): array {
 
 
 /**
- * Checks if a value exists in an array-like variable.
+ * Return a version-aware URL helper for the given URI {@link VersionedUrl}. An URI starting with a slash "/"
+ * is interpreted as relative to the application's base URI. An URI not starting with a slash is interpreted as
+ * relative to the application {@link Module}'s base URI (the module the current request belongs to).
  *
- * Complement of PHP's <tt>in_array()</tt> function adding support for {@link \Traversable} arguments.
+ * Procedural equivalent of <tt>new \rosasurfer\ministruts\struts\url\VersionedUrl($uri)</tt>.
  *
- * @param  mixed           $needle
- * @param  iterable<mixed> $haystack
- * @param  bool            $strict [optional]
+ * @param  string $uri
  *
- * @return bool
+ * @return VersionedUrl
  */
-function in_array($needle, iterable $haystack, bool $strict = false): bool {
-    if ($haystack instanceof \Traversable) {
-        $haystack = iterator_to_array($haystack, false);
+function asset(string $uri): VersionedUrl {
+    return new VersionedUrl($uri);
+}
+
+
+/**
+ * Manually load the specified class, interface or trait. If the component was already loaded the call does nothing.
+ *
+ * @param  string $name - name
+ *
+ * @return ?string - the same name or NULL if a component of that name doesn't exist or couldn't be loaded
+ */
+function autoload(string $name): ?string {
+    if (class_exists($name, true) || interface_exists($name, true) || trait_exists($name, true)) {
+        return $name;
     }
-    return \in_array($needle, $haystack, $strict);
+    return null;
+}
+
+
+/**
+ * Convert a value to a boolean and return the string "true" or "false".
+ *
+ * @param  mixed $value - value to interpret
+ *
+ * @return string
+ */
+function boolToStr($value): string {
+    if (is_string($value)) {
+        $value = trim(strtolower($value));
+        switch ($value) {
+            case 'true':
+            case 'on':
+            case 'yes': return 'true';
+
+            case 'false':
+            case 'off':
+            case 'no':  return 'false';
+
+            default:
+                if (is_numeric($value)) {
+                    $value = (float) $value;
+                }
+        }
+    }
+    return $value ? 'true':'false';
+}
+
+
+/**
+ * Send an "X-Debug-???" header with a message. Each sent header name will end with an increasing number.
+ *
+ * @param  mixed $message
+ *
+ * @return void
+ */
+function debugHeader($message): void {
+    if (CLI) return;
+
+    if     (is_scalar($message)) $message = (string) $message;
+    elseif (is_null($message))   $message = '(null)';
+    else                         $message = print_r($message, true);
+
+    static $i = 0;
+    $i++;
+    header("X-Debug-$i: ".str_replace(["\r", "\n"], ['\r', '\n'], $message));
+}
+
+
+/**
+ * Parse command line arguments and match them against the specified {@link https://docopt.org/#} syntax definition.
+ *
+ * @param  string                     $doc                - help text, i.e. a syntax definition in Docopt language format
+ * @param  string|string[]|null       $args    [optional] - arguments to parse (default: the arguments passed in $_SERVER['argv'])
+ * @param  array<string, bool|string> $options [optional] - parser options (default: none)
+ *
+ * @return DocoptResult - the parsing result
+ */
+function docopt(string $doc, $args=null, array $options=[]): DocoptResult {
+    $parser = new DocoptParser($options);
+    return $parser->parse($doc, $args);
+}
+
+
+/**
+ * Dumps a variable to the standard output device or into a string.
+ *
+ * @param  mixed $var                     - variable
+ * @param  bool  $return       [optional] - TRUE,  if the variable is to be dumped into a string <br>
+ *                                          FALSE, if the variable is to be dumped to the standard output device (default)
+ * @param  bool  $flushBuffers [optional] - whether to flush output buffers on output (default: yes)
+ *
+ * @return ($return is true ? string : null)
+ */
+function dump($var, bool $return = false, bool $flushBuffers = true): ?string {
+    if ($return) ob_start();
+    var_dump($var);
+    if ($return) return ob_get_clean();
+
+    $flushBuffers && ob_get_level() && ob_flush();
+    return null;
+}
+
+
+/**
+ * Alias of print_p($var, false, $flushBuffers)
+ *
+ * Outputs a variable in a formatted and pretty way. Output always ends with a EOL marker.
+ *
+ * @param  mixed $var
+ * @param  bool  $flushBuffers [optional] - whether to flush output buffers (default: yes)
+ *
+ * @return void
+ */
+function echof($var, bool $flushBuffers = true): void {
+    print_p($var, false, $flushBuffers);
 }
 
 
@@ -243,6 +337,283 @@ function firstKey(iterable $values) {
 
 
 /**
+ * Return the host name of the internet host specified by a given IP address.
+ *
+ * @param  string $ipAddress - the host IP address
+ *
+ * @return string - the host name on success, or the unmodified IP address on resolver error
+ */
+function getHostByAddress(string $ipAddress): string {
+    if ($ipAddress == '') throw new InvalidValueException('Invalid parameter $ipAddress: "" (empty)');
+
+    $result = \gethostbyaddr($ipAddress);
+
+    if ($result === false) throw new InvalidValueException("Invalid parameter \$ipAddress: \"$ipAddress\"");
+
+    if ($result==='localhost' && !strStartsWith($ipAddress, '127.')) {
+        $result = $ipAddress;
+    }
+    return $result;
+}
+
+
+/**
+ * Convert special characters to HTML entities.
+ *
+ * Inline replacement and shortcut for htmlspecialchars() using different default flags.
+ *
+ * @param  string  $string
+ * @param  ?int    $flags        [optional] - default: ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5
+ * @param  ?string $encoding     [optional] - default: 'UTF-8'
+ * @param  bool    $doubleEncode [optional] - default: yes
+ *
+ * @return string - converted string
+ *
+ * @see   \htmlspecialchars()
+ */
+function hsc(string $string, ?int $flags = null, ?string $encoding = null, bool $doubleEncode = true): string {
+    if (!isset($flags))    $flags = ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5;
+    if (!isset($encoding)) $encoding = 'UTF-8';
+
+    return htmlspecialchars($string, $flags, $encoding, $doubleEncode);
+}
+
+
+/**
+ * Checks if a value exists in an array-like variable.
+ *
+ * Complement of PHP's <tt>in_array()</tt> function adding support for {@link \Traversable} arguments.
+ *
+ * @param  mixed           $needle
+ * @param  iterable<mixed> $haystack
+ * @param  bool            $strict [optional]
+ *
+ * @return bool
+ */
+function in_array($needle, iterable $haystack, bool $strict = false): bool {
+    if ($haystack instanceof \Traversable) {
+        $haystack = iterator_to_array($haystack, false);
+    }
+    return \in_array($needle, $haystack, $strict);
+}
+
+
+/**
+ * Return the value of a "php.ini" option as a boolean.
+ *
+ * NOTE: Don't use ini_get() to read boolean "php.ini" values as it will return the plain string as passed to ini_set().
+ *
+ * @param  string $option            - option name
+ * @param  bool   $strict [optional] - whether to enable strict checking of the found value:
+ *                                     TRUE:  invalid values cause a runtime exception (default)
+ *                                     FALSE: invalid values are converted to a boolean
+ *
+ * @return ?bool - boolean value or NULL if the setting doesn't exist
+ */
+function ini_get_bool(string $option, bool $strict = true): ?bool {
+    $value = \ini_get($option);
+
+    if ($value === false) return null;      // setting doesn't exist
+    if ($value === '')    return false;     // setting is empty or NULL (unset)
+
+    $flags = $strict ? FILTER_NULL_ON_FAILURE : 0;
+    /** @var ?bool $result */
+    $result = filter_var($value, FILTER_VALIDATE_BOOLEAN, $flags);
+
+    if ($result === null) {
+        throw new InvalidValueException("Invalid \"php.ini\" setting for strict type boolean: \"$option\" = \"$value\"");
+    }
+    return $result;
+}
+
+
+/**
+ * Return the value of a "php.ini" option as a byte value supporting PHP shorthand notation ("K", "M", "G").
+ *
+ * NOTE: Don't use ini_get() to read "php.ini" byte values as it will return the plain string as passed to ini_set().
+ *
+ * @param  string $option            - option name
+ * @param  bool   $strict [optional] - whether to enable strict checking of the found value:
+ *                                     TRUE:  invalid values cause a runtime exception (default)
+ *                                     FALSE: invalid values are converted to an integer
+ *
+ * @return ?int - integer value or NULL if the setting doesn't exist
+ */
+function ini_get_bytes(string $option, bool $strict = true): ?int {
+    $value = \ini_get($option);
+
+    if ($value === false) return null;      // setting doesn't exist
+    if ($value === '')    return 0;         // setting is empty or NULL (unset)
+
+    $result = 0;
+    try {
+        $result = php_byte_value($value);
+    }
+    catch (InvalidValueException $ex) {
+        if ($strict) throw new InvalidValueException("Invalid \"php.ini\" setting for PHP byte value: \"$option\" = \"$value\"", 0, $ex);
+        $result = (int)$value;
+    }
+    return $result;
+}
+
+
+/**
+ * Return the value of a "php.ini" option as an integer.
+ *
+ * NOTE: Don't use ini_get() to read "php.ini" integer values as it will return the plain string as passed to ini_set().
+ *
+ * @param  string $option            - option name
+ * @param  bool   $strict [optional] - whether to enable strict checking of the found value:
+ *                                     TRUE:  invalid values cause a runtime exception (default)
+ *                                     FALSE: invalid values are converted to an integer
+ *
+ * @return ?int - integer value or NULL if the setting doesn't exist
+ */
+function ini_get_int(string $option, bool $strict = true): ?int {
+    $value = \ini_get($option);
+
+    if ($value === false) return null;      // setting doesn't exist
+    if ($value === '')    return 0;         // setting is empty or NULL (unset)
+
+    $iValue = (int)$value;
+
+    if ($strict && $value !== (string)$iValue) {
+        throw new InvalidValueException("Invalid \"php.ini\" setting for strict type int: \"$option\" = \"$value\"");
+    }
+    return $iValue;
+}
+
+
+/**
+ * Whether a variable can be used like an array.
+ *
+ * Complement for PHP's <tt>is_array()</tt> function adding support for {@link \ArrayAccess} arguments.
+ *
+ * @param  mixed $var
+ *
+ * @return bool
+ */
+function is_array_like($var): bool {
+    return \is_array($var) || $var instanceof \ArrayAccess;
+}
+
+
+/**
+ * Whether the specified class exists (loaded or not) and is not an interface or a trait. Same as
+ * <pre>class_exists($name, true)</pre> but suppresses auto loading errors.
+ *
+ * @param  string $name - class name
+ *
+ * @return bool
+ */
+function is_class(string $name): bool {
+    try {
+        return class_exists($name, true);
+    }
+    catch (Throwable $ex) {}            // faulty class loaders may interrupt the script
+
+    return class_exists($name, false);
+}
+
+
+/**
+ * Whether the specified interface exists (loaded or not) and is not a class or a trait. Same as
+ * <pre>interface_exists($name, true)</pre> but suppresses auto loading errors.
+ *
+ * @param  string $name - interface name
+ *
+ * @return bool
+ */
+function is_interface(string $name): bool {
+    try {
+        return interface_exists($name, true);
+    }
+    catch (Throwable $ex) {}            // faulty class loaders may interrupt the script
+
+    return interface_exists($name, false);
+}
+
+
+/**
+ * Whether the specified trait exists (loaded or not) and is not a class or an interface. Same as
+ * <pre>trait_exists($name, true)</pre> but suppresses auto loading errors.
+ *
+ * @param  string $name - trait name
+ *
+ * @return bool
+ */
+function is_trait(string $name): bool {
+    try {
+        return trait_exists($name, true);
+    }
+    catch (Throwable $ex) {}            // faulty class loaders may interrupt the script
+
+    return trait_exists($name, false);
+}
+
+
+/**
+ * Whether the byte order of the machine we are running on is "little endian".
+ *
+ * @return bool
+ */
+function isLittleEndian(): bool {
+    return (pack('S', 1) == "\x01\x00");
+}
+
+
+/**
+ * Whether the specified path is relative or absolute, according to the current operating system.
+ *
+ * @param  string $path
+ *
+ * @return bool
+ */
+function isRelativePath(string $path): bool {
+    if (WINDOWS) {
+        return !preg_match('/^[a-z]:/i', $path);
+    }
+    if (strlen($path) && $path[0]=='/') {
+        return false;
+    }
+    return true;                // an empty string cannot be considered absolute, so it's interpreted as relative
+}
+
+
+/**
+ * Whether the given index exists in an array-like variable.
+ *
+ * Complement of PHP's <tt>key_exists()</tt> function adding support for {@link \ArrayAccess} arguments.
+ *
+ * @param  int|string                              $key
+ * @param  mixed[]|\ArrayAccess<int|string, mixed> $array
+ *
+ * @return bool
+ */
+function key_exists($key, $array): bool {
+    if ($array instanceof \ArrayAccess) {
+        return $array->offsetExists($key);
+    }
+    return \array_key_exists($key, $array);
+}
+
+
+/**
+ * Return a sorted copy of the specified array using the algorythm and parameters of {@link \ksort()}.
+ * Unlike the PHP function this function will not modify the passed array.
+ *
+ * @param  mixed[] $values
+ * @param  int     $flags [optional]
+ *
+ * @return mixed[]
+ */
+function ksortc(array $values, int $flags = SORT_REGULAR): array {
+    ksort($values, $flags);
+    return $values;
+}
+
+
+/**
  * Return the last element of an array-like variable without affecting the internal array pointer.
  *
  * @param  iterable<mixed> $values
@@ -277,115 +648,220 @@ function lastKey(iterable $values) {
 
 
 /**
- * Convert a value to a boolean and return the string "true" or "false".
+ * Return one of the meta types "class", "interface" or "trait" for a component identifier.
  *
- * @param  mixed $value - value to interpret
+ * @param  string $name - name
+ *
+ * @return string - meta type
+ */
+function metatypeOf(string $name): string {
+    if ($name == '') throw new InvalidValueException('Invalid parameter $name: "" (empty)');
+
+    if (is_class    ($name)) return 'class';
+    if (is_interface($name)) return 'interface';
+    if (is_trait    ($name)) return 'trait';
+
+    return '(unknown type)';
+}
+
+
+/**
+ * Normalize EOL markers in a string. If the string contains mixed line endings the number of lines of the passed and the
+ * resulting string may differ. Netscape line endings are honored only if all line endings are Netscape format (no mixed mode).
+ *
+ * @param  string $string          - string to normalize
+ * @param  string $mode [optional] - format of the resulting string, can be one of:                             <br>
+ *                                   EOL_MAC:      line endings are converted to Mac format      "\r"           <br>
+ *                                   EOL_NETSCAPE: line endings are converted to Netscape format "\r\r\n"       <br>
+ *                                   EOL_UNIX:     line endings are converted to Unix format     "\n" (default) <br>
+ *                                   EOL_WINDOWS:  line endings are converted to Windows format  "\r\n"         <br>
+ * @return string
+ */
+function normalizeEOL(string $string, string $mode = EOL_UNIX): string {
+    $done = false;
+
+    if (strContains($string, EOL_NETSCAPE)) {
+        $count1 = $count2 = null;
+        $tmp = str_replace(EOL_NETSCAPE, EOL_UNIX, $string, $count1);
+        if (!strContains($tmp, EOL_MAC)) {
+            str_replace(EOL_UNIX, '.', $tmp, $count2);
+            if ($count1 == $count2) {
+                $string = $tmp;            // only Netscape => OK
+                $done = true;
+            }
+        }
+    }
+    if (!$done) $string = str_replace([EOL_WINDOWS, EOL_MAC], EOL_UNIX, $string);
+
+    if ($mode==EOL_MAC || $mode==EOL_NETSCAPE || $mode==EOL_WINDOWS) {
+        $string = str_replace(EOL_UNIX, $mode, $string);
+    }
+    elseif ($mode != EOL_UNIX) {
+        throw new InvalidValueException("Invalid parameter \$mode: \"$mode\"");
+    }
+    return $string;
+}
+
+
+/**
+ * Inline replacement for number_format() removing the default parameter violation.
+ *
+ * @param  float  $number
+ * @param  int    $decimals           [optional] - default: 0
+ * @param  string $decimalSeparator   [optional] - default: dot "."
+ * @param  string $thousandsSeparator [optional] - default: comma ","
+ *
+ * @return string - formatted number
+ */
+function numf(float $number, int $decimals = 0, string $decimalSeparator = '.', string $thousandsSeparator = ','): string {
+    return number_format($number, $decimals, $decimalSeparator, $thousandsSeparator);
+}
+
+
+/**
+ * Convert an object to an array.
+ *
+ * @param  object $object
+ * @param  int    $access [optional] - access levels of the properties to return in the result (default: ACCESS_PUBLIC)
+ *
+ * @return array<string, mixed>
+ */
+function objectToArray(object $object, int $access = ACCESS_PUBLIC): array {
+    $source = (array)$object;
+    $array = [];
+
+    foreach ($source as $name => $value) {
+        if ($name[0] != "\0") {                     // public
+            if ($access & ACCESS_PUBLIC) {
+                $array[$name] = $value;
+            }
+        }
+        elseif ($name[1] == '*') {                  // protected
+            if ($access & ACCESS_PROTECTED) {
+                $publicName = substr($name, 3);
+                $array[$publicName] = $value;
+            }
+        }
+        elseif ($access & ACCESS_PRIVATE) {         // private
+            $publicName = strRightFrom($name, "\0", 2);
+            if (!\key_exists($publicName, $array)) {
+                $array[$publicName] = $value;
+            }
+        }
+    }
+    return $array;
+}
+
+
+/**
+ * Convert a byte value to an integer supporting "php.ini" shorthand notation ("K", "M", "G").
+ *
+ * @param  string|int $value - byte value
+ *
+ * @return int - converted byte value
+ */
+function php_byte_value($value): int {
+    if (is_int($value)) return $value;
+    Assert::string($value);
+    if (!strlen($value)) return 0;
+
+    $match = null;
+    if (!preg_match('/^([+-]?[0-9]+)([KMG]?)$/i', $value, $match)) {
+        throw new InvalidValueException('Invalid parameter $value: "'.$value.'" (not a PHP byte value)');
+    }
+
+    $iValue = (int)$match[1];
+
+    switch (strtoupper($match[2])) {
+        case 'K': $iValue <<= 10; break;    // 1024
+        case 'M': $iValue <<= 20; break;    // 1024 * 1024
+        case 'G': $iValue <<= 30; break;    // 1024 * 1024 * 1024
+    }
+    return $iValue;
+}
+
+
+/**
+ * Return a pluralized string according to the specified number of items.
+ *
+ * @param  int    $count               - the number of items to determine the output from
+ * @param  string $singular [optional] - singular form of string (default: empty string)
+ * @param  string $plural   [optional] - plural form of string (default: "s")
  *
  * @return string
  */
-function boolToStr($value): string {
-    if (is_string($value)) {
-        $value = trim(strtolower($value));
-        switch ($value) {
-            case 'true':
-            case 'on':
-            case 'yes': return 'true';
+function pluralize(int $count, string $singular='', string $plural='s'): string {
+    if (abs($count) == 1) {
+        return $singular;
+    }
+    return $plural;
+}
 
-            case 'false':
-            case 'off':
-            case 'no':  return 'false';
 
-            default:
-                if (is_numeric($value)) {
-                    $value = (float) $value;
-                }
+/**
+ * Same as the builtin function but throws an exception in case of errors.
+ *
+ * @param  string|string[] $pattern
+ * @param  string|string[] $replacement
+ * @param  string|string[] $subject
+ * @param  int             $limit  [optional]
+ * @param  int             &$count [optional]
+ *
+ * @return ($subject is array ? string[] : string)
+ *
+ * @throws ErrorException in case of errors
+ *
+ * @link   http://www.php.net/manual/en/function.preg-replace.php
+ */
+function preg_replace($pattern, $replacement, $subject, int $limit=-1, int &$count=null) {
+    // This wrapper is just here to make PHPStan happy.
+    $argc = func_num_args();
+
+    $args[] = $pattern;
+    $args[] = $replacement;
+    $args[] = $subject;
+    if ($argc > 3) $args[] = $limit;
+    if ($argc > 4) $args[] = $count;
+
+    $result = \preg_replace(...$args);
+    if ($result === null) throw new ErrorException('Error executing preg_replace(...) => NULL');
+    return $result;
+}
+
+
+/**
+ * Format a byte value.
+ *
+ * @param  int|float|string $value               - byte value
+ * @param  int              $decimals [optional] - number of decimal digits (default: 1)
+ *
+ * @return string - formatted byte value
+ */
+function prettyBytes($value, int $decimals = 1): string {
+    if (!is_int($value)) {
+        if (is_string($value)) {
+            if (!strIsNumeric($value)) throw new InvalidValueException('Invalid parameter $value: "'.$value.'" (non-numeric)');
+            $value = (float) $value;
         }
+        else Assert::float($value, '$value');
+
+        if ($value < PHP_INT_MIN) throw new InvalidValueException('Invalid parameter $value: '.$value.' (out of range)');
+        if ($value > PHP_INT_MAX) throw new InvalidValueException('Invalid parameter $value: '.$value.' (out of range)');
+        $value = (int) round($value);
     }
-    return $value ? 'true':'false';
-}
+    Assert::int($decimals, '$decimals');
 
+    if ($value < 1024)
+        return (string) $value;
 
-/**
- * Print a message to STDOUT.
- *
- * @param  string $message
- *
- * @return void
- */
-function stdout(string $message): void {
-    $hStream = CLI ? \STDOUT : fopen('php://stdout', 'a');
-    fwrite($hStream, $message);
-    if (!CLI) fclose($hStream);
-}
-
-
-/**
- * Print a message to STDERR.
- *
- * @param  string $message
- *
- * @return void
- */
-function stderr(string $message): void {
-    $hStream = CLI ? \STDERR : fopen('php://stderr', 'a');
-    fwrite($hStream, $message);
-    if (!CLI) fclose($hStream);
-}
-
-
-/**
- * Send an "X-Debug-???" header with a message. Each sent header name will end with an increasing number.
- *
- * @param  mixed $message
- *
- * @return void
- */
-function debugHeader($message): void {
-    if (CLI) return;
-
-    if (!is_string($message)) {
-        if (is_array($message)) $message = print_r($message, true);
-        else                    $message = (string) $message;
+    $unit = '';
+    foreach (['K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'] as $unit) {
+        $value /= 1024;
+        if ($value < 1024)
+            break;
     }
 
-    static $i = 0;
-    $i++;
-    header("X-Debug-$i: ".str_replace(["\r", "\n"], ['\r', '\n'], $message));
-}
-
-
-/**
- * Dumps a variable to the screen or into a string.
- *
- * @param  mixed $var                     - variable
- * @param  bool  $return       [optional] - TRUE,  if the variable is to be dumped into a string <br>
- *                                          FALSE, if the variable is to be dumped to the standard output device (default)
- * @param  bool  $flushBuffers [optional] - whether to flush output buffers on output (default: TRUE)
- *
- * @return ?string - string if the result is to be returned, NULL otherwise
- */
-function dump($var, bool $return = false, bool $flushBuffers = true): ?string {
-    if ($return) ob_start();
-    var_dump($var);
-    if ($return) return ob_get_clean();
-
-    $flushBuffers && ob_get_level() && ob_flush();
-    return null;
-}
-
-
-/**
- * Alias of print_p($var, false, $flushBuffers)
- *
- * Outputs a variable in a formatted and pretty way. Output always ends with a EOL marker.
- *
- * @param  mixed $var
- * @param  bool  $flushBuffers [optional] - whether to flush output buffers (default: yes)
- *
- * @return void
- */
-function echof($var, bool $flushBuffers = true): void {
-    print_p($var, false, $flushBuffers);
+    return sprintf('%.'.$decimals.'f%s', $value, $unit);
 }
 
 
@@ -397,7 +873,7 @@ function echof($var, bool $flushBuffers = true): void {
  *                                          FALSE, if the result is to be printed to the screen (default)
  * @param  bool  $flushBuffers [optional] - whether to flush output buffers on output (default: TRUE)
  *
- * @return ?string - string if the result is to be returned, NULL otherwise
+ * @return ($return is true ? string : null)
  */
 function print_p($var, bool $return = false, bool $flushBuffers = true): ?string {
     if (is_object($var) && method_exists($var, '__toString') && !$var instanceof \SimpleXMLElement) {
@@ -440,217 +916,122 @@ function print_p($var, bool $return = false, bool $flushBuffers = true): ?string
 
 
 /**
- * Format a byte value.
+ * Returns the canonicalized absolute pathname of a path. Expands all symbolic links and resolves relative references.
+ * Same as the builtin function but throws an exception in case of errors.
  *
- * @param  int|float|string $value               - byte value
- * @param  int              $decimals [optional] - number of decimal digits (default: 1)
+ * @param  string $path - The path being checked. An empty string is interpreted as the current directory.
  *
- * @return string - formatted byte value
+ * @return string - canonicalized absolute pathname
+ *
+ * @throws ErrorException in case of errors
+ *
+ * @link   http://www.php.net/manual/en/function.realpath.php
  */
-function prettyBytes($value, int $decimals = 1): string {
-    if (!is_int($value)) {
-        if (is_string($value)) {
-            if (!strIsNumeric($value)) throw new InvalidValueException('Invalid parameter $value: "'.$value.'" (non-numeric)');
-            $value = (float) $value;
-        }
-        else Assert::float($value, '$value');
-
-        if ($value < PHP_INT_MIN) throw new InvalidValueException('Invalid parameter $value: '.$value.' (out of range)');
-        if ($value > PHP_INT_MAX) throw new InvalidValueException('Invalid parameter $value: '.$value.' (out of range)');
-        $value = (int) round($value);
-    }
-    Assert::int($decimals, '$decimals');
-
-    if ($value < 1024)
-        return (string) $value;
-
-    $unit = '';
-    foreach (['K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'] as $unit) {
-        $value /= 1024;
-        if ($value < 1024)
-            break;
-    }
-
-    return sprintf('%.'.$decimals.'f%s', $value, $unit);
-}
-
-
-/**
- * Convert a byte value to an integer supporting "php.ini" shorthand notation ("K", "M", "G").
- *
- * @param  string|int $value - byte value
- *
- * @return int - converted byte value
- */
-function php_byte_value($value): int {
-    if (is_int($value)) return $value;
-    Assert::string($value);
-    if (!strlen($value)) return 0;
-
-    $match = null;
-    if (!preg_match('/^([+-]?[0-9]+)([KMG]?)$/i', $value, $match)) {
-        throw new InvalidValueException('Invalid parameter $value: "'.$value.'" (not a PHP byte value)');
-    }
-
-    $iValue = (int)$match[1];
-
-    switch (strtoupper($match[2])) {
-        case 'K': $iValue <<= 10; break;    // 1024
-        case 'M': $iValue <<= 20; break;    // 1024 * 1024
-        case 'G': $iValue <<= 30; break;    // 1024 * 1024 * 1024
-    }
-    return $iValue;
-}
-
-
-/**
- * Inline replacement for number_format() removing the default parameter violation.
- *
- * @param  float  $number
- * @param  int    $decimals           [optional] - default: 0
- * @param  string $decimalSeparator   [optional] - default: dot "."
- * @param  string $thousandsSeparator [optional] - default: comma ","
- *
- * @return string - formatted number
- */
-function numf(float $number, int $decimals = 0, string $decimalSeparator = '.', string $thousandsSeparator = ','): string {
-    return number_format($number, $decimals, $decimalSeparator, $thousandsSeparator);
-}
-
-
-/**
- * Return the value of a "php.ini" option as a boolean.
- *
- * NOTE: Don't use ini_get() to read boolean "php.ini" values as it will return the plain string as passed to ini_set().
- *
- * @param  string $option            - option name
- * @param  bool   $strict [optional] - whether to enable strict checking of the found value:
- *                                     TRUE:  invalid values cause a runtime exception (default)
- *                                     FALSE: invalid values are converted to a boolean
- *
- * @return ?bool - boolean value or NULL if the setting doesn't exist
- */
-function ini_get_bool(string $option, bool $strict = true): ?bool {
-    $value = \ini_get($option);
-
-    if ($value === false) return null;      // setting doesn't exist
-    if ($value === '')    return false;     // setting is empty or NULL (unset)
-
-    $flags = $strict ? FILTER_NULL_ON_FAILURE : 0;
-    /** @var ?bool $result */
-    $result = filter_var($value, FILTER_VALIDATE_BOOLEAN, $flags);
-
-    if ($result === null) {
-        throw new InvalidValueException("Invalid \"php.ini\" setting for strict type boolean: \"$option\" = \"$value\"");
-    }
+function realpath(string $path): string {
+    $result = \realpath($path);
+    if ($result === false) throw new ErrorException("Error executing realpath(\"$path\") => false");
     return $result;
 }
 
 
 /**
- * Return the value of a "php.ini" option as an integer.
+ * Lookup and return a {@link Url} helper for the named {@link \rosasurfer\ministruts\struts\ActionMapping}.
  *
- * NOTE: Don't use ini_get() to read "php.ini" integer values as it will return the plain string as passed to ini_set().
+ * @param  string $name - route name
  *
- * @param  string $option            - option name
- * @param  bool   $strict [optional] - whether to enable strict checking of the found value:
- *                                     TRUE:  invalid values cause a runtime exception (default)
- *                                     FALSE: invalid values are converted to an integer
- *
- * @return ?int - integer value or NULL if the setting doesn't exist
+ * @return Url
  */
-function ini_get_int(string $option, bool $strict = true): ?int {
-    $value = \ini_get($option);
+function route(string $name): Url {
+    $path = $query = $hash = null;
 
-    if ($value === false) return null;      // setting doesn't exist
-    if ($value === '')    return 0;         // setting is empty or NULL (unset)
-
-    $iValue = (int)$value;
-
-    if ($strict && $value !== (string)$iValue) {
-        throw new InvalidValueException("Invalid \"php.ini\" setting for strict type int: \"$option\" = \"$value\"");
+    $pos = strpos($name, '#');
+    if ($pos !== false) {
+        $hash = substr($name, $pos);
+        $name = substr($name, 0, $pos);
     }
-    return $iValue;
+    $pos = strpos($name, '?');
+    if ($pos !== false) {
+        $query = substr($name, $pos);
+        $name  = substr($name, 0, $pos);
+    }
+
+    $module = Request::getModule();
+    if (!$module) throw new RuntimeException("Request module not found");
+
+    $mapping = $module->getMapping($name);
+    if (!$mapping) throw new RuntimeException("Route \"$name\" not found");
+
+    $path = $mapping->getPath();
+    if ($path[0] == '/') {
+        $path = ($path=='/') ? '' : substr($path, 1);   // substr() returns FALSE on start==length
+    }
+    if ($query) $path .= $query;
+    if ($hash)  $path .= $hash;
+
+    return new Url($path);
 }
 
 
 /**
- * Return the value of a "php.ini" option as a byte value supporting PHP shorthand notation ("K", "M", "G").
+ * Return the simple name of a class (i.e. the base name).
  *
- * NOTE: Don't use ini_get() to read "php.ini" byte values as it will return the plain string as passed to ini_set().
+ * @param  string|object $class - class name or instance
  *
- * @param  string $option            - option name
- * @param  bool   $strict [optional] - whether to enable strict checking of the found value:
- *                                     TRUE:  invalid values cause a runtime exception (default)
- *                                     FALSE: invalid values are converted to an integer
- *
- * @return ?int - integer value or NULL if the setting doesn't exist
+ * @return string
  */
-function ini_get_bytes(string $option, bool $strict = true): ?int {
-    $value = \ini_get($option);
-
-    if ($value === false) return null;      // setting doesn't exist
-    if ($value === '')    return 0;         // setting is empty or NULL (unset)
-
-    $result = 0;
-    try {
-        $result = php_byte_value($value);
+function simpleClassName($class) {
+    if (is_object($class)) {
+        $class = get_class($class);
     }
-    catch (InvalidValueException $ex) {
-        if ($strict) throw new InvalidValueException("Invalid \"php.ini\" setting for PHP byte value: \"$option\" = \"$value\"", 0, $ex);
-        $result = (int)$value;
-    }
-    return $result;
+    else Assert::string($class);
+
+    return strRightFrom($class, '\\', -1, false, $class);
 }
 
 
 /**
- * Convert special characters to HTML entities.
+ * Print a message to STDERR.
  *
- * Inline replacement and shortcut for htmlspecialchars() using different default flags.
+ * @param  string $message
  *
- * @param  string  $string
- * @param  ?int    $flags        [optional] - default: ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5
- * @param  ?string $encoding     [optional] - default: 'UTF-8'
- * @param  bool    $doubleEncode [optional] - default: TRUE
- *
- * @return string - converted string
- *
- * @see   \htmlspecialchars()
+ * @return void
  */
-function hsc(string $string, ?int $flags = null, ?string $encoding = null, bool $doubleEncode = true): string {
-    if (!isset($flags))    $flags = ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5;
-    if (!isset($encoding)) $encoding = 'UTF-8';
-
-    return htmlspecialchars($string, $flags, $encoding, $doubleEncode);
+function stderr(string $message): void {
+    $hStream = CLI ? \STDERR : fopen('php://stderr', 'a');
+    fwrite($hStream, $message);
+    if (!CLI) fclose($hStream);
 }
 
 
 /**
- * Whether the byte order of the machine we are running on is "little endian".
+ * Print a message to STDOUT.
  *
- * @return bool
+ * @param  string $message
+ *
+ * @return void
  */
-function isLittleEndian(): bool {
-    return (pack('S', 1) == "\x01\x00");
+function stdout(string $message): void {
+    $hStream = CLI ? \STDOUT : fopen('php://stdout', 'a');
+    fwrite($hStream, $message);
+    if (!CLI) fclose($hStream);
 }
 
 
 /**
- * Whether the specified path is relative or absolute, according to the current operating system.
+ * Collapse multiple consecutive white space characters in a string to a single one.
  *
- * @param  string $path
+ * @param  string $string               - string to process
+ * @param  bool   $joinLines [optional] - whether to return a single line result (default: yes)
+ * @param  string $separator [optional] - the separator to use for joining (default: space character " ")
  *
- * @return bool
+ * @return string
  */
-function isRelativePath(string $path): bool {
-    if (WINDOWS) {
-        return !preg_match('/^[a-z]:/i', $path);
+function strCollapseWhiteSpace(string $string, bool $joinLines=true, string $separator=' '): string {
+    $string = normalizeEOL($string);
+    if ($joinLines) {
+        $string = str_replace(EOL_UNIX, $separator, $string);
     }
-    if (strlen($path) && $path[0]=='/') {
-        return false;
-    }
-    return true;                // an empty string cannot be considered absolute, so it's interpreted as relative
+    return preg_replace('/\s+/', ' ', $string);
 }
 
 
@@ -721,51 +1102,6 @@ function strContainsI(string $haystack, string $needle) : bool {
 
 
 /**
- * Whether a string starts with a substring. If multiple prefixes are given, whether the string
- * starts with one of them.
- *
- * @param  string          $string
- * @param  string|string[] $prefix                - one or more prefixes
- * @param  bool            $ignoreCase [optional] - default: no
- *
- * @return bool
- */
-function strStartsWith(string $string, $prefix, bool $ignoreCase = false): bool {
-    if (is_array($prefix)) {
-        foreach ($prefix as $p) {
-            if (strStartsWith($string, $p, $ignoreCase)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    Assert::string($prefix, '$prefix');
-
-    if (!strlen($string) || !strlen($prefix)) {
-        return false;
-    }
-    if ($ignoreCase) {
-        return (stripos($string, $prefix) === 0);
-    }
-    return (strpos($string, $prefix) === 0);
-}
-
-
-/**
- * Whether a string starts with a substring ignoring case differences. If multiple prefixes
- * are given, whether the string starts with one of them.
- *
- * @param  string          $string
- * @param  string|string[] $prefix - one or more prefixes
- *
- * @return bool
- */
-function strStartsWithI(string $string, $prefix): bool  {
-    return strStartsWith($string, $prefix, true);
-}
-
-
-/**
  * Whether a string ends with a substring. If multiple suffixes are given, whether the string
  * ends with one of them.
  *
@@ -810,6 +1146,83 @@ function strEndsWith(string $string, $suffix, bool $ignoreCase = false): bool {
  */
 function strEndsWithI(string $string, $suffix): bool {
     return strEndsWith($string, $suffix, true);
+}
+
+
+/**
+ * Whether a string consists only of digits (0-9).
+ *
+ * @param  string $string
+ *
+ * @return bool
+ */
+function strIsDigits(string $string): bool {
+    return ctype_digit($string);
+}
+
+
+/**
+ * Whether a string is wrapped in double quotes.
+ *
+ * @param  string $string
+ *
+ * @return bool
+ */
+function strIsDoubleQuoted(string $string): bool {
+    $len = strlen($string);
+    if ($len > 1) {
+        return ($string[0]=='"' && $string[--$len]=='"');
+    }
+    return false;
+}
+
+
+/**
+ * Whether a string consists only of numerical characters and represents a valid numerical value. Unlike the built-in
+ * PHP function is_numeric() this function returns FALSE if the string begins with non-numerical characters
+ * (e.g. white space).
+ *
+ * @param  string $string
+ *
+ * @return bool
+ */
+function strIsNumeric(string $string): bool {
+    if (is_numeric($string)) {
+        return ctype_graph($string);
+    }
+    return false;
+}
+
+
+/**
+ * Whether a string is wrapped in single or double quotes.
+ *
+ * @param  string $string
+ *
+ * @return bool
+ */
+function strIsQuoted(string $string): bool {
+    $len = strlen($string);
+    if ($len > 1) {
+        return (strIsSingleQuoted($string) || strIsDoubleQuoted($string));
+    }
+    return false;
+}
+
+
+/**
+ * Whether a string is wrapped in single quotes.
+ *
+ * @param  string $string
+ *
+ * @return bool
+ */
+function strIsSingleQuoted(string $string): bool {
+    $len = strlen($string);
+    if ($len > 1) {
+        return ($string[0]=="'" && $string[--$len]=="'");
+    }
+    return false;
 }
 
 
@@ -999,79 +1412,47 @@ function strRightFrom(string $string, string $limiter, int $count=1, bool $inclu
 
 
 /**
- * Whether a string is wrapped in single or double quotes.
+ * Whether a string starts with a substring. If multiple prefixes are given, whether the string
+ * starts with one of them.
  *
- * @param  string $string
+ * @param  string          $string
+ * @param  string|string[] $prefix                - one or more prefixes
+ * @param  bool            $ignoreCase [optional] - default: no
  *
  * @return bool
  */
-function strIsQuoted(string $string): bool {
-    $len = strlen($string);
-    if ($len > 1) {
-        return (strIsSingleQuoted($string) || strIsDoubleQuoted($string));
+function strStartsWith(string $string, $prefix, bool $ignoreCase = false): bool {
+    if (is_array($prefix)) {
+        foreach ($prefix as $p) {
+            if (strStartsWith($string, $p, $ignoreCase)) {
+                return true;
+            }
+        }
+        return false;
     }
-    return false;
+    Assert::string($prefix, '$prefix');
+
+    if (!strlen($string) || !strlen($prefix)) {
+        return false;
+    }
+    if ($ignoreCase) {
+        return (stripos($string, $prefix) === 0);
+    }
+    return (strpos($string, $prefix) === 0);
 }
 
 
 /**
- * Whether a string is wrapped in single quotes.
+ * Whether a string starts with a substring ignoring case differences. If multiple prefixes
+ * are given, whether the string starts with one of them.
  *
- * @param  string $string
- *
- * @return bool
- */
-function strIsSingleQuoted(string $string): bool {
-    $len = strlen($string);
-    if ($len > 1) {
-        return ($string[0]=="'" && $string[--$len]=="'");
-    }
-    return false;
-}
-
-
-/**
- * Whether a string is wrapped in double quotes.
- *
- * @param  string $string
+ * @param  string          $string
+ * @param  string|string[] $prefix - one or more prefixes
  *
  * @return bool
  */
-function strIsDoubleQuoted(string $string): bool {
-    $len = strlen($string);
-    if ($len > 1) {
-        return ($string[0]=='"' && $string[--$len]=='"');
-    }
-    return false;
-}
-
-
-/**
- * Whether a string consists only of digits (0-9).
- *
- * @param  string $string
- *
- * @return bool
- */
-function strIsDigits(string $string): bool {
-    return ctype_digit($string);
-}
-
-
-/**
- * Whether a string consists only of numerical characters and represents a valid numerical value. Unlike the built-in
- * PHP function is_numeric() this function returns FALSE if the string begins with non-numerical characters
- * (e.g. white space).
- *
- * @param  string $string
- *
- * @return bool
- */
-function strIsNumeric(string $string): bool {
-    if (is_numeric($string)) {
-        return ctype_graph($string);
-    }
-    return false;
+function strStartsWithI(string $string, $prefix): bool  {
+    return strStartsWith($string, $prefix, true);
 }
 
 
@@ -1251,93 +1632,28 @@ function strToTimestamp(string $string, $format = 'Y-m-d') {
 
 
 /**
- * Collapse multiple consecutive white space characters in a string to a single one.
+ * Execute a task in a synchronized way. Emulates the Java keyword "synchronized".
  *
- * @param  string $string               - string to process
- * @param  bool   $joinLines [optional] - whether to return a single line result (default: yes)
- * @param  string $separator [optional] - the separator to use for joining (default: space character " ")
+ * @param  Closure $task             - task to execute (an anonymous function is implicitly casted)
+ * @param  ?string $mutex [optional] - mutex identifier (default: the calling line of code)
  *
- * @return string
+ * @return void
  */
-function strCollapseWhiteSpace(string $string, bool $joinLines=true, string $separator=' '): string {
-    $string = normalizeEOL($string);
-    if ($joinLines) {
-        $string = str_replace(EOL_UNIX, $separator, $string);
+function synchronized(Closure $task, ?string $mutex = null): void {
+    if (!isset($mutex)) {
+        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        $file  = $trace[0]['file'] ?? '';
+        $line  = $trace[0]['line'] ?? '';
+        $mutex = "$file#$line";
     }
-    return preg_replace('/\s+/', ' ', $string);
-}
+    $lock = new Lock($mutex);
 
-
-/**
- * Normalize EOL markers in a string. If the string contains mixed line endings the number of lines of the passed and the
- * resulting string may differ. Netscape line endings are honored only if all line endings are Netscape format (no mixed mode).
- *
- * @param  string $string          - string to normalize
- * @param  string $mode [optional] - format of the resulting string, can be one of:                             <br>
- *                                   EOL_MAC:      line endings are converted to Mac format      "\r"           <br>
- *                                   EOL_NETSCAPE: line endings are converted to Netscape format "\r\r\n"       <br>
- *                                   EOL_UNIX:     line endings are converted to Unix format     "\n" (default) <br>
- *                                   EOL_WINDOWS:  line endings are converted to Windows format  "\r\n"         <br>
- * @return string
- */
-function normalizeEOL(string $string, string $mode = EOL_UNIX): string {
-    $done = false;
-
-    if (strContains($string, EOL_NETSCAPE)) {
-        $count1 = $count2 = null;
-        $tmp = str_replace(EOL_NETSCAPE, EOL_UNIX, $string, $count1);
-        if (!strContains($tmp, EOL_MAC)) {
-            str_replace(EOL_UNIX, '.', $tmp, $count2);
-            if ($count1 == $count2) {
-                $string = $tmp;            // only Netscape => OK
-                $done = true;
-            }
-        }
+    try {
+        $task();
     }
-    if (!$done) $string = str_replace([EOL_WINDOWS, EOL_MAC], EOL_UNIX, $string);
-
-    if ($mode==EOL_MAC || $mode==EOL_NETSCAPE || $mode==EOL_WINDOWS) {
-        $string = str_replace(EOL_UNIX, $mode, $string);
+    finally {
+        $lock->release();
     }
-    elseif ($mode != EOL_UNIX) {
-        throw new InvalidValueException("Invalid parameter \$mode: \"$mode\"");
-    }
-    return $string;
-}
-
-
-/**
- * Convert an object to an array.
- *
- * @param  object $object
- * @param  int    $access [optional] - access levels of the properties to return in the result (default: ACCESS_PUBLIC)
- *
- * @return array<string, mixed>
- */
-function objectToArray(object $object, int $access = ACCESS_PUBLIC): array {
-    $source = (array)$object;
-    $array = [];
-
-    foreach ($source as $name => $value) {
-        if ($name[0] != "\0") {                     // public
-            if ($access & ACCESS_PUBLIC) {
-                $array[$name] = $value;
-            }
-        }
-        elseif ($name[1] == '*') {                  // protected
-            if ($access & ACCESS_PROTECTED) {
-                $publicName = substr($name, 3);
-                $array[$publicName] = $value;
-            }
-        }
-        elseif ($access & ACCESS_PRIVATE) {         // private
-            $publicName = strRightFrom($name, "\0", 2);
-            if (!\key_exists($publicName, $array)) {
-                $array[$publicName] = $value;
-            }
-        }
-    }
-    return $array;
 }
 
 
@@ -1354,236 +1670,6 @@ function typeof($var): string {
 
 
 /**
- * Manually load the specified class, interface or trait. If the component was already loaded the call does nothing.
- *
- * @param  string $name - name
- *
- * @return ?string - the same name or NULL if a component of that name doesn't exist or couldn't be loaded
- */
-function autoload(string $name): ?string {
-    if (class_exists($name, true) || interface_exists($name, true) || trait_exists($name, true)) {
-        return $name;
-    }
-    return null;
-}
-
-
-/**
- * Whether the specified class exists (loaded or not) and is not an interface or a trait. Same as
- * <pre>class_exists($name, true)</pre> but suppresses auto loading errors.
- *
- * @param  string $name - class name
- *
- * @return bool
- */
-function is_class(string $name): bool {
-    try {
-        return class_exists($name, true);
-    }
-    catch (Throwable $ex) {}            // faulty class loaders may interrupt the script
-
-    return class_exists($name, false);
-}
-
-
-/**
- * Whether the specified interface exists (loaded or not) and is not a class or a trait. Same as
- * <pre>interface_exists($name, true)</pre> but suppresses auto loading errors.
- *
- * @param  string $name - interface name
- *
- * @return bool
- */
-function is_interface(string $name): bool {
-    try {
-        return interface_exists($name, true);
-    }
-    catch (Throwable $ex) {}            // faulty class loaders may interrupt the script
-
-    return interface_exists($name, false);
-}
-
-
-/**
- * Whether the specified trait exists (loaded or not) and is not a class or an interface. Same as
- * <pre>trait_exists($name, true)</pre> but suppresses auto loading errors.
- *
- * @param  string $name - trait name
- *
- * @return bool
- */
-function is_trait(string $name): bool {
-    try {
-        return trait_exists($name, true);
-    }
-    catch (Throwable $ex) {}            // faulty class loaders may interrupt the script
-
-    return trait_exists($name, false);
-}
-
-
-/**
- * Whether a variable can be used like an array.
- *
- * Complement for PHP's <tt>is_array()</tt> function adding support for {@link \ArrayAccess} arguments.
- *
- * @param  mixed $var
- *
- * @return bool
- */
-function is_array_like($var): bool {
-    return \is_array($var) || $var instanceof \ArrayAccess;
-}
-
-
-/**
- * Return the simple name of a class (i.e. the base name).
- *
- * @param  string|object $class - class name or instance
- *
- * @return string
- */
-function simpleClassName($class) {
-    if (is_object($class)) {
-        $class = get_class($class);
-    }
-    else Assert::string($class);
-
-    return strRightFrom($class, '\\', -1, false, $class);
-}
-
-
-/**
- * Return one of the meta types "class", "interface" or "trait" for a component identifier.
- *
- * @param  string $name - name
- *
- * @return string - meta type
- */
-function metatypeOf(string $name): string {
-    if ($name == '') throw new InvalidValueException('Invalid parameter $name: "" (empty)');
-
-    if (is_class    ($name)) return 'class';
-    if (is_interface($name)) return 'interface';
-    if (is_trait    ($name)) return 'trait';
-
-    return '(unknown type)';
-}
-
-
-/**
- * Return the host name of the internet host specified by a given IP address.
- *
- * @param  string $ipAddress - the host IP address
- *
- * @return string - the host name on success, or the unmodified IP address on resolver error
- */
-function getHostByAddress(string $ipAddress): string {
-    if ($ipAddress == '') throw new InvalidValueException('Invalid parameter $ipAddress: "" (empty)');
-
-    $result = \gethostbyaddr($ipAddress);
-
-    if ($result === false) throw new InvalidValueException("Invalid parameter \$ipAddress: \"$ipAddress\"");
-
-    if ($result==='localhost' && !strStartsWith($ipAddress, '127.')) {
-        $result = $ipAddress;
-    }
-    return $result;
-}
-
-
-/**
- * Return a sorted copy of the specified array using the algorythm and parameters of {@link \ksort()}.
- * Unlike the PHP function this function will not modify the passed array.
- *
- * @param  mixed[] $values
- * @param  int     $flags [optional]
- *
- * @return mixed[]
- */
-function ksortc(array $values, int $flags = SORT_REGULAR): array {
-    ksort($values, $flags);
-    return $values;
-}
-
-
-/**
- * Return a pluralized string according to the specified number of items.
- *
- * @param  int    $count               - the number of items to determine the output from
- * @param  string $singular [optional] - singular form of string (default: empty string)
- * @param  string $plural   [optional] - plural form of string (default: "s")
- *
- * @return string
- */
-function pluralize(int $count, string $singular='', string $plural='s'): string {
-    if (abs($count) == 1) {
-        return $singular;
-    }
-    return $plural;
-}
-
-
-/**
- * Execute a task in a synchronized way. Emulates the Java keyword "synchronized".
- *
- * @param  Closure $task             - task to execute (an anonymous function is implicitly casted)
- * @param  ?string $mutex [optional] - mutex identifier (default: the calling line of code)
- *
- * @return void
- */
-function synchronized(Closure $task, ?string $mutex = null): void {
-    if (!isset($mutex)) {
-        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-        $mutex = $trace[0]['file'].'#'.$trace[0]['line'];
-    }
-    $lock = new Lock($mutex);
-
-    try {
-        $task();
-    }
-    finally {
-        $lock->release();
-    }
-}
-
-
-/**
- * Lookup and return a {@link Url} helper for the named {@link \rosasurfer\ministruts\struts\ActionMapping}.
- *
- * @param  string $name - route name
- *
- * @return Url
- */
-function route(string $name): Url {
-    $path = $query = $hash = null;
-
-    $pos = strpos($name, '#');
-    if ($pos !== false) {
-        $hash = substr($name, $pos);
-        $name = substr($name, 0, $pos);
-    }
-    $pos = strpos($name, '?');
-    if ($pos !== false) {
-        $query = substr($name, $pos);
-        $name  = substr($name, 0, $pos);
-    }
-
-    $mapping = Request::getModule()->getMapping($name);
-    if (!$mapping) throw new RuntimeException("Route \"$name\" not found");
-
-    $path = $mapping->getPath();
-    if ($path[0] == '/') {
-        $path = ($path=='/') ? '' : substr($path, 1);   // substr() returns FALSE on start==length
-    }
-    if ($query) $path .= $query;
-    if ($hash)  $path .= $hash;
-
-    return new Url($path);
-}
-
-
-/**
  * Return a {@link Url} helper for the given URI. An URI starting with a slash "/" is interpreted as relative
  * to the application's base URI. An URI not starting with a slash is interpreted as relative to the application
  * {@link Module}'s base URI (the module the current request belongs to).
@@ -1596,35 +1682,4 @@ function route(string $name): Url {
  */
 function url(string $uri): Url {
     return new Url($uri);
-}
-
-
-/**
- * Return a version-aware URL helper for the given URI {@link VersionedUrl}. An URI starting with a slash "/"
- * is interpreted as relative to the application's base URI. An URI not starting with a slash is interpreted as
- * relative to the application {@link Module}'s base URI (the module the current request belongs to).
- *
- * Procedural equivalent of <tt>new \rosasurfer\ministruts\struts\url\VersionedUrl($uri)</tt>.
- *
- * @param  string $uri
- *
- * @return VersionedUrl
- */
-function asset(string $uri): VersionedUrl {
-    return new VersionedUrl($uri);
-}
-
-
-/**
- * Parse command line arguments and match them against the specified {@link https://docopt.org/#} syntax definition.
- *
- * @param  string                     $doc                - help text, i.e. a syntax definition in Docopt language format
- * @param  string|string[]|null       $args    [optional] - arguments to parse (default: the arguments passed in $_SERVER['argv'])
- * @param  array<string, bool|string> $options [optional] - parser options (default: none)
- *
- * @return DocoptResult - the parsing result
- */
-function docopt(string $doc, $args=null, array $options=[]): DocoptResult {
-    $parser = new DocoptParser($options);
-    return $parser->parse($doc, $args);
 }
