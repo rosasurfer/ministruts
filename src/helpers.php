@@ -799,37 +799,6 @@ function pluralize(int $count, string $singular='', string $plural='s'): string 
 
 
 /**
- * Same as the builtin function but throws an exception in case of errors.
- *
- * @param  string|string[] $pattern
- * @param  string|string[] $replacement
- * @param  string|string[] $subject
- * @param  int             $limit  [optional]
- * @param  int             &$count [optional]
- *
- * @return ($subject is array ? string[] : string)
- *
- * @throws ErrorException in case of errors
- *
- * @link   http://www.php.net/manual/en/function.preg-replace.php
- */
-function preg_replace($pattern, $replacement, $subject, int $limit=-1, int &$count=null) {
-    // This wrapper is just here to make PHPStan happy.
-    $argc = func_num_args();
-
-    $args[] = $pattern;
-    $args[] = $replacement;
-    $args[] = $subject;
-    if ($argc > 3) $args[] = $limit;
-    if ($argc > 4) $args[] = $count;
-
-    $result = \preg_replace(...$args);
-    if ($result === null) throw new ErrorException('Error executing preg_replace(...) => NULL');
-    return $result;
-}
-
-
-/**
  * Format a byte value.
  *
  * @param  int|float|string $value               - byte value
@@ -916,18 +885,18 @@ function print_p($var, bool $return = false, bool $flushBuffers = true): ?string
 
 
 /**
- * Returns the canonicalized absolute pathname of a path. Expands all symbolic links and resolves relative references.
  * Same as the builtin function but throws an exception in case of errors.
  *
- * @param  string $path - The path being checked. An empty string is interpreted as the current directory.
+ * @param  string $path
  *
- * @return string - canonicalized absolute pathname
+ * @return string
  *
  * @throws ErrorException in case of errors
  *
  * @link   http://www.php.net/manual/en/function.realpath.php
  */
 function realpath(string $path): string {
+    // realpath() can return FALSE without generating an internal error
     $result = \realpath($path);
     if ($result === false) throw new ErrorException("Error executing realpath(\"$path\") => false");
     return $result;
@@ -1031,7 +1000,9 @@ function strCollapseWhiteSpace(string $string, bool $joinLines=true, string $sep
     if ($joinLines) {
         $string = str_replace(EOL_UNIX, $separator, $string);
     }
-    return preg_replace('/\s+/', ' ', $string);
+    /** @var string result */
+    $result = preg_replace('/\s+/', ' ', $string);
+    return $result;
 }
 
 
