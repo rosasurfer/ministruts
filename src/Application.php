@@ -8,7 +8,7 @@ use rosasurfer\core\CObject;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\debug\ErrorHandler;
 use rosasurfer\core\exception\InvalidArgumentException;
-use rosasurfer\di\DiInterface;
+use rosasurfer\di\DiInterface as Di;
 use rosasurfer\di\defaultt\CliServiceContainer;
 use rosasurfer\di\defaultt\WebServiceContainer;
 use rosasurfer\log\Logger;
@@ -23,10 +23,10 @@ use rosasurfer\util\PHP;
 class Application extends CObject {
 
 
-    /** @var ?ConfigInterface - the application's current default configuration */
+    /** @var ?ConfigInterface - the application's current configuration */
     protected static $defaultConfig;
 
-    /** @var ?DiInterface - the application's current default DI container */
+    /** @var ?Di - the application's current dependency container */
     protected static $defaultDi;
 
     /** @var Command[] - registered CLI commands */
@@ -77,7 +77,7 @@ class Application extends CObject {
         /** @var DefaultConfig $config */
         $config = $this->initDefaultConfig($options);
 
-        /** @var DiInterface $di */
+        /** @var Di $di */
         $di = $this->initDefaultDi($config['app.dir.config']);
         $di->set('app', $this);
         $di->set('config', $config);
@@ -320,7 +320,7 @@ class Application extends CObject {
      *
      * @param  string $serviceDir - directory with service configurations
      *
-     * @return DiInterface
+     * @return Di
      */
     protected function initDefaultDi($serviceDir) {
         $this->setDi($di = CLI ? new CliServiceContainer($serviceDir) : new WebServiceContainer($serviceDir));
@@ -392,7 +392,7 @@ class Application extends CObject {
 
 
     /**
-     * Return the current default configuration of the {@link Application}. This is the configuration previously set
+     * Return the current configuration of the {@link Application}. This is the configuration previously set
      * with {@link Application::setConfig()}.
      *
      * @return ?ConfigInterface
@@ -403,11 +403,11 @@ class Application extends CObject {
 
 
     /**
-     * Set a new default configuration for the {@link Application}.
+     * Set a new configuration for the {@link Application}.
      *
      * @param  ConfigInterface $configuration
      *
-     * @return ?ConfigInterface - the previously registered default configuration
+     * @return ?ConfigInterface - the previously registered configuration (if any)
      */
     final public static function setConfig(ConfigInterface $configuration) {
         $previous = self::$defaultConfig;
@@ -419,10 +419,10 @@ class Application extends CObject {
 
 
     /**
-     * Return the default dependency injection container of the {@link Application}. This is the instance previously set
+     * Return the current dependency container of the {@link Application}. This is the instance previously set
      * with {@link Application::setDi()}.
      *
-     * @return ?DiInterface
+     * @return ?Di
      */
     public static function getDi() {
         return self::$defaultDi;
@@ -430,13 +430,13 @@ class Application extends CObject {
 
 
     /**
-     * Set a new default dependency injection container for the {@link Application}.
+     * Set a new dependency container for the {@link Application}.
      *
-     * @param  DiInterface $di
+     * @param  Di $di
      *
-     * @return ?DiInterface - the previously registered default container
+     * @return ?Di - the previously registered dependency container
      */
-    final public static function setDi(DiInterface $di) {
+    final public static function setDi(Di $di) {
         $previous = self::$defaultDi;
         if (!$di->has('app') && $previous && $previous->has('app')) {
             $di['app'] = $previous['app'];

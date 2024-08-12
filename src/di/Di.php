@@ -178,6 +178,7 @@ class Di extends CObject implements DiInterface {
      *
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($name) {
         return $this->has($name);
     }
@@ -194,6 +195,7 @@ class Di extends CObject implements DiInterface {
      * @throws ServiceNotFoundException if the service was not found
      * @throws ContainerException       if the dependency could not be resolved
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($name) {
         return $this->get($name);
     }
@@ -204,7 +206,10 @@ class Di extends CObject implements DiInterface {
      *
      * @param  string        $name       - service identifier
      * @param  string|object $definition - a class name, an instance or a Closure acting as an instance factory
+     *
+     * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($name, $definition) {
         $this->set($name, $definition);
     }
@@ -214,7 +219,10 @@ class Di extends CObject implements DiInterface {
      * Remove a service from the container using {@link \ArrayAccess} syntax.
      *
      * @param  string $name - service identifier
+     *
+     * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($name) {
         $this->remove($name);
     }

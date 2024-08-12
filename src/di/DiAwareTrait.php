@@ -12,7 +12,7 @@ trait DiAwareTrait {
 
 
     /**
-     * Resolve a named service and return its implementation using the service locator pattern, or return the dependency injection
+     * Resolve a named service and return its implementation using the service locator pattern, or return the dependency
      * container of the {@link \rosasurfer\Application}.
      *
      * @param  ?string $name [optional] - service identifier (default: none to return the DI container)
@@ -21,8 +21,9 @@ trait DiAwareTrait {
      */
     protected static function di($name = null) {
         $di = Application::getDi();
-        if ($di && isset($name))
+        if ($di && isset($name)) {
             return $di->get($name);
+        }
         return $di;
     }
 }

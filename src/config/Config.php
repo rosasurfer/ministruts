@@ -590,6 +590,7 @@ class Config extends CObject implements ConfigInterface {
      *
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($key) {
         Assert::string($key);
         $notFound = false;
@@ -608,6 +609,7 @@ class Config extends CObject implements ConfigInterface {
      *
      * @throws RuntimeException if the setting does not exist
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($key) {
         return $this->get($key);
     }
@@ -619,11 +621,11 @@ class Config extends CObject implements ConfigInterface {
      * @param  string $key   - case-insensitive key
      * @param  mixed  $value - new value
      *
-     * @return mixed - new value
+     * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($key, $value) {
         $this->set($key, $value);
-        return $value;
     }
 
 
@@ -631,7 +633,10 @@ class Config extends CObject implements ConfigInterface {
      * Unset the config setting with the specified key.
      *
      * @param  string $key - case-insensitive key
+     *
+     * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($key) {
         $this->set($key, null);
     }
