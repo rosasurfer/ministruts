@@ -57,7 +57,4 @@ parameters:
   tipsOfTheDay: false
 
 
-services:
-  - class: rosasurfer\ministruts\phpstan\extension\CoreFunctionReturnType
-    tags:
-      - phpstan.broker.dynamicFunctionReturnTypeExtension
+services: []

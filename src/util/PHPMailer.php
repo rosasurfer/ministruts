@@ -245,14 +245,13 @@ class PHPMailer extends CObject {
      *
      * @return ?string - value of the last found header or NULL if the header was not found
      */
-    protected function getHeader(array $headers, $name) {
-        Assert::string($name, '$name');
-        if (!preg_match('/^[a-z]+(-[a-z]+)*$/i', $name)) throw new InvalidValueException('Invalid parameter $name: "'.$name.'"');
+    protected function getHeader(array $headers, string $name): ?string {
+        if (!preg_match('/^[a-z]+(-[a-z]+)*$/i', $name)) throw new InvalidValueException("Invalid parameter $name: \"$name\"");
 
         // reversely iterate over the array to find the last of duplicate headers
         for (end($headers); key($headers)!==null; prev($headers)){
             $header = current($headers);
-            if (strStartsWithI($header, $name.':')) {
+            if (strStartsWithI($header, "$name:")) {
                 return trim(substr($header, strlen($name)+1));
             }
         }
@@ -269,9 +268,8 @@ class PHPMailer extends CObject {
      *
      * @return ?string - value of the last removed header or NULL if the header was not found
      */
-    protected function removeHeader(array &$headers, $name) {
-        Assert::string($name, '$name');
-        if (!preg_match('/^[a-z]+(-[a-z]+)*$/i', $name)) throw new InvalidValueException('Invalid parameter $name: "'.$name.'"');
+    protected function removeHeader(array &$headers, string $name): ?string {
+        if (!preg_match('/^[a-z]+(-[a-z]+)*$/i', $name)) throw new InvalidValueException("Invalid parameter $name: \"$name\"");
 
         $result = null;
 

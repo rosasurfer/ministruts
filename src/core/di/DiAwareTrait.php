@@ -26,8 +26,7 @@ trait DiAwareTrait {
      */
     protected static function di($name = null) {
         $di = Application::getDi();
-        // @phpstan-ignore booleanNot.alwaysFalse ($di may be NULL in the application's bootstrap phase)
-        if (!$di) throw new RuntimeException('Service container not yet initialized');
+        if (!$di) throw new RuntimeException('Service container not available');
 
         if (isset($name)) {
             return $di->get($name);

@@ -31,10 +31,10 @@ class Application extends CObject {
     protected static self $instance;
 
     /** @var ?Config - the application's main configuration */
-    protected static $config = null;
+    protected static ?Config $config = null;
 
     /** @var ?Di - the application's service container */
-    protected static $di = null;
+    protected static ?Di $di = null;
 
     /** @var Command[] - registered CLI commands */
     private array $commands;
@@ -398,9 +398,9 @@ class Application extends CObject {
      * Return the {@link Application}'s dependency/service container. This method should be used to access
      * the container from a non-class context (i.e. from procedural code).
      *
-     * @return Di
+     * @return ?Di
      */
-    public static function getDi(): Di {
+    public static function getDi(): ?Di {
         return self::$di;
     }
 

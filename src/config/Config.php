@@ -647,6 +647,7 @@ class Config extends CObject implements ConfigInterface {
      *
      * @throws RuntimeException if the setting does not exist
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($key) {
         return $this->get($key);
     }
@@ -658,11 +659,10 @@ class Config extends CObject implements ConfigInterface {
      * @param  string $key   - case-insensitive key
      * @param  mixed  $value - new value
      *
-     * @return mixed - new value
+     * @return void
      */
-    public function offsetSet($key, $value) {
+    public function offsetSet($key, $value): void {
         $this->set($key, $value);
-        return $value;
     }
 
 

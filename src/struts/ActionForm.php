@@ -181,7 +181,7 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
      *
      * @return bool
      */
-    public function offsetExists($name) {
+    public function offsetExists($name): bool {
         Assert::string($name);
 
         switch ($name) {
@@ -201,6 +201,7 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($name) {
         return $this->get($name);
     }
@@ -212,9 +213,11 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
      * @param  string $name
      * @param  mixed  $value
      *
+     * @return void
+     *
      * @throws IllegalAccessException
      */
-    final public function offsetSet($name, $value) {
+    final public function offsetSet($name, $value): void {
         throw new IllegalAccessException('Cannot set/modify ActionForm properties');
     }
 
@@ -224,9 +227,11 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
      *
      * @param  string $name
      *
+     * @return void
+     *
      * @throws IllegalAccessException
      */
-    final public function offsetUnset($name) {
+    final public function offsetUnset($name): void {
         throw new IllegalAccessException('Cannot set/modify ActionForm properties');
     }
 

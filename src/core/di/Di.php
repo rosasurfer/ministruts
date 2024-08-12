@@ -24,6 +24,7 @@ use rosasurfer\ministruts\core\di\service\ServiceNotFoundException;
  *  $di = new Di();                                         // creating a new container
  *  $di = $this->di();                                      // getting the default container in a class context
  *  $di = Application::getDi();                             // getting the default container in a non-class context
+ *  if (!$di) die('Service container not available');
  *
  *  // defining a parameterless service using a string
  *  $di->set('request', 'rosasurfer\\ministruts\\struts\\Request');
@@ -191,7 +192,7 @@ class Di extends CObject implements DiInterface {
      *
      * @return bool
      */
-    public function offsetExists($name) {
+    public function offsetExists($name): bool {
         return $this->has($name);
     }
 
@@ -207,6 +208,7 @@ class Di extends CObject implements DiInterface {
      * @throws ServiceNotFoundException if the service was not found
      * @throws ContainerException       if the dependency could not be resolved
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($name) {
         return $this->get($name);
     }
@@ -217,8 +219,10 @@ class Di extends CObject implements DiInterface {
      *
      * @param  string        $name       - service identifier
      * @param  string|object $definition - a class name, an instance or a Closure acting as an instance factory
+     *
+     * @return void
      */
-    public function offsetSet($name, $definition) {
+    public function offsetSet($name, $definition): void {
         $this->set($name, $definition);
     }
 
@@ -227,8 +231,10 @@ class Di extends CObject implements DiInterface {
      * Remove a service from the container using {@link \ArrayAccess} syntax.
      *
      * @param  string $name - service identifier
+     *
+     * @return void
      */
-    public function offsetUnset($name) {
+    public function offsetUnset($name): void {
         $this->remove($name);
     }
 }

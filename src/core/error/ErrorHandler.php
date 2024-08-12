@@ -160,9 +160,9 @@ class ErrorHandler extends StaticClass {
         self::setExceptionProperties($error, $trace);                       // let the stacktrace point to the trigger statement
 
         // handle the error accordingly
-        $alwaysLog = ($level & (E_DEPRECATED | E_USER_DEPRECATED | E_USER_NOTICE | E_USER_WARNING));
+        $neverThrow = ($level & (E_DEPRECATED | E_USER_DEPRECATED | E_USER_NOTICE | E_USER_WARNING));
 
-        if (self::$errorHandling == self::MODE_LOG || $alwaysLog) {         // only log the error
+        if ($neverThrow || self::$errorHandling == self::MODE_LOG) {        // log the error
             $error->prependMessage('PHP ' . self::errorLevelDescr($level) . ': ');
             switch ($level) {
                 case E_NOTICE           : $logLevel = L_NOTICE; break;
@@ -360,7 +360,7 @@ class ErrorHandler extends StaticClass {
 
 
     /**
-     * Return the description of an error reporting level.
+     * Return the description of a single error reporting level.
      *
      * @param  int $level - single error reporting level
      *
@@ -389,13 +389,13 @@ class ErrorHandler extends StaticClass {
 
 
     /**
-     * Return a readable representation of an error reporting flag.
+     * Return a string representation of a combination of error reporting levels.
      *
-     * @param  int $flag - combination of error reporting levels
+     * @param  int $flags - combination of error reporting levels
      *
      * @return string
      */
-    public static function errorLevelToStr(int $flag): string {
+    public static function errorLevelToStr(int $flags): string {
         // ordered by human-readable priorities (for conversion to string)
         $allLevels = [
             E_NOTICE            => 'E_NOTICE',                  //     8
@@ -418,7 +418,7 @@ class ErrorHandler extends StaticClass {
         $set = $notset = [];
 
         foreach ($allLevels as $level => $description) {
-            if ($flag & $level) {
+            if ($flags & $level) {
                 $set[] = $description;
             }
             else {

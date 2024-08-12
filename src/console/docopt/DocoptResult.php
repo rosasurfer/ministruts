@@ -121,6 +121,7 @@ class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
      *
      * @return bool|int|string[]|null
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         return $this->args[$offset];
     }
@@ -134,7 +135,7 @@ class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
      *
      * @return void
      */
-    public function offsetSet($offset, $value) {
+    public function offsetSet($offset, $value): void {
         throw new IllegalAccessException('Modification of CLI parse results denied');
     }
 
@@ -146,7 +147,7 @@ class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
      *
      * @return void
      */
-    public function offsetUnset($offset) {
+    public function offsetUnset($offset): void {
         throw new IllegalAccessException('Modification of CLI parse results denied');
     }
 
