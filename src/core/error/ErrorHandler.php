@@ -3,8 +3,10 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\core\error;
 
+use Exception;
 use Throwable;
 
+use rosasurfer\ministruts\config\ConfigInterface as Config;
 use rosasurfer\ministruts\core\StaticClass;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\log\Logger;
@@ -155,15 +157,16 @@ class ErrorHandler extends StaticClass {
 
         // convert error to a PHPError exception
         $message = strLeftTo($message, ' (this will throw an Error in a future version of PHP)', -1);
-        $error = new PHPError($message, 0, $level, $file, $line);
-        $trace = self::shiftStackFramesByLocation($error->getTrace(), $file, $line);
-        self::setExceptionProperties($error, $trace);                       // let the stacktrace point to the trigger statement
+        $exception = new PHPError($message, 0, $level, $file, $line);
+        $trace = self::shiftStackFramesByLocation($exception->getTrace(), $file, $line);
+        self::setExceptionProperties($exception, $trace);                   // let the stacktrace point to the trigger statement
 
         // handle the error accordingly
         $neverThrow = ($level & (E_DEPRECATED | E_USER_DEPRECATED | E_USER_NOTICE | E_USER_WARNING));
 
-        if ($neverThrow || self::$errorHandling == self::MODE_LOG) {        // log the error
-            $error->prependMessage('PHP ' . self::errorLevelDescr($level) . ': ');
+        if ($neverThrow || self::$errorHandling == self::MODE_LOG) {
+            // only log the error
+            $exception->prependMessage('PHP '.self::errorLevelDescr($level).': ');
             switch ($level) {
                 case E_NOTICE           : $logLevel = L_NOTICE; break;
                 case E_WARNING          : $logLevel = L_WARN;   break;
@@ -183,21 +186,28 @@ class ErrorHandler extends StaticClass {
 
                 default: $logLevel = L_ERROR;
             }
-            Logger::log($error, $logLevel, [
-                'file'          => $file,
-                'line'          => $line,
-                'error-handler' => true,
-            ]);
-            return $prevErrorHandler();
+
+            // catch exceptions thrown by logger or chained error handler
+            try {
+                Logger::log($exception, $logLevel, [
+                    'file'          => $file,
+                    'line'          => $line,
+                    'error-handler' => true,
+                ]);
+                // chain a previously active handler
+                return $prevErrorHandler();
+            }
+            catch (Throwable $second) {
+                self::handle2ndException($exception, $second);
+            }
+            return false;
         }
 
-        // throw back the error as an exception
-
         /**
-         * TODO: There are rare cases were throwing an exception from the error handler causes even more errors.
+         * TODO: There are rare cases were throwing an exception from the error handler is not possible:
          *
-         * Errors triggered by require() or require_once():
-         * ------------------------------------------------
+         * Errors triggered by require() or require_once()
+         * -----------------------------------------------
          * Problem:  PHP errors triggered by require() or require_once() are non-catchable errors and do not follow regular
          *           application flow. PHP terminates the script after leaving the error handler, thrown exceptions are
          *           ignored. This termination is intended behavior and the main difference to include() and include_once().
@@ -216,8 +226,8 @@ class ErrorHandler extends StaticClass {
         //    }
         //}
 
-        // now throw back everything else
-        throw $error->prependMessage('PHP Error: ');
+        // throw back everything else
+        throw $exception->prependMessage('PHP Error: ');
     }
 
 
@@ -232,7 +242,7 @@ class ErrorHandler extends StaticClass {
         if (!self::$exceptionHandling) return;
         //echof('ErrorHandler::handleException() '.$exception->getMessage());
 
-        // prevent exceptions to be thrown from the handler itself (causes uncatchable fatal errors)
+        // catch exceptions thrown by logger or chained exception handler
         try {
             Logger::log($exception, L_FATAL, [
                 'file'          => $exception->getFile(),
@@ -246,7 +256,7 @@ class ErrorHandler extends StaticClass {
             }
         }
         catch (Throwable $second) {
-            self::handleExceptionOnException($exception, $second);
+            self::handle2ndException($exception, $second);
         }
     }
 
@@ -263,27 +273,30 @@ class ErrorHandler extends StaticClass {
      *
      * @return void
      */
-    private static function handleExceptionOnException(Throwable $first, Throwable $second): void {
-        //echof('ErrorHandler::handleExceptionOnException() '.$second->getMessage());
+    private static function handle2ndException(Throwable $first, Throwable $second): void {
+        //echof('ErrorHandler::handle2ndException() '.$second->getMessage());
         try {
-            // last chance to log something
             $indent = ' ';
-            $msg1  = trim(ErrorHandler::getVerboseMessage($first, $indent));
-            $msg1  = $indent.'[FATAL] Unhandled '.$msg1.NL.$indent.'in '.$first->getFile().' on line '.$first->getLine().NL.NL;
-            $msg1 .= $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
-            $msg1 .= ErrorHandler::getAdjustedStackTraceAsString($first, $indent);
-
-            $msg2  = trim(ErrorHandler::getVerboseMessage($second, $indent));
-            $msg2  = $indent.$msg2.NL.$indent.'in '.$second->getFile().' on line '.$second->getLine().NL.NL;
-            $msg2 .= $indent.'Stacktrace:'.NL.$indent.'-----------'.NL;
-            $msg2 .= ErrorHandler::getAdjustedStackTraceAsString($second, $indent);
-
-            $msg  = $msg1.NL.NL;
+            $msg  = trim(ErrorHandler::getVerboseMessage($first, $indent));
+            $msg  = $indent.($first instanceof PHPError ? '':'[FATAL] Unhandled ').$msg.NL;
+            $msg .= $indent.'in '.$first->getFile().' on line '.$first->getLine().NL;
+            $msg .= NL;
+            $msg .= $indent.'Stacktrace:'.NL;
+            $msg .= $indent.'-----------'.NL;
+            $msg .= ErrorHandler::getAdjustedStackTraceAsString($first, $indent);
+            $msg .= NL;
+            $msg .= NL;
             $msg .= $indent.'followed by'.NL;
-            $msg .= $msg2.NL;
+            $msg .= $indent.trim(ErrorHandler::getVerboseMessage($second, $indent)).NL;
+            $msg .= $indent.'in '.$second->getFile().' on line '.$second->getLine().NL;
+            $msg .= NL;
+            $msg .= $indent.'Stacktrace:'.NL;
+            $msg .= $indent.'-----------'.NL;
+            $msg .= ErrorHandler::getAdjustedStackTraceAsString($second, $indent);
+            $msg .= NL;
 
             // log everything to the system logger (never throws an error)
-            $msg = str_replace(chr(0), '\0', $msg);                             // replace NUL bytes which mess up the logfile
+            $msg = str_replace(chr(0), '\0', $msg);         // replace NUL bytes which mess up the logfile
             if (WINDOWS) {
                 $msg = str_replace(NL, PHP_EOL, $msg);
             }
@@ -296,7 +309,7 @@ class ErrorHandler extends StaticClass {
                 // TODO
             }
         }
-        catch (Throwable $ex) {}                                                // intentionally eat it
+        catch (Throwable $ex) {}                            // intentionally eat it
     }
 
 
@@ -513,11 +526,11 @@ class ErrorHandler extends StaticClass {
     /**
      * Takes a regular PHP stacktrace and adjusts it to be more readable.
      *
-     * @param  stackframe[] $trace           - regular PHP stacktrace
+     * @param  STACKFRAME[] $trace           - regular PHP stacktrace
      * @param  string       $file [optional] - name of the file where the stacktrace was generated
      * @param  int          $line [optional] - line of the file where the stacktrace was generated
      *
-     * @return stackframe[] - adjusted stacktrace
+     * @return STACKFRAME[] - adjusted stacktrace
      *
      * @example
      * before: frame locations point to the called statement
@@ -613,15 +626,16 @@ class ErrorHandler extends StaticClass {
     /**
      * Return a formatted and more readable version of a stacktrace.
      *
-     * @param  stackframe[]   $trace             - stacktrace
+     * @param  STACKFRAME[]   $trace             - stacktrace
      * @param  string         $indent [optional] - indent formatted lines by this value (default: no indenting)
      * @param  ?ContentFilter $filter [optional] - the content filter to apply (default: none)
      *
      * @return string - string representation ending with an EOL marker
      */
     public static function formatStackTrace(array $trace, string $indent = '', ContentFilter $filter = null): string {
-        // TODO: if the trace contains frame arguments moderate the arguments using a provided filter
+        // If we start to include frame arguments (future?), those arguments need moderation using the provided filter.
 
+        /** @var Config $config */
         $config  = self::di('config');
         $appRoot = $config['app.dir.root'];
         $result  = '';
@@ -658,10 +672,10 @@ class ErrorHandler extends StaticClass {
         }
 
         for ($i=0; $i < $size; $i++) {
-            $call = $trace[$i]['call'];
-            $file = $trace[$i]['file'];
-            $line = $trace[$i]['line'];
-            $result .= $indent.str_pad($call, $callLen).' '.str_pad($line, $lineLen).$file.NL;
+            $call = $trace[$i]['call'] ?? '';
+            $file = $trace[$i]['file'] ?? '';
+            $line = $trace[$i]['line'] ?? '';
+            $result .= $indent.str_pad($call, $callLen).' '.str_pad((string)$line, $lineLen).$file.NL;
         }
         return $result;
     }
@@ -670,7 +684,7 @@ class ErrorHandler extends StaticClass {
     /**
      * Return a stack frame's full method name similar to the constant __METHOD__. Used for generating a formatted stacktrace.
      *
-     * @param  stackframe $frame                - stack frame
+     * @param  STACKFRAME $frame                - stack frame
      * @param  bool       $nsToLower [optional] - whether to return the namespace part in lower case (default: unmodified)
      *
      * @return string - method name without trailing parentheses
@@ -686,7 +700,7 @@ class ErrorHandler extends StaticClass {
                 if ($nsToLower && is_int($pos = strrpos($class, '\\'))) {
                     $class = strtolower(substr($class, 0, $pos)).substr($class, $pos);
                 }
-                $class = $class.$frame['type'];
+                $class = $class.($frame['type'] ?? '');
             }
             elseif ($nsToLower && is_int($pos = strrpos($function, '\\'))) {
                 $function = strtolower(substr($function, 0, $pos)).substr($function, $pos);
@@ -700,11 +714,11 @@ class ErrorHandler extends StaticClass {
      * Shift all frames from the beginning of a stacktrace up to and including the specified file and line.
      * Effectively, this brings the stacktrace in line with the specified file location.
      *
-     * @param stackframe[] $trace - stacktrace to process
+     * @param STACKFRAME[] $trace - stacktrace to process
      * @param string       $file  - filename where an error was triggered
      * @param int          $line  - line number where an error was triggered
      *
-     * @return stackframe[]
+     * @return STACKFRAME[]
      */
     public static function shiftStackFramesByLocation(array $trace, string $file, int $line) {
         $result = $trace;
@@ -723,12 +737,12 @@ class ErrorHandler extends StaticClass {
     /**
      * Shift all frames from the beginning of a stacktrace pointing to the specified method.
      *
-     * @param  \Exception $exception - exception to modify
-     * @param  string     $method    - method name
+     * @param  Exception $exception - exception to modify
+     * @param  string    $method    - method name
      *
      * @return int - number of removed frames
      */
-    public static function shiftStackFramesByMethod(\Exception $exception, string $method): int {
+    public static function shiftStackFramesByMethod(Exception $exception, string $method): int {
         $trace  = $exception->getTrace();
         $size   = sizeof($trace);
         $file   = $exception->getFile();
@@ -756,29 +770,29 @@ class ErrorHandler extends StaticClass {
 
 
     /**
-     * Set the properties of an {@link \Exception}.
+     * Set the properties of an {@link Exception}.
      *
-     * @param  \Exception   $exception       - exception to modify
-     * @param  stackframe[] $trace           - stacktrace
+     * @param  Exception    $exception       - exception to modify
+     * @param  STACKFRAME[] $trace           - stacktrace
      * @param  string       $file [optional] - filename of the error location (default: unchanged)
      * @param  int          $line [optional] - line number of the error location (default: unchanged)
      *
      * @return void
      */
-    private static function setExceptionProperties(\Exception $exception, array $trace, string $file = '', int $line = 0) {
+    private static function setExceptionProperties(Exception $exception, array $trace, string $file = '', int $line = 0) {
         static $traceProperty = null;
         if (!$traceProperty) {
-            $traceProperty = new \ReflectionProperty(\Exception::class, 'trace');
+            $traceProperty = new \ReflectionProperty(Exception::class, 'trace');
             $traceProperty->setAccessible(true);
         }
         static $fileProperty = null;
         if (!$fileProperty) {
-            $fileProperty = new \ReflectionProperty(\Exception::class, 'file');
+            $fileProperty = new \ReflectionProperty(Exception::class, 'file');
             $fileProperty->setAccessible(true);
         }
         static $lineProperty = null;
         if (!$lineProperty) {
-            $lineProperty = new \ReflectionProperty(\Exception::class, 'line');
+            $lineProperty = new \ReflectionProperty(Exception::class, 'line');
             $lineProperty->setAccessible(true);
         }
 

@@ -22,9 +22,9 @@ trait DiAwareTrait {
      *
      * @param  ?string $name [optional] - service identifier (default: none to return the service container)
      *
-     * @return DiInterface|object
+     * @return ($name is null ? DiInterface : object)
      */
-    protected static function di($name = null) {
+    protected static function di(?string $name = null): object {
         $di = Application::getDi();
         if (!$di) throw new RuntimeException('Service container not available');
 

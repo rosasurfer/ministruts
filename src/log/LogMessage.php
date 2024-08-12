@@ -235,7 +235,7 @@ class LogMessage extends CObject {
                 if (!isset($this->context['stacktrace'])) {
                     $this->generateStackTrace();
                 }
-                /** @var stackframe[] $stacktrace */
+                /** @var STACKFRAME[] $stacktrace */
                 $stacktrace = $this->context['stacktrace'];
                 $detail  = $indent.'Stacktrace:'.NL .$indent.'-----------'.NL;
                 $detail .= ErrorHandler::formatStackTrace($stacktrace, $indent, $filter);
@@ -413,7 +413,7 @@ class LogMessage extends CObject {
         if (!isset($this->context['stacktrace'])) {
             $this->generateStackTrace();
         }
-        /** @var stackframe[] $stacktrace */
+        /** @var STACKFRAME[] $stacktrace */
         $stacktrace = $this->context['stacktrace'];
 
         foreach ($stacktrace as $frame) {
