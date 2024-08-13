@@ -36,6 +36,8 @@ use const rosasurfer\ministruts\WINDOWS;
 
 /**
  * A handler for unhandled PHP errors and exceptions.
+ *
+ * @phpstan-import-type  STACKFRAME from \rosasurfer\ministruts\Application
  */
 class ErrorHandler extends StaticClass {
 
@@ -532,6 +534,8 @@ class ErrorHandler extends StaticClass {
      *
      * @return STACKFRAME[] - adjusted stacktrace
      *
+     * @see  \rosasurfer\ministruts\STACKFRAME
+     *
      * @example
      * before: frame locations point to the called statement
      * <pre>
@@ -551,7 +555,7 @@ class ErrorHandler extends StaticClass {
      */
     public static function getAdjustedStackTrace(array $trace, string $file = 'unknown', int $line = 0): array {
         // check if the stacktrace is already adjusted
-        if (isset($trace[0]['__ministruts_adjusted__'])) {
+        if (isset($trace[0]['__adjusted'])) {
             return $trace;
         }
 
@@ -573,7 +577,7 @@ class ErrorHandler extends StaticClass {
             if (isset($trace[$i-1]['line'])) $trace[$i]['line'] = $trace[$i-1]['line'];
             else                       unset($trace[$i]['line']);
 
-            $trace[$i]['__ministruts_adjusted__'] = 1;
+            $trace[$i]['__adjusted'] = 1;
         }
 
         // add location details from parameters to frame[0] only if they differ from the old values (now in frame[1])
@@ -631,6 +635,8 @@ class ErrorHandler extends StaticClass {
      * @param  ?ContentFilter $filter [optional] - the content filter to apply (default: none)
      *
      * @return string - string representation ending with an EOL marker
+     *
+     * @see  \rosasurfer\ministruts\STACKFRAME
      */
     public static function formatStackTrace(array $trace, string $indent = '', ContentFilter $filter = null): string {
         // If we start to include frame arguments (future?), those arguments need moderation using the provided filter.
@@ -688,6 +694,8 @@ class ErrorHandler extends StaticClass {
      * @param  bool       $nsToLower [optional] - whether to return the namespace part in lower case (default: unmodified)
      *
      * @return string - method name without trailing parentheses
+     *
+     * @see  \rosasurfer\ministruts\STACKFRAME
      */
     public static function getStackFrameMethod(array $frame, bool $nsToLower = false): string {
         $class = $function = '';
@@ -719,6 +727,8 @@ class ErrorHandler extends StaticClass {
      * @param int          $line  - line number where an error was triggered
      *
      * @return STACKFRAME[]
+     *
+     * @see  \rosasurfer\ministruts\STACKFRAME
      */
     public static function shiftStackFramesByLocation(array $trace, string $file, int $line) {
         $result = $trace;
@@ -778,6 +788,8 @@ class ErrorHandler extends StaticClass {
      * @param  int          $line [optional] - line number of the error location (default: unchanged)
      *
      * @return void
+     *
+     * @see  \rosasurfer\ministruts\STACKFRAME
      */
     private static function setExceptionProperties(Exception $exception, array $trace, string $file = '', int $line = 0) {
         static $traceProperty = null;

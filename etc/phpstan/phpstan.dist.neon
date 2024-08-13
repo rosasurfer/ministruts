@@ -43,9 +43,6 @@ parameters:
   universalObjectCratesClasses:
     - rosasurfer\ministruts\struts\ActionForm
 
-  typeAliases:
-    STACKFRAME: 'array{file?:string, line?:int, class?:string, type?:"->"|"::", function?:string, object?:object, args?:mixed[], __ministruts_adjusted__?:int}'
-
   ignoreErrors:
     # skip broken PHPStan checks
     - '#^Unsafe usage of new static\(\)\.$#'

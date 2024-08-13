@@ -23,6 +23,9 @@ use rosasurfer\ministruts\util\PHP;
  * A class representing the application instance.
  *
  * TODO: support creation of multiple instances for testing
+ *
+ *
+ * @phpstan-type  STACKFRAME array{file?:string, line?:int, class?:string, type?:'->'|'::', function?:string, object?:object, args?:mixed[], __adjusted?:int}
  */
 class Application extends CObject {
 

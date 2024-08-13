@@ -23,6 +23,8 @@ use const rosasurfer\ministruts\NL;
 
 /**
  * LogMessage
+ *
+ * @phpstan-import-type  STACKFRAME from \rosasurfer\ministruts\Application
  */
 class LogMessage extends CObject {
 
