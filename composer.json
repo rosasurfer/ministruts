@@ -8,6 +8,9 @@
         "email": "ministruts@rosasurfer.com"
     }],
     "config": {
+        "platform": {
+            "php": "7.4"
+        },
         "optimize-autoloader": true
     },
     "require": {
@@ -20,15 +23,20 @@
         "ext-simplexml": "*",
         "psr/container": "^1.0"
     },
+    "require-dev": {
+        "phpstan/phpstan": "^1.11",
+        "phpunit/phpunit": "^9.3"
+    },
     "autoload": {
         "psr-4": {
-            "rosasurfer\\ministruts\\": "src"
+            "rosasurfer\\ministruts\\": "src",
+            "rosasurfer\\ministruts\\phpstan\\extension\\": "etc/phpstan/extension"
         },
         "files": ["src/load.php"]
     },
     "autoload-dev": {
         "psr-4": {
-            "rosasurfer\\ministruts\\phpstan\\extension\\": "etc/phpstan/extension"
+            "rosasurfer\\ministruts\\test\\": "test"
         }
     },
     "extra": {
