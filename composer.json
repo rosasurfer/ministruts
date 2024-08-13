@@ -26,6 +26,11 @@
         },
         "files": ["src/load.php"]
     },
+    "autoload-dev": {
+        "psr-4": {
+            "rosasurfer\\ministruts\\phpstan\\extension\\": "etc/phpstan/extension"
+        }
+    },
     "extra": {
         "branch-alias": {
             "dev-master": "0.11.x-dev"
