@@ -24,7 +24,7 @@ class Assert extends StaticClass {
      * @param  string   $message [optional] - value identifier or description
      * @param  mixed ...$args    [optional] - additional message arguments
      *
-     * @return bool - whether the assertion is TRUE
+     * @return bool - ($value is array ? true : false)
      *
      * @phpstan-assert array $value
      */
@@ -43,7 +43,7 @@ class Assert extends StaticClass {
      * @param  string   $message [optional] - value identifier or description
      * @param  mixed ...$args    [optional] - additional message arguments
      *
-     * @return bool - whether the assertion is TRUE
+     * @return bool - ($value is bool ? true : false)
      *
      * @phpstan-assert bool $value
      */
@@ -62,7 +62,7 @@ class Assert extends StaticClass {
      * @param  string   $message [optional] - value identifier or description
      * @param  mixed ...$args    [optional] - additional message arguments
      *
-     * @return bool - whether the assertion is TRUE
+     * @return bool - ($value is int ? true : false)
      *
      * @phpstan-assert int $value
      */
@@ -81,7 +81,7 @@ class Assert extends StaticClass {
      * @param  string   $message [optional] - value identifier or description
      * @param  mixed ...$args    [optional] - additional message arguments
      *
-     * @return bool - whether the assertion is TRUE
+     * @return bool - ($value is float ? true : false)
      *
      * @phpstan-assert float $value
      */
@@ -100,7 +100,7 @@ class Assert extends StaticClass {
      * @param  string   $message [optional] - value identifier or description
      * @param  mixed ...$args    [optional] - additional message arguments
      *
-     * @return bool - whether the assertion is TRUE
+     * @return bool - ($value is string ? true : false)
      *
      * @phpstan-assert string $value
      */
@@ -119,7 +119,7 @@ class Assert extends StaticClass {
      * @param  string   $message [optional] - value identifier or description
      * @param  mixed ...$args    [optional] - additional message arguments
      *
-     * @return bool - whether the assertion is TRUE
+     * @return bool - ($value is scalar ? true : false)
      *
      * @phpstan-assert scalar $value
      */
@@ -138,7 +138,7 @@ class Assert extends StaticClass {
      * @param  string   $message [optional] - value identifier or description
      * @param  mixed ...$args    [optional] - additional message arguments
      *
-     * @return bool - whether the assertion is TRUE
+     * @return bool - ($value is object ? true : false)
      *
      * @phpstan-assert object $value
      */
@@ -157,7 +157,7 @@ class Assert extends StaticClass {
      * @param  string   $message [optional] - value identifier or description
      * @param  mixed ...$args    [optional] - additional message arguments
      *
-     * @return bool - whether the assertion is TRUE
+     * @return bool - ($value is Throwable ? true : false)
      *
      * @phpstan-assert Throwable $value
      */
@@ -199,8 +199,6 @@ class Assert extends StaticClass {
      * @param  mixed ...$args    [optional] - additional message arguments
      *
      * @return bool - whether the assertion is TRUE
-     *
-     * @phpstan-assert resource $value
      */
     public static function resource($value, $type = null, $message = '', ...$args) {
         if (!is_resource($value)) {
@@ -220,7 +218,7 @@ class Assert extends StaticClass {
      * @param  string   $message [optional] - value identifier or description
      * @param  mixed ...$args    [optional] - additional message arguments
      *
-     * @return bool - whether the assertion is TRUE
+     * @return bool - ($value is ?array ? true : false)
      *
      * @phpstan-assert ?array $value
      */
@@ -239,7 +237,7 @@ class Assert extends StaticClass {
      * @param  string   $message [optional] - value identifier or description
      * @param  mixed ...$args    [optional] - additional message arguments
      *
-     * @return bool - whether the assertion is TRUE
+     * @return bool - ($value is ?bool ? true : false)
      *
      * @phpstan-assert ?bool $value
      */
@@ -258,7 +256,7 @@ class Assert extends StaticClass {
      * @param  string   $message [optional] - value identifier or description
      * @param  mixed ...$args    [optional] - additional message arguments
      *
-     * @return bool - whether the assertion is TRUE
+     * @return bool - ($value is ?int ? true : false)
      *
      * @phpstan-assert ?int $value
      */
@@ -277,7 +275,7 @@ class Assert extends StaticClass {
      * @param  string   $message [optional] - value identifier or description
      * @param  mixed ...$args    [optional] - additional message arguments
      *
-     * @return bool - whether the assertion is TRUE
+     * @return bool - ($value is ?float ? true : false)
      *
      * @phpstan-assert ?float $value
      */
@@ -296,7 +294,7 @@ class Assert extends StaticClass {
      * @param  string   $message [optional] - value identifier or description
      * @param  mixed ...$args    [optional] - additional message arguments
      *
-     * @return bool - whether the assertion is TRUE
+     * @return bool - ($value is ?string ? true : false)
      *
      * @phpstan-assert ?string $value
      */
@@ -315,7 +313,7 @@ class Assert extends StaticClass {
      * @param  string   $message [optional] - value identifier or description
      * @param  mixed ...$args    [optional] - additional message arguments
      *
-     * @return bool - whether the assertion is TRUE
+     * @return bool - ($value is ?scalar ? true : false)
      *
      * @phpstan-assert ?scalar $value
      */
@@ -334,7 +332,7 @@ class Assert extends StaticClass {
      * @param  string   $message [optional] - value identifier or description
      * @param  mixed ...$args    [optional] - additional message arguments
      *
-     * @return bool - whether the assertion is TRUE
+     * @return bool - ($value is ?object ? true : false)
      *
      * @phpstan-assert ?object $value
      */
@@ -355,8 +353,6 @@ class Assert extends StaticClass {
      * @param  mixed ...$args    [optional] - additional message arguments
      *
      * @return bool - whether the assertion is TRUE
-     *
-     * @phpstan-assert ?resource $value
      */
     public static function nullOrResource($value, $type = null, $message = '', ...$args) {
         if (isset($value)) {
@@ -364,7 +360,7 @@ class Assert extends StaticClass {
                 throw new InvalidTypeException(static::illegalTypeMessage($value, 'null or resource', $message, $args));
             }
             if (isset($type) && get_resource_type($value) != $type) {
-                throw new InvalidTypeException(static::illegalTypeMessage($value, 'null or '.$type.' resource', $message, $args));
+                throw new InvalidTypeException(static::illegalTypeMessage($value, "null or $type resource", $message, $args));
             }
         }
         return true;

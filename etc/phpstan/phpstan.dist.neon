@@ -3,13 +3,14 @@
 #  See the PHPStan wrapper "bin/phpstan".
 #
 # File format:
-#  @see https://phpstan.org/config-reference
+#  @see  https://phpstan.org/config-reference
 #
 parameters:
   phpVersion: 70400                             # assume this PHP version if running under a different one
   level:      7                                 # default rule level, a rule level on the command line overrides this value
 
-  bootstrapFiles:                               # initialize the PHP runtime before PHPStan runs (executed as regular PHP)
+  bootstrapFiles:                               # initialize the PHP runtime environment before PHPStan runs
+    - init.php
 
   scanFiles:                                    # scanned for additional symbols, not analyzed (e.g. stubs for unavailable PHP extensions)
     - symbols/php-extensions.php
@@ -57,7 +58,7 @@ parameters:
   tipsOfTheDay: false
 
 
-services:
+services:                                       # must be loadable via Composer's auto-loader
   - class: rosasurfer\ministruts\phpstan\extension\CoreFunctionReturnType
     tags:
       - phpstan.broker.dynamicFunctionReturnTypeExtension

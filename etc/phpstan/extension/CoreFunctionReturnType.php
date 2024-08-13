@@ -15,6 +15,11 @@ use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Type\NullType;
 
 use function PHPStan\dumpType;
+use function rosasurfer\ministruts\normalizeEOL;
+
+use const rosasurfer\ministruts\ERROR_LOG_DEFAULT;
+use const rosasurfer\ministruts\NL;
+use const rosasurfer\ministruts\WINDOWS;
 
 
 /**
@@ -37,11 +42,12 @@ class CoreFunctionReturnType implements DynamicFunctionReturnTypeExtension {
         $null = new NullType();
 
         $this->supportedFunctions = [
-            'file'         => $bool,        // array|false       => array
-            'fopen'        => $bool,        // resource|false    => resource
-            'getcwd'       => $bool,        // string|false      => string
-            'ob_get_clean' => $bool,        // string|false      => string
-            'preg_replace' => $null,        // string|array|null => string|array
+            // function    => return type to remove
+            'file'         => $bool,                //: array|false
+            'fopen'        => $bool,                //: resource|false
+            'getcwd'       => $bool,                //: string|false
+            'ob_get_clean' => $bool,                //: string|false
+            'preg_replace' => $null,                //: string|array|null
         ];
     }
 
@@ -60,8 +66,8 @@ class CoreFunctionReturnType implements DynamicFunctionReturnTypeExtension {
         $name = $function->getName();
 
         if ($name == 'preg_replace') {
-            // it seems the extension is skipped for this fucntion
-            \file_put_contents('phpstan-extension.log', __METHOD__.'()  '.$name.PHP_EOL, FILE_APPEND);
+            // it seems the extension is skipped for preg_replace()
+            $this->log(__METHOD__.'()  '.$name);
         }
 
         $originalType = $this->getOriginalReturnType($function, $call, $scope);
@@ -86,5 +92,19 @@ class CoreFunctionReturnType implements DynamicFunctionReturnTypeExtension {
 
         $signature = ParametersAcceptorSelector::selectFromArgs($scope, $args, $variants);
         return $signature->getReturnType();
+    }
+
+
+    /**
+     * Log to the system logger.
+     */
+    protected function log(string $message): void {
+        // replace NUL bytes which mess up the logfile
+        $message = str_replace(chr(0), '\0', $message);
+        $message = normalizeEOL($message);
+        if (WINDOWS) {
+            $message = str_replace(NL, PHP_EOL, $message);
+        }
+        error_log($message, ERROR_LOG_DEFAULT);
     }
 }
