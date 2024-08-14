@@ -65,7 +65,7 @@ class PHPMailer extends CObject {
      *
      * @return bool
      */
-    public function sendMail($sender, $receiver, $subject, $message, array $headers = []) {
+    public function sendMail(?string $sender, $receiver, string $subject, $message, array $headers = []) {
         // delay sending to the script's shutdown if configured (e.g. as not to block other tasks)
         if (!empty($this->options['send-later'])) {
             return $this->sendLater($sender, $receiver, $subject, $message, $headers);
@@ -83,14 +83,13 @@ class PHPMailer extends CObject {
 
         // auto-complete sender if not specified
         if (!isset($sender)) {
-            $sender = $config->get('mail.from', ini_get('sendmail_from'));
+            $sender = $config->get('mail.from', ini_get('sendmail_from') ?: '');
             if (!strlen($sender)) {
                 $sender = strtolower(get_current_user().'@'.$this->hostName);
             }
         }
 
         // Return-Path: (invisible sender)
-        Assert::string($sender, '$sender');
         $returnPath = self::parseAddress($sender);
         if (!$returnPath)                  throw new InvalidValueException('Invalid parameter $sender: '.$sender);
         $value = $this->removeHeader($headers, 'Return-Path');
@@ -131,7 +130,6 @@ class PHPMailer extends CObject {
         $to = $this->encodeNonAsciiChars($to);
 
         // Subject:
-        Assert::string($subject, '$subject');
         $subject = $this->encodeNonAsciiChars(trim($subject));
 
         // encode remaining headers (must be ASCII chars only)
@@ -250,6 +248,7 @@ class PHPMailer extends CObject {
 
         // reversely iterate over the array to find the last of duplicate headers
         for (end($headers); key($headers)!==null; prev($headers)){
+            /** @var string $header */
             $header = current($headers);
             if (strStartsWithI($header, "$name:")) {
                 return trim(substr($header, strlen($name)+1));
@@ -284,18 +283,18 @@ class PHPMailer extends CObject {
 
 
     /**
-     * Encode non-ASCII characters with UTF-8. If a string doesn't contain non-ASCII characters it is not modified.
+     * Encode non-ASCII characters with UTF-8. If the string doesn't contain non-ASCII characters it is not modified.
      *
      * @param  string|string[] $value - a single or a list of values
      *
-     * @return string|string[] - a single or a list of encoded values
+     * @return ($value is string ? string : string[]) - the encoded value(s)
      */
     protected function encodeNonAsciiChars($value) {
         if (is_array($value)) {
             /** @var string[] */
             $result = [];
             foreach ($value as $k => $v) {
-                $result[$k] = $this->{__FUNCTION__}($v);
+                $result[$k] = $this->encodeNonAsciiChars($v);
             }
             return $result;
         }

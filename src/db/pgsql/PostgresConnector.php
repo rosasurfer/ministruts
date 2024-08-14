@@ -12,7 +12,6 @@ use rosasurfer\ministruts\db\Connector;
 use rosasurfer\ministruts\db\DatabaseException;
 
 use function rosasurfer\ministruts\strContains;
-use function rosasurfer\ministruts\strContainsI;
 use function rosasurfer\ministruts\strStartsWithI;
 
 use const rosasurfer\ministruts\NL;
@@ -228,8 +227,12 @@ class PostgresConnector extends Connector {
         while ($this->hConnection) {
             try {
                 $result = pg_query($this->hConnection, 'show search_path');
-                $row    = pg_fetch_array($result, null, PGSQL_NUM);
-                $path   = $row[0];
+                if (!$result) throw new DatabaseException(pg_last_error($this->hConnection));
+
+                $row = pg_fetch_array($result, null, PGSQL_NUM);
+                if (!$row) throw new DatabaseException(pg_last_error($this->hConnection));
+
+                $path = $row[0];
 
                 if (strContains($path, '"$user"') && isset($options['user'])) {
                     $path = str_replace('"$user"', $options['user'], $path);
@@ -237,7 +240,7 @@ class PostgresConnector extends Connector {
                 break;
             }
             catch (Throwable $ex) {
-                if (strContainsI($ex->getMessage(), 'current transaction is aborted, commands ignored until end of transaction block')) {
+                if (strContains($ex->getMessage(), 'current transaction is aborted, commands ignored until end of transaction block')) {
                     if ($this->transactionLevel > 0) {
                         $this->transactionLevel = 1;        // immediately skip nested transactions
                         $this->rollback();
@@ -263,8 +266,10 @@ class PostgresConnector extends Connector {
 
         try {
             error_clear_last();
-            $this->hConnection = pg_connect($connStr, PGSQL_CONNECT_FORCE_NEW);
-            if (!$this->hConnection) throw new DatabaseException(error_get_last()['message']);
+            $connection = pg_connect($connStr, PGSQL_CONNECT_FORCE_NEW);;
+            if (!$connection) throw new DatabaseException(error_get_last()['message']);
+
+            $this->hConnection = $connection;
         }
         catch (Throwable $ex) {
             if (!$ex instanceof IRosasurferException) {
@@ -327,12 +332,15 @@ class PostgresConnector extends Connector {
 
     /**
      * {@inheritdoc}
+     *
+     * @param  string $name
+     *
+     * @return string
      */
     public function escapeIdentifier($name) {
-        Assert::string($name);
-
-        if (!$this->isConnected())
+        if (!$this->isConnected()) {
             $this->connect();
+        }
 
         if (strContains($name, '.')) {
             $names = explode('.', $name);

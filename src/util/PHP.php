@@ -7,7 +7,6 @@ use Throwable;
 
 use rosasurfer\ministruts\config\ConfigInterface as Config;
 use rosasurfer\ministruts\core\StaticClass;
-use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\error\ErrorHandler;
 use rosasurfer\ministruts\core\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
@@ -69,11 +68,10 @@ class PHP extends StaticClass {
      *                                              This option will not affect the return value (default: no)            <br>
      *                  key "stderr-passthrough":   Whether to additionally pass-through (print) the contents of STDERR.  <br>
      *                                              This option will not affect the return value (default: no)            <br>
-     * @return string - content of STDOUT
+     *
+     * @return ?string - content of STDOUT or NULL if the process didn't produce any output
      */
-    public static function execProcess($cmd, &$stderr=null, &$exitCode=null, $dir=null, $env=null, array $options=[]) {
-        Assert::string($cmd, '$cmd');
-
+    public static function execProcess(string $cmd, &$stderr=null, &$exitCode=null, $dir=null, $env=null, array $options=[]): ?string {
         // check whether the process needs to be watched asynchronously
         $argc         = func_num_args();
         $needStderr   = ($argc > 1);
@@ -81,8 +79,9 @@ class PHP extends StaticClass {
         $stdoutPassthrough = isset($options['stdout-passthrough']) && $options['stdout-passthrough'];
         $stderrPassthrough = isset($options['stderr-passthrough']) && $options['stderr-passthrough'];
 
-        if (!$needStderr && !$needExitCode && !WINDOWS)
-            return \shell_exec($cmd);                                   // the process doesn't need watching and we can go with shell_exec()
+        if (!$needStderr && !$needExitCode && !WINDOWS) {
+            return shell_exec($cmd);                                    // the process doesn't need watching and we can go with shell_exec()
+        }
 
         // we must use proc_open()/proc_close()
         $descriptors = [                                                // "pipes" or "files":
@@ -92,13 +91,13 @@ class PHP extends StaticClass {
         ];
         $pipes = [];
 
-        $hProc = $match = null;
         try {
             $hProc = proc_open($cmd, $descriptors, $pipes, $dir, $env, ['bypass_shell'=>true]);
         }
         catch (Throwable $ex) {
             if (!$ex instanceof IRosasurferException) $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex);
 
+            $match = null;
             if (WINDOWS && preg_match('/proc_open\(\): CreateProcess failed, error code - ([0-9]+)/i', $ex->getMessage(), $match)) {
                 $error = Windows::errorToString((int) $match[1]);
                 if ($error != $match[1]) $ex->appendMessage($match[1].': '.$error);
@@ -202,11 +201,9 @@ class PHP extends StaticClass {
         /*PHP_INI_ALL   */ if (!empty(ini_get     ('open_basedir'                  )))                               $issues[] = 'Info:  open_basedir is not empty: "'.ini_get('open_basedir').'" [performance]';
         /*PHP_INI_SYSTEM*/ if (      !ini_get_bool('allow_url_fopen'               ))                                $issues[] = 'Info:  allow_url_fopen is not On [functionality]';
         /*PHP_INI_SYSTEM*/ if (       ini_get_bool('allow_url_include'))                                             $issues[] = 'Error: allow_url_include is not Off [security]';
-        /*PHP_INI_ALL   */ foreach (explode(PATH_SEPARATOR, ini_get('include_path' )) as $path) {
-            if (!strlen($path)) {                                                                                    $issues[] = 'Warn:  include_path contains an empty path: "'.ini_get('include_path').'" [setup]';
-                break;
-        }}
-
+        /*PHP_INI_ALL   */ foreach (explode(PATH_SEPARATOR, ini_get('include_path') ?: '') as $i => $path) {
+                               if (!strlen($path))                                                                   $issues[] = 'Warn:  include_path['.$i.'] contains an empty path: "'.ini_get('include_path').'" [setup]';
+                           }
         // error handling
         // --------------
         /*PHP_INI_ALL   */ $current = ini_get_int('error_reporting');
@@ -244,14 +241,15 @@ class PHP extends StaticClass {
 
         // request & HTML handling
         // -----------------------
-        /*PHP_INI_PERDIR*/ $order = ini_get('request_order'); /*if empty automatic fall-back to GPC order in "variables_order"*/
+        /*PHP_INI_PERDIR*/ $order = ini_get('request_order') ?: ''; /*if empty automatic fall-back to GPC order in "variables_order"*/
             if (empty($order)) {
-                /*PHP_INI_PERDIR*/ $order = ini_get('variables_order');
+                /*PHP_INI_PERDIR*/ $order = ini_get('variables_order') ?: '';
                 $newOrder = '';
-                $len      = strlen($order);
+                $len = strlen($order);
                 for ($i=0; $i < $len; $i++) {
-                    if (in_array($char=$order[$i], ['G','P','C']))
+                    if (in_array($char=$order[$i], ['G','P','C'])) {
                         $newOrder .= $char;
+                    }
                 }
                 $order = $newOrder;
             }              if ($order != 'GP')                                                                     $issues[] = 'Error: request_order is not "GP": "'.(empty(ini_get('request_order')) ? '" (empty) => variables_order:"':'').$order.'" [standards]';
@@ -268,18 +266,18 @@ class PHP extends StaticClass {
             elseif ($globalMemoryLimit < $postMaxSize      )                                                       $issues[] = 'Info:  make sure memory_limit "'.ini_get('memory_limit').'" is raised before script entry as global memory_limit "'.ini_get_all()['memory_limit']['global_value'].'" is too low for post_max_size "'.ini_get('post_max_size').'" [configuration]';
         /*PHP_INI_SYSTEM*/ if (       ini_get_bool('file_uploads'                  ) && !CLI) {                    $issues[] = 'Info:  file_uploads is not Off [security]';
         /*PHP_INI_PERDIR*/ if (       ini_get_bytes('upload_max_filesize') >= $postMaxSize)                        $issues[] = 'Error: post_max_size "'.ini_get('post_max_size').'" is not larger than upload_max_filesize "'.ini_get('upload_max_filesize').'" [request handling]';
-        /*PHP_INI_SYSTEM*/ $dir = ini_get($name = 'upload_tmp_dir');
+        /*PHP_INI_SYSTEM*/ $dir = ini_get($name = 'upload_tmp_dir') ?: '';
             $file = null;
-            if (trim($dir) == '') {                                                                                $issues[] = 'Info:  '.$name.' is not set [setup]';
-                $dir  = sys_get_temp_dir();
+            if (!strlen(trim($dir))) {                                                                             $issues[] = 'Info:  '.$name.' is not set [setup]';
+                $dir = sys_get_temp_dir();
                 $name = 'sys_get_temp_dir()';
             }
             if (!is_dir($dir))                                                                                     $issues[] = 'Error: '.$name.' "'.$dir.'" is not a valid directory [setup]';
             elseif (!($file=@tempnam($dir, 'php')) || !strStartsWith(realpath($file), realpath($dir)))             $issues[] = 'Error: '.$name.' "'.$dir.'" directory is not writable [setup]';
-            is_file($file) && @unlink($file);
+            $file && is_file($file) && @unlink($file);
         }
         /*PHP_INI_ALL   */ if (            ini_get('default_mimetype')  != 'text/html')                            $issues[] = 'Info:  default_mimetype is not "text/html": "'.ini_get('default_mimetype').'" [standards]';
-        /*PHP_INI_ALL   */ if ( strtolower(ini_get('default_charset' )) != 'utf-8')                                $issues[] = 'Info:  default_charset is not "UTF-8": "'.ini_get('default_charset').'" [standards]';
+        /*PHP_INI_ALL   */ if ( strtolower(ini_get('default_charset') ?: '') != 'utf-8')                           $issues[] = 'Info:  default_charset is not "UTF-8": "'.ini_get('default_charset').'" [standards]';
         /*PHP_INI_ALL   */ if (       ini_get_bool('implicit_flush'  ) && !CLI/*hardcoded*/)                       $issues[] = 'Warn:  implicit_flush is not Off [performance]';
         /*PHP_INI_PERDIR*/ $buffer = ini_get_bytes('output_buffering');
             if (!CLI) {

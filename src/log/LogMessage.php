@@ -447,7 +447,7 @@ class LogMessage extends CObject {
 
         foreach ($stacktrace as $i => $frame) {
             if (isset($frame['class'])) {
-                $method = strtolower($frame['class'].'::'.$frame['function']);
+                $method = strtolower($frame['class'].'::'.($frame['function'] ?? ''));
                 if ($method == $logMethod) {
                     $result = array_slice($stacktrace, $i + 1);
                     break;

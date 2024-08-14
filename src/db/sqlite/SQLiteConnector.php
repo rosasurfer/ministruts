@@ -5,6 +5,7 @@ namespace rosasurfer\ministruts\db\sqlite;
 
 use Throwable;
 
+use rosasurfer\ministruts\config\ConfigInterface as Config;
 use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\RosasurferExceptionInterface as IRosasurferException;
@@ -115,7 +116,9 @@ class SQLiteConnector extends Connector {
             $this->file = $file;
         }
         else {
-            $rootDir = $this->di('config')['app.dir.root'];
+            /** @var Config $config */
+            $config = $this->di('config');
+            $rootDir = $config['app.dir.root'];
             $this->file = str_replace('\\', '/', $rootDir.'/'.$file);
         }
         return $this;

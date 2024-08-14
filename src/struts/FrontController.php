@@ -7,7 +7,7 @@ use Throwable;
 
 use rosasurfer\ministruts\cache\Cache;
 use rosasurfer\ministruts\cache\monitor\FileDependency;
-use rosasurfer\ministruts\config\ConfigInterface;
+use rosasurfer\ministruts\config\ConfigInterface as Config;
 use rosasurfer\ministruts\core\Singleton;
 use rosasurfer\ministruts\core\di\proxy\Request as RequestProxy;
 use rosasurfer\ministruts\core\exception\IllegalStateException;
@@ -59,6 +59,7 @@ class FrontController extends Singleton {
             if (!$controller) {                                             // @phpstan-ignore booleanNot.alwaysTrue (TODO: fix cache)
                 $controller = self::getInstance(static::class);
 
+                /** @var Config $config */
                 $config = self::di('config');
                 $configDir = $config['app.dir.config'];
                 $configFile = str_replace('\\', '/', $configDir.'/struts-config.xml');
@@ -84,7 +85,7 @@ class FrontController extends Singleton {
     protected function __construct() {
         parent::__construct();
 
-        /** @var ConfigInterface $config */
+        /** @var Config $config */
         $config = $this->di('config');
 
         // lookup Struts configuration files

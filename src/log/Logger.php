@@ -116,9 +116,11 @@ class Logger extends StaticClass {
      * @return bool
      */
     private static function isAppenderEnabled(string $id): bool {
-        /** @var Config|null $config */
         static $config = null;
-        if (!$config) $config = self::di('config');
+        if (!$config) {
+            /** @var Config $config */
+            $config = self::di('config');
+        }
 
         switch ($id) {
             case 'print':    return $config->getBool("log.appender.$id.enabled", null, true) ?? PrintAppender::getDefaultEnabled();

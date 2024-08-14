@@ -66,6 +66,7 @@ class FileSystem extends StaticClass {
     public static function isDirEmpty(string $dirname, array $ignore = []): bool {
         $isEmpty = true;
         $hDir = openDir($dirname);
+
         while (($entry = readDir($hDir)) !== false) {
             if ($entry=='.' || $entry=='..') {
                 continue;
@@ -76,6 +77,7 @@ class FileSystem extends StaticClass {
             }
         }
         closeDir($hDir);
+
         return $isEmpty;
     }
 

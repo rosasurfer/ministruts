@@ -10,42 +10,42 @@ namespace rosasurfer\ministruts\struts;
 /**
  * Default {@link RequestProcessor} class.
  *
- * @var string
+ * @var class-string<RequestProcessor>
  */
 const DEFAULT_REQUEST_PROCESSOR_CLASS = RequestProcessor::class;
 
 /**
  * Default {@link ActionForward} class.
  *
- * @var string
+ * @var class-string<ActionForward>
  */
 const DEFAULT_ACTION_FORWARD_CLASS = ActionForward::class;
 
 /**
  * Default {@link ActionMapping} class.
  *
- * @var string
+ * @var class-string<ActionMapping>
  */
 const DEFAULT_ACTION_MAPPING_CLASS = ActionMapping::class;
 
 /**
  * {@link Action} base class.
  *
- * @var string
+ * @var class-string<Action>
  */
 const ACTION_BASE_CLASS = Action::class;
 
 /**
  * {@link ActionForm} base class.
  *
- * @var string
+ * @var class-string<ActionForm>
  */
 const ACTION_FORM_BASE_CLASS = ActionForm::class;
 
 /**
  * {@link RoleProcessor} base class.
  *
- * @var string
+ * @var class-string<RoleProcessor>
  */
 const ROLE_PROCESSOR_BASE_CLASS = RoleProcessor::class;
 

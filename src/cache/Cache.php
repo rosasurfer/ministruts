@@ -3,13 +3,14 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\cache;
 
-use rosasurfer\ministruts\config\ConfigInterface as IConfig;
+use rosasurfer\ministruts\config\ConfigInterface as Config;
 use rosasurfer\ministruts\core\StaticClass;
 use rosasurfer\ministruts\core\assert\Assert;
 
 use function rosasurfer\ministruts\ini_get_bool;
 
 use const rosasurfer\ministruts\CLI;
+use rosasurfer\ministruts\core\exception\RuntimeException;
 
 
 /**
@@ -26,10 +27,10 @@ final class Cache extends StaticClass {
     const EXPIRES_NEVER = 0;
 
     /** @var ?CachePeer - default cache implementation */
-    private static $default = null;
+    private static ?CachePeer $default = null;
 
     /** @var CachePeer[] - array of further cache implementations */
-    private static $caches;
+    private static array $caches;
 
 
     /**
@@ -40,7 +41,7 @@ final class Cache extends StaticClass {
      *
      * @return CachePeer
      */
-    public static function me($label = null) {
+    public static function me(?string $label = null): CachePeer {
         // TODO: prevent accidental usage of the application id as cache identifier
 
         // default cache
@@ -61,12 +62,14 @@ final class Cache extends StaticClass {
         Assert::string($label);
 
         if (!isset(self::$caches[$label])) {
-            /** @var IConfig $config */
+            /** @var Config $config */
             $config = self::di('config');
 
             // get cache configuration and create new instance
             $class   = $config->get('cache.'.$label.'.class');
-            $options = $config->get('cache.'.$label.'.options', null);
+            $options = $config->get('cache.'.$label.'.options', []);
+
+            if (!is_subclass_of($class, CachePeer::class)) throw new RuntimeException('Not a subclass of '.CachePeer::class.": $class");
 
             self::$caches[$label] = new $class($label, $options);
         }

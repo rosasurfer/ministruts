@@ -4,9 +4,8 @@ declare(strict_types=1);
 namespace rosasurfer\ministruts\cache;
 
 use rosasurfer\ministruts\cache\monitor\Dependency;
-use rosasurfer\ministruts\config\ConfigInterface;
+use rosasurfer\ministruts\config\ConfigInterface as Config;
 use rosasurfer\ministruts\core\assert\Assert;
-use rosasurfer\ministruts\core\error\PHPError;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 use rosasurfer\ministruts\file\FileSystem as FS;
 
@@ -27,36 +26,33 @@ final class FileSystemCache extends CachePeer {
 
 
     /** @var string - filepath of the chaching directory */
-    private $directory;
+    private string $directory;
 
 
     /**
-     * Constructor.
+     * Constructor
      *
-     * @param  string                $label              - cache identifier (namespace)
-     * @param  array<string, scalar> $options [optional] - additional instantiation options (default: none)
+     * @param  string               $label              - cache identifier (namespace)
+     * @param  array<string, mixed> $options [optional] - additional instantiation options (default: none)
      */
     public function __construct($label, array $options = []) {
         $this->label     = $label;
         $this->namespace = $label;
         $this->options   = $options;
 
-        /** @var ConfigInterface $config */
+        /** @var Config $config */
         $config = $this->di('config');
 
-        // resolve cache directory
-        if (isset($options['directory'])) {
-            $directory = $options['directory'];
-            if (isRelativePath($directory)) {
-                $directory = $config['app.dir.root'].'/'.$directory;
-            }
-        }
-        else {
-            /** @var string $directory */
-            $directory = $config['app.dir.cache'];
+        // determine the cache directory to use
+        /** @var ?string $directory */
+        $directory = $options['directory'] ?? $config['app.dir.cache'] ?? null;
+        if (!isset($directory)) throw new RuntimeException('Missing cache instantiation option "directory"');
+
+        if (isRelativePath($directory)) {
+            $directory = $config['app.dir.root'].'/'.$directory;
         }
 
-        // make sure the cache directory exists
+        // make sure the directory exists
         FS::mkDir($directory);
 
         $this->directory = realpath($directory).DIRECTORY_SEPARATOR;
@@ -65,19 +61,25 @@ final class FileSystemCache extends CachePeer {
 
     /**
      * {@inheritdoc}
+     *
+     * @param  string $key
+     *
+     * @return bool
      */
     public function isCached($key) {
         // The actual working horse. This method does not only check the key's existence, it also retrieves the value and
         // stores it in the local reference pool. Thus following cache queries can use the local reference.
 
         // check local reference pool
-        if ($this->getReferencePool()->isCached($key))
+        if ($this->getReferencePool()->isCached($key)) {
             return true;
+        }
 
         // find and read a stored file
         $file = $this->getFilePath($key);
+        if (!is_file($file)) return false;  // cache miss
+
         $data = $this->readFile($file);
-        if (!$data) return false;           // cache miss
 
         // cache hit
         /** @var int $created */
@@ -121,6 +123,11 @@ final class FileSystemCache extends CachePeer {
 
     /**
      * {@inheritdoc}
+     *
+     * @param  string $key
+     * @param  mixed  $default [optional]
+     *
+     * @return mixed
      */
     public function get($key, $default = null) {
         if ($this->isCached($key))
@@ -131,6 +138,10 @@ final class FileSystemCache extends CachePeer {
 
     /**
      * {@inheritdoc}
+     *
+     * @param  string $key
+     *
+     * @return bool
      */
     public function drop($key) {
         $fileName = $this->getFilePath($key);
@@ -149,6 +160,13 @@ final class FileSystemCache extends CachePeer {
 
     /**
      * {@inheritdoc}
+     *
+     * @param  string      $key
+     * @param  mixed       $value
+     * @param  int         $expires    [optional]
+     * @param  ?Dependency $dependency [optional]
+     *
+     * @return bool
      */
     public function set($key, $value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null) {
         Assert::string($key,  '$key');
@@ -185,16 +203,8 @@ final class FileSystemCache extends CachePeer {
      *
      * @return mixed - content
      */
-    private function readFile($fileName) {
-        try {
-            $data = file_get_contents($fileName, false);
-        }
-        catch (PHPError $ex) {
-            if (strEndsWith($ex->getMessage(), 'failed to open stream: No such file or directory'))
-                return null;
-            throw $ex;
-        }
-        if ($data === false) throw new RuntimeException('file_get_contents() returned FALSE, $fileName: "'.$fileName);
+    private function readFile(string $fileName) {
+        $data = file_get_contents($fileName, false);
         return unserialize($data);
     }
 

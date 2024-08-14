@@ -129,18 +129,19 @@ class Response extends Singleton {
      * @param  string $base - base URL
      *
      * @return string - absolute URL
-     *
-     * @todo   rewrite because parse_url() fails at query parameters with colons, e.g. "/beanstalk-console?server=vm-centos:11300"
      */
-    public static function relativeToAbsoluteUrl($rel, $base) {
-        $relFragment = strRightFrom($rel, '#');
-        strlen($relFragment) && $rel = strLeft($rel, -strlen($relFragment)-1);
+    public static function relativeToAbsoluteUrl(string $rel, string $base): string {
+        // TODO: rewrite because parse_url() fails at query parameters with colons, e.g. "/beanstalk-console?server=vm-centos:11300"
+        // TODO: the whole logic is nonsense
+        if (strlen($relFragment = strRightFrom($rel, '#'))) {
+            $rel = strLeft($rel, -strlen($relFragment)-1);
+        }
+        if (strlen($relQuery = strRightFrom($rel, '?'))) {
+            $rel = strLeft($rel, -strlen($relQuery)-1);
+        }
 
-        $relQuery = strRightFrom($rel, '?');
-        strlen($relQuery) && $rel = strLeft($rel, -strlen($relQuery)-1);
-
-        if (($relParts =parse_url($rel )) === false) throw new InvalidValueException('Invalid parameter $rel: '.$rel);
-        if (($baseParts=parse_url($base)) === false) throw new InvalidValueException('Invalid parameter $base: '.$base);
+        if (($relParts =parse_url($rel )) === false) throw new InvalidValueException("Invalid parameter \$rel: $rel");
+        if (($baseParts=parse_url($base)) === false) throw new InvalidValueException("Invalid parameter \$base: $base");
 
         if (strlen($relQuery)) {
             $relParts['query'] = $relQuery;
@@ -157,17 +158,16 @@ class Response extends Singleton {
 
             // if already an absolute URL return $rel
             if (isset($relParts['scheme'])) return $rel;
-            $scheme = $baseParts['scheme'];
+            $scheme = $baseParts['scheme'] ?? '';
 
             // if $rel contains a host only expand the scheme
             if (isset($relParts['host'])) return $scheme.':'.$rel;
 
             // a query only w/o anchor
             if ($rel[0] == '?') {
-                $query = '?'.$relParts['query'];
-                if     (isset($relParts ['fragment'])) $fragment = "#$relParts[fragment]";
-                elseif (isset($baseParts['fragment'])) $fragment = "#$baseParts[fragment]";
-                else                                   $fragment = '';
+                $query    = '?'.($relParts['query'] ?? '');
+                $fragment = '#'.($relParts['fragment'] ?? $baseParts['fragment'] ?? '');
+                if ($fragment == '#') $fragment = '';
                 return strLeftTo($base, '?').$query.$fragment;
             }
 
@@ -176,12 +176,12 @@ class Response extends Singleton {
 
             // $rel is an absolute or relative path with its own parameters
             if ($rel[0] == '/') $path = '';
-            else                $path = strLeftTo($baseParts['path'], '/', -1, true, '/');
+            else                $path = strLeftTo($baseParts['path'] ?? '', '/', -1, true, '/');
 
-            $host  = $baseParts['host'];
-            $port  = isset($baseParts['port']) ? ':'.$baseParts['port'] : '';
-            $user  = isset($baseParts['user']) ?     $baseParts['user'] : '';
-            $pass  = isset($baseParts['pass']) ? ':'.$baseParts['pass'] : '';
+            $host  = $baseParts['host'] ?? '';
+            $port  = isset($baseParts['port']) ? ":$baseParts[port]" : '';
+            $user  = $baseParts['user'] ?? '';
+            $pass  = isset($baseParts['pass']) ? ":$baseParts[pass]" : '';
             $at    = strlen($user) ? '@' : '';
             $path .= $rel;                              // includes $rel query and/or fragment
 

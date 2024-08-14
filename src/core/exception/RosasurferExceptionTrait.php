@@ -13,22 +13,6 @@ trait RosasurferExceptionTrait {
 
 
     /**
-     * Set the error code of an exception. Used to enrich the exception with additional data.
-     * Ignored if the error code is already set.
-     *
-     * @param  int $code
-     *
-     * @return $this
-     */
-    public function setCode(int $code): self {
-        if (!isset($this->code)) {
-            $this->code = $code;
-        }
-        return $this;
-    }
-
-
-    /**
      * Prepend a message to the exception's existing message. Used to enrich the exception with additional data.
      *
      * @param  string $message
@@ -53,6 +37,22 @@ trait RosasurferExceptionTrait {
     public function appendMessage(string $message): self {
         if (strlen($message)) {
             $this->message = trim($this->message.$message);
+        }
+        return $this;
+    }
+
+
+    /**
+     * Set the error code of an exception. Used to enrich the exception with additional data.
+     * Ignored if the error code is already set.
+     *
+     * @param  int $code
+     *
+     * @return $this
+     */
+    public function setCode(int $code): self {
+        if (!isset($this->code)) {
+            $this->code = $code;
         }
         return $this;
     }

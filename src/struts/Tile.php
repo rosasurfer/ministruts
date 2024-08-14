@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace rosasurfer\ministruts\struts;
 
 use rosasurfer\ministruts\Application;
+use rosasurfer\ministruts\config\ConfigInterface as Config;
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\di\proxy\Request as Request;
 use rosasurfer\ministruts\core\exception\IllegalStateException;
@@ -276,7 +277,9 @@ class Tile extends CObject {
 
         $tileHint = false;
         if (Application::isAdminIP()) {
-            $rootDir  = $this->di('config')['app.dir.root'];
+            /** @var Config $config */
+            $config = $this->di('config');
+            $rootDir  = $config['app.dir.root'];
             $file     = $this->fileName;
             $file     = strRightFrom($file, $rootDir.DIRECTORY_SEPARATOR, 1, false, $file);
             $file     = 'file="'.str_replace('\\', '/', $file).'"';

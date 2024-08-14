@@ -43,13 +43,13 @@ class Request extends CObject {
     /** @var string */
     protected $hostUrl;
 
-    /** @var array<string|mixed[]> */
+    /** @var array<string, mixed> */
     protected $_GET;
 
-    /** @var array<string|mixed[]> */
+    /** @var array<string, mixed> */
     protected $_POST;
 
-    /** @var array<string|mixed[]> */
+    /** @var array<string, mixed> */
     protected $_REQUEST;
 
     /** @var ?ActionInput - all input */
@@ -137,8 +137,9 @@ class Request extends CObject {
      * @return ActionInput
      */
     public function input() {
-        if (!$this->allInput)
+        if (!$this->allInput) {
             $this->allInput = new ActionInput($this->_REQUEST);
+        }
         return $this->allInput;
     }
 
@@ -149,8 +150,9 @@ class Request extends CObject {
      * @return ActionInput
      */
     public function get() {
-        if (!$this->getInput)
+        if (!$this->getInput) {
             $this->getInput = new ActionInput($this->_GET);
+        }
         return $this->getInput;
     }
 
@@ -161,8 +163,9 @@ class Request extends CObject {
      * @return ActionInput
      */
     public function post() {
-        if (!$this->postInput)
+        if (!$this->postInput) {
             $this->postInput = new ActionInput($this->_POST);
+        }
         return $this->postInput;
     }
 

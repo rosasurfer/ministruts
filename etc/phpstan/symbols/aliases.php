@@ -4,6 +4,8 @@ declare(strict_types=1);
 /**
  * IDE tooltip support for PHPStan type aliases. The types are used in PHPDoc only, PHP never sees them.
  * Add this file to the library path of the project.
+ *
+ * @phpstan-import-type  STACKFRAME from \rosasurfer\ministruts\Application
  */
 namespace rosasurfer\ministruts {
 
@@ -12,13 +14,13 @@ namespace rosasurfer\ministruts {
      *
      * <pre>
      * array(
-     *   'file'     => (string),
-     *   'line'     => (int),
-     *   'class'    => (string),
-     *   'type'     => '->'|'::',
-     *   'function' => (string),
-     *   'object'   => (object),
-     *   'args'     => mixed[],
+     *     file?     => (string),
+     *     line?     => (int),
+     *     class?    => (string),
+     *     type?     => '->'|'::',
+     *     function? => (string),
+     *     object?   => (object),
+     *     args?     => mixed[],
      * )
      * </pre>
      */

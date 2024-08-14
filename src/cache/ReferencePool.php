@@ -45,6 +45,10 @@ final class ReferencePool extends CachePeer {
 
     /**
      * {@inheritdoc}
+     *
+     * @param  string $key
+     *
+     * @return bool
      */
     public function isCached($key) {
         if (!isset($this->pool[$key]))
@@ -63,6 +67,11 @@ final class ReferencePool extends CachePeer {
 
     /**
      * {@inheritdoc}
+     *
+     * @param  string $key
+     * @param  mixed  $default [optional]
+     *
+     * @return mixed
      */
     public function get($key, $default = null) {
         if ($this->isCached($key))
@@ -73,6 +82,10 @@ final class ReferencePool extends CachePeer {
 
     /**
      * {@inheritdoc}
+     *
+     * @param  string $key
+     *
+     * @return bool
      */
     public function drop($key) {
         if (isset($this->pool[$key])) {
@@ -85,6 +98,13 @@ final class ReferencePool extends CachePeer {
 
     /**
      * {@inheritdoc}
+     *
+     * @param  string      $key
+     * @param  mixed       $value
+     * @param  int         $expires    [optional]
+     * @param  ?Dependency $dependency [optional]
+     *
+     * @return bool
      */
     public function set($key, $value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null) {
         Assert::string($key, '$key');

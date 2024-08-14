@@ -28,8 +28,6 @@ parameters:
   stubFiles:                                        # custom PHPDoc annotations overriding 3rd-party definitions
 
   dynamicConstantNames:                             # changing constants, depending on the environment
-    - PHP_VERSION_ID
-    
     - rosasurfer\ministruts\_CLI
     - rosasurfer\ministruts\_LOCALHOST
     - rosasurfer\ministruts\_MACOS

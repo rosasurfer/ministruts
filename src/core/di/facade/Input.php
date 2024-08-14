@@ -20,7 +20,7 @@ class Input extends Facade {
     /**
      * Return all raw input parameters of the current HTTP request.
      *
-     * @return string[]
+     * @return array<string, mixed>
      */
     public static function all() {
         $input = static::current();

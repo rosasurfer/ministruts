@@ -82,19 +82,19 @@ class Module extends CObject {
     /** @var string - default view namespace for file resources and tiles (configurable) */
     protected $viewNamespace = '';
 
-    /** @var string - classname of the {@link RequestProcessor} implementation used by the module (configurable) */
+    /** @var class-string<RequestProcessor> - classname of the {@link RequestProcessor} implementation used by the module (configurable) */
     protected $requestProcessorClass = DEFAULT_REQUEST_PROCESSOR_CLASS;
 
-    /** @var string - default classname of the {@link ActionForward} implementation used by the module (configurable) */
+    /** @var class-string<ActionForward> - default classname of the {@link ActionForward} implementation used by the module (configurable) */
     protected $forwardClass = DEFAULT_ACTION_FORWARD_CLASS;
 
-    /** @var string - default classname of the {@link ActionMapping} implementation used by the module (configurable) */
+    /** @var class-string<ActionMapping> - default classname of the {@link ActionMapping} implementation used by the module (configurable) */
     protected $mappingClass = DEFAULT_ACTION_MAPPING_CLASS;
 
-    /** @var string - default classname of the {@link Tile} implementation used by the module (configurable) */
+    /** @var class-string<Tile> - default classname of the {@link Tile} implementation used by the module (configurable) */
     protected $tilesClass = Tile::class;
 
-    /** @var string - classname of the {@link RoleProcessor} implementation used by the module (configurable) */
+    /** @var class-string<RoleProcessor> - classname of the {@link RoleProcessor} implementation used by the module (configurable) */
     protected $roleProcessorClass;
 
     /** @var ?RoleProcessor - the RoleProcessor instance used by the module */
@@ -139,7 +139,7 @@ class Module extends CObject {
 
 
     /**
-     * Read and validate the module configuration, and convert it to a {@link SimpleXMLElement} instance.
+     * Read and validate the module configuration, and convert it to an instance of {@link SimpleXMLElement}.
      *
      * @param  string $fileName - full filename
      *
@@ -426,7 +426,7 @@ class Module extends CObject {
                 if (!$forward)              throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'": Forward "'.$forwardAttr.'" not found.');
                 $mapping->setForward($forward);
             }
-            if ($mapping->getForward() && sizeof($tag->xpath('./forward'))) throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'": Only an "include", "redirect" or "forward" attribute *or* nested <forward> elements can be specified.');
+            if ($mapping->getForward() && sizeof($tag->xpath('./forward') ?: [])) throw new StrutsConfigException('<mapping'.$sName.' path="'.$path.'": Only an "include", "redirect" or "forward" attribute *or* nested <forward> elements can be specified.');
 
             // attribute action="%ClassName" #IMPLIED
             if (isset($tag['action'])) {
@@ -636,7 +636,7 @@ class Module extends CObject {
         $this->tilesContext[] = $name;
 
         // find the tile definition...
-        $nodes = $xml->xpath("/struts-config/tiles/tile[@name='".$name."']");
+        $nodes = $xml->xpath("/struts-config/tiles/tile[@name='".$name."']") ?: [];
         if (!$nodes)            throw new StrutsConfigException('Tile named "'.$name.'" not found');
         if (sizeof($nodes) > 1) throw new StrutsConfigException('Multiple tiles named "'.$name.'" found');
 
@@ -706,13 +706,13 @@ class Module extends CObject {
     private function processTileProperties(Tile $tile, SimpleXMLElement $xml) {
         // process <include> elements
         foreach ($xml->{'include'} as $tag) {
-            $name  = (string) $tag['name'];
-            $nodes = $xml->xpath("/struts-config/tiles/tile[@name='".$tile->getName()."']/include[@name='".$name."']");
-            if (sizeof($nodes) > 1) throw new StrutsConfigException('<tile name="'.$tile->getName().'"> <include name="'.$name.'">: Multiple elements with the same name found.');
+            $name = (string) $tag['name'];
+            $nodes = $xml->xpath("/struts-config/tiles/tile[@name='".$tile->getName()."']/include[@name='$name']") ?: [];
+            if (sizeof($nodes) > 1) throw new StrutsConfigException('<tile name="'.$tile->getName()."\"> <include name=\"$name\">: Multiple elements with the same name found.");
 
             if (isset($tag['value'])) {                                 // "value" is specified
                 $value = (string) $tag['value'];
-                if (!$this->isIncludable($value, $xml)) throw new StrutsConfigException('<tile name="'.$tile->getName().'"> <include name="'.$name.'" value="'.$value.'": '.(strStartsWith($value, '.') ? 'Tile definition':'File').' not found.');
+                if (!$this->isIncludable($value, $xml)) throw new StrutsConfigException('<tile name="'.$tile->getName()."\"> <include name=\"$name\" value=\"$value\": ".(strStartsWith($value, '.') ? 'Tile definition':'File').' not found.');
 
                 if ($this->isTileDefinition($value, $xml)) {
                     $nestedTile = $this->getTile($value, $xml);
@@ -737,8 +737,8 @@ class Module extends CObject {
 
         // process <set> elements
         foreach ($xml->{'set'} as $tag) {
-            $name  = (string) $tag['name'];
-            $nodes = $xml->xpath("/struts-config/tiles/tile[@name='".$tile->getName()."']/set[@name='".$name."']");
+            $name = (string) $tag['name'];
+            $nodes = $xml->xpath("/struts-config/tiles/tile[@name='".$tile->getName()."']/set[@name='".$name."']") ?: [];
             if (sizeof($nodes) > 1) throw new StrutsConfigException('<tile name="'.$tile->getName().'"> <set name="'.$name.'": Multiple elements with the same name found.');
 
             if (isset($tag['value'])) {                                 // value is specified as an attribute
@@ -975,7 +975,7 @@ class Module extends CObject {
     /**
      * Return the classname of the {@link RequestProcessor} implementation used by the module.
      *
-     * @return string
+     * @return class-string<RequestProcessor>
      */
     public function getRequestProcessorClass() {
         return $this->requestProcessorClass;
@@ -1038,7 +1038,7 @@ class Module extends CObject {
     /**
      * Return the classname of the {@link Tile} implementation used by the module.
      *
-     * @return string
+     * @return class-string<Tile>
      */
     public function getTilesClass() {
         return $this->tilesClass;
@@ -1068,7 +1068,7 @@ class Module extends CObject {
     /**
      * Return the classname of the {@link ActionMapping} implementation used by the module.
      *
-     * @return string
+     * @return class-string<ActionMapping>
      */
     public function getMappingClass() {
         return $this->mappingClass;
@@ -1098,7 +1098,7 @@ class Module extends CObject {
     /**
      * Return the classname of the {@link ActionForward} implementation used by the module.
      *
-     * @return string
+     * @return class-string<ActionForward>
      */
     public function getForwardClass() {
         return $this->forwardClass;

@@ -13,19 +13,19 @@ use rosasurfer\ministruts\core\exception\IllegalAccessException;
  * An object providing access to the current HTTP request's raw user input.
  * Use {@link ActionForm} to access the request's validated and interpreted input.
  *
- * @implements \ArrayAccess<string, string|string[]>
+ * @implements \ArrayAccess<string, mixed>
  */
 class ActionInput extends CObject implements \ArrayAccess {
 
 
-    /** @var array<string|string[]> */
+    /** @var array<string, mixed> */
     protected $parameters;
 
 
     /**
      * Constructor
      *
-     * @param  array<string|string[]> $parameters
+     * @param  array<string, mixed> $parameters
      */
     public function __construct(array $parameters) {
         $this->parameters = $parameters;
@@ -35,7 +35,7 @@ class ActionInput extends CObject implements \ArrayAccess {
     /**
      * Return all raw input parameters.
      *
-     * @return array<string|string[]>
+     * @return array<string, mixed>
      */
     public function all() {
         return $this->parameters;

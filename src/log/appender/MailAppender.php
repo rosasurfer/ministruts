@@ -299,13 +299,17 @@ class MailAppender extends BaseAppender {
         $message = $this->normalizeLines($message);
 
         // send mail
-        $prevSendmailFrom = ini_get('sendmail_from');
-        if (WINDOWS) ini_set('sendmail_from', $returnPath);
+        if (WINDOWS) {
+            $prevSendmailFrom = ini_get('sendmail_from') ?: '';
+            ini_set('sendmail_from', $returnPath);
+        }
         try {
             mail("<$receiver>", $subject, $message, $headers, "-f $returnPath");
         }
         finally {
-            if (WINDOWS) ini_set('sendmail_from', $prevSendmailFrom);
+            if (WINDOWS) {
+                ini_set('sendmail_from', $prevSendmailFrom);
+            }
         }
     }
 

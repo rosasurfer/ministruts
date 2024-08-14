@@ -12,17 +12,6 @@ use Throwable;
 interface RosasurferExceptionInterface extends Throwable {
 
     /**
-     * Set the error code of an exception. Used to enrich the exception with additional data.
-     * Ignored if the error code is already set.
-     *
-     * @param  int $code
-     *
-     * @return $this
-     */
-    public function setCode(int $code): self;
-
-
-    /**
      * Prepend a message to the exception's existing message. Used to enrich the exception with additional data.
      *
      * @param  string $message
@@ -40,4 +29,15 @@ interface RosasurferExceptionInterface extends Throwable {
      * @return $this
      */
     public function appendMessage(string $message): self;
+
+
+    /**
+     * Set the error code of an exception. Used to enrich the exception with additional data.
+     * Ignored if the error code is already set.
+     *
+     * @param  int $code
+     *
+     * @return $this
+     */
+    public function setCode(int $code): self;
 }
