@@ -2,15 +2,13 @@
 declare(strict_types=1);
 
 /**
- * IDE support for PHPStan type aliases. The types are used in PHPdoc only, PHP never sees them.
+ * IDE support for displaying PHPStan alias definitions. The types are used in PHPDoc only, PHP never sees them.
  * Add this file to the library path of the project.
- *
- * @phpstan-import-type  STACKFRAME from \rosasurfer\ministruts\Application
  */
 namespace rosasurfer\ministruts {
 
     /**
-     * Alias for an array holding a single frame of a stacktrace.
+     * PHPStan alias for an array holding a single frame of a stacktrace.
      *
      * <pre>
      * array(

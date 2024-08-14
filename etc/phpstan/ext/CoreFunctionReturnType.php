@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace rosasurfer\ministruts\phpstan\extension;
+namespace rosasurfer\ministruts\phpstan;
 
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\FunctionReflection;

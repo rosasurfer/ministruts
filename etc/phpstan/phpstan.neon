@@ -13,7 +13,7 @@ parameters:
     - init.php
 
   scanFiles:                                    # scanned for additional symbols, not analyzed (e.g. stubs for unavailable PHP extensions)
-    - symbols/php-extensions.php
+    - symbols/php.php
 
   stubFiles:                                    # custom PHPDoc annotations overriding 3rd-party userland typing
 
@@ -21,7 +21,7 @@ parameters:
     - ../../bin
     - ../../src
     - ../../test
-    - extension
+    - ext
 
   excludePaths:
     - ../../vendor
@@ -56,6 +56,6 @@ parameters:
 
 
 services:                                       # must be loadable via Composer's auto-loader
-  - class: rosasurfer\ministruts\phpstan\extension\CoreFunctionReturnType
+  - class: rosasurfer\ministruts\phpstan\CoreFunctionReturnType
     tags:
       - phpstan.broker.dynamicFunctionReturnTypeExtension

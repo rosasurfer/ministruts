@@ -29,10 +29,10 @@
     },
     "autoload": {
         "psr-4": {
-            "rosasurfer\\ministruts\\": "src",
-            "rosasurfer\\ministruts\\phpstan\\extension\\": "etc/phpstan/extension"
+            "rosasurfer\\ministruts\\": "src/"
         },
-        "files": ["src/load.php"]
+        "classmap": ["etc/phpstan/ext/"],        
+        "files":    ["src/load.php"]
     },
     "autoload-dev": {
         "psr-4": {

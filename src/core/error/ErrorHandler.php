@@ -537,7 +537,7 @@ class ErrorHandler extends StaticClass {
      * @see  \rosasurfer\ministruts\STACKFRAME
      *
      * @example
-     * before: frame locations point to the called statement
+     * before: The location in the frame points to the called statement.
      * <pre>
      *  require_once()  # line 5,  file: /var/www/phalcon/vokuro/vendor/autoload.php
      *  include_once()  # line 21, file: /var/www/phalcon/vokuro/app/config/loader.php
@@ -545,7 +545,7 @@ class ErrorHandler extends StaticClass {
      *  {main}
      * </pre>
      *
-     * after: frame locations point to the calling statement
+     * after: The location in the frame points to the calling statement.
      * <pre>
      *  require_once()             [php]
      *  include_once()  # line 5,  file: /var/www/phalcon/vokuro/vendor/autoload.php
@@ -559,17 +559,17 @@ class ErrorHandler extends StaticClass {
             return $trace;
         }
 
-        // fix a missing first line if $file matches (e.g. with \SimpleXMLElement)
+        // fix a zero $line[0] if $file matches (e.g. with \SimpleXMLElement)
         if ($file != 'unknown' && $line) {
-            if (($trace[0]['file'] ?? null)==$file && ($trace[0]['line'] ?? 0)==0) {
+            if (($trace[0]['file'] ?? null)===$file && ($trace[0]['line'] ?? 0)===0) {
                 $trace[0]['line'] = $line;
             }
         }
 
-        // append a frame for the main script
+        // append a frame without location for the main script
         $trace[] = ['function' => '{main}'];
 
-        // move fields FILE and LINE to the end by one position
+        // move all locations to the end by one position
         for ($i = sizeof($trace); $i--;) {
             if (isset($trace[$i-1]['file'])) $trace[$i]['file'] = $trace[$i-1]['file'];
             else                       unset($trace[$i]['file']);
@@ -580,16 +580,16 @@ class ErrorHandler extends StaticClass {
             $trace[$i]['__adjusted'] = 1;
         }
 
-        // add location details from parameters to frame[0] only if they differ from the old values (now in frame[1])
+        // add location from parameters to first frame if it differs from the old one (now in second frame)
         if (!isset($trace[1]['file'], $trace[1]['line']) || $trace[1]['file']!=$file || $trace[1]['line']!=$line) {
             $trace[0]['file'] = $file;                          // test with:
             $trace[0]['line'] = $line;                          // \SQLite3::enableExceptions(true|false);
         }                                                       // \SQLite3::exec($invalid_sql);
         else {
-            unset($trace[0]['file'], $trace[0]['line']);        // otherwise delete them
+            unset($trace[0]['file'], $trace[0]['line']);        // otherwise delete location (a call from PHP core)
         }
 
-        // remove the last frame (the one appended for the main script) if it now points to an unknown location (the PHP core)
+        // remove the last frame again if it has no location (no main script, call from PHP core)
         $size = sizeof($trace);
         if (!isset($trace[$size-1]['file'])) {
             array_pop($trace);
