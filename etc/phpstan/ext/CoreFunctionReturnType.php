@@ -48,6 +48,7 @@ class CoreFunctionReturnType implements DynamicFunctionReturnTypeExtension {
             'getcwd'       => $bool,                //: string|false
             'ob_get_clean' => $bool,                //: string|false
             'preg_replace' => $null,                //: string|array|null
+            'preg_split'   => $bool,                //: array|false
         ];
     }
 

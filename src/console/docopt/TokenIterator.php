@@ -19,25 +19,25 @@ class TokenIterator extends \ArrayIterator {
     use ObjectTrait, DiAwareTrait;
 
 
-    /** @var string */
-    protected $tokenError;
+    /** @var class-string<\Throwable> */
+    protected string $errorClass;
 
 
     /**
      * Constructor
      *
-     * @param  string|string[] $source
-     * @param  string          $tokenError [optional] - classname of token errors used for error output
-     *                                                  (default: "DocoptUserNotification")
+     * @param  string|string[]           $source
+     * @param  class-string<\Throwable>  $errorClass [optional] - classname of token errors used for error output
+     *                                                            (default: 'DocoptUserNotification')
      */
-    public function __construct($source, $tokenError = DocoptUserNotification::class) {
+    public function __construct($source, string $errorClass = DocoptUserNotification::class) {
         if (!is_array($source)) {
             $source = trim($source);
             $source = strlen($source) ? preg_split('/\s+/', $source) : [];
         }
         parent::__construct($source);
 
-        $this->tokenError = $tokenError;
+        $this->errorClass = $errorClass;
     }
 
 
@@ -54,10 +54,10 @@ class TokenIterator extends \ArrayIterator {
 
 
     /**
-     * @return string - classname of token errors
+     * @return class-string<\Throwable> - classname of token errors
      */
-    public function getTokenError() {
-        return $this->tokenError;
+    public function getErrorClass(): string {
+        return $this->errorClass;
     }
 
 

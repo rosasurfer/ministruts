@@ -22,7 +22,7 @@ class TestParser extends DocoptParser {
      *
      * @return string
      */
-    public static function formalUsage($section) {
+    public static function formalUsage(string $section): string {
         return parent::formalUsage($section);
     }
 
@@ -58,7 +58,7 @@ class TestParser extends DocoptParser {
      *
      * @return Required
      */
-    public static function parsePattern($source, OptionIterator $options) {
+    public static function parsePattern(string $source, OptionIterator $options): Required {
         return parent::parsePattern($source, $options);
     }
 

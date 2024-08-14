@@ -172,13 +172,13 @@ class DocoptParser extends CObject {
      *
      * @return string
      */
-    protected static function formalUsage($section) {
-        list (, $section) = explode(':', $section, 2);  # drop "usage:"
+    protected static function formalUsage(string $section): string {
+        list(, $section) = explode(':', $section, 2);       // drop "usage:"
         $pu = preg_split('/\s+/', trim($section));
 
         $ret = [];
         foreach (array_slice($pu, 1) as $s) {
-            if ($s == $pu[0]) $ret[] = ') | (';
+            if ($pu[0] == $s) $ret[] = ') | (';
             else              $ret[] = $s;
         }
         return '( '.join(' ', $ret).' )';
@@ -259,11 +259,11 @@ class DocoptParser extends CObject {
      *
      * @return Required
      */
-    protected static function parsePattern($source, OptionIterator $options) {
+    protected static function parsePattern(string $source, OptionIterator $options): Required {
         $tokens = TokenIterator::fromPattern($source);
         $result = static::parseExpression($tokens, $options);
         if ($tokens->current() !== null) {
-            $error = $tokens->getTokenError();
+            $error = $tokens->getErrorClass();
             throw new $error('Unexpected ending: '.join(' ', $tokens->left()));
         }
         return new Required($result);                       // @phpstan-ignore deadCode.unreachable (refactor using iterator->valid())
@@ -371,13 +371,13 @@ class DocoptParser extends CObject {
 
             $similarCnt = sizeof($similar);
             if ($similarCnt > 1) {
-                $error = $tokens->getTokenError();
+                $error = $tokens->getErrorClass();
                 throw new $error($short.' is specified ambiguously '.$similarCnt.' times');
             }
             elseif ($similarCnt < 1) {
                 $o = new Option($short, null, 0);
                 $options[] = $o;
-                if ($tokens->getTokenError() == DocoptUserNotification::class) {
+                if ($tokens->getErrorClass() == DocoptUserNotification::class) {
                     $o = new Option($short, null, 0, true);
                 }
             }
@@ -387,7 +387,7 @@ class DocoptParser extends CObject {
                 if ($o->argcount != 0) {
                     if ($left == '') {
                         if ($tokens->current()===null || $tokens->current()=='--') {    // @phpstan-ignore identical.alwaysFalse (refactor using iterator->valid())
-                            $error = $tokens->getTokenError();
+                            $error = $tokens->getErrorClass();
                             throw new $error($short.' requires an argument');
                         }
                         $value = $tokens->move();
@@ -397,7 +397,7 @@ class DocoptParser extends CObject {
                         $left = '';
                     }
                 }
-                if ($tokens->getTokenError() == DocoptUserNotification::class) {
+                if ($tokens->getErrorClass() == DocoptUserNotification::class) {
                     $o->value = isset($value) ? $value : true;
                 }
             }
@@ -416,7 +416,7 @@ class DocoptParser extends CObject {
      * @return Option[]
      */
     protected static function parseLong(TokenIterator $tokens, OptionIterator $options) {
-        $tokenError = $tokens->getTokenError();
+        $tokenError = $tokens->getErrorClass();
         $token      = $tokens->move();
         $exploded   = explode('=', $token, 2);
 
@@ -458,22 +458,22 @@ class DocoptParser extends CObject {
         }
         elseif (sizeof($similar) > 1) {
             // might be simply specified ambiguously 2+ times?
-            throw new $tokenError($long.' is not a unique prefix: '.join(', ', array_map(function($o) {
+            throw new $tokenError("$long is not a unique prefix: ".join(', ', array_map(function($o) {
                 return $o->long;
             }, $similar)));
         }
         else {
             $o = new Option($similar[0]->short, $similar[0]->long, $similar[0]->argcount, $similar[0]->value);
             if ($o->argcount == 0) {
-                if (isset($value)) throw new $tokenError($o->long.' must not have an argument');
+                if (isset($value)) throw new $tokenError("$o->long must not have an argument");
             }
             elseif ($value === null) {
                 // @phpstan-ignore identical.alwaysFalse (refactor using iterator->valid())
-                if ($tokens->current()===null || $tokens->current()=='--') throw new $tokenError($o->long.' requires an argument');
+                if ($tokens->current()===null || $tokens->current()=='--') throw new $tokenError("$o->long requires an argument");
                 $value = $tokens->move();
             }
-            if ($tokens->getTokenError() == DocoptUserNotification::class) {
-                $o->value = isset($value) ? $value : true;
+            if ($tokens->getErrorClass() == DocoptUserNotification::class) {
+                $o->value = $value ?? true;
             }
         }
         return [$o];
@@ -489,22 +489,23 @@ class DocoptParser extends CObject {
      * @return Pattern[]
      */
     protected static function parseAtom(TokenIterator $tokens, OptionIterator $options) {
-        $tokenError = $tokens->getTokenError();
-        $token      = $tokens->current();
-        $result     = [];
+        $tokenError = $tokens->getErrorClass();
+        $token = $tokens->current();
+        $result = [];
 
         if ($token=='(' || $token=='[') {
             $tokens->move();
 
-            static $index; !$index && $index = [
+            /** @var ?array<array<class-string<Pattern>>> $index */
+            static $index;
+            $index ??= [
                 '(' => [')', Required::class],
                 '[' => [']', Optional::class],
             ];
-            list ($matching, $patternClass) = $index[$token];
+            list($matching, $patternClass) = $index[$token];
 
             $result = new $patternClass(static::parseExpression($tokens, $options));
-            if ($tokens->move() != $matching)
-                throw new $tokenError('Unmatched "'.$token.'"');
+            if ($tokens->move() != $matching) throw new $tokenError("Unmatched \"$token\"");
             return [$result];
         }
         elseif ($token == 'options') {
