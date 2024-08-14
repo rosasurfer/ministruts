@@ -19,11 +19,14 @@
 # Short option name/value separator are zero or more spaces.      e.g. "-l3" or "-l 4"
 # Long option name/value separator are space or equal sign "=".   e.g. "--level 5" or "--level=6"
 #
+# PHPStan can be executed using a non-standard PHP interpreter by setting the environment variable PHP='<php-cmd>'.
+#
 # Examples:
 #   phpstan                                 // analyse the code base with the configured settings
 #   phpstan --level=1 api/app               // analyse a single directory with a custom rule level
 #   phpstan --level=6 -b baseline.neon      // analyse the code base and save the result as file "baseline.neon"
 #   phpstan --level=7 -u baseline.neon      // analyse the code base using file "baseline.neon" as a filter
+#   PHP=php81 phpstan                       // run PHPStan using PHP interpreter "php81" instead of the standard "php"
 #
 set -eu -o pipefail
 
@@ -164,5 +167,9 @@ set -- "${ARGS[@]}"
 }
 
 
+# determine the PHP interpreter to use
+PHP=${PHP:-php}
+
+
 # call PHPStan
-"$BIN_DIR/phpstan" "$@" --ansi
+"$PHP" "$BIN_DIR/phpstan" "$@" --ansi
