@@ -31,7 +31,7 @@
         "psr-4": {
             "rosasurfer\\ministruts\\": "src/"
         },
-        "classmap": ["etc/phpstan/ext/"],        
+        "classmap": ["etc/phpstan/ext/", "src/core/lock/SysvSemaphore.php"],        
         "files":    ["src/load.php"]
     },
     "autoload-dev": {

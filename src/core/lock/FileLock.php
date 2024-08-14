@@ -51,7 +51,7 @@ final class FileLock extends BaseLock {
      *
      * @return bool
      */
-    public function isAquired() {
+    public function isAquired(): bool {
         if (isset(self::$hFiles[$this->filename]))
             return is_resource(self::$hFiles[$this->filename]);
         return false;
@@ -60,8 +60,10 @@ final class FileLock extends BaseLock {
 
     /**
      * If called on an aquired lock the lock is released. If called on an already released lock the call does nothing.
+     *
+     * @return void
      */
-    public function release() {
+    public function release(): void {
         if ($this->isAquired()) {
             $hFile = self::$hFiles[$this->filename];
             if (!flock($hFile, LOCK_UN)) throw new RuntimeException('Can not release lock on file "'.$this->filename.'"');
@@ -74,9 +76,11 @@ final class FileLock extends BaseLock {
     /**
      * Destructor
      *
-     * Release the resources occupied by the instance.
+     * Releases the resources occupied by the instance.
+     *
+     * @return void
      */
-    public function __destruct() {
+    public function __destruct(): void {
         try {
             $this->release();
         }

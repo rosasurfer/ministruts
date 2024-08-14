@@ -24,11 +24,12 @@ parameters:
 
   scanFiles:                                        # scanned for symbols only, not analyzed (legacy or future code)
     - symbols/php_mysql.php
-    - symbols/SysvSemaphore.php
 
   stubFiles:                                        # custom PHPDoc annotations overriding 3rd-party definitions
 
   dynamicConstantNames:                             # changing constants, depending on the environment
+    - PHP_VERSION_ID
+    
     - rosasurfer\ministruts\_CLI
     - rosasurfer\ministruts\_LOCALHOST
     - rosasurfer\ministruts\_MACOS

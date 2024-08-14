@@ -18,7 +18,7 @@ abstract class BaseLock extends CObject {
      *
      * @return bool
      */
-    abstract public function isAquired();
+    abstract public function isAquired(): bool;
 
 
     /**
@@ -26,21 +26,25 @@ abstract class BaseLock extends CObject {
      *
      * @return void
      */
-    abstract public function release();
+    abstract public function release(): void;
 
 
     /**
      * Prevent serialization of lock instances.
+     *
+     * @return mixed[]
      */
-    final public function __sleep() {
+    final public function __sleep(): array {
         throw new IllegalStateException('You cannot serialize me: '.get_class($this));
     }
 
 
     /**
      * Prevent de-serialization of lock instances.
+     *
+     * @return void
      */
-    final public function __wakeUp() {
+    final public function __wakeUp(): void {
         throw new IllegalStateException('You cannot deserialize me: '.get_class($this));
     }
 }

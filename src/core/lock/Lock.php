@@ -63,7 +63,7 @@ class Lock extends BaseLock {
      *
      * @return bool
      */
-    public function isAquired() {
+    public function isAquired(): bool {
         if ($this->impl) {
             return $this->impl->isAquired();
         }
@@ -74,8 +74,10 @@ class Lock extends BaseLock {
     /**
      * If called on an aquired lock the lock is released.
      * If called on an already released lock the call does nothing.
+     *
+     * @return void
      */
-    public function release() {
+    public function release(): void {
         if ($this->impl) {
             $this->impl->release();
             unset(self::$lockedKeys[$this->key]);
@@ -86,9 +88,11 @@ class Lock extends BaseLock {
     /**
      * Destructor
      *
-     * Release occupied resources.
+     * Releases occupied resources.
+     *
+     * @return void
      */
-    public function __destruct() {
+    public function __destruct(): void {
         try {
             $this->release();
         }

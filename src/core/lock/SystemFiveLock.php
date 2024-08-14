@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\core\lock;
 
+use SysvSemaphore;
 use Throwable;
 
 use rosasurfer\ministruts\core\error\ErrorHandler;
@@ -25,11 +26,11 @@ use const rosasurfer\ministruts\NL;
  */
 class SystemFiveLock extends BaseLock {
 
-    /** @var array<?resource> - semaphore handles */
-    private static array $hSemaphores = [];
+    /** @var array<resource|SysvSemaphore|null> - semaphore handles */
+    private static array $semaphores = [];
 
     /** @var string */
-    private $key;
+    private string $key;
 
 
     /**
@@ -48,8 +49,8 @@ class SystemFiveLock extends BaseLock {
      * </pre>
      */
     public function __construct(string $key) {
-        if (\key_exists($key, self::$hSemaphores)) throw new RuntimeException("Dead-lock detected: already holding a lock for key \"$key\"");
-        self::$hSemaphores[$key] = null;
+        if (\key_exists($key, self::$semaphores)) throw new RuntimeException("Dead-lock detected: already holding a lock for key \"$key\"");
+        self::$semaphores[$key] = null;
 
         // TODO: use fTok() instead
         $integer = $this->keyToId($key);
@@ -65,7 +66,7 @@ class SystemFiveLock extends BaseLock {
                 if (!sem_acquire($hSemaphore)) throw new RuntimeException("cannot aquire semaphore for key $integer");
 
                 $this->key = $key;                          // TODO: sem_get() and sem_acquire() may fail under load
-                self::$hSemaphores[$key] = $hSemaphore;
+                self::$semaphores[$key] = $hSemaphore;
             }
             catch (Throwable $ex) {
                 // TODO: find bug and rewrite (most probably a file limit is hit), @see ext/sysvsem/sysvsem.c
@@ -102,9 +103,11 @@ class SystemFiveLock extends BaseLock {
     /**
      * Destructor
      *
-     * Release any lock still held.
+     * Releases any lock still held.
+     *
+     * @return void
      */
-    public function __destruct() {
+    public function __destruct(): void {
         try {
             $this->release();
         }
@@ -119,22 +122,23 @@ class SystemFiveLock extends BaseLock {
      *
      * @return bool
      */
-    public function isAquired() {
-        if (isset(self::$hSemaphores[$this->key])) {
-            return is_resource(self::$hSemaphores[$this->key]);
-        }
-        return false;
+    public function isAquired(): bool {
+        return isset(self::$semaphores[$this->key]);
     }
 
 
     /**
      * If called on an aquired lock the lock is released.
      * If called on an already released lock the call does nothing.
+     *
+     * @return void
      */
-    public function release() {
+    public function release(): void {
         if ($this->isAquired()) {
-            if (!sem_remove(self::$hSemaphores[$this->key])) throw new RuntimeException('Cannot remove semaphore for key "'.$this->key.'"');
-            unset(self::$hSemaphores[$this->key]);
+            $semaphore = self::$semaphores[$this->key];
+            // @phpstan-ignore argument.type (incompatible types PHP7 vs PHP8)
+            if (!sem_remove($semaphore)) throw new RuntimeException("Cannot remove semaphore for key \"$this->key\"");
+            unset(self::$semaphores[$this->key]);
         }
     }
 
@@ -148,7 +152,7 @@ class SystemFiveLock extends BaseLock {
      *
      * @todo   replace with fTok()
      */
-    private function keyToId($key) {
+    private function keyToId(string $key): int {
         return (int) hexdec(substr(md5($key), 0, 7)) + strlen($key);
     }                                         // 7: strlen(dechex(PHP_INT_MAX)) - 1 (x86)
 }
