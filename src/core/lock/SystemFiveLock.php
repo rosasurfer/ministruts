@@ -5,7 +5,6 @@ namespace rosasurfer\ministruts\core\lock;
 
 use Throwable;
 
-use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\error\ErrorHandler;
 use rosasurfer\ministruts\core\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
@@ -26,8 +25,8 @@ use const rosasurfer\ministruts\NL;
  */
 class SystemFiveLock extends BaseLock {
 
-    /** @var resource[] - semaphore handles */
-    private static $hSemaphores = [];
+    /** @var array<?resource> - semaphore handles */
+    private static array $hSemaphores = [];
 
     /** @var string */
     private $key;
@@ -45,58 +44,58 @@ class SystemFiveLock extends BaseLock {
      *
      * @example
      * <pre>
-     *  $lock = new SystemFiveLock(__FILE__.'#'.__LINE__);
+     * $lock = new SystemFiveLock(__FILE__.'#'.__LINE__);
      * </pre>
      */
-    public function __construct($key) {
-        Assert::string($key);
-        if (\key_exists($key, self::$hSemaphores)) throw new RuntimeException('Dead-lock detected: already holding a lock for key "'.$key.'"');
+    public function __construct(string $key) {
+        if (\key_exists($key, self::$hSemaphores)) throw new RuntimeException("Dead-lock detected: already holding a lock for key \"$key\"");
         self::$hSemaphores[$key] = null;
 
         // TODO: use fTok() instead
         $integer = $this->keyToId($key);
 
-        $i      = 0;
+        $i = 0;
         $trials = 5;                                        // max. amount of errors before an exception is re-thrown
-        $hSemaphore = $messages = null;
-        do {
-            $ex = null;
+        $messages = [];
+
+        while (true) {
             try {
                 $hSemaphore = sem_get($integer, 1, 0666);   // get semaphore handle
-                if (!is_resource($hSemaphore)) throw new RuntimeException('cannot get semaphore handle for key '.$integer);
-                sem_acquire($hSemaphore);
+                if (!$hSemaphore)              throw new RuntimeException("cannot get semaphore handle for key $integer");
+                if (!sem_acquire($hSemaphore)) throw new RuntimeException("cannot aquire semaphore for key $integer");
+
+                $this->key = $key;
+                self::$hSemaphores[$key] = $hSemaphore;
                 break;                                      // TODO: sem_get() and sem_acquire() may fail under load
             }
             catch (Throwable $ex) {
-                if (!$ex instanceof IRosasurferException) $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex);
-
                 // TODO: find bug and rewrite (most probably a file limit is hit), @see ext/sysvsem/sysvsem.c
                 $message = $ex->getMessage();
                 $hexId = dechex($integer);
                 $prefixes = [
-                    'sem_get(): failed for key 0x'.$hexId.': Invalid argument',
-                    'sem_get(): failed for key 0x'.$hexId.': Identifier removed',
-                    'sem_get(): failed acquiring SYSVSEM_SETVAL for key 0x'.$hexId.': Invalid argument',
-                    'sem_get(): failed acquiring SYSVSEM_SETVAL for key 0x'.$hexId.': Identifier removed',
-                    'sem_get(): failed releasing SYSVSEM_SETVAL for key 0x'.$hexId.': Invalid argument',
-                    'sem_get(): failed releasing SYSVSEM_SETVAL for key 0x'.$hexId.': Identifier removed',
-                    'sem_acquire(): failed to acquire key 0x'.$hexId.': Invalid argument',
-                    'sem_acquire(): failed to acquire key 0x'.$hexId.': Identifier removed',
+                    "sem_get(): failed for key 0x$hexId: Invalid argument",
+                    "sem_get(): failed for key 0x$hexId: Identifier removed",
+                    "sem_get(): failed acquiring SYSVSEM_SETVAL for key 0x$hexId: Invalid argument",
+                    "sem_get(): failed acquiring SYSVSEM_SETVAL for key 0x$hexId: Identifier removed",
+                    "sem_get(): failed releasing SYSVSEM_SETVAL for key 0x$hexId: Invalid argument",
+                    "sem_get(): failed releasing SYSVSEM_SETVAL for key 0x$hexId: Identifier removed",
+                    "sem_acquire(): failed to acquire key 0x$hexId: Invalid argument",
+                    "sem_acquire(): failed to acquire key 0x$hexId: Identifier removed",
                 ];
                 if (++$i < $trials && strStartsWith($message, $prefixes)) {
-                    Logger::log($message.', trying again ... ('.($i+1).')', L_DEBUG);
+                    Logger::log("$message, trying again...", L_DEBUG);
                     $messages[] = $message;
-                    usleep(200000);     // wait 200 msec
+                    usleep(200000);                         // wait 200 msec
                     continue;
                 }
+
                 // prevent infinite loop
-                throw $ex->appendMessage('Giving up to get lock for key "'.$key.'" after '.$i.' trials'.($messages ? ', former errors:'.NL.join(NL, $messages) : ''));
+                if (!$ex instanceof IRosasurferException) {
+                    $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex);
+                }
+                throw $ex->appendMessage("Giving up to get lock for key \"$key\" after $i trials".($messages ? ', former errors:'.NL.join(NL, $messages) : ''));
             }
         }
-        while (true);
-
-        $this->key               = $key;
-        self::$hSemaphores[$key] = $hSemaphore;
     }
 
 

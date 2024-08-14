@@ -22,8 +22,9 @@ parameters:
     - ../../vendor
     - .tmp
 
-  scanFiles:                                        # scanned for symbols only, not analyzed (e.g. legacy code)
+  scanFiles:                                        # scanned for symbols only, not analyzed (legacy or future code)
     - symbols/php_mysql.php
+    - symbols/SysvSemaphore.php
 
   stubFiles:                                        # custom PHPDoc annotations overriding 3rd-party definitions
 

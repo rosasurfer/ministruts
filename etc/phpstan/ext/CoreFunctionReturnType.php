@@ -33,7 +33,6 @@ class CoreFunctionReturnType implements DynamicFunctionReturnTypeExtension {
     /** @var array<string, Type> */
     protected array $supportedFunctions;
 
-
     /**
      * Constructor
      */
