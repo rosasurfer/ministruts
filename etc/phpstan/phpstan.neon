@@ -6,18 +6,13 @@
 #  @see  https://phpstan.org/config-reference
 #
 parameters:
-  phpVersion: 70400                             # assume this PHP version if running under a different one
-  level:      7                                 # default rule level, a rule level on the command line overrides this value
+  phpVersion: 70400                                 # assume this PHP version if running under a different one
+  level:      7                                     # default rule level, a rule level on the command line overrides this value
 
-  bootstrapFiles:                               # initialize the PHP runtime environment before PHPStan runs
+  bootstrapFiles:                                   # initialize the PHP runtime environment before PHPStan runs
     - init.php
 
-  scanFiles:                                    # scanned for additional symbols, not analyzed (e.g. stubs for unavailable PHP extensions)
-    - symbols/php.php
-
-  stubFiles:                                    # custom PHPDoc annotations overriding 3rd-party userland typing
-
-  paths:                                        # analyzed paths, paths on the command line override these values
+  paths:                                            # analyzed paths, paths on the command line override these values
     - ../../bin
     - ../../src
     - ../../test
@@ -27,7 +22,12 @@ parameters:
     - ../../vendor
     - .tmp
 
-  dynamicConstantNames:                         # dynamic constants with values depending on the environment
+  scanFiles:                                        # scanned for symbols only, not analyzed (e.g. legacy 3rd party code)
+    - symbols/php_mysql.php
+
+  stubFiles:                                        # custom PHPDoc annotations overriding 3rd-party definitions
+
+  dynamicConstantNames:                             # changing constants, depending on the environment
     - rosasurfer\ministruts\_CLI
     - rosasurfer\ministruts\_LOCALHOST
     - rosasurfer\ministruts\_MACOS
@@ -44,7 +44,7 @@ parameters:
     - rosasurfer\ministruts\struts\ActionForm
 
   ignoreErrors:
-    # skip broken PHPStan checks
+    # skip buggy PHPStan checks
     - '#^Unsafe usage of new static\(\)\.$#'
 
   reportUnmatchedIgnoredErrors: false

@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 /**
- * IDE support for displaying PHPStan alias definitions. The types are used in PHPDoc only, PHP never sees them.
+ * IDE tooltip support for PHPStan type aliases. The types are used in PHPDoc only, PHP never sees them.
  * Add this file to the library path of the project.
  */
 namespace rosasurfer\ministruts {
