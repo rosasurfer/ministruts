@@ -22,7 +22,7 @@ parameters:
     - ../../vendor
     - .tmp
 
-  scanFiles:                                        # scanned for symbols only, not analyzed (e.g. legacy 3rd party code)
+  scanFiles:                                        # scanned for symbols only, not analyzed (e.g. legacy code)
     - symbols/php_mysql.php
 
   stubFiles:                                        # custom PHPDoc annotations overriding 3rd-party definitions
@@ -44,7 +44,7 @@ parameters:
     - rosasurfer\ministruts\struts\ActionForm
 
   ignoreErrors:
-    # skip buggy PHPStan checks
+    # ignore buggy PHPStan checks
     - '#^Unsafe usage of new static\(\)\.$#'
 
   reportUnmatchedIgnoredErrors: false
@@ -55,7 +55,7 @@ parameters:
   tipsOfTheDay: false
 
 
-services:                                       # must be loadable via Composer's auto-loader
+services:                                           # must be loadable via Composer
   - class: rosasurfer\ministruts\phpstan\CoreFunctionReturnType
     tags:
       - phpstan.broker.dynamicFunctionReturnTypeExtension
