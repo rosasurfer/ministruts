@@ -64,9 +64,8 @@ class SystemFiveLock extends BaseLock {
                 if (!$hSemaphore)              throw new RuntimeException("cannot get semaphore handle for key $integer");
                 if (!sem_acquire($hSemaphore)) throw new RuntimeException("cannot aquire semaphore for key $integer");
 
-                $this->key = $key;
+                $this->key = $key;                          // TODO: sem_get() and sem_acquire() may fail under load
                 self::$hSemaphores[$key] = $hSemaphore;
-                break;                                      // TODO: sem_get() and sem_acquire() may fail under load
             }
             catch (Throwable $ex) {
                 // TODO: find bug and rewrite (most probably a file limit is hit), @see ext/sysvsem/sysvsem.c
@@ -93,8 +92,9 @@ class SystemFiveLock extends BaseLock {
                 if (!$ex instanceof IRosasurferException) {
                     $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex);
                 }
-                throw $ex->appendMessage("Giving up to get lock for key \"$key\" after $i trials".($messages ? ', former errors:'.NL.join(NL, $messages) : ''));
+                throw $ex->appendMessage("Giving up to get lock for key \"$key\" after $i trials".($messages ? ', previous errors:'.NL.join(NL, $messages) : ''));
             }
+            break;
         }
     }
 
