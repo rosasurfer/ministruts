@@ -6,7 +6,7 @@
 #  @see  https://phpstan.org/config-reference
 #
 includes:
-  - includes/by-php-version.neon.php                # get PHP version specific config settings
+  - include/by-php-version.neon.php                 # fetch PHP version specific settings
 
 
 parameters:
@@ -19,11 +19,12 @@ parameters:
     - ../../bin
     - ../../src
     - ../../test
-    - ext
+    - .                                             # etc/phpstan itself
 
-  excludePaths:
+  excludePaths:                                     # excludeAnalyze + excludeScan
     - ../../vendor
     - .tmp
+    - symbols
 
   scanFiles:                                        # scanned for symbols only, not analyzed (legacy or future code)
     - symbols/php_mysql.php

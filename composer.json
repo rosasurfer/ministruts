@@ -24,15 +24,18 @@
         "psr/container": "^1.0"
     },
     "require-dev": {
-        "phpstan/phpstan": "^1.11",
+        "phpstan/phpstan": "^1.0",
         "phpunit/phpunit": "^9.3"
     },
     "autoload": {
         "psr-4": {
             "rosasurfer\\ministruts\\": "src/"
         },
-        "classmap": ["etc/phpstan/ext/", "src/core/lock/SysvSemaphore.php"],        
-        "files":    ["src/load.php"]
+        "classmap": [
+            "etc/phpstan/extension/", 
+            "src/core/lock/SysvSemaphore.php"
+        ],        
+        "files": ["src/load.php"]
     },
     "autoload-dev": {
         "psr-4": {
