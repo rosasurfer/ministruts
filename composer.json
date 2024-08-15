@@ -33,7 +33,7 @@
         },
         "classmap": [
             "etc/phpstan/extension/", 
-            "src/core/lock/SysvSemaphore.php"
+            "src/util/php8/"
         ],        
         "files": ["src/load.php"]
     },
