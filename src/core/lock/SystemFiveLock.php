@@ -26,7 +26,10 @@ use const rosasurfer\ministruts\NL;
  */
 class SystemFiveLock extends BaseLock {
 
-    /** @var array<resource|SysvSemaphore|null> - semaphore handles */
+    /**
+     * @var array<resource|SysvSemaphore|null> - semaphore handles
+     * @phpstan-var array<SysvSemaphoreId|null>
+     */
     private static array $semaphores = [];
 
     /** @var string */
@@ -136,6 +139,7 @@ class SystemFiveLock extends BaseLock {
     public function release(): void {
         if (isset(self::$semaphores[$this->key])) {
             $semaphore = self::$semaphores[$this->key];
+
             if (!sem_remove($semaphore)) throw new RuntimeException("Cannot remove semaphore for key \"$this->key\"");
             unset(self::$semaphores[$this->key]);
         }

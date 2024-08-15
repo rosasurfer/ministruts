@@ -43,24 +43,25 @@ class CoreFunctionReturnType implements DynamicFunctionReturnTypeExtension {
         $this->supportedFunctions = [
             // function            => type to remove    // original return type
             'file'                 => $bool,            // array|false
-            'file_get_contents'    => $bool,            // string|false         @see  https://www.php.net/manual/en/function.file-get-contents.php
-            'filemtime'            => $bool,            // int|false            @see  https://www.php.net/manual/en/function.filemtime.php
+            'file_get_contents'    => $bool,            // string|false             @see  https://www.php.net/manual/en/function.file-get-contents.php
+            'filemtime'            => $bool,            // int|false                @see  https://www.php.net/manual/en/function.filemtime.php
             'fopen'                => $bool,            // resource|false
             'getcwd'               => $bool,            // string|false
-            'ini_get_all'          => $bool,            // array|false          @see  https://www.php.net/manual/en/function.ini-get-all.php
+            'ini_get_all'          => $bool,            // array|false              @see  https://www.php.net/manual/en/function.ini-get-all.php
             'ob_get_clean'         => $bool,            // string|false
             'opendir'              => $bool,            // resource|false
-            'pg_escape_identifier' => $bool,            // (1) string           @see  https://www.php.net/manual/en/function.pg-escape-identifier.php
-            'pg_escape_literal'    => $bool,            // (1) string           @see  https://www.php.net/manual/en/function.pg-escape-literal.php
-            'preg_replace'         => $null,            // string|array|null
+            'pg_escape_identifier' => $bool,            // (1) string               @see  https://www.php.net/manual/en/function.pg-escape-identifier.php
+            'pg_escape_literal'    => $bool,            // (1) string               @see  https://www.php.net/manual/en/function.pg-escape-literal.php
+            'preg_replace'         => $null,            // (2) string|array|null
             'preg_split'           => $bool,            // array|false
-            'proc_open'            => $bool,            // resource|false       @see  https://www.php.net/manual/en/function.proc-open.php
-            'session_id'           => $bool,            // string|false         @see  https://www.php.net/manual/en/function.session-id.php
-            'session_name'         => $bool,            // string|false         @see  https://www.php.net/manual/en/function.session-name.php
-            'shell_exec'           => $bool,            // string|false|null    @see  https://www.php.net/manual/en/function.shell-exec.php
-            'stream_get_contents'  => $bool,            // string|false         @see  https://www.php.net/manual/en/function.stream-get-contents.php
+            'proc_open'            => $bool,            // resource|false           @see  https://www.php.net/manual/en/function.proc-open.php
+            'session_id'           => $bool,            // string|false             @see  https://www.php.net/manual/en/function.session-id.php
+            'session_name'         => $bool,            // string|false             @see  https://www.php.net/manual/en/function.session-name.php
+            'shell_exec'           => $bool,            // string|false|null        @see  https://www.php.net/manual/en/function.shell-exec.php
+            'stream_get_contents'  => $bool,            // string|false             @see  https://www.php.net/manual/en/function.stream-get-contents.php
 
-            // (1) not clear whether PHPStan or the documentation is wrong
+            // (1) either PHPStan or the PHP documentation is wrong
+            // (2) with PHPStan v1.11.10 the extension is skipped
         ];
     }
 
@@ -79,7 +80,6 @@ class CoreFunctionReturnType implements DynamicFunctionReturnTypeExtension {
         $name = $function->getName();
 
         if ($name == 'preg_replace') {
-            // PHPStan v1.11.10: the extension is skipped for preg_replace()
             $this->log(__METHOD__.'()  '.$name);
         }
 

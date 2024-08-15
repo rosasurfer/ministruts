@@ -23,8 +23,10 @@ abstract class Connector extends CObject implements ConnectorInterface {
      * Destructor
      *
      * Make sure that on destruction of the instance a pending transaction is rolled back and the connection is closed.
+     *
+     * @return void
      */
-    public function __destruct() {
+    public function __destruct(): void {
         try {
             if ($this->isConnected()) {
                 if ($this->isInTransaction())

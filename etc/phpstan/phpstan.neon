@@ -5,9 +5,12 @@
 # File format:
 #  @see  https://phpstan.org/config-reference
 #
+includes:
+  - includes/by-php-version.neon.php                # get PHP version specific config settings
+
+
 parameters:
-  phpVersion: 70400                                 # assume this PHP version if running under a different one
-  level:      7                                     # default rule level, a rule level on the command line overrides this value
+  level: 7                                          # default rule level, a rule level on the command line overrides this value
 
   bootstrapFiles:                                   # initialize the PHP runtime environment before PHPStan runs
     - init.php
@@ -45,7 +48,6 @@ parameters:
 
   ignoreErrors:
     # silence erroneous checks
-    - '#^Parameter \#1 \$sem_identifier of function sem_remove expects resource, resource\|SysvSemaphore given\.$#'
     - '#^Unsafe usage of new static\(\)\.$#'
 
   reportUnmatchedIgnoredErrors: false
