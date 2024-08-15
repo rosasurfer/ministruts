@@ -20,11 +20,11 @@ use const rosasurfer\ministruts\NL;
 
 
 /**
- * System-V lock
+ * SysvLock
  *
  * A lock using a System-V shared memory segment as a mutex (not supported on Windows).
  */
-class SystemFiveLock extends BaseLock {
+class SysvLock extends BaseLock {
 
     /**
      * @var array<resource|SysvSemaphore|null> - semaphore handles
@@ -48,7 +48,7 @@ class SystemFiveLock extends BaseLock {
      *
      * @example
      * <pre>
-     * $lock = new SystemFiveLock(__FILE__.'#'.__LINE__);
+     * $lock = new SysvLock(__FILE__.'#'.__LINE__);
      * </pre>
      */
     public function __construct(string $key) {

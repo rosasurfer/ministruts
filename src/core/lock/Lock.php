@@ -40,9 +40,9 @@ class Lock extends BaseLock {
 
         self::$lockedKeys[$key] = $this->key = $key;
 
-        // prefer SysVLock...
+        // prefer SysvLock...
         if (false && extension_loaded('sysvsem')) {     // @phpstan-ignore  booleanAnd.leftAlwaysFalse (keep for testing)
-            $this->impl = new SystemFiveLock($key);
+            $this->impl = new SysvLock($key);
         }
         else {
             /** @var ConfigInterface $config */
