@@ -44,7 +44,8 @@ parameters:
     - rosasurfer\ministruts\struts\ActionForm
 
   ignoreErrors:
-    # ignore buggy PHPStan checks
+    # silence erroneous checks
+    - '#^Parameter \#1 \$sem_identifier of function sem_remove expects resource, resource\|SysvSemaphore given\.$#'
     - '#^Unsafe usage of new static\(\)\.$#'
 
   reportUnmatchedIgnoredErrors: false

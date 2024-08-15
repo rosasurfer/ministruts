@@ -134,9 +134,8 @@ class SystemFiveLock extends BaseLock {
      * @return void
      */
     public function release(): void {
-        if ($this->isAquired()) {
+        if (isset(self::$semaphores[$this->key])) {
             $semaphore = self::$semaphores[$this->key];
-            // @phpstan-ignore argument.type (incompatible types PHP7 vs PHP8)
             if (!sem_remove($semaphore)) throw new RuntimeException("Cannot remove semaphore for key \"$this->key\"");
             unset(self::$semaphores[$this->key]);
         }
