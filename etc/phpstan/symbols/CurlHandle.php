@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A fully opaque class which replaces curl resources as of PHP 8.0.0.
  *

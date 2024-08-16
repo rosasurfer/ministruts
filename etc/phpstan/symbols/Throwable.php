@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Include into the library path to prevent IDE validation errors under PHP 5.
  */

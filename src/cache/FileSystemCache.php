@@ -5,7 +5,6 @@ use rosasurfer\cache\monitor\Dependency;
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\exception\RuntimeException;
-use rosasurfer\core\exception\error\PHPError;
 use rosasurfer\file\FileSystem as FS;
 
 use function rosasurfer\isRelativePath;
@@ -60,7 +59,11 @@ final class FileSystemCache extends CachePeer {
 
 
     /**
+     * {@inheritdoc}
      *
+     * @param  string $key
+     *
+     * @return bool
      */
     public function isCached($key) {
         // The actual working horse. This method does not only check the key's existence, it also retrieves the value and
@@ -72,8 +75,9 @@ final class FileSystemCache extends CachePeer {
 
         // find and read a stored file
         $file = $this->getFilePath($key);
+        if (!is_file($file)) return false;  // cache miss
+
         $data = $this->readFile($file);
-        if (!$data) return false;           // cache miss
 
         // cache hit
         /** @var int $created */
@@ -116,7 +120,12 @@ final class FileSystemCache extends CachePeer {
 
 
     /**
+     * {@inheritdoc}
      *
+     * @param  string $key
+     * @param  mixed  $default [optional]
+     *
+     * @return mixed
      */
     public function get($key, $default = null) {
         if ($this->isCached($key))
@@ -126,7 +135,11 @@ final class FileSystemCache extends CachePeer {
 
 
     /**
+     * {@inheritdoc}
      *
+     * @param  string $key
+     *
+     * @return bool
      */
     public function drop($key) {
         $fileName = $this->getFilePath($key);
@@ -144,7 +157,14 @@ final class FileSystemCache extends CachePeer {
 
 
     /**
+     * {@inheritdoc}
      *
+     * @param  string      $key
+     * @param  mixed       $value
+     * @param  int         $expires    [optional]
+     * @param  ?Dependency $dependency [optional]
+     *
+     * @return bool
      */
     public function set($key, &$value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null) {
         Assert::string($key,  '$key');
@@ -182,15 +202,7 @@ final class FileSystemCache extends CachePeer {
      * @return mixed - content
      */
     private function readFile($fileName) {
-        try {
-            $data = file_get_contents($fileName, false);
-        }
-        catch (PHPError $ex) {
-            if (strEndsWith($ex->getMessage(), 'failed to open stream: No such file or directory'))
-                return null;
-            throw $ex;
-        }
-        if ($data === false) throw new RuntimeException('file_get_contents() returned FALSE, $fileName: "'.$fileName);
+        $data = file_get_contents($fileName, false);
         return unserialize($data);
     }
 

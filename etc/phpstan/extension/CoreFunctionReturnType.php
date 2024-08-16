@@ -14,12 +14,11 @@ use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Type\NullType;
 
-use function PHPStan\dumpType;
-use function rosasurfer\ministruts\normalizeEOL;
+use function rosasurfer\normalizeEOL;
 
-use const rosasurfer\ministruts\ERROR_LOG_DEFAULT;
-use const rosasurfer\ministruts\NL;
-use const rosasurfer\ministruts\WINDOWS;
+use const rosasurfer\ERROR_LOG_DEFAULT;
+use const rosasurfer\NL;
+use const rosasurfer\WINDOWS;
 
 
 /**
