@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\net\http;
 
+use CurlHandle;
 use Throwable;
 
 use rosasurfer\ministruts\core\error\ErrorHandler;
@@ -26,7 +27,10 @@ use const rosasurfer\ministruts\NL;
 class CurlHttpClient extends HttpClient {
 
 
-    /** @var ?resource - CURL handle */
+    /**
+     * @var resource|CurlHandle|null - CURL handle
+     * @phpstan-var CurlHandleId|null
+     */
     protected $hCurl = null;
 
     /** @var int - counter of manual redirects (if "open_basedir" is enabled) */
@@ -152,9 +156,9 @@ class CurlHttpClient extends HttpClient {
      */
     public function __destruct(): void {
         try {
-            if (is_resource($this->hCurl)) {
+            if ($this->hCurl) {
                 $hTmp = $this->hCurl;
-                $this->hCurl = null;
+                unset($this->hCurl);
                 curl_close($hTmp);
             }
         }
@@ -174,11 +178,12 @@ class CurlHttpClient extends HttpClient {
      * @throws IOException in case of errors
      */
     public function send(HttpRequest $request) {
-        if (!is_resource($this->hCurl))
+        if (!$this->hCurl) {
             $this->hCurl = curl_init();
+        }
 
         $response = new CurlHttpResponse();
-        $options  = $this->prepareCurlOptions($request, $response);
+        $options = $this->prepareCurlOptions($request, $response);
 
         // CURLOPT_FOLLOWLOCATION works only if php.ini setting "open_basedir" is disabled
         if (!ini_get_bool('open_basedir')) {
@@ -257,12 +262,13 @@ class CurlHttpClient extends HttpClient {
     /**
      * Return a description of the last curl error code.
      *
-     * @param  resource $hCurl - curl handle
+     * @param  resource|CurlHandle $hCurl - curl handle
+     * @phpstan-param  CurlHandleId $hCurl
      *
      * @return string
      */
     protected static function getError($hCurl) {
-        $errorNo  = curl_errno($hCurl);
+        $errorNo = curl_errno($hCurl);
         $errorStr = curl_error($hCurl);
 
         if (isset(self::$errors[$errorNo])) {

@@ -64,12 +64,12 @@ class SysvLock extends BaseLock {
 
         while (true) {
             try {
-                $hSemaphore = sem_get($integer, 1, 0666);   // get semaphore handle
-                if (!$hSemaphore)              throw new RuntimeException("cannot get semaphore handle for key $integer");
-                if (!sem_acquire($hSemaphore)) throw new RuntimeException("cannot aquire semaphore for key $integer");
+                $semaphoreId = sem_get($integer, 1, 0666);  // get semaphore handle
+                if (!$semaphoreId)              throw new RuntimeException("cannot get semaphore handle for key $integer");
+                if (!sem_acquire($semaphoreId)) throw new RuntimeException("cannot aquire semaphore for key $integer");
 
                 $this->key = $key;                          // TODO: sem_get() and sem_acquire() may fail under load
-                self::$semaphores[$key] = $hSemaphore;
+                self::$semaphores[$key] = $semaphoreId;
             }
             catch (Throwable $ex) {
                 // TODO: find bug and rewrite (most probably a file limit is hit), @see ext/sysvsem/sysvsem.c

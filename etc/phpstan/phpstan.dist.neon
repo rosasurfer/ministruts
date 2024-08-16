@@ -22,9 +22,9 @@ parameters:
     - .                                             # etc/phpstan itself
 
   excludePaths:                                     # excludeAnalyze + excludeScan
-    - ../../vendor
     - .tmp
     - symbols
+    - ../../vendor
 
   scanFiles:                                        # scanned for symbols only, not analyzed (legacy or future code)
     - symbols/php_mysql.php

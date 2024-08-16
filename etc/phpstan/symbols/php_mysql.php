@@ -19,7 +19,7 @@ const MYSQL_BOTH = 3;
  *
  * @return int
  */
-function mysql_affected_rows(?resource $link_identifier = null): int {}
+function mysql_affected_rows($link_identifier = null): int {}
 
 
 /**
@@ -29,7 +29,7 @@ function mysql_affected_rows(?resource $link_identifier = null): int {}
  *
  * @return bool
  */
-function mysql_close(?resource $link_identifier = null): bool {}
+function mysql_close($link_identifier = null): bool {}
 
 
 /**
@@ -53,7 +53,7 @@ function mysql_connect(string $server='', string $username='', string $password=
  *
  * @return string
  */
-function mysql_error(?resource $link_identifier = null) {}
+function mysql_error($link_identifier = null) {}
 
 
 /**
@@ -63,7 +63,7 @@ function mysql_error(?resource $link_identifier = null) {}
  *
  * @return int
  */
-function mysql_errno(?resource $link_identifier = null): int {}
+function mysql_errno($link_identifier = null): int {}
 
 
 /**
@@ -74,7 +74,7 @@ function mysql_errno(?resource $link_identifier = null): int {}
  *
  * @return string[]
  */
-function mysql_fetch_array(resource $result, int $result_type = MYSQL_BOTH): array {}
+function mysql_fetch_array($result, int $result_type = MYSQL_BOTH): array {}
 
 
 /**
@@ -84,7 +84,7 @@ function mysql_fetch_array(resource $result, int $result_type = MYSQL_BOTH): arr
  *
  * @return bool
  */
-function mysql_free_result(resource $result): bool {}
+function mysql_free_result($result): bool {}
 
 
 /**
@@ -94,7 +94,7 @@ function mysql_free_result(resource $result): bool {}
  *
  * @return string|false
  */
-function mysql_get_server_info(?resource $link_identifier = null) {}
+function mysql_get_server_info($link_identifier = null) {}
 
 
 /**
@@ -104,7 +104,7 @@ function mysql_get_server_info(?resource $link_identifier = null) {}
  *
  * @return int
  */
-function mysql_insert_id(?resource $link_identifier = null): int {}
+function mysql_insert_id($link_identifier = null): int {}
 
 
 /**
@@ -114,7 +114,7 @@ function mysql_insert_id(?resource $link_identifier = null): int {}
  *
  * @return int
  */
-function mysql_num_fields(resource $result): int {}
+function mysql_num_fields($result): int {}
 
 
 /**
@@ -124,7 +124,7 @@ function mysql_num_fields(resource $result): int {}
  *
  * @return int|false
  */
-function mysql_num_rows(resource $result) {}
+function mysql_num_rows($result) {}
 
 
 /**
@@ -135,7 +135,7 @@ function mysql_num_rows(resource $result) {}
  *
  * @return resource|bool
  */
-function mysql_query(string $query, ?resource $link_identifier = null) {}
+function mysql_query(string $query, $link_identifier = null) {}
 
 
 /**
@@ -146,7 +146,7 @@ function mysql_query(string $query, ?resource $link_identifier = null) {}
  *
  * @return string
  */
-function mysql_real_escape_string(string $unescaped_string, ?resource $link_identifier = null): string {}
+function mysql_real_escape_string(string $unescaped_string, $link_identifier = null): string {}
 
 
 /**
@@ -157,7 +157,7 @@ function mysql_real_escape_string(string $unescaped_string, ?resource $link_iden
  *
  * @return bool
  */
-function mysql_select_db(string $database_name, ?resource $link_identifier = null): bool {}
+function mysql_select_db(string $database_name, $link_identifier = null): bool {}
 
 
 /**
@@ -168,4 +168,4 @@ function mysql_select_db(string $database_name, ?resource $link_identifier = nul
  *
  * @return bool
  */
-function mysql_set_charset(string $charset, ?resource $link_identifier = null): bool {}
+function mysql_set_charset(string $charset, $link_identifier = null): bool {}

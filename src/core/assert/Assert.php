@@ -191,21 +191,19 @@ class Assert extends StaticClass {
 
 
     /**
-     * Ensure that the passed value is a resource of the specified type.
+     * Ensure that the passed value is a resource.
      *
      * @param  mixed    $value
-     * @param  ?string  $type    [optional]
      * @param  string   $message [optional] - value identifier or description
      * @param  mixed ...$args    [optional] - additional message arguments
      *
-     * @return bool - whether the assertion is TRUE
+     * @return ($value is resource ? true : false)
+     *
+     * @phpstan-assert resource $value
      */
-    public static function resource($value, $type = null, $message = '', ...$args) {
+    public static function resource($value, $message = '', ...$args) {
         if (!is_resource($value)) {
             throw new InvalidTypeException(static::illegalTypeMessage($value, 'resource', $message, $args));
-        }
-        if (isset($type) && get_resource_type($value) != $type) {
-            throw new InvalidTypeException(static::illegalTypeMessage($value, $type.' resource', $message, $args));
         }
         return true;
     }
@@ -345,22 +343,20 @@ class Assert extends StaticClass {
 
 
     /**
-     * Ensure that the passed value is either NULL or a resource of the specified type.
+     * Ensure that the passed value is either NULL or a resource.
      *
      * @param  mixed    $value
-     * @param  ?string  $type    [optional]
      * @param  string   $message [optional] - value identifier or description
      * @param  mixed ...$args    [optional] - additional message arguments
      *
-     * @return bool - whether the assertion is TRUE
+     * @return ($value is ?resource ? true : false)
+     *
+     * @phpstan-assert ?resource $value
      */
-    public static function nullOrResource($value, $type = null, $message = '', ...$args) {
+    public static function nullOrResource($value, $message = '', ...$args) {
         if (isset($value)) {
             if (!is_resource($value)) {
                 throw new InvalidTypeException(static::illegalTypeMessage($value, 'null or resource', $message, $args));
-            }
-            if (isset($type) && get_resource_type($value) != $type) {
-                throw new InvalidTypeException(static::illegalTypeMessage($value, "null or $type resource", $message, $args));
             }
         }
         return true;

@@ -33,9 +33,10 @@ set -eu -o pipefail
 
 # resolve directories and environment
 PROJECT_DIR="$(dirname $(readlink -f "$0"))/.."
-BIN_DIR="$PROJECT_DIR/vendor/bin"
 CONFIG_DIR="$PROJECT_DIR/etc/phpstan"
 IS_WINDOWS_PHP=$(php -r "echo (bool)defined('PHP_WINDOWS_VERSION_BUILD');")
+phpstan="$PROJECT_DIR/vendor/bin/phpstan"
+[ -f "$phpstan" ] || { echo "PHPStan executable not found: vendor/bin/phpstan" && exit 1; }
 
 
 # parse command line arguments and create a new argument set for PHPStan
@@ -172,4 +173,4 @@ PHP=${PHP:-php}
 
 
 # call PHPStan
-"$PHP" "$BIN_DIR/phpstan" "$@" --ansi
+"$PHP" "$phpstan" "$@" --ansi

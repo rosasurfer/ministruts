@@ -1318,6 +1318,7 @@ function strLeftTo(string $string, string $limiter, int $count=1, bool $includeL
 function strRight(string $string, int $length): string {
     if (!$length) return '';
 
+    /** @var string|false $result - since PHP8.0 substr() always returns string */
     $result = substr($string, -$length);
     return $result===false ? '' : $result;
 }
