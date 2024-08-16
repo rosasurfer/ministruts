@@ -482,7 +482,7 @@ class Logger extends StaticClass {
 
                     if ($status != 200) {
                         try {
-                            $description = isset(HttpResponse::$statusCodes[$status]) ? HttpResponse::$statusCodes[$status] : '?';
+                            $description = isset(HttpResponse::$sc[$status]) ? HttpResponse::$sc[$status] : '?';
                             self::log('Unexpected HTTP status code '.$status.' ('.$description.') for URL: '.$request->getUrl(), L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
                         }
                         catch (\Throwable $ex) {}   // intentionally eat it
@@ -519,7 +519,7 @@ class Logger extends StaticClass {
                     $content  = $response->getContent();
                     if ($status != 200) {
                         try {
-                            $description = isset(HttpResponse::$statusCodes[$status]) ? HttpResponse::$statusCodes[$status] : '?';
+                            $description = isset(HttpResponse::$sc[$status]) ? HttpResponse::$sc[$status] : '?';
                             self::log('Unexpected HTTP status code '.$status.' ('.$description.') for URL: '.$request->getUrl(), L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
                         }
                         catch (\Throwable $ex) {}   // intentionally eat it

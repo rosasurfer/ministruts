@@ -1,6 +1,8 @@
 <?php
 namespace rosasurfer\core\assert;
 
+use Throwable;
+
 use rosasurfer\core\StaticClass;
 
 use function rosasurfer\strContains;
@@ -21,7 +23,9 @@ class Assert extends StaticClass {
      * @param  string   $message [optional] - value identifier or description
      * @param  mixed ...$args    [optional] - additional description arguments
      *
-     * @return bool - whether the assertion is TRUE
+     * @return ($value is array ? true : false)
+     *
+     * @phpstan-assert array $value
      */
     public static function isArray($value, $message = '', ...$args) {
         if (!is_array($value)) {
@@ -38,7 +42,9 @@ class Assert extends StaticClass {
      * @param  string   $message [optional] - value identifier or description
      * @param  mixed ...$args    [optional] - additional description arguments
      *
-     * @return bool - whether the assertion is TRUE
+     * @return ($value is bool ? true : false)
+     *
+     * @phpstan-assert bool $value
      */
     public static function bool($value, $message = '', ...$args) {
         if (!is_bool($value)) {
@@ -55,7 +61,9 @@ class Assert extends StaticClass {
      * @param  string   $message [optional] - value identifier or description
      * @param  mixed ...$args    [optional] - additional description arguments
      *
-     * @return bool - whether the assertion is TRUE
+     * @return ($value is int ? true : false)
+     *
+     * @phpstan-assert int $value
      */
     public static function int($value, $message = '', ...$args) {
         if (!is_int($value)) {
@@ -72,7 +80,9 @@ class Assert extends StaticClass {
      * @param  string   $message [optional] - value identifier or description
      * @param  mixed ...$args    [optional] - additional description arguments
      *
-     * @return bool - whether the assertion is TRUE
+     * @return ($value is float ? true : false)
+     *
+     * @phpstan-assert float $value
      */
     public static function float($value, $message = '', ...$args) {
         if (!is_float($value)) {
@@ -89,7 +99,9 @@ class Assert extends StaticClass {
      * @param  string   $message [optional]
      * @param  mixed ...$args    [optional] - additional message arguments
      *
-     * @return bool - whether the assertion is TRUE
+     * @return ($value is string ? true : false)
+     *
+     * @phpstan-assert string $value
      */
     public static function string($value, $message = '', ...$args) {
         if (!is_string($value)) {
@@ -106,7 +118,9 @@ class Assert extends StaticClass {
      * @param  string   $message [optional] - value identifier or description
      * @param  mixed ...$args    [optional] - additional description arguments
      *
-     * @return bool - whether the assertion is TRUE
+     * @return ($value is scalar ? true : false)
+     *
+     * @phpstan-assert scalar $value
      */
     public static function scalar($value, $message = '', ...$args) {
         if (!is_scalar($value)) {
@@ -123,7 +137,9 @@ class Assert extends StaticClass {
      * @param  string   $message [optional] - value identifier or description
      * @param  mixed ...$args    [optional] - additional description arguments
      *
-     * @return bool - whether the assertion is TRUE
+     * @return ($value is object ? true : false)
+     *
+     * @phpstan-assert object $value
      */
     public static function object($value, $message = '', ...$args) {
         if (!is_object($value)) {
@@ -140,7 +156,9 @@ class Assert extends StaticClass {
      * @param  string   $message [optional] - value identifier or description
      * @param  mixed ...$args    [optional] - additional description arguments
      *
-     * @return bool - whether the assertion is TRUE
+     * @return ($value is Throwable ? true : false)
+     *
+     * @phpstan-assert Throwable $value
      */
     public static function throwable($value, $message = '', ...$args) {
         if (PHP_VERSION_ID < 70000) {
@@ -186,7 +204,9 @@ class Assert extends StaticClass {
      * @param  string   $message [optional] - value identifier or description
      * @param  mixed ...$args    [optional] - additional description arguments
      *
-     * @return bool - whether the assertion is TRUE
+     * @return ($value is resource ? true : false)
+     *
+     * @phpstan-assert resource $value
      */
     public static function resource($value, $type = null, $message = '', ...$args) {
         if (!is_resource($value)) {
@@ -206,7 +226,9 @@ class Assert extends StaticClass {
      * @param  string   $message [optional] - value identifier or description
      * @param  mixed ...$args    [optional] - additional description arguments
      *
-     * @return bool - whether the assertion is TRUE
+     * @return ($value is ?array ? true : false)
+     *
+     * @phpstan-assert ?array $value
      */
     public static function nullOrArray($value, $message = '', ...$args) {
         if (isset($value) && !is_array($value)) {
@@ -223,7 +245,9 @@ class Assert extends StaticClass {
      * @param  string   $message [optional] - value identifier or description
      * @param  mixed ...$args    [optional] - additional description arguments
      *
-     * @return bool - whether the assertion is TRUE
+     * @return ($value is ?bool ? true : false)
+     *
+     * @phpstan-assert ?bool $value
      */
     public static function nullOrBool($value, $message = '', ...$args) {
         if (isset($value) && !is_bool($value)) {
@@ -240,7 +264,9 @@ class Assert extends StaticClass {
      * @param  string   $message [optional] - value identifier or description
      * @param  mixed ...$args    [optional] - additional description arguments
      *
-     * @return bool - whether the assertion is TRUE
+     * @return ($value is ?int ? true : false)
+     *
+     * @phpstan-assert ?int $value
      */
     public static function nullOrInt($value, $message = '', ...$args) {
         if (isset($value) && !is_int($value)) {
@@ -257,7 +283,9 @@ class Assert extends StaticClass {
      * @param  string   $message [optional] - value identifier or description
      * @param  mixed ...$args    [optional] - additional description arguments
      *
-     * @return bool - whether the assertion is TRUE
+     * @return ($value is ?float ? true : false)
+     *
+     * @phpstan-assert ?float $value
      */
     public static function nullOrFloat($value, $message = '', ...$args) {
         if (isset($value) && !is_float($value)) {
@@ -274,7 +302,9 @@ class Assert extends StaticClass {
      * @param  string   $message [optional] - value identifier or description
      * @param  mixed ...$args    [optional] - additional description arguments
      *
-     * @return bool - whether the assertion is TRUE
+     * @return ($value is ?string ? true : false)
+     *
+     * @phpstan-assert ?string $value
      */
     public static function nullOrString($value, $message = '', ...$args) {
         if (isset($value) && !is_string($value)) {
@@ -291,7 +321,9 @@ class Assert extends StaticClass {
      * @param  string   $message [optional] - value identifier or description
      * @param  mixed ...$args    [optional] - additional description arguments
      *
-     * @return bool - whether the assertion is TRUE
+     * @return ($value is ?scalar ? true : false)
+     *
+     * @phpstan-assert ?scalar $value
      */
     public static function nullOrScalar($value, $message = '', ...$args) {
         if (isset($value) && !is_scalar($value)) {
@@ -308,7 +340,9 @@ class Assert extends StaticClass {
      * @param  string   $message [optional] - value identifier or description
      * @param  mixed ...$args    [optional] - additional description arguments
      *
-     * @return bool - whether the assertion is TRUE
+     * @return ($value is ?object ? true : false)
+     *
+     * @phpstan-assert ?object $value
      */
     public static function nullOrObject($value, $message = '', ...$args) {
         if (isset($value) && !is_object($value)) {
@@ -326,7 +360,9 @@ class Assert extends StaticClass {
      * @param  string   $message [optional] - value identifier or description
      * @param  mixed ...$args    [optional] - additional description arguments
      *
-     * @return bool - whether the assertion is TRUE
+     * @return ($value is ?resource ? true : false)
+     *
+     * @phpstan-assert ?resource $value
      */
     public static function nullOrResource($value, $type = null, $message = '', ...$args) {
         if (isset($value)) {

@@ -647,6 +647,7 @@ class Config extends CObject implements ConfigInterface {
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count() {
         return sizeof($this->properties);
     }

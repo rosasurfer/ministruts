@@ -1,6 +1,10 @@
 <?php
 namespace rosasurfer\net\http;
 
+use CurlHandle;
+use Exception;
+use Throwable;
+
 use rosasurfer\core\debug\ErrorHandler;
 use rosasurfer\core\exception\IOException;
 use rosasurfer\log\Logger;
@@ -22,7 +26,10 @@ use function rosasurfer\strRightFrom;
 class CurlHttpClient extends HttpClient {
 
 
-    /** @var ?resource - curl handle */
+    /**
+     * @var resource|CurlHandle|null - CURL handle
+     * @phpstan-var CurlHandleId|null
+     */
     protected $hCurl = null;
 
     /** @var int - counter of manual redirects (if "open_basedir" is enabled) */
@@ -145,15 +152,17 @@ class CurlHttpClient extends HttpClient {
      * Close an open curl handle (if any).
      */
     public function __destruct() {
+        $ex = null;
         try {
-            if (is_resource($this->hCurl)) {
+            if ($this->hCurl) {
                 $hTmp = $this->hCurl;
-                $this->hCurl = null;
+                unset($this->hCurl);
                 curl_close($hTmp);
             }
         }
-        catch (\Throwable $ex) { throw ErrorHandler::handleDestructorException($ex); }
-        catch (\Exception $ex) { throw ErrorHandler::handleDestructorException($ex); }  // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
+        catch (Throwable $ex) {}
+        catch (Exception $ex) {}                // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
+        if ($ex) throw ErrorHandler::handleDestructorException($ex);
     }
 
 
@@ -167,8 +176,9 @@ class CurlHttpClient extends HttpClient {
      * @throws IOException in case of errors
      */
     public function send(HttpRequest $request) {
-        if (!is_resource($this->hCurl))
+        if (!$this->hCurl) {
             $this->hCurl = curl_init();
+        }
 
         $response = new CurlHttpResponse();
         $options = $this->prepareCurlOptions($request, $response);
@@ -248,12 +258,13 @@ class CurlHttpClient extends HttpClient {
     /**
      * Return a description of the last curl error code.
      *
-     * @param  resource $hCurl - curl handle
+     * @param  resource|CurlHandle $hCurl - curl handle
+     * @phpstan-param  CurlHandleId $hCurl
      *
      * @return string
      */
     protected static function getError($hCurl) {
-        $errorNo  = curl_errno($hCurl);
+        $errorNo = curl_errno($hCurl);
         $errorStr = curl_error($hCurl);
 
         if (isset(self::$errors[$errorNo])) {

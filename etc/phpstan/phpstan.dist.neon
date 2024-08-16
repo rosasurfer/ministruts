@@ -3,27 +3,35 @@
 #  See the PHPStan wrapper "bin/phpstan".
 #
 # File format:
-#  @see https://phpstan.org/config-reference
+#  @see  https://phpstan.org/config-reference
 #
+includes:
+  - include/by-php-version.neon.php                 # fetch PHP version specific settings
+
+
 parameters:
-  phpVersion: 70499                                 # assume this PHP version if running under a different one
-  level:      7                                     # a rule level on the command line overrides this hardcoded value
+  level: 7                                          # default rule level, a rule level on the command line overrides this value
 
-  bootstrapFiles:                                   # API stubs of unloaded PHP extensions
-    - stubs.php
+  bootstrapFiles:                                   # initialize the PHP runtime environment before PHPStan runs
+    - init.php
 
-  scanFiles:                                        # additional non-autoloaded files to scan for symbols
-
-  paths:                                            # paths on the command line override these hardcoded values
+  paths:                                            # analyzed paths, paths on the command line override these values
     - ../../bin
     - ../../src
+    - .                                             # etc/phpstan itself
 
-  excludePaths:
+  excludePaths:                                     # excludeAnalyze + excludeScan
+    - .tmp
+    - symbols
     - ../../doc
-    - ../../etc
     - ../../vendor
 
-  dynamicConstantNames:                             # dynamic constants with values depending on the environment
+  scanFiles:                                        # scanned for symbols only, not analyzed (legacy or future code)
+    - symbols/php_mysql.php
+
+  stubFiles:                                        # custom PHPDoc annotations overriding 3rd-party definitions
+
+  dynamicConstantNames:                             # changing constants, depending on the environment
     - rosasurfer\_CLI
     - rosasurfer\_LOCALHOST
     - rosasurfer\_MACOS
@@ -40,7 +48,7 @@ parameters:
     - rosasurfer\ministruts\ActionForm
 
   ignoreErrors:
-    # skip broken PHPStan checks
+    # silence erroneous checks
     - '#^Unsafe usage of new static\(\)\.$#'
     
   reportUnmatchedIgnoredErrors: false
@@ -49,3 +57,9 @@ parameters:
     maximumNumberOfProcesses: 4
   tmpDir:       .tmp
   tipsOfTheDay: false
+
+
+services:                                           # must be loadable via Composer
+  - class: rosasurfer\ministruts\phpstan\CoreFunctionReturnType
+    tags:
+      - phpstan.broker.dynamicFunctionReturnTypeExtension

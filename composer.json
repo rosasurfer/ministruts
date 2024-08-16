@@ -24,6 +24,13 @@
         "psr-4": {
             "rosasurfer\\": "src"
         },
+        "classmap": [
+            "etc/phpstan/symbols/"
+        ],
+        "exclude-from-classmap": [
+            "etc/phpstan/symbols/alias*", 
+            "etc/phpstan/symbols/php_*"
+        ],
         "files": ["src/load.php"]
     },
     "extra": {

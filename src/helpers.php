@@ -1055,11 +1055,12 @@ function strLeftTo($string, $limiter, $count=1, $includeLimiter=false, $onNotFou
 function strRight($string, $length) {
     if (!isset($string)) return '';
     Assert::string($string, '$string');
-    Assert::int   ($length, '$length');
+    Assert::int($length, '$length');
 
-    if ($length == 0)
+    if ($length == 0) {
         return '';
-
+    }
+    /** @var string|false $result - since PHP8.0 substr() always returns string */
     $result = substr($string, -$length);
     return $result===false ? '' : $result;
 }

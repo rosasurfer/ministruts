@@ -128,6 +128,7 @@ class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
     /**
      * @return \ArrayIterator
      */
+    #[\ReturnTypeWillChange]
     public function getIterator() {
         return new \ArrayIterator($this->args);
     }
