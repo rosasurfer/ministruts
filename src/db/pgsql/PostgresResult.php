@@ -3,8 +3,10 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\db\pgsql;
 
+use PgSql\Result as PgSqlResult;
+
 use rosasurfer\ministruts\core\assert\Assert;
-use rosasurfer\ministruts\db\ConnectorInterface as IConnector;
+use rosasurfer\ministruts\db\ConnectorInterface as Connector;
 use rosasurfer\ministruts\db\Result;
 
 use const rosasurfer\ministruts\ARRAY_ASSOC;
@@ -49,7 +51,10 @@ class PostgresResult extends Result {
     /** @var string - SQL statement the result was generated from */
     protected $sql;
 
-    /** @var ?resource - the database connector's original result handle */
+    /**
+     * @var resource|PgSqlResult|null - the database connector's original result handle
+     * @phpstan-var ?PgSqlResultId
+     */
     protected $hResult = null;
 
     /** @var int - last number of affected rows (not reset between queries) */
@@ -62,24 +67,24 @@ class PostgresResult extends Result {
     /**
      * Constructor
      *
-     * Create a new PostgresResult instance. Called only when execution of a SQL statement returned successful.
+     * Called only when execution of a SQL statement returned successfully.
      *
-     * @param  IConnector $connector        - Connector managing the database connection
-     * @param  string     $sql              - executed SQL statement
-     * @param  resource   $hResult          - result handle
-     * @param  int        $lastAffectedRows - last number of affected rows of the connection
+     * @param  Connector            $connector        - the connector managing the database connection
+     * @param  string               $sql              - executed SQL statement
+     * @param  resource|PgSqlResult $hResult          - result handle
+     * @phpstan-param PgSqlResultId $hResult
+     * @param  int                  $lastAffectedRows - last number of affected rows of the connection
      */
-    public function __construct(IConnector $connector, $sql, $hResult, $lastAffectedRows) {
+    public function __construct(Connector $connector, string $sql, $hResult, int $lastAffectedRows) {
         Assert::string($sql, '$sql');
-        Assert::resource($hResult, '$hResult');
         Assert::int($lastAffectedRows, '$lastAffectedRows');
 
-        $this->connector        = $connector;
-        $this->sql              = $sql;
+        $this->connector = $connector;
+        $this->sql = $sql;
         $this->lastAffectedRows = $lastAffectedRows;
 
         if (!pg_num_fields($hResult)) {
-            $this->numRows      = 0;
+            $this->numRows = 0;
             $this->nextRowIndex = -1;
         }
         else {
@@ -98,8 +103,9 @@ class PostgresResult extends Result {
      * @return array<?scalar>|null - array of columns or NULL if no more rows are available
      */
     public function fetchRow($mode = ARRAY_BOTH) {
-        if (!$this->hResult || $this->nextRowIndex < 0)
+        if (!$this->hResult || $this->nextRowIndex < 0) {
             return null;
+        }
 
         switch ($mode) {
             case ARRAY_ASSOC: $mode = PGSQL_ASSOC; break;
@@ -112,7 +118,7 @@ class PostgresResult extends Result {
             $this->nextRowIndex++;
         }
         else {
-            $row                = null;
+            $row = null;
             $this->nextRowIndex = -1;
         }
         return $row;
@@ -154,8 +160,7 @@ class PostgresResult extends Result {
      */
     public function numRows() {
         if ($this->numRows === null) {
-            if ($this->hResult) $this->numRows = pg_num_rows($this->hResult);
-            else                $this->numRows = 0;
+            $this->numRows = $this->hResult ? pg_num_rows($this->hResult) : 0;
         }
         return $this->numRows;
     }
@@ -163,6 +168,8 @@ class PostgresResult extends Result {
 
     /**
      * {@inheritdoc}
+     *
+     * @return void
      */
     public function release() {
         if ($this->hResult) {
@@ -177,7 +184,8 @@ class PostgresResult extends Result {
     /**
      * Return this result's internal result object.
      *
-     * @return resource - result handle
+     * @return resource|PgSqlResult|null - result handle
+     * @phpstan-return ?PgSqlResultId
      */
     public function getInternalResult() {
         return $this->hResult;

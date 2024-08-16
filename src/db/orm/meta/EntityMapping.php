@@ -132,7 +132,7 @@ class EntityMapping extends CObject implements \Iterator {
      *
      * @return void
      */
-    public function rewind() {
+    public function rewind(): void {
         if ($this->iteratorKeys === null) {
             $this->iteratorKeys = \array_keys($this->mapping['properties']);
         }
@@ -145,6 +145,7 @@ class EntityMapping extends CObject implements \Iterator {
      *
      * @return scalar[]
      */
+    #[\ReturnTypeWillChange]
     public function current() {
         $key = $this->iteratorKeys[$this->iteratorPosition];
         return $this->mapping['properties'][$key];
@@ -156,6 +157,7 @@ class EntityMapping extends CObject implements \Iterator {
      *
      * @return string - key
      */
+    #[\ReturnTypeWillChange]
     public function key() {
         return $this->iteratorKeys[$this->iteratorPosition];
     }
@@ -166,7 +168,7 @@ class EntityMapping extends CObject implements \Iterator {
      *
      * @return void
      */
-    public function next() {
+    public function next(): void {
         ++$this->iteratorPosition;
     }
 
@@ -176,7 +178,7 @@ class EntityMapping extends CObject implements \Iterator {
      *
      * @return bool
      */
-    public function valid() {
+    public function valid(): bool {
         return isset($this->iteratorKeys[$this->iteratorPosition]);
     }
 }

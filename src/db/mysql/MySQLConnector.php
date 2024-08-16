@@ -415,7 +415,7 @@ class MySQLConnector extends Connector {
      *
      * @throws DatabaseException if an error occurs
      */
-    public function executeRaw($sql) {
+    public function executeRaw(string $sql) {
         Assert::string($sql);
         if (!$this->isConnected())
             $this->connect();

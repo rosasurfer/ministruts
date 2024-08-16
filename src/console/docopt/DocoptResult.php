@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\console\docopt;
 
+use ArrayIterator;
+
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\exception\IllegalAccessException;
 
@@ -109,7 +111,7 @@ class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
      *
      * @return bool
      */
-    public function offsetExists($offset) {
+    public function offsetExists($offset): bool {
         return isset($this->args[$offset]);
     }
 
@@ -155,9 +157,9 @@ class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
     /**
      * {@inheritdoc}
      *
-     * @return \ArrayIterator<string, bool|int|string[]|null>
+     * @return ArrayIterator<string, bool|int|string[]|null>
      */
-    public function getIterator() {
-        return new \ArrayIterator($this->args);
+    public function getIterator(): ArrayIterator {
+        return new ArrayIterator($this->args);
     }
 }

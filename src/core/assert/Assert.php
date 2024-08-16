@@ -151,6 +151,29 @@ class Assert extends StaticClass {
 
 
     /**
+     * Ensure that the passed value is an instance of the specified type.
+     *
+     * @param  mixed    $value
+     * @param  string   $class
+     * @param  string   $message [optional] - value identifier or description
+     * @param  mixed ...$args    [optional] - additional message arguments
+     *
+     * @return bool
+     *
+     * @template        T of object
+     * @phpstan-param   class-string<T> $class
+     * @phpstan-return  ($value is T ? true : false)
+     * @phpstan-assert  T $value
+     */
+    public static function instanceof($value, string $class, string $message = '', ...$args) {
+        if (!$value instanceof $class) {
+            throw new InvalidTypeException(static::illegalTypeMessage($value, $class, $message, $args));
+        }
+        return true;
+    }
+
+
+    /**
      * Ensure that the passed value is a throwable object.
      *
      * @param  mixed    $value

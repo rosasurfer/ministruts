@@ -315,7 +315,7 @@ class SQLiteConnector extends Connector {
      *
      * @throws DatabaseException on errors
      */
-    public function executeRaw($sql) {
+    public function executeRaw(string $sql) {
         Assert::string($sql);
         if (!$this->isConnected())
             $this->connect();

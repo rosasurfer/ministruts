@@ -4,6 +4,9 @@ declare(strict_types=1);
 namespace rosasurfer\ministruts\db\pgsql;
 
 use Throwable;
+use UnexpectedValueException;
+use PgSql\Connection as PgSqlConnection;
+use PgSql\Result as PgSqlResult;
 
 use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\exception\RosasurferExceptionInterface as IRosasurferException;
@@ -69,7 +72,10 @@ class PostgresConnector extends Connector {
     /** @var string[] - session variables */
     protected $sessionVars = [];
 
-    /** @var ?resource - internal connection handle */
+    /**
+     * @var resource|PgSqlConnection|null - PostgreSQL connection handle
+     * @phpstan-var PgSqlConnectionId|null
+     */
     protected $hConnection = null;
 
     /** @var int - transaction nesting level */
@@ -84,8 +90,6 @@ class PostgresConnector extends Connector {
 
     /**
      * Constructor
-     *
-     * Create a new PostgresConnector instance.
      *
      * @param  array<string, mixed> $options - PostgreSQL connection options
      */
@@ -190,11 +194,11 @@ class PostgresConnector extends Connector {
     protected function getConnectionDescription() {
         $options = $this->options;
 
-        if (is_resource($this->hConnection)) {
-            $host        = pg_host($this->hConnection);
-            $port        = pg_port($this->hConnection);
-            $db          = pg_dbname($this->hConnection);
-            $path        = $this->getSchemaSearchPath();
+        if ($this->hConnection) {
+            $host = pg_host($this->hConnection);
+            $port = pg_port($this->hConnection);
+            $db   = pg_dbname($this->hConnection);
+            $path = $this->getSchemaSearchPath();
             $description = "$host:$port/$db (schema search path: $path)";
         }
         else {
@@ -260,8 +264,6 @@ class PostgresConnector extends Connector {
      * @return $this
      */
     public function connect() {
-        if (!function_exists('\pg_connect')) throw new RuntimeException('Undefined function pg_connect() (pgsql extension is not available)');
-
         $connStr = $this->getConnectionString();
 
         try {
@@ -326,7 +328,7 @@ class PostgresConnector extends Connector {
      * @return bool
      */
     public function isConnected() {
-        return is_resource($this->hConnection);
+        return isset($this->hConnection);
     }
 
 
@@ -450,19 +452,18 @@ class PostgresConnector extends Connector {
      *
      * @param  string $sql - SQL statement
      *
-     * @return resource - result handle
+     * @return resource|PgSqlResult - result
+     * @phpstan-return PgSqlResultId
      *
      * @throws DatabaseException on errors
      */
-    public function executeRaw($sql) {
-        Assert::string($sql);
-        if (!$this->isConnected())
+    public function executeRaw(string $sql) {
+        if (!$this->isConnected()) {
             $this->connect();
-
-        /** @var resource $result */
-        $result = null;
+        }
 
         // execute statement
+        $result = null;
         try {
             $result = pg_query($this->hConnection, $sql);         // wraps multi-statement queries in a transaction
             if (!$result) throw new DatabaseException(pg_last_error($this->hConnection));
@@ -484,9 +485,9 @@ class PostgresConnector extends Connector {
 
         // track last_affected_rows
         $pattern = '/^(INSERT|UPDATE|DELETE)\b/i';
-        if (preg_match($pattern, $status))
+        if (preg_match($pattern, $status)) {
             $this->lastAffectedRows = pg_affected_rows($result);
-
+        }
         return $result;
     }
 
@@ -499,9 +500,9 @@ class PostgresConnector extends Connector {
     public function begin() {
         if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
 
-        if (!$this->transactionLevel)
+        if (!$this->transactionLevel) {
             $this->execute('begin');
-
+        }
         $this->transactionLevel++;
         return $this;
     }
@@ -515,8 +516,13 @@ class PostgresConnector extends Connector {
     public function commit() {
         if ($this->transactionLevel < 0) throw new RuntimeException("Negative transaction nesting level detected: $this->transactionLevel");
 
-        if     (!$this->isConnected())    trigger_error('Not connected', E_USER_WARNING);
-        elseif (!$this->transactionLevel) trigger_error('No database transaction to commit', E_USER_WARNING);
+        // don't throw an exception; trigger a warning which goes to the log
+        if (!$this->isConnected()) {
+            trigger_error('Not connected', E_USER_WARNING);
+        }
+        elseif (!$this->transactionLevel) {
+            trigger_error('No database transaction to commit', E_USER_WARNING);
+        }
         else {
             if ($this->transactionLevel == 1) {
                 $this->execute('commit');
@@ -536,6 +542,7 @@ class PostgresConnector extends Connector {
     public function rollback() {
         if ($this->transactionLevel < 0) throw new RuntimeException("Negative transaction nesting level detected: $this->transactionLevel");
 
+        // don't throw an exception; trigger a warning which goes to the log
         if (!$this->isConnected()) {
             trigger_error('Not connected', E_USER_WARNING);
         }
@@ -558,8 +565,9 @@ class PostgresConnector extends Connector {
      * @return bool
      */
     public function isInTransaction() {
-        if ($this->isConnected())
+        if ($this->isConnected()) {
             return ($this->transactionLevel > 0);
+        }
         return false;
     }
 
@@ -631,11 +639,13 @@ class PostgresConnector extends Connector {
     /**
      * Return the connector's internal connection object.
      *
-     * @return resource - the internal connection handle
+     * @return resource|PgSqlConnection - the internal connection object
+     * @phpstan-return PgSqlConnectionId
      */
     public function getInternalHandler() {
-        if (!$this->isConnected())
+        if (!$this->isConnected()) {
             $this->connect();
+        }
         return $this->hConnection;
     }
 
@@ -657,8 +667,9 @@ class PostgresConnector extends Connector {
      */
     public function getVersionString() {
         if ($this->versionString === null) {
-            if (!$this->isConnected())
+            if (!$this->isConnected()) {
                 $this->connect();
+            }
             $this->versionString = pg_version($this->hConnection)['server'];
         }
         return $this->versionString;
@@ -675,9 +686,9 @@ class PostgresConnector extends Connector {
             $version = $this->getVersionString();
 
             $match = null;
-            if (!preg_match('/^(\d+)\.(\d+).(\d+)/', $version, $match))
-                throw new \UnexpectedValueException('Unexpected version string "'.$version.'"');
-
+            if (!preg_match('/^(\d+)\.(\d+).(\d+)/', $version, $match)) {
+                throw new UnexpectedValueException('Unexpected version string "'.$version.'"');
+            }
             $major   = (int) $match[1];
             $minor   = (int) $match[2];
             $release = (int) $match[3];

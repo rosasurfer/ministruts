@@ -1,6 +1,4 @@
 <?php
-declare(strict_types=1);
-
 
 /** @var int */
 const MYSQL_ASSOC = 1;

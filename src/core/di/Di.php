@@ -208,8 +208,7 @@ class Di extends CObject implements DiInterface {
      * @throws ServiceNotFoundException if the service was not found
      * @throws ContainerException       if the dependency could not be resolved
      */
-    #[\ReturnTypeWillChange]
-    public function offsetGet($name) {
+    public function offsetGet($name): object {
         return $this->get($name);
     }
 

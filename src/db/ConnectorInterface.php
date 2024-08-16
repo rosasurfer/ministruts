@@ -110,7 +110,7 @@ interface ConnectorInterface {
      *
      * @throws DatabaseException on errors
      */
-    public function executeRaw($sql);
+    public function executeRaw(string $sql);
 
 
     /**
