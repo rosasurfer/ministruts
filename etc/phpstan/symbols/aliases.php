@@ -16,7 +16,7 @@ namespace rosasurfer\ministruts {
      *     file?     => (string),
      *     line?     => (int),
      *     class?    => (string),
-     *     type?     => '->'|'::',
+     *     type?     => '->' | '::',
      *     function? => (string),
      *     object?   => (object),
      *     args?     => mixed[],

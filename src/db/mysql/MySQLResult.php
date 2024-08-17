@@ -20,38 +20,35 @@ class MySQLResult extends Result {
 
 
     /** @var string - SQL statement the result was generated from */
-    protected $sql;
+    protected string $sql;
 
     /** @var ?resource - the database connector's original result handle */
     protected $hResult = null;
 
     /** @var int - last inserted row id of the connection at instance creation time (not reset between queries) */
-    protected $lastInsertId = 0;
+    protected int $lastInsertId = 0;
 
     /** @var int - last number of affected rows (not reset between queries) */
-    protected $lastAffectedRows = 0;
+    protected int $lastAffectedRows = 0;
 
     /** @var int - number of rows returned by the statement */
-    protected $numRows;
+    protected int $numRows;
 
 
     /**
      * Constructor
      *
-     * Create a new MySQLResult instance. Called only when execution of a SQL statement returned successful.
+     * Called only when execution of a SQL statement returned successfully.
      *
      * @param  IConnector $connector        - connector managing the database connection
      * @param  string     $sql              - executed SQL statement
-     * @param  resource   $hResult          - result handle or NULL for a result-less SQL query (SELECT queries not matching
+     * @param  ?resource  $hResult          - result handle or NULL for a result-less SQL query (SELECT queries not matching
      *                                        any rows produce an empty result resource)
      * @param  int        $lastInsertId     - last inserted ID of the connection
      * @param  int        $lastAffectedRows - last number of affected rows of the connection
      */
-    public function __construct(IConnector $connector, $sql, $hResult, $lastInsertId, $lastAffectedRows) {
-        Assert::string        ($sql,              '$sql');
-        Assert::nullOrResource($hResult,          '$hResult');
-        Assert::int           ($lastInsertId,     '$lastInsertId');
-        Assert::int           ($lastAffectedRows, '$lastAffectedRows');
+    public function __construct(IConnector $connector, string $sql, $hResult, int $lastInsertId, int $lastAffectedRows) {
+        Assert::nullOrResource($hResult, '$hResult');
 
         $this->connector        = $connector;
         $this->sql              = $sql;
@@ -59,14 +56,18 @@ class MySQLResult extends Result {
         $this->lastInsertId     = $lastInsertId;
         $this->lastAffectedRows = $lastAffectedRows;
 
-        if (is_resource($hResult) && !mysql_num_fields($hResult)) { // close empty results and release them
-            mysql_free_result($hResult);
-            $hResult            = null;
-            $this->numRows      = 0;
-            $this->nextRowIndex = -1;
-        }
-        else {
-            $this->nextRowIndex = 0;
+        $this->numRows = 0;
+        $this->nextRowIndex = 0;
+
+        if (is_resource($hResult)) {
+            if (!mysql_num_fields($hResult)) {
+                mysql_free_result($hResult);
+                $hResult = null;
+                $this->nextRowIndex = -1;
+            }
+            else {
+                $this->numRows = mysql_num_rows($this->hResult);
+            }
         }
         $this->hResult = $hResult;
     }
@@ -80,9 +81,10 @@ class MySQLResult extends Result {
      *
      * @return array<?scalar>|null - array of columns or NULL if no more rows are available
      */
-    public function fetchRow($mode = ARRAY_BOTH) {
-        if (!is_resource($this->hResult) || $this->nextRowIndex < 0)
+    public function fetchRow(int $mode = ARRAY_BOTH): ?array {
+        if (!is_resource($this->hResult) || $this->nextRowIndex < 0) {
             return null;
+        }
 
         switch ($mode) {
             case ARRAY_ASSOC: $mode = MYSQL_ASSOC; break;
@@ -95,7 +97,7 @@ class MySQLResult extends Result {
             $this->nextRowIndex++;
         }
         else {
-            $row                = null;
+            $row = null;
             $this->nextRowIndex = -1;
         }
         return $row;
@@ -107,10 +109,8 @@ class MySQLResult extends Result {
      * The value is not reset between queries (see the db README).
      *
      * @return int - last generated ID or 0 (zero) if no ID was generated yet in the current session
-     *
-     * @link   https://github.com/rosasurfer/ministruts/tree/master/src/db
      */
-    public function lastInsertId() {
+    public function lastInsertId(): int {
         return (int) $this->lastInsertId;
     }
 
@@ -121,10 +121,8 @@ class MySQLResult extends Result {
      * not reset between queries (see the db README).
      *
      * @return int - last number of affected rows or 0 (zero) if no rows were affected yet in the current session
-     *
-     * @link   https://github.com/rosasurfer/ministruts/tree/master/src/db
      */
-    public function lastAffectedRows() {
+    public function lastAffectedRows(): int {
         return (int) $this->lastAffectedRows;
     }
 
@@ -134,11 +132,7 @@ class MySQLResult extends Result {
      *
      * @return int
      */
-    public function numRows() {
-        if ($this->numRows === null) {
-            if (is_resource($this->hResult)) $this->numRows = mysql_num_rows($this->hResult);
-            else                             $this->numRows = 0;
-        }
+    public function numRows(): int {
         return $this->numRows;
     }
 
@@ -173,8 +167,10 @@ class MySQLResult extends Result {
 
     /**
      * {@inheritdoc}
+     *
+     * @return void
      */
-    public function release() {
+    public function release(): void {
         if (is_resource($this->hResult)) {
             $tmp = $this->hResult;
             $this->hResult = null;

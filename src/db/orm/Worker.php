@@ -5,7 +5,7 @@ namespace rosasurfer\ministruts\db\orm;
 
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\db\ConnectionPool;
-use rosasurfer\ministruts\db\ConnectorInterface as IConnector;
+use rosasurfer\ministruts\db\ConnectorInterface as Connector;
 use rosasurfer\ministruts\db\MultipleRecordsException;
 use rosasurfer\ministruts\db\ResultInterface as IResult;
 
@@ -28,8 +28,8 @@ class Worker extends CObject {
     /** @var string - name of the worker's entity class */
     protected $entityClass;
 
-    /** @var ?IConnector - database adapter used for the worker's entity */
-    private $connector = null;
+    /** @var ?Connector - db adapter used for the worker's entity */
+    private ?Connector $connector = null;
 
 
     /**
@@ -177,7 +177,7 @@ class Worker extends CObject {
     /**
      * Return the database adapter of the Worker's model class.
      *
-     * @return IConnector
+     * @return Connector
      */
     public function getConnector() {
         if (!$this->connector) {

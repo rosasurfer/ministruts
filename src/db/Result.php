@@ -25,17 +25,17 @@ use const rosasurfer\ministruts\ARRAY_BOTH;
 abstract class Result extends CObject implements ResultInterface {
 
 
-    /** @var ConnectorInterface - used database connector */
-    protected $connector;
+    /** @var ConnectorInterface - the used database connector */
+    protected ConnectorInterface $connector;
 
     /** @var int - index of the row fetched by the next unqualified fetch* method call or -1 when hit the end */
-    protected $nextRowIndex = 0;
+    protected int $nextRowIndex = 0;
 
 
     /**
      * Destructor
      *
-     * Release the Result's internal resoruces.
+     * Release the result's internal resoruces.
      *
      * @return void
      */
@@ -51,8 +51,15 @@ abstract class Result extends CObject implements ResultInterface {
 
     /**
      * {@inheritdoc}
+     *
+     * @param  string|int $column       [optional]
+     * @param  ?int       $row          [optional]
+     * @param  mixed      $onNull       [optional]
+     * @param  mixed      $onNoMoreRows [optional]
+     *
+     * @return mixed
      */
-    public function fetchColumn($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
+    public function fetchColumn($column=0, ?int $row=null, $onNull=null, $onNoMoreRows=null) {
         // @phpstan-ignore booleanAnd.alwaysFalse (type comes from PHPDoc)
         if (!is_int($column) && !is_string($column)) throw new InvalidTypeException('Illegal type of parameter $column: '.gettype($column));
         if (isset($row))                             throw new UnimplementedFeatureException('$row='.$row.' (!= NULL)');
@@ -81,8 +88,15 @@ abstract class Result extends CObject implements ResultInterface {
 
     /**
      * {@inheritdoc}
+     *
+     * @param  string|int $column       [optional]
+     * @param  ?int       $row          [optional]
+     * @param  ?string    $onNull       [optional]
+     * @param  ?string    $onNoMoreRows [optional]
+     *
+     * @return ?string
      */
-    public function fetchString($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
+    public function fetchString($column=0, ?int $row=null, ?string $onNull=null, ?string $onNoMoreRows=null): ?string {
         if (func_num_args() < 4) $value = $this->fetchColumn($column, $row, null);
         else                     $value = $this->fetchColumn($column, $row, null, $onNoMoreRows);
 
@@ -97,6 +111,13 @@ abstract class Result extends CObject implements ResultInterface {
 
     /**
      * {@inheritdoc}
+     *
+     * @param  string|int $column       [optional]
+     * @param  ?int       $row          [optional]
+     * @param  ?bool      $onNull       [optional]
+     * @param  ?bool      $onNoMoreRows [optional]
+     *
+     * @return ?bool
      */
     public function fetchBool($column=0, ?int $row=null, ?bool $onNull=null, ?bool $onNoMoreRows=null): ?bool {
         if (func_num_args() < 4) $value = $this->fetchColumn($column, $row, null);
@@ -118,8 +139,15 @@ abstract class Result extends CObject implements ResultInterface {
 
     /**
      * {@inheritdoc}
+     *
+     * @param  string|int $column       [optional]
+     * @param  ?int       $row          [optional]
+     * @param  ?int       $onNull       [optional]
+     * @param  ?int       $onNoMoreRows [optional]
+     *
+     * @return ?int
      */
-    public function fetchInt($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
+    public function fetchInt($column=0, ?int $row=null, ?int $onNull=null, ?int $onNoMoreRows=null): ?int {
         if (func_num_args() < 4) $value = $this->fetchColumn($column, $row, null);
         else                     $value = $this->fetchColumn($column, $row, null, $onNoMoreRows);
 
@@ -145,8 +173,15 @@ abstract class Result extends CObject implements ResultInterface {
 
     /**
      * {@inheritdoc}
+     *
+     * @param  string|int $column       [optional]
+     * @param  ?int       $row          [optional]
+     * @param  ?float     $onNull       [optional]
+     * @param  ?float     $onNoMoreRows [optional]
+     *
+     * @return ?float
      */
-    public function fetchFloat($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
+    public function fetchFloat($column=0, ?int $row=null, ?float $onNull=null, ?float $onNoMoreRows=null): ?float {
         if (func_num_args() < 4) $value = $this->fetchColumn($column, $row, null);
         else                     $value = $this->fetchColumn($column, $row, null, $onNoMoreRows);
 
@@ -163,7 +198,7 @@ abstract class Result extends CObject implements ResultInterface {
      *
      * @return int - row index (starting at 0) or -1 after reaching the end
      */
-    public function nextRowIndex() {
+    public function nextRowIndex(): int {
         return (int) $this->nextRowIndex;
     }
 
@@ -173,7 +208,7 @@ abstract class Result extends CObject implements ResultInterface {
      *
      * @return string
      */
-    public function getType() {
+    public function getType(): string {
         return $this->connector->getType();
     }
 
@@ -183,7 +218,7 @@ abstract class Result extends CObject implements ResultInterface {
      *
      * @return string
      */
-    public function getVersionString() {
+    public function getVersionString(): string {
         return $this->connector->getVersionString();
     }
 
@@ -193,7 +228,7 @@ abstract class Result extends CObject implements ResultInterface {
      *
      * @return int
      */
-    public function getVersionNumber() {
+    public function getVersionNumber(): int {
         return $this->connector->getVersionNumber();
     }
 }

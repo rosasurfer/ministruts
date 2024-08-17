@@ -49,6 +49,7 @@ class CoreFunctionReturnType implements DynamicFunctionReturnTypeExtension {
             'fopen'                => $bool,            // resource|false
             'getcwd'               => $bool,            // string|false
             'ini_get_all'          => $bool,            // array|false                      @see  https://www.php.net/manual/en/function.ini-get-all.php
+            'mysql_num_rows'       => $bool,            // int|false                        @see  https://www.php.net/manual/en/function.mysql-num-rows.php
             'ob_get_clean'         => $bool,            // string|false
             'opendir'              => $bool,            // resource|false
             'pg_escape_identifier' => $bool,            // (1) string                       @see  https://www.php.net/manual/en/function.pg-escape-identifier.php

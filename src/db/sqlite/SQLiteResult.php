@@ -3,8 +3,9 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\db\sqlite;
 
-use rosasurfer\ministruts\core\assert\Assert;
-use rosasurfer\ministruts\db\ConnectorInterface as IConnector;
+use SQLite3Result;
+
+use rosasurfer\ministruts\db\ConnectorInterface as Connector;
 use rosasurfer\ministruts\db\Result;
 
 use const rosasurfer\ministruts\ARRAY_ASSOC;
@@ -18,48 +19,43 @@ use const rosasurfer\ministruts\ARRAY_NUM;
  */
 class SQLiteResult extends Result {
 
-
     /** @var string - SQL statement the result was generated from */
-    protected $sql;
+    protected string $sql;
 
-    /** @var ?\SQLite3Result - the database connector's original result object */
+    /** @var ?SQLite3Result - the database connector's original result object */
     protected $result = null;
 
     /** @var int - last inserted row id of the connection at instance creation time (not reset between queries) */
-    protected $lastInsertId = 0;
+    protected int $lastInsertId = 0;
 
     /** @var int - last number of affected rows (not reset between queries) */
-    protected $lastAffectedRows = 0;
+    protected int $lastAffectedRows = 0;
 
     /** @var int - number of rows returned by the statement */
-    protected $numRows;
+    protected int $numRows;
 
 
     /**
      * Constructor
      *
-     * Create a new SQLiteResult instance. Called only when execution of a SQL statement returned successful.
+     * Called only when execution of a SQL statement returned successfully.
      *
-     * @param  IConnector     $connector        - connector managing the database connection
-     * @param  string         $sql              - executed SQL statement
-     * @param  \SQLite3Result $result           - result-less queries produce an empty SQLite3Result
-     * @param  int            $lastInsertId     - last inserted ID of the connection
-     * @param  int            $lastAffectedRows - last number of affected rows of the connection
+     * @param  Connector     $connector        - connector managing the database connection
+     * @param  string        $sql              - executed SQL statement
+     * @param  SQLite3Result $result           - result-less queries produce an empty SQLite3Result
+     * @param  int           $lastInsertId     - last inserted ID of the connection
+     * @param  int           $lastAffectedRows - last number of affected rows of the connection
      */
-    public function __construct(IConnector $connector, $sql, \SQLite3Result $result, $lastInsertId, $lastAffectedRows) {
-        Assert::string($sql,              '$sql');
-        Assert::int   ($lastInsertId,     '$lastInsertId');
-        Assert::int   ($lastAffectedRows, '$lastAffectedRows');
-
+    public function __construct(Connector $connector, string $sql, SQLite3Result $result, int $lastInsertId, int $lastAffectedRows) {
         $this->connector        = $connector;
         $this->sql              = $sql;
         $this->lastInsertId     = $lastInsertId;
         $this->lastAffectedRows = $lastAffectedRows;
 
-        if (!$result->numColumns()) {           // close empty results and release them to prevent access
-            $result->finalize();                // @see bug in SQLite3Result::fetchArray()
-            $result             = null;
-            $this->numRows      = 0;
+        if (!$result->numColumns()) {                           // close empty results and release them to prevent access
+            $result->finalize();                                // @see bug in SQLite3Result::fetchArray()
+            $result = null;
+            $this->numRows = 0;
             $this->nextRowIndex = -1;
         }
         else {
@@ -83,9 +79,10 @@ class SQLiteResult extends Result {
      *  - NULL values are mapped to 'null'.                                                                         <br>
      *  - Strings and blobs are mapped to 'string'.                                                                 <br>
      */
-    public function fetchRow($mode = ARRAY_BOTH) {
-        if (!$this->result || $this->nextRowIndex < 0)        // no automatic result reset()
+    public function fetchRow(int $mode = ARRAY_BOTH): ?array {
+        if (!$this->result || $this->nextRowIndex < 0) {        // no automatic result reset()
             return null;
+        }
 
         switch ($mode) {
             case ARRAY_ASSOC: $mode = SQLITE3_ASSOC; break;
@@ -98,10 +95,11 @@ class SQLiteResult extends Result {
             $this->nextRowIndex++;
         }
         else {
-            if ($this->numRows === null)                       // update $numRows on-the-fly if not yet happened
+            if (!isset($this->numRows)) {                       // update $numRows on-the-fly if not yet happened
                 $this->numRows = $this->nextRowIndex;
-            $row                = null;                        // prevent fetchArray() to trigger an automatic reset()
-            $this->nextRowIndex = -1;                          // on second $row == null
+            }
+            $row                = null;                         // prevent fetchArray() to trigger an automatic reset()
+            $this->nextRowIndex = -1;                           // on second $row == null
         }
         return $row;
     }
@@ -112,10 +110,8 @@ class SQLiteResult extends Result {
      * The value is not reset between queries (see the db README).
      *
      * @return int - last generated ID or 0 (zero) if no ID was generated yet in the current session
-     *
-     * @link   https://github.com/rosasurfer/ministruts/tree/master/src/db
      */
-    public function lastInsertId() {
+    public function lastInsertId(): int {
         return (int) $this->lastInsertId;
     }
 
@@ -126,10 +122,8 @@ class SQLiteResult extends Result {
      * README).
      *
      * @return int - last number of affected rows or 0 (zero) if no rows were affected yet in the current session
-     *
-     * @link   https://github.com/rosasurfer/ministruts/tree/master/src/db
      */
-    public function lastAffectedRows() {
+    public function lastAffectedRows(): int {
         return (int) $this->lastAffectedRows;
     }
 
@@ -139,8 +133,8 @@ class SQLiteResult extends Result {
      *
      * @return int
      */
-    public function numRows() {
-        if ($this->numRows === null) {
+    public function numRows(): int {
+        if (!isset($this->numRows)) {
             // no support for num_rows() in SQLite3, need to count manually
             $previous = $this->nextRowIndex;
 
@@ -161,8 +155,10 @@ class SQLiteResult extends Result {
 
     /**
      * {@inheritdoc}
+     *
+     * @return void
      */
-    public function release() {
+    public function release(): void {
         if ($this->result) {
             $tmp = $this->result;
             $this->result = null;
@@ -178,7 +174,7 @@ class SQLiteResult extends Result {
     /**
      * Return this result's internal SQLite3Result object.
      *
-     * @return ?\SQLite3Result - result handler or NULL for result-less queries
+     * @return ?SQLite3Result - result handler or NULL for result-less queries
      */
     public function getInternalResult() {
         return $this->result;

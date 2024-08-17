@@ -23,7 +23,7 @@ interface ResultInterface {
      *
      * @return array<?scalar>|null - array of columns or NULL if no more rows are available
      */
-    public function fetchRow($mode = ARRAY_BOTH);
+    public function fetchRow(int $mode = ARRAY_BOTH): ?array;
 
 
     /**
@@ -38,7 +38,7 @@ interface ResultInterface {
      *
      * @throws NoMoreRecordsException if no more rows are available and parameter $onNoMoreRows was not set.
      */
-    public function fetchColumn($column=0, $row=null, $onNull=null, $onNoMoreRows=null);
+    public function fetchColumn($column=0, ?int $row=null, $onNull=null, $onNoMoreRows=null);
 
 
     /**
@@ -46,14 +46,14 @@ interface ResultInterface {
      *
      * @param  string|int $column       [optional] - name or offset of the column to fetch from (default: 0)
      * @param  ?int       $row          [optional] - row to fetch from, starting at 0 (default: the next row)
-     * @param  mixed      $onNull       [optional] - value to return if the cell value is NULL
-     * @param  mixed      $onNoMoreRows [optional] - value to return if no more rows are available
+     * @param  ?string    $onNull       [optional] - value to return if the cell value is NULL
+     * @param  ?string    $onNoMoreRows [optional] - value to return if no more rows are available
      *
-     * @return string - string value of a single cell or $onNull if the cell value is NULL
+     * @return ?string - string value of a single cell or $onNull if the cell value is NULL
      *
      * @throws NoMoreRecordsException    if no more rows are available and parameter $onNoMoreRows was not set.
      */
-    public function fetchString($column=0, $row=null, $onNull=null, $onNoMoreRows=null);
+    public function fetchString($column=0, ?int $row=null, ?string $onNull=null, ?string $onNoMoreRows=null): ?string;
 
 
     /**
@@ -71,7 +71,7 @@ interface ResultInterface {
      *                                  representations are "true" and "false", "on" and "off", "yes" and "no", and
      *                                  numerical values.
      */
-    public function fetchBool($column=0, ?int $row=null, ?bool $onNull=null, ?bool $onNoMoreRows=null);
+    public function fetchBool($column=0, ?int $row=null, ?bool $onNull=null, ?bool $onNoMoreRows=null): ?bool;
 
 
     /**
@@ -79,17 +79,17 @@ interface ResultInterface {
      *
      * @param  string|int $column       [optional] - name or offset of the column to fetch from (default: 0)
      * @param  ?int       $row          [optional] - row to fetch from, starting at 0 (default: the next row)
-     * @param  mixed      $onNull       [optional] - value to return if the cell value is NULL
-     * @param  mixed      $onNoMoreRows [optional] - value to return if no more rows are available
+     * @param  ?int       $onNull       [optional] - value to return if the cell value is NULL
+     * @param  ?int       $onNoMoreRows [optional] - value to return if no more rows are available
      *
-     * @return int - integer value of a single cell or $onNull if the cell value is NULL
+     * @return ?int - integer value of a single cell or $onNull if the cell value is NULL
      *
      * @throws NoMoreRecordsException   if no more rows are available and parameter $onNoMoreRows was not set.
      * @throws UnexpectedValueException if the cell value is not NULL and does not represent an integer. The accepted
      *                                  floating point values must have a fractional part equal to 0 (zero).
      *                                  Use <tt>self::fetchFloat()</tt> to interpret more floating point values as integer.
      */
-    public function fetchInt($column=0, $row=null, $onNull=null, $onNoMoreRows=null);
+    public function fetchInt($column=0, ?int $row=null, ?int $onNull=null, ?int $onNoMoreRows=null): ?int;
 
 
     /**
@@ -97,15 +97,15 @@ interface ResultInterface {
      *
      * @param  string|int $column       [optional] - name or offset of the column to fetch from (default: 0)
      * @param  ?int       $row          [optional] - row to fetch from, starting at 0 (default: the next row)
-     * @param  mixed      $onNull       [optional] - value to return if the cell value is NULL
-     * @param  mixed      $onNoMoreRows [optional] - value to return if no more rows are available
+     * @param  ?float     $onNull       [optional] - value to return if the cell value is NULL
+     * @param  ?float     $onNoMoreRows [optional] - value to return if no more rows are available
      *
-     * @return float - floating point value of a single cell or $onNull if the cell value is NULL
+     * @return ?float - floating point value of a single cell or $onNull if the cell value is NULL
      *
      * @throws NoMoreRecordsException   if no more rows are available and parameter $onNoMoreRows was not set.
      * @throws UnexpectedValueException if the cell value is not NULL and does not represent a floating point value.
      */
-    public function fetchFloat($column=0, $row=null, $onNull=null, $onNoMoreRows=null);
+    public function fetchFloat($column=0, ?int $row=null, ?float $onNull=null, ?float $onNoMoreRows=null): ?float;
 
 
     /**
@@ -113,10 +113,8 @@ interface ResultInterface {
      *
      * @return int - last generated ID or 0 (zero) if no ID was generated yet in the current session;
      *               -1 if the DBMS doesn't support this functionality
-     *
-     * @link   https://github.com/rosasurfer/ministruts/tree/master/src/db
      */
-    public function lastInsertId();
+    public function lastInsertId(): int;
 
 
     /**
@@ -124,10 +122,8 @@ interface ResultInterface {
      *
      * @return int - last number of affected rows or 0 (zero) if no rows were affected yet in the current session;
      *               -1 if the DBMS doesn't support this functionality
-     *
-     * @link   https://github.com/rosasurfer/ministruts/tree/master/src/db
      */
-    public function lastAffectedRows();
+    public function lastAffectedRows(): int;
 
 
     /**
@@ -135,7 +131,7 @@ interface ResultInterface {
      *
      * @return int
      */
-    public function numRows();
+    public function numRows(): int;
 
 
     /**
@@ -143,7 +139,7 @@ interface ResultInterface {
      *
      * @return int - row index (starting at 0) or -1 after reaching the end
      */
-    public function nextRowIndex();
+    public function nextRowIndex(): int;
 
 
     /**
@@ -151,7 +147,7 @@ interface ResultInterface {
      *
      * @return void
      */
-    public function release();
+    public function release(): void;
 
 
     /**
@@ -167,7 +163,7 @@ interface ResultInterface {
      *
      * @return string
      */
-    public function getType();
+    public function getType(): string;
 
 
     /**
@@ -175,7 +171,7 @@ interface ResultInterface {
      *
      * @return string
      */
-    public function getVersionString();
+    public function getVersionString(): string;
 
 
     /**
@@ -183,5 +179,5 @@ interface ResultInterface {
      *
      * @return int
      */
-    public function getVersionNumber();
+    public function getVersionNumber(): int;
 }

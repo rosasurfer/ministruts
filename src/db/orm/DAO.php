@@ -189,7 +189,7 @@ abstract class DAO extends Singleton {
      *
      * @return array<string, string|array<scalar[]>>
      */
-    abstract public function getMapping();
+    abstract public function getMapping(): array;
 
 
     /**

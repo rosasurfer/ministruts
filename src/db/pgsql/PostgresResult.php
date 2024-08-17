@@ -20,7 +20,6 @@ use const rosasurfer\ministruts\ARRAY_NUM;
  */
 class PostgresResult extends Result {
 
-
     // Status codes as returned by pg_result_status(PGSQL_STATUS_LONG)
 
     /** @var int - The string sent to the server was empty. */
@@ -102,7 +101,7 @@ class PostgresResult extends Result {
      *
      * @return array<?scalar>|null - array of columns or NULL if no more rows are available
      */
-    public function fetchRow($mode = ARRAY_BOTH) {
+    public function fetchRow(int $mode = ARRAY_BOTH): ?array {
         if (!$this->hResult || $this->nextRowIndex < 0) {
             return null;
         }
@@ -131,10 +130,8 @@ class PostgresResult extends Result {
      *
      * @return int - last generated ID or 0 (zero) if no ID was generated yet in the current session;
      *               -1 if the PostgreSQL server version doesn't support this functionality
-     *
-     * @link   https://github.com/rosasurfer/ministruts/tree/master/src/db
      */
-    public function lastInsertId() {
+    public function lastInsertId(): int {
         return $this->connector->lastInsertId();
     }
 
@@ -145,10 +142,8 @@ class PostgresResult extends Result {
      * (see the db README).
      *
      * @return int - last number of affected rows or 0 (zero) if no rows were affected yet in the current session
-     *
-     * @link   https://github.com/rosasurfer/ministruts/tree/master/src/db
      */
-    public function lastAffectedRows() {
+    public function lastAffectedRows(): int {
         return (int) $this->lastAffectedRows;
     }
 
@@ -158,7 +153,7 @@ class PostgresResult extends Result {
      *
      * @return int
      */
-    public function numRows() {
+    public function numRows(): int {
         if ($this->numRows === null) {
             $this->numRows = $this->hResult ? pg_num_rows($this->hResult) : 0;
         }
@@ -171,7 +166,7 @@ class PostgresResult extends Result {
      *
      * @return void
      */
-    public function release() {
+    public function release(): void {
         if ($this->hResult) {
             $tmp = $this->hResult;
             $this->hResult = null;
@@ -199,7 +194,7 @@ class PostgresResult extends Result {
      *
      * @return string
      */
-    public static function statusToStr($status) {
+    public static function statusToStr($status): string {
         Assert::int($status);
 
         switch ($status) {
