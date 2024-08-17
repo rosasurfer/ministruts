@@ -17,7 +17,7 @@ const MYSQL_BOTH = 3;
  *
  * @return int
  */
-function mysql_affected_rows($link_identifier = null): int {}
+function mysql_affected_rows($link_identifier = null) {}
 
 
 /**
@@ -27,7 +27,7 @@ function mysql_affected_rows($link_identifier = null): int {}
  *
  * @return bool
  */
-function mysql_close($link_identifier = null): bool {}
+function mysql_close($link_identifier = null) {}
 
 
 /**
@@ -61,7 +61,7 @@ function mysql_error($link_identifier = null) {}
  *
  * @return int
  */
-function mysql_errno($link_identifier = null): int {}
+function mysql_errno($link_identifier = null) {}
 
 
 /**
@@ -72,7 +72,7 @@ function mysql_errno($link_identifier = null): int {}
  *
  * @return string[]
  */
-function mysql_fetch_array($result, int $result_type = MYSQL_BOTH): array {}
+function mysql_fetch_array($result, int $result_type = MYSQL_BOTH) {}
 
 
 /**
@@ -82,7 +82,7 @@ function mysql_fetch_array($result, int $result_type = MYSQL_BOTH): array {}
  *
  * @return bool
  */
-function mysql_free_result($result): bool {}
+function mysql_free_result($result) {}
 
 
 /**
@@ -102,7 +102,7 @@ function mysql_get_server_info($link_identifier = null) {}
  *
  * @return int
  */
-function mysql_insert_id($link_identifier = null): int {}
+function mysql_insert_id($link_identifier = null) {}
 
 
 /**
@@ -112,7 +112,7 @@ function mysql_insert_id($link_identifier = null): int {}
  *
  * @return int
  */
-function mysql_num_fields($result): int {}
+function mysql_num_fields($result) {}
 
 
 /**
@@ -144,7 +144,7 @@ function mysql_query(string $query, $link_identifier = null) {}
  *
  * @return string
  */
-function mysql_real_escape_string(string $unescaped_string, $link_identifier = null): string {}
+function mysql_real_escape_string(string $unescaped_string, $link_identifier = null) {}
 
 
 /**
@@ -155,7 +155,7 @@ function mysql_real_escape_string(string $unescaped_string, $link_identifier = n
  *
  * @return bool
  */
-function mysql_select_db(string $database_name, $link_identifier = null): bool {}
+function mysql_select_db(string $database_name, $link_identifier = null) {}
 
 
 /**
@@ -166,4 +166,4 @@ function mysql_select_db(string $database_name, $link_identifier = null): bool {
  *
  * @return bool
  */
-function mysql_set_charset(string $charset, $link_identifier = null): bool {}
+function mysql_set_charset(string $charset, $link_identifier = null) {}
