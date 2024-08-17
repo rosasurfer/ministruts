@@ -31,7 +31,7 @@ class SystemFiveLock extends BaseLock {
      * @var array<resource|SysvSemaphore|null> - semaphore handles
      * @phpstan-var array<SysvSemaphoreId|null>
      */
-    private static array $semaphores = [];
+    private static $semaphores = [];
 
     /** @var string */
     private $key;

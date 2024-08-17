@@ -202,7 +202,7 @@ class Assert extends StaticClass {
      * @phpstan-return  ($value is T ? true : false)
      * @phpstan-assert  T $value
      */
-    public static function instanceOf($value, string $class, string $message = '', ...$args) {
+    public static function instance_of($value, string $class, string $message = '', ...$args) {
         if (!$value instanceof $class) {
             throw new IllegalTypeException(static::illegalTypeMessage($value, $class, $message, $args));
         }
