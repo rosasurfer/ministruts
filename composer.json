@@ -33,12 +33,8 @@
         },
         "classmap": [
             "etc/phpstan/extension/",
-            "etc/phpstan/symbols/"
+            "etc/phpstan/symbols/php8/"
         ],        
-        "exclude-from-classmap": [
-            "etc/phpstan/symbols/alias*", 
-            "etc/phpstan/symbols/php_*"
-        ],
         "files": ["src/load.php"]
     },
     "autoload-dev": {

@@ -66,7 +66,7 @@ class PostgresConnector extends Connector {
     /** @var int - DBMS version number */
     protected $versionNumber;
 
-    /** @var array<string, mixed> - connection options */
+    /** @var mixed[] - connection options */
     protected $options = [];
 
     /** @var string[] - session variables */
@@ -76,7 +76,7 @@ class PostgresConnector extends Connector {
      * @var resource|PgSqlConnection|null - PostgreSQL connection handle
      * @phpstan-var PgSqlConnectionId|null
      */
-    protected $hConnection = null;
+    protected $connection = null;
 
     /** @var int - transaction nesting level */
     protected $transactionLevel = 0;
@@ -91,7 +91,7 @@ class PostgresConnector extends Connector {
     /**
      * Constructor
      *
-     * @param  array<string, mixed> $options - PostgreSQL connection options
+     * @param  mixed[] $options - PostgreSQL connection options
      */
     public function __construct(array $options) {
         $this->setOptions($options);
@@ -101,7 +101,7 @@ class PostgresConnector extends Connector {
     /**
      * Set connection options.
      *
-     * @param  array<string, mixed> $options
+     * @param  mixed[] $options
      *
      * @return $this
      */
@@ -194,10 +194,10 @@ class PostgresConnector extends Connector {
     protected function getConnectionDescription() {
         $options = $this->options;
 
-        if ($this->hConnection) {
-            $host = pg_host($this->hConnection);
-            $port = pg_port($this->hConnection);
-            $db   = pg_dbname($this->hConnection);
+        if ($this->connection) {
+            $host = pg_host($this->connection);
+            $port = pg_port($this->connection);
+            $db   = pg_dbname($this->connection);
             $path = $this->getSchemaSearchPath();
             $description = "$host:$port/$db (schema search path: $path)";
         }
@@ -228,13 +228,13 @@ class PostgresConnector extends Connector {
         $options = $this->options;
         $path = null;
 
-        while ($this->hConnection) {
+        while ($this->connection) {
             try {
-                $result = pg_query($this->hConnection, 'show search_path');
-                if (!$result) throw new DatabaseException(pg_last_error($this->hConnection));
+                $result = pg_query($this->connection, 'show search_path');
+                if (!$result) throw new DatabaseException(pg_last_error($this->connection));
 
                 $row = pg_fetch_array($result, null, PGSQL_NUM);
-                if (!$row) throw new DatabaseException(pg_last_error($this->hConnection));
+                if (!$row) throw new DatabaseException(pg_last_error($this->connection));
 
                 $path = $row[0];
 
@@ -271,7 +271,7 @@ class PostgresConnector extends Connector {
             $connection = pg_connect($connStr, PGSQL_CONNECT_FORCE_NEW);;
             if (!$connection) throw new DatabaseException(error_get_last()['message']);
 
-            $this->hConnection = $connection;
+            $this->connection = $connection;
         }
         catch (Throwable $ex) {
             if (!$ex instanceof IRosasurferException) {
@@ -310,8 +310,8 @@ class PostgresConnector extends Connector {
      */
     public function disconnect() {
         if ($this->isConnected()) {
-            $tmp = $this->hConnection;
-            $this->hConnection = null;
+            $tmp = $this->connection;
+            $this->connection = null;
             pg_close($tmp);
         }
         return $this;
@@ -328,7 +328,7 @@ class PostgresConnector extends Connector {
      * @return bool
      */
     public function isConnected() {
-        return isset($this->hConnection);
+        return isset($this->connection);
     }
 
 
@@ -348,13 +348,13 @@ class PostgresConnector extends Connector {
             $names = explode('.', $name);
 
             foreach ($names as &$subname) {
-                $subname = pg_escape_identifier($this->hConnection, $subname);
+                $subname = pg_escape_identifier($this->connection, $subname);
             }
             unset($subname);
 
             return join('.', $names);
         }
-        return pg_escape_identifier($this->hConnection, $name);
+        return pg_escape_identifier($this->connection, $name);
     }
 
 
@@ -375,7 +375,7 @@ class PostgresConnector extends Connector {
 
         $value = $this->fixUtf8Encoding($value);    // pg_query(): ERROR: invalid byte sequence for encoding "UTF8"
 
-        return pg_escape_literal($this->hConnection, $value);
+        return pg_escape_literal($this->connection, $value);
     }
 
 
@@ -393,7 +393,7 @@ class PostgresConnector extends Connector {
 
         $value = $this->fixUtf8Encoding($value);    // pg_query(): ERROR: invalid byte sequence for encoding "UTF8"
 
-        return pg_escape_string($this->hConnection, $value);
+        return pg_escape_string($this->connection, $value);
     }
 
 
@@ -465,8 +465,8 @@ class PostgresConnector extends Connector {
         // execute statement
         $result = null;
         try {
-            $result = pg_query($this->hConnection, $sql);         // wraps multi-statement queries in a transaction
-            if (!$result) throw new DatabaseException(pg_last_error($this->hConnection));
+            $result = pg_query($this->connection, $sql);            // wraps multi-statement queries in a transaction
+            if (!$result) throw new DatabaseException(pg_last_error($this->connection));
         }
         catch (Throwable $ex) {
             if (!$ex instanceof IRosasurferException) {
@@ -642,7 +642,7 @@ class PostgresConnector extends Connector {
         if (!$this->isConnected()) {
             $this->connect();
         }
-        return $this->hConnection;
+        return $this->connection;
     }
 
 
@@ -666,7 +666,7 @@ class PostgresConnector extends Connector {
             if (!$this->isConnected()) {
                 $this->connect();
             }
-            $this->versionString = pg_version($this->hConnection)['server'];
+            $this->versionString = pg_version($this->connection)['server'];
         }
         return $this->versionString;
     }

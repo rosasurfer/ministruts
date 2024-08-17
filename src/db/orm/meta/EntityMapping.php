@@ -18,7 +18,7 @@ class EntityMapping extends CObject implements \Iterator {
     /** @var string - the entity's class name */
     protected $className;
 
-    /** @var array<string, string|array<scalar[]>> - mapping information */
+    /** @var array<string, mixed>> - mapping information */
     protected $mapping;
 
     /** @var PropertyMapping[] - property mapping instances */
@@ -40,9 +40,7 @@ class EntityMapping extends CObject implements \Iterator {
     /**
      * Constructor
      *
-     * Create a new EntityMapping.
-     *
-     * @param  array<string, string|array<scalar[]>> $mapping - mapping information
+     * @param  array<string, mixed> $mapping - mapping information
      */
     public function __construct(array $mapping) {
         $this->mapping = $mapping;

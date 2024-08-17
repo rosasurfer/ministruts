@@ -52,9 +52,9 @@ class PostgresResult extends Result {
 
     /**
      * @var resource|PgSqlResult|null - the database connector's original result handle
-     * @phpstan-var ?PgSqlResultId
+     * @phpstan-var PgSqlResultId|null
      */
-    protected $hResult = null;
+    protected $result = null;
 
     /** @var int - last number of affected rows (not reset between queries) */
     protected $lastAffectedRows = 0;
@@ -70,39 +70,41 @@ class PostgresResult extends Result {
      *
      * @param  Connector            $connector        - the connector managing the database connection
      * @param  string               $sql              - executed SQL statement
-     * @param  resource|PgSqlResult $hResult          - result handle
-     * @phpstan-param PgSqlResultId $hResult
+     * @param  resource|PgSqlResult $result           - result handle
+     * @phpstan-param PgSqlResultId $result
      * @param  int                  $lastAffectedRows - last number of affected rows of the connection
      */
-    public function __construct(Connector $connector, string $sql, $hResult, int $lastAffectedRows) {
+    public function __construct(Connector $connector, string $sql, $result, int $lastAffectedRows) {
         Assert::string($sql, '$sql');
+        // @phpstan-ignore booleanOr.alwaysTrue, instanceof.alwaysFalse (PHP80/81 incompatibility)
+        Assert::true(is_resource($result) || $result instanceof PgSqlResult, 'resource|PgSqlResult $result');
         Assert::int($lastAffectedRows, '$lastAffectedRows');
 
         $this->connector = $connector;
         $this->sql = $sql;
         $this->lastAffectedRows = $lastAffectedRows;
 
-        if (!pg_num_fields($hResult)) {
+        if (!pg_num_fields($result)) {
             $this->numRows = 0;
             $this->nextRowIndex = -1;
         }
         else {
+            $this->numRows = pg_num_rows($this->result);
             $this->nextRowIndex = 0;
         }
-        $this->hResult = $hResult;
+        $this->result = $result;
     }
 
 
     /**
      * {@inheritdoc}
      *
-     * @param  int $mode [optional] - Controls how the returned array is indexed. Can take one of the following values:
-     *                                ARRAY_ASSOC, ARRAY_NUM, or ARRAY_BOTH (default).
+     * @param  int $mode [optional]
      *
-     * @return array<?scalar>|null - array of columns or NULL if no more rows are available
+     * @return array<?scalar>|null
      */
     public function fetchRow(int $mode = ARRAY_BOTH): ?array {
-        if (!$this->hResult || $this->nextRowIndex < 0) {
+        if (!$this->result || $this->nextRowIndex < 0) {
             return null;
         }
 
@@ -112,7 +114,7 @@ class PostgresResult extends Result {
             default:          $mode = PGSQL_BOTH;
         }
 
-        $row = pg_fetch_array($this->hResult, null, $mode);
+        $row = pg_fetch_array($this->result, null, $mode);
         if ($row) {
             $this->nextRowIndex++;
         }
@@ -154,9 +156,6 @@ class PostgresResult extends Result {
      * @return int
      */
     public function numRows(): int {
-        if ($this->numRows === null) {
-            $this->numRows = $this->hResult ? pg_num_rows($this->hResult) : 0;
-        }
         return $this->numRows;
     }
 
@@ -167,9 +166,9 @@ class PostgresResult extends Result {
      * @return void
      */
     public function release(): void {
-        if ($this->hResult) {
-            $tmp = $this->hResult;
-            $this->hResult = null;
+        if ($this->result) {
+            $tmp = $this->result;
+            $this->result = null;
             $this->nextRowIndex = -1;
             pg_free_result($tmp);
         }
@@ -180,10 +179,10 @@ class PostgresResult extends Result {
      * Return this result's internal result object.
      *
      * @return resource|PgSqlResult|null - result handle
-     * @phpstan-return ?PgSqlResultId
+     * @phpstan-return PgSqlResultId|null
      */
     public function getInternalResult() {
-        return $this->hResult;
+        return $this->result;
     }
 
 

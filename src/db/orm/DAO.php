@@ -187,7 +187,7 @@ abstract class DAO extends Singleton {
     /**
      * Return the mapping configuration of the DAO's entity.
      *
-     * @return array<string, string|array<scalar[]>>
+     * @return array<string, mixed>
      */
     abstract public function getMapping(): array;
 
@@ -195,9 +195,9 @@ abstract class DAO extends Singleton {
     /**
      * Parse and validate the DAO's data mapping.
      *
-     * @param  array<string, string|array<scalar[]>> $mapping - data mapping
+     * @param  array<string, mixed> $mapping - data mapping
      *
-     * @return array<string, string|array<scalar[]>> - validated and normalized mapping
+     * @return array<string, mixed> - validated and normalized mapping
      */
     protected function parseMapping(array $mapping) {
         foreach ($mapping['properties'] as $i => $property) {

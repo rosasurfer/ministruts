@@ -56,6 +56,44 @@ class Assert extends StaticClass {
 
 
     /**
+     * Ensure that the passed value is boolean TRUE.
+     *
+     * @param  mixed    $value
+     * @param  string   $message [optional] - value identifier or description
+     * @param  mixed ...$args    [optional] - additional description arguments
+     *
+     * @return ($value is true ? true : false)
+     *
+     * @phpstan-assert true $value
+     */
+    public static function true($value, $message = '', ...$args) {
+        if ($value !== true) {
+            throw new InvalidValueException("Not true: $message");
+        }
+        return true;
+    }
+
+
+    /**
+     * Ensure that the passed value is boolean FALSE.
+     *
+     * @param  mixed    $value
+     * @param  string   $message [optional] - value identifier or description
+     * @param  mixed ...$args    [optional] - additional description arguments
+     *
+     * @return ($value is false ? true : false)
+     *
+     * @phpstan-assert false $value
+     */
+    public static function false($value, $message = '', ...$args) {
+        if ($value !== false) {
+            throw new InvalidValueException("Not false: $message");
+        }
+        return true;
+    }
+
+
+    /**
      * Ensure that the passed value is an integer.
      *
      * @param  mixed    $value
@@ -165,7 +203,7 @@ class Assert extends StaticClass {
      * @phpstan-return  ($value is T ? true : false)
      * @phpstan-assert  T $value
      */
-    public static function instanceof($value, string $class, string $message = '', ...$args) {
+    public static function instanceOf($value, string $class, string $message = '', ...$args) {
         if (!$value instanceof $class) {
             throw new InvalidTypeException(static::illegalTypeMessage($value, $class, $message, $args));
         }
@@ -391,7 +429,7 @@ class Assert extends StaticClass {
      *
      * @param  mixed   $value        - checked variable
      * @param  string  $expectedType - expected variable type
-     * @param  string  $message      - variabe identifier or custom value description
+     * @param  string  $message      - variabe identifier or description
      * @param  mixed[] $args         - additional description arguments
      *
      * @return string - generated error message
@@ -403,8 +441,9 @@ class Assert extends StaticClass {
                 $message = sprintf($message, ...$args);
             }
             if (!ctype_upper($message[0])) {                // ignore multi-byte or special UTF-8 chars
-                if ($message[0] == '$')
+                if ($message[0] == '$') {
                     $message = 'argument '.$message;
+                }
                 $message = sprintf('Illegal type %s of %s (%s expected)', static::typeToStr($value), $message, $expectedType);
             }
         }
