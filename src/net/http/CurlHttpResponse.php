@@ -63,7 +63,7 @@ class CurlHttpResponse extends HttpResponse {
     /**
      * {@inheritdoc}
      *
-     * @return array - all received headers
+     * @return array<string, string[]> - associative array of all received headers
      */
     public function getHeaders() {
         return $this->headerParser->getHeaders();

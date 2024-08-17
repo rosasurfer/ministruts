@@ -14,31 +14,32 @@ class Validator extends StaticClass {
     /**
      * Whether the passed string represents a valid IP address.
      *
-     * @param  string $string                 - string to validate
-     * @param  bool   $returnBytes [optional] - return type:
-     *                                          FALSE: boolean (default)
-     *                                          TRUE:  array with address parts or FALSE if the string doesn't represent a valid IP address
-     * @return bool|array
+     * @param  string $string                  - string to validate
+     * @param  bool   $returnOctets [optional] - return type:
+     *                                           FALSE: boolean (default)
+     *                                           TRUE:  array with IP octets or FALSE if the string doesn't represent a valid IP address
+     * @return string[]|bool
+     *
+     * @phpstan-return ($returnOctets is true ? string[]|bool : bool)
      */
-    public static function isIPAddress($string, $returnBytes = false) {
+    public static function isIPAddress($string, $returnOctets = false) {
         static $pattern = '/^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/';
-        $bytes = null;
-        $result = is_string($string) && strlen($string) && preg_match($pattern, $string, $bytes);
+        $octets = null;
 
-        if ($result) {
-            \array_shift($bytes);
+        if (is_string($string) && preg_match($pattern, $string, $octets)) {
+            \array_shift($octets);
 
-            foreach ($bytes as $i => $byte) {
+            foreach ($octets as $i => $byte) {
                 $b = (int) $byte;
                 if (!is_string($byte) || $b > 255) {
                     return false;
                 }
-                $bytes[$i] = $b;
+                $octets[$i] = $b;
             }
-            if ($bytes[0] == 0) {
+            if ($octets[0] == 0) {
                 return false;
             }
-            return $returnBytes ? $bytes : true;
+            return $returnOctets ? $octets : true;
         }
         return false;
     }

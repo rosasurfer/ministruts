@@ -35,7 +35,7 @@ class CurlHttpClient extends HttpClient {
     /** @var int - counter of manual redirects (if "open_basedir" is enabled) */
     protected $manualRedirects = 0;
 
-    /** @var array - additional curl options */
+    /** @var mixed[] - additional CURL options */
     protected $options = [];
 
     /** @var string[] - curl error descriptions */
@@ -139,7 +139,7 @@ class CurlHttpClient extends HttpClient {
     /**
      * Constructor
      *
-     * @param  array $options [optional] - additional options (default: none)
+     * @param  mixed[] $options [optional] - additional CURL options (default: none)
      */
     public function __construct(array $options = []) {
         $this->options = $options;
@@ -233,7 +233,7 @@ class CurlHttpClient extends HttpClient {
      * @param  HttpRequest      $request
      * @param  CurlHttpResponse $response
      *
-     * @return array - resulting options
+     * @return mixed[] - resulting CURL options
      */
     protected function prepareCurlOptions(HttpRequest $request, CurlHttpResponse $response) {
         $options = $this->options;                                  // options passed to the constructor
@@ -242,11 +242,13 @@ class CurlHttpClient extends HttpClient {
         $options += [CURLOPT_USERAGENT => $this->userAgent  ];
         $options += [CURLOPT_ENCODING  => ''                ];      // an empty string activates all supported encodings
 
-        if (!isset($options[CURLOPT_WRITEHEADER]))
+        if (!isset($options[CURLOPT_WRITEHEADER])) {
             $options += [CURLOPT_HEADERFUNCTION => [$response, 'writeHeader']];
+        }
 
-        if (!isset($options[CURLOPT_FILE]))                         // overrides CURLOPT_RETURNTRANSFER
+        if (!isset($options[CURLOPT_FILE])) {                       // overrides CURLOPT_RETURNTRANSFER
             $options += [CURLOPT_WRITEFUNCTION  => [$response, 'writeContent']];
+        }
 
         foreach ($request->getHeaders() as $key => $value) {        // add all additionally specified request headers
             $options[CURLOPT_HTTPHEADER][] = $key.': '.$value;

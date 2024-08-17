@@ -55,6 +55,44 @@ class Assert extends StaticClass {
 
 
     /**
+     * Ensure that the passed value is boolean TRUE.
+     *
+     * @param  mixed    $value
+     * @param  string   $message [optional] - value identifier or description
+     * @param  mixed ...$args    [optional] - additional description arguments
+     *
+     * @return ($value is true ? true : false)
+     *
+     * @phpstan-assert true $value
+     */
+    public static function true($value, $message = '', ...$args) {
+        if ($value !== true) {
+            throw new InvalidArgumentException("Not true: $message");
+        }
+        return true;
+    }
+
+
+    /**
+     * Ensure that the passed value is boolean FALSE.
+     *
+     * @param  mixed    $value
+     * @param  string   $message [optional] - value identifier or description
+     * @param  mixed ...$args    [optional] - additional description arguments
+     *
+     * @return ($value is false ? true : false)
+     *
+     * @phpstan-assert false $value
+     */
+    public static function false($value, $message = '', ...$args) {
+        if ($value !== false) {
+            throw new InvalidArgumentException("Not false: $message");
+        }
+        return true;
+    }
+
+
+    /**
      * Ensure that the passed value is an integer.
      *
      * @param  mixed    $value
@@ -144,6 +182,29 @@ class Assert extends StaticClass {
     public static function object($value, $message = '', ...$args) {
         if (!is_object($value)) {
             throw new IllegalTypeException(static::illegalTypeMessage($value, 'object', $message, $args));
+        }
+        return true;
+    }
+
+
+    /**
+     * Ensure that the passed value is an instance of the specified type.
+     *
+     * @param  mixed    $value
+     * @param  string   $class
+     * @param  string   $message [optional] - value identifier or description
+     * @param  mixed ...$args    [optional] - additional message arguments
+     *
+     * @return bool
+     *
+     * @template        T of object
+     * @phpstan-param   class-string<T> $class
+     * @phpstan-return  ($value is T ? true : false)
+     * @phpstan-assert  T $value
+     */
+    public static function instanceOf($value, string $class, string $message = '', ...$args) {
+        if (!$value instanceof $class) {
+            throw new IllegalTypeException(static::illegalTypeMessage($value, $class, $message, $args));
         }
         return true;
     }

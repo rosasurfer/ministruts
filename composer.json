@@ -25,11 +25,8 @@
             "rosasurfer\\": "src"
         },
         "classmap": [
-            "etc/phpstan/symbols/"
-        ],
-        "exclude-from-classmap": [
-            "etc/phpstan/symbols/alias*", 
-            "etc/phpstan/symbols/php_*"
+            "etc/phpstan/extension/",
+            "etc/phpstan/symbols/php7+/"
         ],
         "files": ["src/load.php"]
     },

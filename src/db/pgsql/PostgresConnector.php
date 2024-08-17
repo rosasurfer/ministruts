@@ -1,6 +1,11 @@
 <?php
 namespace rosasurfer\db\pgsql;
 
+use Exception;
+use Throwable;
+use PgSql\Connection as PgSqlConnection;
+use PgSql\Result as PgSqlResult;
+
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\core\exception\RuntimeException;
@@ -60,14 +65,17 @@ class PostgresConnector extends Connector {
     /** @var int - DBMS version number */
     protected $versionNumber;
 
-    /** @var string[]|string[][] - connection options */
+    /** @var mixed[] - connection options */
     protected $options = [];
 
     /** @var string[] - session variables */
     protected $sessionVars = [];
 
-    /** @var ?resource - internal connection handle */
-    protected $hConnection = null;
+    /**
+     * @var resource|PgSqlConnection|null - PostgreSQL connection handle
+     * @phpstan-var PgSqlConnectionId|null
+     */
+    protected $connection = null;
 
     /** @var int - transaction nesting level */
     protected $transactionLevel = 0;
@@ -84,7 +92,7 @@ class PostgresConnector extends Connector {
      *
      * Create a new PostgresConnector instance.
      *
-     * @param  array $options - PostgreSQL connection options
+     * @param  mixed[] $options - PostgreSQL connection options
      */
     public function __construct(array $options) {
         $this->setOptions($options);
@@ -94,7 +102,7 @@ class PostgresConnector extends Connector {
     /**
      * Set connection options.
      *
-     * @param  string[] $options
+     * @param  mixed[] $options
      *
      * @return $this
      */
@@ -187,10 +195,10 @@ class PostgresConnector extends Connector {
     protected function getConnectionDescription() {
         $options = $this->options;
 
-        if (is_resource($this->hConnection)) {
-            $host        = pg_host($this->hConnection);
-            $port        = pg_port($this->hConnection);
-            $db          = pg_dbname($this->hConnection);
+        if ($this->connection) {
+            $host        = pg_host($this->connection);
+            $port        = pg_port($this->connection);
+            $db          = pg_dbname($this->connection);
             $path        = $this->getSchemaSearchPath();
             $description = $host.':'.$port.'/'.$db.' (schema search path: '.$path.')';
         }
@@ -221,10 +229,10 @@ class PostgresConnector extends Connector {
         $options = $this->options;
         $path = null;
 
-        while ($this->hConnection) {
+        while ($this->connection) {
             $ex = null;
             try {
-                $result = pg_query($this->hConnection, 'show search_path');
+                $result = pg_query($this->connection, 'show search_path');
                 $row    = pg_fetch_array($result, null, PGSQL_NUM);
                 $path   = $row[0];
 
@@ -233,8 +241,8 @@ class PostgresConnector extends Connector {
                 }
                 break;
             }
-            catch (\Throwable $ex) {}
-            catch (\Exception $ex) {}                   // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
+            catch (Throwable $ex) {}
+            catch (Exception $ex) {}                    // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
 
             if ($ex && strContainsI($ex->getMessage(), 'current transaction is aborted, commands ignored until end of transaction block')) {
                 if ($this->transactionLevel > 0) {
@@ -255,8 +263,6 @@ class PostgresConnector extends Connector {
      * @return $this
      */
     public function connect() {
-        if (!function_exists('\pg_connect')) throw new RuntimeException('Undefined function pg_connect() (pgsql extension is not available)');
-
         $connStr = $this->getConnectionString();
 
         if (PHP_VERSION_ID < 70000) ini_set('track_errors', '1');       // removed in PHP 8.0
@@ -265,18 +271,19 @@ class PostgresConnector extends Connector {
 
         $ex = null;
         try {
-            $this->hConnection = pg_connect($connStr, PGSQL_CONNECT_FORCE_NEW);
+            $connection = pg_connect($connStr, PGSQL_CONNECT_FORCE_NEW);
 
-            if (!$this->hConnection) {                                  // error handling may be set to "log" only
+            if (!$connection) {                                         // error handling may be set to "log" only
                 if (PHP_VERSION_ID >= 70000 && ($error = error_get_last())) {
                     $php_errormsg = $error['message'];
                 }
                 throw new DatabaseException($php_errormsg);
             }
+            $this->connection = $connection;
         }
         catch (IRosasurferException $ex) {}
-        catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
-        catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }   // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
+        catch (Throwable            $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
+        catch (Exception            $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }   // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
         if ($ex) throw $ex->addMessage('Cannot connect to PostgreSQL server with connection string: "'.$connStr.'"');
 
         $this->setConnectionOptions();
@@ -309,8 +316,8 @@ class PostgresConnector extends Connector {
      */
     public function disconnect() {
         if ($this->isConnected()) {
-            $tmp = $this->hConnection;
-            $this->hConnection = null;
+            $tmp = $this->connection;
+            $this->connection = null;
             pg_close($tmp);
         }
         return $this;
@@ -327,7 +334,7 @@ class PostgresConnector extends Connector {
      * @return bool
      */
     public function isConnected() {
-        return is_resource($this->hConnection);
+        return is_resource($this->connection);
     }
 
 
@@ -344,13 +351,13 @@ class PostgresConnector extends Connector {
             $names = explode('.', $name);
 
             foreach ($names as &$subname) {
-                $subname = pg_escape_identifier($this->hConnection, $subname);
+                $subname = pg_escape_identifier($this->connection, $subname);
             }
             unset($subname);
 
             return join('.', $names);
         }
-        return pg_escape_identifier($this->hConnection, $name);
+        return pg_escape_identifier($this->connection, $name);
     }
 
 
@@ -371,7 +378,7 @@ class PostgresConnector extends Connector {
 
         $value = $this->fixUtf8Encoding($value);    // pg_query(): ERROR: invalid byte sequence for encoding "UTF8"
 
-        return pg_escape_literal($this->hConnection, $value);
+        return pg_escape_literal($this->connection, $value);
     }
 
 
@@ -389,7 +396,7 @@ class PostgresConnector extends Connector {
 
         $value = $this->fixUtf8Encoding($value);    // pg_query(): ERROR: invalid byte sequence for encoding "UTF8"
 
-        return pg_escape_string($this->hConnection, $value);
+        return pg_escape_string($this->connection, $value);
     }
 
 
@@ -448,7 +455,8 @@ class PostgresConnector extends Connector {
      *
      * @param  string $sql - SQL statement
      *
-     * @return resource - result handle
+     * @return resource|PgSqlResult - result
+     * @phpstan-return PgSqlResultId
      *
      * @throws DatabaseException on errors
      */
@@ -463,12 +471,12 @@ class PostgresConnector extends Connector {
         // execute statement
         $ex = null;
         try {
-            $result = pg_query($this->hConnection, $sql);         // wraps multi-statement queries in a transaction
-            if (!$result) throw new DatabaseException(pg_last_error($this->hConnection));
+            $result = pg_query($this->connection, $sql);         // wraps multi-statement queries in a transaction
+            if (!$result) throw new DatabaseException(pg_last_error($this->connection));
         }
         catch (IRosasurferException $ex) {}
-        catch (\Throwable           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
-        catch (\Exception           $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }   // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
+        catch (Throwable            $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }
+        catch (Exception            $ex) { $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex); }   // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
 
         if ($ex) throw $ex->addMessage('Database: '.$this->getConnectionDescription().NL.'SQL: "'.$sql.'"');
 
@@ -630,12 +638,14 @@ class PostgresConnector extends Connector {
     /**
      * Return the connector's internal connection object.
      *
-     * @return resource - the internal connection handle
+     * @return resource|PgSqlConnection - the internal connection object
+     * @phpstan-return PgSqlConnectionId
      */
     public function getInternalHandler() {
-        if (!$this->isConnected())
+        if (!$this->isConnected()) {
             $this->connect();
-        return $this->hConnection;
+        }
+        return $this->connection;
     }
 
 
@@ -658,7 +668,7 @@ class PostgresConnector extends Connector {
         if ($this->versionString === null) {
             if (!$this->isConnected())
                 $this->connect();
-            $this->versionString = pg_version($this->hConnection)['server'];
+            $this->versionString = pg_version($this->connection)['server'];
         }
         return $this->versionString;
     }

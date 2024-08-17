@@ -21,7 +21,7 @@ use function rosasurfer\strStartsWithI;
 abstract class Mailer extends CObject implements MailerInterface {
 
 
-    /** @var array */
+    /** @var scalar[] */
     protected $options;
 
     /** @var string */
@@ -31,7 +31,7 @@ abstract class Mailer extends CObject implements MailerInterface {
     /**
      * Constructor
      *
-     * @param  array $options [optional] - mailer options (default: none)
+     * @param  mixed[] $options [optional] - mailer configuration
      */
     public function __construct(array $options = []) {
         $this->options = $options;
@@ -49,7 +49,7 @@ abstract class Mailer extends CObject implements MailerInterface {
     /**
      * Create and return a new instance.
      *
-     * @param  array $options [optional] - mailer options
+     * @param  mixed[] $options [optional] - mailer configuration
      *
      * @return Mailer
      */

@@ -22,7 +22,7 @@ use const rosasurfer\NL;
 class SMTPMailer extends Mailer {
 
 
-    /** @var array */
+    /** @var array<string, int> */
     private $defaultOptions = [
         'timeout' => 300,                   // socket timeout
     ];
@@ -43,7 +43,7 @@ class SMTPMailer extends Mailer {
     /**
      * Constructor
      *
-     * @param  array $options [optional] - mailer options (default: none)
+     * @param  mixed[] $options [optional] - mailer configuration
      */
     public function __construct(array $options = []) {
         trigger_error(__CLASS__.' is deprecated and will be removed in a future release', E_USER_DEPRECATED);

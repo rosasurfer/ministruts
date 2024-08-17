@@ -40,8 +40,9 @@ class CoreFunctionReturnType implements DynamicFunctionReturnTypeExtension {
         $null = new NullType();
 
         $this->supportedFunctions = [
-            // function            => type to remove    // original return type
-            'curl_init'            => $bool,            // (2) resource|CurlHandle|false    @see  https://www.php.net/manual/en/function.curl-init.php
+            // function            type to remove       original return type
+            // -------------------------------------------------------------------------
+            'curl_init'            => $bool,            // resource|CurlHandle|false (2)    @see  https://www.php.net/manual/en/function.curl-init.php
             'file'                 => $bool,            // array|false
             'file_get_contents'    => $bool,            // string|false                     @see  https://www.php.net/manual/en/function.file-get-contents.php
             'filemtime'            => $bool,            // int|false                        @see  https://www.php.net/manual/en/function.filemtime.php
@@ -50,9 +51,9 @@ class CoreFunctionReturnType implements DynamicFunctionReturnTypeExtension {
             'ini_get_all'          => $bool,            // array|false                      @see  https://www.php.net/manual/en/function.ini-get-all.php
             'ob_get_clean'         => $bool,            // string|false
             'opendir'              => $bool,            // resource|false
-            'pg_escape_identifier' => $bool,            // (1) string                       @see  https://www.php.net/manual/en/function.pg-escape-identifier.php
-            'pg_escape_literal'    => $bool,            // (1) string                       @see  https://www.php.net/manual/en/function.pg-escape-literal.php
-            'preg_replace'         => $null,            // (2) string|array|null
+            'pg_escape_identifier' => $bool,            // string (1)                       @see  https://www.php.net/manual/en/function.pg-escape-identifier.php
+            'pg_escape_literal'    => $bool,            // string (1)                       @see  https://www.php.net/manual/en/function.pg-escape-literal.php
+            'preg_replace'         => $null,            // string|array|null (2)
             'preg_split'           => $bool,            // array|false
             'proc_open'            => $bool,            // resource|false                   @see  https://www.php.net/manual/en/function.proc-open.php
             'session_id'           => $bool,            // string|false                     @see  https://www.php.net/manual/en/function.session-id.php

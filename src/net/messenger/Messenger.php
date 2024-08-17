@@ -11,14 +11,14 @@ use rosasurfer\core\CObject;
  */
 abstract class Messenger extends CObject {
 
-    /** @var array */
+    /** @var scalar[] */
     protected $options;
 
 
     /**
      * Constructor
      *
-     * @param  array $options
+     * @param  scalar[] $options
      */
     abstract protected function __construct(array $options);
 

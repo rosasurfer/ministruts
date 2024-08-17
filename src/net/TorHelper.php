@@ -42,17 +42,16 @@ class TorHelper extends StaticClass {
      *
      * @var string[] */
     private static $torMirrors = [
-        'torstatus.blutmagie.de'   ,
-        'torstatus.cyberphunk.org' ,
-        'tns.hermetix.org'         ,
-        'arachne.doesntexist.org'  ,
-        'torstatus.all.de'         ,
-        'torstatus.kgprog.com'     ,
-        'torstatus.amorphis.eu'    ,
-        'torstat.kleine-eismaus.de',
-      //'kradense.whsites.net/tns' ,
+        'torstatus.blutmagie.de'   ,            // http://torstatus.blutmagie.de/ip_list_exit.php/Tor_ip_list_EXIT.csv
+        'torstatus.cyberphunk.org' ,            // http://torstatus.cyberphunk.org/ip_list_exit.php/Tor_ip_list_EXIT.csv
+        'tns.hermetix.org'         ,            // http://tns.hermetix.org/ip_list_exit.php/Tor_ip_list_EXIT.csv
+        'arachne.doesntexist.org'  ,            // http://arachne.doesntexist.org/ip_list_exit.php/Tor_ip_list_EXIT.csv
+        'torstatus.all.de'         ,            // http://torstatus.all.de/ip_list_exit.php/Tor_ip_list_EXIT.csv
+        'torstatus.kgprog.com'     ,            // http://torstatus.kgprog.com/ip_list_exit.php/Tor_ip_list_EXIT.csv
+        'torstatus.amorphis.eu'    ,            // http://torstatus.amorphis.eu/ip_list_exit.php/Tor_ip_list_EXIT.csv
+        'torstat.kleine-eismaus.de',            // http://torstat.kleine-eismaus.de/ip_list_exit.php/Tor_ip_list_EXIT.csv
+      //'kradense.whsites.net/tns' ,            // http://kradense.whsites.net/tns/ip_list_exit.php/Tor_ip_list_EXIT.csv
     ];
-
 
     /**
      * Initialization
@@ -91,19 +90,19 @@ class TorHelper extends StaticClass {
     /**
      * Return all currently known Tor exit nodes.
      *
-     * @return array - associative array of IP addresses
+     * @return array<string, int> - associative array of IP addresses
      */
     private static function getExitNodes() {
         $cache = Cache::me(__CLASS__);
         $nodes = $cache->get($key='tor_exit_nodes');
 
-        if ($nodes == null) {
+        if ($nodes === null) {
 
             // synchronize reading of the nodes
             synchronized(function() use ($cache, $key, &$nodes) {
                 $nodes = $cache->get($key);
 
-                if ($nodes == null) {
+                if ($nodes === null) {
                     $content = '';
                     $size = sizeof(self::$torMirrors);
 
@@ -112,7 +111,7 @@ class TorHelper extends StaticClass {
                         try {
                             // TODO: warn/update server list if a server doesn't respond
                             $response = (new CurlHttpClient())->send($request);
-                            $status   = $response->getStatus();
+                            $status = $response->getStatus();
 
                             if ($status != 200) {
                                 $description = isset(HttpResponse::$sc[$status]) ? HttpResponse::$sc[$status] : '?';

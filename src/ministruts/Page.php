@@ -19,7 +19,7 @@ use rosasurfer\core\Singleton;
 class Page extends Singleton {
 
 
-    /** @var array - stored variables */
+    /** @var mixed[] - stored variables */
     protected $properties = [];
 
 
@@ -100,7 +100,7 @@ class Page extends Singleton {
     /**
      * Return all variables stored in the context.
      *
-     * @return array - values
+     * @return mixed[] - values
      */
     public function values() {
         return self::me()->properties;

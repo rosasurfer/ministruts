@@ -11,7 +11,7 @@ interface MailerInterface {
     /**
      * Constructor
      *
-     * @param  array $options [optional] - mailer options (default: none)
+     * @param  mixed[] $options [optional] - mailer configuration
      */
     public function __construct(array $options = []);
 

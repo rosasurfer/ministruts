@@ -1,8 +1,10 @@
 <?php
 namespace rosasurfer\db\pgsql;
 
+use PgSql\Result as PgSqlResult;
+
 use rosasurfer\core\assert\Assert;
-use rosasurfer\db\ConnectorInterface as IConnector;
+use rosasurfer\db\ConnectorInterface as Connector;
 use rosasurfer\db\Result;
 
 use const rosasurfer\ARRAY_ASSOC;
@@ -47,8 +49,11 @@ class PostgresResult extends Result {
     /** @var string - SQL statement the result was generated from */
     protected $sql;
 
-    /** @var ?resource - the database connector's original result handle */
-    protected $hResult = null;
+    /**
+     * @var resource|PgSqlResult|null - the database connector's original result handle
+     * @phpstan-var PgSqlResultId|null
+     */
+    protected $result = null;
 
     /** @var int - last number of affected rows (not reset between queries) */
     protected $lastAffectedRows = 0;
@@ -62,37 +67,45 @@ class PostgresResult extends Result {
      *
      * Create a new PostgresResult instance. Called only when execution of a SQL statement returned successful.
      *
-     * @param  IConnector $connector        - Connector managing the database connection
-     * @param  string     $sql              - executed SQL statement
-     * @param  resource   $hResult          - result handle
-     * @param  int        $lastAffectedRows - last number of affected rows of the connection
+     * @param  Connector            $connector        - Connector managing the database connection
+     * @param  string               $sql              - executed SQL statement
+     * @param  resource|PgSqlResult $result           - result handle
+     * @phpstan-param PgSqlResultId $result
+     * @param  int                  $lastAffectedRows - last number of affected rows of the connection
      */
-    public function __construct(IConnector $connector, $sql, $hResult, $lastAffectedRows) {
-        Assert::string  ($sql, '$sql');
-        Assert::resource($hResult, null, '$hResult');
-        Assert::int     ($lastAffectedRows, '$lastAffectedRows');
+    public function __construct(Connector $connector, $sql, $result, $lastAffectedRows) {
+        Assert::string($sql, '$sql');
+        // @phpstan-ignore booleanOr.alwaysTrue, instanceof.alwaysFalse (PHP80/81 incompatibility)
+        Assert::true(is_resource($result) || $result instanceof PgSqlResult, 'resource|PgSqlResult $result');
+        Assert::int($lastAffectedRows, '$lastAffectedRows');
 
         $this->connector        = $connector;
         $this->sql              = $sql;
         $this->lastAffectedRows = $lastAffectedRows;
 
-        if (!pg_num_fields($hResult)) {
+        if (!pg_num_fields($result)) {
             $this->numRows      = 0;
             $this->nextRowIndex = -1;
         }
         else {
+            $this->numRows = pg_num_rows($this->result);
             $this->nextRowIndex = 0;
         }
-        $this->hResult = $hResult;
+        $this->result = $result;
     }
 
 
     /**
+     * {@inheritdoc}
      *
+     * @param  int $mode [optional]
+     *
+     * @return array<?scalar>|null
      */
     public function fetchRow($mode = ARRAY_BOTH) {
-        if (!$this->hResult || $this->nextRowIndex < 0)
+        if (!$this->result || $this->nextRowIndex < 0) {
             return null;
+        }
 
         switch ($mode) {
             case ARRAY_ASSOC: $mode = PGSQL_ASSOC; break;
@@ -100,7 +113,7 @@ class PostgresResult extends Result {
             default:          $mode = PGSQL_BOTH;
         }
 
-        $row = pg_fetch_array($this->hResult, null, $mode);
+        $row = pg_fetch_array($this->result, null, $mode);
         if ($row) {
             $this->nextRowIndex++;
         }
@@ -146,21 +159,19 @@ class PostgresResult extends Result {
      * @return int
      */
     public function numRows() {
-        if ($this->numRows === null) {
-            if ($this->hResult) $this->numRows = pg_num_rows($this->hResult);
-            else                $this->numRows = 0;
-        }
         return $this->numRows;
     }
 
 
     /**
+     * {@inheritdoc}
      *
+     * @return void
      */
     public function release() {
-        if ($this->hResult) {
-            $tmp = $this->hResult;
-            $this->hResult = null;
+        if ($this->result) {
+            $tmp = $this->result;
+            $this->result = null;
             $this->nextRowIndex = -1;
             pg_free_result($tmp);
         }
@@ -170,10 +181,11 @@ class PostgresResult extends Result {
     /**
      * Return this result's internal result object.
      *
-     * @return resource - result handle
+     * @return resource|PgSqlResult|null - result handle
+     * @phpstan-return PgSqlResultId|null
      */
     public function getInternalResult() {
-        return $this->hResult;
+        return $this->result;
     }
 
 

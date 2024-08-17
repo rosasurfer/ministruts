@@ -22,15 +22,15 @@ class RequestProcessor extends CObject {
     /** @var Module - the Module the instance belongs to */
     protected $module;
 
-    /** @var array - additional runtime options */
+    /** @var scalar[] - additional runtime options */
     protected $options;
 
 
     /**
      * Constructor
      *
-     * @param  Module $module  - the Module the instance belongs to
-     * @param  array  $options - additional runtime options
+     * @param  Module   $module  - the Module the instance belongs to
+     * @param  scalar[] $options - additional runtime options
      */
     public function __construct(Module $module, array $options) {
         $this->module  = $module;

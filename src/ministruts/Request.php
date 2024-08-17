@@ -42,10 +42,10 @@ class Request extends CObject {
     /** @var string */
     protected $path;
 
-    /** @var ?array - normalized structure of files uploaded with the request */
+    /** @var ?scalar[][] - normalized array of files uploaded with the request */
     protected $files = null;
 
-    /** @var array - additional variables context */
+    /** @var mixed[] - additional variables context */
     protected $attributes = [];
 
 
@@ -269,7 +269,7 @@ class Request extends CObject {
      * Return an object-oriented representation of the files uploaded with the request. The PHP array structure of $_FILES
      * is converted to normalized arrays.
      *
-     * @return array - associative array of files
+     * @return scalar[][]- associative array of files
      *
      * @todo   convert the returned arrays to instances of UploadedFile
      */
@@ -305,7 +305,7 @@ class Request extends CObject {
      *
      * @param  string $name - parameter name of the file upload
      *
-     * @return ?array - array or NULL if no such file was uploaded
+     * @return scalar[]|null - array or NULL if no such file was uploaded
      *
      * @todo   convert the returned array to instance of UploadedFile
      */
@@ -870,7 +870,7 @@ class Request extends CObject {
     /**
      * Return all values stored in the request's variables context.
      *
-     * @return array
+     * @return mixed[]
      */
     public function getAttributes() {
         return $this->attributes;

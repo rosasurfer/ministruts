@@ -48,7 +48,7 @@ class Date extends StaticClass {
      * @param  string $startDate - start date (format: yyyy-mm-dd)
      * @param  int    $days      - number of dates to return
      *
-     * @return array
+     * @return string[]
      */
     public static function getDateRange($startDate, $days) {
         Assert::string($startDate, '$startDate');

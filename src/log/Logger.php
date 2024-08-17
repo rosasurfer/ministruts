@@ -1,6 +1,9 @@
 <?php
 namespace rosasurfer\log;
 
+use Exception;
+use Throwable;
+
 use rosasurfer\Application;
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\StaticClass;
@@ -125,7 +128,7 @@ class Logger extends StaticClass {
     /** @var string[] - SMS receivers */
     private static $smsReceivers = [];
 
-    /** @var array - SMS options; resolved at log message time */
+    /** @var mixed[] - SMS options; resolved at log message time */
     private static $smsOptions = [];
 
     /** @var bool - whether the PHP error_log handler is enabled */
@@ -295,7 +298,7 @@ class Logger extends StaticClass {
      *
      * @param  string|object $loggable           - a message or an object implementing <tt>__toString()</tt>
      * @param  int           $level              - loglevel
-     * @param  array         $context [optional] - logging context with additional data
+     * @param  mixed[]       $context [optional] - logging context with additional data
      *
      * @return void
      */
@@ -314,7 +317,7 @@ class Logger extends StaticClass {
             // validate parameters
             if (!is_string($loggable)) {
                 Assert::hasMethod($loggable, '__toString', '$loggable');
-                if (!$loggable instanceof \Throwable && !$loggable instanceof \Exception) { // @phpstan-ignore instanceof.alwaysFalse (PHP5 compatibility)
+                if (!$loggable instanceof Throwable && !$loggable instanceof Exception) {   // @phpstan-ignore instanceof.alwaysFalse (PHP5 compatibility)
                     $loggable = (string) $loggable;
                 }
             }
@@ -352,8 +355,8 @@ class Logger extends StaticClass {
             $isActive = false;
 
         }
-        catch (\Throwable $ex) {}
-        catch (\Exception $ex) {}       // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
+        catch (Throwable $ex) {}
+        catch (Exception $ex) {}        // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
 
         if ($ex) {
             // If the call comes from our framework's exception handler \rosasurfer\core\debug\ErrorHandler::handleException()
@@ -374,9 +377,9 @@ class Logger extends StaticClass {
     /**
      * Display the message on the standard output device (STDOUT in CLI mode, HTTP response in a web context).
      *
-     * @param  string|\Exception|\Throwable $loggable - message or exception to log
-     * @param  int                          $level    - loglevel of the loggable
-     * @param  array                        $context  - reference to the log context with additional data
+     * @param  string|Exception|Throwable $loggable - message or exception to log
+     * @param  int                        $level    - loglevel of the loggable
+     * @param  mixed[]                    $context  - reference to the log context with additional data
      *
      * @return void
      */
@@ -404,9 +407,9 @@ class Logger extends StaticClass {
     /**
      * Send the message to the configured mail receivers.
      *
-     * @param  string|\Exception|\Throwable $loggable - message or exception to log
-     * @param  int                          $level    - loglevel of the loggable
-     * @param  array                        $context  - reference to the log context with additional data
+     * @param  string|Exception|Throwable $loggable - message or exception to log
+     * @param  int                        $level    - loglevel of the loggable
+     * @param  mixed[]                    $context  - reference to the log context with additional data
      *
      * @return void
      */
@@ -438,9 +441,9 @@ class Logger extends StaticClass {
     /**
      * Send the message to the configured SMS receivers (phone numbers).
      *
-     * @param  string|\Exception|\Throwable $loggable - message or exception to log
-     * @param  int                          $level    - loglevel of the loggable
-     * @param  array                        $context  - reference to the log context with additional data
+     * @param  string|Exception|Throwable $loggable - message or exception to log
+     * @param  int                        $level    - loglevel of the loggable
+     * @param  mixed[]                    $context  - reference to the log context with additional data
      *
      * @return void
      *
@@ -485,8 +488,8 @@ class Logger extends StaticClass {
                             $description = isset(HttpResponse::$sc[$status]) ? HttpResponse::$sc[$status] : '?';
                             self::log('Unexpected HTTP status code '.$status.' ('.$description.') for URL: '.$request->getUrl(), L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
                         }
-                        catch (\Throwable $ex) {}   // intentionally eat it
-                        catch (\Exception $ex) {}   // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
+                        catch (Throwable $ex) {}    // intentionally eat it
+                        catch (Exception $ex) {}    // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
                         continue;
                     }
                     if (strStartsWithI($content, 'ERR: 113')) {
@@ -522,8 +525,8 @@ class Logger extends StaticClass {
                             $description = isset(HttpResponse::$sc[$status]) ? HttpResponse::$sc[$status] : '?';
                             self::log('Unexpected HTTP status code '.$status.' ('.$description.') for URL: '.$request->getUrl(), L_WARN, ['class'=>__CLASS__, 'file'=>__FILE__, 'line'=>__LINE__]);
                         }
-                        catch (\Throwable $ex) {}   // intentionally eat it
-                        catch (\Exception $ex) {}   // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
+                        catch (Throwable $ex) {}    // intentionally eat it
+                        catch (Exception $ex) {}    // @phpstan-ignore catch.alreadyCaught (PHP5 compatibility)
                         continue;
                     }
                 }
@@ -542,9 +545,9 @@ class Logger extends StaticClass {
      * system logger instead. On Unix, this means syslog(3) and on Windows it means the event log. If this directive is not
      * set, errors are sent to the SAPI error logger. For example, it is an error log in Apache or STDERR in CLI mode.
      *
-     * @param  string|\Exception|\Throwable $loggable - message or exception to log
-     * @param  int                          $level    - loglevel of the loggable
-     * @param  array                        $context  - reference to the log context with additional data
+     * @param  string|Exception|Throwable $loggable - message or exception to log
+     * @param  int                        $level    - loglevel of the loggable
+     * @param  mixed[]                    $context  - reference to the log context with additional data
      *
      * @return void
      */
@@ -574,9 +577,9 @@ class Logger extends StaticClass {
      * Compose a CLI log message and store it in the passed log context under the keys "cliMessage" and "cliExtra".
      * The separation is used by the SMS handler which only sends the main message ("cliMessage").
      *
-     * @param  string|\Exception|\Throwable $loggable - message or exception to log
-     * @param  int                          $level    - loglevel of the loggable
-     * @param  array                        $context  - reference to the log context
+     * @param  string|Exception|Throwable $loggable - message or exception to log
+     * @param  int                        $level    - loglevel of the loggable
+     * @param  mixed[]                    $context  - reference to the log context
      *
      * @return void
      */
@@ -649,9 +652,9 @@ class Logger extends StaticClass {
     /**
      * Compose a mail log message and store it in the passed log context under the keys "mailSubject" and "mailMessage".
      *
-     * @param  string|\Exception|\Throwable $loggable - message or exception to log
-     * @param  int                          $level    - loglevel of the loggable
-     * @param  array                        $context  - reference to the log context
+     * @param  string|Exception|Throwable $loggable - message or exception to log
+     * @param  int                        $level    - loglevel of the loggable
+     * @param  mixed[]                    $context  - reference to the log context
      *
      * @return void
      */
@@ -710,9 +713,9 @@ class Logger extends StaticClass {
     /**
      * Compose a HTML log message and store it in the passed log context under the key "htmlMessage".
      *
-     * @param  string|\Exception|\Throwable $loggable - message or exception to log
-     * @param  int                          $level    - loglevel of the loggable
-     * @param  array                        $context  - reference to the log context
+     * @param  string|Exception|Throwable $loggable - message or exception to log
+     * @param  int                        $level    - loglevel of the loggable
+     * @param  mixed[]                    $context  - reference to the log context
      *
      * @return void
      */
@@ -796,7 +799,7 @@ class Logger extends StaticClass {
     /**
      * Resolve the location the logger was called from and store it in the log context under the keys "file" and "line".
      *
-     * @param  array $context - reference to the log context
+     * @param  mixed[] $context - reference to the log context
      *
      * @return void
      */
@@ -823,7 +826,7 @@ class Logger extends StaticClass {
     /**
      * Resolve the class the logger was called from and store it in the log context under the key "class".
      *
-     * @param  array $context - reference to the log context
+     * @param  mixed[] $context - reference to the log context
      *
      * @return void
      *
@@ -841,7 +844,7 @@ class Logger extends StaticClass {
     /**
      * Generate an internal stacktrace and store it in the log context under the key "trace".
      *
-     * @param  array $context - reference to the log context
+     * @param  mixed[] $context - reference to the log context
      *
      * @return void
      */
