@@ -15,7 +15,6 @@ use function rosasurfer\synchronized;
 
 use const rosasurfer\L_DEBUG;
 use const rosasurfer\L_ERROR;
-use const rosasurfer\L_INFO;
 use const rosasurfer\L_NOTICE;
 use const rosasurfer\MINUTES;
 use const rosasurfer\NL;

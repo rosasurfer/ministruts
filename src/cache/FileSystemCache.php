@@ -8,7 +8,6 @@ use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\file\FileSystem as FS;
 
 use function rosasurfer\isRelativePath;
-use function rosasurfer\strEndsWith;
 
 
 /**

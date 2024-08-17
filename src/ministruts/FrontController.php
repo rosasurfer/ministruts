@@ -15,9 +15,6 @@ use function rosasurfer\strLeftTo;
 use function rosasurfer\strStartsWith;
 
 use const rosasurfer\CLI;
-use const rosasurfer\LOCALHOST;
-use const rosasurfer\MINUTE;
-use const rosasurfer\WINDOWS;
 
 
 /**
