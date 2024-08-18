@@ -138,11 +138,11 @@ class ErrorHandler extends StaticClass {
      * normally. All other errors are logged according to the configured error handling mode. Either they are logged and
      * script exceution continues normally, or they are wrapped in a PHPError exception and thrown back.
      *
-     * @param  int    $level              - PHP error severity level
-     * @param  string $message            - error message
-     * @param  string $file               - name of file where the error occurred
-     * @param  int    $line               - line of file where the error occurred
-     * @param  ?array $context [optional] - symbols of the point where the error occurred (variable scope at error trigger time)
+     * @param  int     $level              - PHP error severity level
+     * @param  string  $message            - error message
+     * @param  string  $file               - name of file where the error occurred
+     * @param  int     $line               - line of file where the error occurred
+     * @param  mixed[] $symbols [optional] - symbol table at the point of the error (removed since PHP8.0)
      *
      * @return bool - TRUE if the error was successfully handled.
      *                FALSE if the error shall be processed as if no error handler was installed.
@@ -150,25 +150,24 @@ class ErrorHandler extends StaticClass {
      *
      * @throws PHPError
      */
-    public static function handleError($level, $message, $file, $line, array $context = null) {
-        //echoPre(__METHOD__);
-        //echoPre(DebugHelper::errorLevelToStr($level).': $message='.$message.', $file='.$file.', $line='.$line);
+    public static function handleError($level, $message, $file, $line, array $symbols = []) {
+        //echoPre('ErrorHandler::handleError() '.DebugHelper::errorLevelToStr($level).': $message='.$message.', $file='.$file.', $line='.$line);
 
         // Ignore suppressed errors and errors not covered by the current reporting level.
-        $reportingLevel = error_reporting();
-        if (!$reportingLevel)            return false;     // the @ operator was specified
-        if (!($reportingLevel & $level)) return true;      // the error is not covered by current reporting level
+        $reportingLevel = error_reporting();                // since PHP8 some errors are not silenceable anymore
+        if (!$reportingLevel)            return false;      // the @ operator was specified
+        if (!($reportingLevel & $level)) return true;       // the error is not covered by current reporting level
 
         $message = strLeftTo($message, ' (this will throw an Error in a future version of PHP)', -1);
-        $logContext = ['file' => $file, 'line' => $line];
+        $context = ['file'=>$file, 'line'=>$line];
 
         // Process errors according to their severity level.
         switch ($level) {
             // log non-critical errors and continue normally
-            case E_DEPRECATED     : { Logger::log($message, L_INFO,   $logContext); return true; }
-            case E_USER_DEPRECATED: { Logger::log($message, L_INFO,   $logContext); return true; }
-            case E_USER_NOTICE    : { Logger::log($message, L_NOTICE, $logContext); return true; }
-            case E_USER_WARNING   : { Logger::log($message, L_WARN,   $logContext); return true; }
+            case E_DEPRECATED     : { Logger::log($message, L_INFO,   $context); return true; }
+            case E_USER_DEPRECATED: { Logger::log($message, L_INFO,   $context); return true; }
+            case E_USER_NOTICE    : { Logger::log($message, L_NOTICE, $context); return true; }
+            case E_USER_WARNING   : { Logger::log($message, L_WARN,   $context); return true; }
         }
 
         // Wrap everything else in the matching PHPError exception.
@@ -190,18 +189,18 @@ class ErrorHandler extends StaticClass {
 
         // Handle the error according to the configuration.
         if (self::$errorMode == self::LOG_ERRORS) {
-            Logger::log($exception, L_ERROR, $logContext);
+            Logger::log($exception, L_ERROR, $context);
             return true;
         }
 
         /**
-         * Handle cases where throwing an exception is not possible or not allowed.
+         * Handle cases where throwing an exception is not possible.
          *
          * Fatal out-of-memory errors:
          * ---------------------------
          */
         if (self::$inShutdown && $level==E_ERROR && preg_match(self::$oomRegExp, $message)) {
-            Logger::log($message, L_FATAL, $logContext);    // logging the error is sufficient as there is no stacktrace anyway
+            Logger::log($message, L_FATAL, $context);                           // logging the error is sufficient as there is no stacktrace anyway
             return true;
         }
 

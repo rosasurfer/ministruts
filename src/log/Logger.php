@@ -616,7 +616,7 @@ class Logger extends StaticClass {
         else {
             // $loggable is an exception
             $type = null;
-            $msg  = trim(DebugHelper::composeBetterMessage($loggable, $indent));
+            $msg = trim(DebugHelper::composeBetterMessage($loggable, $indent));
             if (\key_exists('unhandled-exception', $context)) {
                 $type = 'Unhandled ';
                 if ($loggable instanceof PHPError) {

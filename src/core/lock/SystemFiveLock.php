@@ -116,8 +116,6 @@ class SystemFiveLock extends BaseLock {
      * Destructor
      *
      * Release any lock still held.
-     *
-     * @return void
      */
     public function __destruct() {
         $ex = null;
