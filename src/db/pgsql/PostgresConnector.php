@@ -666,7 +666,7 @@ class PostgresConnector extends Connector {
             if (!$this->isConnected()) {
                 $this->connect();
             }
-            $this->versionString = pg_version($this->connection)['server'];
+            $this->versionString = (string)pg_version($this->connection)['server'];
         }
         return $this->versionString;
     }

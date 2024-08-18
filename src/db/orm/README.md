@@ -7,11 +7,19 @@ Entity mapping:
 ---------------
 ```php
 $mapping = [
-    'class'      => 'EntityClassName',                  // (1) class name
-    'table'      => '{table-name}',                     // (2) table name
-    'connection' => '{connection-id}',                  // (3) connection identifier, e.g. 'application-db'
-    'properties' => [$propertyA, ..., $propertyN],
-    'relations'  => [$relationA, ..., $relationN]
+    'class'      => '{entity-class-name}',
+    'connection' => '{database-id}',
+    'table'      => '{table-name}',
+    'properties' => [
+        $propertyA, 
+        $propertyB, 
+        ..., 
+    ],
+    'relations' => [
+        $relationA,
+        $relationB,
+        ..., 
+    ]
 ];
 ```
 

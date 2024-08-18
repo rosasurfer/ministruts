@@ -14,7 +14,7 @@ use rosasurfer\ministruts\db\ConnectorInterface as IConnector;
 /**
  * Connector
  *
- * Abstract super class for concrete storage mechanism adapters.
+ * Abstract super class for concrete storage adapters.
  */
 abstract class Connector extends CObject implements ConnectorInterface {
 
@@ -22,11 +22,9 @@ abstract class Connector extends CObject implements ConnectorInterface {
     /**
      * Destructor
      *
-     * Make sure that on destruction of the instance a pending transaction is rolled back and the connection is closed.
-     *
-     * @return void
+     * Make sure a pending transaction is rolled back and the connection is closed.
      */
-    public function __destruct(): void {
+    public function __destruct() {
         try {
             if ($this->isConnected()) {
                 if ($this->isInTransaction())
@@ -49,7 +47,7 @@ abstract class Connector extends CObject implements ConnectorInterface {
      * @return IConnector
      */
     public static function create($class, array $options) {
-        if (!is_subclass_of($class, IConnector::class)) throw new InvalidTypeException('Not a '.IConnector::class.' implementing class: '.$class);
+        if (!is_subclass_of($class, IConnector::class)) throw new InvalidTypeException($class.' does not implement '.IConnector::class);
         return new $class($options);
     }
 
@@ -58,11 +56,11 @@ abstract class Connector extends CObject implements ConnectorInterface {
      * Execute a task in a transactional way. The transaction is automatically committed or rolled back.
      * A nested transaction is executed in the context of the nesting transaction.
      *
-     * @param  \Closure $task - task to execute (an anonymous function is implicitly casted)
+     * @param  callable $task - task to execute
      *
      * @return mixed - the task's return value (if any)
      */
-    public function transaction(\Closure $task) {
+    public function transaction(callable $task) {
         try {
             $this->begin();
             $result = $task();

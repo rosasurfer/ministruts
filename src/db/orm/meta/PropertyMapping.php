@@ -20,7 +20,7 @@ class PropertyMapping extends CObject {
     protected $entityMapping;
 
     /** @var scalar[] - mapping information */
-    protected $mapping;
+    protected array $mapping;
 
     /** @var string - the property's PHP name */
     protected $name;
@@ -29,15 +29,13 @@ class PropertyMapping extends CObject {
     /**
      * Constructor
      *
-     * Create a new PropertyMapping.
-     *
-     * @param  EntityMapping $entity  - the entity mapping this mapping is a part of
-     * @param  scalar[]      $mapping - property mapping information
+     * @param  EntityMapping $entity - the entity this property belongs to
+     * @param  scalar[]      $data   - property mapping information
      */
-    public function __construct(EntityMapping $entity, array $mapping) {
+    public function __construct(EntityMapping $entity, array $data) {
         $this->entityMapping = $entity;
-        $this->mapping = $mapping;
-        $this->name = $mapping['name'];
+        $this->mapping = $data;
+        $this->name = $data['name'];
     }
 
 

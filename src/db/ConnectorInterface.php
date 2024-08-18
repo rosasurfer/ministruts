@@ -141,11 +141,11 @@ interface ConnectorInterface {
      * Execute a task in a transactional way. The transaction is automatically committed or rolled back.
      * A nested transaction is executed in the context of the nesting transaction.
      *
-     * @param  \Closure $task - task to execute (an anonymous function is implicitly casted)
+     * @param  callable $task - task to execute
      *
      * @return mixed - the task's return value (if any)
      */
-    public function transaction(\Closure $task);
+    public function transaction(callable $task);
 
 
     /**

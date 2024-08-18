@@ -16,6 +16,14 @@ use function rosasurfer\ministruts\is_class;
 use function rosasurfer\ministruts\strEndsWith;
 use function rosasurfer\ministruts\strLeft;
 
+use const rosasurfer\ministruts\db\orm\meta\BOOL;
+use const rosasurfer\ministruts\db\orm\meta\BOOLEAN;
+use const rosasurfer\ministruts\db\orm\meta\DOUBLE;
+use const rosasurfer\ministruts\db\orm\meta\FLOAT;
+use const rosasurfer\ministruts\db\orm\meta\INT;
+use const rosasurfer\ministruts\db\orm\meta\INTEGER;
+use const rosasurfer\ministruts\db\orm\meta\STRING;
+
 
 /**
  * PersistableObject
@@ -314,12 +322,12 @@ abstract class PersistableObject extends CObject {
 
 
     /**
-     * Return the instance's identity value.
+     * Return the instance's identity value (i.e. the value of the primary key).
      *
-     * @return mixed - identity value
+     * @return int|string - identity value
      */
     final public function getObjectId() {
-        $mapping  = $this->dao()->getMapping();
+        $mapping = $this->dao()->getMapping();
         $property = $mapping['identity']['name'];
         return $this->$property;
     }
@@ -525,6 +533,7 @@ abstract class PersistableObject extends CObject {
         /** @var string $idColumn */
         $idColumn = $mapping['identity']['column'];
 
+        /** @var ?int $id */
         $id = $values[$idColumn] ?? null;
         unset($values[$idColumn]);
 
@@ -534,7 +543,7 @@ abstract class PersistableObject extends CObject {
         }
 
         // create SQL statement
-        $sql = 'insert into '.$table.' ('.join(', ', \array_keys($values)).')
+        $sql = "insert into $table (".join(', ', \array_keys($values)).')
                    values ('.join(', ', $values).')';
 
         // execute SQL statement
@@ -668,19 +677,19 @@ abstract class PersistableObject extends CObject {
 
                 switch ($propertyType) {
                     case 'origin' : $this->$propertyName = $row[$column]; break;
-                    case 'bool'   :
-                    case 'boolean':
+                    case BOOL:
+                    case BOOLEAN:
                         if ($dbType == 'pgsql') {
                             if     ($row[$column] == 't') $row[$column] = 1;
                             elseif ($row[$column] == 'f') $row[$column] = 0;
                         };
                         $this->$propertyName = (bool)(int) $row[$column]; break;
-                    case 'int'    :
-                    case 'integer': $this->$propertyName =    (int) $row[$column]; break;
-                    case 'float'  :
-                    case 'double' : $this->$propertyName =  (float) $row[$column]; break;
-                    case 'string' : $this->$propertyName = (string) $row[$column]; break;
-                  //case 'array'  : $this->$propertyName = strlen($row[$column]) ? explode(',', $row[$column]):[]; break;
+                    case INT    :
+                    case INTEGER: $this->$propertyName =    (int) $row[$column]; break;
+                    case FLOAT  :
+                    case DOUBLE : $this->$propertyName =  (float) $row[$column]; break;
+                    case STRING : $this->$propertyName = (string) $row[$column]; break;
+                  //case 'array': $this->$propertyName = strlen($row[$column]) ? explode(',', $row[$column]):[]; break;
                   //case DateTime::class: $this->$propertyName = new DateTime($row[$column]); break;
 
                     default:
