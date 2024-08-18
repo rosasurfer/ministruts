@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\log;
 
+use ErrorException;
 use Throwable;
 
 use rosasurfer\ministruts\core\CObject;
@@ -31,7 +32,7 @@ class LogMessage extends CObject {
     /** @var string - a logged string message */
     protected string $message = '';
 
-    /** @var ?Throwable - a logged exception, if any */
+    /** @var Throwable|null - a logged exception, if any */
     protected ?Throwable $exception = null;
 
     /** @var int - loglevel */
@@ -164,7 +165,10 @@ class LogMessage extends CObject {
         if ($this->exception) {
             $msg = trim(ErrorHandler::getVerboseMessage($this->exception, $indent, $filter));
             if ($this->isSentByErrorHandler() && $this->logLevel==L_FATAL) {
-                $msg = "Unhandled $msg";
+                if (!$this->exception instanceof ErrorException ||
+                    !($this->exception->getSeverity() & (E_ERROR | E_PARSE | E_CORE_ERROR | E_CORE_WARNING | E_COMPILE_ERROR | E_COMPILE_WARNING))) {
+                    $msg = "Unhandled $msg";
+                }
             }
         }
         else {
@@ -442,7 +446,7 @@ class LogMessage extends CObject {
             return;
         }
 
-        $result = $stacktrace = ErrorHandler::getAdjustedStackTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), __FILE__, __LINE__);
+        $result = $stacktrace = ErrorHandler::adjustStackTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), __FILE__, __LINE__);
         $logMethod = strtolower(Logger::class.'::log');
 
         foreach ($stacktrace as $i => $frame) {

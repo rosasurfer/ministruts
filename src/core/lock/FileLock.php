@@ -77,10 +77,8 @@ final class FileLock extends BaseLock {
      * Destructor
      *
      * Releases the resources occupied by the instance.
-     *
-     * @return void
      */
-    public function __destruct(): void {
+    public function __destruct() {
         try {
             $this->release();
         }

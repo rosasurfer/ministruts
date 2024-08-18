@@ -89,10 +89,8 @@ class Lock extends BaseLock {
      * Destructor
      *
      * Releases occupied resources.
-     *
-     * @return void
      */
-    public function __destruct(): void {
+    public function __destruct() {
         try {
             $this->release();
         }

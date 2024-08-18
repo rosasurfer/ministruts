@@ -151,10 +151,8 @@ class CurlHttpClient extends HttpClient {
      * Destructor
      *
      * Close an open CURL handle (if any).
-     *
-     * @return void
      */
-    public function __destruct(): void {
+    public function __destruct() {
         try {
             if ($this->hCurl) {
                 $hTmp = $this->hCurl;

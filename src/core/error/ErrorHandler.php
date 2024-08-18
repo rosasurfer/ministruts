@@ -128,11 +128,11 @@ class ErrorHandler extends StaticClass {
      *
      * Errors of level E_DEPRECATED, E_USER_DEPRECATED, E_USER_NOTICE or E_USER_WARNING are just logged and never thrown back.
      *
-     * @param  int                  $level              - error severity level
-     * @param  string               $message            - error message
-     * @param  string               $file               - name of file where the error occurred
-     * @param  int                  $line               - line of file where the error occurred
-     * @param  array<string, mixed> $symbols [optional] - symbol table at the point of the error
+     * @param  int     $level              - error severity level
+     * @param  string  $message            - error message
+     * @param  string  $file               - name of file where the error occurred
+     * @param  int     $line               - line of file where the error occurred
+     * @param  mixed[] $symbols [optional] - symbol table at the point of the error (removed since PHP8.0)
      *
      * @return bool - TRUE  if the error was handled and PHP should call error_clear_last();
      *                FALSE if the error was not handled and PHP should not call error_clear_last()
@@ -140,7 +140,7 @@ class ErrorHandler extends StaticClass {
      * @throws PHPError
      */
     public static function handleError($level, $message, $file, $line, array $symbols = []) {
-        //echof('ErrorHandler::handleError() '.self::errorLevelToStr($level).': '.$message.', in '.$file.', line '.$line);
+        //echof('ErrorHandler::handleError(inShutdown='.(int)self::$inShutdown.') '.self::errorLevelToStr($level).': '.$message.', in '.$file.', line '.$line);
         if (!self::$errorHandling) return false;
 
         // anonymous function to chain a previously active handler
@@ -164,7 +164,7 @@ class ErrorHandler extends StaticClass {
         self::setExceptionProperties($exception, $trace);                   // let the stacktrace point to the trigger statement
 
         // handle the error accordingly
-        $neverThrow = ($level & (E_DEPRECATED | E_USER_DEPRECATED | E_USER_NOTICE | E_USER_WARNING));
+        $neverThrow = (bool)($level & (E_DEPRECATED | E_USER_DEPRECATED | E_USER_NOTICE | E_USER_WARNING));
 
         if ($neverThrow || self::$errorHandling == self::MODE_LOG) {
             // only log the error
@@ -205,28 +205,23 @@ class ErrorHandler extends StaticClass {
             return false;
         }
 
-        /**
-         * TODO: There are rare cases were throwing an exception from the error handler is not possible:
-         *
-         * Errors triggered by require() or require_once()
-         * -----------------------------------------------
-         * Problem:  PHP errors triggered by require() or require_once() are non-catchable errors and do not follow regular
-         *           application flow. PHP terminates the script after leaving the error handler, thrown exceptions are
-         *           ignored. This termination is intended behavior and the main difference to include() and include_once().
-         * Solution: Manually call the exception handler.
-         *
-         * @see  https://stackoverflow.com/questions/25584494/php-set-exception-handler-not-working-for-error-thrown-in-set-error-handler-cal
-         */
-        //$trace = $error->getTrace();
-        //if ($trace) {                                                 // after a fatal error the trace may be empty
-        //    $function = self::getStackFrameMethod($trace[0]);
-        //    if ($function=='require' || $function=='require_once') {
-        //        $currentHandler = set_exception_handler(null);
-        //        restore_exception_handler();
-        //        $currentHandler && ($currentHandler)($error);
-        //        return (bool)$currentHandler;
-        //    }
-        //}
+        // Problem: (1) Compile time errors can't be thrown back as exceptions. An installed exception handler is ignored for:
+        //              E_ERROR, E_PARSE, E_CORE_ERROR, E_CORE_WARNING, E_COMPILE_ERROR, E_COMPILE_WARNING
+        //          (2) require() is identical to include() except upon failure it will also produce a fatal E_COMPILE_ERROR error.
+        //
+        //          If those errors show up here the error handler was called manually.
+        //
+        // Solution: Call the exception handler manually.
+        $cantThrow = (bool)($level & (E_ERROR | E_PARSE | E_CORE_ERROR | E_CORE_WARNING | E_COMPILE_ERROR | E_COMPILE_WARNING));
+        if ($cantThrow) {
+            $exception->prependMessage('PHP '.self::errorLevelDescr($level).': ');
+            $currentHandler = set_exception_handler(null);
+            restore_exception_handler();
+            if ($currentHandler) {
+                ($currentHandler)($exception);
+            }
+            return true;
+        }
 
         // throw back everything else
         throw $exception->prependMessage('PHP Error: ');
@@ -240,9 +235,9 @@ class ErrorHandler extends StaticClass {
      *
      * @return void
      */
-    public static function handleException(Throwable $exception) {
+    public static function handleException(Throwable $exception): void {
+        //echof('ErrorHandler::handleException(inShutdown='.(int)self::$inShutdown.') '.$exception->getMessage());
         if (!self::$exceptionHandling) return;
-        //echof('ErrorHandler::handleException() '.$exception->getMessage());
 
         // catch exceptions thrown by logger or chained exception handler
         try {
@@ -276,7 +271,7 @@ class ErrorHandler extends StaticClass {
      * @return void
      */
     private static function handle2ndException(Throwable $first, Throwable $second): void {
-        //echof('ErrorHandler::handle2ndException() '.$second->getMessage());
+        //echof('ErrorHandler::handle2ndException(inShutdown='.(int)self::$inShutdown.') '.$second->getMessage());
         try {
             $indent = ' ';
             $msg  = trim(ErrorHandler::getVerboseMessage($first, $indent));
@@ -350,10 +345,15 @@ class ErrorHandler extends StaticClass {
      *
      * @return void
      */
-    public static function onShutdown() {
+    public static function onShutdown(): void {
         self::$inShutdown = true;
 
-        // Errors showing up here (e.g. "out-of-memory" errors) haven't been passed to an installed error handler.
+        // Errors showing up here haven't been passed to an installed custom error handler. That's compile time
+        // errors (E_ERROR, E_PARSE, E_CORE_ERROR, E_CORE_WARNING, E_COMPILE_ERROR, E_COMPILE_WARNING) or fatal
+        // runtime errors (e.g. "out-of-memory").
+        //
+        // @see  https://www.php.net/manual/en/function.set-error-handler.php
+
         $error = error_get_last();
         if ($error) {
             // release the reserved memory, so preg_match() survives a potential OOM condition
@@ -553,7 +553,7 @@ class ErrorHandler extends StaticClass {
      *  {main}          # line 26, file: /var/www/phalcon/vokuro/public/index.php
      * </pre>
      */
-    public static function getAdjustedStackTrace(array $trace, string $file = 'unknown', int $line = 0): array {
+    public static function adjustStackTrace(array $trace, string $file = 'unknown', int $line = 0): array {
         // check if the stacktrace is already adjusted
         if (isset($trace[0]['__adjusted'])) {
             return $trace;
@@ -583,8 +583,8 @@ class ErrorHandler extends StaticClass {
         // add location from parameters to first frame if it differs from the old one (now in second frame)
         if (!isset($trace[1]['file'], $trace[1]['line']) || $trace[1]['file']!=$file || $trace[1]['line']!=$line) {
             $trace[0]['file'] = $file;                          // test with:
-            $trace[0]['line'] = $line;                          // \SQLite3::enableExceptions(true|false);
-        }                                                       // \SQLite3::exec($invalid_sql);
+            $trace[0]['line'] = $line;                          // SQLite3::enableExceptions(true|false);
+        }                                                       // SQLite3::exec($invalid_sql);
         else {
             unset($trace[0]['file'], $trace[0]['line']);        // otherwise delete location (a call from PHP core)
         }
@@ -596,6 +596,7 @@ class ErrorHandler extends StaticClass {
         }
         return $trace;
 
+        // TODO: fix stack traces originating from require()/require_once() errors
         // TODO: fix wrong stack frames originating from calls to virtual static functions
         //
         // phalcon\mvc\Model::__callStatic()                  [php-phalcon]
@@ -614,7 +615,7 @@ class ErrorHandler extends StaticClass {
      * @return string - string representation ending with an EOL marker
      */
     public static function getAdjustedStackTraceAsString(Throwable $throwable, string $indent = '', ContentFilter $filter = null): string {
-        $trace  = self::getAdjustedStackTrace($throwable->getTrace(), $throwable->getFile(), $throwable->getLine());
+        $trace = self::adjustStackTrace($throwable->getTrace(), $throwable->getFile(), $throwable->getLine());
         $result = self::formatStackTrace($trace, $indent, $filter);
 
         if ($cause = $throwable->getPrevious()) {

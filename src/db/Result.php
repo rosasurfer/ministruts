@@ -36,10 +36,8 @@ abstract class Result extends CObject implements ResultInterface {
      * Destructor
      *
      * Release the result's internal resoruces.
-     *
-     * @return void
      */
-    public function __destruct(): void {
+    public function __destruct() {
         try {
             $this->release();
         }

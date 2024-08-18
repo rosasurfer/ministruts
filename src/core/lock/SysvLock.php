@@ -107,10 +107,8 @@ class SysvLock extends BaseLock {
      * Destructor
      *
      * Releases any lock still held.
-     *
-     * @return void
      */
-    public function __destruct(): void {
+    public function __destruct() {
         try {
             $this->release();
         }

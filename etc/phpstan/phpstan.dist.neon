@@ -27,7 +27,6 @@ parameters:
     - ../../vendor
 
   scanFiles:                                        # scanned for symbols only, not analyzed (legacy or future code)
-    - symbols/php_mysql.php
 
   stubFiles:                                        # custom PHPDoc annotations overriding 3rd-party definitions
 
