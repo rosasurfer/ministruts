@@ -13,7 +13,6 @@ define('rosasurfer\ministruts\ROOT_DIR', dirname(__DIR__));
 
 // Include helper functions and constants which can't be auto-loaded.
 if (!defined('rosasurfer\ministruts\CLI'))               require(__DIR__.'/helpers.php');
-if (!defined('rosasurfer\ministruts\db\orm\meta\BOOL'))  require(__DIR__.'/db/orm/meta/defines.php');
 if (!defined('rosasurfer\ministruts\struts\MODULE_KEY')) require(__DIR__.'/struts/defines.php');
 
 

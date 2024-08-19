@@ -125,11 +125,11 @@ class Worker extends CObject {
                 $modelName = $match[0];
                 $offset    = $match[1];
                 $className = $namespace.$modelName;
-                if (is_a($className, PersistableObject::class, true)) {
+                if (is_subclass_of($className, PersistableObject::class)) {
                     /** @var DAO $dao */
-                    $dao   = $className::dao();
+                    $dao = $className::dao();
                     $table = $dao->getMapping()['table'];
-                    $sql   = substr_replace($sql, $table, $offset-1, strlen($modelName)+1);
+                    $sql = substr_replace($sql, $table, $offset-1, strlen($modelName)+1);
                 }
             }
         }

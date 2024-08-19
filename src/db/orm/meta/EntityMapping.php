@@ -9,6 +9,11 @@ use rosasurfer\ministruts\core\exception\RuntimeException;
 
 /**
  * An EntityMapping is an object encapsulating meta information about how to map a PHP class to a database table.
+ *
+ * @phpstan-import-type  EntityClass  from \rosasurfer\ministruts\db\orm\ORM
+ * @phpstan-import-type  ORM_ENTITY   from \rosasurfer\ministruts\db\orm\ORM
+ * @phpstan-import-type  ORM_PROPERTY from \rosasurfer\ministruts\db\orm\ORM
+ * @phpstan-import-type  ORM_RELATION from \rosasurfer\ministruts\db\orm\ORM
  */
 class EntityMapping extends CObject {
 
@@ -16,8 +21,11 @@ class EntityMapping extends CObject {
     /** @var string - the entity's class name */
     protected $className;
 
-    /** @var array<string, mixed>> - mapping information */
-    protected $mapping;
+    /**
+     * @var array<string, mixed>> - mapping information
+     * @phpstan-var ORM_ENTITY
+     */
+    protected array $mapping;
 
     /** @var PropertyMapping[] - property mapping instances */
     protected $properties;
@@ -33,6 +41,8 @@ class EntityMapping extends CObject {
      * Constructor
      *
      * @param  array<string, mixed> $mapping - mapping information
+     *
+     * @phpstan-param ORM_ENTITY $mapping
      */
     public function __construct(array $mapping) {
         $this->mapping = $mapping;
@@ -82,12 +92,10 @@ class EntityMapping extends CObject {
      */
     public function getIdentity() {
         if ($this->identity === null) {
-            foreach ($this->mapping['properties'] as $property) {
-                if (($property['primary'] ?? 0) === true) {
-                    return $this->identity = new PropertyMapping($this, $property);
-                }
-            }
-            throw new RuntimeException('Invalid mapping for "'.$this->getClassName().'" (primary key not found)');
+            $identity = $this->mapping['identity'] ?? null;
+            if (!$identity) throw new RuntimeException('Invalid mapping for "'.$this->getClassName().'" (primary key not found)');
+
+            $this->identity = new PropertyMapping($this, $identity);
         }
         return $this->identity;
     }
@@ -100,12 +108,8 @@ class EntityMapping extends CObject {
      */
     public function getVersion() {
         if ($this->version === null) {
-            foreach ($this->mapping['properties'] as $property) {
-                if (($property['version'] ?? 0) === true) {
-                    return $this->version = new PropertyMapping($this, $property);
-                }
-            }
-            $this->version = false;
+            $version = $this->mapping['version'] ?? null;
+            $this->version = $version ? new PropertyMapping($this, $version) : false;
         }
         return $this->version ?: null;
     }

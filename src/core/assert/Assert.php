@@ -16,16 +16,92 @@ use function rosasurfer\ministruts\strContains;
  */
 class Assert extends StaticClass {
 
-
     /**
-     * Ensure that the passed value is an array.
+     * Ensure that the passed value is considered "empty".
      *
      * @param  mixed    $value
      * @param  string   $message [optional] - value identifier or description
      * @param  mixed ...$args    [optional] - additional message arguments
      *
-     * @return ($value is array ? true : false)
+     * @return bool
      *
+     * @phpstan-return ($value is empty ? true : false)
+     * @phpstan-assert empty $value
+     */
+    public static function empty($value, $message = '', ...$args) {
+        if (!empty($value)) {
+            throw new InvalidValueException("Not empty: $message");
+        }
+        return true;
+    }
+
+
+    /**
+     * Ensure that the passed value is considered "non-empty".
+     *
+     * @param  mixed    $value
+     * @param  string   $message [optional] - value identifier or description
+     * @param  mixed ...$args    [optional] - additional message arguments
+     *
+     * @return bool
+     *
+     * @phpstan-return ($value is empty ? false : true)
+     * @phpstan-assert !empty $value
+     */
+    public static function notEmpty($value, $message = '', ...$args) {
+        if (empty($value)) {
+            throw new InvalidValueException("Empty: $message");
+        }
+        return true;
+    }
+
+
+    /**
+     * Ensure that two values are considered "equal" (weak comparison: not necessarily identical).
+     *
+     * @param  mixed    $value1
+     * @param  mixed    $value2
+     * @param  string   $message [optional] - value identifier or description
+     * @param  mixed ...$args    [optional] - additional description arguments
+     *
+     * @return bool
+     */
+    public static function equal($value1, $value2, $message = '', ...$args) {
+        if ($value1 != $value2) {
+            throw new InvalidValueException("Not equal: $message");
+        }
+        return true;
+    }
+
+
+    /**
+     * Ensure that two values are considered "not equal" (weak comparison).
+     *
+     * @param  mixed    $value1
+     * @param  mixed    $value2
+     * @param  string   $message [optional] - value identifier or description
+     * @param  mixed ...$args    [optional] - additional description arguments
+     *
+     * @return bool
+     */
+    public static function notEqual($value1, $value2, $message = '', ...$args) {
+        if ($value1 == $value2) {
+            throw new InvalidValueException("Not different: $message");
+        }
+        return true;
+    }
+
+
+    /**
+     * Ensure that the passed value is an array.
+     *
+     * @param  mixed  $value
+     * @param  string $message [optional] - value description
+     * @param  scalar ...$args [optional] - additional message arguments
+     *
+     * @return bool
+     *
+     * @phpstan-return ($value is array ? true : false)
      * @phpstan-assert array $value
      */
     public static function isArray($value, $message = '', ...$args) {
@@ -39,12 +115,13 @@ class Assert extends StaticClass {
     /**
      * Ensure that the passed value is a boolean.
      *
-     * @param  mixed    $value
-     * @param  string   $message [optional] - value identifier or description
-     * @param  mixed ...$args    [optional] - additional message arguments
+     * @param  mixed  $value
+     * @param  string $message [optional] - value description
+     * @param  scalar ...$args [optional] - additional message arguments
      *
-     * @return ($value is bool ? true : false)
+     * @return bool
      *
+     * @phpstan-return ($value is bool ? true : false)
      * @phpstan-assert bool $value
      */
     public static function bool($value, $message = '', ...$args) {
@@ -58,12 +135,13 @@ class Assert extends StaticClass {
     /**
      * Ensure that the passed value is boolean TRUE.
      *
-     * @param  mixed    $value
-     * @param  string   $message [optional] - value identifier or description
-     * @param  mixed ...$args    [optional] - additional description arguments
+     * @param  mixed  $value
+     * @param  string $message [optional] - value description
+     * @param  scalar ...$args [optional] - additional message arguments
      *
-     * @return ($value is true ? true : false)
+     * @return bool
      *
+     * @phpstan-return ($value is true ? true : false)
      * @phpstan-assert true $value
      */
     public static function true($value, $message = '', ...$args) {
@@ -77,12 +155,13 @@ class Assert extends StaticClass {
     /**
      * Ensure that the passed value is boolean FALSE.
      *
-     * @param  mixed    $value
-     * @param  string   $message [optional] - value identifier or description
-     * @param  mixed ...$args    [optional] - additional description arguments
+     * @param  mixed  $value
+     * @param  string $message [optional] - value description
+     * @param  scalar ...$args [optional] - additional message arguments
      *
-     * @return ($value is false ? true : false)
+     * @return bool
      *
+     * @phpstan-return ($value is false ? true : false)
      * @phpstan-assert false $value
      */
     public static function false($value, $message = '', ...$args) {
@@ -96,12 +175,13 @@ class Assert extends StaticClass {
     /**
      * Ensure that the passed value is an integer.
      *
-     * @param  mixed    $value
-     * @param  string   $message [optional] - value identifier or description
-     * @param  mixed ...$args    [optional] - additional message arguments
+     * @param  mixed  $value
+     * @param  string $message [optional] - value description
+     * @param  scalar ...$args [optional] - additional message arguments
      *
-     * @return ($value is int ? true : false)
+     * @return bool
      *
+     * @phpstan-return ($value is int ? true : false)
      * @phpstan-assert int $value
      */
     public static function int($value, $message = '', ...$args) {
@@ -115,12 +195,13 @@ class Assert extends StaticClass {
     /**
      * Ensure that the passed value is a float.
      *
-     * @param  mixed    $value
-     * @param  string   $message [optional] - value identifier or description
-     * @param  mixed ...$args    [optional] - additional message arguments
+     * @param  mixed  $value
+     * @param  string $message [optional] - value description
+     * @param  scalar ...$args [optional] - additional message arguments
      *
-     * @return ($value is float ? true : false)
+     * @return bool
      *
+     * @phpstan-return ($value is float ? true : false)
      * @phpstan-assert float $value
      */
     public static function float($value, $message = '', ...$args) {
@@ -134,12 +215,13 @@ class Assert extends StaticClass {
     /**
      * Ensure that the passed value is a string.
      *
-     * @param  mixed    $value
-     * @param  string   $message [optional] - value identifier or description
-     * @param  mixed ...$args    [optional] - additional message arguments
+     * @param  mixed  $value
+     * @param  string $message [optional] - value description
+     * @param  scalar ...$args [optional] - additional message arguments
      *
-     * @return ($value is string ? true : false)
+     * @return bool
      *
+     * @phpstan-return ($value is string ? true : false)
      * @phpstan-assert string $value
      */
     public static function string($value, $message = '', ...$args) {
@@ -151,14 +233,34 @@ class Assert extends StaticClass {
 
 
     /**
+     * Ensure that the passed value is a non-empty string.
+     *
+     * @param  mixed  $value
+     * @param  string $message [optional] - value description
+     * @param  scalar ...$args [optional] - additional message arguments
+     *
+     * @return bool
+     *
+     * @phpstan-return ($value is non-empty-string ? true : false)
+     * @phpstan-assert non-empty-string $value
+     */
+    public static function stringNotEmpty($value, $message = '', ...$args) {
+        static::string($value, $message, ...$args);
+        static::notEqual($value, '', $message, ...$args);
+        return true;
+    }
+
+
+    /**
      * Ensure that the passed value is a scalar.
      *
-     * @param  mixed    $value
-     * @param  string   $message [optional] - value identifier or description
-     * @param  mixed ...$args    [optional] - additional message arguments
+     * @param  mixed  $value
+     * @param  string $message [optional] - value description
+     * @param  scalar ...$args [optional] - additional message arguments
      *
-     * @return ($value is scalar ? true : false)
+     * @return bool
      *
+     * @phpstan-return ($value is scalar ? true : false)
      * @phpstan-assert scalar $value
      */
     public static function scalar($value, $message = '', ...$args) {
@@ -172,12 +274,13 @@ class Assert extends StaticClass {
     /**
      * Ensure that the passed value is an object.
      *
-     * @param  mixed    $value
-     * @param  string   $message [optional] - value identifier or description
-     * @param  mixed ...$args    [optional] - additional message arguments
+     * @param  mixed  $value
+     * @param  string $message [optional] - value description
+     * @param  scalar ...$args [optional] - additional message arguments
      *
-     * @return ($value is object ? true : false)
+     * @return bool
      *
+     * @phpstan-return ($value is object ? true : false)
      * @phpstan-assert object $value
      */
     public static function object($value, $message = '', ...$args) {
@@ -191,17 +294,17 @@ class Assert extends StaticClass {
     /**
      * Ensure that the passed value is an instance of the specified type.
      *
-     * @param  mixed    $value
-     * @param  string   $class
-     * @param  string   $message [optional] - value identifier or description
-     * @param  mixed ...$args    [optional] - additional message arguments
+     * @param  mixed  $value
+     * @param  string $class
+     * @param  string $message [optional] - value description
+     * @param  scalar ...$args [optional] - additional message arguments
      *
      * @return bool
      *
-     * @template        T of object
-     * @phpstan-param   class-string<T> $class
-     * @phpstan-return  ($value is T ? true : false)
-     * @phpstan-assert  T $value
+     * @template       T of object
+     * @phpstan-param  class-string<T> $class
+     * @phpstan-return ($value is T ? true : false)
+     * @phpstan-assert T $value
      */
     public static function instanceOf($value, string $class, string $message = '', ...$args) {
         if (!$value instanceof $class) {
@@ -214,12 +317,13 @@ class Assert extends StaticClass {
     /**
      * Ensure that the passed value is a throwable object.
      *
-     * @param  mixed    $value
-     * @param  string   $message [optional] - value identifier or description
-     * @param  mixed ...$args    [optional] - additional message arguments
+     * @param  mixed  $value
+     * @param  string $message [optional] - value description
+     * @param  scalar ...$args [optional] - additional message arguments
      *
-     * @return ($value is Throwable ? true : false)
+     * @return bool
      *
+     * @phpstan-return ($value is Throwable ? true : false)
      * @phpstan-assert Throwable $value
      */
     public static function throwable($value, $message = '', ...$args) {
@@ -233,33 +337,34 @@ class Assert extends StaticClass {
     /**
      * Ensure that the passed object or class has a method.
      *
-     * @param  mixed    $objectOrClass
-     * @param  string   $method
-     * @param  string   $message [optional] - value identifier or description
-     * @param  mixed ...$args    [optional] - additional message arguments
+     * @param  mixed  $objectOrClass
+     * @param  string $method
+     * @param  string $message [optional] - value description
+     * @param  scalar ...$args [optional] - additional message arguments
      *
      * @return bool - whether the assertion is TRUE
      */
     public static function hasMethod($objectOrClass, $method, $message = '', ...$args) {
-        if (!method_exists($objectOrClass, $method)) {
-            if     (is_string($objectOrClass)) $value = $objectOrClass;
-            elseif (is_object($objectOrClass)) $value = get_class($objectOrClass);
-            else                               $value = static::valueToStr($objectOrClass);
-            throw new InvalidTypeException(static::illegalTypeMessage($value, "object or class with method \"$method()\"", $message, $args));
+        if (is_string($objectOrClass) || is_object($objectOrClass)) {
+            if (method_exists($objectOrClass, $method)) {
+                return true;
+            }
         }
-        return true;
+        $value = static::valueToStr($objectOrClass);
+        throw new InvalidTypeException(static::illegalTypeMessage($value, "object or class with method \"$method()\"", $message, $args));
     }
 
 
     /**
      * Ensure that the passed value is a resource.
      *
-     * @param  mixed    $value
-     * @param  string   $message [optional] - value identifier or description
-     * @param  mixed ...$args    [optional] - additional message arguments
+     * @param  mixed  $value
+     * @param  string $message [optional] - value description
+     * @param  scalar ...$args [optional] - additional message arguments
      *
-     * @return ($value is resource ? true : false)
+     * @return bool
      *
+     * @phpstan-return ($value is resource ? true : false)
      * @phpstan-assert resource $value
      */
     public static function resource($value, $message = '', ...$args) {
@@ -273,12 +378,13 @@ class Assert extends StaticClass {
     /**
      * Ensure that the passed value is either NULL or an array.
      *
-     * @param  mixed    $value
-     * @param  string   $message [optional] - value identifier or description
-     * @param  mixed ...$args    [optional] - additional message arguments
+     * @param  mixed  $value
+     * @param  string $message [optional] - value description
+     * @param  scalar ...$args [optional] - additional message arguments
      *
-     * @return ($value is ?array ? true : false)
+     * @return bool
      *
+     * @phpstan-return ($value is ?array ? true : false)
      * @phpstan-assert ?array $value
      */
     public static function nullOrArray($value, $message = '', ...$args) {
@@ -292,12 +398,13 @@ class Assert extends StaticClass {
     /**
      * Ensure that the passed value is either NULL or a boolean.
      *
-     * @param  mixed    $value
-     * @param  string   $message [optional] - value identifier or description
-     * @param  mixed ...$args    [optional] - additional message arguments
+     * @param  mixed  $value
+     * @param  string $message [optional] - value description
+     * @param  scalar ...$args [optional] - additional message arguments
      *
-     * @return ($value is ?bool ? true : false)
+     * @return bool
      *
+     * @phpstan-return ($value is ?bool ? true : false)
      * @phpstan-assert ?bool $value
      */
     public static function nullOrBool($value, $message = '', ...$args) {
@@ -311,12 +418,13 @@ class Assert extends StaticClass {
     /**
      * Ensure that the passed value is either NULL or an integer.
      *
-     * @param  mixed    $value
-     * @param  string   $message [optional] - value identifier or description
-     * @param  mixed ...$args    [optional] - additional message arguments
+     * @param  mixed  $value
+     * @param  string $message [optional] - value description
+     * @param  scalar ...$args [optional] - additional message arguments
      *
-     * @return ($value is ?int ? true : false)
+     * @return bool
      *
+     * @phpstan-return ($value is ?int ? true : false)
      * @phpstan-assert ?int $value
      */
     public static function nullOrInt($value, $message = '', ...$args) {
@@ -330,12 +438,13 @@ class Assert extends StaticClass {
     /**
      * Ensure that the passed value is either NULL or a float.
      *
-     * @param  mixed    $value
-     * @param  string   $message [optional] - value identifier or description
-     * @param  mixed ...$args    [optional] - additional message arguments
+     * @param  mixed  $value
+     * @param  string $message [optional] - value description
+     * @param  scalar ...$args [optional] - additional message arguments
      *
-     * @return ($value is ?float ? true : false)
+     * @return bool
      *
+     * @phpstan-return ($value is ?float ? true : false)
      * @phpstan-assert ?float $value
      */
     public static function nullOrFloat($value, $message = '', ...$args) {
@@ -349,12 +458,13 @@ class Assert extends StaticClass {
     /**
      * Ensure that the passed value is either NULL or a string.
      *
-     * @param  mixed    $value
-     * @param  string   $message [optional] - value identifier or description
-     * @param  mixed ...$args    [optional] - additional message arguments
+     * @param  mixed  $value
+     * @param  string $message [optional] - value description
+     * @param  scalar ...$args [optional] - additional message arguments
      *
-     * @return ($value is ?string ? true : false)
+     * @return bool
      *
+     * @phpstan-return ($value is ?string ? true : false)
      * @phpstan-assert ?string $value
      */
     public static function nullOrString($value, $message = '', ...$args) {
@@ -368,12 +478,13 @@ class Assert extends StaticClass {
     /**
      * Ensure that the passed value is either NULL or a scalar.
      *
-     * @param  mixed    $value
-     * @param  string   $message [optional] - value identifier or description
-     * @param  mixed ...$args    [optional] - additional message arguments
+     * @param  mixed  $value
+     * @param  string $message [optional] - value description
+     * @param  scalar ...$args [optional] - additional message arguments
      *
-     * @return ($value is ?scalar ? true : false)
+     * @return bool
      *
+     * @phpstan-return ($value is ?scalar ? true : false)
      * @phpstan-assert ?scalar $value
      */
     public static function nullOrScalar($value, $message = '', ...$args) {
@@ -387,12 +498,13 @@ class Assert extends StaticClass {
     /**
      * Ensure that the passed value is either NULL or an object.
      *
-     * @param  mixed    $value
-     * @param  string   $message [optional] - value identifier or description
-     * @param  mixed ...$args    [optional] - additional message arguments
+     * @param  mixed  $value
+     * @param  string $message [optional] - value description
+     * @param  scalar ...$args [optional] - additional message arguments
      *
-     * @return ($value is ?object ? true : false)
+     * @return bool
      *
+     * @phpstan-return ($value is ?object ? true : false)
      * @phpstan-assert ?object $value
      */
     public static function nullOrObject($value, $message = '', ...$args) {
@@ -406,12 +518,13 @@ class Assert extends StaticClass {
     /**
      * Ensure that the passed value is either NULL or a resource.
      *
-     * @param  mixed    $value
-     * @param  string   $message [optional] - value identifier or description
-     * @param  mixed ...$args    [optional] - additional message arguments
+     * @param  mixed  $value
+     * @param  string $message [optional] - value description
+     * @param  scalar ...$args [optional] - additional message arguments
      *
-     * @return ($value is ?resource ? true : false)
+     * @return bool
      *
+     * @phpstan-return ($value is ?resource ? true : false)
      * @phpstan-assert ?resource $value
      */
     public static function nullOrResource($value, $message = '', ...$args) {
@@ -427,10 +540,10 @@ class Assert extends StaticClass {
     /**
      * Compose a "type assertion failed" error message.
      *
-     * @param  mixed   $value        - checked variable
-     * @param  string  $expectedType - expected variable type
-     * @param  string  $message      - variabe identifier or description
-     * @param  mixed[] $args         - additional description arguments
+     * @param  mixed    $value        - checked variable
+     * @param  string   $expectedType - expected variable type
+     * @param  string   $message      - variabe identifier or description
+     * @param  scalar[] $args         - additional description arguments
      *
      * @return string - generated error message
      */
@@ -481,10 +594,13 @@ class Assert extends StaticClass {
         if (is_resource($value)) return 'resource';
         if (is_string  ($value)) return '"'.$value.'"';
         if (is_object  ($value)) {
-            if (method_exists($value, '__toString'))
+            if (method_exists($value, '__toString')) {
                 return get_class($value).' {'.$value.'}';
+            }
             return get_class($value);
         }
+        /** @var int|float $value */
+        $value = $value;
         return (string) $value;
     }
 }

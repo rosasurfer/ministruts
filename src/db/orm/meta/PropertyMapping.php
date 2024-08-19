@@ -4,14 +4,17 @@ declare(strict_types=1);
 namespace rosasurfer\ministruts\db\orm\meta;
 
 use rosasurfer\ministruts\core\CObject;
-use rosasurfer\ministruts\core\exception\RuntimeException;
+use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\db\ConnectorInterface as IConnector;
-
-use function rosasurfer\ministruts\is_class;
 
 
 /**
  * A PropertyMapping is an object encapsulating meta information about how to map a PHP class property to a database column.
+ *
+ * @phpstan-import-type  EntityClass  from \rosasurfer\ministruts\db\orm\ORM
+ * @phpstan-import-type  ORM_ENTITY   from \rosasurfer\ministruts\db\orm\ORM
+ * @phpstan-import-type  ORM_PROPERTY from \rosasurfer\ministruts\db\orm\ORM
+ * @phpstan-import-type  ORM_RELATION from \rosasurfer\ministruts\db\orm\ORM
  */
 class PropertyMapping extends CObject {
 
@@ -19,7 +22,10 @@ class PropertyMapping extends CObject {
     /** @var EntityMapping - the entity mapping this mapping is a part of */
     protected $entityMapping;
 
-    /** @var scalar[] - mapping information */
+    /**
+     * @var scalar[] - mapping information
+     * @phpstan-var ORM_PROPERTY
+     */
     protected array $mapping;
 
     /** @var string - the property's PHP name */
@@ -30,7 +36,9 @@ class PropertyMapping extends CObject {
      * Constructor
      *
      * @param  EntityMapping $entity - the entity this property belongs to
-     * @param  scalar[]      $data   - property mapping information
+     * @param  scalar[]      $data   - raw property mapping information
+     *
+     * @phpstan-param ORM_PROPERTY $data
      */
     public function __construct(EntityMapping $entity, array $data) {
         $this->entityMapping = $entity;
@@ -86,24 +94,17 @@ class PropertyMapping extends CObject {
         else {
             $type = $this->mapping['type'];
             switch ($type) {
-                case 'bool'   :
-                case 'boolean': $value = $connector->escapeLiteral((bool) $value); break;
-
-                case 'int'    :
-                case 'integer': $value = (string)(int) $value; break;
-
-                case 'real'   :
-                case 'float'  :
-                case 'double' : $value = (string)(float) $value; break;
-
-                case 'string' : $value = $connector->escapeLiteral((string) $value); break;
+                case 'bool'  : $value = $connector->escapeLiteral((bool) $value);   break;
+                case 'int'   : $value = (string)(int) $value;                       break;
+                case 'float' : $value = (string)(float) $value;                     break;
+                case 'string': $value = $connector->escapeLiteral((string) $value); break;
 
                 default:
-                    if (is_class($type)) {
+                    if (is_subclass_of($type, Type::class)) {
                         $value = (new $type())->convertToDBValue($value, $this, $connector);
                         break;
                     }
-                    throw new RuntimeException('Unsupported type "'.$type.'" for database mapping of '.$this->entityMapping->getClassName().'::'.$this->getName());
+                    throw new InvalidValueException("Unsupported type \"$type\" for db mapping of ".$this->entityMapping->getClassName().'::'.$this->getName());
             }
         }
         return $value;

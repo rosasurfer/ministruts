@@ -1,23 +1,29 @@
 
-O/R Mapping Reference
+ORM mapping reference
 =====================
 
 
 Entity mapping:
 ---------------
+An entity mapping describes a single model class and the database table where its class properties are stored.
+
 ```php
+/**
+ * @phpstan-var ORM_ENTITY $mapping 
+ * @see rosasurfer\ministruts\db\orm\ORM
+ */
 $mapping = [
-    'class'      => '{entity-class-name}',
-    'connection' => '{database-id}',
-    'table'      => '{table-name}',
-    'properties' => [
-        $propertyA, 
-        $propertyB, 
+    'class'      => '{entity-class-name}',      // model class name, must be extended from PersistableObject (required)
+    'connection' => '{database-id}',            // the database identifier as configured in the application configuration (required)
+    'table'      => '{table-name}',             // name of the database table where class properties are stored (required)
+    'properties' => [                           // one or more property definitions (required)
+        ORM_PROPERTY, 
+        ORM_PROPERTY, 
         ..., 
     ],
-    'relations' => [
-        $relationA,
-        $relationB,
+    'relations' => [                            // zero or more relation definitions between entities resp. database tables (optional)
+        ORM_RELATION,
+        ORM_RELATION,
         ..., 
     ]
 ];
@@ -26,8 +32,10 @@ $mapping = [
 
 Property mapping:
 -----------------
+A property mapping describes how a specific class member is mapped to a sepcific database column.
+
 ```php
-$property = [
+ORM_PROPERTY = [
     'name'   => '{property-name}',
     'type'   => 'RelatedClassName',
     'column' => '{column-name}'
@@ -51,7 +59,7 @@ One-To-One: without local foreign-key column
     'assoc'      => 'one-to-one'
     'name'       => 'propertyName'
     'type'       => 'RelatedClassName'
-    'key'        => 'propertyName'          // optional: local key property (default: identity)
+    'key'        => 'propertyName'          // local key property (optional, default: identity)
     'ref-column' => 'column_name'           // foreign column referencing the local key
 
 

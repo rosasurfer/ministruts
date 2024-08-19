@@ -16,15 +16,16 @@ use rosasurfer\ministruts\db\ResultInterface as IResult;
 use rosasurfer\ministruts\db\orm\meta\EntityMapping;
 
 use function rosasurfer\ministruts\is_class;
-
-use const rosasurfer\ministruts\db\orm\meta\BOOL;
-use const rosasurfer\ministruts\db\orm\meta\BOOLEAN;
+use rosasurfer\ministruts\core\assert\Assert;
 
 
 /**
- * DAO
- *
  * Abstract DAO base class.
+ *
+ * @phpstan-import-type  EntityClass  from \rosasurfer\ministruts\db\orm\ORM
+ * @phpstan-import-type  ORM_ENTITY   from \rosasurfer\ministruts\db\orm\ORM
+ * @phpstan-import-type  ORM_PROPERTY from \rosasurfer\ministruts\db\orm\ORM
+ * @phpstan-import-type  ORM_RELATION from \rosasurfer\ministruts\db\orm\ORM
  */
 abstract class DAO extends Singleton {
 
@@ -190,103 +191,167 @@ abstract class DAO extends Singleton {
     /**
      * Return the mapping configuration of the DAO's entity.
      *
-     * @return array<string, mixed>
+     * @return         array<string, mixed>
+     * @phpstan-return ORM_ENTITY
      */
-    abstract public function getMapping();
+    abstract public function getMapping(): array;
 
 
     /**
      * Parse and validate the DAO's data mapping.
      *
-     * @param  array<string, mixed> $mapping - data mapping
+     * @param  array<mixed> $mapping - user provided mapping data
      *
-     * @return array<string, mixed> - validated and normalized mapping
+     * @return array<string, mixed> - validated full entity mapping
+     *
+     * @phpstan-return ORM_ENTITY
      */
-    protected function parseMapping(array $mapping) {
-        // validate properties
-        foreach ($mapping['properties'] as $i => $property) {
-            $name = $property['name'];
-            $type = $property['type'];
+    protected function parseMapping(array $mapping): array {
+        $configError = function(string $message): bool {
+            throw new ConfigException("ORM config error: $message");
+        };
+        $entity = [];
 
-            $property['column'     ] ??= $name;
-            $property['column-type'] ??= $type;                     // TODO: $type may be a custom type
+        // [class]
+        $class = $mapping['class'] ?? $configError('missing field "class"');
+        Assert::string($class, 'invalid type of field "class" (string expected)');
+        if (!is_subclass_of($class, PersistableObject::class)) {
+            $configError("invalid field \"class\": \"$class\" (not a subclass of ".PersistableObject::class.')');
+        }
+        $entity['class'] = $class;
 
-            if (($property['primary'] ?? 0) === true) {
-                $mapping['identity'] = $property;
+        // [connection]
+        $connection = $mapping['connection'] ?? $configError('missing field "connection"');
+        Assert::stringNotEmpty($connection, 'invalid field "connection" (non-empty-string expected)');
+        $entity['connection'] = $connection;
+
+        // [table]
+        $table = $mapping['table'] ?? $configError('missing field "table"');
+        Assert::stringNotEmpty($table, 'invalid field "table" (non-empty-string expected)');
+        $entity['table'] = $table;
+
+        // [properties]
+        $properties = $mapping['properties'] ?? $configError('missing field "properties"');
+        Assert::isArray($properties, 'invalid field "properties" (array expected)');
+        Assert::notEmpty($properties, 'invalid field "properties" (non-empty-array expected)');
+
+        foreach ($properties as $i => $data) {
+            $name = $data['name'] ?? $configError("missing field [properties][$i][name]");
+            Assert::stringNotEmpty($name, "invalid field [properties][$i][name] (non-empty-string expected)");
+
+            $type = $data['type'] ?? $configError("missing field [properties][$i][type]");
+            Assert::stringNotEmpty($type, "invalid field [properties][$i][type] (non-empty-string expected)");
+
+            $column = $data['column'] ?? $name;
+            Assert::stringNotEmpty($column, "invalid field [properties][$i][column] (non-empty-string expected)");
+
+            $columnType = $data['column-type'] ?? $type;            // TODO: $type may be a custom type
+            Assert::stringNotEmpty($columnType, "invalid field [properties][$i][column-type] (non-empty-string expected)");
+
+            $property = [
+                'name'        => $name,
+                'type'        => $type,
+                'column'      => $column,
+                'column-type' => $columnType,
+            ];
+
+            if ($data['primary'] ?? 0) {
+                if (isset($entity['identity'])) $configError('only one property/column can be marked with "primary"');
+                $property['primary'] = true;
+                $entity['identity'] = &$property;                   // Properties are stored by reference to be able to update all instances
+            }                                                       // at once from related mappings in PersistableObject::getPhysicalValue().
+            if ($data['version'] ?? 0) {
+                if (isset($entity['version'])) $configError('only one property/column can be marked with "version"');
+                $property['version'] = true;
+                $entity['version'] = &$property;
             }
-            if (($property['version'] ?? 0) === true) {
-                $mapping['version'] = $property;
+            if ($data['soft-delete'] ?? 0) {
+                if (isset($entity['soft-delete'])) $configError('only one property/column can be marked with "soft-delete"');
+                $property['soft-delete'] = true;
+                $entity['soft-delete'] = &$property;
             }
-            $mapping['columns'][$property['column']] = $property;
 
-            if ($type==BOOL || $type==BOOLEAN) {
-                $mapping['getters']["is$name" ] = $property;
-                $mapping['getters']["has$name"] = $property;
+            if (isset($entity['properties'][$name])) $configError("multiple properties named \"$name\" found (names must be unique)");
+            $entity['properties'][$name] = &$property;              // add all properties to collection "properties"
+
+            if (isset($entity['columns'][$column])) $configError("multiple columns named \"$column\" found (columns must be unique)");
+            $entity['columns'][$column] = &$property;               // add all properties to collection "columns"
+
+            if ($type == ORM::BOOL) {                               // register virtual getters for all properties
+                $entity['getters']["is$name" ] = &$property;
+                $entity['getters']["has$name"] = &$property;
             }
             else {
-                $mapping['getters']["get$name"] = $property;
+                $entity['getters']["get$name"] = &$property;
             }
-
-            $mapping['properties'][$name] = $property;
-            unset($mapping['properties'][$i]);
+            unset($property);                                       // reset the reference
         }
+        $entity['identity'] ?? $configError('missing property/column marked with "primary" (tables without primary key are not supported)');
 
-        // validate relations
-        $mapping['relations'] ??= [];
 
-        foreach ($mapping['relations'] as $i => $relation) {
+        // TODO:
+        // [relations]
+        $relations = $mapping['relations'] ?? [];
+        Assert::isArray($relations, 'invalid field $mapping[relations] (array expected)');
+
+        foreach ($relations as $i => $relation) {
             $name  = $relation['name' ];
             $assoc = $relation['assoc'];
 
             // any association using a mandatory or optional join table
             if ($assoc=='many-to-many' || isset($relation['join-table'])) {
-                if (!isset($relation['join-table']))                      throw new RuntimeException("Missing attribute \"join-table\"=\"{table-name}\" in relation [name=\"$name\" ...] of entity class \"$mapping[class]\"");
-                if (!isset($relation['key']))
-                    $relation['key'] = $mapping['identity']['name'];
-                elseif (!isset($mapping['properties'][$relation['key']])) throw new RuntimeException("Illegal attribute \"key\"=\"$relation[key]\" in relation [name=\"$name\" ...] of entity class \"$mapping[class]\"");
-                if (!isset($relation['ref-column']))                      throw new RuntimeException("Missing attribute \"ref-column\"=\"{table-name.column-name}\" in relation [name=\"$name\" ...] of entity class \"$mapping[class]\"");
-                if (!isset($relation['fk-ref-column']))                   throw new RuntimeException("Missing attribute \"fk-ref-column\"=\"{table-name.column-name}\" in relation [name=\"$name\" ...] of entity class \"$mapping[class]\"");
+                if (!isset($relation['join-table']))                     throw new RuntimeException("Missing attribute \"join-table\"=\"{table-name}\" in relation [name=\"$name\" ...] of entity class \"$entity[class]\"");
+                if (!isset($relation['key'])) {
+                    $relation['key'] = $entity['identity']['name'];
+                }
+                elseif (!isset($entity['properties'][$relation['key']])) throw new RuntimeException("Illegal attribute \"key\"=\"$relation[key]\" in relation [name=\"$name\" ...] of entity class \"$entity[class]\"");
+                if (!isset($relation['ref-column']))                     throw new RuntimeException("Missing attribute \"ref-column\"=\"{table-name.column-name}\" in relation [name=\"$name\" ...] of entity class \"$entity[class]\"");
+                if (!isset($relation['fk-ref-column']))                  throw new RuntimeException("Missing attribute \"fk-ref-column\"=\"{table-name.column-name}\" in relation [name=\"$name\" ...] of entity class \"$entity[class]\"");
             }
 
             // one-to-one (using no optional join table)
             elseif ($assoc == 'one-to-one') {
                 if (!isset($relation['column'])) {
-                    if (!isset($relation['key']))
-                        $relation['key'] = $mapping['identity']['name'];
-                    elseif (!isset($mapping['properties'][$relation['key']])) throw new RuntimeException("Illegal attribute \"key\"=\"$relation[key]\" in relation [name=\"$name\" ...] of entity class \"$mapping[class]\"");
-                    if (!isset($relation['ref-column']))                      throw new RuntimeException("Missing attribute \"ref-column\"=\"{column-name}\" in relation [name=\"$name\" ...] of entity class \"$mapping[class]\"");
+                    if (!isset($relation['key'])) {
+                        $relation['key'] = $entity['identity']['name'];
+                    }
+                    elseif (!isset($entity['properties'][$relation['key']])) throw new RuntimeException("Illegal attribute \"key\"=\"$relation[key]\" in relation [name=\"$name\" ...] of entity class \"$entity[class]\"");
+                    if (!isset($relation['ref-column']))                     throw new RuntimeException("Missing attribute \"ref-column\"=\"{column-name}\" in relation [name=\"$name\" ...] of entity class \"$entity[class]\"");
                 }
             }
 
             // one-to-many (using no optional join table)
             elseif ($assoc == 'one-to-many') {
-                if (!isset($relation['key']))
-                    $relation['key'] = $mapping['identity']['name'];
-                elseif (!isset($mapping['properties'][$relation['key']])) throw new RuntimeException("Illegal attribute \"key\"=\"$relation[key]\" in relation [name=\"$name\" ...] of entity class \"$mapping[class]\"");
-                if (!isset($relation['ref-column']))                      throw new RuntimeException("Missing attribute \"ref-column\"=\"{column-name}\" in relation [name=\"$name\" ...] of entity class \"$mapping[class]\"");
+                if (!isset($relation['key'])) {
+                    $relation['key'] = $entity['identity']['name'];
+                }
+                elseif (!isset($entity['properties'][$relation['key']])) throw new RuntimeException("Illegal attribute \"key\"=\"$relation[key]\" in relation [name=\"$name\" ...] of entity class \"$entity[class]\"");
+                if (!isset($relation['ref-column']))                     throw new RuntimeException("Missing attribute \"ref-column\"=\"{column-name}\" in relation [name=\"$name\" ...] of entity class \"$entity[class]\"");
             }
 
             // many-to-one (using no optional join table)
             elseif ($assoc == 'many-to-one') {
-                if (!isset($relation['column'])) throw new RuntimeException("Missing attribute \"column\"=\"{column-name}\" in relation [name=\"$name\" ...] of entity class \"$mapping[class]\"");
+                if (!isset($relation['column'])) throw new RuntimeException("Missing attribute \"column\"=\"{column-name}\" in relation [name=\"$name\" ...] of entity class \"$entity[class]\"");
             }
-            else                                 throw new RuntimeException("Illegal attribute \"assoc\"=\"$assoc\" in relation [name=\"$name\" ...] of entity class \"$mapping[class]\"");
+            else                                 throw new RuntimeException("Illegal attribute \"assoc\"=\"$assoc\" in relation [name=\"$name\" ...] of entity class \"$entity[class]\"");
 
             if (isset($relation['column'])) {
-                $mapping['columns'][$relation['column']] = $relation;
-            }
-            $mapping['getters']["get$name"] = $relation;
+                $entity['columns'][$relation['column']] = &$relation;   // Stored by reference to be able to update all instances at once.
+            }                                                           // See explanations above for referenced properties.
+            $entity['getters']["get$name"] = &$relation;
 
-            $mapping['relations'][$name] = $relation;
-            unset($mapping['relations'][$i]);
+            $entity['relations'][$name] = &$relation;
+            unset($relation);                                           // reset the reference
         }
 
-        // for faster indexing set aggregated column and getter names to all-lower-case
-        $mapping['columns'] = \array_change_key_case($mapping['columns'], CASE_LOWER);
-        $mapping['getters'] = \array_change_key_case($mapping['getters'], CASE_LOWER);
+        // for faster indexing set collected column and getter names to all-lower-case
+        $entity['columns'] = \array_change_key_case($entity['columns'], CASE_LOWER);
+        $entity['getters'] = \array_change_key_case($entity['getters'], CASE_LOWER);
 
-        //error_log(print_r($mapping, true));
-        return $mapping;
+        //error_log(print_r($entity, true));
+
+        /** @phpstan-var ORM_ENTITY $entity */
+        return $entity = $entity;
     }
 
 

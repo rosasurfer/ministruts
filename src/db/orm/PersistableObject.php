@@ -7,7 +7,7 @@ use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\exception\ConcurrentModificationException;
 use rosasurfer\ministruts\core\exception\IllegalAccessException;
 use rosasurfer\ministruts\core\exception\IllegalStateException;
-use rosasurfer\ministruts\core\exception\InvalidTypeException;
+use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 use rosasurfer\ministruts\db\ConnectorInterface as IConnector;
 use rosasurfer\ministruts\db\orm\meta\PropertyMapping;
@@ -15,14 +15,6 @@ use rosasurfer\ministruts\db\orm\meta\PropertyMapping;
 use function rosasurfer\ministruts\is_class;
 use function rosasurfer\ministruts\strEndsWith;
 use function rosasurfer\ministruts\strLeft;
-
-use const rosasurfer\ministruts\db\orm\meta\BOOL;
-use const rosasurfer\ministruts\db\orm\meta\BOOLEAN;
-use const rosasurfer\ministruts\db\orm\meta\DOUBLE;
-use const rosasurfer\ministruts\db\orm\meta\FLOAT;
-use const rosasurfer\ministruts\db\orm\meta\INT;
-use const rosasurfer\ministruts\db\orm\meta\INTEGER;
-use const rosasurfer\ministruts\db\orm\meta\STRING;
 
 
 /**
@@ -69,14 +61,14 @@ abstract class PersistableObject extends CObject {
 
         // calls to getters of mapped properties are intercepted
         if (isset($mapping['getters'][$methodL])) {
-            $property = $mapping['getters'][$methodL]['name'];
-            return $this->get($property);
+            $propertyName = $mapping['getters'][$methodL]['name'];
+            return $this->get($propertyName);
         }
 
         // calls to setters of mapped properties are intercepted
         //if (isset($mapping['setters'][$methodL])) {               // TODO: implement default setters
-        //    $property = $mapping['getters'][$methodL]['name'];
-        //    $this->$property = $args;
+        //    $propertyName = $mapping['getters'][$methodL]['name'];
+        //    $this->$propertyName = $args;
         //    return $this;
         //}
 
@@ -112,27 +104,27 @@ abstract class PersistableObject extends CObject {
 
 
     /**
-     * Return the logical value of a mapped property.
+     * Return the logical PHP value of a mapped property.
      *
      * @param  string $property - property name
      *
      * @return mixed - property value
      */
-    protected function get($property) {
+    protected function get(string $property) {
         $mapping = $this->dao()->getMapping();
 
-        if (isset($mapping['properties'][$property]))
+        if (isset($mapping['properties'][$property])) {
             return $this->getNonRelationValue($property);
-
-        if (isset($mapping['relations'][$property]))
+        }
+        if (isset($mapping['relations'][$property])) {
             return $this->getRelationValue($property);
-
-        throw new RuntimeException('Not a mapped property "'.$property.'"');
+        }
+        throw new RuntimeException("Not a mapped property \"$property\"");
     }
 
 
     /**
-     * Return the logical value of a mapped non-relation property.
+     * Return the logical PHP value of a mapped non-relation property.
      *
      * @param  string $property - property name
      *
@@ -144,38 +136,38 @@ abstract class PersistableObject extends CObject {
 
 
     /**
-     * Return the logical value of a mapped relation property. If the related objects have not yet been fetched before they
-     * are fetched now.
+     * Return the logical PHP value of a mapped relation property. If the related objects have not yet
+     * been fetched they are fetched now.
      *
      * @param  string $property - property name
      *
-     * @return PersistableObject|PersistableObject[]? - property value
+     * @return PersistableObject|PersistableObject[]|null - property value
      */
     private function getRelationValue($property) {
         $propertyName = $property;
         /** @var PersistableObject|PersistableObject[]|scalar|null $value */
         $value = &$this->$propertyName;                                 // existing property value
 
-        if (is_object($value)) return $value;                           // relation is fetched and is an object or an array
-        if (is_array ($value)) return $value;                           // (Collections are not yet implemented)
+        if (is_object($value)) return $value;                           // relation was already fetched and is object or array
+        if (is_array ($value)) return $value;                           // (collections are not yet implemented)
 
-        $dao          =  $this->dao();
-        $mapping      =  $dao->getMapping();
-        $relation     = &$mapping['relations'][$propertyName];
+        $dao = $this->dao();
+        $mapping = $dao->getMapping();
+        $relation = &$mapping['relations'][$propertyName];
         $isCollection = strEndsWith($relation['assoc'], 'many');
-        /** @var PersistableObject[]? $emptyResult */
-        $emptyResult  = $isCollection ? [] : null;
+        $emptyResult = $isCollection ? [] : null;
 
+        // scalar|null $value
         if ($value === null) {
-            if (!$this->isPersistent())
+            if (!$this->isPersistent()) {
                 return $emptyResult;
+            }
         }
-        elseif ($value === false) {                                     // relation is fetched and marked as empty
+        elseif ($value === false) {                                     // relation was already fetched and marked as empty
             return $emptyResult;
         }
 
         // The relation is not yet fetched, the property is NULL or holds a physical foreign-key value.
-        /** @var string $type */
         $type = $relation['type'];                                      // related class name
         /** @var DAO $relatedDao */
         $relatedDao = $type::dao();
@@ -184,16 +176,17 @@ abstract class PersistableObject extends CObject {
 
         if ($value === null) {
             if (isset($relation['column'])) {                           // a local column with a foreign-key value of NULL
-                $value = false;
-                return $emptyResult;                                    // the relation is marked as empty
+                $value = false;                                         // mark relation as empty
+                return $emptyResult;
             }
 
             // a local key is used
-            if (!isset($relation['key']))
+            if (!isset($relation['key'])) {
                 $relation['key'] = $mapping['identity']['name'];        // default local key is identity
+            }
             $keyName = $relation['key'];                                // the used local key property
             if ($this->$keyName === null) {
-                $value = false;                                         // the relation is marked as empty
+                $value = false;                                         // mark relation as empty
                 return $emptyResult;
             }
             $keyColumn = $mapping['properties'][$keyName]['column'];    // the used local key column
@@ -268,27 +261,28 @@ abstract class PersistableObject extends CObject {
     private function getPhysicalValue($column, $type = null) {
         $mapping = $this->dao()->getMapping();
         $column  = strtolower($column);
-        if (!isset($mapping['columns'][$column])) throw new RuntimeException('Not a mapped column "'.func_get_arg(0).'"');
+        if (!isset($mapping['columns'][$column])) throw new RuntimeException("Not a mapped column \"$column\"");
 
-        $property = &$mapping['columns'][$column];
+        $property = &$mapping['columns'][$column];          // by reference to be able to update all properties at once below (1)
         $propertyName = $property['name'];
-        $propertyValue = $this->$propertyName;              // the logical or physical column value
+        $propertyValue = $this->$propertyName;              // this is the logical or physical column value
 
-        if ($propertyValue === null)
+        if ($propertyValue === null) {
             return null;
-
+        }
         if (isset($property['assoc'])) {
-            if ($propertyValue === false)
+            if ($propertyValue === false) {
                 return null;
+            }
             if (!is_object($propertyValue)) {               // a foreign-key value of a not-yet-fetched relation
                 if ($type !== null) throw new RuntimeException('Unexpected parameter $type="'.$type.'" (not null) for relation [name="'.$propertyName.'", column="'.$column.'", ...] of entity "'.$mapping['class'].'"');
                 return $propertyValue;
             }
-
             /** @var PersistableObject $object */
             $object = $propertyValue;                       // a single instance of "one-to-one"|"many-to-one" relation, no join table
-            if (!isset($property['ref-column']))
+            if (!isset($property['ref-column'])) {          // (1) use reference and update all properties with related entity settings
                 $property['ref-column'] = $object->dao()->getMapping()['identity']['column'];
+            }
             $fkColumn = $property['ref-column'];
             return $object->getPhysicalValue($fkColumn);
         }
@@ -296,19 +290,10 @@ abstract class PersistableObject extends CObject {
         $columnType = $property['column-type'];
 
         switch ($columnType) {
-            case 'bool'   :
-            case 'boolean': return (bool)(int) $propertyValue;
-
-            case 'int'    :
-            case 'integer': return (int) $propertyValue;
-
-            case 'real'   :
-            case 'float'  :
-            case 'double' :
-            case 'decimal': return (float) $propertyValue;
-
-            case 'text'   :
-            case 'string' : return (string) $propertyValue;
+            case ORM::BOOL  : return (bool)(int) $propertyValue;
+            case ORM::INT   : return       (int) $propertyValue;
+            case ORM::FLOAT : return     (float) $propertyValue;
+            case ORM::STRING: return    (string) $propertyValue;
 
             default:
                 // TODO: convert custom types (e.g. Enum|DateTime) to physical values
@@ -346,15 +331,16 @@ abstract class PersistableObject extends CObject {
 
 
     /**
-     * Whether the instance is marked as "soft deleted".
+     * Whether the instance is marked as "soft deleted". Can be overwritten by custom classes.
      *
      * @return bool
      */
-    final public function isDeleted() {
-        foreach ($this->dao()->getMapping()['properties'] as $name => $property) {
-            if (isset($property['soft-delete']) && $property['soft-delete']===true) {
-                return ($this->$name !== null);
-            }
+    public function isDeleted() {
+        $mapping = $this->dao()->getMapping();
+        $property = $mapping['soft-delete'] ?? null;
+        if ($property) {
+            $name = $property['name'];
+            return ($this->$name !== null);     // any db value != NULL is considered as "deleted" flag
         }
         return false;
     }
@@ -387,24 +373,27 @@ abstract class PersistableObject extends CObject {
      * @return $this
      */
     public function save() {
-        if ($this->__inSave)                                        // skip recursive calls from pre/post-processing hooks
-            return $this;
+        if ($this->__inSave) {
+            return $this;                                           // skip recursive calls from pre/post-processing hooks
+        }
 
         try {
             $this->__inSave = true;
 
             if (!$this->isPersistent()) {
                 $this->dao()->transaction(function() {
-                    if ($this->beforeSave() !== true)               // pre-processing hook
+                    if ($this->beforeSave() !== true) {             // pre-processing hook
                         return $this;
+                    }
                     $this->insert();
                     $this->afterSave();                             // post-processing hook
                 });
             }
             elseif ($this->isModified()) {
                 $this->dao()->transaction(function() {
-                    if ($this->beforeSave() !== true)               // pre-processing hook
+                    if ($this->beforeSave() !== true) {             // pre-processing hook
                         return $this;
+                    }
                     $this->update();
                     $this->afterSave();                             // post-processing hook
                 });
@@ -429,8 +418,9 @@ abstract class PersistableObject extends CObject {
         if ($this->isPersistent()) throw new RuntimeException('Cannot insert already persistent '.$this);
 
         // pre-processing hook
-        if ($this->beforeInsert() !== true)
+        if ($this->beforeInsert() !== true) {
             return $this;
+        }
 
         $mapping = $this->dao()->getMapping();
 
@@ -446,8 +436,9 @@ abstract class PersistableObject extends CObject {
 
         // assign the returned identity value
         $idName = $mapping['identity']['name'];
-        if ($this->$idName === null)
+        if ($this->$idName === null) {
             $this->$idName = $id;
+        }
 
         // post-processing hook
         $this->afterInsert();
@@ -462,8 +453,9 @@ abstract class PersistableObject extends CObject {
      */
     private function update() {
         // pre-processing hook
-        if ($this->beforeUpdate() !== true)
+        if ($this->beforeUpdate() !== true) {
             return $this;
+        }
 
         $mapping = $this->dao()->getMapping();
         $changes = [];
@@ -491,8 +483,9 @@ abstract class PersistableObject extends CObject {
      * @return $this
      */
     public function delete() {
-        if ($this->__inDelete)                                                  // skip recursive calls from pre/post-processing hooks
-            return $this;
+        if ($this->__inDelete) {
+            return $this;                                               // skip recursive calls from pre/post-processing hooks
+        }
 
         try {
             $this->__inDelete = true;
@@ -500,15 +493,16 @@ abstract class PersistableObject extends CObject {
             if (!$this->isPersistent()) throw new IllegalStateException('Cannot delete non-persistent '.get_class($this));
 
             $this->dao()->transaction(function() {
-                if ($this->beforeDelete() !== true)                             // pre-processing hook
+                if ($this->beforeDelete() !== true) {                   // pre-processing hook
                     return $this;
+                }
 
-                if ($this->doDelete()) {                                        // perform deletion
+                if ($this->doDelete()) {                                // perform deletion
                     // reset identity property
                     $idName = $this->dao()->getMapping()['identity']['name'];
                     $this->$idName = null;
 
-                    $this->afterDelete();                                       // post-processing hook
+                    $this->afterDelete();                               // post-processing hook
                 }
             });
         }
@@ -530,7 +524,6 @@ abstract class PersistableObject extends CObject {
         $db       = $this->db();
         $mapping  = $this->dao()->getMapping();
         $table    = $mapping['table'];
-        /** @var string $idColumn */
         $idColumn = $mapping['identity']['column'];
 
         /** @var ?int $id */
@@ -587,28 +580,28 @@ abstract class PersistableObject extends CObject {
         //}
 
         // create SQL
-        $sql = 'update '.$table.' set';                                     // update table
+        $sql = "update $table set";                                         // update table
         foreach ($changes as $name => $value) {                             //    set ...
             /** @var PropertyMapping $mapping */
             $mapping     = $entity->getProperty($name);                     //        ...
             $columnName  = $mapping->getColumn();                           //        ...
             $columnValue = $mapping->convertToDBValue($value, $db);         //        column1 = value1,
-            $sql .= ' '.$columnName.' = '.$columnValue.',';                 //        column2 = value2,
+            $sql .= " $columnName = $columnValue,";                         //        column2 = value2,
         }                                                                   //        ...
         $sql  = strLeft($sql, -1);                                          //        ...
-        $sql .= ' where '.$idColumn.' = '.$idValue;                         //    where id = value
-        if ($versionMapping) {                                              //        ...                               @phpstan-ignore if.alwaysFalse      (keep for testing)
-            $op   = $oldVersion=='null' ? 'is':'=';                         //        ...                               @phpstan-ignore ternary.alwaysFalse (keep for testing)
-            $sql .= ' and '.$versionColumn.' '.$op.' '.$oldVersion;         //      and version = oldVersion
+        $sql .= " where $idColumn = $idValue";                              //    where id = value
+        if ($versionMapping) {                                              //        ...                           @phpstan-ignore if.alwaysFalse      (keep for further development)
+            $op = $oldVersion=='null' ? 'is':'=';                           //        ...                           @phpstan-ignore ternary.alwaysFalse (keep for further development)
+            $sql .= " and $versionColumn $op $oldVersion";                  //      and version = oldVersion
         }
 
         // execute SQL and check for concurrent modifications
         if ($db->execute($sql)->lastAffectedRows() != 1) {
-            if ($versionMapping) {                                                                                   // @phpstan-ignore if.alwaysFalse      (keep for testing)
+            $msg = 'record not found';
+            if ($versionMapping) {                                                                               // @phpstan-ignore if.alwaysFalse      (keep for further development)
                 $this->reload();
-                $msg = 'expected version: '.$oldVersion.', found version: '.$this->$versionName;
+                $msg = "expected version: $oldVersion, found version: $this->$versionName";
             }
-            else $msg = 'record not found';
             throw new ConcurrentModificationException('Error updating '.get_class($this).' (oid='.$this->getObjectId().'), '.$msg);
         }
         return true;
@@ -654,51 +647,53 @@ abstract class PersistableObject extends CObject {
         $mapping = $this->dao()->getMapping();
         $dbType = $this->dao()->db()->getType();
 
-        foreach ($mapping['columns'] as $column => &$property) {
+        // ORM_PROPERTY|ORM_RELATION $property
+        foreach ($mapping['columns'] as $column => $property) {
             $propertyName = $property['name'];
 
             if ($row[$column] === null) {
                 $this->$propertyName = null;
             }
             else {
-                $propertyType = $property['type'];
-
                 if (isset($property['assoc'])) {                // $property[type] is a PersistableObject class
+                    // ORM_RELATION $property
+                    $this->$propertyName = $row[$column];       // the foreign-key column is stored as is
+
                     //if (!isset($property['column-type'])) {
                     //    $relatedMapping = $propertyType::dao()->getMapping();
-                    //    if (!isset($property['ref-column']))
+                    //    if (!isset($property['ref-column'])) {
                     //        $property['ref-column'] = $relatedMapping['identity']['column'];
+                    //    }
                     //    $refColumn = $property['ref-column'];
                     //    $property['column-type'] = $relatedMapping['columns'][$refColumn]['type'];
                     //}
                     //$propertyType = $property['column-type'];
-                    $propertyType = 'origin';                   // the foreign-key column is stored as provided
                 }
+                else {
+                    // ORM_PROPERTY $property
+                    switch ($property['type']) {
+                        case ORM::BOOL:
+                            if ($dbType == 'pgsql') {
+                                if     ($row[$column] == 't') $row[$column] = 1;
+                                elseif ($row[$column] == 'f') $row[$column] = 0;
+                            };
+                            $this->$propertyName = (bool)(int) $row[$column];
+                            break;
 
-                switch ($propertyType) {
-                    case 'origin' : $this->$propertyName = $row[$column]; break;
-                    case BOOL:
-                    case BOOLEAN:
-                        if ($dbType == 'pgsql') {
-                            if     ($row[$column] == 't') $row[$column] = 1;
-                            elseif ($row[$column] == 'f') $row[$column] = 0;
-                        };
-                        $this->$propertyName = (bool)(int) $row[$column]; break;
-                    case INT    :
-                    case INTEGER: $this->$propertyName =    (int) $row[$column]; break;
-                    case FLOAT  :
-                    case DOUBLE : $this->$propertyName =  (float) $row[$column]; break;
-                    case STRING : $this->$propertyName = (string) $row[$column]; break;
-                  //case 'array': $this->$propertyName = strlen($row[$column]) ? explode(',', $row[$column]):[]; break;
-                  //case DateTime::class: $this->$propertyName = new DateTime($row[$column]); break;
+                        case ORM::INT    : $this->$propertyName =    (int) $row[$column]; break;
+                        case ORM::FLOAT  : $this->$propertyName =  (float) $row[$column]; break;
+                        case ORM::STRING : $this->$propertyName = (string) $row[$column]; break;
+                      //case 'array': $this->$propertyName = strlen($row[$column]) ? explode(',', $row[$column]):[]; break;
+                      //case DateTime::class: $this->$propertyName = new DateTime($row[$column]); break;
 
-                    default:
-                        // TODO: handle custom types
-                        //if (is_class($propertyType)) {
-                        //    $object->$propertyName = new $propertyType($row[$column]);
-                        //    break;
-                        //}
-                        throw new RuntimeException('Unsupported PHP type "'.$propertyType.'" for mapping of database column '.$mapping['table'].'.'.$column);
+                        default:
+                            // TODO: handle custom types
+                            //if (is_class($propertyType)) {
+                            //    $object->$propertyName = new $propertyType($row[$column]);
+                            //    break;
+                            //}
+                            throw new RuntimeException("Unsupported property type \"$property[type]\" for mapping of column $mapping[table].$column");
+                    }
                 }
             }
         }
@@ -716,8 +711,8 @@ abstract class PersistableObject extends CObject {
      * @return PersistableObject
      */
     public static function populateNew($class, array $row) {
-        if (static::class != __CLASS__)     throw new IllegalAccessException('Cannot access method '.__METHOD__.'() on a derived class.');
-        if (!is_a($class, __CLASS__, true)) throw new InvalidTypeException('Not a '.__CLASS__.' subclass: '.$class);
+        if (static::class != __CLASS__)         throw new IllegalAccessException('Cannot access method '.__METHOD__.'() on a derived class.');
+        if (!is_subclass_of($class, __CLASS__)) throw new InvalidValueException("Invalid parameter \$class: $class (not a subclass of ".__CLASS__.')');
 
         /** @var self $object */
         $object = new $class();

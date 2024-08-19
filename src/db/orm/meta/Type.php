@@ -10,7 +10,7 @@ use rosasurfer\ministruts\db\ConnectorInterface as Connector;
 /**
  * Type
  *
- * Defines conversion methods between a property's PHP and SQL representation.
+ * Defines custom conversion methods between a property's PHP and SQL representation.
  */
 abstract class Type extends CObject {
 

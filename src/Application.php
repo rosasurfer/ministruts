@@ -25,11 +25,18 @@ use rosasurfer\ministruts\util\PHP;
  * TODO: support creation of multiple instances for testing
  *
  *
- * @phpstan-type  STACKFRAME array{file?:string, line?:int, class?:string, type?:'->'|'::', function?:string, object?:object, args?:mixed[], __adjusted?:int}
+ * @phpstan-type  STACKFRAME = array{
+ *     file?    : string,
+ *     line?    : int,
+ *     class?   : string,
+ *     type?    : '->'|'::',
+ *     function?: string,
+ *     object?  : object,
+ *     args?    : mixed[],
+ *   __adjusted?: int,
+ * }
  */
 class Application extends CObject {
-
-    const CLI = false;
 
     /** @var self - the application itself */
     protected static self $instance;
