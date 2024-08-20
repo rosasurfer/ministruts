@@ -51,8 +51,7 @@ class Input extends CObject {
      *
      * @return bool
      */
-    public function isCommand($name) {
-        Assert::string($name);                      // @phpstan-ignore booleanNot.alwaysFalse (can be FALSE as the type is not enforced)
+    public function isCommand(string $name) {
         if (!$this->docoptResult) return false;
 
         if (!strlen($name) || !key_exists($name, $this->docoptResult->getArgs())) {

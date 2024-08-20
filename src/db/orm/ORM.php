@@ -30,7 +30,7 @@ use rosasurfer\ministruts\core\StaticClass;
  *     type        : string,
  *     column      : string,
  *     column-type : string,
- *     primary?    : bool,
+ *     primary-key?: bool,
  *     version?    : bool,
  *     soft-delete?: bool,
  * }
@@ -43,8 +43,8 @@ use rosasurfer\ministruts\core\StaticClass;
  *     column?       : string,
  *     ref-column?   : string,
  *     join-table?   : string,
- *     foreign-key?  : string,
  *     fk-ref-column?: string,
+ *     foreign-key?  : string,
  * }
  */
 final class ORM extends StaticClass {
@@ -62,4 +62,16 @@ final class ORM extends StaticClass {
 
     /** @var string - synonym for db type "text" */
     const STRING = 'string';
+
+
+    /**
+     * Helper to throw an ORM configuration exception.
+     *
+     * @param  string $message
+     *
+     * @return never
+     */
+    public static function configError(string $message) {
+        throw new ConfigException("ORM config error: $message");
+    }
 }

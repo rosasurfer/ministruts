@@ -38,6 +38,8 @@ A property mapping describes how one specific class member is mapped to one spec
 /**
  * @phpstan-var ORM_PROPERTY $property
  * @see \rosasurfer\ministruts\db\orm\ORM
+ *
+ * TODO:
  */
 $property = [
     'name'   => '{property-name}',
@@ -63,67 +65,65 @@ $relation = [
 ```
 
 
-Relation type "one-to-one" with local foreign-key column
---------------------------------------------------------
+Relation type "one-to-one" (local foreign-key column, no join table)
+--------------------------------------------------------------------
 ```php
 $relation = [
-    ...,                                                            // required fields (see above)
+    ...,                                                            // common fields (see above)
     'assoc'      => 'one-to-one',
-    'column'     => '{column-name}',                                // local column referencing a foreign key
+    'column'     => '{column-name}',                                // local column referencing a foreign key (required)
     'ref-column' => '{column-name}',                                // referenced foreign column (optional, default: primary key)
 ];
 ```
 
 
-Relation type "one-to-one" without local foreign-key column
------------------------------------------------------------
+Relation type "one-to-one" (no local foreign-key column, optional join table)
+-----------------------------------------------------------------------------
 ```php
 $relation = [
-    ...,                                                            // required fields (see above)
-    'assoc'         => 'one-to-one',
-    'key'           => '{property-name}',                           // local key property (optional, default: primary key)
-    'ref-column'    => '{column-name}',                             // foreign column referencing the local key (required)
-    'join-table'    => '{table-name}',                              // join table (optional, default: table of the related entity)
-    'fk-ref-column' => '{column-name}',                             // join table column referencing the foreign key of the relation (required with join-table)
+    ...,                                                            // common fields (see above)
+    'assoc'      => 'one-to-one',
+    'key'        => '{property-name}',                              // local key property (optional, default: primary key)
+    'ref-column' => '{column-name}',                                // foreign column referencing the local key (required)
 ];
 ```
 
 
-Relation type "one-to-many" (no local foreign-key column)
----------------------------------------------------------
+Relation type "one-to-many" (no local foreign-key column, optional join table)
+------------------------------------------------------------------------------
 ```php
 $relation = [
-    ...,                                        // required fields (see above)
+    ...,                                                            // common fields (see above)
     'assoc'      => 'one-to-many'
-    'key'        => 'propertyName'              // optional: local key property (default: identity)
-    'ref-column' => 'column_name'               // foreign column referencing the local key
+    'key'        => '{property-name}'                               // local key property (optional, default: identity)
+    'ref-column' => '{column-name}'                                 // foreign column referencing the local key
 ];
 ```
 
 
-Relation type "many-to-one" (local foreign-key column)
-------------------------------------------------------
+Relation type "many-to-one" (local foreign-key column, no join table)
+---------------------------------------------------------------------
 ```php
 $relation = [
-    ...,                                        // required fields (see above)
+    ...,                                                            // common fields (see above)
     'assoc'      => 'many-to-one'
-    'column'     => 'column_name'               // local column referencing a foreign key
-    'ref-column' => 'column_name'               // optional: referenced foreign column (default: identity)
+    'column'     => '{column-name}'                                 // local column referencing a foreign key (required)
+    'ref-column' => '{column-name}'                                 // referenced foreign column (optional, default: identity)
 ];
 ```
 
 
-Relation type "many-to-many" (no local foreign-key column)
-----------------------------------------------------------
+Relation type "many-to-many" (no local foreign-key column, mandatory join table)
+--------------------------------------------------------------------------------
 ```php
 $relation = [
     ...,                                        // required fields (see above)
     'assoc'         => 'many-to-many'
-    'key'           => 'propertyName'           // optional: local key property (default: identity)
-    'ref-column'    => 'column_name'            // join table column referencing the local key
-    'join-table'    => 'table_name'             // join table
-    'fk-ref-column' => 'column_name'            // join table column referencing the foreign key
-    'foreign-key'   => 'propertyName'           // optional: foreign key property (default: identity)
+    'key'           => 'propertyName'           // local key property (optional, default: identity)
+    'join-table'    => 'table_name'             // join table (required)
+    'ref-column'    => 'column_name'            // join table column referencing the local key (required)
+    'fk-ref-column' => 'column_name'            // join table column referencing the foreign key (required)
+    'foreign-key'   => 'propertyName'           // foreign key property (optional, default: identity)
 ];
 ```
 

@@ -6,9 +6,9 @@ namespace rosasurfer\ministruts\db\orm;
 use Throwable;
 
 use rosasurfer\ministruts\core\Singleton;
+use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\exception\ClassNotFoundException;
 use rosasurfer\ministruts\core\exception\InvalidTypeException;
-use rosasurfer\ministruts\core\exception\RuntimeException;
 use rosasurfer\ministruts\db\ConnectorInterface as IConnector;
 use rosasurfer\ministruts\db\MultipleRecordsException;
 use rosasurfer\ministruts\db\NoSuchRecordException;
@@ -16,7 +16,6 @@ use rosasurfer\ministruts\db\ResultInterface as IResult;
 use rosasurfer\ministruts\db\orm\meta\EntityMapping;
 
 use function rosasurfer\ministruts\is_class;
-use rosasurfer\ministruts\core\assert\Assert;
 
 
 /**
@@ -207,75 +206,91 @@ abstract class DAO extends Singleton {
      * @phpstan-return ORM_ENTITY
      */
     protected function parseMapping(array $mapping): array {
-        $configError = function(string $message): bool {
-            throw new ConfigException("ORM config error: $message");
+        $entityClass = '?';
+        $configError = function(string $message) use (&$entityClass) {
+            ORM::configError("$message in mapping of $entityClass");
         };
         $entity = [];
 
         // [class]
-        $class = $mapping['class'] ?? $configError('missing field "class"');
-        Assert::string($class, 'invalid type of field "class" (string expected)');
+        $class = $mapping['class'] ?? $configError('missing element "class"');
+        Assert::string($class, 'invalid type of element "class" (string expected)');
+        $class = trim($class);
         if (!is_subclass_of($class, PersistableObject::class)) {
-            $configError("invalid field \"class\": \"$class\" (not a subclass of ".PersistableObject::class.')');
+            $configError("invalid element \"class\": \"$class\" (not a subclass of ".PersistableObject::class.')');
         }
-        $entity['class'] = $class;
+        $entity['class'] = $entityClass = $class;
 
         // [connection]
-        $connection = $mapping['connection'] ?? $configError('missing field "connection"');
-        Assert::stringNotEmpty($connection, 'invalid field "connection" (non-empty-string expected)');
+        $connection = $mapping['connection'] ?? $configError('missing element "connection"');
+        Assert::string($connection, 'invalid element "connection" (string expected)');
+        $connection = trim($connection);
+        Assert::notEmpty($connection, 'invalid element "connection" (non-empty-string expected)');
         $entity['connection'] = $connection;
 
         // [table]
-        $table = $mapping['table'] ?? $configError('missing field "table"');
-        Assert::stringNotEmpty($table, 'invalid field "table" (non-empty-string expected)');
+        $table = $mapping['table'] ?? $configError('missing element "table"');
+        Assert::string($table, 'invalid element "table" (string expected)');
+        $table = trim($table);
+        Assert::notEmpty($table, 'invalid element "table" (non-empty-string expected)');
         $entity['table'] = $table;
 
         // [properties]
-        $properties = $mapping['properties'] ?? $configError('missing field "properties"');
-        Assert::isArray($properties, 'invalid field "properties" (array expected)');
-        Assert::notEmpty($properties, 'invalid field "properties" (non-empty-array expected)');
+        $properties = $mapping['properties'] ?? $configError('missing element "properties"');
+        Assert::isArray($properties, 'invalid element "properties" (array expected)');
+        Assert::notEmpty($properties, 'invalid element "properties" (non-empty-array expected)');
 
-        foreach ($properties as $i => $data) {
-            $name = $data['name'] ?? $configError("missing field [properties][$i][name]");
-            Assert::stringNotEmpty($name, "invalid field [properties][$i][name] (non-empty-string expected)");
+        foreach ($properties as $i => $userdata) {
+            $property = [];
 
-            $type = $data['type'] ?? $configError("missing field [properties][$i][type]");
-            Assert::stringNotEmpty($type, "invalid field [properties][$i][type] (non-empty-string expected)");
+            $name = $userdata['name'] ?? $configError("missing attribute [properties][$i][\"name\"]");
+            Assert::string($name, "invalid attribute [properties][$i][\"name\"] (string expected)");
+            $name = trim($name);
+            Assert::notEmpty($name, "invalid attribute [properties][$i][\"name\"] (non-empty-string expected)");
+            $property['name'] = $name;
 
-            $column = $data['column'] ?? $name;
-            Assert::stringNotEmpty($column, "invalid field [properties][$i][column] (non-empty-string expected)");
+            $type = $userdata['type'] ?? $configError("missing attribute [properties][$i][@name=$name \"type\"]");
+            Assert::string($type, "invalid attribute [properties][$i][@name=$name \"type\"] (string expected)");
+            $type = trim($type);
+            Assert::notEmpty($type, "invalid attribute [properties][$i][@name=$name \"type\"] (non-empty-string expected)");
+            // TODO: validate "type" (can also be a custom type)
+            $property['type'] = $type;
 
-            $columnType = $data['column-type'] ?? $type;            // TODO: $type may be a custom type
-            Assert::stringNotEmpty($columnType, "invalid field [properties][$i][column-type] (non-empty-string expected)");
+            $column = $userdata['column'] ?? $name;
+            Assert::string($column, "invalid attribute [properties][$i][@name=$name \"column\"] (string expected)");
+            $column = trim($column);
+            Assert::notEmpty($column, "invalid attribute [properties][$i][@name=$name \"column\"] (non-empty-string expected)");
+            $property['column'] = $column;
 
-            $property = [
-                'name'        => $name,
-                'type'        => $type,
-                'column'      => $column,
-                'column-type' => $columnType,
-            ];
+            $columnType = $userdata['column-type'] ?? $type;
+            Assert::string($columnType, "invalid attribute [properties][$i][@name=$name \"column-type\"] (string expected)");
+            $columnType = trim($columnType);
+            Assert::notEmpty($columnType, "invalid attribute [properties][$i][@name=$name \"column-type\"] (non-empty-string expected)");
+            // TODO: validate "column-type" (can also be a custom type)
+            $property['column-type'] = $columnType;
 
-            if ($data['primary'] ?? 0) {
-                if (isset($entity['identity'])) $configError('only one property/column can be marked with "primary"');
-                $property['primary'] = true;
-                $entity['identity'] = &$property;                   // Properties are stored by reference to be able to update all instances
-            }                                                       // at once from related mappings in PersistableObject::getPhysicalValue().
-            if ($data['version'] ?? 0) {
-                if (isset($entity['version'])) $configError('only one property/column can be marked with "version"');
+            if ($userdata['primary-key'] ?? 0) {
+                if (isset($entity['identity'])) $configError('only one property must be marked with attribute "primary-key"');
+                $property['primary-key'] = true;
+                $entity['identity'] = &$property;                   // by reference to be able to update all instances at once when needed
+            }                                                       // @see  PersistableObject::getPhysicalValue()
+            if ($userdata['version'] ?? 0) {
+                if (isset($entity['version'])) $configError('only one property can be marked with attribute "version"');
                 $property['version'] = true;
                 $entity['version'] = &$property;
             }
-            if ($data['soft-delete'] ?? 0) {
-                if (isset($entity['soft-delete'])) $configError('only one property/column can be marked with "soft-delete"');
+            if ($userdata['soft-delete'] ?? 0) {
+                if (isset($entity['soft-delete'])) $configError('only one property can be marked with attribute "soft-delete"');
                 $property['soft-delete'] = true;
                 $entity['soft-delete'] = &$property;
             }
 
-            if (isset($entity['properties'][$name])) $configError("multiple properties named \"$name\" found (names must be unique)");
+            if (isset($entity['properties'][$name])) $configError("multiple property names \"$name\" found (names must be unique)");
             $entity['properties'][$name] = &$property;              // add all properties to collection "properties"
 
-            if (isset($entity['columns'][$column])) $configError("multiple columns named \"$column\" found (columns must be unique)");
-            $entity['columns'][$column] = &$property;               // add all properties to collection "columns"
+            $columnL = strtolower($column);
+            if (isset($entity['columns'][$columnL])) $configError("multiple columns \"$columnL\" found (columns must be unique)");
+            $entity['columns'][$columnL] = &$property;              // add all properties to collection "columns"
 
             if ($type == ORM::BOOL) {                               // register virtual getters for all properties
                 $entity['getters']["is$name" ] = &$property;
@@ -286,73 +301,213 @@ abstract class DAO extends Singleton {
             }
             unset($property);                                       // reset the reference
         }
-        $entity['identity'] ?? $configError('missing property/column marked with "primary" (tables without primary key are not supported)');
+        if (!isset($entity['identity'])) $configError('missing property marked with attribute "primary-key" (tables without primary key are not supported)');
 
-
-        // TODO:
         // [relations]
         $relations = $mapping['relations'] ?? [];
-        Assert::isArray($relations, 'invalid field $mapping[relations] (array expected)');
+        Assert::isArray($relations, 'invalid element "relations" (array expected)');
 
-        foreach ($relations as $i => $relation) {
-            $name  = $relation['name' ];
-            $type  = $relation['type' ];
-            $assoc = $relation['assoc'];
+        foreach ($relations as $i => $userdata) {
+            $relation = [];
 
-            $newRelation = [
-                'name'  => $name,
-                'type'  => $type,
-                'assoc' => $assoc,
-            ];
+            $name = $userdata['name'] ?? $configError("missing attribute [relations][$i][\"name\"]");
+            Assert::string($name, "invalid attribute [relations][$i][\"name\"] (string expected)");
+            $name = trim($name);
+            Assert::notEmpty($name, "invalid attribute [relations][$i][\"name\"] (non-empty-string expected)");
+            $relation['name'] = $name;
 
-            // any association using a mandatory or optional join table
-            if ($assoc=='many-to-many' || isset($relation['join-table'])) {
-                if (!isset($relation['join-table']))    throw new RuntimeException("Missing attribute \"join-table\"=\"{table-name}\" in relation [name=\"$name\" ...] of entity \"$entity[class]\"");
-                if (!isset($relation['ref-column']))    throw new RuntimeException("Missing attribute \"ref-column\"=\"{table-name.column-name}\" in relation [name=\"$name\" ...] of entity \"$entity[class]\"");
-                if (!isset($relation['fk-ref-column'])) throw new RuntimeException("Missing attribute \"fk-ref-column\"=\"{table-name.column-name}\" in relation [name=\"$name\" ...] of entity \"$entity[class]\"");
+            $type = $userdata['type'] ?? $configError("missing attribute [relations][$i][@name=$name \"type\"]");
+            Assert::string($type, "invalid attribute [relations][$i][@name=$name \"type\"] (string expected)");
+            $type = trim($type);
+            if (!is_subclass_of($type, PersistableObject::class)) {
+                $configError("invalid attribute [relations][$i][@name=$name \"type\"] (not a subclass of ".PersistableObject::class.')');
+            }
+            $relation['type'] = $type;
+
+            $assoc = $userdata['assoc'] ?? $configError("missing attribute [relations][$i][@name=$name \"assoc\"]");
+            Assert::string($assoc, "invalid attribute [relations][$i][@name=$name \"assoc\"] (string expected)");
+            $assoc = trim($assoc);
+            if (!in_array($assoc, $assocs = ['one-to-one','one-to-many','many-to-one','many-to-many'])) {
+                $configError("invalid attribute [relations][$i][@name=$name \"assoc\"] (one of '".join('|', $assocs)."' expected)");
+            }
+            $relation['assoc'] = $assoc;
+
+            switch ($assoc) {
+                // -------------------------------------------------------------------------------------------------------------------------
+                case 'one-to-one':
+                    if (isset($userdata['column'])) {
+                        // variant 1: local foreign-key column, optional ref-column, no join table
+                        $column = $userdata['column'];
+                        Assert::string($column, "invalid attribute [relations][$i][@name=$name \"column\"] (string expected)");
+                        $column = trim($column);
+                        Assert::notEmpty($column, "invalid attribute [relations][$i][@name=$name \"column\"] (non-empty-string expected)");
+                        $relation['column'] = $column;
+
+                        if (isset($userdata['ref-column'])) {
+                            $refColumn = $userdata['ref-column'];
+                            Assert::string($refColumn, "invalid attribute [relations][$i][@name=$name \"ref-column\"] (string expected)");
+                            $refColumn = trim($refColumn);
+                            Assert::notEmpty($refColumn, "invalid attribute [relations][$i][@name=$name \"ref-column\"] (non-empty-string expected)");
+                            $relation['ref-column'] = $refColumn;
+                        }
+                        if (isset($userdata['join-table'])) $configError("invalid relation [relations][$i][@name=$name] (attribute \"column\" cannot be combined with attribute \"join-table\")");
+                    }
+                    else {
+                        // variant 2: no local foreign-key column, required ref-column, optional join table
+                        $refColumn = $userdata['ref-column'] ?? $configError("missing attribute [relations][$i][@name=$name \"ref-column\"]");
+                        Assert::string($refColumn, "invalid attribute [relations][$i][@name=$name \"ref-column\"] (string expected)");
+                        $refColumn = trim($refColumn);
+                        Assert::notEmpty($refColumn, "invalid attribute [relations][$i][@name=$name \"ref-column\"] (non-empty-string expected)");
+                        $relation['ref-column'] = $refColumn;
+                    }
+                    $relation = $this->validateJoinTableSettings($userdata, $relation, true, $i, $entityClass);
+                    break;
+
+                // -------------------------------------------------------------------------------------------------------------------------
+                case 'one-to-many':
+                    // no local foreign-key column, required ref-column, optional join table
+                    if (isset($userdata['column'])) $configError("invalid relation [relations][$i][@name=$name] (assoc \"one-to-many\" cannot have attribute \"column\")");
+
+                    $refColumn = $userdata['ref-column'] ?? $configError("missing attribute [relations][$i][@name=$name \"ref-column\"]");
+                    Assert::string($refColumn, "invalid attribute [relations][$i][@name=$name \"ref-column\"] (string expected)");
+                    $refColumn = trim($refColumn);
+                    Assert::notEmpty($refColumn, "invalid attribute [relations][$i][@name=$name \"ref-column\"] (non-empty-string expected)");
+                    $relation['ref-column'] = $refColumn;
+
+                    $relation = $this->validateJoinTableSettings($userdata, $relation, true, $i, $entityClass);
+                    break;
+
+                // -------------------------------------------------------------------------------------------------------------------------
+                case 'many-to-one':
+                    // required local foreign-key column, optional ref-column, no join table
+                    $column = $userdata['column'] ?? $configError("missing attribute [relations][$i][@name=$name \"column\"]");
+                    Assert::string($column, "invalid attribute [relations][$i][@name=$name \"column\"] (string expected)");
+                    $column = trim($column);
+                    Assert::notEmpty($column, "invalid attribute [relations][$i][@name=$name \"column\"] (non-empty-string expected)");
+                    $relation['column'] = $column;
+
+                    if (isset($userdata['ref-column'])) {
+                        $refColumn = $userdata['ref-column'];
+                        Assert::string($refColumn, "invalid attribute [relations][$i][@name=$name \"ref-column\"] (string expected)");
+                        $refColumn = trim($refColumn);
+                        Assert::notEmpty($refColumn, "invalid attribute [relations][$i][@name=$name \"ref-column\"] (non-empty-string expected)");
+                        $relation['ref-column'] = $refColumn;
+                    }
+
+                    if (isset($userdata['join-table'])) $configError("invalid relation [relations][$i][@name=$name] (assoc \"many-to-one\" cannot have attribute \"join-table\")");
+                    $relation = $this->validateJoinTableSettings($userdata, $relation, true, $i, $entityClass);
+                    break;
+
+                // -------------------------------------------------------------------------------------------------------------------------
+                case 'many-to-many':
+                    // no local foreign-key column, required ref-column, required join table
+                    if (isset($userdata['column'])) $configError("invalid relation [relations][$i][@name=$name] (assoc \"many-to-many\" cannot have attribute \"column\")");
+
+                    $relation = $this->validateJoinTableSettings($userdata, $relation, false, $i, $entityClass);
+                    break;
+
+                // -------------------------------------------------------------------------------------------------------------------------
+                default:
+                    $configError("invalid attribute [relations][$i][@name=$name \"assoc\"] (one of '".join('|', $assocs)."' expected)");
             }
 
-            // one-to-one (without join table)
-            elseif ($assoc == 'one-to-one') {
-                if (!isset($relation['column'])) {
-                    if (!isset($relation['ref-column'])) throw new RuntimeException("Missing attribute \"ref-column\"=\"{column-name}\" in relation [name=\"$name\" ...] of entity \"$entity[class]\"");
-                }
-            }
+            // ensure the local "key" property is set (default: identity)
+            $key = $userdata['key'] ?? $entity['identity']['name'];     // @phpstan-ignore offsetAccess.notFound ('identity' always exist here)
 
-            // one-to-many (without join table)
-            elseif ($assoc == 'one-to-many') {
-                if (!isset($relation['ref-column'])) throw new RuntimeException("Missing attribute \"ref-column\"=\"{column-name}\" in relation [name=\"$name\" ...] of entity \"$entity[class]\"");
-            }
+            if (!isset($entity['properties'][$key])) $configError("invalid attribute [relations][$i][@name=$name \"key\"] (property name expected)");
+            $relation['key'] = $key;
 
-            // many-to-one (can't use a join table)
-            elseif ($assoc == 'many-to-one') {
-                if (!isset($relation['column'])) throw new RuntimeException("Missing attribute \"column\"=\"{column-name}\" in relation [name=\"$name\" ...] of entity \"$entity[class]\"");
-            }
-            else $configError("invalid attribute \"assoc\"=\"$assoc\" in relation [name=\"$name\" ...] of entity \"$entity[class]\"");
+            // add all relations to collection "relations"
+            if (isset($entity['relations'][$name])) $configError("multiple relations with name \"$name\" found (names must be unique)");
+            $entity['relations'][$name] = &$relation;                   // by reference to be able to update all instances at once if needed
 
-            // all relations: ensure "key" is set (default: identity)
-            $relation['key'] ??= $entity['identity']['name'];
-            $entity['properties'][$relation['key']] ?? $configError("invalid attribute \"key\"=\"$relation[key]\" in relation [name=\"$name\" ...] of entity \"$entity[class]\"");
-
-
-
+            // add all relations with local column to collection "columns"
             if (isset($relation['column'])) {
-                $entity['columns'][$relation['column']] = &$relation;   // Stored by reference to be able to update all instances at once.
-            }                                                           // See explanations above for referenced properties.
+                $columnL = strtolower($relation['column']);
+                if (isset($entity['columns'][$columnL])) $configError("multiple mappings for column \"$columnL\" found (columns must be unique)");
+                $entity['columns'][$columnL] = &$relation;
+            }
 
+            // register virtual getters for all relations
             $entity['getters']["get$name"] = &$relation;
-            $entity['relations'][$name] = &$relation;
+
             unset($relation);                                           // reset the reference
         }
 
-        // for faster indexing set collected column and getter names to all-lower-case
-        $entity['columns'] = \array_change_key_case($entity['columns'], CASE_LOWER);
+        // for faster indexing set collected getter names to all-lower-case
         $entity['getters'] = \array_change_key_case($entity['getters'], CASE_LOWER);
 
         //error_log(print_r($entity, true));
 
         /** @phpstan-var ORM_ENTITY $entity */
         return $entity = $entity;
+    }
+
+
+    /**
+     * Validate a relation's "join-table" settings in the user-provided mapping data.
+     *
+     * @param mixed[]  $userdata - user-provided mapping data
+     * @param mixed[]  $relation - existing relation data
+     * @param bool     $optional - whether "join-table" settings in $userdata are optional or required
+     * @param int      $pos      - position of the relation in the mapping (for generation of error messages)
+     * @param string   $class    - entity class the settings belong to (for generation of error messages)
+     *
+     * @return mixed[] - the resulting relation data
+     *
+     * @throws ConfigException on configuration errors
+     */
+    private function validateJoinTableSettings(array $userdata, array $relation, bool $optional, int $pos, string $class): array {
+        $name = $relation['name'] ?? '';
+        $i = $pos;
+        $configError = function(string $message) use ($class) {
+            ORM::configError("$message in mapping of $class");
+        };
+        $newData = [];
+
+        if ($optional) {
+            if (isset($userdata['join-table'])) {
+                // validation as with "join-table" (see below)
+            }
+            else {
+                if (isset($userdata['fk-ref-column'])) $configError("invalid relation [relations][$i][@name=$name] (attribute \"fk-ref-column\" requires a \"join-table\")");
+                if (isset($userdata['foreign-key'  ])) $configError("invalid relation [relations][$i][@name=$name] (attribute \"foreign-key\" requires a \"join-table\")");
+            }
+        }
+        else {
+            // "join-table" (required)
+            $joinTable = $userdata['join-table'] ?? $configError("missing attribute [relations][$i][@name=$name \"join-table\"]");
+            Assert::string($joinTable, "invalid attribute [relations][$i][@name=$name \"join-table\"] (string expected)");
+            $joinTable = trim($joinTable);
+            Assert::notEmpty($joinTable, "invalid attribute [relations][$i][@name=$name \"join-table\"] (non-empty-string expected)");
+            $newData['join-table'] = $joinTable;
+
+            // "ref-column" (required)
+            if (!isset($relation['ref-column'])) {
+                $refColumn = $userdata['ref-column'] ?? $configError("missing attribute [relations][$i][@name=$name \"ref-column\"]");
+                Assert::string($refColumn, "invalid attribute [relations][$i][@name=$name \"ref-column\"] (string expected)");
+                $refColumn = trim($refColumn);
+                Assert::notEmpty($refColumn, "invalid attribute [relations][$i][@name=$name \"ref-column\"] (non-empty-string expected)");
+                $newData['ref-column'] = $refColumn;
+            }
+
+            // "fk-ref-column" (required)
+            $fkRefColumn = $userdata['fk-ref-column'] ?? $configError("missing attribute [relations][$i][@name=$name \"fk-ref-column\"]");
+            Assert::string($fkRefColumn, "invalid attribute [relations][$i][@name=$name \"fk-ref-column\"] (string expected)");
+            $fkRefColumn = trim($fkRefColumn);
+            Assert::notEmpty($fkRefColumn, "invalid attribute [relations][$i][@name=$name \"fk-ref-column\"] (non-empty-string expected)");
+            $newData['fk-ref-column'] = $fkRefColumn;
+
+            // "foreign-key" (optional)
+            if (isset($userdata['foreign-key'])) {
+                $foreignKey = $userdata['foreign-key'];
+                Assert::string($foreignKey, "invalid attribute [relations][$i][@name=$name \"foreign-key\"] (string expected)");
+                $foreignKey = trim($foreignKey);
+                Assert::notEmpty($foreignKey, "invalid attribute [relations][$i][@name=$name \"foreign-key\"] (non-empty-string expected)");
+                $newData['foreign-key'] = $foreignKey;
+            }
+        }
+        return $relation + $newData;
     }
 
 

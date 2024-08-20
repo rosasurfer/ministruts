@@ -198,7 +198,7 @@ abstract class PersistableObject extends CObject {
 
             if (!isset($relation['join-table'])) {
                 // the referencing column is part of the related table
-                $refColumnType = $relatedMapping['columns'][$refColumn]['type'];
+                $refColumnType = $relatedMapping['columns'][$refColumn]['type'] ?? ORM::configError("column \"$refColumn\" not found in mapping of $type (referenced in ".static::class.')');
                 $refValue      = $relatedDao->escapeLiteral($this->getPhysicalValue($keyColumn, $refColumnType));
                 $sql = "select r.*
                             from $relatedTable r
@@ -655,8 +655,16 @@ abstract class PersistableObject extends CObject {
         $mapping = $this->dao()->getMapping();
         $dbType = $this->dao()->db()->getType();
 
+        static $columnsChecked = [];
+
         // ORM_PROPERTY|ORM_RELATION $property
         foreach ($mapping['columns'] as $column => $property) {
+            if (!isset($columnsChecked[static::class])) {
+                if (!key_exists($column, $row)) {
+                    ORM::configError("column \"$column\" not found in query result for ".static::class);
+                }
+            }
+
             $propertyName = $property['name'];
 
             if ($row[$column] === null) {
@@ -705,6 +713,8 @@ abstract class PersistableObject extends CObject {
                 }
             }
         }
+        $columnsChecked[static::class] = true;
+
         return $this;
     }
 
