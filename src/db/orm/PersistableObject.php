@@ -9,7 +9,7 @@ use rosasurfer\ministruts\core\exception\IllegalAccessException;
 use rosasurfer\ministruts\core\exception\IllegalStateException;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
-use rosasurfer\ministruts\db\ConnectorInterface as IConnector;
+use rosasurfer\ministruts\db\ConnectorInterface as Connector;
 use rosasurfer\ministruts\db\orm\meta\PropertyMapping;
 
 use function rosasurfer\ministruts\is_class;
@@ -21,6 +21,12 @@ use function rosasurfer\ministruts\strLeft;
  * PersistableObject
  *
  * Abstract base class for stored objects.
+ *
+ *
+ * @phpstan-import-type  EntityClass  from \rosasurfer\ministruts\db\orm\ORM
+ * @phpstan-import-type  ORM_ENTITY   from \rosasurfer\ministruts\db\orm\ORM
+ * @phpstan-import-type  ORM_PROPERTY from \rosasurfer\ministruts\db\orm\ORM
+ * @phpstan-import-type  ORM_RELATION from \rosasurfer\ministruts\db\orm\ORM
  */
 abstract class PersistableObject extends CObject {
 
@@ -145,11 +151,11 @@ abstract class PersistableObject extends CObject {
      */
     private function getRelationValue($property) {
         $propertyName = $property;
-        /** @var PersistableObject|PersistableObject[]|scalar|null $value */
-        $value = &$this->$propertyName;                                 // existing property value
+        /** @var PersistableObject|PersistableObject[]|int|false|null $value */
+        $value = &$this->$propertyName;                                                 // existing property value
 
-        if (is_object($value)) return $value;                           // relation was already fetched and is object or array
-        if (is_array ($value)) return $value;                           // (collections are not yet implemented)
+        if (is_object($value)) return $value;                                           // relation was already fetched and is object or array
+        if (is_array ($value)) return $value;                                           // (collections are not yet implemented)
 
         $dao = $this->dao();
         $mapping = $dao->getMapping();
@@ -157,85 +163,83 @@ abstract class PersistableObject extends CObject {
         $isCollection = strEndsWith($relation['assoc'], 'many');
         $emptyResult = $isCollection ? [] : null;
 
-        // scalar|null $value
+        // null|int|false $value
         if ($value === null) {
             if (!$this->isPersistent()) {
                 return $emptyResult;
             }
         }
-        elseif ($value === false) {                                     // relation was already fetched and marked as empty
+        elseif ($value === false) {                                                     // relation was already fetched and marked as empty
             return $emptyResult;
         }
 
         // The relation is not yet fetched, the property is NULL or holds a physical foreign-key value.
-        $type = $relation['type'];                                      // related class name
+        $type = $relation['type'];                                                      // related class name
         /** @var DAO $relatedDao */
         $relatedDao = $type::dao();
         $relatedMapping = $relatedDao->getMapping();
         $relatedTable = $relatedMapping['table'];
 
         if ($value === null) {
-            if (isset($relation['column'])) {                           // a local column with a foreign-key value of NULL
-                $value = false;                                         // mark relation as empty
+            if (isset($relation['column'])) {                                           // a local column with a foreign-key value of NULL
+                $value = false;                                                         // mark relation as empty
                 return $emptyResult;
             }
 
-            // a local key is used
-            if (!isset($relation['key'])) {
-                $relation['key'] = $mapping['identity']['name'];        // default local key is identity
-            }
-            $keyName = $relation['key'];                                // the used local key property
+            // w/o local fk column a local key is used
+            $keyName = $relation['key'];                                                // the used local key property
             if ($this->$keyName === null) {
-                $value = false;                                         // mark relation as empty
+                $value = false;                                                         // mark relation as empty
                 return $emptyResult;
             }
-            $keyColumn = $mapping['properties'][$keyName]['column'];    // the used local key column
-            $refColumn = $relation['ref-column'];                       // the referencing column
+            $keyColumn = $mapping['properties'][$keyName]['column'];                    // the used local key column
+            // @phpstan-ignore offsetAccess.notFound (always set)
+            $refColumn = $relation['ref-column'];                                       // the referencing foreign column
 
             if (!isset($relation['join-table'])) {
                 // the referencing column is part of the related table
                 $refColumnType = $relatedMapping['columns'][$refColumn]['type'];
                 $refValue      = $relatedDao->escapeLiteral($this->getPhysicalValue($keyColumn, $refColumnType));
-                $sql = 'select r.*
-                            from '.$relatedTable.' r
-                            where r.'.$refColumn.' = '.$refValue;
+                $sql = "select r.*
+                            from $relatedTable r
+                            where r.$refColumn = $refValue";
             }
             else {
-                // the referenced column is part of a join table
+                // the referenced column is located in a join table
                 $joinTable = $relation['join-table'];
                 $keyValue  = $dao->escapeLiteral($this->getPhysicalValue($keyColumn));  // the physical local key value
 
-                if (!isset($relation['foreign-key']))
-                    $relation['foreign-key'] = $relatedMapping['identity']['name'];     // default foreign-key is identity
+                $relation['foreign-key'] ??= $relatedMapping['identity']['name'];       // default foreign-key is identity
+
                 $fkName      = $relation['foreign-key'];                                // the used foreign-key property
                 $fkColumn    = $relatedMapping['properties'][$fkName]['column'];        // the used foreign-key column
-                $fkRefColumn = $relation['fk-ref-column'];                              // join column referencing the foreign-key
-                $sql = 'select r.*
-                            from '.$relatedTable.' r
-                            join '.$joinTable.'    j on r.'.$fkColumn.' = j.'.$fkRefColumn.'
-                            where j.'.$refColumn.' = '.$keyValue;
+                // @phpstan-ignore offsetAccess.notFound (always set)
+                $fkRefColumn = $relation['fk-ref-column'];                              // join table column referencing the foreign-key
+
+                $sql = "select r.*
+                            from $relatedTable r
+                            join $joinTable    j on r.$fkColumn = j.$fkRefColumn
+                            where j.$refColumn = $keyValue";
             }
             if ($isCollection) {                                                        // default result sorting
                 /** @var string $relatedIdColumn */
                 $relatedIdColumn = $relatedMapping['identity']['column'];               // the related identity column
-                $sql .= ' order by r.'.$relatedIdColumn;                                // sort by identity
+                $sql .= " order by r.$relatedIdColumn";                                 // sort by identity
             }
         }
         else {
             // $value holds a non-NULL column-type foreign-key value pointing to a single related record
             if (isset($relation['join-table'])) {
-                if (!isset($relation['foreign-key']))
-                    $relation['foreign-key'] = $relatedMapping['identity']['name'];     // default foreign-key is identity
+                $relation['foreign-key'] ??= $relatedMapping['identity']['name'];       // default foreign-key is identity
                 $fkName   = $relation['foreign-key'];                                   // the used foreign-key property
                 $fkColumn = $relatedMapping['properties'][$fkName]['column'];           // the used foreign-key column
             }
-            elseif (isset($relation['column'])) {                       // a local column referencing the foreign key
-                if (!isset($relation['ref-column']))                    // default foreign-key is identity
-                    $relation['ref-column'] = $relatedMapping['identity']['column'];
-                $fkColumn = $relation['ref-column'];                    // the used foreign-key column
+            elseif (isset($relation['column'])) {                                       // a local column referencing the foreign key
+                $relation['ref-column'] ??= $relatedMapping['identity']['column'];      // default foreign-key is identity
+                $fkColumn = $relation['ref-column'];                                    // the used foreign-key column
             }
             else {
-                $fkColumn = $relatedMapping['identity']['column'];      // the used foreign-key column is identity
+                $fkColumn = $relatedMapping['identity']['column'];                      // the used foreign-key column is identity
             }
             $fkValue = $relatedDao->escapeLiteral($value);
             $sql = "select r.*
@@ -243,8 +247,8 @@ abstract class PersistableObject extends CObject {
                         where r.$fkColumn = $fkValue";
         }
 
-        if (!$isCollection) $value = $relatedDao->find($sql);           // => PersistableObject
-        else                $value = $relatedDao->findAll($sql);        // => PersistableObject[]
+        if (!$isCollection) $value = $relatedDao->find($sql);       // => PersistableObject
+        else                $value = $relatedDao->findAll($sql);    // => PersistableObject[]
 
         return $value;
     }
@@ -263,37 +267,41 @@ abstract class PersistableObject extends CObject {
         $column  = strtolower($column);
         if (!isset($mapping['columns'][$column])) throw new RuntimeException("Not a mapped column \"$column\"");
 
-        $property = &$mapping['columns'][$column];          // by reference to be able to update all properties at once below (1)
-        $propertyName = $property['name'];
-        $propertyValue = $this->$propertyName;              // this is the logical or physical column value
+        // array<ORM_PROPERTY|ORM_RELATION> $property
+        $propertyOrRelation = &$mapping['columns'][$column];    // by reference to be able to update all properties at once below (1)
+        $propertyName = $propertyOrRelation['name'];
+        $value = $this->$propertyName;                          // this is the logical or physical column value
 
-        if ($propertyValue === null) {
+        if ($value === null) {
             return null;
         }
-        if (isset($property['assoc'])) {
-            if ($propertyValue === false) {
+
+        if (isset($propertyOrRelation['assoc'])) {
+            /** @phpstan-var ORM_RELATION $relation */
+            $relation = &$propertyOrRelation;
+            if ($value === false) {
                 return null;
             }
-            if (!is_object($propertyValue)) {               // a foreign-key value of a not-yet-fetched relation
+            if (!is_object($value)) {                           // a foreign-key value of a not-yet-fetched relation
                 if ($type !== null) throw new RuntimeException('Unexpected parameter $type="'.$type.'" (not null) for relation [name="'.$propertyName.'", column="'.$column.'", ...] of entity "'.$mapping['class'].'"');
-                return $propertyValue;
+                return $value;
             }
-            /** @var PersistableObject $object */
-            $object = $propertyValue;                       // a single instance of "one-to-one"|"many-to-one" relation, no join table
-            if (!isset($property['ref-column'])) {          // (1) use reference and update all properties with related entity settings
-                $property['ref-column'] = $object->dao()->getMapping()['identity']['column'];
-            }
-            $fkColumn = $property['ref-column'];
+            /** @var PersistableObject $object */               // a single fetched instance of a "one-to-one"|"many-to-one" relation, no join table
+            $object = $value;                                   // (1) use reference and update all properties with related entity settings
+            $relation['ref-column'] ??= $object->dao()->getMapping()['identity']['column'];
+            $fkColumn = $relation['ref-column'];
             return $object->getPhysicalValue($fkColumn);
         }
 
+        /** @phpstan-var ORM_PROPERTY $property */
+        $property = &$propertyOrRelation;
         $columnType = $property['column-type'];
 
         switch ($columnType) {
-            case ORM::BOOL  : return (bool)(int) $propertyValue;
-            case ORM::INT   : return       (int) $propertyValue;
-            case ORM::FLOAT : return     (float) $propertyValue;
-            case ORM::STRING: return    (string) $propertyValue;
+            case ORM::BOOL  : return (bool)(int) $value;
+            case ORM::INT   : return       (int) $value;
+            case ORM::FLOAT : return     (float) $value;
+            case ORM::STRING: return    (string) $value;
 
             default:
                 // TODO: convert custom types (e.g. Enum|DateTime) to physical values
@@ -875,7 +883,7 @@ abstract class PersistableObject extends CObject {
     /**
      * Return the database adapter for the calling class.
      *
-     * @return IConnector
+     * @return Connector
      */
     public static function db() {
         if (static::class == __CLASS__) throw new IllegalAccessException('Use an entity class to access method '.__METHOD__.'()');

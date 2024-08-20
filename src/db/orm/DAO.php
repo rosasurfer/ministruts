@@ -296,50 +296,51 @@ abstract class DAO extends Singleton {
 
         foreach ($relations as $i => $relation) {
             $name  = $relation['name' ];
+            $type  = $relation['type' ];
             $assoc = $relation['assoc'];
+
+            $newRelation = [
+                'name'  => $name,
+                'type'  => $type,
+                'assoc' => $assoc,
+            ];
 
             // any association using a mandatory or optional join table
             if ($assoc=='many-to-many' || isset($relation['join-table'])) {
-                if (!isset($relation['join-table']))                     throw new RuntimeException("Missing attribute \"join-table\"=\"{table-name}\" in relation [name=\"$name\" ...] of entity class \"$entity[class]\"");
-                if (!isset($relation['key'])) {
-                    $relation['key'] = $entity['identity']['name'];
-                }
-                elseif (!isset($entity['properties'][$relation['key']])) throw new RuntimeException("Illegal attribute \"key\"=\"$relation[key]\" in relation [name=\"$name\" ...] of entity class \"$entity[class]\"");
-                if (!isset($relation['ref-column']))                     throw new RuntimeException("Missing attribute \"ref-column\"=\"{table-name.column-name}\" in relation [name=\"$name\" ...] of entity class \"$entity[class]\"");
-                if (!isset($relation['fk-ref-column']))                  throw new RuntimeException("Missing attribute \"fk-ref-column\"=\"{table-name.column-name}\" in relation [name=\"$name\" ...] of entity class \"$entity[class]\"");
+                if (!isset($relation['join-table']))    throw new RuntimeException("Missing attribute \"join-table\"=\"{table-name}\" in relation [name=\"$name\" ...] of entity \"$entity[class]\"");
+                if (!isset($relation['ref-column']))    throw new RuntimeException("Missing attribute \"ref-column\"=\"{table-name.column-name}\" in relation [name=\"$name\" ...] of entity \"$entity[class]\"");
+                if (!isset($relation['fk-ref-column'])) throw new RuntimeException("Missing attribute \"fk-ref-column\"=\"{table-name.column-name}\" in relation [name=\"$name\" ...] of entity \"$entity[class]\"");
             }
 
-            // one-to-one (using no optional join table)
+            // one-to-one (without join table)
             elseif ($assoc == 'one-to-one') {
                 if (!isset($relation['column'])) {
-                    if (!isset($relation['key'])) {
-                        $relation['key'] = $entity['identity']['name'];
-                    }
-                    elseif (!isset($entity['properties'][$relation['key']])) throw new RuntimeException("Illegal attribute \"key\"=\"$relation[key]\" in relation [name=\"$name\" ...] of entity class \"$entity[class]\"");
-                    if (!isset($relation['ref-column']))                     throw new RuntimeException("Missing attribute \"ref-column\"=\"{column-name}\" in relation [name=\"$name\" ...] of entity class \"$entity[class]\"");
+                    if (!isset($relation['ref-column'])) throw new RuntimeException("Missing attribute \"ref-column\"=\"{column-name}\" in relation [name=\"$name\" ...] of entity \"$entity[class]\"");
                 }
             }
 
-            // one-to-many (using no optional join table)
+            // one-to-many (without join table)
             elseif ($assoc == 'one-to-many') {
-                if (!isset($relation['key'])) {
-                    $relation['key'] = $entity['identity']['name'];
-                }
-                elseif (!isset($entity['properties'][$relation['key']])) throw new RuntimeException("Illegal attribute \"key\"=\"$relation[key]\" in relation [name=\"$name\" ...] of entity class \"$entity[class]\"");
-                if (!isset($relation['ref-column']))                     throw new RuntimeException("Missing attribute \"ref-column\"=\"{column-name}\" in relation [name=\"$name\" ...] of entity class \"$entity[class]\"");
+                if (!isset($relation['ref-column'])) throw new RuntimeException("Missing attribute \"ref-column\"=\"{column-name}\" in relation [name=\"$name\" ...] of entity \"$entity[class]\"");
             }
 
-            // many-to-one (using no optional join table)
+            // many-to-one (can't use a join table)
             elseif ($assoc == 'many-to-one') {
-                if (!isset($relation['column'])) throw new RuntimeException("Missing attribute \"column\"=\"{column-name}\" in relation [name=\"$name\" ...] of entity class \"$entity[class]\"");
+                if (!isset($relation['column'])) throw new RuntimeException("Missing attribute \"column\"=\"{column-name}\" in relation [name=\"$name\" ...] of entity \"$entity[class]\"");
             }
-            else                                 throw new RuntimeException("Illegal attribute \"assoc\"=\"$assoc\" in relation [name=\"$name\" ...] of entity class \"$entity[class]\"");
+            else $configError("invalid attribute \"assoc\"=\"$assoc\" in relation [name=\"$name\" ...] of entity \"$entity[class]\"");
+
+            // all relations: ensure "key" is set (default: identity)
+            $relation['key'] ??= $entity['identity']['name'];
+            $entity['properties'][$relation['key']] ?? $configError("invalid attribute \"key\"=\"$relation[key]\" in relation [name=\"$name\" ...] of entity \"$entity[class]\"");
+
+
 
             if (isset($relation['column'])) {
                 $entity['columns'][$relation['column']] = &$relation;   // Stored by reference to be able to update all instances at once.
             }                                                           // See explanations above for referenced properties.
-            $entity['getters']["get$name"] = &$relation;
 
+            $entity['getters']["get$name"] = &$relation;
             $entity['relations'][$name] = &$relation;
             unset($relation);                                           // reset the reference
         }

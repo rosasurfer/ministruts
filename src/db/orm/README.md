@@ -10,18 +10,18 @@ An entity mapping describes a single model class and the database table where it
 ```php
 /**
  * @phpstan-var ORM_ENTITY $mapping 
- * @see rosasurfer\ministruts\db\orm\ORM
+ * @see \rosasurfer\ministruts\db\orm\ORM
  */
 $mapping = [
-    'class'      => '{entity-class-name}',      // model class name, must be extended from PersistableObject (required)
-    'connection' => '{database-id}',            // the database identifier as configured in the application configuration (required)
+    'class'      => '{entity-class-name}',      // model class, extended from PersistableObject (required)
+    'connection' => '{database-id}',            // database identifier as configured in the application configuration (required)
     'table'      => '{table-name}',             // name of the database table where class properties are stored (required)
     'properties' => [                           // one or more property definitions (required)
         ORM_PROPERTY, 
         ORM_PROPERTY, 
         ..., 
     ],
-    'relations' => [                            // zero or more relation definitions between entities resp. database tables (optional)
+    'relations' => [                            // zero or more relation definitions between entities/database tables (optional)
         ORM_RELATION,
         ORM_RELATION,
         ..., 
@@ -32,13 +32,17 @@ $mapping = [
 
 Property mapping:
 -----------------
-A property mapping describes how a specific class member is mapped to a sepcific database column.
+A property mapping describes how one specific class member is mapped to one specific database column.
 
 ```php
-ORM_PROPERTY = [
+/**
+ * @phpstan-var ORM_PROPERTY $property
+ * @see \rosasurfer\ministruts\db\orm\ORM
+ */
+$property = [
     'name'   => '{property-name}',
-    'type'   => 'RelatedClassName',
-    'column' => '{column-name}'
+    'type'   => '',
+    'column' => '{column-name}',
 ];
 ```
 
@@ -46,62 +50,82 @@ ORM_PROPERTY = [
 Relation mapping:
 -----------------
 ```php
+/**
+ * @phpstan-var ORM_RELATION $relation
+ * @see \rosasurfer\ministruts\db\orm\ORM
+ */
 $relation = [
-    'name'   => '{property-name}',
-    'type'   => 'RelatedClassName',
-    'column' => '{column-name}'
+    'name'  => '{property-name}',                                   // local property of the relation (required)
+    'type'  => '{entity-class-name}',                               // related model class, extended from PersistableObject (required)
+    'assoc' => 'one-to-one|one-to-many|many-to-one|many-to-many',   // relation type (required)
+    ...,                                                            // optional fields depending on relation type (see below)
 ];
 ```
 
 
-One-To-One: without local foreign-key column
------------
-    'assoc'      => 'one-to-one'
-    'name'       => 'propertyName'
-    'type'       => 'RelatedClassName'
-    'key'        => 'propertyName'          // local key property (optional, default: identity)
-    'ref-column' => 'column_name'           // foreign column referencing the local key
+Relation type "one-to-one" with local foreign-key column
+--------------------------------------------------------
+```php
+$relation = [
+    ...,                                                            // required fields (see above)
+    'assoc'      => 'one-to-one',
+    'column'     => '{column-name}',                                // local column referencing a foreign key
+    'ref-column' => '{column-name}',                                // referenced foreign column (optional, default: primary key)
+];
+```
 
 
-One-To-One: with local foreign-key column
------------
-    'assoc'      => 'one-to-one'
-    'name'       => 'propertyName'
-    'type'       => 'RelatedClassName'
-    'column'     => 'column_name'           // local column referencing a foreign key
-    'ref-column' => 'column_name'           // optional: referenced foreign column (default: identity)
+Relation type "one-to-one" without local foreign-key column
+-----------------------------------------------------------
+```php
+$relation = [
+    ...,                                                            // required fields (see above)
+    'assoc'         => 'one-to-one',
+    'key'           => '{property-name}',                           // local key property (optional, default: primary key)
+    'ref-column'    => '{column-name}',                             // foreign column referencing the local key (required)
+    'join-table'    => '{table-name}',                              // join table (optional, default: table of the related entity)
+    'fk-ref-column' => '{column-name}',                             // join table column referencing the foreign key of the relation (required with join-table)
+];
+```
 
 
-One-To-Many: no local foreign-key column
-------------
+Relation type "one-to-many" (no local foreign-key column)
+---------------------------------------------------------
+```php
+$relation = [
+    ...,                                        // required fields (see above)
     'assoc'      => 'one-to-many'
-    'name'       => 'propertyName'
-    'type'       => 'RelatedClassName'
-    'key'        => 'propertyName'          // optional: local key property (default: identity)
-    'ref-column' => 'column_name'           // foreign column referencing the local key
+    'key'        => 'propertyName'              // optional: local key property (default: identity)
+    'ref-column' => 'column_name'               // foreign column referencing the local key
+];
+```
 
 
-Many-To-One: with local foreign-key column
-------------
+Relation type "many-to-one" (local foreign-key column)
+------------------------------------------------------
+```php
+$relation = [
+    ...,                                        // required fields (see above)
     'assoc'      => 'many-to-one'
-    'name'       => 'propertyName'
-    'type'       => 'RelatedClassName'
-    'column'     => 'column_name'           // local column referencing a foreign key
-    'ref-column' => 'column_name'           // optional: referenced foreign column (default: identity)
+    'column'     => 'column_name'               // local column referencing a foreign key
+    'ref-column' => 'column_name'               // optional: referenced foreign column (default: identity)
+];
+```
 
 
-Many-To-Many: no local foreign-key column
-------------
+Relation type "many-to-many" (no local foreign-key column)
+----------------------------------------------------------
+```php
+$relation = [
+    ...,                                        // required fields (see above)
     'assoc'         => 'many-to-many'
-    'name'          => 'propertyName'
-    'type'          => 'RelatedClassName'
-    'key'           => 'propertyName'       // optional: local key property (default: identity)
-    'ref-column'    => 'column_name'        // join table column referencing the local key
-    'join-table'    => 'table_name'         // join table
-    'foreign-key'   => 'propertyName'       // optional: foreign key property (default: identity)
-    'fk-ref-column' => 'column_name'        // join table column referencing the foreign key
-
-
+    'key'           => 'propertyName'           // optional: local key property (default: identity)
+    'ref-column'    => 'column_name'            // join table column referencing the local key
+    'join-table'    => 'table_name'             // join table
+    'fk-ref-column' => 'column_name'            // join table column referencing the foreign key
+    'foreign-key'   => 'propertyName'           // optional: foreign key property (default: identity)
+];
+```
 
 
 Many-To-One:

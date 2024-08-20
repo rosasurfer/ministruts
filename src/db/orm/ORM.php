@@ -12,6 +12,19 @@ use rosasurfer\ministruts\core\StaticClass;
  *
  * @phpstan-type  EntityClass = \rosasurfer\ministruts\db\orm\PersistableObject
  *
+ * @phpstan-type  ORM_ENTITY = array{
+ *     class       : class-string<EntityClass>,
+ *     connection  : string,
+ *     table       : string,
+ *     properties  : array<ORM_PROPERTY>,
+ *     relations   : array<ORM_RELATION>,
+ *     columns     : array<ORM_PROPERTY|ORM_RELATION>,
+ *     getters     : array<ORM_PROPERTY|ORM_RELATION>,
+ *     identity    : ORM_PROPERTY,
+ *     version?    : ORM_PROPERTY,
+ *     soft-delete?: ORM_PROPERTY,
+ * }
+ *
  * @phpstan-type  ORM_PROPERTY = array{
  *     name        : string,
  *     type        : string,
@@ -26,25 +39,12 @@ use rosasurfer\ministruts\core\StaticClass;
  *     name          : string,
  *     assoc         : string,
  *     type          : class-string<EntityClass>,
- *     key?          : string,
+ *     key           : string,
  *     column?       : string,
  *     ref-column?   : string,
  *     join-table?   : string,
  *     foreign-key?  : string,
  *     fk-ref-column?: string,
- * }
- *
- * @phpstan-type  ORM_ENTITY = array{
- *     class       : class-string<EntityClass>,
- *     connection  : string,
- *     table       : string,
- *     properties  : array<ORM_PROPERTY>,
- *     relations   : array<ORM_RELATION>,
- *     columns     : array<ORM_PROPERTY|ORM_RELATION>,
- *     getters     : array<ORM_PROPERTY|ORM_RELATION>,
- *     identity    : ORM_PROPERTY,
- *     version?    : ORM_PROPERTY,
- *     soft-delete?: ORM_PROPERTY,
  * }
  */
 final class ORM extends StaticClass {
