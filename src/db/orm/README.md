@@ -42,8 +42,8 @@ $property = [
     "type"        => "{type}",                  // scalar PHP type of the variable (required)
     "column"      => "{column-name}",           // database column (optional, default: same as "name")
     "column-type" => "{column-type}",           // database column type (optional, default: same as "type")
-    "primary-key" => true,                      // marks the property as the identity field of the entity (optional)
-    "version"     => true,                      // marks the property as the version field of the entity (optional)
+    "primary-key" => true,                      // marks the property as identity field of the entity (optional)
+    "version"     => true,                      // marks the property as version field of the entity (optional)
     "soft-delete" => true,                      // defines the property as marker for "soft-deleted" entities (optional)
 ];
 ```
