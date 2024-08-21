@@ -70,7 +70,7 @@ $relation = [
 ```php
 $relation = [
     ...,                                        // common fields (see above)
-    "assoc"      => "one-to-one",
+    "type"       => "one-to-one",
     "column"     => "{column-name}",            // local column referencing a foreign key (required)
     "ref-column" => "{column-name}",            // referenced foreign column (optional, default: primary key)
 ];
@@ -81,7 +81,7 @@ $relation = [
 ```php
 $relation = [
     ...,                                        // common fields (see above)
-    "assoc"      => "one-to-one",
+    "type"       => "one-to-one",
     "key"        => "{property-name}",          // local key property (optional, default: primary key)
     "ref-column" => "{column-name}",            // foreign column referencing the local key (required)
 ];
@@ -92,7 +92,7 @@ $relation = [
 ```php
 $relation = [
     ...,                                        // common fields (see above)
-    "assoc"      => "one-to-many"
+    "type"       => "one-to-many"
     "key"        => "{property-name}"           // local key property (optional, default: identity)
     "ref-column" => "{column-name}"             // foreign column referencing the local key (required)
 ];
@@ -103,7 +103,7 @@ $relation = [
 ```php
 $relation = [
     ...,                                        // common fields (see above)
-    "assoc"      => "many-to-one"
+    "type"       => "many-to-one"
     "column"     => "{column-name}"             // local column referencing a foreign key (required)
     "ref-column" => "{column-name}"             // referenced foreign column (optional, default: identity)
 ];
@@ -114,7 +114,7 @@ $relation = [
 ```php
 $relation = [
     ...,                                        // common fields (see above)
-    "assoc"         => "many-to-many"
+    "type"          => "many-to-many"
     "key"           => "{property-name}"        // local key property (optional, default: identity)
     "join-table"    => "{table-name}"           // join table (required)
     "ref-column"    => "{column-name}"          // join table column referencing the local key (required)
