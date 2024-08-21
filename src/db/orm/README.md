@@ -3,7 +3,6 @@ ORM mapping reference
 =====================
 
 
-
 ## Entity mapping:
 An entity mapping describes an entity class and the database table where its class properties are stored.
 
@@ -39,9 +38,13 @@ A property mapping describes how a member variable of an entity class is mapped 
  * @see \rosasurfer\ministruts\db\orm\ORM
  */
 $property = [
-    "name"   => "{property-name}",
-    "type"   => "{type}",
-    "column" => "{column-name}",
+    "name"        => "{property-name}",         // name of the PHP variable, accessor of the mapped database field (required)
+    "type"        => "{type}",                  // scalar PHP type of the variable (required)
+    "column"      => "{column-name}",           // database column (optional, default: same as "name")
+    "column-type" => "{column-type}",           // database column type (optional, default: same as "type")
+    "primary-key" => true,                      // marks the property as the identity field of the entity (optional)
+    "version"     => true,                      // marks the property as the version field of the entity (optional)
+    "soft-delete" => true,                      // defines the property as marker for "soft-deleted" entities (optional)
 ];
 ```
 
@@ -55,7 +58,7 @@ A relation mapping describes the object-oriented relation between two entity cla
  * @see \rosasurfer\ministruts\db\orm\ORM
  */
 $relation = [
-    "name"  => "{property-name}",               // local property of the relation, accessor of the related object/s (required)
+    "name"  => "{property-name}",               // PHP property of the relation, accessor of the related object/s (required)
     "assoc" => "{type}",                        // relation type, one of "one-to-one|one-to-many|many-to-one|many-to-many" (required)
     "type"  => PersistableObject::class,        // model class of the related object/s, must extend PersistableObject (required)
     ...,                                        // optional fields (see below)
