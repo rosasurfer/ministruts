@@ -3,8 +3,8 @@ ORM mapping reference
 =====================
 
 
-Entity mapping:
----------------
+
+## Entity mapping:
 An entity mapping describes an entity class and the database table where its class properties are stored.
 
 ```php
@@ -30,16 +30,13 @@ $mapping = [
 ```
 
 
-Property mapping:
------------------
+## Property mapping:
 A property mapping describes how a member variable of an entity class is mapped to a specific database column.
 
 ```php
 /**
  * @phpstan-var ORM_PROPERTY $property
  * @see \rosasurfer\ministruts\db\orm\ORM
- *
- * TODO:
  */
 $property = [
     "name"   => "{property-name}",
@@ -49,8 +46,7 @@ $property = [
 ```
 
 
-Relation mapping:
------------------
+## Relation mapping:
 A relation mapping describes the object-oriented relation between two entity clases (resp. ER model of two database tables).
 
 ```php
