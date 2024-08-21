@@ -159,7 +159,7 @@ abstract class PersistableObject extends CObject {
         $dao = $this->dao();
         $mapping = $dao->getMapping();
         $relation = &$mapping['relations'][$propertyName];
-        $isCollection = strEndsWith($relation['assoc'], 'many');
+        $isCollection = strEndsWith($relation['type'], 'many');
         $emptyResult = $isCollection ? [] : null;
 
         // null|int|false $value
@@ -173,9 +173,9 @@ abstract class PersistableObject extends CObject {
         }
 
         // The relation is not yet fetched, the property is NULL or holds a physical foreign-key value.
-        $type = $relation['type'];                                                      // related class name
+        $relatedClass = $relation['class'];                                             // related class name
         /** @var DAO $relatedDao */
-        $relatedDao = $type::dao();
+        $relatedDao = $relatedClass::dao();
         $relatedMapping = $relatedDao->getMapping();
         $relatedTable = $relatedMapping['table'];
 
@@ -195,11 +195,10 @@ abstract class PersistableObject extends CObject {
             // @phpstan-ignore offsetAccess.notFound (always set)
             $refColumn = $relation['ref-column'];                                       // the referencing foreign column
 
-            if (!isset($relation['join-table'])) {
-                // the referencing column is part of the related table
-                $relatedMapping['columns'][$refColumn] ?? ORM::configError("column \"$refColumn\" not found in mapping of $type (referenced in ".static::class.')');
-
-                $refColumnType = $relatedMapping['columns'][$refColumn]['type'];
+            if (!isset($relation['join-table'])) {                                      // the referencing column is part of the related table
+                /** @phpstan-var ORM_PROPERTY $refProperty */
+                $refProperty   = $relatedMapping['columns'][$refColumn] ?? ORM::configError("column \"$refColumn\" not found in mapping of $relatedClass (referenced in ".static::class.')');
+                $refColumnType = $refProperty['type'];
                 $refValue      = $relatedDao->escapeLiteral($this->getPhysicalValue($keyColumn, $refColumnType));
                 $sql = "select r.*
                             from $relatedTable r
@@ -277,7 +276,7 @@ abstract class PersistableObject extends CObject {
             return null;
         }
 
-        if (isset($propertyOrRelation['assoc'])) {
+        if (isset($propertyOrRelation['class'])) {
             /** @phpstan-var ORM_RELATION $relation */
             $relation = &$propertyOrRelation;
             if ($value === false) {
@@ -659,22 +658,23 @@ abstract class PersistableObject extends CObject {
         static $columnsChecked = [];
 
         // ORM_PROPERTY|ORM_RELATION $property
-        foreach ($mapping['columns'] as $column => $property) {
+        foreach ($mapping['columns'] as $column => $propertyOrRelation) {
             if (!isset($columnsChecked[static::class])) {
                 if (!key_exists($column, $row)) {
                     ORM::configError("column \"$column\" not found in query result for ".static::class);
                 }
             }
 
-            $propertyName = $property['name'];
+            $name = $propertyOrRelation['name'];
 
             if ($row[$column] === null) {
-                $this->$propertyName = null;
+                $this->$name = null;
             }
             else {
-                if (isset($property['assoc'])) {                // $property[type] is a PersistableObject class
-                    // ORM_RELATION $property
-                    $this->$propertyName = $row[$column];       // the foreign-key column is stored as is
+                if (isset($propertyOrRelation['class'])) {
+                    /** @phpstan-var ORM_RELATION $relation */
+                    $relation = $propertyOrRelation;
+                    $this->$name = $row[$column];               // the foreign-key column is stored as is
 
                     //if (!isset($property['column-type'])) {
                     //    $relatedMapping = $propertyType::dao()->getMapping();
@@ -687,26 +687,28 @@ abstract class PersistableObject extends CObject {
                     //$propertyType = $property['column-type'];
                 }
                 else {
-                    // ORM_PROPERTY $property
+                    /** @phpstan-var ORM_PROPERTY $property */
+                    $property = $propertyOrRelation;
+
                     switch ($property['type']) {
                         case ORM::BOOL:
                             if ($dbType == 'pgsql') {
                                 if     ($row[$column] == 't') $row[$column] = 1;
                                 elseif ($row[$column] == 'f') $row[$column] = 0;
                             };
-                            $this->$propertyName = (bool)(int) $row[$column];
+                            $this->$name = (bool)(int) $row[$column];
                             break;
 
-                        case ORM::INT    : $this->$propertyName =    (int) $row[$column]; break;
-                        case ORM::FLOAT  : $this->$propertyName =  (float) $row[$column]; break;
-                        case ORM::STRING : $this->$propertyName = (string) $row[$column]; break;
-                      //case 'array': $this->$propertyName = strlen($row[$column]) ? explode(',', $row[$column]):[]; break;
-                      //case DateTime::class: $this->$propertyName = new DateTime($row[$column]); break;
+                        case ORM::INT    : $this->$name =    (int) $row[$column]; break;
+                        case ORM::FLOAT  : $this->$name =  (float) $row[$column]; break;
+                        case ORM::STRING : $this->$name = (string) $row[$column]; break;
+                      //case 'array': $this->$name = strlen($row[$column]) ? explode(',', $row[$column]):[]; break;
+                      //case DateTime::class: $this->$name = new DateTime($row[$column]); break;
 
                         default:
                             // TODO: handle custom types
                             //if (class_exists($propertyType)) {
-                            //    $object->$propertyName = new $propertyType($row[$column]);
+                            //    $object->$name = new $propertyType($row[$column]);
                             //    break;
                             //}
                             throw new RuntimeException("Unsupported property type \"$property[type]\" for mapping of column $mapping[table].$column");

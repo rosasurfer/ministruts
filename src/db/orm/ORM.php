@@ -14,8 +14,8 @@ use rosasurfer\ministruts\core\StaticClass;
  *
  * @phpstan-type  ORM_ENTITY = array{
  *     class       : class-string<EntityClass>,
- *     connection  : string,
- *     table       : string,
+ *     connection  : non-empty-string,
+ *     table       : non-empty-string,
  *     properties  : array<ORM_PROPERTY>,
  *     relations   : array<ORM_RELATION>,
  *     columns     : array<ORM_PROPERTY|ORM_RELATION>,
@@ -26,25 +26,25 @@ use rosasurfer\ministruts\core\StaticClass;
  * }
  *
  * @phpstan-type  ORM_PROPERTY = array{
- *     name        : string,
- *     type        : string,
- *     column      : string,
- *     column-type : string,
- *     primary-key?: bool,
- *     version?    : bool,
- *     soft-delete?: bool,
+ *     name        : non-empty-string,
+ *     type        : non-empty-string,
+ *     column      : non-empty-string,
+ *     column-type : non-empty-string,
+ *     primary-key?: true,
+ *     version?    : true,
+ *     soft-delete?: true,
  * }
  *
  * @phpstan-type  ORM_RELATION = array{
- *     name          : string,
- *     assoc         : string,
- *     type          : class-string<EntityClass>,
- *     key           : string,
- *     column?       : string,
- *     ref-column?   : string,
- *     join-table?   : string,
- *     fk-ref-column?: string,
- *     foreign-key?  : string,
+ *     name          : non-empty-string,
+ *     type          : 'one-to-one'|'one-to-many'|'many-to-one'|'many-to-many',
+ *     class         : class-string<EntityClass>,
+ *     key           : non-empty-string,
+ *     column?       : non-empty-string,
+ *     ref-column?   : non-empty-string,
+ *     join-table?   : non-empty-string,
+ *     fk-ref-column?: non-empty-string,
+ *     foreign-key?  : non-empty-string,
  * }
  */
 final class ORM extends StaticClass {

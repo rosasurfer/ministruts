@@ -302,6 +302,7 @@ abstract class DAO extends Singleton {
         // [relations]
         $relations = $mapping['relations'] ?? [];
         Assert::isArray($relations, 'invalid element "relations" (array expected)');
+        $relationTypes = ['one-to-one','one-to-many','many-to-one','many-to-many'];
 
         foreach ($relations as $i => $userdata) {
             $relation = [];
@@ -312,23 +313,23 @@ abstract class DAO extends Singleton {
             Assert::notEmpty($name, "invalid attribute [relations][$i][\"name\"] (non-empty-string expected)");
             $relation['name'] = $name;
 
-            $assoc = $userdata['assoc'] ?? $configError("missing attribute [relations][$i][@name=$name \"assoc\"]");
-            Assert::string($assoc, "invalid attribute [relations][$i][@name=$name \"assoc\"] (string expected)");
-            $assoc = trim($assoc);
-            if (!in_array($assoc, $assocs = ['one-to-one','one-to-many','many-to-one','many-to-many'])) {
-                $configError("invalid attribute [relations][$i][@name=$name \"assoc\"] (one of '".join('|', $assocs)."' expected)");
-            }
-            $relation['assoc'] = $assoc;
-
             $type = $userdata['type'] ?? $configError("missing attribute [relations][$i][@name=$name \"type\"]");
             Assert::string($type, "invalid attribute [relations][$i][@name=$name \"type\"] (string expected)");
             $type = trim($type);
-            if (!is_subclass_of($type, PersistableObject::class)) {
-                $configError("invalid attribute [relations][$i][@name=$name \"type\"] (not a subclass of ".PersistableObject::class.')');
+            if (!in_array($type, $relationTypes)) {
+                $configError("invalid attribute [relations][$i][@name=$name \"type\"] (one of \"".join('|', $relationTypes)."\" expected)");
             }
             $relation['type'] = $type;
 
-            switch ($assoc) {
+            $class = $userdata['class'] ?? $configError("missing attribute [relations][$i][@name=$name \"class\"]");
+            Assert::string($class, "invalid attribute [relations][$i][@name=$name \"class\"] (string expected)");
+            $class = trim($class);
+            if (!is_subclass_of($class, PersistableObject::class)) {
+                $configError("invalid attribute [relations][$i][@name=$name \"class\"] (not a subclass of ".PersistableObject::class.')');
+            }
+            $relation['class'] = $class;
+
+            switch ($type) {
                 // -------------------------------------------------------------------------------------------------------------------------
                 case 'one-to-one':
                     if (isset($userdata['column'])) {
@@ -362,7 +363,7 @@ abstract class DAO extends Singleton {
                 // -------------------------------------------------------------------------------------------------------------------------
                 case 'one-to-many':
                     // no local foreign-key column, required ref-column, optional join table
-                    if (isset($userdata['column'])) $configError("invalid relation [relations][$i][@name=$name] (assoc \"one-to-many\" cannot have attribute \"column\")");
+                    if (isset($userdata['column'])) $configError("invalid relation [relations][$i][@name=$name] (type \"one-to-many\" cannot have attribute \"column\")");
 
                     $refColumn = $userdata['ref-column'] ?? $configError("missing attribute [relations][$i][@name=$name \"ref-column\"]");
                     Assert::string($refColumn, "invalid attribute [relations][$i][@name=$name \"ref-column\"] (string expected)");
@@ -390,21 +391,21 @@ abstract class DAO extends Singleton {
                         $relation['ref-column'] = $refColumn;
                     }
 
-                    if (isset($userdata['join-table'])) $configError("invalid relation [relations][$i][@name=$name] (assoc \"many-to-one\" cannot have attribute \"join-table\")");
+                    if (isset($userdata['join-table'])) $configError("invalid relation [relations][$i][@name=$name] (type \"many-to-one\" cannot have attribute \"join-table\")");
                     $relation = $this->validateJoinTableSettings($userdata, $relation, true, $i, $entityClass);
                     break;
 
                 // -------------------------------------------------------------------------------------------------------------------------
                 case 'many-to-many':
                     // no local foreign-key column, required ref-column, required join table
-                    if (isset($userdata['column'])) $configError("invalid relation [relations][$i][@name=$name] (assoc \"many-to-many\" cannot have attribute \"column\")");
+                    if (isset($userdata['column'])) $configError("invalid relation [relations][$i][@name=$name] (type \"many-to-many\" cannot have attribute \"column\")");
 
                     $relation = $this->validateJoinTableSettings($userdata, $relation, false, $i, $entityClass);
                     break;
 
                 // -------------------------------------------------------------------------------------------------------------------------
                 default:
-                    $configError("invalid attribute [relations][$i][@name=$name \"assoc\"] (one of '".join('|', $assocs)."' expected)");
+                    $configError("invalid attribute [relations][$i][@name=$name \"type\"] (one of \"".join('|', $relationTypes)."\" expected)");
             }
 
             // ensure the local "key" property is set (default: identity)

@@ -59,8 +59,8 @@ A relation mapping describes the object-oriented relation between two entity cla
  */
 $relation = [
     "name"  => "{property-name}",               // PHP property of the relation, accessor of the related object/s (required)
-    "assoc" => "{type}",                        // relation type, one of "one-to-one|one-to-many|many-to-one|many-to-many" (required)
-    "type"  => PersistableObject::class,        // model class of the related object/s, must extend PersistableObject (required)
+    "type"  => "{type}",                        // one of "one-to-one|one-to-many|many-to-one|many-to-many" (required)
+    "class" => PersistableObject::class,        // model class of the related object/s, must extend PersistableObject (required)
     ...,                                        // optional fields (see below)
 ];
 ```
