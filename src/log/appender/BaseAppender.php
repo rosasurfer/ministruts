@@ -70,7 +70,7 @@ abstract class BaseAppender extends CObject implements AppenderInterface {
         // read a configured content filter
         /** @var ?string $class */
         $class = $options['filter'] ?? null;
-        if (!is_null($class)) {
+        if (isset($class)) {
             if (!is_a($class, ContentFilter::class, true)) {
                 throw new InvalidValueException('Invalid parameter $options[filter] (not a subclass of '.ContentFilter::class.')');
             }

@@ -7,8 +7,6 @@ use Closure;
 
 use rosasurfer\ministruts\core\exception\ClassNotFoundException;
 
-use function rosasurfer\ministruts\is_class;
-
 
 /**
  * Service
@@ -111,7 +109,7 @@ class Service implements ServiceInterface {
         if (!$factory) $args = [];
 
         if (is_string($definition)) {                       // a string is a class name without parameters
-            if (!is_class($definition)) throw new ClassNotFoundException('Cannot resolve service "'.$this->name.'" (unknown class "'.$definition.'")');
+            if (!class_exists($definition)) throw new ClassNotFoundException("Cannot resolve service \"$this->name\" (unknown class \"$definition\")");
             $instance = new $definition(...$args);
         }
         elseif (is_object($definition)) {                   // objects may be a Closure or an already resolved instance

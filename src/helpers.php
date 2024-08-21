@@ -9,7 +9,6 @@ namespace rosasurfer\ministruts;
 use ArrayAccess;
 use Closure;
 use ErrorException;
-use Throwable;
 use Traversable;
 
 use rosasurfer\ministruts\console\docopt\DocoptParser;
@@ -508,60 +507,6 @@ function is_array_like($var): bool {
 
 
 /**
- * Whether the specified class exists (loaded or not) and is not an interface or a trait. Same as
- * <pre>class_exists($name, true)</pre> but suppresses auto loading errors.
- *
- * @param  string $name - class name
- *
- * @return bool
- */
-function is_class(string $name): bool {
-    try {
-        return class_exists($name, true);
-    }
-    catch (Throwable $ex) {}            // faulty class loaders may interrupt the script
-
-    return class_exists($name, false);
-}
-
-
-/**
- * Whether the specified interface exists (loaded or not) and is not a class or a trait. Same as
- * <pre>interface_exists($name, true)</pre> but suppresses auto loading errors.
- *
- * @param  string $name - interface name
- *
- * @return bool
- */
-function is_interface(string $name): bool {
-    try {
-        return interface_exists($name, true);
-    }
-    catch (Throwable $ex) {}            // faulty class loaders may interrupt the script
-
-    return interface_exists($name, false);
-}
-
-
-/**
- * Whether the specified trait exists (loaded or not) and is not a class or an interface. Same as
- * <pre>trait_exists($name, true)</pre> but suppresses auto loading errors.
- *
- * @param  string $name - trait name
- *
- * @return bool
- */
-function is_trait(string $name): bool {
-    try {
-        return trait_exists($name, true);
-    }
-    catch (Throwable $ex) {}            // faulty class loaders may interrupt the script
-
-    return trait_exists($name, false);
-}
-
-
-/**
  * Whether the byte order of the machine we are running on is "little endian".
  *
  * @return bool
@@ -670,9 +615,9 @@ function lastKey(iterable $values) {
 function metatypeOf(string $name): string {
     if ($name == '') throw new InvalidValueException('Invalid parameter $name: "" (empty)');
 
-    if (is_class    ($name)) return 'class';
-    if (is_interface($name)) return 'interface';
-    if (is_trait    ($name)) return 'trait';
+    if (class_exists($name))     return 'class';
+    if (interface_exists($name)) return 'interface';
+    if (trait_exists($name))     return 'trait';
 
     return '(unknown type)';
 }

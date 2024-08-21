@@ -12,7 +12,6 @@ use rosasurfer\ministruts\core\exception\RuntimeException;
 use rosasurfer\ministruts\db\ConnectorInterface as Connector;
 use rosasurfer\ministruts\db\orm\meta\PropertyMapping;
 
-use function rosasurfer\ministruts\is_class;
 use function rosasurfer\ministruts\strEndsWith;
 use function rosasurfer\ministruts\strLeft;
 
@@ -101,9 +100,9 @@ abstract class PersistableObject extends CObject {
             }
             elseif (is_array($this->$name)) {                       // property access level encoding
                 $protected = "\0*\0$name";                          // ------------------------------
-                $public = $name;                                    // private:   "\0{className}\0{propertyName}"
-                unset($array[$protected], $array[$public]);         // protected: "\0*\0{propertyName}"
-            }                                                       // public:    "{propertyName}"
+                $public = $name;                                    // private:   "\0{className}\0{property-name}"
+                unset($array[$protected], $array[$public]);         // protected: "\0*\0{property-name}"
+            }                                                       // public:    "{property-name}"
         }
         return \array_keys($array);
     }
@@ -198,7 +197,9 @@ abstract class PersistableObject extends CObject {
 
             if (!isset($relation['join-table'])) {
                 // the referencing column is part of the related table
-                $refColumnType = $relatedMapping['columns'][$refColumn]['type'] ?? ORM::configError("column \"$refColumn\" not found in mapping of $type (referenced in ".static::class.')');
+                $relatedMapping['columns'][$refColumn] ?? ORM::configError("column \"$refColumn\" not found in mapping of $type (referenced in ".static::class.')');
+
+                $refColumnType = $relatedMapping['columns'][$refColumn]['type'];
                 $refValue      = $relatedDao->escapeLiteral($this->getPhysicalValue($keyColumn, $refColumnType));
                 $sql = "select r.*
                             from $relatedTable r
@@ -305,7 +306,7 @@ abstract class PersistableObject extends CObject {
 
             default:
                 // TODO: convert custom types (e.g. Enum|DateTime) to physical values
-                //if (is_class($propertyType)) {
+                //if (class_exists($propertyType)) {
                 //    $object->$propertyName = new $propertyType($row[$column]);
                 //    break;
                 //}
@@ -704,7 +705,7 @@ abstract class PersistableObject extends CObject {
 
                         default:
                             // TODO: handle custom types
-                            //if (is_class($propertyType)) {
+                            //if (class_exists($propertyType)) {
                             //    $object->$propertyName = new $propertyType($row[$column]);
                             //    break;
                             //}

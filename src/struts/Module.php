@@ -11,7 +11,6 @@ use rosasurfer\ministruts\file\xml\SimpleXMLElement;
 use rosasurfer\ministruts\net\http\HttpResponse;
 
 use function rosasurfer\ministruts\first;
-use function rosasurfer\ministruts\is_class;
 use function rosasurfer\ministruts\isRelativePath;
 use function rosasurfer\ministruts\realpath;
 use function rosasurfer\ministruts\simpleClassName;
@@ -909,7 +908,7 @@ class Module extends CObject {
                 continue;
             }
 
-            if (is_class($value)) {                     // imported class
+            if (class_exists($value)) {                 // imported class
                 if (strStartsWith($value, '\\')) $value = substr($value, 1);
                 $simpleName = simpleClassName($value);
                 if (isset($this->uses[$simpleName])) throw new StrutsConfigException('<imports> <import value="'.$import['value'].'": Duplicate value.');
@@ -1027,8 +1026,8 @@ class Module extends CObject {
      */
     protected function setTilesClass($className) {
         if ($this->configured)                        throw new IllegalStateException('Configuration is frozen');
-        if (!is_class($className))                    throw new StrutsConfigException('Class '.$className.' not found');
-        if (!is_subclass_of($className, Tile::class)) throw new StrutsConfigException('Not a subclass of '.Tile::class.': '.$className);
+        if (!class_exists($className))                throw new StrutsConfigException("Class $className not found");
+        if (!is_subclass_of($className, Tile::class)) throw new StrutsConfigException('Not a subclass of '.Tile::class.": $className");
 
         $this->tilesClass = $className;
         return $this;
@@ -1057,8 +1056,8 @@ class Module extends CObject {
      */
     protected function setMappingClass($className) {
         if ($this->configured)                                         throw new IllegalStateException('Configuration is frozen');
-        if (!is_class($className))                                     throw new StrutsConfigException('Class '.$className.' not found');
-        if (!is_subclass_of($className, DEFAULT_ACTION_MAPPING_CLASS)) throw new StrutsConfigException('Not a subclass of '.DEFAULT_ACTION_MAPPING_CLASS.': '.$className);
+        if (!class_exists($className))                                 throw new StrutsConfigException("Class $className not found");
+        if (!is_subclass_of($className, DEFAULT_ACTION_MAPPING_CLASS)) throw new StrutsConfigException('Not a subclass of '.DEFAULT_ACTION_MAPPING_CLASS.": $className");
 
         $this->mappingClass = $className;
         return $this;
@@ -1087,8 +1086,8 @@ class Module extends CObject {
      */
     protected function setForwardClass($className) {
         if ($this->configured)                                         throw new IllegalStateException('Configuration is frozen');
-        if (!is_class($className))                                     throw new StrutsConfigException('Class '.$className.' not found');
-        if (!is_subclass_of($className, DEFAULT_ACTION_FORWARD_CLASS)) throw new StrutsConfigException('Not a subclass of '.DEFAULT_ACTION_FORWARD_CLASS.': '.$className);
+        if (!class_exists($className))                                 throw new StrutsConfigException("Class $className not found");
+        if (!is_subclass_of($className, DEFAULT_ACTION_FORWARD_CLASS)) throw new StrutsConfigException('Not a subclass of '.DEFAULT_ACTION_FORWARD_CLASS.": $className");
 
         $this->forwardClass = $className;
         return $this;
@@ -1253,20 +1252,23 @@ class Module extends CObject {
         $name = str_replace('/', '\\', trim($name));
 
         // no need to resolve a qualified name
-        if (strContains($name, '\\'))
-            return is_class($name) ? [$name] : [];
+        if (strContains($name, '\\')) {
+            return class_exists($name) ? [$name] : [];
+        }
 
         // unqualified name, check "use" declarations
-        $lowerName = strtolower($name);
-        if (isset($this->uses[$lowerName]))
-            return [$this->uses[$lowerName]];
+        $nameL = strtolower($name);
+        if (isset($this->uses[$nameL])) {
+            return [$this->uses[$nameL]];
+        }
 
         // unqualified name, check imported namespaces
         $results = [];
         foreach ($this->imports as $namespace) {
             $class = $namespace.$name;
-            if (is_class($class))
+            if (class_exists($class)) {
                 $results[] = $class;
+            }
         }
         return $results;
     }

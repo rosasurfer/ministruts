@@ -7,15 +7,12 @@ use Throwable;
 
 use rosasurfer\ministruts\core\Singleton;
 use rosasurfer\ministruts\core\assert\Assert;
-use rosasurfer\ministruts\core\exception\ClassNotFoundException;
-use rosasurfer\ministruts\core\exception\InvalidTypeException;
+use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\db\ConnectorInterface as IConnector;
 use rosasurfer\ministruts\db\MultipleRecordsException;
 use rosasurfer\ministruts\db\NoSuchRecordException;
 use rosasurfer\ministruts\db\ResultInterface as IResult;
 use rosasurfer\ministruts\db\orm\meta\EntityMapping;
-
-use function rosasurfer\ministruts\is_class;
 
 
 /**
@@ -43,24 +40,6 @@ abstract class DAO extends Singleton {
 
 
     /**
-     * Get the specified DAO implementation.
-     *
-     * @param  string $class - DAO class name
-     *
-     * @return DAO
-     */
-    final public static function getImplementation($class) {
-        if (!is_a($class, __CLASS__, true)) {
-            if (!is_class($class)) throw new ClassNotFoundException('Class not found: '.$class );
-            throw new InvalidTypeException('Not a '.__CLASS__.' subclass: '.$class);
-        }
-        /** @var self $dao */
-        $dao = self::getInstance($class);
-        return $dao;
-    }
-
-
-    /**
      * Constructor
      *
      * Create a new DAO.
@@ -68,6 +47,23 @@ abstract class DAO extends Singleton {
     protected function __construct() {
         parent::__construct();
         $this->entityClass = substr(get_class($this), 0, -3);
+    }
+
+
+    /**
+     * Get the specified DAO implementation.
+     *
+     * @param  string $class - concrete DAO class name
+     *
+     * @return DAO
+     */
+    final public static function getImplementation($class) {
+        if (!is_subclass_of($class, __CLASS__, true)) {
+            throw new InvalidValueException("Invalid parameter \$class: $class (not a subclass of ".__CLASS__.')');
+        }
+        /** @var self $dao */
+        $dao = self::getInstance($class);
+        return $dao;
     }
 
 
@@ -316,14 +312,6 @@ abstract class DAO extends Singleton {
             Assert::notEmpty($name, "invalid attribute [relations][$i][\"name\"] (non-empty-string expected)");
             $relation['name'] = $name;
 
-            $type = $userdata['type'] ?? $configError("missing attribute [relations][$i][@name=$name \"type\"]");
-            Assert::string($type, "invalid attribute [relations][$i][@name=$name \"type\"] (string expected)");
-            $type = trim($type);
-            if (!is_subclass_of($type, PersistableObject::class)) {
-                $configError("invalid attribute [relations][$i][@name=$name \"type\"] (not a subclass of ".PersistableObject::class.')');
-            }
-            $relation['type'] = $type;
-
             $assoc = $userdata['assoc'] ?? $configError("missing attribute [relations][$i][@name=$name \"assoc\"]");
             Assert::string($assoc, "invalid attribute [relations][$i][@name=$name \"assoc\"] (string expected)");
             $assoc = trim($assoc);
@@ -331,6 +319,14 @@ abstract class DAO extends Singleton {
                 $configError("invalid attribute [relations][$i][@name=$name \"assoc\"] (one of '".join('|', $assocs)."' expected)");
             }
             $relation['assoc'] = $assoc;
+
+            $type = $userdata['type'] ?? $configError("missing attribute [relations][$i][@name=$name \"type\"]");
+            Assert::string($type, "invalid attribute [relations][$i][@name=$name \"type\"] (string expected)");
+            $type = trim($type);
+            if (!is_subclass_of($type, PersistableObject::class)) {
+                $configError("invalid attribute [relations][$i][@name=$name \"type\"] (not a subclass of ".PersistableObject::class.')');
+            }
+            $relation['type'] = $type;
 
             switch ($assoc) {
                 // -------------------------------------------------------------------------------------------------------------------------
