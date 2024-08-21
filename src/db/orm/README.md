@@ -67,8 +67,7 @@ $relation = [
 ```
 
 
-Relation type "one-to-one" (local foreign-key column, no join table)
---------------------------------------------------------------------
+#### Relation type "one-to-one" (local foreign-key column, no join table)
 ```php
 $relation = [
     ...,                                        // common fields (see above)
@@ -79,8 +78,7 @@ $relation = [
 ```
 
 
-Relation type "one-to-one" (no local foreign-key column, optional join table)
------------------------------------------------------------------------------
+#### Relation type "one-to-one" (no local foreign-key column, optional join table)
 ```php
 $relation = [
     ...,                                        // common fields (see above)
@@ -91,8 +89,7 @@ $relation = [
 ```
 
 
-Relation type "one-to-many" (no local foreign-key column, optional join table)
-------------------------------------------------------------------------------
+#### Relation type "one-to-many" (no local foreign-key column, optional join table)
 ```php
 $relation = [
     ...,                                        // common fields (see above)
@@ -103,8 +100,7 @@ $relation = [
 ```
 
 
-Relation type "many-to-one" (local foreign-key column, no join table)
----------------------------------------------------------------------
+#### Relation type "many-to-one" (local foreign-key column, no join table)
 ```php
 $relation = [
     ...,                                        // common fields (see above)
@@ -115,8 +111,7 @@ $relation = [
 ```
 
 
-Relation type "many-to-many" (no local foreign-key column, mandatory join table)
---------------------------------------------------------------------------------
+#### Relation type "many-to-many" (no local foreign-key column, mandatory join table)
 ```php
 $relation = [
     ...,                                        // common fields (see above)
