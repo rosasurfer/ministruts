@@ -13,9 +13,7 @@ use rosasurfer\ministruts\log\Logger;
 use rosasurfer\ministruts\log\filter\ContentFilterInterface as ContentFilter;
 
 use function rosasurfer\ministruts\echof;
-use function rosasurfer\ministruts\ini_get_bool;
 use function rosasurfer\ministruts\normalizeEOL;
-use function rosasurfer\ministruts\simpleClassName;
 use function rosasurfer\ministruts\strEndsWith;
 use function rosasurfer\ministruts\strLeftTo;
 use function rosasurfer\ministruts\strRightFrom;

@@ -14,8 +14,6 @@ use rosasurfer\ministruts\log\Logger;
 use function rosasurfer\ministruts\strStartsWith;
 
 use const rosasurfer\ministruts\L_DEBUG;
-use const rosasurfer\ministruts\L_INFO;
-use const rosasurfer\ministruts\L_NOTICE;
 use const rosasurfer\ministruts\NL;
 
 

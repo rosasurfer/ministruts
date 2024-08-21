@@ -6,9 +6,6 @@ namespace rosasurfer\ministruts\core;
 use rosasurfer\ministruts\core\error\ErrorHandler;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 
-use function rosasurfer\ministruts\simpleClassName;
-use function rosasurfer\ministruts\strLeftTo;
-
 
 /**
  * A trait capable of adding {@link CObject} behavior to any class. Used to add error detection features.
