@@ -47,25 +47,22 @@ class Date extends StaticClass {
 
 
     /**
-     * Return a range of dates.
+     * Return an array holding a number of consecutive date values.
      *
      * @param  string $startDate - start date (format: yyyy-mm-dd)
      * @param  int    $days      - number of dates to return
      *
      * @return string[]
      */
-    public static function getDateRange($startDate, $days) {
-        Assert::string($startDate, '$startDate');
-        Assert::int($days, '$days');
-        if (strToTimestamp($startDate) === false) throw new InvalidValueException('Invalid parameter $startDate: "'.$startDate.'"');
-        if ($days < 0)                            throw new InvalidValueException('Invalid parameter $days: '.$days);
+    public static function getDateRange(string $startDate, int $days): array {
+        $ts = strToTimestamp($startDate, 'Y-m-d');
+        if ($ts === false) throw new InvalidValueException("Invalid parameter \$startDate: \"$startDate\"");
+        if ($days < 0)     throw new InvalidValueException("Invalid parameter \$days: $days");
 
         $range = [];
-        $date = new DateTime($startDate);
 
-        for ($i=0; $i < $days; ++$i) {
-            $range[] = $date->format('Y-m-d');
-            $date->modify('+1 day');
+        for ($i=0; $i < $days; $i++) {
+            $range[] = date('Y-m-d', $ts + $i*DAYS);
         }
         return $range;
     }
@@ -77,17 +74,11 @@ class Date extends StaticClass {
      * @param  string $date - initial date (format: yyyy-mm-dd)
      * @param  int    $days - number of days to add
      *
-     * @return string - resulting date
+     * @return string - resulting date (format: yyyy-mm-dd)
      */
-    public static function addDays($date, $days) {
-        if (strToTimestamp($date) === false) throw new InvalidValueException('Invalid parameter $date: '.$date);
-        Assert::int($days, '$days');
-
-        $parts = explode('-', $date);
-        $year  = (int) $parts[0];
-        $month = (int) $parts[1];
-        $day   = (int) $parts[2];
-
-        return date('Y-m-d', mktime(0, 0, 0, $month, $day+$days, $year));
+    public static function addDays(string $date, int $days): string {
+        $ts = strToTimestamp($date, 'Y-m-d');
+        if ($ts === false) throw new InvalidValueException("Invalid parameter \$date: \"$date\"");
+        return date('Y-m-d', $ts + $days*DAYS);
     }
 }

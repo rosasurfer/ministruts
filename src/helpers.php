@@ -1416,7 +1416,7 @@ function strToBool(string $string, bool $strict = false): ?bool {
  * @param  string|string[] $format [optional] - date/time format the string is required to match (default: 'Y-m-d')
  *                                              if an array the string must match at least one of the provided formats
  *
- * @return int|bool - Unix timestamp or FALSE if the string doesn't match the specified format(s)
+ * @return int|false - Unix timestamp or FALSE if the string doesn't match the specified format(s)
  *
  * <pre>
  *  Supported format strings:

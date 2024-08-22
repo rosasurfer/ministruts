@@ -5,7 +5,6 @@ namespace rosasurfer\ministruts\struts;
 
 use rosasurfer\ministruts\config\ConfigInterface;
 use rosasurfer\ministruts\core\CObject;
-use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\exception\IllegalStateException;
 use rosasurfer\ministruts\file\xml\SimpleXMLElement;
 use rosasurfer\ministruts\net\http\HttpResponse;
@@ -27,14 +26,14 @@ use const rosasurfer\ministruts\NL;
 /**
  * Module
  *
- * Struts modules allow separation (splitting) of a web application into multiple logical sections. Each Module (or section)
- * is defined by a unique base path (aka the Module prefix), e.g. "/admin/", "/backend/" or "/shop/". Each Module has its
- * own Struts configuration and can be configured and managed entirely separate from all other modules.
+ * Struts modules allow separation (splitting) of web applications into multiple logical sections. Each Module (or section) is defined
+ * by a unique base path (the module prefix), e.g. "/admin/", "/backend/" or "/shop/". Each Module has its own Struts configuration and
+ * can be configured and managed separately from other modules.
  *
- * The main Module of an application has the module prefix "" (an empty string), its base path is "/" and its Struts
- * configuration is stored in "struts-config.xml". Other modules of the application have a non-empty prefix, their base path
- * is "/{prefix}/" and their Struts configurations are stored in files named "struts-config-{prefix}.xml". Modules can be
- * nested, and a full module can be moved in the application by only changing the module's prefix.
+ * The main Module of an application has module prefix "" (an empty string), its base path is "/" and its Struts configuration is stored
+ * in "struts-config.xml". Additional modules of the application have a non-empty prefix, their base path is "/{prefix}/" and their Struts
+ * configurations are stored in separate files named "struts-config-{prefix}.xml". Modules can be nested, and a full Module can be moved
+ * in the application by only changing its module prefix.
  *
  * The full URI of a route to a specific module's {@link ActionMapping} is "/{app-base-path}/{module-prefix}/{mapping-path}".
  */
@@ -45,11 +44,11 @@ class Module extends CObject {
      * Module prefix relative to the base URI of the web application. All module prefixes in an application are unique.
      * The module with the prefix "" (empty string) is the main module of an application.
      *
-     * @var string (configurable)
+     * @var string
      */
     protected $prefix;
 
-    /** @var string[] - imported fully qualified class names (configurable) */
+    /** @var string[] - imported class names (configurable) */
     protected $uses;
 
     /** @var string[] - imported namespaces (configurable) */
@@ -58,18 +57,17 @@ class Module extends CObject {
     /** @var string[] - base directory for file resources used by the module (configurable) */
     protected $resourceLocations = [];
 
-    /** @var ActionForward[] - all global forwards of the module (configurable) */
+    /** @var ActionForward[] - global forwards of the module (configurable) */
     protected $globalForwards = [];
 
-    /** @var ActionMapping[][] - all action mappings of the module (configurable) */
+    /** @var ActionMapping[][] - action mappings of the module (configurable) */
     protected $mappings = [
         'names' => [],
         'paths' => [],
     ];
 
     /**
-     * Default action mapping of the module or NULL if undefined. Used when a request does
-     * not match any other action mapping (configurable).
+     * Default action mapping of the module or NULL if undefined. Used when a request does not match any other action mapping (configurable).
      *
      * @var ?ActionMapping
      */
@@ -99,8 +97,8 @@ class Module extends CObject {
     /** @var ?RoleProcessor - the RoleProcessor instance used by the module */
     protected $roleProcessor = null;
 
-    /** @var string[] - module initialization context for detecting circular tile references */
-    protected $tilesContext = [];
+    /** @var string[] - initialization context for detecting circular tile references */
+    protected array $tilesContext = [];
 
     /** @var bool - whether this component is fully configured */
     protected $configured = false;
@@ -109,7 +107,7 @@ class Module extends CObject {
     /**
      * Constructor
      *
-     * Creates a new instance, reads and parses the module's XML configuration ("struts-config.xml").
+     * Creates a new instance from the specified configuration file ("struts-config.xml").
      *
      * @param  string $fileName - full name of the module's configuration file
      * @param  string $prefix   - module prefix
@@ -118,10 +116,7 @@ class Module extends CObject {
      *
      * TODO: check/handle different config file encodings
      */
-    public function __construct($fileName, $prefix) {
-        Assert::string($fileName, '$fileName');
-        Assert::string($prefix, '$prefix');
-
+    public function __construct(string $fileName, string $prefix) {
         $xml = $this->loadConfiguration($fileName);
 
         $this->setPrefix($prefix);
@@ -138,7 +133,7 @@ class Module extends CObject {
 
 
     /**
-     * Read and validate the module configuration, and convert it to an instance of {@link SimpleXMLElement}.
+     * Load the module configuration ("struts-config.xml") and convert it to an {@link SimpleXMLElement} instance.
      *
      * @param  string $fileName - full filename
      *
@@ -146,18 +141,19 @@ class Module extends CObject {
      *
      * @throws StrutsConfigException on configuration errors
      */
-    protected function loadConfiguration($fileName) {
+    protected function loadConfiguration(string $fileName): SimpleXMLElement {
         if (!is_file($fileName)) throw new StrutsConfigException('Configuration file not found: "'.$fileName.'"');
 
-        // TODO: what about checking the search result?
         $content = file_get_contents($fileName);
-        $search  = '<!DOCTYPE struts-config SYSTEM "struts-config.dtd">';
-        $offset  = strpos($content, $search);
-        $dtd     = str_replace('\\', '/', __DIR__.'/dtd/struts-config.dtd');
-        $replace = '<!DOCTYPE struts-config SYSTEM "file:///'.$dtd.'">';
-        $content = substr_replace($content, $replace, $offset, strlen($search));
+        $search = '<!DOCTYPE struts-config SYSTEM "struts-config.dtd">';
+        $offset = strpos($content, $search);
 
-        // parse, validate, instantiate...
+        if ($offset !== false) {
+            $dtd = str_replace('\\', '/', __DIR__.'/dtd/struts-config.dtd');
+            $replace = "<!DOCTYPE struts-config SYSTEM \"file:///$dtd\">";
+            $content = substr_replace($content, $replace, $offset, strlen($search));
+        }
+
         return SimpleXMLElement::from($content, LIBXML_DTDVALID|LIBXML_NONET);
     }
 
