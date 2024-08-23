@@ -34,13 +34,13 @@ class CurlHttpClient extends HttpClient {
     protected $hCurl = null;
 
     /** @var int - counter of manual redirects (if "open_basedir" is enabled) */
-    protected $manualRedirects = 0;
+    protected int $manualRedirects = 0;
 
     /** @var mixed[] - additional CURL options */
-    protected $options = [];
+    protected array $options = [];
 
     /** @var string[] - CURL error descriptions */
-    protected static $errors = [
+    protected static array $errors = [
         CURLE_OK                          => 'CURLE_OK',
         CURLE_UNSUPPORTED_PROTOCOL        => 'CURLE_UNSUPPORTED_PROTOCOL',
         CURLE_FAILED_INIT                 => 'CURLE_FAILED_INIT',
@@ -150,7 +150,7 @@ class CurlHttpClient extends HttpClient {
     /**
      * Destructor
      *
-     * Close an open CURL handle (if any).
+     * Close an open cURL handle (if any).
      */
     public function __destruct() {
         try {
@@ -175,7 +175,7 @@ class CurlHttpClient extends HttpClient {
      *
      * @throws IOException in case of errors
      */
-    public function send(HttpRequest $request) {
+    public function send(HttpRequest $request): HttpResponse {
         if (!$this->hCurl) {
             $this->hCurl = curl_init();
         }
@@ -228,14 +228,14 @@ class CurlHttpClient extends HttpClient {
 
 
     /**
-     * Create a CURL options array for the current request.
+     * Create a cURL options array for the current request.
      *
      * @param  HttpRequest      $request
      * @param  CurlHttpResponse $response
      *
-     * @return mixed[] - resulting CURL options
+     * @return mixed[] - resulting cURL options
      */
-    protected function prepareCurlOptions(HttpRequest $request, CurlHttpResponse $response) {
+    protected function prepareCurlOptions(HttpRequest $request, CurlHttpResponse $response): array {
         $options = $this->options;                                  // options passed to the constructor
         $options    [CURLOPT_URL]      =  $request->getUrl();       // set or overwrite an existing URL
         $options += [CURLOPT_TIMEOUT   => $this->timeout    ];      // set but don't overwrite these existing options
@@ -258,14 +258,14 @@ class CurlHttpClient extends HttpClient {
 
 
     /**
-     * Return a description of the last curl error code.
+     * Return a description of the last cURL error code.
      *
-     * @param  resource|CurlHandle $hCurl - curl handle
+     * @param  resource|CurlHandle $hCurl - cURL handle
      * @phpstan-param  CurlHandleId $hCurl
      *
      * @return string
      */
-    protected static function getError($hCurl) {
+    protected static function getError($hCurl): string {
         $errorNo = curl_errno($hCurl);
         $errorStr = curl_error($hCurl);
 

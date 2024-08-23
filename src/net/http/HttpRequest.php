@@ -15,23 +15,20 @@ class HttpRequest extends CObject {
 
 
     /** @var string */
-    protected $url;
+    protected string $url = '';
 
     /** @var string - HTTP method (default: GET) */
-    protected $method = 'GET';
+    protected string $method = 'GET';
 
     /** @var string[] - user-defined HTTP headers */
-    protected $headers = [];
+    protected array $headers = [];
 
 
     /**
      * Constructor
-     *
-     * Create a new HttpRequest.
-     *
      * @param  ?string $url [optional] - URL (default: none)
      */
-    public function __construct($url = null) {
+    public function __construct(?string $url = null) {
         if (isset($url)) {
             $this->setUrl($url);
         }
@@ -43,7 +40,7 @@ class HttpRequest extends CObject {
      *
      * @return string
      */
-    public function getMethod() {
+    public function getMethod(): string {
         return $this->method;
     }
 
@@ -55,10 +52,8 @@ class HttpRequest extends CObject {
      *
      * @return $this
      */
-    public function setMethod($method) {
-        Assert::string($method);
+    public function setMethod(string $method): self {
         if ($method!=='GET' && $method!=='POST') throw new InvalidValueException('Invalid parameter $method: '.$method);
-
         $this->method = $method;
         return $this;
     }
@@ -69,7 +64,7 @@ class HttpRequest extends CObject {
      *
      * @return string
      */
-    public function getUrl() {
+    public function getUrl(): string {
         return $this->url;
     }
 
@@ -81,8 +76,7 @@ class HttpRequest extends CObject {
      *
      * @return $this
      */
-    public function setUrl($url) {
-        Assert::string($url);
+    public function setUrl(string $url): self {
         // TODO: validate URL
         if (strpos($url, ' ') !== false) throw new InvalidValueException('Invalid parameter $url: '.$url);
         $this->url = $url;
@@ -94,14 +88,12 @@ class HttpRequest extends CObject {
      * Set an HTTP header.  This method overwrites an existing header of the same name.
      *
      * @param  string  $name  - header name
-     * @param  ?string $value - header value (an empty value removes an existing header)
+     * @param  ?string $value - header value (NULL removes an existing header)
      *
      * @return $this
      */
-    public function setHeader($name, $value) {
-        Assert::string($name, '$name');
+    public function setHeader(string $name, ?string $value): self {
         if (!strlen($name)) throw new InvalidValueException('Invalid parameter $name: '.$name);
-        Assert::nullOrString($value, '$value');
 
         $name  = trim($name);
         $value = trim($value);
@@ -113,7 +105,7 @@ class HttpRequest extends CObject {
         }
 
         // set new header if non-empty
-        if (!empty($value)) {
+        if ($value !== null) {
             $this->headers[$name] = $value;
         }
         return $this;
@@ -130,11 +122,9 @@ class HttpRequest extends CObject {
      *
      * @see    https://stackoverflow.com/questions/3241326/set-more-than-one-http-header-with-the-same-name
      */
-    public function addHeader($name, $value) {
-        Assert::string($name,  '$name');
-        Assert::string($value, '$value');
-        if (!strlen($name))     throw new InvalidValueException('Invalid parameter $name: '.$name);
-        if (!strlen($value))    throw new InvalidValueException('Invalid parameter $value: '.$value);
+    public function addHeader(string $name, string $value): self {
+        if (!strlen($name))  throw new InvalidValueException('Invalid parameter $name: '.$name);
+        if (!strlen($value)) throw new InvalidValueException('Invalid parameter $value: '.$value);
 
         $name  = trim($name);
         $value = trim($value);
@@ -156,17 +146,17 @@ class HttpRequest extends CObject {
     /**
      * Return the request header with the specified name.  This method returns the value of a single header.
      *
-     * @param  string $name - header name (case is ignored)
+     * @param  string $name - header name (case insensitive)
      *
      * @return ?string - header value or NULL if no such header was found
      */
-    public function getHeader($name) {
-        Assert::string($name);
+    public function getHeader(string $name): ?string {
         if (!strlen($name)) throw new InvalidValueException('Invalid parameter $name: '.$name);
 
         $headers = $this->getHeaders($name);
-        if ($headers)
+        if ($headers) {
             return join(', ', $headers);    // combine multiple headers of the same name according to RFC
+        }
         return null;
     }
 
@@ -174,15 +164,15 @@ class HttpRequest extends CObject {
     /**
      * Return the request headers with the specified names.  This method returns a key-value pair for each found header.
      *
-     * @param  string|string[] $names [optional] - one or more header names (case is ignored)
+     * @param  string|string[] $names [optional] - one or more header names (case insensitive)
      *                                             (default: without a name all headers are returned)
      *
      * @return string[] - array of name-value pairs or an empty array if no such headers were found
      */
-    public function getHeaders($names = []) {
+    public function getHeaders($names = []): array {
         if (is_array($names)) {
             foreach ($names as $i => $name) {
-                Assert::string($name, '$names['.$i.']');
+                Assert::string($name, "\$names[$i]");
             }
         }
         else {

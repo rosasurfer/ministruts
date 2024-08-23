@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\net\http;
 
-use rosasurfer\ministruts\core\assert\Assert;
+use CurlHandle;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 
 
@@ -16,16 +16,16 @@ class CurlHttpResponse extends HttpResponse {
 
 
     /** @var HeaderParser */
-    protected $headerParser;
+    protected HeaderParser $headerParser;
 
     /** @var int - HTTP status code */
-    protected $status;
+    protected int $status;
 
     /** @var string - content */
-    protected $content;
+    protected string $content;
 
     /** @var int - length of the currently read content in bytes */
-    protected $currentContentLength = 0;
+    protected int $currentContentLength = 0;
 
 
     /**
@@ -41,7 +41,7 @@ class CurlHttpResponse extends HttpResponse {
      *
      * @return int
      */
-    public function getStatus() {
+    public function getStatus(): int {
         return $this->status;
     }
 
@@ -53,10 +53,8 @@ class CurlHttpResponse extends HttpResponse {
      *
      * @return $this
      */
-    public function setStatus($status) {
-        Assert::int($status);
+    public function setStatus(int $status): self {
         if ($status < 1) throw new InvalidValueException('Invalid parameter $status: '.$status);
-
         $this->status = $status;
         return $this;
     }
@@ -67,7 +65,7 @@ class CurlHttpResponse extends HttpResponse {
      *
      * @return array<string, string[]> - associative array of all received headers
      */
-    public function getHeaders() {
+    public function getHeaders(): array {
         return $this->headerParser->getHeaders();
     }
 
@@ -79,7 +77,7 @@ class CurlHttpResponse extends HttpResponse {
      *
      * @return string[] - array of received header values; empty if no such header was received
      */
-    public function getHeaderValues($name) {
+    public function getHeaderValues(string $name): array {
         return $this->headerParser->getHeaderValues($name);
     }
 
@@ -91,7 +89,7 @@ class CurlHttpResponse extends HttpResponse {
      *
      * @return bool
      */
-    public function isHeader($name) {
+    public function isHeader(string $name): bool {
         return $this->headerParser->isHeader($name);
     }
 
@@ -99,12 +97,14 @@ class CurlHttpResponse extends HttpResponse {
     /**
      * Callback for CurlHttpClient, called with the received HTTP response headers (line by line).
      *
-     * @param  resource $hCurl - curl handle of the processed HTTP request
-     * @param  string   $line  - a single line from the received header section
+     * @param  resource|CurlHandle $hCurl - cURL handle of the processed HTTP request
+     * @phpstan-param  CurlHandleId $hCurl
+     * @param  string   $line             - a single line from the received header section
      *
      * @return int - number of bytes read (the length of the received line)
+     *
      */
-    public function writeHeader($hCurl, $line) {
+    public function writeHeader($hCurl, string $line): int {
         $this->headerParser->parseHeaderLine($line);
         return strlen($line);
     }
@@ -113,12 +113,13 @@ class CurlHttpResponse extends HttpResponse {
     /**
      * Callback for CurlHttpClient, called with the received HTTP content (in chunks).
      *
-     * @param  resource $hCurl - curl handle of the processed HTTP request
+     * @param  resource|CurlHandle $hCurl - cURL handle of the processed HTTP request
+     * @phpstan-param  CurlHandleId $hCurl
      * @param  string   $data  - chunk of received content data
      *
      * @return int - number of bytes read (the length of the received content chunk)
      */
-    public function writeContent($hCurl, $data) {
+    public function writeContent($hCurl, string $data): int {
         $this->content .= $data;
 
         $obtainedLength = strlen($data);
@@ -133,7 +134,7 @@ class CurlHttpResponse extends HttpResponse {
      *
      * @return string - content
      */
-    public function getContent() {
+    public function getContent(): string {
         return (string)$this->content;
     }
 }

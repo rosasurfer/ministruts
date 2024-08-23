@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace rosasurfer\ministruts\net\http;
 
 use rosasurfer\ministruts\core\CObject;
-use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\IOException;
 
@@ -18,16 +17,16 @@ abstract class HttpClient extends CObject {
     // default settings
 
     /** @var int */
-    protected $timeout = 30;
+    protected int $timeout = 30;
 
     /** @var bool */
-    protected $followRedirects = true;
+    protected bool $followRedirects = true;
 
     /** @var int */
-    protected $maxRedirects = 5;
+    protected int $maxRedirects = 5;
 
     /** @var string */
-    protected $userAgent = 'Mozilla/5.0';
+    protected string $userAgent = 'Mozilla/5.0';
 
 
     /**
@@ -35,7 +34,7 @@ abstract class HttpClient extends CObject {
      *
      * @return int - timeout in seconds
      */
-    public function getTimeout() {
+    public function getTimeout(): int {
         return $this->timeout;
     }
 
@@ -47,8 +46,7 @@ abstract class HttpClient extends CObject {
      *
      * @return $this
      */
-    public function setTimeout($timeout) {
-        Assert::int($timeout);
+    public function setTimeout(int $timeout): self {
         if ($timeout < 1) throw new InvalidValueException('Invalid parameter $timeout: '.$timeout);
 
         $this->timeout = $timeout;
@@ -61,7 +59,7 @@ abstract class HttpClient extends CObject {
      *
      * @return bool
      */
-    public function isFollowRedirects() {
+    public function isFollowRedirects(): bool {
         return $this->followRedirects;
     }
 
@@ -73,8 +71,7 @@ abstract class HttpClient extends CObject {
      *
      * @return $this
      */
-    public function setFollowRedirects($follow) {
-        Assert::bool($follow);
+    public function setFollowRedirects(bool $follow): self {
         $this->followRedirects = $follow;
         return $this;
     }
@@ -85,7 +82,7 @@ abstract class HttpClient extends CObject {
      *
      * @return int
      */
-    public function getMaxRedirects() {
+    public function getMaxRedirects(): int {
         return $this->maxRedirects;
     }
 
@@ -97,8 +94,7 @@ abstract class HttpClient extends CObject {
      *
      * @return $this
      */
-    public function setMaxRedirects($maxRedirects) {
-        Assert::int($maxRedirects);
+    public function setMaxRedirects(int $maxRedirects): self {
         $this->maxRedirects = $maxRedirects;
         return $this;
     }
@@ -113,5 +109,5 @@ abstract class HttpClient extends CObject {
      *
      * @throws IOException in case of errors
      */
-    abstract public function send(HttpRequest $request);
+    abstract public function send(HttpRequest $request): HttpResponse;
 }

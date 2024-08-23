@@ -20,7 +20,7 @@ class ClickatellMessenger extends Messenger {
     /**
      * {@inheritdoc}
      *
-     * @param  scalar[] $options
+     * @param  mixed[] $options
      */
     protected function __construct(array $options) {
         $this->options = $options;
@@ -35,7 +35,7 @@ class ClickatellMessenger extends Messenger {
      *
      * @return void
      */
-    public function sendMessage($receiver, $message): void {
+    public function sendMessage(string $receiver, string $message): void {
         throw new UnimplementedFeatureException(__METHOD__.'() not yet implemented');
     }
 }

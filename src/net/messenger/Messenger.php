@@ -13,14 +13,14 @@ use rosasurfer\ministruts\core\CObject;
  */
 abstract class Messenger extends CObject {
 
-    /** @var scalar[] */
-    protected $options;
+    /** @var mixed[] */
+    protected array $options;
 
 
     /**
      * Constructor
      *
-     * @param  scalar[] $options
+     * @param  mixed[] $options
      */
     abstract protected function __construct(array $options);
 
@@ -33,5 +33,5 @@ abstract class Messenger extends CObject {
      *
      * @return void
      */
-    abstract public function sendMessage($receiver, $message): void;
+    abstract public function sendMessage(string $receiver, string $message): void;
 }

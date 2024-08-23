@@ -16,7 +16,7 @@ use rosasurfer\ministruts\core\CObject;
 abstract class HttpResponse extends CObject {
 
 
-    // HTTP status codes; @see RFC 2068.
+    // HTTP status codes; @see RFC 2068
 
     /**
      * @var int - Status code (100) indicating the client can continue.
@@ -247,7 +247,7 @@ abstract class HttpResponse extends CObject {
     /**
      * @var string[] - HTTP status code descriptions
      */
-    public static $statusCodes = [
+    public static array $statusCodes = [
         self::SC_CONTINUE                        => 'SC_CONTINUE'                       ,
         self::SC_SWITCHING_PROTOCOLS             => 'SC_SWITCHING_PROTOCOLS'            ,
         self::SC_OK                              => 'SC_OK'                             ,
@@ -296,7 +296,7 @@ abstract class HttpResponse extends CObject {
      *
      * @return int - status code
      */
-    abstract public function getStatus();
+    abstract public function getStatus(): int;
 
 
     /**
@@ -304,7 +304,7 @@ abstract class HttpResponse extends CObject {
      *
      * @return array<string, string[]> - associative array of all received headers
      */
-    abstract public function getHeaders();
+    abstract public function getHeaders(): array;
 
 
     /**
@@ -314,7 +314,7 @@ abstract class HttpResponse extends CObject {
      *
      * @return string[] - array of received header values, or an empty array if no such header was received
      */
-    abstract public function getHeaderValues($name);
+    abstract public function getHeaderValues(string $name): array;
 
 
     /**
@@ -324,7 +324,7 @@ abstract class HttpResponse extends CObject {
      *
      * @return bool
      */
-    abstract public function isHeader($name);
+    abstract public function isHeader(string $name): bool;
 
 
     /**
@@ -332,5 +332,5 @@ abstract class HttpResponse extends CObject {
      *
      * @return string - content
      */
-    abstract public function getContent();
+    abstract public function getContent(): string;
 }

@@ -18,7 +18,7 @@ class IRCMessenger extends Messenger {
     /**
      * {@inheritdoc}
      *
-     * @param  scalar[] $options
+     * @param  mixed[] $options
      */
     protected function __construct(array $options) {
         $this->options = $options;
@@ -33,7 +33,7 @@ class IRCMessenger extends Messenger {
      *
      * @return void
      */
-    public function sendMessage($channel, $message): void {
+    public function sendMessage(string $channel, string $message): void {
         throw new UnimplementedFeatureException(__METHOD__.'() not yet implemented');
     }
 }

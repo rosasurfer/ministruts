@@ -18,9 +18,9 @@ class Process extends StaticClass {
      *
      * @return bool - success status
      */
-    public static function dispatchSignals() {
-        if (function_exists('pcntl_signal_dispatch')) {
-            return pcntl_signal_dispatch();
+    public static function dispatchSignals(): bool {
+        if (\function_exists('pcntl_signal_dispatch')) {
+            return \pcntl_signal_dispatch();
         }
         return false;
     }

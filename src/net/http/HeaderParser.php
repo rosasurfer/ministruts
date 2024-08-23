@@ -13,10 +13,10 @@ class HeaderParser extends CObject {
 
 
     /** @var array<string, string[]> */
-    protected $headers = [];
+    protected array $headers = [];
 
     /** @var ?string */
-    protected $lastName = null;
+    protected ?string $lastName = null;
 
 
     /**
@@ -26,7 +26,7 @@ class HeaderParser extends CObject {
      *
      * @return $this
      */
-    public function parseHeaderSection($data) {
+    public function parseHeaderSection(string $data): self {
         foreach (explode("\n", $data) as $line) {
             $this->parseHeaderLine($line);
         }
@@ -41,7 +41,7 @@ class HeaderParser extends CObject {
      *
      * @return $this
      */
-    public function parseHeaderLine($line) {
+    public function parseHeaderLine(string $line): self {
         $line = trim($line, "\r\n");
 
         $matches = null;
@@ -67,7 +67,7 @@ class HeaderParser extends CObject {
      *
      * @return array<string, string[]> - associative array of all received headers
      */
-    public function getHeaders() {
+    public function getHeaders(): array {
         return $this->headers;
     }
 
@@ -79,7 +79,7 @@ class HeaderParser extends CObject {
      *
      * @return string[] - array of received header values, or an empty array if no such header was received
      */
-    public function getHeaderValues($name) {
+    public function getHeaderValues(string $name): array {
         $name = strtolower($name);
         return $this->headers[$name] ?? [];
     }
@@ -92,7 +92,7 @@ class HeaderParser extends CObject {
      *
      * @return bool
      */
-    public function isHeader($name) {
+    public function isHeader(string $name): bool {
         return isset($this->headers[strtolower($name)]);
     }
 }

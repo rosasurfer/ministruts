@@ -20,7 +20,7 @@ class NexmoMessenger extends Messenger {
     /**
      * {@inheritdoc}
      *
-     * @param  scalar[] $options
+     * @param  mixed[] $options
      */
     protected function __construct(array $options) {
         $this->options = $options;
@@ -35,7 +35,7 @@ class NexmoMessenger extends Messenger {
      *
      * @return void
      */
-    public function sendMessage($receiver, $message): void {
+    public function sendMessage(string $receiver, string $message): void {
         throw new UnimplementedFeatureException(__METHOD__.'() not yet implemented');
         // https://rest.nexmo.com/sms/json?api_key={api_key}&api_secret={api_secret}&to={receiver}&from={sender}&text={message};
     }
