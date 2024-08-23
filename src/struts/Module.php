@@ -641,7 +641,6 @@ class Module extends CObject {
         if (is_string($file)) {
             if (is_string($extends)) Struts::configError("<tile name=\"$name\": Only one of \"file\", \"extends\" or \"alias\" can be specified.");
 
-            /** @var string $filePath */
             $filePath = $this->findFile($file);
             if (!$filePath) Struts::configError("<tile name=\"$name\" file=\"$file\": File not found.");
 
@@ -665,7 +664,7 @@ class Module extends CObject {
             $tile->setPushModelSupport($push == 'true');
         }
 
-        // process it's child nodes
+        // process its child nodes
         $this->processTileProperties($tile, $tag);
 
         // finally save the tile
