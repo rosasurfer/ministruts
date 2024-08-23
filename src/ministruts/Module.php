@@ -679,11 +679,12 @@ class Module extends CObject {
         }
 
         // attribute "extends" %LogicalName; #IMPLIED
-        else  {
+        elseif (is_string($extends)) {
             $extended = $this->getTile($extends, $xml);
             $tile = clone $extended;                    // clone the extended tile
             $tile->setName($name);
         }
+        else throw new StrutsConfigException("<tile name=\"$name\": One of \"file\", \"extends\" or \"alias\" must be specified.");
 
         // attribute "push" %Boolean; "false"
         if (is_string($push)) {
