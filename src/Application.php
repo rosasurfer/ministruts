@@ -299,7 +299,7 @@ class Application extends CObject {
 
                 // execute "cache-info" task if enabled
                 if ($cacheInfoTask) {
-                    // TODO: include(ROOT_DIR.'/src/debug/apc.php');
+                    // TODO: include(__DIR__.'/debug/apc.php');
                 }
             }
         }

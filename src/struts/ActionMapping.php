@@ -249,8 +249,12 @@ class ActionMapping extends CObject {
         $name = $this->name ? ' name="'.$this->name.'"':'';
         $path = $this->path ? ' path="'.$this->path.'"':'';
 
-        if (!is_subclass_of($className, ACTION_BASE_CLASS)) throw new StrutsConfigException('<mapping'.$name.$path.' action="'.$className.'": Not a subclass of '.ACTION_BASE_CLASS.'.');
-        if ($this->forward)                                 throw new StrutsConfigException('<mapping'.$name.$path.': Only one of "action", "include", "forward" or "redirect" can be specified.');
+        if (!is_subclass_of($className, Struts::ACTION_BASE_CLASS)) {
+            throw new StrutsConfigException('<mapping'.$name.$path.' action="'.$className.'": Not a subclass of '.Struts::ACTION_BASE_CLASS.'.');
+        }
+        if ($this->forward) {
+            throw new StrutsConfigException('<mapping'.$name.$path.': Only one of "action", "include", "forward" or "redirect" can be specified.');
+        }
 
         $this->actionClassName = $className;
         return $this;
@@ -281,7 +285,9 @@ class ActionMapping extends CObject {
         $name = $this->name ? ' name="'.$this->name.'"':'';
         $path = $this->path ? ' path="'.$this->path.'"':'';
 
-        if (!is_subclass_of($className, ACTION_FORM_BASE_CLASS)) throw new StrutsConfigException('<mapping'.$name.$path.' form="'.$className.'": Not a subclass of '.ACTION_FORM_BASE_CLASS.'.');
+        if (!is_subclass_of($className, Struts::ACTION_FORM_BASE_CLASS)) {
+            throw new StrutsConfigException('<mapping'.$name.$path.' form="'.$className.'": Not a subclass of '.Struts::ACTION_FORM_BASE_CLASS.'.');
+        }
 
         $this->formClassName = $className;
         return $this;

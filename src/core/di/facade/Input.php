@@ -5,8 +5,7 @@ namespace rosasurfer\ministruts\core\di\facade;
 
 use rosasurfer\ministruts\core\di\proxy\Request as RequestProxy;
 use rosasurfer\ministruts\struts\ActionInput;
-
-use const rosasurfer\ministruts\struts\ACTION_INPUT_KEY;
+use rosasurfer\ministruts\struts\Struts;
 
 
 /**
@@ -107,7 +106,7 @@ class Input extends Facade {
      * @return ActionInput
      */
     public static function old() {
-        $input = RequestProxy::getAttribute(ACTION_INPUT_KEY.'.old');
+        $input = RequestProxy::getAttribute(Struts::ACTION_INPUT_KEY.'.old');
         if ($input) return $input;
 
         $class = new \ReflectionClass(ActionInput::class);

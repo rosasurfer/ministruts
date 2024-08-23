@@ -49,7 +49,7 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
         $this->request = $request;
 
         /** @var ActionMapping $mapping */
-        $mapping = $request->getAttribute(ACTION_MAPPING_KEY);
+        $mapping = $request->getAttribute(Struts::ACTION_MAPPING_KEY);
         $actionClass = $mapping->getActionClassName();
 
         // if a DispatchAction is used read the action key

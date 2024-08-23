@@ -132,7 +132,7 @@ class FrontController extends Singleton {
             // select the Module
             $prefix = $controller->getModulePrefix($request);
             $module = $controller->modules[$prefix];
-            $request->setAttribute(MODULE_KEY, $module);
+            $request->setAttribute(Struts::MODULE_KEY, $module);
 
             // get the RequestProcessor
             $processor = $controller->getRequestProcessor($module, $options);

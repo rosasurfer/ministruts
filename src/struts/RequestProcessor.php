@@ -141,7 +141,7 @@ class RequestProcessor extends CObject {
 
         // look-up a configured mapping, store it in the request, and return it
         if (($mapping=$this->module->findMapping($mappingPath)) || ($mapping=$this->module->getDefaultMapping())) {
-            $request->setAttribute(ACTION_MAPPING_KEY, $mapping);
+            $request->setAttribute(Struts::ACTION_MAPPING_KEY, $mapping);
             return $mapping;
         }
 
@@ -264,7 +264,7 @@ PROCESS_METHOD_ERROR_SC_405;
         $form = $formClass ? new $formClass($request) : new EmptyActionForm($request);
 
         // store the form in the request
-        $request->setAttribute(ACTION_FORM_KEY, $form);
+        $request->setAttribute(Struts::ACTION_FORM_KEY, $form);
 
         return $form;
     }
@@ -445,10 +445,10 @@ PROCESS_METHOD_ERROR_SC_405;
      * @return void
      */
     protected function storeActionForm(Request $request) {
-        $form = $request->getAttribute(ACTION_FORM_KEY);
+        $form = $request->getAttribute(Struts::ACTION_FORM_KEY);
         if (!$form || $form instanceof EmptyActionForm)
             return;
-        $request->getSession()->setAttribute(ACTION_FORM_KEY.'.old', $form);
+        $request->getSession()->setAttribute(Struts::ACTION_FORM_KEY.'.old', $form);
     }
 
 
@@ -464,7 +464,7 @@ PROCESS_METHOD_ERROR_SC_405;
     protected function restoreActionForm(Request $request) {
         if ($request->hasSessionId()) {
             $request->getSession();                     // initialize session
-            $oldFormKey = ACTION_FORM_KEY.'.old';
+            $oldFormKey = Struts::ACTION_FORM_KEY.'.old';
 
             if (isset($_SESSION[$oldFormKey])) {
                 $form = $_SESSION[$oldFormKey];
@@ -487,17 +487,17 @@ PROCESS_METHOD_ERROR_SC_405;
         $errors = $request->getActionErrors();
         if ($errors) {
             $request->getSession();                     // initialize session
-            if (isset($_SESSION[ACTION_ERRORS_KEY]))
-                $errors = \array_merge($_SESSION[ACTION_ERRORS_KEY], $errors);
-            $_SESSION[ACTION_ERRORS_KEY] = $errors;
+            if (isset($_SESSION[Struts::ACTION_ERRORS_KEY]))
+                $errors = \array_merge($_SESSION[Struts::ACTION_ERRORS_KEY], $errors);
+            $_SESSION[Struts::ACTION_ERRORS_KEY] = $errors;
         }
 
         $messages = $request->getActionMessages();
         if ($messages) {
             $request->getSession();                     // initialize session
-            if (isset($_SESSION[ACTION_MESSAGES_KEY]))
-                $messages = \array_merge($_SESSION[ACTION_MESSAGES_KEY], $messages);
-            $_SESSION[ACTION_MESSAGES_KEY] = $messages;
+            if (isset($_SESSION[Struts::ACTION_MESSAGES_KEY]))
+                $messages = \array_merge($_SESSION[Struts::ACTION_MESSAGES_KEY], $messages);
+            $_SESSION[Struts::ACTION_MESSAGES_KEY] = $messages;
         }
     }
 
@@ -515,15 +515,15 @@ PROCESS_METHOD_ERROR_SC_405;
             $request->getSession();                     // initialize session
             $messages = $errors = [];
 
-            if (isset($_SESSION[ACTION_MESSAGES_KEY])) {
-                $messages = $_SESSION[ACTION_MESSAGES_KEY];
-                unset($_SESSION[ACTION_MESSAGES_KEY]);
+            if (isset($_SESSION[Struts::ACTION_MESSAGES_KEY])) {
+                $messages = $_SESSION[Struts::ACTION_MESSAGES_KEY];
+                unset($_SESSION[Struts::ACTION_MESSAGES_KEY]);
             }
-            if (isset($_SESSION[ACTION_ERRORS_KEY])) {
-                $errors = $_SESSION[ACTION_ERRORS_KEY];
-                unset($_SESSION[ACTION_ERRORS_KEY]);
+            if (isset($_SESSION[Struts::ACTION_ERRORS_KEY])) {
+                $errors = $_SESSION[Struts::ACTION_ERRORS_KEY];
+                unset($_SESSION[Struts::ACTION_ERRORS_KEY]);
             }
-            $request->setAttribute(ACTION_MESSAGES_KEY, \array_merge($messages, $errors));
+            $request->setAttribute(Struts::ACTION_MESSAGES_KEY, \array_merge($messages, $errors));
         }
     }
 }

@@ -6,8 +6,7 @@ namespace rosasurfer\ministruts\core\di\facade;
 use rosasurfer\ministruts\core\di\proxy\Request;
 use rosasurfer\ministruts\struts\ActionForm;
 use rosasurfer\ministruts\struts\EmptyActionForm;
-
-use const rosasurfer\ministruts\struts\ACTION_FORM_KEY;
+use rosasurfer\ministruts\struts\Struts;
 
 
 /**
@@ -46,10 +45,11 @@ class Form extends Facade {
      * @return ActionForm
      */
     public static function current($type = null) {
-        $form = Request::getAttribute(ACTION_FORM_KEY);
+        $form = Request::getAttribute(Struts::ACTION_FORM_KEY);
 
-        if ($form && (!isset($type) || $form instanceof $type))
+        if ($form && (!isset($type) || $form instanceof $type)) {
             return $form;
+        }
         return new EmptyActionForm(Request::instance());
     }
 
@@ -64,10 +64,11 @@ class Form extends Facade {
      * @return ActionForm
      */
     public static function old($type = null) {
-        $form = Request::getAttribute(ACTION_FORM_KEY.'.old');
+        $form = Request::getAttribute(Struts::ACTION_FORM_KEY.'.old');
 
-        if ($form && (!isset($type) || $form instanceof $type))
+        if ($form && (!isset($type) || $form instanceof $type)) {
             return $form;
+        }
         return new EmptyActionForm(Request::instance());
     }
 }

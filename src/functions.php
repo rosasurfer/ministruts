@@ -21,26 +21,22 @@ use rosasurfer\ministruts\core\lock\Lock;
 use rosasurfer\ministruts\struts\url\Url;
 use rosasurfer\ministruts\struts\url\VersionedUrl;
 
-
 // Whether we run on a command line interface, on localhost and/or on Windows.
 define('rosasurfer\ministruts\_CLI',        defined('\STDIN') && is_resource(\STDIN));
-define('rosasurfer\ministruts\_LOCALHOST',  !_CLI && in_array($_SERVER['REMOTE_ADDR'], ['127.0.0.1', $_SERVER['SERVER_ADDR']]));
 define('rosasurfer\ministruts\_MACOS',      strtoupper(PHP_OS) == 'DARWIN');
 define('rosasurfer\ministruts\_WINDOWS',    defined('\PHP_WINDOWS_VERSION_BUILD'));
 define('rosasurfer\ministruts\_NUL_DEVICE', _WINDOWS ? 'nul' : '/dev/null');
 
-/** @var bool    - whether we run on a command line interface */
-const CLI        = _CLI;
-/** @var bool    - whether we run on a webserver's localhost */
-const LOCALHOST  = _LOCALHOST;
-/** @var bool    - whether we run on MacOS */                       // constant declarations improve IDE auto-completion
-const MACOS      = _MACOS;
-/** @var bool    - whether we run on Windows */
-const WINDOWS    = _WINDOWS;
-/** @var string  - the system's NUL device name */
+/** @var bool - whether we run on a command line interface */       // constant declarations improve IDE auto-completion
+const CLI = _CLI;
+/** @var bool - whether we run on MacOS */
+const MACOS = _MACOS;
+/** @var bool - whether we run on Windows */
+const WINDOWS = _WINDOWS;
+/** @var string - the system's NUL device name */
 const NUL_DEVICE = _NUL_DEVICE;
 
-// custom log level
+// custom log levels
 const L_DEBUG           =  1;
 const L_INFO            =  2;
 const L_NOTICE          =  4;
@@ -53,7 +49,7 @@ const ERROR_LOG_DEFAULT =  0;                                       // message i
 const ERROR_LOG_MAIL    =  1;                                       // message is sent by e-mail
 const ERROR_LOG_DEBUG   =  2;                                       // message is sent through the PHP debugging connection (no longer available)
 const ERROR_LOG_FILE    =  3;                                       // message is appended to the file in parameter 'destination'
-const ERROR_LOG_SAPI    =  4;                                       // message is sent directly to the SAPI logger (e.g. Apache or STDERR)
+const ERROR_LOG_SAPI    =  4;                                       // message is sent to the SAPI logger (e.g. Apache or STDERR)
 
 // time periods
 const SECOND            =   1;           const SECONDS = SECOND;
@@ -95,17 +91,6 @@ const EOL_MAC           = "\r";                                     //   CR     
 const EOL_NETSCAPE      = "\r\r\n";                                 //   CRCRLF   0D0D0A  13,13,10
 const EOL_UNIX          = "\n";                                     //   LF       0A      10
 const EOL_WINDOWS       = "\r\n";                                   //   CRLF     0D0A    13,10
-
-// global definitions
-!defined('PHP_INT_MIN') && define('PHP_INT_MIN', ~PHP_INT_MAX);     // built-in since PHP 7.0
-
-// php.ini access level
-define('INI_ONLY',       0         );                               // undefined access level
-define('PHP_INI_ONLY',   INI_ONLY  );       // 0    no flag         // entry can be set in php.ini only
-define('PHP_INI_USER',   INI_USER  );       // 1    flag            // entry can be set in scripts and in .user.ini
-define('PHP_INI_PERDIR', INI_PERDIR);       // 2    flag            // entry can be set in php.ini, httpd.conf, .htaccess and in .user.ini
-define('PHP_INI_SYSTEM', INI_SYSTEM);       // 4    flag            // entry can be set in php.ini and in httpd.conf
-define('PHP_INI_ALL',    INI_ALL   );       // 7    flag            // entry can be set anywhere
 
 
 /**

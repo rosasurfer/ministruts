@@ -267,7 +267,7 @@ class Tile extends CObject {
         $properties['request' ] = $request;
         $properties['response'] = Response::me();
         $properties['session' ] = $request->isSession() ? $request->getSession() : null;
-        $properties['form'    ] = $request->getAttribute(ACTION_FORM_KEY);
+        $properties['form'    ] = $request->getAttribute(Struts::ACTION_FORM_KEY);
         $properties['page'    ] = Page::me();
 
         if ($this->isPushModelSupport()) {

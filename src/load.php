@@ -1,16 +1,15 @@
 <?php
 declare(strict_types=1);
 
-/**
- * Protective wrapper around the framework.
- */
-if (PHP_VERSION_ID < 70400 || PHP_VERSION_ID >= 90000) {
-    echo 'Error: unsupported PHP version '.PHP_VERSION.' (this "rosasurfer/ministruts" version requires PHP 7.4 to 8.*)'.PHP_EOL;
-    exit(1);
+namespace rosasurfer\ministruts;
+
+// load helper functions and constants which can't be auto-loaded
+require(__DIR__.'/functions.php');
+
+// CLI mode: register a SIGINT handler to catch Ctrl-C
+if (CLI && \function_exists('pcntl_signal')) {
+    \pcntl_signal(SIGINT, function(int $signo, $signinfo = null): void {
+        // calling exit() is sufficient to execute destructors
+        exit(1);
+    });
 }
-
-// prevent multiple includes
-if (\defined('rosasurfer\ministruts\ROOT_DIR')) return;
-
-// now include the framework
-require(__DIR__.'/bootstrap.php');

@@ -164,7 +164,7 @@ class PHP extends StaticClass {
      * @return void
      *
      * PHP_INI_ALL    - entry can be set anywhere
-     * PHP_INI_USER   - entry can be set in scripts and in .user.ini
+     * PHP_INI_USER   - entry can be set via ini_set() and in .user.ini
      * PHP_INI_ONLY   - entry can be set in php.ini only
      * PHP_INI_SYSTEM - entry can be set in php.ini and in httpd.conf
      * PHP_INI_PERDIR - entry can be set in php.ini, httpd.conf, .htaccess and in .user.ini

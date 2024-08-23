@@ -845,7 +845,7 @@ class Request extends CObject {
         Assert::string($role);
 
         /** @var ?Module $module */
-        $module = $this->getAttribute(MODULE_KEY);
+        $module = $this->getAttribute(Struts::MODULE_KEY);
         if (!$module) throw new RuntimeException('Current Struts module not found');
 
         $processor = $module->getRoleProcessor();
@@ -866,7 +866,7 @@ class Request extends CObject {
         Assert::nullOrString($key);
 
         /** @var string[] $messages */
-        $messages = $this->getAttribute(ACTION_MESSAGES_KEY) ?? [];
+        $messages = $this->getAttribute(Struts::ACTION_MESSAGES_KEY) ?? [];
 
         if (!isset($key)) {                             // return the first one
             if ($messages) {
@@ -886,7 +886,7 @@ class Request extends CObject {
      * @return string[]
      */
     public function getActionMessages() {
-        $messages = $this->getAttribute(ACTION_MESSAGES_KEY) ?? [];
+        $messages = $this->getAttribute(Struts::ACTION_MESSAGES_KEY) ?? [];
         $errors = $this->getActionErrors();
         return \array_merge($messages, $errors);
     }
@@ -933,10 +933,10 @@ class Request extends CObject {
         Assert::nullOrString($message, '$message');
 
         if (!isset($message)) {
-            unset($this->attributes[ACTION_MESSAGES_KEY][$key]);
+            unset($this->attributes[Struts::ACTION_MESSAGES_KEY][$key]);
         }
         else {
-            $this->attributes[ACTION_MESSAGES_KEY][$key] = $message;
+            $this->attributes[Struts::ACTION_MESSAGES_KEY][$key] = $message;
         }
         return $this;
     }
@@ -950,19 +950,20 @@ class Request extends CObject {
      * @return string[] - the removed ActionMessages
      */
     public function removeActionMessages(...$keys) {
-        $messages = $this->getAttribute(ACTION_MESSAGES_KEY) ?? [];
+        $messages = $this->getAttribute(Struts::ACTION_MESSAGES_KEY) ?? [];
         $removed = [];
 
         foreach ($keys as $key) {
             Assert::string($key, '$keys');
-            if (isset($messages[$key]))
+            if (isset($messages[$key])) {
                 $removed[$key] = $messages[$key];
-            unset($this->attributes[ACTION_MESSAGES_KEY][$key]);
+            }
+            unset($this->attributes[Struts::ACTION_MESSAGES_KEY][$key]);
         }
-        if ($keys)
+        if ($keys) {
             return $removed;
-
-        unset($this->attributes[ACTION_MESSAGES_KEY]);
+        }
+        unset($this->attributes[Struts::ACTION_MESSAGES_KEY]);
         return $messages;
     }
 
@@ -974,11 +975,9 @@ class Request extends CObject {
      *
      * @return ?string - message
      */
-    public function getActionError($key = null) {
-        Assert::nullOrString($key);
-
+    public function getActionError(?string $key = null) {
         /** @var string[] $errors */
-        $errors = $this->getAttribute(ACTION_ERRORS_KEY) ?? [];
+        $errors = $this->getAttribute(Struts::ACTION_ERRORS_KEY) ?? [];
 
         if (!isset($key)) {                             // return the first one
             if ($errors) {
@@ -998,7 +997,7 @@ class Request extends CObject {
      * @return string[]
      */
     public function getActionErrors() {
-        return $this->getAttribute(ACTION_ERRORS_KEY) ?? [];
+        return $this->getAttribute(Struts::ACTION_ERRORS_KEY) ?? [];
     }
 
 
@@ -1043,10 +1042,10 @@ class Request extends CObject {
         Assert::nullOrString($message, '$message');
 
         if (!isset($message)) {
-            unset($this->attributes[ACTION_ERRORS_KEY][$key]);
+            unset($this->attributes[Struts::ACTION_ERRORS_KEY][$key]);
         }
         else {
-            $this->attributes[ACTION_ERRORS_KEY][$key] = $message;
+            $this->attributes[Struts::ACTION_ERRORS_KEY][$key] = $message;
         }
         return $this;
     }
@@ -1060,19 +1059,21 @@ class Request extends CObject {
      * @return string[] - the removed ActionErrors
      */
     public function removeActionErrors(...$keys) {
-        $errors = $this->getAttribute(ACTION_ERRORS_KEY) ?? [];
+        $errors = $this->getAttribute(Struts::ACTION_ERRORS_KEY) ?? [];
         $removed = [];
 
         foreach ($keys as $key) {
             Assert::string($key, '$keys');
-            if (isset($errors[$key]))
+            if (isset($errors[$key])) {
                 $removed[$key] = $errors[$key];
-            unset($this->attributes[ACTION_ERRORS_KEY][$key]);
+            }
+            unset($this->attributes[Struts::ACTION_ERRORS_KEY][$key]);
         }
-        if ($keys)
+        if ($keys) {
             return $removed;
+        }
 
-        unset($this->attributes[ACTION_ERRORS_KEY]);
+        unset($this->attributes[Struts::ACTION_ERRORS_KEY]);
         return $errors;
     }
 
@@ -1083,7 +1084,7 @@ class Request extends CObject {
      * @return ?ActionMapping - instance or NULL if the request doesn't match any of the configured mappings
      */
     final public function getMapping() {
-        return $this->getAttribute(ACTION_MAPPING_KEY);
+        return $this->getAttribute(Struts::ACTION_MAPPING_KEY);
     }
 
 
@@ -1093,7 +1094,7 @@ class Request extends CObject {
      * @return ?Module - instance or NULL if the request doesn't match any of the configured modules
      */
     final public function getModule() {
-        return $this->getAttribute(MODULE_KEY);
+        return $this->getAttribute(Struts::MODULE_KEY);
     }
 
 

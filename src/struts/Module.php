@@ -80,13 +80,13 @@ class Module extends CObject {
     protected $viewNamespace = '';
 
     /** @var class-string<RequestProcessor> - classname of the {@link RequestProcessor} implementation used by the module (configurable) */
-    protected $requestProcessorClass = DEFAULT_REQUEST_PROCESSOR_CLASS;
+    protected $requestProcessorClass = Struts::DEFAULT_REQUEST_PROCESSOR_CLASS;
 
     /** @var class-string<ActionForward> - default classname of the {@link ActionForward} implementation used by the module (configurable) */
-    protected $forwardClass = DEFAULT_ACTION_FORWARD_CLASS;
+    protected $forwardClass = Struts::DEFAULT_ACTION_FORWARD_CLASS;
 
     /** @var class-string<ActionMapping> - default classname of the {@link ActionMapping} implementation used by the module (configurable) */
-    protected $mappingClass = DEFAULT_ACTION_MAPPING_CLASS;
+    protected $mappingClass = Struts::DEFAULT_ACTION_MAPPING_CLASS;
 
     /** @var class-string<Tile> - default classname of the {@link Tile} implementation used by the module (configurable) */
     protected $tilesClass = Tile::class;
@@ -960,8 +960,11 @@ class Module extends CObject {
      * @throws StrutsConfigException on configuration errors
      */
     protected function setRequestProcessorClass($className) {
-        if ($this->configured)                                            throw new IllegalStateException('Configuration is frozen');
-        if (!is_subclass_of($className, DEFAULT_REQUEST_PROCESSOR_CLASS)) throw new StrutsConfigException('Not a subclass of '.DEFAULT_REQUEST_PROCESSOR_CLASS.': '.$className);
+        if ($this->configured) throw new IllegalStateException('Configuration is frozen');
+
+        if (!is_subclass_of($className, Struts::DEFAULT_REQUEST_PROCESSOR_CLASS)) {
+            throw new StrutsConfigException('Not a subclass of '.Struts::DEFAULT_REQUEST_PROCESSOR_CLASS.': '.$className);
+        }
         $this->requestProcessorClass = $className;
         return $this;
     }
@@ -988,9 +991,11 @@ class Module extends CObject {
      * @throws StrutsConfigException on configuration errors
      */
     protected function setRoleProcessorClass($className) {
-        if ($this->configured)                                      throw new IllegalStateException('Configuration is frozen');
-        if (!is_subclass_of($className, ROLE_PROCESSOR_BASE_CLASS)) throw new StrutsConfigException('Not a subclass of '.ROLE_PROCESSOR_BASE_CLASS.': '.$className);
+        if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
+        if (!is_subclass_of($className, Struts::ROLE_PROCESSOR_BASE_CLASS)) {
+            throw new StrutsConfigException('Not a subclass of '.Struts::ROLE_PROCESSOR_BASE_CLASS.': '.$className);
+        }
         $this->roleProcessorClass = $className;
         return $this;
     }
@@ -1022,7 +1027,6 @@ class Module extends CObject {
      */
     protected function setTilesClass($className) {
         if ($this->configured)                        throw new IllegalStateException('Configuration is frozen');
-        if (!class_exists($className))                throw new StrutsConfigException("Class $className not found");
         if (!is_subclass_of($className, Tile::class)) throw new StrutsConfigException('Not a subclass of '.Tile::class.": $className");
 
         $this->tilesClass = $className;
@@ -1051,10 +1055,11 @@ class Module extends CObject {
      * @throws StrutsConfigException on configuration errors
      */
     protected function setMappingClass($className) {
-        if ($this->configured)                                         throw new IllegalStateException('Configuration is frozen');
-        if (!class_exists($className))                                 throw new StrutsConfigException("Class $className not found");
-        if (!is_subclass_of($className, DEFAULT_ACTION_MAPPING_CLASS)) throw new StrutsConfigException('Not a subclass of '.DEFAULT_ACTION_MAPPING_CLASS.": $className");
+        if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
+        if (!is_subclass_of($className, Struts::DEFAULT_ACTION_MAPPING_CLASS)) {
+            throw new StrutsConfigException('Not a subclass of '.Struts::DEFAULT_ACTION_MAPPING_CLASS.": $className");
+        }
         $this->mappingClass = $className;
         return $this;
     }
@@ -1081,10 +1086,11 @@ class Module extends CObject {
      * @throws StrutsConfigException on configuration errors
      */
     protected function setForwardClass($className) {
-        if ($this->configured)                                         throw new IllegalStateException('Configuration is frozen');
-        if (!class_exists($className))                                 throw new StrutsConfigException("Class $className not found");
-        if (!is_subclass_of($className, DEFAULT_ACTION_FORWARD_CLASS)) throw new StrutsConfigException('Not a subclass of '.DEFAULT_ACTION_FORWARD_CLASS.": $className");
+        if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
+        if (!is_subclass_of($className, Struts::DEFAULT_ACTION_FORWARD_CLASS)) {
+            throw new StrutsConfigException('Not a subclass of '.Struts::DEFAULT_ACTION_FORWARD_CLASS.": $className");
+        }
         $this->forwardClass = $className;
         return $this;
     }
