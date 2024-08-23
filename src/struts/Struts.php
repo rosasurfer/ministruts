@@ -93,4 +93,16 @@ final class Struts extends StaticClass {
      * Request key under which the current request's {@link Module} is stored.
      */
     const MODULE_KEY = 'org.apache.struts.action.MODULE';
+
+
+    /**
+     * Helper to throw a Struts configuration exception.
+     *
+     * @param  string $message
+     *
+     * @return never
+     */
+    public static function configError(string $message) {
+        throw new StrutsException("Struts config error: $message");
+    }
 }

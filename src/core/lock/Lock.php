@@ -22,7 +22,7 @@ class Lock extends BaseLock {
     /** @var string[] - keys of all currently aquired locks */
     private static $lockedKeys;
 
-    /** @var ?BaseLock - lock implementation */
+    /** @var BaseLock|null - lock implementation */
     private $impl = null;
 
     /** @var string - key of the locking implementation */

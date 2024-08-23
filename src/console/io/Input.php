@@ -16,7 +16,7 @@ use rosasurfer\ministruts\core\assert\Assert;
 class Input extends CObject {
 
 
-    /** @var ?DocoptResult */
+    /** @var DocoptResult|null */
     private $docoptResult = null;
 
 

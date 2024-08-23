@@ -176,68 +176,68 @@ class PHP extends StaticClass {
 
         // core configuration
         // ------------------
-        if (!php_ini_loaded_file())                                                                                  $issues[] = 'Error: no "php.ini" configuration file loaded [setup]';
-        /*PHP_INI_PERDIR*/ if (       ini_get_bool('short_open_tag'                ))                                $issues[] = 'Error: short_open_tag is not Off [XML compatibility]';
-        /*PHP_INI_ONLY  */ if (       ini_get_bool('expose_php'                    ) && !CLI)                        $issues[] = 'Warn:  expose_php is not Off [security]';
-        /*PHP_INI_ALL   */ if (       ini_get_int ('max_execution_time'            ) > 30 && !CLI /*hardcoded*/)     $issues[] = 'Info:  max_execution_time is very high: '.ini_get('max_execution_time').' [resources]';
-        /*PHP_INI_ALL   */ if (       ini_get_int ('default_socket_timeout'        ) > 30   /*PHP default: 60*/)     $issues[] = 'Info:  default_socket_timeout is very high: '.ini_get('default_socket_timeout').' [resources]';
+        if (!php_ini_loaded_file())                                                                                $issues[] = 'Error: no "php.ini" configuration file loaded [setup]';
+        /*PHP_INI_PERDIR*/ if (       ini_get_bool('short_open_tag'                ))                              $issues[] = 'Error: short_open_tag is not Off [XML compatibility]';
+        /*PHP_INI_ONLY  */ if (       ini_get_bool('expose_php'                    ) && !CLI)                      $issues[] = 'Warn:  expose_php is not Off [security]';
+        /*PHP_INI_ALL   */ if (       ini_get_int ('max_execution_time'            ) > 30 && !CLI /*hardcoded*/)   $issues[] = 'Info:  max_execution_time is very high: '.ini_get('max_execution_time').' [resources]';
+        /*PHP_INI_ALL   */ if (       ini_get_int ('default_socket_timeout'        ) > 30   /*PHP default: 60*/)   $issues[] = 'Info:  default_socket_timeout is very high: '.ini_get('default_socket_timeout').' [resources]';
         /*PHP_INI_ALL   */ $memoryLimit = ini_get_bytes('memory_limit');
-            if     ($memoryLimit ==    -1)                                                                           $issues[] = 'Warn:  memory_limit is unlimited [resources]';
-            elseif ($memoryLimit <=     0)                                                                           $issues[] = 'Error: memory_limit is invalid: '.ini_get('memory_limit');
-            elseif ($memoryLimit <  32*MB)                                                                           $issues[] = 'Warn:  memory_limit is very low: '.ini_get('memory_limit').' [resources]';
-            elseif ($memoryLimit > 128*MB)                                                                           $issues[] = 'Info:  memory_limit is very high: '.ini_get('memory_limit').' [resources]';
+            if     ($memoryLimit ==    -1)                                                                         $issues[] = 'Warn:  memory_limit is unlimited [resources]';
+            elseif ($memoryLimit <=     0)                                                                         $issues[] = 'Error: memory_limit is invalid: '.ini_get('memory_limit');
+            elseif ($memoryLimit <  32*MB)                                                                         $issues[] = 'Warn:  memory_limit is very low: '.ini_get('memory_limit').' [resources]';
+            elseif ($memoryLimit > 128*MB)                                                                         $issues[] = 'Info:  memory_limit is very high: '.ini_get('memory_limit').' [resources]';
 
             if ($config) {
                 $sWarnLimit = $config->get('log.warn.memory_limit', '');
                 $warnLimit  = php_byte_value($sWarnLimit);
                 if ($warnLimit) {
-                    if     ($warnLimit <             0)                                                              $issues[] = 'Error: log.warn.memory_limit is invalid: '.$sWarnLimit.' [configuration]';
-                    elseif ($warnLimit >= $memoryLimit)                                                              $issues[] = 'Error: log.warn.memory_limit ('.$sWarnLimit.') is not lower than memory_limit ('.ini_get('memory_limit').') [configuration]';
-                    elseif ($warnLimit >        128*MB)                                                              $issues[] = 'Info:  log.warn.memory_limit ('.$sWarnLimit.') is very high (memory_limit: '.ini_get('memory_limit').') [configuration]';
+                    if     ($warnLimit <             0)                                                            $issues[] = 'Error: log.warn.memory_limit is invalid: '.$sWarnLimit.' [configuration]';
+                    elseif ($warnLimit >= $memoryLimit)                                                            $issues[] = 'Error: log.warn.memory_limit ('.$sWarnLimit.') is not lower than memory_limit ('.ini_get('memory_limit').') [configuration]';
+                    elseif ($warnLimit >        128*MB)                                                            $issues[] = 'Info:  log.warn.memory_limit ('.$sWarnLimit.') is very high (memory_limit: '.ini_get('memory_limit').') [configuration]';
                 }
             }
-        /*PHP_INI_PERDIR*/ if (       ini_get_bool('register_argc_argv'            ) && !CLI /*hardcoded*/)          $issues[] = 'Info:  register_argc_argv is not Off [performance]';
-        /*PHP_INI_PERDIR*/ if (      !ini_get_bool('auto_globals_jit'              ))                                $issues[] = 'Info:  auto_globals_jit is not On [performance]';
-        /*PHP_INI_ALL   */ if (!empty(ini_get     ('open_basedir'                  )))                               $issues[] = 'Info:  open_basedir is not empty: "'.ini_get('open_basedir').'" [performance]';
-        /*PHP_INI_SYSTEM*/ if (      !ini_get_bool('allow_url_fopen'               ))                                $issues[] = 'Info:  allow_url_fopen is not On [functionality]';
-        /*PHP_INI_SYSTEM*/ if (       ini_get_bool('allow_url_include'))                                             $issues[] = 'Error: allow_url_include is not Off [security]';
+        /*PHP_INI_PERDIR*/ if (       ini_get_bool('register_argc_argv'            ) && !CLI /*hardcoded*/)        $issues[] = 'Info:  register_argc_argv is not Off [performance]';
+        /*PHP_INI_PERDIR*/ if (      !ini_get_bool('auto_globals_jit'              ))                              $issues[] = 'Info:  auto_globals_jit is not On [performance]';
+        /*PHP_INI_ALL   */ if (!empty(ini_get     ('open_basedir'                  )))                             $issues[] = 'Info:  open_basedir is not empty: "'.ini_get('open_basedir').'" [performance]';
+        /*PHP_INI_SYSTEM*/ if (      !ini_get_bool('allow_url_fopen'               ))                              $issues[] = 'Info:  allow_url_fopen is not On [functionality]';
+        /*PHP_INI_SYSTEM*/ if (       ini_get_bool('allow_url_include'))                                           $issues[] = 'Error: allow_url_include is not Off [security]';
         /*PHP_INI_ALL   */ foreach (explode(PATH_SEPARATOR, ini_get('include_path') ?: '') as $i => $path) {
-                               if (!strlen($path))                                                                   $issues[] = 'Warn:  include_path['.$i.'] contains an empty path: "'.ini_get('include_path').'" [setup]';
+                               if (!strlen($path))                                                                 $issues[] = 'Warn:  include_path['.$i.'] contains an empty path: "'.ini_get('include_path').'" [setup]';
                            }
         // error handling
         // --------------
         /*PHP_INI_ALL   */ $current = ini_get_int('error_reporting');
             $target = E_ALL & ~E_DEPRECATED;
-            if ($notCovered=($target ^ $current) & $target)                                                          $issues[] = 'Warn:  error_reporting does not cover '.ErrorHandler::errorLevelToStr($notCovered).' [standards]';
+            if ($notCovered=($target ^ $current) & $target)                                                        $issues[] = 'Warn:  error_reporting does not cover '.ErrorHandler::errorLevelToStr($notCovered).' [standards]';
         if (!WINDOWS) { /* Windows is always development */
-            /*PHP_INI_ALL*/ if (ini_get_bool('display_errors'        )) /*bool|string:stderr*/                       $issues[] = 'Warn:  display_errors is not Off [security]';
-            /*PHP_INI_ALL*/ if (ini_get_bool('display_startup_errors'))                                              $issues[] = 'Warn:  display_startup_errors is not Off [security]';
+            /*PHP_INI_ALL*/ if (ini_get_bool('display_errors'        )) /*bool|string:stderr*/                     $issues[] = 'Warn:  display_errors is not Off [security]';
+            /*PHP_INI_ALL*/ if (ini_get_bool('display_startup_errors'))                                            $issues[] = 'Warn:  display_startup_errors is not Off [security]';
         }
-        /*PHP_INI_ALL   */ if ( ini_get_bool('ignore_repeated_errors'))                                              $issues[] = 'Info:  ignore_repeated_errors is not Off [resources]';
-        /*PHP_INI_ALL   */ if ( ini_get_bool('ignore_repeated_source'))                                              $issues[] = 'Info:  ignore_repeated_source is not Off [resources]';
-        /*PHP_INI_ALL   */ if ( ini_get_bool('html_errors'           ))                                              $issues[] = 'Warn:  html_errors is not Off [functionality]';
-        /*PHP_INI_ALL   */ if (!ini_get_bool('log_errors'            ))                                              $issues[] = 'Error: log_errors is not On [setup]';
+        /*PHP_INI_ALL   */ if ( ini_get_bool('ignore_repeated_errors'))                                            $issues[] = 'Info:  ignore_repeated_errors is not Off [resources]';
+        /*PHP_INI_ALL   */ if ( ini_get_bool('ignore_repeated_source'))                                            $issues[] = 'Info:  ignore_repeated_source is not Off [resources]';
+        /*PHP_INI_ALL   */ if ( ini_get_bool('html_errors'           ))                                            $issues[] = 'Warn:  html_errors is not Off [functionality]';
+        /*PHP_INI_ALL   */ if (!ini_get_bool('log_errors'            ))                                            $issues[] = 'Error: log_errors is not On [setup]';
         /*PHP_INI_ALL   */ $bytes = ini_get_bytes('log_errors_max_len');
-            if     ($bytes <  0)   /* 'log_errors' and 'log_errors_max_len' do not affect */                         $issues[] = 'Error: log_errors_max_len is invalid: '.ini_get('log_errors_max_len');
-            elseif ($bytes != 0)   /* explicit calls to the function error_log()          */                         $issues[] = 'Warn:  log_errors_max_len is not 0: '.ini_get('log_errors_max_len').' [functionality]';
+            if     ($bytes <  0)   /* 'log_errors' and 'log_errors_max_len' do not affect */                       $issues[] = 'Error: log_errors_max_len is invalid: '.ini_get('log_errors_max_len');
+            elseif ($bytes != 0)   /* explicit calls to the function error_log()          */                       $issues[] = 'Warn:  log_errors_max_len is not 0: '.ini_get('log_errors_max_len').' [functionality]';
         /*PHP_INI_ALL   */ $errorLog = ini_get('error_log');
             if (!empty($errorLog) && $errorLog!='syslog') {
                 if (is_file($errorLog)) {
                     $hFile = @fopen($errorLog, 'ab');         // try to open
                     if (is_resource($hFile)) fclose($hFile);
-                    else                                                                                             $issues[] = 'Error: error_log "'.$errorLog.'" file is not writable [setup]';
+                    else                                                                                           $issues[] = 'Error: error_log "'.$errorLog.'" file is not writable [setup]';
                 }
                 else {
                     $hFile = @fopen($errorLog, 'wb');         // try to create
                     if (is_resource($hFile)) fclose($hFile);
-                    else                                                                                             $issues[] = 'Error: error_log "'.$errorLog.'" directory is not writable [setup]';
+                    else                                                                                           $issues[] = 'Error: error_log "'.$errorLog.'" directory is not writable [setup]';
                     is_file($errorLog) && @unlink($errorLog);
                 }
             }
 
         // input sanitizing
         // ----------------
-        /*PHP_INI_SYSTEM*/     if      (ini_get_bool('sql.safe_mode'       ))                                        $issues[] = 'Warn:  sql.safe_mode is not Off [setup]';
+        /*PHP_INI_SYSTEM*/     if      (ini_get_bool('sql.safe_mode'       ))                                      $issues[] = 'Warn:  sql.safe_mode is not Off [setup]';
 
         // request & HTML handling
         // -----------------------
@@ -340,28 +340,8 @@ class PHP extends StaticClass {
 
         // opcode cache
         // ------------
-        if (extension_loaded('apc')) {
-            //if (phpVersion('apc') >= '3.1.3' && phpVersion('apc') < '3.1.7')                                     $issues[] = 'Warn:  You are running a buggy APC version (a version < 3.1.3 or >= 3.1.7 is recommended): '.phpVersion('apc');
-            ///*PHP_INI_SYSTEM*/ if (!ini_get('apc.enabled'))                                                      $issues[] = 'Warn:  apc.enabled is not On [performance]';      // warning "Potential cache slam averted for key '...'" https://bugs.php.net/bug.php?id=58832
-            ///*PHP_INI_SYSTEM*/ if ( ini_get('apc.report_autofilter'))                                            $issues[] = 'Warn:  apc.report_autofilter is not Off';
-            //
-            //if (WINDOWS) {       // development
-            //    /*PHP_INI_SYSTEM*/ if     (ini_get('apc.stat'))                                                  $issues[] = 'Warn:  apc.stat is not Off';
-            //    /*PHP_INI_ALL   */ elseif (ini_get('apc.cache_by_default'))                                      $issues[] = 'Warn:  apc.cache_by_default is not Off';          // "On" may crash some Windows APC versions (apc-error: cannot redeclare class ***)
-            //}                                                                                                                                                                   // Windows: if apc.stat="Off" this option MUST be "Off"
-            //else {               // production
-            //    /*PHP_INI_ALL   */ if (!ini_get('apc.cache_by_default'))                                         $issues[] = 'Warn:  apc.cache_by_default is not On';
-            //    /*PHP_INI_SYSTEM*/ if ( ini_get('apc.stat'))                                                     $issues[] = 'Warn:  apc.stat is not Off';                      // we want to cache fs-stat calls
-            //    /*PHP_INI_SYSTEM*/ if (!ini_get('apc.write_lock'))                                               $issues[] = 'Warn:  apc.write_lock is not On';                 // "Off" for perfomance; file modifications in production shall be disabled
-            //
-            //    if (phpVersion('apc') >= '3.1.3' && phpVersion('apc') < '3.1.7') {
-            //        /*PHP_INI_SYSTEM*/ if (ini_get('apc.include_once_override'))                                 $issues[] = 'Warn:  apc.include_once_override is not Off';     // never use slow include_once()/require_once()
-            //    }
-            //    /*PHP_INI_SYSTEM*/ elseif (!ini_get('apc.include_once_override'))                                $issues[] = 'Warn:  apc.include_once_override is not On';
-            //}
-        }
-        elseif (extension_loaded('zend opcache')) {
-            /*PHP_INI_ALL   */ if (!ini_get('opcache.enable'))                                                     $issues[] = 'Info:  opcache.enable is not On [performance]';
+        if (extension_loaded('zend opcache')) {
+            /*PHP_INI_ALL*/ if (!ini_get('opcache.enable'))                                                        $issues[] = 'Info:  opcache.enable is not On [performance]';
         }
         else                                                                                                       $issues[] = 'Info:  No opcode cache found [performance]';
 
@@ -411,11 +391,11 @@ class PHP extends StaticClass {
      *
      * @param  string          $option
      * @param  bool|int|string $value
-     * @param  bool            $throwException [optional] - whether to throw an exception on errors (default: yes)
+     * @param  bool            $throw [optional] - whether to throw exceptions on assignment errors (default: yes)
      *
      * @return bool - success status
      */
-    public static function ini_set($option, $value, $throwException = true) {
+    public static function ini_set(string $option, $value, bool $throw = true): bool {
         if (is_bool($value)) $value = (int) $value;
         $newValue = (string) $value;
 
@@ -428,7 +408,7 @@ class PHP extends StaticClass {
         if ($oldValue == $newValue) {       // the error can be ignored
             return true;
         }
-        if ($throwException) throw new RuntimeException('Cannot set php.ini option "'.$option.'" (former value="'.$oldValue.'")');
+        if ($throw) throw new RuntimeException('Cannot set php.ini option "'.$option.'" (current value: "'.$oldValue.'")');
         return false;
     }
 }

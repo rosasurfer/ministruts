@@ -52,13 +52,13 @@ class Request extends CObject {
     /** @var array<string, mixed> */
     protected $_REQUEST;
 
-    /** @var ?ActionInput - all input */
+    /** @var ActionInput|null - all input */
     protected $allInput = null;
 
-    /** @var ?ActionInput - GET input*/
+    /** @var ActionInput|null - GET input*/
     protected $getInput = null;
 
-    /** @var ?ActionInput - POST input */
+    /** @var ActionInput|null - POST input */
     protected $postInput = null;
 
     /** @var ?scalar[][] - normalized array of files uploaded with the request */
@@ -844,7 +844,7 @@ class Request extends CObject {
     public function isUserInRole($role) {
         Assert::string($role);
 
-        /** @var ?Module $module */
+        /** @var Module|null $module */
         $module = $this->getAttribute(Struts::MODULE_KEY);
         if (!$module) throw new RuntimeException('Current Struts module not found');
 

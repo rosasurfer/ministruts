@@ -39,7 +39,7 @@ abstract class BaseAppender extends CObject implements AppenderInterface {
     /** @var bool - whether server environment details will be logged by this instance */
     protected bool $serverDetails = false;
 
-    /** @var ?ContentFilter - a configured content filter, if any */
+    /** @var ContentFilter|null - a configured content filter, if any */
     protected ?ContentFilter $filter = null;
 
 

@@ -22,7 +22,7 @@ class SQLiteResult extends Result {
     /** @var string - SQL statement the result was generated from */
     protected string $sql;
 
-    /** @var ?SQLite3Result - the database connector's original result object */
+    /** @var SQLite3Result|null - the database connector's original result object */
     protected $result = null;
 
     /** @var int - last inserted row id of the connection at instance creation time (not reset between queries) */

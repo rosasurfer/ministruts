@@ -25,7 +25,7 @@ final class Cache extends StaticClass {
     /** @var int */
     const EXPIRES_NEVER = 0;
 
-    /** @var ?CachePeer - default cache implementation */
+    /** @var CachePeer|null - default cache implementation */
     private static ?CachePeer $default = null;
 
     /** @var CachePeer[] - array of further cache implementations */

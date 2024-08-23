@@ -76,8 +76,6 @@ class FrontController extends Singleton {
      * Constructor
      *
      * Load and parse all Struts configuration files and create the corresponding object hierarchy.
-     *
-     * @throws StrutsConfigException on configuration errors
      */
     protected function __construct() {
         parent::__construct();
@@ -90,7 +88,7 @@ class FrontController extends Singleton {
         !$configDir && $configDir=$config['app.dir.config'];                        // fall-back to standard config directory
 
         $mainConfig = str_replace('\\', '/', $configDir.'/struts-config.xml');      // main module config
-        if (!is_file($mainConfig)) throw new StrutsConfigException('Struts configuration file not found: "'.$mainConfig.'"');
+        if (!is_file($mainConfig)) Struts::configError('Struts configuration file not found: "'.$mainConfig.'"');
 
         $subConfigs = glob($configDir.'/struts-config-*.xml', GLOB_ERR) ?: [];      // scan for submodule configs
         $configs    = \array_merge([$mainConfig], $subConfigs);
@@ -105,12 +103,12 @@ class FrontController extends Singleton {
                 $module = new Module($file, $prefix);
                 $module->freeze();
 
-                if (isset($this->modules[$prefix])) throw new StrutsConfigException('All Struts modules must have unique prefixes, non-unique prefix found: "'.$prefix.'"');
+                if (isset($this->modules[$prefix])) Struts::configError('All Struts modules must have unique prefixes, non-unique prefix found: "'.$prefix.'"');
                 $this->modules[$prefix] = $module;
             }
         }
         catch (Throwable $ex) {
-            if (!$ex instanceof IRosasurferException) $ex = new StrutsConfigException($ex->getMessage(), $ex->getCode(), $ex);
+            if (!$ex instanceof IRosasurferException) $ex = new StrutsException($ex->getMessage(), $ex->getCode(), $ex);
             throw $ex->appendMessage("Error instantiating Struts module from file \"$file\"");
         }
     }

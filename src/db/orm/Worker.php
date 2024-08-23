@@ -28,7 +28,7 @@ class Worker extends CObject {
     /** @var string - name of the worker's entity class */
     protected $entityClass;
 
-    /** @var ?Connector - db adapter used for the worker's entity */
+    /** @var Connector|null - db adapter used for the worker's entity */
     private ?Connector $connector = null;
 
 

@@ -26,13 +26,13 @@ use rosasurfer\ministruts\db\orm\meta\EntityMapping;
 abstract class DAO extends Singleton {
 
 
-    /** @var ?IConnector - the db connector for this DAO */
+    /** @var IConnector|null - the db connector for this DAO */
     private $connector = null;
 
-    /** @var ?Worker - the worker this DAO uses */
+    /** @var Worker|null - the worker this DAO uses */
     private $worker = null;
 
-    /** @var ?EntityMapping - the mapping of the DAO's entity */
+    /** @var EntityMapping|null - the mapping of the DAO's entity */
     private $entityMapping = null;
 
     /** @var string - the PHP class name of the DAO's entity */

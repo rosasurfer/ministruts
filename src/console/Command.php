@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\console;
 
+use Closure;
+
 use rosasurfer\ministruts\console\docopt\DocoptParser;
 use rosasurfer\ministruts\console\docopt\DocoptResult;
 use rosasurfer\ministruts\console\io\Input;
@@ -39,10 +41,10 @@ class Command extends CObject {
     /** @var DocoptResult|null - parsed and matched Docopt block */
     private $docoptResult = null;
 
-    /** @var ?\Closure */
+    /** @var Closure|null */
     private $validator = null;
 
-    /** @var ?\Closure */
+    /** @var Closure|null */
     private $task = null;
 
     /** @var bool - whether the command configuration is frozen */
@@ -249,11 +251,11 @@ class Command extends CObject {
      * Set the command's dynamic validation implementation. When a command is executed a dynamic validator is given higher
      * priority than a pre-defined implementation in an overridden {@link Command::validate()} method.
      *
-     * @param  \Closure $validator
+     * @param  Closure $validator
      *
      * @return $this
      */
-    public function setValidator(\Closure $validator) {
+    public function setValidator(Closure $validator) {
         $this->validator = $validator->bindTo($this);
         return $this;
     }
@@ -273,11 +275,11 @@ class Command extends CObject {
      * Set the command's dynamic task implementation. When a command is executed a dynamic task is given higher priority than
      * a pre-defined implementation in an overridden {@link Command::execute()} method.
      *
-     * @param  \Closure $task
+     * @param  Closure $task
      *
      * @return $this
      */
-    public function setTask(\Closure $task) {
+    public function setTask(Closure $task) {
         $this->task = $task->bindTo($this);
         return $this;
     }

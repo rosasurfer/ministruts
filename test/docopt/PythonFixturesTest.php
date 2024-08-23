@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\test\docopt;
 
+use Exception;
 use PHPUnit\Framework\TestCase;
-
 use rosasurfer\ministruts\console\docopt\DocoptResult;
 
 use function rosasurfer\ministruts\docopt;
@@ -37,14 +37,16 @@ class PythonFixturesTest extends TestCase {
      */
     public function dataProvider(): array {
         $filename = __DIR__.'/../fixtures/docopt.txt';
-        if (!file_exists($filename)) throw new \Exception('Python fixtures "'.$filename.'" not found.');
+        if (!file_exists($filename)) throw new Exception("Python fixtures \"$filename\" not found.");
         $raw = file_get_contents($filename);
 
         $filename = __DIR__.'/../fixtures/docopt-extra.txt';
-        if (!file_exists($filename)) throw new \Exception('Python fixtures "'.$filename.'" not found.');
+        if (!file_exists($filename)) throw new Exception("Python fixtures \"$filename\" not found.");
         $raw .= file_get_contents($filename);
 
-        $raw = trim(preg_replace('/#.*$/m', '', $raw));             // drop file comments
+        /** @var string $raw */
+        $raw = preg_replace('/#.*$/m', '', $raw);
+        $raw = trim($raw);                                          // drop file comments
         if (strpos($raw, '"""') === 0) {
             $raw = substr($raw, 3);
         }
@@ -55,7 +57,7 @@ class PythonFixturesTest extends TestCase {
             if (!strlen($fixture)) continue;
 
             $parts = explode('"""', $fixture, 2);
-            if (sizeof($parts) < 2) throw new \Exception('Missing string close marker');
+            if (sizeof($parts) < 2) throw new Exception('Missing string close marker');
             list($usage, $body) = $parts;
                                                                     // split test cases
             foreach (array_slice(explode('$', $body), 1) as $testCase) {

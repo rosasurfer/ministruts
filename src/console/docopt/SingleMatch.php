@@ -16,7 +16,7 @@ class SingleMatch extends CObject {
     /** @var ?int */
     public $pos = null;
 
-    /** @var ?Pattern */
+    /** @var Pattern|null */
     public $pattern = null;
 
 

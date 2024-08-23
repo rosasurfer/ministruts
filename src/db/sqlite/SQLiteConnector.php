@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\db\sqlite;
 
+use SQLite3;
 use Throwable;
 
 use rosasurfer\ministruts\config\ConfigInterface as Config;
@@ -68,7 +69,7 @@ class SQLiteConnector extends Connector {
     /** @var array<string, string> - configuration options */
     protected $options = [];
 
-    /** @var ?\SQLite3 - internal database handler instance */
+    /** @var SQLite3|null - internal database handler instance */
     protected $sqlite = null;
 
     /** @var int - transaction nesting level */

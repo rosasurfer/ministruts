@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace rosasurfer\ministruts\struts\url;
 
 use rosasurfer\ministruts\core\CObject;
-use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\di\proxy\Request;
+use rosasurfer\ministruts\core\exception\RuntimeException;
 
 use const rosasurfer\ministruts\CLI;
 
@@ -29,14 +29,11 @@ class Url extends CObject {
     /**
      * Constructor
      *
-     * Create a new Url instance.
-     *
      * @param  string $uri - URI part of the URL to generate. If the URI starts with a slash "/" it is interpreted as
      *                       relative to the application's base URI (the main module). If the URI does not start with a
      *                       slash it is interpreted as relative to the application's current module.
      */
-    public function __construct($uri) {
-        Assert::string($uri);
+    public function __construct(string $uri) {
         $this->uri = $uri;
 
         // TODO: If called from a non-MiniStruts context (i.e. CLI) this method will fail.
@@ -48,7 +45,10 @@ class Url extends CObject {
         }
         else {
             // the resulting URI is relative to the application's current module (which may be the main module)
-            $prefix = Request::getModule()->getPrefix();        // main: "";  submodule: "path/"
+            $module = Request::getModule();
+            if (!$module) throw new RuntimeException("Request module not found");
+
+            $prefix = $module->getPrefix();             // main module: "";  submodule: "path/"
             $this->appRelativeUri = $prefix.$uri;
         }
     }

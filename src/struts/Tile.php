@@ -48,13 +48,13 @@ class Tile extends CObject {
     /** @var ?bool - whether the MVC push model is enabled for the Tile */
     protected $pushModelSupport = null;
 
-    /** @var array<string, ?Tile> - nested Tiles */
+    /** @var array<string, Tile|null> - nested Tiles */
     protected $nestedTiles = [];
 
     /** @var mixed[] - additional Tile properties */
     protected $properties = [];
 
-    /** @var ?Tile - parent instance containing this Tile or NULL if this Tile is the outermost fragment of the generated view */
+    /** @var Tile|null - parent instance containing this Tile or NULL if this Tile is the outermost fragment of the generated view */
     protected $parent;
 
     /** @var bool - whether this component can still be modified or configuration is frozen */
@@ -225,12 +225,10 @@ class Tile extends CObject {
      * Freeze the configuration of this component. After the call the instance can't be modified anymore.
      *
      * @return $this
-     *
-     * @throws StrutsConfigException on configuration errors
      */
     public function freeze() {
         if (!$this->configured) {
-            if (!$this->fileName) throw new StrutsConfigException('<tile name="'.$this->name.'": No file configured.');
+            if (!$this->fileName) Struts::configError('<tile name="'.$this->name.'": No file configured.');
 
             foreach ($this->nestedTiles as $tile) {
                 if ($tile) $tile->freeze();
@@ -252,7 +250,9 @@ class Tile extends CObject {
         $appUri      = $request->getApplicationBaseUri();
         $nestedTiles = $this->nestedTiles;
         foreach ($nestedTiles as $tile) {
-            $tile->setParent($this);
+            if ($tile) {
+                $tile->setParent($this);
+            }
         }
         $properties = $this->getMergedProperties();
 

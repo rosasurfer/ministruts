@@ -7,9 +7,9 @@ use rosasurfer\ministruts\core\exception\RosasurferException;
 
 
 /**
- * StrutsConfigException
+ * StrutsException
  *
- * Base exception for configuration errors in "struts-config.xml"
+ * Base exception for Struts errors.
  */
-class StrutsConfigException extends RosasurferException {
+class StrutsException extends RosasurferException {
 }

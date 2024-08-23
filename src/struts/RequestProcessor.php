@@ -120,7 +120,10 @@ class RequestProcessor extends CObject {
      */
     protected function processMapping(Request $request, Response $response) {
         // resolve the full request path
-        $requestPath = '/'.trim(preg_replace('|/{2,}|', '/', $request->getPath()), '/').'/';
+
+        /** @var string $requestPath */
+        $requestPath = preg_replace('|/{2,}|', '/', $request->getPath());
+        $requestPath = '/'.trim($requestPath, '/').'/';
         if ($requestPath=='//') $requestPath = '/';
         // /                                            // path may point to: application root
         // /action/                                     // path may point to: an action

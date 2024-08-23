@@ -41,10 +41,10 @@ class Application extends CObject {
     /** @var self - the application itself */
     protected static self $instance;
 
-    /** @var ?Config - the application's main configuration */
+    /** @var Config|null - the application's main configuration */
     protected static ?Config $config = null;
 
-    /** @var ?Di - the application's service container */
+    /** @var Di|null - the application's service container */
     protected static ?Di $di = null;
 
     /** @var Command[] - registered CLI commands */

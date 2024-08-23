@@ -47,6 +47,7 @@ class TokenIterator extends \ArrayIterator {
      * @return TokenIterator
      */
     public static function fromPattern($source) {
+        /** @var string $source */
         $source = preg_replace('/([\[\]\(\)\|]|\.\.\.)/', ' $1 ', $source);
         $source = preg_split('/\s+|(\S*<.*?'.'>)/', $source, 0, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
         return new static($source, DocoptFormatError::class);
