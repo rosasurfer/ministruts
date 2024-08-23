@@ -5,7 +5,6 @@ namespace rosasurfer\ministruts\cache;
 
 use rosasurfer\ministruts\cache\monitor\Dependency;
 use rosasurfer\ministruts\config\ConfigInterface as Config;
-use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 use rosasurfer\ministruts\file\FileSystem as FS;
 
@@ -30,10 +29,10 @@ final class FileSystemCache extends CachePeer {
     /**
      * Constructor
      *
-     * @param  string               $label              - cache identifier (namespace)
-     * @param  array<string, mixed> $options [optional] - additional instantiation options (default: none)
+     * @param  string  $label              - cache identifier (namespace)
+     * @param  mixed[] $options [optional] - additional instantiation options (default: none)
      */
-    public function __construct($label, array $options = []) {
+    public function __construct(string $label, array $options = []) {
         $this->label     = $label;
         $this->namespace = $label;
         $this->options   = $options;
@@ -64,7 +63,7 @@ final class FileSystemCache extends CachePeer {
      *
      * @return bool
      */
-    public function isCached($key) {
+    public function isCached(string $key): bool {
         // The actual working horse. This method does not only check the key's existence, it also retrieves the value and
         // stores it in the local reference pool. Thus following cache queries can use the local reference.
 
@@ -127,7 +126,7 @@ final class FileSystemCache extends CachePeer {
      *
      * @return mixed
      */
-    public function get($key, $default = null) {
+    public function get(string $key, $default = null) {
         if ($this->isCached($key))
             return $this->getReferencePool()->get($key);
         return $default;
@@ -141,7 +140,7 @@ final class FileSystemCache extends CachePeer {
      *
      * @return bool
      */
-    public function drop($key) {
+    public function drop(string $key): bool {
         $fileName = $this->getFilePath($key);
 
         if (is_file($fileName)) {
@@ -150,7 +149,7 @@ final class FileSystemCache extends CachePeer {
                 $this->getReferencePool()->drop($key);
                 return true;
             }
-            throw new RuntimeException('Cannot delete file: '.$fileName);
+            throw new RuntimeException("Cannot delete file: \"$fileName\"");
         }
         return false;
     }
@@ -166,10 +165,7 @@ final class FileSystemCache extends CachePeer {
      *
      * @return bool
      */
-    public function set($key, $value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null) {
-        Assert::string($key,  '$key');
-        Assert::int($expires, '$expires');
-
+    public function set(string $key, $value, int $expires = Cache::EXPIRES_NEVER, ?Dependency $dependency = null): bool {
         // stored data: [created, expires, value, dependency]
         $created = time();
 
@@ -188,7 +184,7 @@ final class FileSystemCache extends CachePeer {
      *
      * @return string - filepath
      */
-    private function getFilePath($key) {
+    private function getFilePath(string $key): string {
         $key = md5($key);
         return $this->directory.$key[0].DIRECTORY_SEPARATOR.$key[1].DIRECTORY_SEPARATOR.substr($key, 2);
     }
@@ -216,7 +212,7 @@ final class FileSystemCache extends CachePeer {
      *
      * @return bool - success status
      */
-    private function writeFile($fileName, $value, $expires) {
+    private function writeFile(string $fileName, $value, int $expires): bool {
         FS::mkDir(dirname($fileName));
         file_put_contents($fileName, serialize($value));
 

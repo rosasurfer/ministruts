@@ -180,21 +180,6 @@ function asset(string $uri): VersionedUrl {
 
 
 /**
- * Manually load the specified class, interface or trait. If the component was already loaded the call does nothing.
- *
- * @param  string $name - name
- *
- * @return ?string - the same name or NULL if a component of that name doesn't exist or couldn't be loaded
- */
-function autoload(string $name): ?string {
-    if (class_exists($name, true) || interface_exists($name, true) || trait_exists($name, true)) {
-        return $name;
-    }
-    return null;
-}
-
-
-/**
  * Convert a value to a boolean and return the string "true" or "false".
  *
  * @param  mixed $value - value to interpret
@@ -353,7 +338,7 @@ function getHostByAddress(string $ipAddress): string {
 /**
  * Convert special characters to HTML entities.
  *
- * Inline replacement and shortcut for htmlspecialchars() using different default flags.
+ * Inline replacement and shortcut for htmlspecialchars() using differing default flags.
  *
  * @param  string  $string
  * @param  ?int    $flags        [optional] - default: ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5
@@ -365,9 +350,8 @@ function getHostByAddress(string $ipAddress): string {
  * @see   \htmlspecialchars()
  */
 function hsc(string $string, ?int $flags = null, ?string $encoding = null, bool $doubleEncode = true): string {
-    if (!isset($flags))    $flags = ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5;
-    if (!isset($encoding)) $encoding = 'UTF-8';
-
+    $flags ??= ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5;
+    $encoding ??= 'UTF-8';
     return htmlspecialchars($string, $flags, $encoding, $doubleEncode);
 }
 
@@ -674,18 +658,18 @@ function objectToArray(object $object, int $access = ACCESS_PUBLIC): array {
     $array = [];
 
     foreach ($source as $name => $value) {
-        if ($name[0] != "\0") {                     // public
+        if ($name[0] != "\0") {                         // public
             if ($access & ACCESS_PUBLIC) {
                 $array[$name] = $value;
             }
         }
-        elseif ($name[1] == '*') {                  // protected
+        elseif ($name[1] == '*') {                      // protected
             if ($access & ACCESS_PROTECTED) {
                 $publicName = substr($name, 3);
                 $array[$publicName] = $value;
             }
         }
-        elseif ($access & ACCESS_PRIVATE) {         // private
+        elseif ($access & ACCESS_PRIVATE) {             // private
             $publicName = strRightFrom($name, "\0", 2);
             if (!\key_exists($publicName, $array)) {
                 $array[$publicName] = $value;
@@ -763,8 +747,9 @@ function prettyBytes($value, int $decimals = 1): string {
     }
     Assert::int($decimals, '$decimals');
 
-    if ($value < 1024)
+    if ($value < 1024) {
         return (string) $value;
+    }
 
     $unit = '';
     foreach (['K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'] as $unit) {

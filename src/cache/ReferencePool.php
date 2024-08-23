@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace rosasurfer\ministruts\cache;
 
 use rosasurfer\ministruts\cache\monitor\Dependency;
-use rosasurfer\ministruts\core\assert\Assert;
 
 
 /**
@@ -18,16 +17,16 @@ final class ReferencePool extends CachePeer {
 
 
     /** @var array<string, mixed> */
-    private $pool;
+    private array $pool;
 
 
     /**
      * Constructor.
      *
-     * @param  ?string               $label   [optional] - cache identifier (namespace, ignored for in-memory instances)
-     * @param  array<string, scalar> $options [optional] - additional instantiation options (default: none)
+     * @param  ?string $label   [optional] - cache identifier (namespace, ignored for in-memory instances)
+     * @param  mixed[] $options [optional] - additional instantiation options (default: none)
      */
-    public function __construct($label=null, array $options=[]) {
+    public function __construct(?string $label=null, array $options=[]) {
         $this->label   = $label;
         $this->options = $options;
     }
@@ -38,7 +37,7 @@ final class ReferencePool extends CachePeer {
      *
      * @return $this
      */
-    protected function getReferencePool() {
+    protected function getReferencePool(): self {
         return $this;
     }
 
@@ -50,9 +49,10 @@ final class ReferencePool extends CachePeer {
      *
      * @return bool
      */
-    public function isCached($key) {
-        if (!isset($this->pool[$key]))
+    public function isCached($key): bool {
+        if (!isset($this->pool[$key])) {
             return false;
+        }
 
         // @todo: As long as we don't have the $created value from the real cache, we can't check $expires or $minValidity.
         //$dependency = $this->pool[$key][3];
@@ -73,9 +73,10 @@ final class ReferencePool extends CachePeer {
      *
      * @return mixed
      */
-    public function get($key, $default = null) {
-        if ($this->isCached($key))
+    public function get(string $key, $default = null) {
+        if ($this->isCached($key)) {
             return $this->pool[$key][1];
+        }
         return $default;
     }
 
@@ -87,7 +88,7 @@ final class ReferencePool extends CachePeer {
      *
      * @return bool
      */
-    public function drop($key) {
+    public function drop(string $key): bool {
         if (isset($this->pool[$key])) {
             unSet($this->pool[$key]);
             return true;
@@ -106,10 +107,7 @@ final class ReferencePool extends CachePeer {
      *
      * @return bool
      */
-    public function set($key, $value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null) {
-        Assert::string($key, '$key');
-        Assert::int($expires, '$expires');
-
+    public function set(string $key, $value, int $expires = Cache::EXPIRES_NEVER, ?Dependency $dependency = null): bool {
         // stored data: [created, value, expires, dependency]
         $this->pool[$key] = [null, $value, null, $dependency];
         return true;

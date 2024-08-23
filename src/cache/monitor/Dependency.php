@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace rosasurfer\ministruts\cache\monitor;
 
 use rosasurfer\ministruts\core\CObject;
-use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 
 
@@ -22,7 +21,7 @@ use rosasurfer\ministruts\core\exception\InvalidValueException;
  *  ->andDependency(FileDependency::create('/etc/hosts'))
  *  ->andDependency(FileDependency::create('/etc/resolve.conf'));
  *
- *  // ...
+ *  ...
  *
  *  if (!$dependency->isValid()) {
  *      // state of one of the files has changed, trigger some action...
@@ -37,7 +36,7 @@ abstract class Dependency extends CObject {
 
 
     /** @var int - min. validity of the instance in seconds */
-    private $minValidity = 0;
+    private int $minValidity = 0;
 
 
     /**
@@ -46,7 +45,7 @@ abstract class Dependency extends CObject {
      * @return bool - TRUE if the the event didn't yet occur and the dependency is still valid
      *                FALSE if the event has occurred and invalidated the dependency
      */
-    abstract public function isValid();
+    abstract public function isValid(): bool;
 
 
     /**
@@ -56,9 +55,10 @@ abstract class Dependency extends CObject {
      *
      * @return self
      */
-    public function andDependency(Dependency $dependency) {
-        if ($dependency === $this)
+    public function andDependency(Dependency $dependency): self {
+        if ($dependency === $this) {
             return $this;
+        }
         return ChainedDependency::create($this)->andDependency($dependency);
     }
 
@@ -70,9 +70,10 @@ abstract class Dependency extends CObject {
      *
      * @return self
      */
-    public function orDependency(Dependency $dependency) {
-        if ($dependency === $this)
+    public function orDependency(Dependency $dependency): self {
+        if ($dependency === $this) {
             return $this;
+        }
         return ChainedDependency::create($this)->orDependency($dependency);
     }
 
@@ -82,7 +83,7 @@ abstract class Dependency extends CObject {
      *
      * @return int - seconds
      */
-    public function getMinValidity() {
+    public function getMinValidity(): int {
         return $this->minValidity;
     }
 
@@ -94,8 +95,7 @@ abstract class Dependency extends CObject {
      *
      * @return $this
      */
-    public function setMinValidity($time) {
-        Assert::int($time);
+    public function setMinValidity(int $time): self {
         if ($time < 0) throw new InvalidValueException('Invalid parameter $time: '.$time);
 
         $this->minValidity = $time;

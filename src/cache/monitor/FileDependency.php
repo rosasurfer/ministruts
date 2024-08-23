@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\cache\monitor;
 
-use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 
 use function rosasurfer\ministruts\isRelativePath;
@@ -21,7 +20,7 @@ use function rosasurfer\ministruts\realpath;
  *  &lt;?php
  *  $dependency = new FileDependency('/etc/crontab');
  *
- *  // ...
+ *  ...
  *
  *  if (!$dependency->isValid()) {
  *      // file state has changed, trigger some action...
@@ -36,10 +35,10 @@ class FileDependency extends Dependency {
 
 
     /** @var string - name of the monitored file */
-    private $fileName;
+    private string $fileName;
 
     /** @var ?int - last modification time of the monitored file (Unix timestamp) */
-    private $lastModified = null;
+    private ?int $lastModified = null;
 
 
     /**
@@ -49,8 +48,7 @@ class FileDependency extends Dependency {
      *
      * @param  string $fileName - file name
      */
-    public function __construct($fileName) {
-        Assert::string($fileName);
+    public function __construct(string $fileName) {
         if (!strlen($fileName)) throw new InvalidValueException('Invalid parameter $fileName: '.$fileName);
 
         if (file_exists($fileName)) {
@@ -75,7 +73,7 @@ class FileDependency extends Dependency {
      *
      * @return Dependency
      */
-    public static function create(array $fileNames) {
+    public static function create(array $fileNames): Dependency {
         if (!$fileNames) throw new InvalidValueException('Invalid argument $fileNames (empty)');
 
         $dependency = null;
@@ -91,8 +89,10 @@ class FileDependency extends Dependency {
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
-    public function isValid() {
+    public function isValid(): bool {
         // TODO: reset stat cache on repeated call, @see clearstatcache()
 
         if (file_exists($this->fileName)) {

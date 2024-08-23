@@ -283,7 +283,7 @@ class Application extends CObject {
                                                               .NL
                            .'Application configuration:'      .NL
                            .'--------------------------'      .NL
-                           . print_r($config->dump(['sort'=>SORT_ASC]), true)
+                           .print_r($config->dump(['sort'=>SORT_ASC]), true)
                            ?>
                         </pre>
                     </div>

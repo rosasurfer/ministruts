@@ -5,7 +5,6 @@ namespace rosasurfer\ministruts\cache;
 
 use rosasurfer\ministruts\cache\monitor\Dependency;
 use rosasurfer\ministruts\config\ConfigInterface as Config;
-use rosasurfer\ministruts\core\assert\Assert;
 
 
 /**
@@ -19,10 +18,10 @@ class ApcCache extends CachePeer {
     /**
      * Constructor.
      *
-     * @param  ?string               $label   [optional] - cache identifier (namespace, default: none)
-     * @param  array<string, scalar> $options [optional] - additional instantiation options (default: none)
+     * @param  ?string $label   [optional] - cache identifier (namespace, default: none)
+     * @param  mixed[] $options [optional] - additional instantiation options (default: none)
      */
-    public function __construct($label=null, array $options=[]) {
+    public function __construct(?string $label=null, array $options=[]) {
         /** @var Config $config */
         $config = $this->di('config');
 
@@ -39,13 +38,14 @@ class ApcCache extends CachePeer {
      *
      * @return bool
      */
-    public function isCached($key) {
+    public function isCached(string $key): bool {
         // The actual working horse. This method does not only check the key's existence, it also retrieves the value and
         // stores it in the local reference pool. Thus following cache queries can use the local reference.
 
         // check local reference pool
-        if ($this->getReferencePool()->isCached($key))
+        if ($this->getReferencePool()->isCached($key)) {
             return true;
+        }
 
         // query APC cache
         $data = apc_fetch($this->namespace.'::'.$key);
@@ -102,9 +102,10 @@ class ApcCache extends CachePeer {
      *
      * @return mixed
      */
-    public function get($key, $default = null) {
-        if ($this->isCached($key))
+    public function get(string $key, $default = null) {
+        if ($this->isCached($key)) {
             return $this->getReferencePool()->get($key);
+        }
         return $default;
     }
 
@@ -116,7 +117,7 @@ class ApcCache extends CachePeer {
      *
      * @return bool
      */
-    public function drop($key) {
+    public function drop(string $key): bool {
         $this->getReferencePool()->drop($key);
         return apc_delete($this->namespace.'::'.$key);
     }
@@ -132,10 +133,7 @@ class ApcCache extends CachePeer {
      *
      * @return bool
      */
-    public function set($key, $value, $expires=Cache::EXPIRES_NEVER, Dependency $dependency=null) {
-        Assert::string($key,  '$key');
-        Assert::int($expires, '$expires');
-
+    public function set(string $key, $value, int $expires=Cache::EXPIRES_NEVER, ?Dependency $dependency=null): bool {
         // stored data: [created, expires, serialized([value, dependency])]
         $fullKey = $this->namespace.'::'.$key;
         $created = time();
@@ -164,9 +162,9 @@ class ApcCache extends CachePeer {
         if (function_exists('apc_add')) {                                               // APC >= 3.0.13
             if (function_exists('apc_exists')) $isKey =        apc_exists($fullKey);    // APC >= 3.1.4
             else                               $isKey = (bool) apc_fetch ($fullKey);
-            if ($isKey)
+            if ($isKey) {
                 apc_delete($fullKey);      // apc_delete()+apc_add() result in less memory fragmentation than apc_store()
-
+            }
             if (!apc_add($fullKey, [$created, $expires, serialize($data)])) {
                 //Logger::log('apc_add() unexpectedly returned FALSE for $key "'.$fullKey.'" '.($isKey ? '(did exist and was deleted)':'(did not exist)'), L_WARN);
                 return false;

@@ -5,7 +5,6 @@ namespace rosasurfer\ministruts\cache;
 
 use rosasurfer\ministruts\config\ConfigInterface as Config;
 use rosasurfer\ministruts\core\StaticClass;
-use rosasurfer\ministruts\core\assert\Assert;
 
 use function rosasurfer\ministruts\ini_get_bool;
 
@@ -59,8 +58,6 @@ final class Cache extends StaticClass {
         }
 
         // specific cache
-        Assert::string($label);
-
         if (!isset(self::$caches[$label])) {
             /** @var Config $config */
             $config = self::di('config');
@@ -69,8 +66,9 @@ final class Cache extends StaticClass {
             $class   = $config->get('cache.'.$label.'.class');
             $options = $config->get('cache.'.$label.'.options', []);
 
-            if (!is_subclass_of($class, CachePeer::class)) throw new RuntimeException('Not a subclass of '.CachePeer::class.": $class");
-
+            if (!is_subclass_of($class, CachePeer::class)) {
+                throw new RuntimeException('Not a subclass of '.CachePeer::class.": $class");
+            }
             self::$caches[$label] = new $class($label, $options);
         }
         return self::$caches[$label];

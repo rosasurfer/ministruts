@@ -25,16 +25,16 @@ abstract class CachePeer extends CObject {
 
 
     /** @var ?string */
-    protected $label = null;
+    protected ?string $label = null;
 
     /** @var string */
-    protected $namespace;
+    protected string $namespace;
 
-    /** @var array<string, scalar> */
-    protected $options;
+    /** @var mixed[] */
+    protected array $options;
 
-    /** @var ?ReferencePool */
-    private $referencePool = null;
+    /** @var ReferencePool */
+    private ReferencePool $referencePool;
 
 
     /**
@@ -42,11 +42,8 @@ abstract class CachePeer extends CObject {
      *
      * @return ReferencePool
      */
-    protected function getReferencePool() {
-        if (!$this->referencePool) {
-            $this->referencePool = new ReferencePool($this->label);
-        }
-        return $this->referencePool;
+    protected function getReferencePool(): ReferencePool {
+        return $this->referencePool ??= new ReferencePool($this->label);
     }
 
 
@@ -57,7 +54,7 @@ abstract class CachePeer extends CObject {
      *
      * @return bool
      */
-    abstract public function isCached($key);
+    abstract public function isCached(string $key): bool;
 
 
     /**
@@ -68,7 +65,7 @@ abstract class CachePeer extends CObject {
      *
      * @return mixed - stored value (may be NULL itself) or the specified default value
      */
-    abstract public function get($key, $default = null);
+    abstract public function get(string $key, $default = null);
 
 
     /**
@@ -78,7 +75,7 @@ abstract class CachePeer extends CObject {
      *
      * @return bool - success status or FALSE if no such value exists in the cache
      */
-    abstract public function drop($key);
+    abstract public function drop(string $key): bool;
 
 
     /**
@@ -92,7 +89,7 @@ abstract class CachePeer extends CObject {
      *
      * @return bool - success status
      */
-    abstract public function set($key, $value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null);
+    abstract public function set(string $key, $value, int $expires = Cache::EXPIRES_NEVER, ?Dependency $dependency = null): bool;
 
 
     /**
@@ -107,9 +104,10 @@ abstract class CachePeer extends CObject {
      *
      * @return bool - success status
      */
-    final public function add($key, $value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null) {
-        if ($this->isCached($key))
+    final public function add(string $key, $value, int $expires = Cache::EXPIRES_NEVER, ?Dependency $dependency = null): bool {
+        if ($this->isCached($key)) {
             return false;
+        }
         return $this->set($key, $value, $expires, $dependency);
     }
 
@@ -126,9 +124,10 @@ abstract class CachePeer extends CObject {
      *
      * @return bool - success status
      */
-    final public function replace($key, $value, $expires = Cache::EXPIRES_NEVER, Dependency $dependency = null) {
-        if (!$this->isCached($key))
+    final public function replace(string $key, $value, int $expires = Cache::EXPIRES_NEVER, ?Dependency $dependency = null): bool {
+        if (!$this->isCached($key)) {
             return false;
+        }
         return $this->set($key, $value, $expires, $dependency);
     }
 }
