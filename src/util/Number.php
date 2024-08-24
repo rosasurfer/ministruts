@@ -5,7 +5,6 @@ namespace rosasurfer\ministruts\util;
 
 use rosasurfer\ministruts\core\StaticClass;
 use rosasurfer\ministruts\core\assert\Assert;
-use rosasurfer\ministruts\core\exception\InvalidTypeException;
 
 
 /**
@@ -25,11 +24,9 @@ class Number extends StaticClass {
      *
      * @return string
      */
-    public static function formatMoney($value, $decimals=2, $decimalsSeparator='.', $thousandsSeparator='') {
-        if (!is_int($value) && !is_float($value)) throw new InvalidTypeException('Invalid type of parameter $value: '.gettype($value));     // @phpstan-ignore booleanAnd.alwaysFalse (types come from PHPDoc)
-        Assert::int   ($decimals,           '$decimals');
-        Assert::string($decimalsSeparator,  '$decimalsSeparator');
-        Assert::string($thousandsSeparator, '$thousandsSeparator');
+    public static function formatMoney($value, int $decimals=2, string $decimalsSeparator='.', string $thousandsSeparator=''): string {
+        // @phpstan-ignore booleanOr.alwaysTrue (types come from PHPDoc)
+        Assert::true(is_int($value) || is_float($value), 'int|float $value');
 
         return number_format($value, $decimals, $decimalsSeparator, $thousandsSeparator);
     }

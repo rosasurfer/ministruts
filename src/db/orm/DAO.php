@@ -77,7 +77,7 @@ abstract class DAO extends Singleton {
      *
      * @throws MultipleRecordsException if the query returned multiple rows and $allowMany was not set to TRUE.
      */
-    public function find($query, $allowMany = false) {
+    public function find(string $query, bool $allowMany = false): ?PersistableObject {
         return $this->getWorker()->find($query, $allowMany);
     }
 
@@ -110,10 +110,10 @@ abstract class DAO extends Singleton {
      * @throws NoSuchRecordException    if the query returned no rows
      * @throws MultipleRecordsException if the query returned multiple rows and $allowMany was not set to TRUE
      */
-    public function get($query, $allowMany = false) {
+    public function get(string $query, bool $allowMany = false): PersistableObject {
         $result = $this->find($query, $allowMany);
-        if (!$result)
-            throw new NoSuchRecordException($query);
+
+        if (!$result) throw new NoSuchRecordException($query);
         return $result;
     }
 
@@ -409,7 +409,7 @@ abstract class DAO extends Singleton {
             }
 
             // ensure the local "key" property is set (default: identity)
-            $key = $userdata['key'] ?? $entity['identity']['name'];     // @phpstan-ignore offsetAccess.notFound ('identity' always exist here)
+            $key = $userdata['key'] ?? $entity['identity']['name'];
 
             if (!isset($entity['properties'][$key])) $configError("invalid attribute [relations][$i][@name=$name \"key\"] (property name expected)");
             $relation['key'] = $key;

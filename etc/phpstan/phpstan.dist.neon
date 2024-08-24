@@ -26,7 +26,7 @@ parameters:
     - symbols
     - ../../vendor
 
-  scanFiles:                                        # scanned for symbols only, not analyzed (legacy or future code)
+  scanFiles:                                        # scanned for symbols only, not analyzed (for legacy or future code)
 
   stubFiles:                                        # custom PHPDoc annotations overriding vendor definitions
 

@@ -528,7 +528,7 @@ abstract class PersistableObject extends CObject {
      *
      * @return int - the inserted record's identity value
      */
-    private function doInsert(array $values) {
+    private function doInsert(array $values): int {
         $db       = $this->db();
         $mapping  = $this->dao()->getMapping();
         $table    = $mapping['table'];
@@ -553,6 +553,7 @@ abstract class PersistableObject extends CObject {
         }
         elseif ($db->supportsInsertReturn()) {
             $id = $db->query("$sql returning $idColumn")->fetchInt();
+            if ($id === null) throw new IllegalStateException("Unable to get lastInsertId: $table.$idColumn = (null)");
         }
         else {
             $id = $db->execute($sql)->lastInsertId();

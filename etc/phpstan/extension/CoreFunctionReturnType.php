@@ -21,7 +21,7 @@ use PHPStan\Type\Type;
  */
 class CoreFunctionReturnType extends Extension implements DynamicFunctionReturnTypeExtension {
 
-    /** @var array<string, Type> */
+    /** @var Type[] */
     protected array $supportedFunctions;
 
 
@@ -74,7 +74,24 @@ class CoreFunctionReturnType extends Extension implements DynamicFunctionReturnT
 
 
     /**
-     * Resolve the dynamic return type of the passed function.
+     * Resolve the original return type of the passed function call.
+     *
+     * @param  FunctionReflection $function
+     * @param  FuncCall           $call
+     * @param  Scope              $scope
+     *
+     * @return Type
+     */
+    protected function getOriginalTypeFromFunctionCall(FunctionReflection $function, FuncCall $call, Scope $scope): Type {
+        $args = $call->getArgs();
+        $variants = $function->getVariants();
+        $signature = ParametersAcceptorSelector::selectFromArgs($scope, $args, $variants);
+        return $signature->getReturnType();
+    }
+
+
+    /**
+     * Resolve the new return type of the passed function call.
      *
      * @param  FunctionReflection $function
      * @param  FuncCall           $call
@@ -85,35 +102,19 @@ class CoreFunctionReturnType extends Extension implements DynamicFunctionReturnT
     public function getTypeFromFunctionCall(FunctionReflection $function, FuncCall $call, Scope $scope): Type {
         $name = $function->getName();
 
-        if (\in_array($name, ['curl_init', 'preg_replace'])) {
+        if (in_array($name, ['curl_init', 'preg_replace'])) {
             $this->log(__METHOD__.'()  '.$name);
         }
 
-        $originalType = $this->getOriginalReturnType($function, $call, $scope);
+        $origType = $this->getOriginalTypeFromFunctionCall($function, $call, $scope);
         $typeToRemove = $this->supportedFunctions[$name] ?? null;
 
         if ($typeToRemove) {
-            $newReturnType = $originalType->tryRemove($typeToRemove);
-            if ($newReturnType) {
-                return $newReturnType;
+            $newType = $origType->tryRemove($typeToRemove);
+            if ($newType) {
+                return $newType;
             }
         }
-        return $originalType;
-    }
-
-    /**
-     * Resolve the original return type of the passed function.
-     *
-     * @param  FunctionReflection $function
-     * @param  FuncCall           $call
-     * @param  Scope              $scope
-     *
-     * @return Type
-     */
-    protected function getOriginalReturnType(FunctionReflection $function, FuncCall $call, Scope $scope): Type {
-        $args = $call->getArgs();
-        $variants = $function->getVariants();
-        $signature = ParametersAcceptorSelector::selectFromArgs($scope, $args, $variants);
-        return $signature->getReturnType();
+        return $origType;
     }
 }
