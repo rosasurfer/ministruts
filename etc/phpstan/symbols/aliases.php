@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /**
  * IDE tooltip support for PHPStan type aliases. The types are used in PHPDoc only, PHP never sees them.

@@ -28,17 +28,10 @@ parameters:
 
   scanFiles:                                        # scanned for symbols only, not analyzed (legacy or future code)
 
-  stubFiles:                                        # custom PHPDoc annotations overriding 3rd-party definitions
+  stubFiles:                                        # custom PHPDoc annotations overriding vendor definitions
 
   dynamicConstantNames:                             # changing constants, depending on the environment
-    - rosasurfer\ministruts\_CLI
-    - rosasurfer\ministruts\_LOCALHOST
-    - rosasurfer\ministruts\_MACOS
-    - rosasurfer\ministruts\_WINDOWS
-    - rosasurfer\ministruts\_NUL_DEVICE
-
     - rosasurfer\ministruts\CLI
-    - rosasurfer\ministruts\LOCALHOST
     - rosasurfer\ministruts\MACOS
     - rosasurfer\ministruts\WINDOWS
     - rosasurfer\ministruts\NUL_DEVICE
@@ -58,7 +51,11 @@ parameters:
   tipsOfTheDay: false
 
 
-services:                                           # must be loadable via Composer
+services:                                           # services must be loadable via Composer
   - class: rosasurfer\ministruts\phpstan\CoreFunctionReturnType
     tags:
       - phpstan.broker.dynamicFunctionReturnTypeExtension
+
+  - class: rosasurfer\ministruts\phpstan\DaoGetReturnType
+    tags:
+      - phpstan.broker.dynamicMethodReturnTypeExtension

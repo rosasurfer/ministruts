@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /**
  * A fully opaque class which replaces a sysvsem resource as of PHP 8.0.0.

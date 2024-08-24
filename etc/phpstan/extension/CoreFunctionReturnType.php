@@ -3,23 +3,14 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\phpstan;
 
+use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\FunctionReflection;
 use PHPStan\Reflection\ParametersAcceptorSelector;
 use PHPStan\Type\BooleanType;
 use PHPStan\Type\DynamicFunctionReturnTypeExtension;
-use PHPStan\Type\Type;
-
-use PhpParser\Node\Arg;
-use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Type\NullType;
-
-use function PHPStan\dumpType;
-use function rosasurfer\ministruts\normalizeEOL;
-
-use const rosasurfer\ministruts\ERROR_LOG_DEFAULT;
-use const rosasurfer\ministruts\NL;
-use const rosasurfer\ministruts\WINDOWS;
+use PHPStan\Type\Type;
 
 
 /**
@@ -28,10 +19,11 @@ use const rosasurfer\ministruts\WINDOWS;
  * Removing the return type of the error condition (usually FALSE or NULL) from the resulting return type
  * simplifies PHPStan analysis considerably.
  */
-class CoreFunctionReturnType implements DynamicFunctionReturnTypeExtension {
+class CoreFunctionReturnType extends Extension implements DynamicFunctionReturnTypeExtension {
 
     /** @var array<string, Type> */
     protected array $supportedFunctions;
+
 
     /**
      * Constructor
@@ -67,16 +59,28 @@ class CoreFunctionReturnType implements DynamicFunctionReturnTypeExtension {
         ];
     }
 
+
     /**
+     * Whether the passed function is supported by this extension.
      *
+     * @param  FunctionReflection $function
+     *
+     * @return bool
      */
     public function isFunctionSupported(FunctionReflection $function): bool {
         $name = $function->getName();
         return isset($this->supportedFunctions[$name]);
     }
 
+
     /**
+     * Resolve the dynamic return type of the passed function.
      *
+     * @param  FunctionReflection $function
+     * @param  FuncCall           $call
+     * @param  Scope              $scope
+     *
+     * @return Type
      */
     public function getTypeFromFunctionCall(FunctionReflection $function, FuncCall $call, Scope $scope): Type {
         $name = $function->getName();
@@ -98,28 +102,18 @@ class CoreFunctionReturnType implements DynamicFunctionReturnTypeExtension {
     }
 
     /**
+     * Resolve the original return type of the passed function.
      *
+     * @param  FunctionReflection $function
+     * @param  FuncCall           $call
+     * @param  Scope              $scope
+     *
+     * @return Type
      */
     protected function getOriginalReturnType(FunctionReflection $function, FuncCall $call, Scope $scope): Type {
-        /** @var Arg[] $args */
-        $args = $call->args;
+        $args = $call->getArgs();
         $variants = $function->getVariants();
-
         $signature = ParametersAcceptorSelector::selectFromArgs($scope, $args, $variants);
         return $signature->getReturnType();
-    }
-
-
-    /**
-     * Log to the system logger.
-     */
-    protected function log(string $message): void {
-        // replace NUL bytes which mess up the logfile
-        $message = str_replace(chr(0), '\0', $message);
-        $message = normalizeEOL($message);
-        if (WINDOWS) {
-            $message = str_replace(NL, PHP_EOL, $message);
-        }
-        error_log($message, ERROR_LOG_DEFAULT);
     }
 }
