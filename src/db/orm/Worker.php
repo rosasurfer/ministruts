@@ -145,13 +145,14 @@ class Worker extends CObject {
      *
      * @return ?PersistableObject - instance or NULL if the result doesn't hold any more rows
      */
-    protected function makeObject(IResult $result) {
+    protected function makeObject(IResult $result): ?PersistableObject {
 
         // TODO: Prefer to return existing instance from IdentityMap
 
         $row = $result->fetchRow(ARRAY_ASSOC);
-        if ($row === null)
+        if ($row === null) {
             return null;
+        }
         return PersistableObject::populateNew($this->entityClass, $row);
     }
 

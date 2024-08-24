@@ -876,7 +876,7 @@ function route(string $name): Url {
  *
  * @return string
  */
-function simpleClassName($class) {
+function simpleClassName($class): string {
     if (is_object($class)) {
         $class = get_class($class);
     }
@@ -995,7 +995,7 @@ function strContains(string $haystack, string $needle, bool $ignoreCase = false)
  *
  * @return bool
  */
-function strContainsI(string $haystack, string $needle) : bool {
+function strContainsI(string $haystack, string $needle): bool {
     return strContains($haystack, $needle, true);
 }
 
@@ -1386,7 +1386,7 @@ function strToBool(string $string, bool $strict = false): ?bool {
  * @param  string|string[] $format [optional] - date/time format the string is required to match (default: 'Y-m-d')
  *                                              if an array the string must match at least one of the provided formats
  *
- * @return int|false - Unix timestamp or FALSE if the string doesn't match the specified format(s)
+ * @return ?int - Unix timestamp or NULL if the string doesn't match the specified format(s)
  *
  * <pre>
  *  Supported format strings:
@@ -1396,7 +1396,7 @@ function strToBool(string $string, bool $strict = false): ?bool {
  *  'd/m/Y [H:i[:s]]'
  * </pre>
  */
-function strToTimestamp(string $string, $format = 'Y-m-d') {
+function strToTimestamp(string $string, $format = 'Y-m-d'): ?int {
     // TODO: rewrite and add strToDateTime()
 
     if (is_array($format)) {
@@ -1406,14 +1406,14 @@ function strToTimestamp(string $string, $format = 'Y-m-d') {
                 return $timestamp;
             }
         }
-        return false;
+        return null;
     }
     Assert::string($format, '$format');
 
     $year = $month = $day = $hour = $minute = $second = $m = null;
 
     if ($format == 'Y-m-d') {
-        if (!preg_match('/^([0-9]{4})-([0-9]{2})-([0-9]{2})$/', $string, $m)) return false;
+        if (!preg_match('/^([0-9]{4})-([0-9]{2})-([0-9]{2})$/', $string, $m)) return null;
         $year   = (int)$m[1];
         $month  = (int)$m[2];
         $day    = (int)$m[3];
@@ -1422,7 +1422,7 @@ function strToTimestamp(string $string, $format = 'Y-m-d') {
         $second = 0;
     }
     elseif ($format == 'Y-m-d H:i') {
-        if (!preg_match('/^([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2})$/', $string, $m)) return false;
+        if (!preg_match('/^([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2})$/', $string, $m)) return null;
         $year   = (int)$m[1];
         $month  = (int)$m[2];
         $day    = (int)$m[3];
@@ -1431,7 +1431,7 @@ function strToTimestamp(string $string, $format = 'Y-m-d') {
         $second = 0;
     }
     elseif ($format == 'Y-m-d H:i:s') {
-        if (!preg_match('/^([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})$/', $string, $m)) return false;
+        if (!preg_match('/^([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})$/', $string, $m)) return null;
         $year   = (int)$m[1];
         $month  = (int)$m[2];
         $day    = (int)$m[3];
@@ -1440,7 +1440,7 @@ function strToTimestamp(string $string, $format = 'Y-m-d') {
         $second = (int)$m[6];
     }
     elseif ($format == 'Y.m.d') {
-        if (!preg_match('/^([0-9]{4})\.([0-9]{2})\.([0-9]{2})$/', $string, $m)) return false;
+        if (!preg_match('/^([0-9]{4})\.([0-9]{2})\.([0-9]{2})$/', $string, $m)) return null;
         $year   = (int)$m[1];
         $month  = (int)$m[2];
         $day    = (int)$m[3];
@@ -1449,7 +1449,7 @@ function strToTimestamp(string $string, $format = 'Y-m-d') {
         $second = 0;
     }
     elseif ($format == 'Y.m.d H:i') {
-        if (!preg_match('/^([0-9]{4})\.([0-9]{2})\.([0-9]{2}) ([0-9]{2}):([0-9]{2})$/', $string, $m)) return false;
+        if (!preg_match('/^([0-9]{4})\.([0-9]{2})\.([0-9]{2}) ([0-9]{2}):([0-9]{2})$/', $string, $m)) return null;
         $year   = (int)$m[1];
         $month  = (int)$m[2];
         $day    = (int)$m[3];
@@ -1458,7 +1458,7 @@ function strToTimestamp(string $string, $format = 'Y-m-d') {
         $second = 0;
     }
     elseif ($format == 'Y.m.d H:i:s') {
-        if (!preg_match('/^([0-9]{4})\.([0-9]{2})\.([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})$/', $string, $m)) return false;
+        if (!preg_match('/^([0-9]{4})\.([0-9]{2})\.([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})$/', $string, $m)) return null;
         $year   = (int)$m[1];
         $month  = (int)$m[2];
         $day    = (int)$m[3];
@@ -1467,7 +1467,7 @@ function strToTimestamp(string $string, $format = 'Y-m-d') {
         $second = (int)$m[6];
     }
     elseif ($format == 'd.m.Y') {
-        if (!preg_match('/^([0-9]{2})\.([0-9]{2})\.([0-9]{4})$/', $string, $m)) return false;
+        if (!preg_match('/^([0-9]{2})\.([0-9]{2})\.([0-9]{4})$/', $string, $m)) return null;
         $year   = (int)$m[3];
         $month  = (int)$m[2];
         $day    = (int)$m[1];
@@ -1476,7 +1476,7 @@ function strToTimestamp(string $string, $format = 'Y-m-d') {
         $second = 0;
     }
     elseif ($format == 'd.m.Y H:i') {
-        if (!preg_match('/^([0-9]{2})\.([0-9]{2})\.([0-9]{4}) ([0-9]{2}):([0-9]{2})$/', $string, $m)) return false;
+        if (!preg_match('/^([0-9]{2})\.([0-9]{2})\.([0-9]{4}) ([0-9]{2}):([0-9]{2})$/', $string, $m)) return null;
         $day    = (int)$m[1];
         $month  = (int)$m[2];
         $year   = (int)$m[3];
@@ -1485,7 +1485,7 @@ function strToTimestamp(string $string, $format = 'Y-m-d') {
         $second = 0;
     }
     elseif ($format == 'd.m.Y H:i:s') {
-        if (!preg_match('/^([0-9]{2})\.([0-9]{2})\.([0-9]{4}) ([0-9]{2}):([0-9]{2}):([0-9]{2})$/', $string, $m)) return false;
+        if (!preg_match('/^([0-9]{2})\.([0-9]{2})\.([0-9]{4}) ([0-9]{2}):([0-9]{2}):([0-9]{2})$/', $string, $m)) return null;
         $day    = (int)$m[1];
         $month  = (int)$m[2];
         $year   = (int)$m[3];
@@ -1494,7 +1494,7 @@ function strToTimestamp(string $string, $format = 'Y-m-d') {
         $second = (int)$m[6];
     }
     elseif ($format == 'd/m/Y') {
-        if (!preg_match('/^([0-9]{2})\/([0-9]{2})\/([0-9]{4})$/', $string, $m)) return false;
+        if (!preg_match('/^([0-9]{2})\/([0-9]{2})\/([0-9]{4})$/', $string, $m)) return null;
         $year   = (int)$m[3];
         $month  = (int)$m[2];
         $day    = (int)$m[1];
@@ -1503,7 +1503,7 @@ function strToTimestamp(string $string, $format = 'Y-m-d') {
         $second = 0;
     }
     elseif ($format == 'd/m/Y H:i') {
-        if (!preg_match('/^([0-9]{2})\/([0-9]{2})\/([0-9]{4}) ([0-9]{2}):([0-9]{2})$/', $string, $m)) return false;
+        if (!preg_match('/^([0-9]{2})\/([0-9]{2})\/([0-9]{4}) ([0-9]{2}):([0-9]{2})$/', $string, $m)) return null;
         $day    = (int)$m[1];
         $month  = (int)$m[2];
         $year   = (int)$m[3];
@@ -1512,7 +1512,7 @@ function strToTimestamp(string $string, $format = 'Y-m-d') {
         $second = 0;
     }
     elseif ($format == 'd/m/Y H:i:s') {
-        if (!preg_match('/^([0-9]{2})\/([0-9]{2})\/([0-9]{4}) ([0-9]{2}):([0-9]{2}):([0-9]{2})$/', $string, $m)) return false;
+        if (!preg_match('/^([0-9]{2})\/([0-9]{2})\/([0-9]{4}) ([0-9]{2}):([0-9]{2}):([0-9]{2})$/', $string, $m)) return null;
         $day    = (int)$m[1];
         $month  = (int)$m[2];
         $year   = (int)$m[3];
@@ -1521,13 +1521,17 @@ function strToTimestamp(string $string, $format = 'Y-m-d') {
         $second = (int)$m[6];
     }
     else {
-        return false;
+        return null;
     }
 
     if (checkdate($month, $day, $year) && $hour < 24 && $minute < 60 && $second < 60) {
-        return mktime($hour, $minute, $second, $month, $day, $year);
+        $timestamp = mktime($hour, $minute, $second, $month, $day, $year);
+        if ($timestamp === false) {
+            return null;
+        }
+        return $timestamp;
     }
-    return false;
+    return null;
 }
 
 

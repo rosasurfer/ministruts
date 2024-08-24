@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\db\orm;
 
+use Closure;
 use Throwable;
 
 use rosasurfer\ministruts\core\Singleton;
@@ -93,7 +94,7 @@ abstract class DAO extends Singleton {
         if ($query === null) {
             $mapping = $this->getMapping();
             $table = $this->escapeIdentifier($mapping['table']);
-            $query = 'select * from '.$table;
+            $query = "select * from $table";
         }
         return $this->getWorker()->findAll($query);
     }
@@ -112,7 +113,6 @@ abstract class DAO extends Singleton {
      */
     public function get(string $query, bool $allowMany = false): PersistableObject {
         $result = $this->find($query, $allowMany);
-
         if (!$result) throw new NoSuchRecordException($query);
         return $result;
     }
@@ -125,12 +125,13 @@ abstract class DAO extends Singleton {
      *
      * @return PersistableObject[] - at least one instance
      *
+     * @phpstan-return non-empty-array<PersistableObject>
+     *
      * @throws NoSuchRecordException  if the query returned no rows
      */
     public function getAll($query = null) {
         $results = $this->findAll($query);
-        if (!$results)
-            throw new NoSuchRecordException((string)$query);
+        if (!$results) throw new NoSuchRecordException((string)$query);
         return $results;
     }
 
@@ -165,11 +166,11 @@ abstract class DAO extends Singleton {
      * Execute a task in a transactional way. The transaction is automatically committed or rolled back.
      * A nested transaction is executed in the context of the nesting transaction.
      *
-     * @param  \Closure $task - task to execute (an anonymous function is implicitly casted)
+     * @param  Closure $task - task to execute (an anonymous function is implicitly casted)
      *
      * @return mixed - the task's return value (if any)
      */
-    public function transaction(\Closure $task) {
+    public function transaction(Closure $task) {
         try {
             $this->db()->begin();
             $result = $task();

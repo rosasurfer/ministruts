@@ -6,6 +6,7 @@ namespace rosasurfer\ministruts\core\error;
 use Exception;
 use Throwable;
 
+use rosasurfer\ministruts\Application;
 use rosasurfer\ministruts\config\ConfigInterface as Config;
 use rosasurfer\ministruts\core\StaticClass;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
@@ -638,13 +639,16 @@ class ErrorHandler extends StaticClass {
      * @see  \rosasurfer\ministruts\STACKFRAME
      */
     public static function formatStackTrace(array $trace, string $indent = '', ContentFilter $filter = null): string {
-        // If we start to include frame arguments (future?), those arguments need moderation using the provided filter.
-
-        /** @var Config $config */
-        $config  = self::di('config');
-        $appRoot = $config['app.dir.root'];
-        $result  = '';
-        $size    = sizeof($trace);
+        /** @var string $appRoot */
+        $appRoot = '';
+        $di = Application::getDi();
+        if ($di && $di->has('config')) {
+            /** @var Config $config */
+            $config = $di['config'];
+            $appRoot = $config['app.dir.root'];
+        }
+        $result = '';
+        $size = sizeof($trace);
         $callLen = $lineLen = 0;
 
         for ($i=0; $i < $size; $i++) {              // align FILE and LINE

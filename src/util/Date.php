@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace rosasurfer\ministruts\util;
 
 use rosasurfer\ministruts\core\StaticClass;
-use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\log\Logger;
 
@@ -28,20 +27,18 @@ class Date extends StaticClass {
      *
      * @return int - number of days
      */
-    public static function diffDays($start, $end) {
-        Assert::string($start, '$start');
-        Assert::string($end, '$end');
-        if (strToTimestamp($start) === false) throw new InvalidValueException('Invalid parameter $start: "'.$start.'"');
-        if (strToTimestamp($end) === false)   throw new InvalidValueException('Invalid parameter $end: "'.$end.'"');
+    public static function diffDays(string $start, string $end): int {
+        if (strToTimestamp($start) === null) throw new InvalidValueException("Invalid parameter \$start: \"$start\"");
+        if (strToTimestamp($end) === null)   throw new InvalidValueException("Invalid parameter \$end: \"$end\"");
 
         $ts1 = strtotime($start.' GMT');    // always GMT (w/o timezone PHP assumes local time and DST may distort the result)
         $ts2 = strtotime($end.' GMT');
 
         $diff = $ts2 - $ts1;
 
-        if ($diff % DAYS)
-            Logger::log('('.$ts2.'-'.$ts1.') % DAYS != 0: '.($diff%DAYS), L_WARN);
-
+        if ($diff % DAYS) {
+            Logger::log("($ts2-$ts1) % DAYS != 0: ".($diff % DAYS), L_WARN);
+        }
         return (int)($diff / DAYS);
     }
 
@@ -56,8 +53,8 @@ class Date extends StaticClass {
      */
     public static function getDateRange(string $startDate, int $days): array {
         $ts = strToTimestamp($startDate, 'Y-m-d');
-        if ($ts === false) throw new InvalidValueException("Invalid parameter \$startDate: \"$startDate\"");
-        if ($days < 0)     throw new InvalidValueException("Invalid parameter \$days: $days");
+        if ($ts === null) throw new InvalidValueException("Invalid parameter \$startDate: \"$startDate\"");
+        if ($days < 0)    throw new InvalidValueException("Invalid parameter \$days: $days");
 
         $range = [];
 
@@ -78,7 +75,7 @@ class Date extends StaticClass {
      */
     public static function addDays(string $date, int $days): string {
         $ts = strToTimestamp($date, 'Y-m-d');
-        if ($ts === false) throw new InvalidValueException("Invalid parameter \$date: \"$date\"");
+        if ($ts === null) throw new InvalidValueException("Invalid parameter \$date: \"$date\"");
         return date('Y-m-d', $ts + $days*DAYS);
     }
 }

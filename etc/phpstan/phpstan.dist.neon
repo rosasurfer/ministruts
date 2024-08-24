@@ -56,6 +56,6 @@ services:                                           # services must be loadable 
     tags:
       - phpstan.broker.dynamicFunctionReturnTypeExtension
 
-  - class: rosasurfer\ministruts\phpstan\DaoGetReturnType
+  - class: rosasurfer\ministruts\phpstan\DaoReturnType
     tags:
       - phpstan.broker.dynamicMethodReturnTypeExtension

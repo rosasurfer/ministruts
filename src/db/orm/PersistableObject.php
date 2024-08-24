@@ -732,7 +732,7 @@ abstract class PersistableObject extends CObject {
      *
      * @return PersistableObject
      */
-    public static function populateNew($class, array $row) {
+    public static function populateNew(string $class, array $row): PersistableObject {
         if (static::class != __CLASS__)         throw new IllegalAccessException('Cannot access method '.__METHOD__.'() on a derived class.');
         if (!is_subclass_of($class, __CLASS__)) throw new InvalidValueException("Invalid parameter \$class: $class (not a subclass of ".__CLASS__.')');
 

@@ -16,6 +16,7 @@ use const rosasurfer\ministruts\WINDOWS;
  */
 abstract class Extension extends CObject {
 
+
     /**
      * Log a message to the system logger.
      *
@@ -23,7 +24,7 @@ abstract class Extension extends CObject {
      *
      * @return void
      */
-    protected function log(string $message): void {
+    public static function log(string $message): void {
         $message = str_replace(chr(0), '\0', $message);         // replace NUL bytes which mess up the logfile
         $message = normalizeEOL($message);
         if (WINDOWS) {

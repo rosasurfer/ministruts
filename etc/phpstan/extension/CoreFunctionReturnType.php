@@ -12,6 +12,8 @@ use PHPStan\Type\DynamicFunctionReturnTypeExtension;
 use PHPStan\Type\NullType;
 use PHPStan\Type\Type;
 
+use function rosasurfer\ministruts\simpleClassName;
+
 
 /**
  * Overwrites the return type of many PHP core functions, taking into account the installed error handler.
@@ -77,13 +79,13 @@ class CoreFunctionReturnType extends Extension implements DynamicFunctionReturnT
      * Resolve the original return type of the passed function call.
      *
      * @param  FunctionReflection $function
-     * @param  FuncCall           $call
+     * @param  FuncCall           $functionCall
      * @param  Scope              $scope
      *
      * @return Type
      */
-    protected function getOriginalTypeFromFunctionCall(FunctionReflection $function, FuncCall $call, Scope $scope): Type {
-        $args = $call->getArgs();
+    protected function getOriginalTypeFromFunctionCall(FunctionReflection $function, FuncCall $functionCall, Scope $scope): Type {
+        $args = $functionCall->getArgs();
         $variants = $function->getVariants();
         $signature = ParametersAcceptorSelector::selectFromArgs($scope, $args, $variants);
         return $signature->getReturnType();
@@ -94,19 +96,19 @@ class CoreFunctionReturnType extends Extension implements DynamicFunctionReturnT
      * Resolve the new return type of the passed function call.
      *
      * @param  FunctionReflection $function
-     * @param  FuncCall           $call
+     * @param  FuncCall           $functionCall
      * @param  Scope              $scope
      *
      * @return Type
      */
-    public function getTypeFromFunctionCall(FunctionReflection $function, FuncCall $call, Scope $scope): Type {
+    public function getTypeFromFunctionCall(FunctionReflection $function, FuncCall $functionCall, Scope $scope): Type {
         $name = $function->getName();
 
         if (in_array($name, ['curl_init', 'preg_replace'])) {
-            $this->log(__METHOD__.'()  '.$name);
+            throw new ExtensionException("function $name was passed to ".simpleClassName(__CLASS__).' extension');
         }
 
-        $origType = $this->getOriginalTypeFromFunctionCall($function, $call, $scope);
+        $origType = $this->getOriginalTypeFromFunctionCall($function, $functionCall, $scope);
         $typeToRemove = $this->supportedFunctions[$name] ?? null;
 
         if ($typeToRemove) {
