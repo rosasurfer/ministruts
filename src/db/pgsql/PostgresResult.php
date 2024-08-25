@@ -75,13 +75,12 @@ class PostgresResult extends Result {
      * @param  int                  $lastAffectedRows - last number of affected rows of the connection
      */
     public function __construct(Connector $connector, string $sql, $result, int $lastAffectedRows) {
-        Assert::string($sql, '$sql');
         // @phpstan-ignore booleanOr.alwaysTrue, instanceof.alwaysFalse (PHP80/81 incompatibility)
         Assert::true(is_resource($result) || $result instanceof PgSqlResult, 'resource|PgSqlResult $result');
-        Assert::int($lastAffectedRows, '$lastAffectedRows');
 
         $this->connector = $connector;
         $this->sql = $sql;
+        $this->result = $result;
         $this->lastAffectedRows = $lastAffectedRows;
 
         if (!pg_num_fields($result)) {
@@ -89,10 +88,9 @@ class PostgresResult extends Result {
             $this->nextRowIndex = -1;
         }
         else {
-            $this->numRows = pg_num_rows($this->result);
+            $this->numRows = pg_num_rows($result);
             $this->nextRowIndex = 0;
         }
-        $this->result = $result;
     }
 
 

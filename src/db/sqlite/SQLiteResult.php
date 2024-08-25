@@ -5,6 +5,7 @@ namespace rosasurfer\ministruts\db\sqlite;
 
 use SQLite3Result;
 
+use rosasurfer\ministruts\core\exception\IllegalAccessException;
 use rosasurfer\ministruts\db\ConnectorInterface as Connector;
 use rosasurfer\ministruts\db\Result;
 
@@ -135,6 +136,10 @@ class SQLiteResult extends Result {
      */
     public function numRows(): int {
         if (!isset($this->numRows)) {
+            if (!$this->result) {
+                throw new IllegalAccessException('Cannot call method '.__FUNCTION__.'() after the result has been released');
+            }
+
             // no support for num_rows() in SQLite3, need to count manually
             $previous = $this->nextRowIndex;
 

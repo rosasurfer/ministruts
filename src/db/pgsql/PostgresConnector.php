@@ -269,7 +269,7 @@ class PostgresConnector extends Connector {
         try {
             error_clear_last();
             $connection = pg_connect($connStr, PGSQL_CONNECT_FORCE_NEW);;
-            if (!$connection) throw new DatabaseException(error_get_last()['message']);
+            if (!$connection) throw new DatabaseException(error_get_last()['message'] ?? '');
 
             $this->connection = $connection;
         }
@@ -310,9 +310,10 @@ class PostgresConnector extends Connector {
      */
     public function disconnect() {
         if ($this->isConnected()) {
-            $tmp = $this->connection;
+            /** @phpstan-var PgSqlConnectionId $connection */
+            $connection = $this->connection;
             $this->connection = null;
-            pg_close($tmp);
+            pg_close($connection);
         }
         return $this;
 
@@ -343,18 +344,20 @@ class PostgresConnector extends Connector {
         if (!$this->isConnected()) {
             $this->connect();
         }
+        /** @phpstan-var PgSqlConnectionId $connection */
+        $connection = $this->connection;
 
         if (strContains($name, '.')) {
             $names = explode('.', $name);
 
             foreach ($names as &$subname) {
-                $subname = pg_escape_identifier($this->connection, $subname);
+                $subname = pg_escape_identifier($connection, $subname);
             }
             unset($subname);
 
             return join('.', $names);
         }
-        return pg_escape_identifier($this->connection, $name);
+        return pg_escape_identifier($connection, $name);
     }
 
 
@@ -370,30 +373,39 @@ class PostgresConnector extends Connector {
         if (is_int  ($value)) return (string) $value;
         if (is_float($value)) return (string) $value;
 
-        if (!$this->isConnected())
+        if (!$this->isConnected()) {
             $this->connect();
+        }
+        /** @phpstan-var PgSqlConnectionId $connection */
+        $connection = $this->connection;
 
         $value = $this->fixUtf8Encoding($value);    // pg_query(): ERROR: invalid byte sequence for encoding "UTF8"
 
-        return pg_escape_literal($this->connection, $value);
+        return pg_escape_literal($connection, $value);
     }
 
 
     /**
      * {@inheritdoc}
+     *
+     * @param  ?string $value
+     *
+     * @return ?string
      */
-    public function escapeString($value) {
+    public function escapeString(?string $value): ?string {
         // bug or feature: pg_escape_string(null) => empty string instead of NULL
-        if ($value === null)
+        if ($value === null) {
             return null;
-        Assert::string($value);
-
-        if (!$this->isConnected())
+        }
+        if (!$this->isConnected()) {
             $this->connect();
+        }
+        /** @phpstan-var PgSqlConnectionId $connection */
+        $connection = $this->connection;
 
         $value = $this->fixUtf8Encoding($value);    // pg_query(): ERROR: invalid byte sequence for encoding "UTF8"
 
-        return pg_escape_string($this->connection, $value);
+        return pg_escape_string($connection, $value);
     }
 
 
@@ -406,10 +418,11 @@ class PostgresConnector extends Connector {
      *
      * @see https://www.drupal.org/node/434802
      */
-    private function fixUtf8Encoding($value) {
+    private function fixUtf8Encoding(string $value): string {
         $encoding = mb_detect_encoding($value, null, true);
-        if ($encoding!='ASCII' && $encoding!='UTF-8')
+        if ($encoding!='ASCII' && $encoding!='UTF-8') {
             $value = utf8_encode($value);
+        }
         return $value;
     }
 
@@ -461,12 +474,14 @@ class PostgresConnector extends Connector {
         if (!$this->isConnected()) {
             $this->connect();
         }
+        /** @phpstan-var PgSqlConnectionId $connection */
+        $connection = $this->connection;
 
         // execute statement
         $result = null;
         try {
-            $result = pg_query($this->connection, $sql);            // wraps multi-statement queries in a transaction
-            if (!$result) throw new DatabaseException(pg_last_error($this->connection));
+            $result = pg_query($connection, $sql);              // wraps multi-statement queries in a transaction
+            if (!$result) throw new DatabaseException(pg_last_error($connection));
         }
         catch (Throwable $ex) {
             if (!$ex instanceof IRosasurferException) {
@@ -475,7 +490,6 @@ class PostgresConnector extends Connector {
             throw $ex->appendMessage('Database: '.$this->getConnectionDescription().NL."SQL: \"$sql\"");
         }
 
-        /** @var string $status */
         $status = pg_result_status($result, PGSQL_STATUS_STRING);
 
         // reset last_insert_id on INSERTs, afterwards it's resolved on request as it requires an extra SQL query
@@ -642,7 +656,10 @@ class PostgresConnector extends Connector {
         if (!$this->isConnected()) {
             $this->connect();
         }
-        return $this->connection;
+        /** @phpstan-var PgSqlConnectionId $connection */
+        $connection = $this->connection;
+
+        return $connection;
     }
 
 
@@ -666,7 +683,10 @@ class PostgresConnector extends Connector {
             if (!$this->isConnected()) {
                 $this->connect();
             }
-            $this->versionString = (string)pg_version($this->connection)['server'];
+            /** @phpstan-var PgSqlConnectionId $connection */
+            $connection = $this->connection;
+
+            $this->versionString = pg_version($connection)['server'];
         }
         return $this->versionString;
     }

@@ -145,8 +145,6 @@ class SQLiteConnector extends Connector {
      * @return $this
      */
     public function connect() {
-        if (!class_exists('SQLite3')) throw new RuntimeException('Undefined class \SQLite3 (sqlite3 extension is not available)');
-
         /** @var int $flags */
         $flags = SQLITE3_OPEN_READWRITE;                                        // available flags:
         try {                                                                   // 1: SQLITE3_OPEN_READONLY
@@ -157,17 +155,18 @@ class SQLiteConnector extends Connector {
                 $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex);
             }
             $file = $this->file;
-            $what = $where = null;
+            $doWhat = $where = null;
             if (file_exists($file)) {
-                $what = 'open';
-                if (is_dir($file = realpath($file)))
+                $doWhat = 'open';
+                if (is_dir($file = realpath($file))) {
                     $where = ' (directory)';
+                }
             }
             else {
-                $what = ($flags & SQLITE3_OPEN_CREATE) ? 'create' : 'find';
-                isRelativePath($file) && $where=' in "'.getcwd().'"';
+                $doWhat = ($flags & SQLITE3_OPEN_CREATE) ? 'create' : 'find';
+                if (isRelativePath($file)) $where=' in "'.getcwd().'"';
             }
-            throw $ex->appendMessage('Cannot '.$what.' database file "'.$file.'"'.$where);
+            throw $ex->appendMessage("Cannot $doWhat database file \"$file\"$where");
         }
 
         $this->setConnectionOptions();
@@ -200,6 +199,7 @@ class SQLiteConnector extends Connector {
      */
     public function disconnect() {
         if ($this->isConnected()) {
+            /** @var SQLite3 $sqlite */
             $sqlite = $this->sqlite;
             $this->sqlite = null;
             $sqlite->close();
@@ -214,7 +214,7 @@ class SQLiteConnector extends Connector {
      * @return bool
      */
     public function isConnected() {
-        return is_object($this->sqlite);
+        return ($this->sqlite !== null);
     }
 
 
@@ -246,16 +246,23 @@ class SQLiteConnector extends Connector {
 
     /**
      * {@inheritdoc}
+     *
+     * @param  ?string $value
+     *
+     * @return ?string
      */
-    public function escapeString($value) {
+    public function escapeString(?string $value): ?string {
         // bug or feature: SQLite3::escapeString(null) => empty string instead of NULL
-        if ($value === null)
+        if ($value === null) {
             return null;
-        Assert::string($value);
-
-        if (!$this->isConnected())
+        }
+        if (!$this->isConnected()) {
             $this->connect();
-        return $this->sqlite->escapeString($value);
+        }
+        /** @var SQLite3 $sqlite */
+        $sqlite = $this->sqlite;
+
+        return $sqlite->escapeString($value);
     }
 
 
@@ -317,16 +324,18 @@ class SQLiteConnector extends Connector {
      * @throws DatabaseException on errors
      */
     public function executeRaw(string $sql) {
-        Assert::string($sql);
-        if (!$this->isConnected())
+        if (!$this->isConnected()) {
             $this->connect();
+        }
+        /** @var SQLite3 $sqlite */
+        $sqlite = $this->sqlite;
 
         // execute statement
         $result = false;
         try {
-            if ($this->skipResults) $result = $this->sqlite->exec($sql);        // TRUE on success, FALSE on error
-            else                    $result = $this->sqlite->query($sql);       // bug: always SQLite3Result, never boolean
-            if (!$result) throw new DatabaseException('Error '.$this->sqlite->lastErrorCode().', '.$this->sqlite->lastErrorMsg());
+            if ($this->skipResults) $result = $sqlite->exec($sql);      // TRUE on success, FALSE on error
+            else                    $result = $sqlite->query($sql);     // bug: always SQLite3Result, never boolean
+            if (!$result) throw new DatabaseException('Error '.$sqlite->lastErrorCode().', '.$sqlite->lastErrorMsg());
         }
         catch (Throwable $ex) {
             if (!$ex instanceof IRosasurferException) {
@@ -336,10 +345,10 @@ class SQLiteConnector extends Connector {
         }
 
         // track last_insert_id
-        $this->lastInsertId = $this->sqlite->lastInsertRowID();
+        $this->lastInsertId = $sqlite->lastInsertRowID();
 
         // track last_affected_rows
-        $this->lastAffectedRows = $this->sqlite->changes();
+        $this->lastAffectedRows = $sqlite->changes();
 
         return $result;
     }
@@ -450,12 +459,15 @@ class SQLiteConnector extends Connector {
     /**
      * Return this connector's internal SQLite3 connection object.
      *
-     * @return \SQLite3 - the internal connection handler
+     * @return SQLite3 - the internal connection handler
      */
-    public function getInternalHandler() {
-        if (!$this->isConnected())
+    public function getInternalHandler(): SQLite3 {
+        if (!$this->isConnected()) {
             $this->connect();
-        return $this->sqlite;
+        }
+        /** @var SQLite3 $sqlite */
+        $sqlite = $this->sqlite;
+        return $sqlite;
     }
 
 
@@ -479,7 +491,9 @@ class SQLiteConnector extends Connector {
             if (!$this->isConnected()) {
                 $this->connect();
             }
-            $this->versionString = $this->sqlite->version()['versionString'];
+            /** @var SQLite3 $sqlite */
+            $sqlite = $this->sqlite;
+            $this->versionString = $sqlite->version()['versionString'];
         }
         return $this->versionString;
     }
@@ -495,7 +509,9 @@ class SQLiteConnector extends Connector {
             if (!$this->isConnected()) {
                 $this->connect();
             }
-            $this->versionNumber = $this->sqlite->version()['versionNumber'];
+            /** @var SQLite3 $sqlite */
+            $sqlite = $this->sqlite;
+            $this->versionNumber = $sqlite->version()['versionNumber'];
         }
         return $this->versionNumber;
     }

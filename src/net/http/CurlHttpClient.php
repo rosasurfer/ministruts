@@ -28,7 +28,7 @@ class CurlHttpClient extends HttpClient {
 
 
     /**
-     * @var resource|CurlHandle|null - CURL handle
+     * @var resource|CurlHandle|null - cURL handle
      * @phpstan-var CurlHandleId|null
      */
     protected $hCurl = null;
@@ -39,7 +39,7 @@ class CurlHttpClient extends HttpClient {
     /** @var mixed[] - additional CURL options */
     protected array $options = [];
 
-    /** @var string[] - CURL error descriptions */
+    /** @var string[] - cURL error descriptions */
     protected static array $errors = [
         CURLE_OK                          => 'CURLE_OK',
         CURLE_UNSUPPORTED_PROTOCOL        => 'CURLE_UNSUPPORTED_PROTOCOL',
@@ -188,11 +188,11 @@ class CurlHttpClient extends HttpClient {
             if ($this->isFollowRedirects()) {
                 $options[CURLOPT_FOLLOWLOCATION] = true;
             }
-            elseif (isset($options[CURLOPT_FOLLOWLOCATION]) && $options[CURLOPT_FOLLOWLOCATION]) {
+            elseif ($options[CURLOPT_FOLLOWLOCATION] ?? false) {
                 $this->setFollowRedirects(true);
             }
             if ($this->isFollowRedirects()) {
-                !isset($options[CURLOPT_MAXREDIRS]) && $options[CURLOPT_MAXREDIRS]=$this->maxRedirects;
+                $options[CURLOPT_MAXREDIRS] ??= $this->maxRedirects;
             }
         }
 
@@ -204,6 +204,11 @@ class CurlHttpClient extends HttpClient {
             $options[CURLOPT_URL       ] = strLeftTo($request->getUrl(), '?');
             $options[CURLOPT_POSTFIELDS] = strRightFrom($request->getUrl(), '?');   // use URL parameters as POST fields
         }
+
+        /** @phpstan-var CurlHandleId $hCurl - $this->setFollowRedirects() makes PHPStan forget the status of $this->hCurl */
+        $hCurl = $this->hCurl;
+        $this->hCurl = $hCurl;
+
         curl_setopt_array($this->hCurl, $options);
 
         // execute request
@@ -219,7 +224,7 @@ class CurlHttpClient extends HttpClient {
             /** @var string $location */
             [$location, ] = $response->getHeaderValues('Location');             // TODO: catch/handle relative redirects
             Logger::log('Performing manual redirect to: '.$location, L_INFO);   // TODO: catch/handle nested IOExceptions
-            $request  = new HttpRequest($location);
+            $request = new HttpRequest($location);
             $response = $this->send($request);
         }
 
@@ -238,9 +243,9 @@ class CurlHttpClient extends HttpClient {
     protected function prepareCurlOptions(HttpRequest $request, CurlHttpResponse $response): array {
         $options = $this->options;                                  // options passed to the constructor
         $options    [CURLOPT_URL]      =  $request->getUrl();       // set or overwrite an existing URL
-        $options += [CURLOPT_TIMEOUT   => $this->timeout    ];      // set but don't overwrite these existing options
-        $options += [CURLOPT_USERAGENT => $this->userAgent  ];
-        $options += [CURLOPT_ENCODING  => ''                ];      // an empty string activates all supported encodings
+        $options += [CURLOPT_TIMEOUT   => $this->timeout  ];        // set but don't overwrite these existing options
+        $options += [CURLOPT_USERAGENT => $this->userAgent];
+        $options += [CURLOPT_ENCODING  => ''              ];        // an empty string activates all supported encodings
 
         if (!isset($options[CURLOPT_WRITEHEADER])) {
             $options += [CURLOPT_HEADERFUNCTION => [$response, 'writeHeader']];
@@ -273,9 +278,9 @@ class CurlHttpClient extends HttpClient {
             $errorNo = self::$errors[$errorNo];
         }
         else {
-            Logger::log('Unknown CURL error code: '.$errorNo, L_WARN);
+            Logger::log("Unknown cURL error code: $errorNo", L_WARN);
         }
 
-        return $errorNo.' ('.$errorStr.')';
+        return "$errorNo ($errorStr)";
     }
 }

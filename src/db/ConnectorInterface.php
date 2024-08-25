@@ -67,13 +67,13 @@ interface ConnectorInterface {
 
 
     /**
-     * Escape a scalar value. The resulting string must be quoted according to the DBMS before it can be used in queries.
+     * Escape a string. The resulting string must be quoted according to the DBMS before it can be used in queries.
      *
-     * @param  ?scalar $value - value to escape
+     * @param  ?string $value - the value to escape
      *
-     * @return ?string - escaped and unquoted string or NULL if the value was NULL
+     * @return ?string - escaped and unquoted string or NULL if the passed value was NULL
      */
-    public function escapeString($value);
+    public function escapeString(?string $value): ?string;
 
 
     /**
