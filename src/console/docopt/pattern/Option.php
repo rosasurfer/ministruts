@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\console\docopt\pattern;
 
+use InvalidArgumentException;
+
 use rosasurfer\ministruts\console\docopt\SingleMatch;
 
 
@@ -13,10 +15,10 @@ class Option extends LeafPattern {
 
 
     /** @var ?string */
-    public $short = null;
+    public ?string $short = null;
 
     /** @var ?string */
-    public $long = null;
+    public ?string $long = null;
 
     /** @var int */
     public $argcount;
@@ -28,8 +30,9 @@ class Option extends LeafPattern {
      * @param  int              $argcount [optional]
      * @param  bool|string|null $value    [optional]
      */
-    public function __construct($short=null, $long=null, $argcount=0, $value=false) {
-        if ($argcount > 1) throw new \InvalidArgumentException();
+    public function __construct(?string $short=null, ?string $long=null, int $argcount=0, $value=false) {
+        if (!isset($short) && !isset($long)) throw new InvalidArgumentException('invalid arguments $short/$long (one must be set)');
+        if ($argcount > 1)                   throw new InvalidArgumentException("invalid argument \$argcount: $argcount (must be 0 or 1)");
 
         $this->short    = $short;
         $this->long     = $long;
@@ -94,7 +97,7 @@ class Option extends LeafPattern {
     /**
      * @return string
      */
-    public function name() {
-        return $this->long ?? $this->short;
+    public function name(): string {
+        return $this->long ?? $this->short;         // @phpstan-ignore  return.type (one of them is always set)
     }
 }

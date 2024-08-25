@@ -13,48 +13,6 @@ final class Struts extends StaticClass {
 
 
     /**
-     * Default {@link RequestProcessor} class.
-     *
-     * @var class-string<RequestProcessor>
-     */
-    const DEFAULT_REQUEST_PROCESSOR_CLASS = RequestProcessor::class;
-
-    /**
-     * Default {@link ActionForward} class.
-     *
-     * @var class-string<ActionForward>
-     */
-    const DEFAULT_ACTION_FORWARD_CLASS = ActionForward::class;
-
-    /**
-     * Default {@link ActionMapping} class.
-     *
-     * @var class-string<ActionMapping>
-     */
-    const DEFAULT_ACTION_MAPPING_CLASS = ActionMapping::class;
-
-    /**
-     * {@link Action} base class.
-     *
-     * @var class-string<Action>
-     */
-    const ACTION_BASE_CLASS = Action::class;
-
-    /**
-     * {@link ActionForm} base class.
-     *
-     * @var class-string<ActionForm>
-     */
-    const ACTION_FORM_BASE_CLASS = ActionForm::class;
-
-    /**
-     * {@link RoleProcessor} base class.
-     *
-     * @var class-string<RoleProcessor>
-     */
-    const ROLE_PROCESSOR_BASE_CLASS = RoleProcessor::class;
-
-    /**
      * Request or session key under which action messages are stored (if any).
      */
     const ACTION_MESSAGES_KEY = 'org.apache.struts.action.MESSAGES';

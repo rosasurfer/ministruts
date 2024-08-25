@@ -39,8 +39,9 @@ abstract class LeafPattern extends Pattern {
      * @return Pattern[]
      */
     public function flat(array $types = []) {
-        if (!$types || in_array(get_class($this), $types))
+        if (!$types || in_array(get_class($this), $types)) {
             return [$this];
+        }
         return [];
     }
 

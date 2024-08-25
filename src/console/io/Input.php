@@ -52,8 +52,9 @@ class Input extends CObject {
      * @return bool
      */
     public function isCommand(string $name) {
-        if (!$this->docoptResult) return false;
-
+        if (!$this->docoptResult) {
+            return false;
+        }
         if (!strlen($name) || !key_exists($name, $this->docoptResult->getArgs())) {
             return false;
         }

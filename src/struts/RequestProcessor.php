@@ -235,10 +235,15 @@ PROCESS_METHOD_ERROR_SC_405;
      * @return bool
      */
     protected function processRoles(Request $request, Response $response, ActionMapping $mapping) {
-        if (empty($mapping->getRoles())) return true;
+        if (empty($mapping->getRoles())) {
+            return true;
+        }
+
+        /** @var RoleProcessor $roleProcessor */
+        $roleProcessor = $this->module->getRoleProcessor();
 
         /** @var ActionForward|string|null $forward */
-        $forward = $this->module->getRoleProcessor()->processRoles($request, $mapping);
+        $forward = $roleProcessor->processRoles($request, $mapping);
         if (!isset($forward)) return true;
 
         // if a string identifier was returned resolve the named instance
@@ -261,7 +266,7 @@ PROCESS_METHOD_ERROR_SC_405;
      * @return ActionForm
      */
     protected function processActionFormCreate(Request $request, ActionMapping $mapping) {
-        $formClass = $mapping->getFormClassName();
+        $formClass = $mapping->getFormClass();
 
         /** @var ActionForm $form */
         $form = $formClass ? new $formClass($request) : new EmptyActionForm($request);
@@ -291,8 +296,9 @@ PROCESS_METHOD_ERROR_SC_405;
 
         $success = $form->validate();
 
-        if ($mapping->getActionClassName())
+        if ($mapping->getActionClass()) {
             return true;
+        }
 
         $forward = $mapping->getForward();
         if (!$forward) {
@@ -338,8 +344,7 @@ PROCESS_METHOD_ERROR_SC_405;
      * @return Action
      */
     protected function processActionCreate(ActionMapping $mapping, ActionForm $form) {
-        $className = $mapping->getActionClassName();
-
+        $className = $mapping->getActionClass();
         return new $className($mapping, $form);
     }
 

@@ -16,7 +16,7 @@ use rosasurfer\ministruts\core\exception\RuntimeException;
 final class FileLock extends BaseLock {
 
 
-    /** @var resource[] - all file handles currently used for locking */
+    /** @var array<resource|null> - all file handles currently used for locking */
     private static $hFiles = [];
 
     /** @var string - name of the file used by the current instance */
@@ -34,13 +34,13 @@ final class FileLock extends BaseLock {
      */
     public function __construct($filename) {
         Assert::string($filename);
-        if (\key_exists($filename, self::$hFiles)) throw new RuntimeException('Dead-lock: re-entry detected for lock file "'.$filename.'"');
+        if (\key_exists($filename, self::$hFiles)) throw new RuntimeException("Dead-lock: re-entry detected for lock file \"$filename\"");
         self::$hFiles[$filename] = null;                // pre-define the index and handle re-entry if the constructor crashes
 
         $this->filename = $filename;
         $hFile = fopen($filename, 'c');                 // 'c' will never fail
 
-        if (!flock($hFile, LOCK_EX)) throw new RuntimeException('Can not aquire exclusive lock on file "'.$filename.'"');
+        if (!flock($hFile, LOCK_EX)) throw new RuntimeException("Can not aquire exclusive lock on file \"$filename\"");
 
         self::$hFiles[$filename] = $hFile;              // lock is aquired
     }
@@ -52,9 +52,7 @@ final class FileLock extends BaseLock {
      * @return bool
      */
     public function isAquired(): bool {
-        if (isset(self::$hFiles[$this->filename]))
-            return is_resource(self::$hFiles[$this->filename]);
-        return false;
+        return is_resource(self::$hFiles[$this->filename] ?? null);
     }
 
 
@@ -65,6 +63,7 @@ final class FileLock extends BaseLock {
      */
     public function release(): void {
         if ($this->isAquired()) {
+            /** @var resource $hFile */
             $hFile = self::$hFiles[$this->filename];
             if (!flock($hFile, LOCK_UN)) throw new RuntimeException('Can not release lock on file "'.$this->filename.'"');
             unset(self::$hFiles[$this->filename]);

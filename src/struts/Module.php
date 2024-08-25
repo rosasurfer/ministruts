@@ -80,19 +80,19 @@ class Module extends CObject {
     protected $viewNamespace = '';
 
     /** @var class-string<RequestProcessor> - classname of the {@link RequestProcessor} implementation used by the module (configurable) */
-    protected $requestProcessorClass = Struts::DEFAULT_REQUEST_PROCESSOR_CLASS;
+    protected $requestProcessorClass = RequestProcessor::class;
 
-    /** @var class-string<ActionForward> - default classname of the {@link ActionForward} implementation used by the module (configurable) */
-    protected $forwardClass = Struts::DEFAULT_ACTION_FORWARD_CLASS;
+    /** @var class-string<ActionForward> - classname of the {@link ActionForward} implementation used by the module (configurable) */
+    protected $forwardClass = ActionForward::class;
 
-    /** @var class-string<ActionMapping> - default classname of the {@link ActionMapping} implementation used by the module (configurable) */
-    protected $mappingClass = Struts::DEFAULT_ACTION_MAPPING_CLASS;
+    /** @var class-string<ActionMapping> - classname of the {@link ActionMapping} implementation used by the module (configurable) */
+    protected $mappingClass = ActionMapping::class;
 
-    /** @var class-string<Tile> - default classname of the {@link Tile} implementation used by the module (configurable) */
+    /** @var class-string<Tile> - classname of the {@link Tile} implementation used by the module (configurable) */
     protected $tilesClass = Tile::class;
 
-    /** @var class-string<RoleProcessor> - classname of the {@link RoleProcessor} implementation used by the module (configurable) */
-    protected $roleProcessorClass;
+    /** @var ?class-string<RoleProcessor> - classname of the {@link RoleProcessor} implementation used by the module (configurable) */
+    protected $roleProcessorClass = null;
 
     /** @var RoleProcessor|null - the RoleProcessor instance used by the module */
     protected $roleProcessor = null;
@@ -358,8 +358,8 @@ class Module extends CObject {
             // attribute name="%LogicalName" #IMPLIED
             $sName = '';
             if (isset($tag['name'])) {
-                $name  = (string) $tag['name'];
-                $sName = ' name="'.$name.'"';
+                $name = (string) $tag['name'];
+                $sName = " name=\"$name\"";
                 $mapping->setName($name);
             }
 
@@ -417,7 +417,7 @@ class Module extends CObject {
                 $classNames = $this->resolveClassName($name);
                 if (!$classNames)            Struts::configError('<mapping'.$sName.' path="'.$path.'" action="'.$tag['action'].'": Class not found.');
                 if (sizeof($classNames) > 1) Struts::configError('<mapping'.$sName.' path="'.$path.'" action="'.$tag['action'].'": Ambiguous class name, found "'.join('", "', $classNames).'".');
-                $mapping->setActionClassName($classNames[0]);
+                $mapping->setActionClass($classNames[0]);
             }
 
             // attribute form="%ClassName" #IMPLIED
@@ -426,13 +426,13 @@ class Module extends CObject {
                 $classNames = $this->resolveClassName($name);
                 if (!$classNames)            Struts::configError('<mapping'.$sName.' path="'.$path.'" form="'.$tag['form'].'": Class not found.');
                 if (sizeof($classNames) > 1) Struts::configError('<mapping'.$sName.' path="'.$path.'" form="'.$tag['form'].'": Ambiguous class name, found "'.join('", "', $classNames).'".');
-                $mapping->setFormClassName($classNames[0]);
+                $mapping->setFormClass($classNames[0]);
             }
 
             // attribute form-validate-first="%Boolean" "true"
             $formValidateFirst = false;
-            if ($mapping->getFormClassName()) {
-                $action = $mapping->getActionClassName();
+            if ($mapping->getFormClass()) {
+                $action = $mapping->getActionClass();
                 if ($action || $mapping->getForward()) {
                     $formValidateFirst = isset($tag['form-validate-first']) ? ($tag['form-validate-first']=='true') : !$action;
                 }
@@ -460,7 +460,7 @@ class Module extends CObject {
 
             // attribute roles="CDATA" #IMPLIED
             if (isset($tag['roles'])) {
-                if (!$this->roleProcessorClass) Struts::configError('<mapping'.$sName.' path="'.$path.'" roles="'.$tag['roles'].'": RoleProcessor configuration not found');
+                if (!$this->roleProcessorClass) Struts::configError("<mapping$sName path=\"$path\" roles=\"$tag[roles]\": RoleProcessor configuration not found");
                 $mapping->setRoles((string) $tag['roles']);
             }
 
@@ -906,7 +906,7 @@ class Module extends CObject {
 
         foreach ($elements as $tag) {
             if (isset($tag['request-processor'])) {
-                $name       = trim((string) $tag['request-processor']);
+                $name = trim((string) $tag['request-processor']);
                 $classNames = $this->resolveClassName($name);
                 if (!$classNames)            Struts::configError('<controller request-processor="'.$tag['request-processor'].'": Class not found.');
                 if (sizeof($classNames) > 1) Struts::configError('<controller request-processor="'.$tag['request-processor'].'": Ambiguous class name, found "'.join('", "', $classNames).'"');
@@ -914,7 +914,7 @@ class Module extends CObject {
             }
 
             if (isset($tag['role-processor'])) {
-                $name       = trim((string) $tag['role-processor']);
+                $name = trim((string) $tag['role-processor']);
                 $classNames = $this->resolveClassName($name);
                 if (!$classNames)            Struts::configError('<controller role-processor="'.$tag['role-processor'].'": Class not found.');
                 if (sizeof($classNames) > 1) Struts::configError('<controller role-processor="'.$tag['role-processor'].'": Ambiguous class name, found "'.join('", "', $classNames).'"');
@@ -935,8 +935,8 @@ class Module extends CObject {
     protected function setRequestProcessorClass($className) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
-        if (!is_subclass_of($className, Struts::DEFAULT_REQUEST_PROCESSOR_CLASS)) {
-            Struts::configError('Not a subclass of '.Struts::DEFAULT_REQUEST_PROCESSOR_CLASS.': '.$className);
+        if (!is_subclass_of($className, RequestProcessor::class)) {
+            Struts::configError("Invalid request processor class: $className (not a subclass of ".RequestProcessor::class.")");
         }
         $this->requestProcessorClass = $className;
         return $this;
@@ -961,11 +961,11 @@ class Module extends CObject {
      *
      * @return $this
      */
-    protected function setRoleProcessorClass($className) {
+    protected function setRoleProcessorClass(string $className): self {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
-        if (!is_subclass_of($className, Struts::ROLE_PROCESSOR_BASE_CLASS)) {
-            Struts::configError('Not a subclass of '.Struts::ROLE_PROCESSOR_BASE_CLASS.': '.$className);
+        if (!is_subclass_of($className, RoleProcessor::class)) {
+            Struts::configError("Invalid role processor class: $className (not a subclass of ".RoleProcessor::class.")");
         }
         $this->roleProcessorClass = $className;
         return $this;
@@ -980,7 +980,9 @@ class Module extends CObject {
     public function getRoleProcessor() {
         if (!$this->roleProcessor) {
             $class = $this->roleProcessorClass;
-            $class && $this->roleProcessor = new $class();
+            if (isset($class)) {
+                $this->roleProcessor = new $class();
+            }
         }
         return $this->roleProcessor;
     }
@@ -996,7 +998,10 @@ class Module extends CObject {
      */
     protected function setTilesClass($className) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-        if (!is_subclass_of($className, Tile::class)) Struts::configError('Not a subclass of '.Tile::class.": $className");
+
+        if (!is_subclass_of($className, Tile::class)) {
+            Struts::configError("Invalid tiles class: $className (not a subclass of ".Tile::class.")");
+        }
 
         $this->tilesClass = $className;
         return $this;
@@ -1024,8 +1029,8 @@ class Module extends CObject {
     protected function setMappingClass($className) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
-        if (!is_subclass_of($className, Struts::DEFAULT_ACTION_MAPPING_CLASS)) {
-            Struts::configError('Not a subclass of '.Struts::DEFAULT_ACTION_MAPPING_CLASS.": $className");
+        if (!is_subclass_of($className, ActionMapping::class)) {
+            Struts::configError("Invalid action mapping class: $className (not a subclass of ".ActionMapping::class.")");
         }
         $this->mappingClass = $className;
         return $this;
@@ -1053,8 +1058,8 @@ class Module extends CObject {
     protected function setForwardClass($className) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
-        if (!is_subclass_of($className, Struts::DEFAULT_ACTION_FORWARD_CLASS)) {
-            Struts::configError('Not a subclass of '.Struts::DEFAULT_ACTION_FORWARD_CLASS.": $className");
+        if (!is_subclass_of($className, ActionForward::class)) {
+            Struts::configError("Invalid action forward class: $className (not a subclass of ".ActionForward::class.")");
         }
         $this->forwardClass = $className;
         return $this;

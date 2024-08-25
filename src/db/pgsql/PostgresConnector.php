@@ -236,6 +236,7 @@ class PostgresConnector extends Connector {
                 $row = pg_fetch_array($result, null, PGSQL_NUM);
                 if (!$row) throw new DatabaseException(pg_last_error($this->connection));
 
+                /** @var string $path */
                 $path = $row[0];
 
                 if (strContains($path, '"$user"') && isset($options['user'])) {
@@ -490,6 +491,7 @@ class PostgresConnector extends Connector {
             throw $ex->appendMessage('Database: '.$this->getConnectionDescription().NL."SQL: \"$sql\"");
         }
 
+        /** @var string $status */
         $status = pg_result_status($result, PGSQL_STATUS_STRING);
 
         // reset last_insert_id on INSERTs, afterwards it's resolved on request as it requires an extra SQL query
@@ -686,7 +688,11 @@ class PostgresConnector extends Connector {
             /** @phpstan-var PgSqlConnectionId $connection */
             $connection = $this->connection;
 
-            $this->versionString = pg_version($connection)['server'];
+            $version = pg_version($connection);
+            $versionStr = (string)($version['server'] ?? '');
+            Assert::notEmpty($versionStr, "unexpected pgsql version string \"$versionStr\"");
+
+            $this->versionString = $versionStr;
         }
         return $this->versionString;
     }
@@ -703,7 +709,7 @@ class PostgresConnector extends Connector {
 
             $match = null;
             if (!preg_match('/^(\d+)\.(\d+).(\d+)/', $version, $match)) {
-                throw new UnexpectedValueException('Unexpected version string "'.$version.'"');
+                throw new UnexpectedValueException("Unexpected pgsql version string \"$version\"");
             }
             $major   = (int) $match[1];
             $minor   = (int) $match[2];

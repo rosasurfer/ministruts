@@ -78,8 +78,8 @@ class DocoptParser extends CObject {
      */
     public function parse($doc, $args = null) {
         try {
-            if (!isset($args) && isset($_SERVER['argv'])) {
-                $args = array_slice($_SERVER['argv'], 1);
+            if (!isset($args)) {
+                $args = array_slice($_SERVER['argv'] ?? [], 1);
             }
 
             $usage = static::parseSection('Usage:', $doc);

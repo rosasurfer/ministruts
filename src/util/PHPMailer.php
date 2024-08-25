@@ -65,7 +65,7 @@ class PHPMailer extends CObject {
      *
      * @return bool
      */
-    public function sendMail(?string $sender, $receiver, string $subject, $message, array $headers = []) {
+    public function sendMail(?string $sender, string $receiver, string $subject, string $message, array $headers = []): bool {
         // delay sending to the script's shutdown if configured (e.g. as not to block other tasks)
         if (!empty($this->options['send-later'])) {
             return $this->sendLater($sender, $receiver, $subject, $message, $headers);
@@ -93,7 +93,7 @@ class PHPMailer extends CObject {
         $returnPath = self::parseAddress($sender);
         if (!$returnPath)                  throw new InvalidValueException('Invalid parameter $sender: '.$sender);
         $value = $this->removeHeader($headers, 'Return-Path');
-        if (strlen($value)) {
+        if (isset($value)) {
             $returnPath = self::parseAddress($value);
             if (!$returnPath)              throw new InvalidValueException('Invalid header "Return-Path: '.$value.'"');
         }
@@ -102,14 +102,13 @@ class PHPMailer extends CObject {
         $from = self::parseAddress($sender);
         if (!$from)                        throw new InvalidValueException('Invalid parameter $sender: '.$sender);
         $value = $this->removeHeader($headers, 'From');
-        if (strlen($value)) {
+        if (isset($value)) {
             $from = self::parseAddress($value);
             if (!$from)                    throw new InvalidValueException('Invalid header "From: '.$value.'"');
         }
         $from = $this->encodeNonAsciiChars($from);
 
         // RCPT: (receiving mailbox)
-        Assert::string($receiver, '$receiver');
         $rcpt = self::parseAddress($receiver);
         if (!$rcpt)                        throw new InvalidValueException('Invalid parameter $receiver: '.$receiver);
         $forced = $config->get('mail.forced-receiver', '');
@@ -123,7 +122,7 @@ class PHPMailer extends CObject {
         $to = self::parseAddress($receiver);
         if (!$to)                          throw new InvalidValueException('Invalid parameter $receiver: '.$receiver);
         $value = $this->removeHeader($headers, 'To');
-        if (strlen($value)) {
+        if (isset($value)) {
             $to = self::parseAddress($value);
             if (!$to)                      throw new InvalidValueException('Invalid header "To: '.$value.'"');
         }
@@ -152,7 +151,6 @@ class PHPMailer extends CObject {
             $headers[] = 'To: '.trim($to['name'].' <'.$to['address'].'>');  // on Windows only if $headers is missing one
 
         // mail body
-        Assert::string($message, '$message');
         $message = str_replace(chr(0), '\0', $message);                     // replace NUL bytes which destroy the mail
         $message = normalizeEOL($message, EOL_WINDOWS);                     // multiple lines must be separated by CRLF
 
@@ -172,10 +170,10 @@ class PHPMailer extends CObject {
     /**
      * Delay sending of the mail to the script shutdown phase.  Can be used to not to block other more important tasks.
      *
-     * NOTE: Usage of this method is a poor man's approach and a last resort.  A more professional way to decouple
-     *       sending of mail is using a regular message queue.
+     * NOTE: Usage of this method is a poor man's approach and a last resort. It's recommended to use a message queue
+     *       as a more professional way to decouple sending of mail.
      *
-     * @param  string   $sender             - mail sender
+     * @param  ?string  $sender             - mail sender
      * @param  string   $receiver           - mail receiver
      * @param  string   $subject            - mail subject
      * @param  string   $message            - mail body
@@ -184,15 +182,12 @@ class PHPMailer extends CObject {
      * @return bool - whether sending of the email was successfully delayed
      *
      */
-    protected function sendLater($sender, $receiver, $subject, $message, array $headers = []) {
-        if (!empty($this->options['send-later'])) {
-            $callable = [$this, 'sendMail'];
-            register_shutdown_function($callable, $sender, $receiver, $subject, $message, $headers);
+    protected function sendLater(?string $sender, string $receiver, string $subject, string $message, array $headers = []): bool {
+        $callable = [$this, 'sendMail'];
+        register_shutdown_function($callable, $sender, $receiver, $subject, $message, $headers);
 
-            $this->options['send-later'] = false;
-            return true;
-        }
-        return false;
+        $this->options['send-later'] = false;       // TODO: this causes the next mail to be sent immediately (not what we want)
+        return true;
 
         // TODO: Not yet found a way to send a "Location" header (redirect) to the client, close the browser connection
         //       and keep the mail script sending in background with "output_buffering" enabled. As the output buffer is
@@ -206,10 +201,9 @@ class PHPMailer extends CObject {
      *
      * @param  string $value
      *
-     * @return ?string[] - aray with name and address part or NULL if the specified address is invalid
+     * @return ?string[] - array with name and address part or NULL if the specified address is invalid
      */
-    public function parseAddress($value) {
-        Assert::string($value);
+    public function parseAddress(string $value) {
         $value = trim($value);
 
         if (strEndsWith($value, '>')) {

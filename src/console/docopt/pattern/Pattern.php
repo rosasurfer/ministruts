@@ -14,8 +14,8 @@ use function rosasurfer\ministruts\array_merge;
 abstract class Pattern extends CObject {
 
 
-    /** @var string */
-    protected $name;
+    /** @var ?string */
+    protected ?string $name;
 
     /** @var mixed */
     public $value = null;
@@ -42,9 +42,9 @@ abstract class Pattern extends CObject {
 
 
     /**
-     * @return string
+     * @return ?string
      */
-    public function name() {
+    public function name(): ?string {
         return $this->name;
     }
 

@@ -574,13 +574,13 @@ abstract class DAO extends Singleton {
 
 
     /**
-     * Escape a scalar value. The resulting string must be quoted according to the DBMS before it can be used in queries.
+     * Escape a string. The resulting string must be quoted according to the DBMS before it can be used in queries.
      *
-     * @param  ?scalar $value - value to escape
+     * @param  ?string $value - value to escape
      *
-     * @return ?string - escaped but unquoted string or NULL if the value was NULL
+     * @return ?string - escaped but unquoted string or NULL if the passed value was NULL
      */
-    public function escapeString($value) {
+    public function escapeString(?string $value): ?string {
         return $this->db()->escapeString($value);
     }
 }

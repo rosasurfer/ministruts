@@ -36,7 +36,7 @@ class Command extends CObject {
     private $aliases = [];
 
     /** @var string - syntax definition in Docopt format */
-    private $docoptDefinition;
+    private string $docoptDefinition;
 
     /** @var DocoptResult|null - parsed and matched Docopt block */
     private $docoptResult = null;
@@ -66,7 +66,7 @@ class Command extends CObject {
      * Create a new command.
      */
     public function __construct() {
-        $this->input  = InputProxy::instance();
+        $this->input = InputProxy::instance();
         $this->output = OutputProxy::instance();
         $this->configure();
     }
@@ -95,16 +95,18 @@ class Command extends CObject {
         $input = $this->input;
         $output = $this->output;
 
-        $input->setDocoptResult($this->docoptResult);
+        if ($this->docoptResult) {
+            $input->setDocoptResult($this->docoptResult);
+        }
 
-        if ($this->validator) $error = $this->validator->__invoke($input, $output);
+        if ($this->validator) $error = ($this->validator)($input, $output);
         else                  $error = $this->validate($input, $output);
 
         if ($error) {
             return $this->status = (int) $error;
         }
 
-        if ($this->task) $status = $this->task->__invoke($input, $output);
+        if ($this->task) $status = ($this->task)($input, $output);
         else             $status = $this->execute($input, $output);
 
         return $this->status = (int) $status;
@@ -222,9 +224,8 @@ class Command extends CObject {
      *
      * @link   https://docopt.org/
      */
-    public function setDocoptDefinition($doc) {
+    public function setDocoptDefinition(string $doc) {
         if ($this->frozen) throw new RuntimeException('Configuration of "'.get_class($this).'" is frozen');
-        Assert::string($doc);
 
         $self = basename($_SERVER['PHP_SELF']);
         $doc = str_replace('{:cmd:}', $self, $doc);

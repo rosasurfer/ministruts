@@ -16,6 +16,27 @@ use function rosasurfer\ministruts\strContains;
  */
 class Assert extends StaticClass {
 
+
+    /**
+     * Ensure that the passed value is NULL.
+     *
+     * @param  mixed    $value
+     * @param  string   $message [optional] - value identifier or description
+     * @param  mixed ...$args    [optional] - additional message arguments
+     *
+     * @return bool
+     *
+     * @phpstan-return ($value is null ? true : false)
+     * @phpstan-assert null $value
+     */
+    public static function null($value, $message = '', ...$args) {
+        if (isset($value)) {
+            throw new InvalidValueException("Not NULL: $message");
+        }
+        return true;
+    }
+
+
     /**
      * Ensure that the passed value is considered "empty".
      *
