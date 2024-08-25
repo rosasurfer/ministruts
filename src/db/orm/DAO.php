@@ -435,10 +435,8 @@ abstract class DAO extends Singleton {
         // for faster indexing set collected getter names to all-lower-case
         $entity['getters'] = \array_change_key_case($entity['getters'], CASE_LOWER);
 
-        //error_log(print_r($entity, true));
-
         /** @phpstan-var ORM_ENTITY $entity */
-        return $entity = $entity;
+        return $entity;
     }
 
 

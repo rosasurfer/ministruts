@@ -93,20 +93,18 @@ class HttpRequest extends CObject {
      * @return $this
      */
     public function setHeader(string $name, ?string $value): self {
-        if (!strlen($name)) throw new InvalidValueException('Invalid parameter $name: '.$name);
+        $name = trim($name);
+        if (!strlen($name)) throw new InvalidValueException('Invalid parameter $name: "" (empty)');
 
-        $name  = trim($name);
-        $value = trim($value);
-
-        // drop existing headers of the same name (ignore case)
+        // drop existing headers of the same name (case-insensitive)
         $existing = \array_intersect_ukey($this->headers, [$name => '1'], 'strCaseCmp');
         foreach ($existing as $key => $v) {
             unset($this->headers[$key]);
         }
 
         // set new header if non-empty
-        if ($value !== null) {
-            $this->headers[$name] = $value;
+        if (isset($value)) {
+            $this->headers[$name] = trim($value);
         }
         return $this;
     }

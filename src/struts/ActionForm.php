@@ -53,7 +53,7 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
         $actionClass = $mapping->getActionClassName();
 
         // if a DispatchAction is used read the action key
-        if (is_subclass_of($actionClass, DispatchAction::class)) {
+        if ($actionClass && is_subclass_of($actionClass, DispatchAction::class)) {
             $this->initActionKey();
         }
         $this->populate();
