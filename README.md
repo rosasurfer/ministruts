@@ -4,7 +4,7 @@
 
 MiniStruts
 ----------
-An **MVC** micro framework for PHP.
+**MVC** micro framework for PHP
 
 
 **M** - The basis of the model component is an ORM. The ORM is implemented as a "Data Mapper" and follows the "database first" approach.
