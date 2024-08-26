@@ -8,7 +8,7 @@ MiniStruts
 
 
 **M** - The basis of the model component is an ORM. The ORM is implemented as a "Data Mapper" and follows the "database first" approach.
-This approach is mainly designed for working with existing databases. The implementation requires neither code generator nor proxy classes
+This approach is mainly designed for working with existing databases. The implementation requires neither code generation nor proxy classes
 (no surprises from code you didn't write). As long as tables have primary keys, any standard and non-standard database model can be connected
 and manually customized. Configuration uses pure PHP (no annotations or attributes). The ORM was inspired by [Hibernate ORM](https://hibernate.org/).
 
