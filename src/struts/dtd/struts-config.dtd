@@ -1,12 +1,21 @@
 <!--
+                                           DTD for the Struts configuration file
+                                          =======================================
 
-                                     DTD for the application's Struts configuration file
-                                    =====================================================
+Wikipedia:                 https://en.wikipedia.org/wiki/Apache_Struts_1
+Struts 1 home page:        https://weblegacy.github.io/struts1/
+Comparing Struts 1 and 2:  https://cwiki.apache.org/confluence/display/WW/Comparing+Struts+1+and+2
 
-
-                          Struts 1 general design and overview:  https://weblegacy.github.io/struts1/
-                       
-                Comparing Struts 1 and 2:  https://cwiki.apache.org/confluence/display/WW/Comparing+Struts+1+and+2
+Used @link elements reference PHP classes in namespace \rosasurfer\ministruts\struts:
+ Action
+ ActionForm
+ ActionForward
+ ActionMapping
+ Module
+ Page
+ RequestProcessor
+ RoleProcessor
+ Tile
 -->
 
 
@@ -14,13 +23,13 @@
 
 
 <!--
-    A "Boolean" is the string representation of a boolean variable ('true' or 'false').
+    A "Boolean" is the string representation of a boolean variable ("true" or "false").
 -->
 <!ENTITY % Boolean "(true|false)">
 
 
 <!--
-    A "ClassName" is the name of a PHP class that is instantiated to provide the functionality of the enclosing element.
+    A "ClassName" is the name of a PHP class that's instantiated to provide the functionality of the enclosing element.
 -->
 <!ENTITY % ClassName "CDATA">
 
@@ -58,8 +67,8 @@
                [default: the global namespace]
 
     file-base  Comma-delimited list of paths to lookup referenced files or file system locations (templates, layouts, page
-               fragments etc). Values may be absolute or relative to the directory "app.dir.root". Each {@link Module} can
-               have its own list of "file-base" locations.
+               fragments etc). Values may be absolute or relative to the directory "app.dir.root". Each Struts {@link Module}
+               can have its own list of "file-base" locations.
                [default: the application-wide configured view directory "app.dir.view"]
 -->
 <!ELEMENT struts-config (imports?, global-forwards?, action-mappings, tiles?, controller?)>
