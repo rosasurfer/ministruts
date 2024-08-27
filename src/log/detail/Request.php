@@ -57,15 +57,19 @@ class Request extends CObject {
      */
     protected function getNormalizedHeaders(): array {
         if (!isset($this->headers)) {
+            // content related headers
             $contentNames = [
                 'CONTENT_TYPE'   => 'Content-Type',
                 'CONTENT_LENGTH' => 'Content-Length',
                 'CONTENT_MD5'    => 'Content-MD5',
             ];
+
+            // headers with commonly used names (not a RFC requirement)
             $fixNames = [
-                'CDN'   => 'CDN',
-                'DNT'   => 'DNT',
-                'X-CDN' => 'X-CDN',
+                'CDN'     => 'CDN',
+                'DNT'     => 'DNT',
+                'SEC_GPC' => 'Sec-GPC',
+                'X_CDN'   => 'X-CDN',
             ];
             $headers = [];
 
@@ -78,15 +82,15 @@ class Request extends CObject {
                 }
                 if (substr($name, 0, 5) == 'HTTP_') {
                     $name = substr($name, 5);
+                    // skip content headers
                     if (!isset($contentNames[$name])) {
-                        if (!isset($fixNames[$name])) {
-                            $name = str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower($name))));
-                        }
+                        $name = $fixNames[$name] ?? str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower($name))));
                         $headers[$name] = $value;
                     }
                 }
             }
 
+            // collect all content headers together at the end
             foreach ($contentNames as $name => $value) {
                 if (isset($_SERVER[$name])) {
                     $headers[$contentNames[$name]] = $_SERVER[$name];

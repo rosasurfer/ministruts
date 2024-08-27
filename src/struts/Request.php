@@ -666,7 +666,12 @@ class Request extends CObject {
         }
 
         static $headers = null;
-        static $fixHeaderNames = ['CDN'=>1, 'DNT'=>2, 'X-CDN'=>3];
+        static $fixHeaderNames = [
+            'CDN'     => 'CDN',
+            'DNT'     => 'DNT',
+            'SEC_GPC' => 'Sec-GPC',
+            'X_CDN'   => 'X-CDN',
+        ];
 
         // read headers only once
         if ($headers === null) {
@@ -678,8 +683,7 @@ class Request extends CObject {
                 }
                 if (substr($name, 0, 5) == 'HTTP_') {
                     $name = substr($name, 5);
-                    if (!isset($fixHeaderNames[$name]))
-                        $name = str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower($name))));
+                    $name = $fixHeaderNames[$name] ?? str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower($name))));
                     $headers[$name] = $value;
                 }
             }
