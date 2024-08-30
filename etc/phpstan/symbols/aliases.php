@@ -28,11 +28,11 @@ namespace rosasurfer\ministruts {
 }
 
 namespace rosasurfer\ministruts\core\error {
-* @see \rosasurfer\ministruts\STACKFRAME */
+    /** @see \rosasurfer\ministruts\STACKFRAME */
     class STACKFRAME extends \rosasurfer\ministruts\STACKFRAME {}
 }
 
 namespace rosasurfer\ministruts\log {
-* @see \rosasurfer\ministruts\STACKFRAME */
+    /** @see \rosasurfer\ministruts\STACKFRAME */
     class STACKFRAME extends \rosasurfer\ministruts\STACKFRAME {}
 }
