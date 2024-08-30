@@ -533,7 +533,7 @@ class ErrorHandler extends StaticClass {
      *
      * @return STACKFRAME[] - adjusted stacktrace
      *
-     * @see  \rosasurfer\ministruts\STACKFRAME
+     * @see \rosasurfer\ministruts\STACKFRAME
      *
      * @example
      * before: The location in the frame points to the called statement.
@@ -636,7 +636,7 @@ class ErrorHandler extends StaticClass {
      *
      * @return string - string representation ending with an EOL marker
      *
-     * @see  \rosasurfer\ministruts\STACKFRAME
+     * @see \rosasurfer\ministruts\STACKFRAME
      */
     public static function formatStackTrace(array $trace, string $indent = '', ContentFilter $filter = null): string {
         /** @var string $appRoot */
@@ -698,7 +698,7 @@ class ErrorHandler extends StaticClass {
      *
      * @return string - method name without trailing parentheses
      *
-     * @see  \rosasurfer\ministruts\STACKFRAME
+     * @see \rosasurfer\ministruts\STACKFRAME
      */
     public static function getStackFrameMethod(array $frame, bool $nsToLower = false): string {
         $class = $function = '';
@@ -731,7 +731,7 @@ class ErrorHandler extends StaticClass {
      *
      * @return STACKFRAME[]
      *
-     * @see  \rosasurfer\ministruts\STACKFRAME
+     * @see \rosasurfer\ministruts\STACKFRAME
      */
     public static function shiftStackFramesByLocation(array $trace, string $file, int $line) {
         $result = $trace;
@@ -792,7 +792,7 @@ class ErrorHandler extends StaticClass {
      *
      * @return void
      *
-     * @see  \rosasurfer\ministruts\STACKFRAME
+     * @see \rosasurfer\ministruts\STACKFRAME
      */
     private static function setExceptionProperties(Exception $exception, array $trace, string $file = '', int $line = 0) {
         static $traceProperty = null;

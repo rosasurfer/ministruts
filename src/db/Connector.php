@@ -8,7 +8,6 @@ use Throwable;
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\error\ErrorHandler;
 use rosasurfer\ministruts\core\exception\InvalidTypeException;
-use rosasurfer\ministruts\db\ConnectorInterface as IConnector;
 
 
 /**
@@ -44,10 +43,12 @@ abstract class Connector extends CObject implements ConnectorInterface {
      * @param  string   $class   - name of class implementing IConnector
      * @param  string[] $options - configuration options
      *
-     * @return IConnector
+     * @return ConnectorInterface
      */
     public static function create($class, array $options) {
-        if (!is_subclass_of($class, IConnector::class)) throw new InvalidTypeException($class.' does not implement '.IConnector::class);
+        if (!is_subclass_of($class, ConnectorInterface::class)) {
+            throw new InvalidTypeException($class.' does not implement '.ConnectorInterface::class);
+        }
         return new $class($options);
     }
 
