@@ -10,7 +10,6 @@ use rosasurfer\ministruts\console\docopt\DocoptResult;
 use rosasurfer\ministruts\console\io\Input;
 use rosasurfer\ministruts\console\io\Output;
 use rosasurfer\ministruts\core\CObject;
-use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\di\proxy\CliInput as InputProxy;
 use rosasurfer\ministruts\core\di\proxy\Output as OutputProxy;
 use rosasurfer\ministruts\core\exception\IllegalStateException;
@@ -21,8 +20,8 @@ use rosasurfer\ministruts\core\exception\RuntimeException;
 /**
  * Command
  *
- * The configuration of a command will be frozen after it is added to the {@link \rosasurfer\ministruts\Application}. A frozen configuration
- * can't be changed anymore.
+ * The configuration of a command will be frozen after it is added to the {@link \rosasurfer\ministruts\Application}.
+ * A frozen configuration can't be changed anymore.
  */
 class Command extends CObject {
 
@@ -91,7 +90,7 @@ class Command extends CObject {
      *
      * @return int - execution status (0 for success)
      */
-    public function run() {
+    public function run(): int {
         $input = $this->input;
         $output = $this->output;
 
@@ -99,23 +98,31 @@ class Command extends CObject {
             $input->setDocoptResult($this->docoptResult);
         }
 
-        if ($this->validator) $error = ($this->validator)($input, $output);
-        else                  $error = $this->validate($input, $output);
-
-        if ($error) {
-            return $this->status = (int) $error;
+        if ($this->validator) {
+            $error = ($this->validator)($input, $output);
+        }
+        else {
+            $error = $this->validate($input, $output);
         }
 
-        if ($this->task) $status = ($this->task)($input, $output);
-        else             $status = $this->execute($input, $output);
+        if ($error) {
+            return $this->status = (int)$error;
+        }
 
-        return $this->status = (int) $status;
+        if ($this->task) {
+            $status = ($this->task)($input, $output);
+        }
+        else {
+            $status = $this->execute($input, $output);
+        }
+
+        return $this->status = (int)$status;
     }
 
 
     /**
-     * Validate the command line arguments. Override this method to pre-define custom validation or set the validator
-     * dynamically via {@link Command::setValidator()}.
+     * Validate the command line arguments. Override this method to pre-define a custom validation or
+     * set the validator dynamically via {@link Command::setValidator()}.
      *
      * @param  Input  $input
      * @param  Output $output
@@ -128,15 +135,16 @@ class Command extends CObject {
 
 
     /**
-     * Execute the command. Override this method to pre-define a command implementation or set it dynamically via
-     * {@link Command::setTask()}.
+     * Execute the command.
+     *
+     * Override this method to define a command implementation or set it dynamically via {@link Command::setTask()}.
      *
      * @param  Input  $input
      * @param  Output $output
      *
      * @return int - execution status (0 for success)
      */
-    protected function execute(Input $input, Output $output) {
+    protected function execute(Input $input, Output $output): int {
         return 0;
     }
 
@@ -287,8 +295,8 @@ class Command extends CObject {
 
 
     /**
-     * Validate the command configuration and lock its configuration. Called after the command is added to the
-     * {@link \rosasurfer\ministruts\Application}.
+     * Validate the command configuration and lock its configuration. Called after the command
+     * is added to the {@link \rosasurfer\ministruts\Application}.
      *
      * @return $this
      */
@@ -309,12 +317,12 @@ class Command extends CObject {
      *
      * @return $this
      */
-    private function validateName($name) {
-        Assert::string($name);
-        if ($name != trim($name)) throw new InvalidValueException('Invalid parameter $name: "'.$name.'" (enclosing white space)');
+    private function validateName(string $name): self {
+        if ($name != trim($name)) throw new InvalidValueException("Invalid parameter \$name: \"$name\" (enclosing white space)");
 
-        if (strlen($name) && !preg_match('/^[^\s:]+(:[^\s:]+)*$/', $name))
-            throw new InvalidValueException('Invalid parameter $name: "'.$name.'" (not a command name)');
+        if (strlen($name) && !preg_match('/^[^\s:]+(:[^\s:]+)*$/', $name)) {
+            throw new InvalidValueException("Invalid parameter \$name: \"$name\" (not a command name)");
+        }
         return $this;
     }
 }
