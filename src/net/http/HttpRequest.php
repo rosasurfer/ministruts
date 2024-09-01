@@ -26,7 +26,8 @@ class HttpRequest extends CObject {
 
     /**
      * Constructor
-     * @param  ?string $url [optional] - URL (default: none)
+     *
+     * @param ?string $url [optional] - URL (default: none)
      */
     public function __construct(?string $url = null) {
         if (isset($url)) {
