@@ -2,7 +2,7 @@
 
 
 /**
- * Polyfills and objects extensions.
+ * Polyfills
  */
 if (!Array.from) { Array.from = (function() {
     var toStr = Object.prototype.toString;
@@ -79,18 +79,15 @@ if (!String.prototype.trim           ) String.prototype.trim            = functi
 if (!String.prototype.repeat         ) String.prototype.repeat          = function repeat         (/*int*/ count) {
     var str = ''+ this;
     count = +count;
-    if (count != count)
-        count = 0;
+    if (count != count) count = 0;
     if (count < 0)         throw new RangeError('repeat count must be non-negative');
     if (count == Infinity) throw new RangeError('repeat count must be less than infinity');
     count = Math.floor(count);
-    if (!str.length || !count)
-        return '';
+    if (!str.length || !count) return '';
     if (str.length * count >= 1 << 28) throw new RangeError('repeat count must not overflow maximum string size');
     var maxCount = str.length * count;
     count = Math.floor(Math.log(count) / Math.log(2));
-    while (count--)
-       str += str;
+    while (count--) str += str;
     str += str.substring(0, maxCount - str.length);
     return str;
 }
@@ -99,10 +96,10 @@ if (!String.prototype.repeat         ) String.prototype.repeat          = functi
 if ('ab'.substr(-1) != 'b') {
     String.prototype.substr = function substr(start, length) {
         var from = start;
-            if (from < 0) from += this.length;
-            if (from < 0) from = 0;
+        if (from < 0) from += this.length;
+        if (from < 0) from = 0;
         var to = length===undefined ? this.length : from+length;
-            if (from > to) to = from;
+        if (from > to) to = from;
         return this.substring(from, to);
     }
 }
@@ -126,7 +123,7 @@ if ('ab'.substr(-1) != 'b') {
             return Math[type](value);
         }
         value = +value;
-        exp   = +exp;
+        exp = +exp;
         // if the value is not a number or the exp is not an integer...
         if (isNaN(value) || typeof(exp)!='number' || exp%1===0) {
             return NaN;
@@ -160,7 +157,7 @@ var rosasurfer = {
      *
      * @param  string url [optional] - URL to get query parameters from (default: the current page location)
      *
-     * @return array - {key1: value1, key2: value2, ..., keyN: valueN}
+     * @return object - {key1: value1, key2: value2, ..., keyN: valueN}
      */
     getQueryParameters: function getQueryParameters(url) {
         var pos, query;
@@ -179,21 +176,25 @@ var rosasurfer = {
                 if (name.contains('[') && (matches = name.match(reArray))) {
                     var array = matches[1];
                     var key = matches[2];
-                    if (typeof(result[array]) != 'object')
-                        result[array] = {};
+                    if (typeof(result[array]) != 'object') {
+                      result[array] = {};
+                    }
                     if (!key.length)        Array.prototype.push.call(result[array], value);
                     else if (key=='length') lengths[array] = value;        // backup length parameter to not confuse Array.push()
                     else                    result[array][key] = value;
                 }
-                else result[name] = value;
+                else {
+                  result[name] = value;
+                } 
             }
         });
 
         Object.keys(result).forEach(function(key) {
             if (typeof(result[key]) == 'object') {
                delete result[key].length;                                  // delete length property defined by Array.push()
-               if (lengths[key] !== undefined)
-                  result[key].length = lengths[key];                       // restore a backed-up length parameter
+               if (lengths[key] !== undefined) {
+                 result[key].length = lengths[key];                        // restore a backed-up length parameter
+               }
             }
         });
         return result;
@@ -285,14 +286,27 @@ var rosasurfer = {
             else if (arg.constructor) type = arg.constructor.name || arg.constructor.toString();
             else                      type = ''+ arg;
 
-            if (type.startsWith('[object ')) {              // [object HTMLAnchorElement]
+            if (type.startsWith('[object ')) {                      // [object HTMLAnchorElement]
                 type = type.slice(8, -1);
             }
-            else if (type.startsWith('function ')) {        // function HTMLAnchorElement() { [native code] }
-                type = type.slice(9, type.indexOf('('));
+            else if (type.startsWith('function')) {                 // function HTMLAnchorElement() { [native code] }
+                var name = type.slice(8, type.indexOf('(')).trim(); // function( param1, param2... ) { <custom code> }
+                type = name.length ? name : 'function';
             }
         }
         return type;
+    },
+
+
+    /**
+     * Whether a variable is defined.
+     *
+     * @param  mixed arg
+     *
+     * @return bool
+     */
+    isDefined: function isDefined(arg) {
+        return (typeof(arg) != 'undefined');
     },
 
     
@@ -382,8 +396,7 @@ var rosasurfer = {
         }
 
         if (properties.length) {
-            if (sort)
-               properties = properties.sort();
+            if (sort) properties = properties.sort();
             this.log(properties.join('\n'));
         }
         else {
@@ -400,20 +413,21 @@ var rosasurfer = {
      *                         The method will remember the last used 'target' parameter.
      */
     log: function log(msg, target/*='top'*/) {
-        if (this.log.console)
-            return console.log(msg);
-
-        var div = this.log.div;
+        if (this.log.console) {
+          return console.log(msg);
+        }
+        
+        var div = this.log.container;
         if (!div) {
-            div = this.log.div = document.createElement('div');
+            div = this.log.container = document.createElement('div');
             div.setAttribute('id', 'rosasurfer.log.output');
             div.style.position        = 'absolute';
-            div.style.zIndex          = '4294967295';
             div.style.top             = '6px';
             div.style.left            = '6px';
+            div.style.zIndex          = '4294967295';
             div.style.padding         = '6px';
             div.style.textAlign       = 'left';
-            div.style.font            = 'normal normal 12px/1.5em arial,helvetica,sans-serif';
+            div.style.font            = 'normal normal 12px/1.1em arial,helvetica,sans-serif';
             div.style.color           = 'black';
             div.style.backgroundColor = 'lightgray';
             var bodies = document.getElementsByTagName('body');
@@ -435,8 +449,9 @@ var rosasurfer = {
      * Clear the log output in the current page.
      */
     clearLog: function clearLog() {
-        if (this.log.div)
-            this.log.div.innerHTML = '';
+        if (this.log.container) {
+          this.log.container.innerHTML = '';
+        }
     },
 
 
