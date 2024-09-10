@@ -3,30 +3,33 @@
 !.htaccess
 
 # ignore Eclipse folders and files
-/.externalToolBuilders/
-/.settings/
+/.externalToolBuilders
+/.settings
 /.buildpath
 /.project*
 
 # ignore IntelliJ folders and files
-/.idea/
+/.idea
 
 # ignore NetBeans folders and files
-.nb-gradle/
-nbbuild/
-nbdist/
-nbproject/
+.nb-gradle
+nbbuild
+nbdist
+nbproject
 nbactions.xml
-/build/
-/dist/
+/build
+/dist
+
+# ignore VSCode folders and files
+/.vscode
 
 # ignore the following folders and files
 /etc/httpd/cgi/php.ini
-/etc/phpstan/.tmp/
+/etc/phpstan/.tmp
 /etc/phpstan/phpstan.neon
 /php-error.log
 
-vendor/
+/vendor
 /composer
 /composer.phar
 /composer*.lock
