@@ -26,6 +26,7 @@ nbactions.xml
 
 # ignore the following folders and files
 /etc/httpd/cgi/php.ini
+/etc/httpd/log
 /etc/phpstan/.tmp
 /etc/phpstan/phpstan.neon
 /php-error.log
