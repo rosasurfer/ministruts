@@ -1,2 +1,4 @@
-The example web server configuration uses SSL certificates which must be located in "etc/httpd/ssl". You may copy/symlink
-your own certificates there, or you may use the provided self-signed certificates.
+If SSL is enabled the used certificates must be located in this directory. You may 
+copy/symlink your own certificates here, or use the provided self-signed certificates.
+The configuration expects the files to be named `certificate.pem` and `private-key.pem`.
+
