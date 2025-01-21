@@ -81,11 +81,14 @@ class Config extends CObject implements ConfigInterface {
         foreach ($files as $i => $file) {
             Assert::string($file, '$files['.$i.']');
 
-            $isFile = is_file($file);
-            if      ($isFile)               $file = realpath($file);
-            else if (isRelativePath($file)) $file = getcwd().PATH_SEPARATOR.$file;
-
-            $this->files[$file] = $isFile && $this->loadFile($file);
+            $success = false;
+            if (is_file($file)) {
+                $success = $this->loadFile($file);
+            }
+            else if (isRelativePath($file)) {
+                $file = getcwd().PATH_SEPARATOR.$file;
+            }
+            $this->files[$file] = $success;
         }
     }
 
