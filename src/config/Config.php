@@ -82,7 +82,6 @@ class Config extends CObject implements ConfigInterface {
 
             $success = false;
             if (is_file($file)) {
-                $file = realpath($file);
                 $success = $this->loadFile($file);
             }
             elseif (isRelativePath($file)) {
