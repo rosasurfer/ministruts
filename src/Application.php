@@ -126,7 +126,7 @@ class Application extends CObject {
             $configFiles = $config->getMonitoredFiles();
             $files = [];
             foreach ($configFiles as $file => $exists) {
-                $files[] = ($exists ? 'OK':'? ').'   '.$file;
+                $files[] = ($exists ? 'OK':'? ').'   '.str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $file);
             }
             ?>
             <div align="left" style="display:initial; visibility:initial; clear:both;
