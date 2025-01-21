@@ -30,7 +30,7 @@ use const rosasurfer\WINDOWS;
 class CoreFunctionReturnType implements DynamicFunctionReturnTypeExtension {
 
     /** @var array<string, Type> */
-    protected array $supportedFunctions;
+    protected $supportedFunctions;
 
     /**
      * Constructor
