@@ -60,13 +60,23 @@ if (!Array.from) { Array.from = (function() {
     };
   }());
 }
-if (!Array.isArray)             Array.isArray             = function isArray   (/*mixed*/ arg) { return Object.prototype.toString.call(arg) === '[object Array]'; };
-if (!Array.prototype.forEach  ) Array.prototype.forEach   = function forEach   (/*function*/ func, scope) { for (var i=0, len=this.length; i < len; ++i) func.call(scope, this[i], i, this); }
-
-if (!Date.prototype.addDays   ) Date.prototype.addDays    = function addDays   (/*int*/ days)    { this.setTime(this.getTime() + (days*24*60*60*1000)); return this; }
-if (!Date.prototype.addHours  ) Date.prototype.addHours   = function addHours  (/*int*/ hours)   { this.setTime(this.getTime() + (  hours*60*60*1000)); return this; }
-if (!Date.prototype.addMinutes) Date.prototype.addMinutes = function addMinutes(/*int*/ minutes) { this.setTime(this.getTime() + (   minutes*60*1000)); return this; }
-if (!Date.prototype.addSeconds) Date.prototype.addSeconds = function addSeconds(/*int*/ seconds) { this.setTime(this.getTime() + (      seconds*1000)); return this; }
+if (!Array.isArray)                   Array.isArray                   = function isArray   (/*mixed*/ arg) { return Object.prototype.toString.call(arg) === '[object Array]'; };
+if (!Array.prototype.forEach        ) Array.prototype.forEach         = function forEach   (/*function*/ func, scope) { for (let i=0, len=this.length; i < len; ++i) func.call(scope, this[i], i, this); }
+                                                                      
+if (!Date.prototype.addDays         ) Date.prototype.addDays          = function addDays   (/*int*/ days)    { this.setTime(this.getTime() + (days*24*60*60*1000)); return this; }
+if (!Date.prototype.addHours        ) Date.prototype.addHours         = function addHours  (/*int*/ hours)   { this.setTime(this.getTime() + (  hours*60*60*1000)); return this; }
+if (!Date.prototype.addMinutes      ) Date.prototype.addMinutes       = function addMinutes(/*int*/ minutes) { this.setTime(this.getTime() + (   minutes*60*1000)); return this; }
+if (!Date.prototype.addSeconds      ) Date.prototype.addSeconds       = function addSeconds(/*int*/ seconds) { this.setTime(this.getTime() + (      seconds*1000)); return this; }
+if (!Date.prototype.toLocalISOString) Date.prototype.toLocalISOString = function toLocalISOString() { 
+  let utcDate = new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate(), this.getHours(), this.getMinutes(), this.getSeconds(), this.getMilliseconds()));
+  let isoDate = utcDate.toISOString().slice(0, -1);
+  let offset = this.getTimezoneOffset();
+  let sign = offset > 0 ? '-' : '+';
+  let absOffset = Math.abs(offset);
+  let hours = String(Math.floor(absOffset / 60)).padStart(2, '0');
+  let minutes = String(absOffset % 60).padStart(2, '0');
+  return isoDate + sign + hours + minutes;
+}
 
 if (!String.prototype.capitalize     ) String.prototype.capitalize      = function capitalize     ()                                    { return this.charAt(0).toUpperCase() + this.slice(1); }
 if (!String.prototype.capitalizeWords) String.prototype.capitalizeWords = function capitalizeWords()                                    { return this.replace(/\w\S*/g, function(word) { return word.capitalize(); }); }
@@ -77,7 +87,7 @@ if (!String.prototype.includes       ) String.prototype.includes        = functi
 if (!String.prototype.contains       ) String.prototype.contains        = String.prototype.includes;
 if (!String.prototype.trim           ) String.prototype.trim            = function trim           ()                                    { return this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, ''); }
 if (!String.prototype.repeat         ) String.prototype.repeat          = function repeat         (/*int*/ count) {
-    var str = ''+ this;
+    let str = ''+ this;
     count = +count;
     if (count != count) count = 0;
     if (count < 0)         throw new RangeError('repeat count must be non-negative');
@@ -85,7 +95,7 @@ if (!String.prototype.repeat         ) String.prototype.repeat          = functi
     count = Math.floor(count);
     if (!str.length || !count) return '';
     if (str.length * count >= 1 << 28) throw new RangeError('repeat count must not overflow maximum string size');
-    var maxCount = str.length * count;
+    let maxCount = str.length * count;
     count = Math.floor(Math.log(count) / Math.log(2));
     while (count--) str += str;
     str += str.substring(0, maxCount - str.length);
@@ -95,10 +105,10 @@ if (!String.prototype.repeat         ) String.prototype.repeat          = functi
 // fix broken Internet Explorer substr()
 if ('ab'.substr(-1) != 'b') {
     String.prototype.substr = function substr(start, length) {
-        var from = start;
+        let from = start;
         if (from < 0) from += this.length;
         if (from < 0) from = 0;
-        var to = length===undefined ? this.length : from+length;
+        let to = length===undefined ? this.length : from+length;
         if (from > to) to = from;
         return this.substring(from, to);
     }
@@ -148,7 +158,7 @@ if ('ab'.substr(-1) != 'b') {
 
 
 /**
- * Namespace
+ * Object with helper functions.
  */
 var rosasurfer = {
 
@@ -159,7 +169,7 @@ var rosasurfer = {
      *
      * @return object - {key1: value1, key2: value2, ..., keyN: valueN}
      */
-    getQueryParameters: function getQueryParameters(url) {
+    getQueryParameters: function(url) {
         var pos, query;
         if (url===undefined) query = location.search;
         else                 query = ((pos=url.indexOf('?'))==-1) ? '' : url.substr(pos);
@@ -209,7 +219,7 @@ var rosasurfer = {
      *
      * @return string - value or undefined if the parameter doesn't exist in the query string
      */
-    getQueryParameter: function getQueryParameter(name, url) {
+    getQueryParameter: function(name, url) {
         if (name===undefined) return alert('rosasurfer.getQueryParameter()\n\nUndefined parameter "name"');
         return this.getQueryParameters(url)[name];
     },
@@ -223,7 +233,7 @@ var rosasurfer = {
      *
      * @return bool
      */
-    isQueryParameter: function isQueryParameter(name, url) {
+    isQueryParameter: function(name, url) {
         if (name===undefined) return alert('rosasurfer.isQueryParameter()\n\nUndefined parameter "name"');
         return this.getQueryParameters(url)[name] !== undefined;
     },
@@ -235,7 +245,7 @@ var rosasurfer = {
      * @param string   url      - url to load
      * @param function callback - callback function
      */
-    getUrl: function getUrl(url, callback) {                   // request.readyState = returns the status of the XMLHttpRequest
+    getUrl: function(url, callback) {                          // request.readyState = returns the status of the XMLHttpRequest
         var request = new XMLHttpRequest();                    //  0: request not initialized
         request.url = url;                                     //  1: server connection established
         request.onreadystatechange = function() {              //  2: request received
@@ -256,7 +266,7 @@ var rosasurfer = {
      * @param object   headers  - additional request header
      * @param function callback - callback function
      */
-    postUrl: function postUrl(url, data, headers, callback) {  // request.readyState = returns the status of the XMLHttpRequest
+    postUrl: function(url, data, headers, callback) {          // request.readyState = returns the status of the XMLHttpRequest
         var request = new XMLHttpRequest();                    //  0: request not initialized
         request.url = url;                                     //  1: server connection established
         request.onreadystatechange = function() {              //  2: request received
@@ -279,7 +289,7 @@ var rosasurfer = {
      *
      * @return string
      */
-    getType: function getType(arg) {
+    getType: function(arg) {
         var type = typeof(arg);
         if (type == 'object') {
             if      (arg === null)    type = 'null';
@@ -299,13 +309,46 @@ var rosasurfer = {
 
 
     /**
+     * Get the full selector path of a DOM element.
+     *
+     * @param  Node   element
+     * @param  object options - options defining whether the returned string should contain element ids and/or classes
+     *
+     * @return string
+     */
+    getFullSelector: function(element, options = {id:false, class:false}) {
+      let path = [];
+
+      do {
+        let selector = element.tagName, classes;
+        
+        if (options?.id && element.id) {
+            selector += '#'+ element.id;
+        }
+        else if (element.parentElement) {
+          let siblings = Array.from(element.parentElement.children).filter(el => el?.tagName === element.tagName);
+          if (siblings.length > 1) {
+            selector += ':nth('+ (Array.from(element.parentElement.children).indexOf(element) + 1) +')';
+          }
+        }
+        if (options?.class && (classes = Array.from(element.classList).join('.'))) {
+          selector += '.'+ classes;
+        }
+        path.unshift(selector);
+      } while (element = element.parentElement);
+      
+      return path.join(' > ');
+    },
+
+
+    /**
      * Whether a variable is defined.
      *
      * @param  mixed arg
      *
      * @return bool
      */
-    isDefined: function isDefined(arg) {
+    isDefined: function(arg) {
         return (typeof(arg) != 'undefined');
     },
 
@@ -318,7 +361,7 @@ var rosasurfer = {
      *
      * @return string
      */
-    md5: function md5(input) {
+    md5: function(input) {
         var hc = '0123456789abcdef';
         function rh(n)                   { var j, s=''; for (j=0; j<=3; j++) s += hc.charAt((n>>(j*8+4)) & 0x0F) + hc.charAt((n>>(j*8)) & 0x0F); return s; }
         function ad(x, y)                { var l=(x & 0xFFFF) + (y & 0xFFFF); var m=(x>>16) + (y>>16) + (l>>16); return (m<<16) | (l & 0xFFFF); }
@@ -370,7 +413,7 @@ var rosasurfer = {
      * @param  mixed arg
      * @param  bool  sort [optional] - whether to sort the displayed properties (default: yes)
      */
-    showProperties: function showProperties(arg, sort) {
+    showProperties: function(arg, sort) {
         if (arg === undefined)                            return alert('rosasurfer.showProperties()\n\nPassed parameter: undefined');
         if (arg === null)                                 return alert('rosasurfer.showProperties()\n\nPassed parameter: null');
         if (this.getType(arg).startsWith('XrayWrapper ')) return this.showProperties(arg.wrappedJSObject, sort);
@@ -412,13 +455,13 @@ var rosasurfer = {
      * @param  string target - Whether to log to the top (default) or the bottom of the page.
      *                         The method will remember the last used 'target' parameter.
      */
-    log: function log(msg, target/*='top'*/) {
-        if (this.log.console) {
-          return console.log(msg);
-        }
-        
+    log: function(msg, target/*='top'*/) {
         var div = this.log.container;
         if (!div) {
+            var bodies = document.getElementsByTagName('body');
+            if (!bodies || !bodies.length) {
+                return alert('rosasurfer.log()\n\nFailed attaching the logger output DIV to the page (BODY tag not found).\nWait for document.onLoad() or use console.log() if you want to log from the page header?');
+            }
             div = this.log.container = document.createElement('div');
             div.setAttribute('id', 'rosasurfer.log.output');
             div.style.position        = 'absolute';
@@ -430,8 +473,6 @@ var rosasurfer = {
             div.style.font            = 'normal normal 12px/1.1em arial,helvetica,sans-serif';
             div.style.color           = 'black';
             div.style.backgroundColor = 'lightgray';
-            var bodies = document.getElementsByTagName('body');
-            if (!bodies || !bodies.length) return alert('rosasurfer.log()\n\nFailed attaching the logger output DIV to the page (BODY tag not found).\nWait for document.onLoad() or use console.log() if you want to log from the page header?');
             bodies[0].appendChild(div);
         }
         if      (target=='top'   ) div.style.position = 'absolute';
@@ -448,7 +489,7 @@ var rosasurfer = {
     /**
      * Clear the log output in the current page.
      */
-    clearLog: function clearLog() {
+    clearLog: function() {
         if (this.log.container) {
           this.log.container.innerHTML = '';
         }
@@ -460,7 +501,7 @@ var rosasurfer = {
      *
      * @param  mixed msg
      */
-    logStatus: function logStatus(msg) {
+    logStatus: function(msg) {
         if (this.getType(msg) == 'Event') this.logEvent(msg);
         else                              self.status = msg;
     },
@@ -471,7 +512,7 @@ var rosasurfer = {
      *
      * @param  Event ev
      */
-    logEvent: function logEvent(ev) {
+    logEvent: function(ev) {
         this.logStatus(ev.type +' event,  window: ['+ (ev.pageX - pageXOffset) +','+ (ev.pageY - pageYOffset) +']  page: ['+ ev.pageX +','+ ev.pageY +']');
     }
 };
