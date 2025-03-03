@@ -18,20 +18,20 @@ use const rosasurfer\NL;
  *
  * Connection configuration and default options:
  * <pre>
- *  +-----------------------------------+-----------------+-----------------------------------+
- *  | config setting                    | value           | default value                     |
- *  +-----------------------------------+-----------------+-----------------------------------+
- *  | db.{connection}.connector         | mysql           | -                                 |
- *  | db.{connection}.host              | [host[:port]]   | "localhost:3306"                  |
- *  | db.{connection}.username          | [user]          | the current system user           |
- *  | db.{connection}.password          | [password]      | (no password)                     |
- *  | db.{connection}.database          | [dbName]        | (no selection)                    |
- *  +-----------------------------------+-----------------+-----------------------------------+
- *  | db.{connection}.options.charset   | [charsetName]   | "utf8"                            |
- *  | db.{connection}.options.collation | [collationName] | "utf8_unicode_ci"                 |
- *  | db.{connection}.options.sql_mode  | [mode]          | "traditional,high_not_precedence" |
- *  | db.{connection}.options.timezone  | [tzName]        | the current local timezone        |
- *  +-----------------------------------+-----------------+-----------------------------------+
+ *  +-----------------------------------+-----------------+----------------------------+
+ *  | config setting                    | value           | default value              |
+ *  +-----------------------------------+-----------------+----------------------------+
+ *  | db.{connection}.connector         | mysql           | -                          |
+ *  | db.{connection}.host              | [host[:port]]   | "localhost:3306"           |
+ *  | db.{connection}.username          | [user]          | the current system user    |
+ *  | db.{connection}.password          | [password]      | (no password)              |
+ *  | db.{connection}.database          | [dbName]        | (no selection)             |
+ *  +-----------------------------------+-----------------+----------------------------+
+ *  | db.{connection}.options.charset   | [charsetName]   | -                          |
+ *  | db.{connection}.options.collation | [collationName] | -                          |
+ *  | db.{connection}.options.sql_mode  | [mode]          | -                          |
+ *  | db.{connection}.options.timezone  | [tzName]        | the current local timezone |
+ *  +-----------------------------------+-----------------+----------------------------+
  * </pre>
  *
  * Additional options may be specified and are valid for the active session.
