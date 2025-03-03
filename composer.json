@@ -2,7 +2,7 @@
     "name":        "rosasurfer/ministruts",
     "description": "MVC micro framework inspired by Java Struts",
     "type":        "library",
-    "license":     "WTFPL",
+    "license":     "Unlicense",
     "authors": [{
         "name":  "Peter Walther",
         "email": "ministruts@rosasurfer.com"

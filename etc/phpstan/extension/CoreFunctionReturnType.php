@@ -37,7 +37,7 @@ class CoreFunctionReturnType extends Extension implements DynamicFunctionReturnT
         $this->supportedFunctions = [
             // function            type to remove       original return type
             // -------------------------------------------------------------------------
-            'curl_init'            => $bool,            // resource|CurlHandle|false (2)    @see  https://www.php.net/manual/en/function.curl-init.php
+            'curl_init'            => $bool,            // resource|CurlHandle|false        @see  https://www.php.net/manual/en/function.curl-init.php
             'file'                 => $bool,            // array|false
             'file_get_contents'    => $bool,            // string|false                     @see  https://www.php.net/manual/en/function.file-get-contents.php
             'filemtime'            => $bool,            // int|false                        @see  https://www.php.net/manual/en/function.filemtime.php
@@ -57,7 +57,7 @@ class CoreFunctionReturnType extends Extension implements DynamicFunctionReturnT
             'stream_get_contents'  => $bool,            // string|false                     @see  https://www.php.net/manual/en/function.stream-get-contents.php
 
             // (1) either PHPStan or the PHP documentation is wrong
-            // (2) with PHPStan v1.11.10 the extension is not called
+            // (2) the extension is not called by PHPStan
         ];
     }
 
@@ -104,8 +104,9 @@ class CoreFunctionReturnType extends Extension implements DynamicFunctionReturnT
     public function getTypeFromFunctionCall(FunctionReflection $function, FuncCall $functionCall, Scope $scope): Type {
         $name = $function->getName();
 
-        if (in_array($name, ['curl_init', 'preg_replace'])) {
-            throw new ExtensionException("function $name was passed to ".simpleClassName(__CLASS__).' extension');
+        if (in_array($name, ['preg_replace'])) {
+            // throw an exception to get notified when PHPStan bugs get fixed
+            throw new ExtensionException("pewa: PHPStan bugfix -> core function $name is now passed to the ".simpleClassName(__CLASS__).' extension');
         }
 
         $origType = $this->getOriginalTypeFromFunctionCall($function, $functionCall, $scope);
