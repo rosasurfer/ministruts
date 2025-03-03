@@ -1,16 +1,16 @@
 #
-# Run a PHPStan check. If the commit message contains "[skip phpstan]" this workflow is skipped.
+# Run a PHPStan check using the configuration in "/etc/phpstan/".
+# If the most recent commit message contains "[skip phpstan]" this workflow is skipped.
 #
 name: PHPStan
 
 on:
   push:
-    branches: 
+    branches:
       - master
-      - feature/github-ci-workflow
 
   pull_request:
-    branches: 
+    branches:
       - master
 
 permissions:
@@ -21,13 +21,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Show PHP status
-        run: php -v || true 
-
-      - name: Show Composer status
-        run: composer diag || true 
-
-      # ------------------------------------------------------------------------------------------------------------------------------------
       - name: Checkout repository
         uses: actions/checkout@v3
 
@@ -37,18 +30,18 @@ jobs:
           composer validate --strict
 
       # ------------------------------------------------------------------------------------------------------------------------------------
-      - name: Check commit message for [skip phpstan]
+      - name: Check commit message for "[skip phpstan]"
         run: |
           SKIP_PHPSTAN=false
           REF_NAME=
           if   [[ "$GITHUB_EVENT_NAME" == "push"         ]]; then REF_NAME="$GITHUB_REF_NAME"
           elif [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then REF_NAME="$GITHUB_HEAD_REF"
-          else 
-            echo "unsupported event: $GITHUB_EVENT_NAME" 
+          else
+            echo "unsupported event: $GITHUB_EVENT_NAME"
             exit 1
-          fi          
+          fi
           COMMIT_MSG=$(git log -1 --format="%B" "origin/$REF_NAME")
-          MAGIC_KEY=$(echo "$COMMIT_MSG" | (grep -io "[skip phpstan]" || true) | tail -1)
+          MAGIC_KEY=$(echo "$COMMIT_MSG" | (grep -io "\[skip phpstan\]" || true) | tail -1)
 
           if [[ -n "$MAGIC_KEY" ]]; then
             echo "Magic commit message found: $MAGIC_KEY"
