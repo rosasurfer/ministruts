@@ -4,6 +4,7 @@ namespace rosasurfer\net\mail;
 use rosasurfer\config\ConfigInterface;
 use rosasurfer\core\assert\Assert;
 use rosasurfer\core\exception\InvalidArgumentException;
+use rosasurfer\core\exception\RuntimeException;
 use rosasurfer\util\PHP;
 
 use function rosasurfer\normalizeEOL;
@@ -28,6 +29,8 @@ class PHPMailer extends Mailer {
      * @param  string   $subject            - mail subject
      * @param  string   $message            - mail body
      * @param  string[] $headers [optional] - additional MIME headers (default: none)
+     *
+     * @return void
      */
     public function sendMail($sender, $receiver, $subject, $message, array $headers = []) {
         // delay sending to the script's shutdown if configured (e.g. as not to block other tasks)
@@ -113,23 +116,36 @@ class PHPMailer extends Mailer {
         // add more needed headers
         $headers[] = 'X-Mailer: Microsoft Office Outlook 11';               // save us from Hotmail junk folder
         $headers[] = 'X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2900.2180';
-        $headers[] = 'Content-Type: text/plain; charset=utf-8';             // ASCII is a subset of UTF-8
+        $headers[] = 'Content-Type: text/plain; charset=utf-8';
+        $headers[] = 'Content-Transfer-Encoding: quoted-printable';
         $headers[] = 'From: '.trim($from['name'].' <'.$from['address'].'>');
-        if ($rcpt != $to)                                                   // on Linux mail() always adds another "To:" header (same as RCPT),
+        if ($rcpt != $to) {                                                 // on Linux mail() always adds another "To:" header (same as RCPT),
             $headers[] = 'To: '.trim($to['name'].' <'.$to['address'].'>');  // on Windows only if $headers is missing one
+        }
 
         // mail body
         Assert::string($message, '$message');
         $message = str_replace(chr(0), '?', $message);                      // replace NUL bytes which destroy the mail
         $message = normalizeEOL($message, EOL_WINDOWS);                     // multiple lines must be separated by CRLF
+        $message = quoted_printable_encode($message);
 
-        // TODO: wrap long lines into several shorter ones                  // max 998 chars per RFC but e.g. FastMail only accepts 990
-                                                                            // @see https://tools.ietf.org/html/rfc2822 see 2.1 General description
-        $oldSendmail_from = ini_get('sendmail_from');
-        WINDOWS && PHP::ini_set('sendmail_from', $returnPath['address']);
+        // send mail
         $receiver = trim($rcpt['name'].' <'.$rcpt['address'].'>');
 
-        mail($receiver, $subject, $message, join(EOL_WINDOWS, $headers), '-f '.$returnPath['address']);
+        $oldSendmail_from = ini_get('sendmail_from');
+        WINDOWS && PHP::ini_set('sendmail_from', $returnPath['address']);
+
+        if (PHP_VERSION_ID < 70000) ini_set('track_errors', '1');           // removed in PHP 8.0
+        else                        error_clear_last();                     // available since PHP 7.0
+        $php_errormsg = '';                                                 // not set since PHP 8.0
+
+        $accepted = mail($receiver, $subject, $message, join(EOL_WINDOWS, $headers), '-f '.$returnPath['address']);
+        if (!$accepted) {
+            if (PHP_VERSION_ID >= 70000 && ($error = error_get_last())) {
+                $php_errormsg = $error['message'];
+            }
+            throw new RuntimeException($php_errormsg ?: __METHOD__.'(): email was not accepted for delivery');
+        }
 
         WINDOWS && PHP::ini_set('sendmail_from', $oldSendmail_from);
     }
