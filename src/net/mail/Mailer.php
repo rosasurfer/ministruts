@@ -74,7 +74,6 @@ abstract class Mailer extends CObject implements MailerInterface {
      * @param  string[] $headers [optional] - additional MIME headers (default: none)
      *
      * @return bool - whether sending of the email was successfully delayed
-     *
      */
     protected function sendLater($sender, $receiver, $subject, $message, array $headers = []) {
         if (!empty($this->options['send-later'])) {

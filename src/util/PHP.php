@@ -177,11 +177,11 @@ class PHP extends StaticClass {
         // core configuration
         // ------------------
         if (!php_ini_loaded_file())                                                                                  $issues[] = 'Error: no "php.ini" configuration file loaded  [setup]';
-        /*PHP_INI_PERDIR*/ if (       ini_get_bool('short_open_tag'                ))                                $issues[] = 'Error: short_open_tag is not Off [XML compatibility]';
+        /*PHP_INI_PERDIR*/ if (       ini_get_bool('short_open_tag'                ))                                $issues[] = 'Warn:  short_open_tag is not Off [XML compatibility]';
         /*PHP_INI_PERDIR*/ if (       ini_get_bool('asp_tags'                      ) && PHP_VERSION_ID <  70000)     $issues[] = 'Info:  asp_tags is not Off  [standards]';
         /*PHP_INI_ONLY  */ if (       ini_get_bool('expose_php'                    ) && !CLI)                        $issues[] = 'Warn:  expose_php is not Off  [security]';
-        /*PHP_INI_ALL   */ if (       ini_get_int ('max_execution_time'            ) > 30 && !CLI /*hardcoded*/)     $issues[] = 'Info:  max_execution_time is very high: '.ini_get('max_execution_time').'  [resources]';
-        /*PHP_INI_ALL   */ if (       ini_get_int ('default_socket_timeout'        ) > 30   /*PHP default: 60*/)     $issues[] = 'Info:  default_socket_timeout is very high: '.ini_get('default_socket_timeout').'  [resources]';
+        /*PHP_INI_ALL   */ if (       ini_get_int ('max_execution_time'            ) > 30 && !CLI /*hardcoded*/)     $issues[] = 'Info:  max_execution_time is very high: '.ini_get('max_execution_time').'  [setup]';
+        /*PHP_INI_ALL   */ if (       ini_get_int ('default_socket_timeout'        ) > 30   /*PHP default: 60*/)     $issues[] = 'Info:  default_socket_timeout is very high: '.ini_get('default_socket_timeout').'  [setup]';
         /*PHP_INI_ALL   */ $memoryLimit = ini_get_bytes('memory_limit');
             if      ($memoryLimit ==    -1)                                                                          $issues[] = 'Warn:  memory_limit is unlimited  [resources]';
             else if ($memoryLimit <=     0)                                                                          $issues[] = 'Error: memory_limit is invalid: '.ini_get('memory_limit');
@@ -219,7 +219,7 @@ class PHP extends StaticClass {
         }
         /*PHP_INI_ALL   */ if ( ini_get_bool('ignore_repeated_errors'))                                              $issues[] = 'Info:  ignore_repeated_errors is not Off  [resources]';
         /*PHP_INI_ALL   */ if ( ini_get_bool('ignore_repeated_source'))                                              $issues[] = 'Info:  ignore_repeated_source is not Off  [resources]';
-        /*PHP_INI_ALL   */ if ( ini_get_bool('html_errors'           ))                                              $issues[] = 'Warn:  html_errors is not Off  [functionality]';
+        /*PHP_INI_ALL   */ if ( ini_get_bool('html_errors'           ))                                              $issues[] = 'Info:  html_errors is not Off  [setup]';
         /*PHP_INI_ALL   */ if (!ini_get_bool('log_errors'            ))                                              $issues[] = 'Error: log_errors is not On  [setup]';
         /*PHP_INI_ALL   */ $bytes = ini_get_bytes('log_errors_max_len');
             if      ($bytes <  0)   /* 'log_errors' and 'log_errors_max_len' do not affect */                        $issues[] = 'Error: log_errors_max_len is invalid: '.ini_get('log_errors_max_len');
@@ -259,7 +259,7 @@ class PHP extends StaticClass {
         /*PHP_INI_PERDIR*/ if (       ini_get_bool('always_populate_raw_post_data' ) && PHP_VERSION_ID <  70000)     $issues[] = 'Info:  always_populate_raw_post_data is not Off  [performance]';
         /*PHP_INI_PERDIR*/ if (      !ini_get_bool('enable_post_data_reading'      ))                                $issues[] = 'Warn:  enable_post_data_reading is not On  [request handling]';
         /*PHP_INI_ALL   */ if (       ini_get     ('arg_separator.output'          ) != '&')                         $issues[] = 'Warn:  arg_separator.output is not "&": "'.ini_get('arg_separator.output').'"  [standards]';
-        /*PHP_INI_ALL   */ if (      !ini_get_bool('ignore_user_abort'             ) && !CLI)                        $issues[] = 'Error: ignore_user_abort is not On  [setup]';
+        /*PHP_INI_ALL   */ if (      !ini_get_bool('ignore_user_abort'             ) && !CLI)                        $issues[] = 'Warn:  ignore_user_abort is not On  [setup]';
         /*PHP_INI_PERDIR*/ $postMaxSize = ini_get_bytes('post_max_size');
             $localMemoryLimit  = $memoryLimit;
             $globalMemoryLimit = php_byte_value(ini_get_all()['memory_limit']['global_value']);
@@ -305,21 +305,18 @@ class PHP extends StaticClass {
         /*PHP_INI_ALL   */ if (!ini_get_bool('session.use_strict_mode'))                                             $issues[] = 'Warn:  session.use_strict_mode is not On  [security]';
         /*PHP_INI_ALL   */ if (!ini_get_bool('session.use_cookies'))                                                 $issues[] = 'Warn:  session.use_cookies is not On  [security]';
         /*PHP_INI_ALL   */ if (!ini_get_bool('session.use_only_cookies'))                                            $issues[] = 'Warn:  session.use_only_cookies is not On  [security]';
-        /*PHP_INI_ALL   */ if ( ini_get_bool('session.use_trans_sid')) {
-                           if (!ini_get_bool('session.use_only_cookies'))                                            $issues[] = 'Warn:  session.use_trans_sid is On  [security]';
-                           else                                                                                      $issues[] = 'Info:  session.use_trans_sid is On';
-        }
+        /*PHP_INI_ALL   */ if ( ini_get_bool('session.use_trans_sid'))                                               $issues[] = 'Warn:  session.use_trans_sid is On  [security]';
 
         // mail related settings
         // ---------------------
         /*PHP_INI_ALL   */ //sendmail_from
         if (WINDOWS && !ini_get('sendmail_path') && !ini_get('sendmail_from') && !isset($_SERVER['SERVER_ADMIN']))   $issues[] = 'Warn:  On Windows and neither sendmail_path nor sendmail_from are set';
-        /*PHP_INI_SYSTEM*/ if (!WINDOWS && !ini_get('sendmail_path'))                                                $issues[] = 'Warn:  sendmail_path is not set';
-        /*PHP_INI_PERDIR*/ if (ini_get('mail.add_x_header'))                                                         $issues[] = 'Warn:  mail.add_x_header is not Off';
+        /*PHP_INI_SYSTEM*/ if (!WINDOWS && !ini_get('sendmail_path'))                                                $issues[] = 'Warn:  sendmail_path is not set  [setup]';
+        /*PHP_INI_PERDIR*/ if (ini_get('mail.add_x_header'))                                                         $issues[] = 'Warn:  mail.add_x_header is not Off  [security]';
 
         // extensions
         // ----------
-        /*PHP_INI_SYSTEM*/ if (ini_get('enable_dl'))                                                                 $issues[] = 'Warn:  enable_dl is not Off';
+        /*PHP_INI_SYSTEM*/ if (ini_get('enable_dl'))                                                                 $issues[] = 'Warn:  enable_dl is not Off  [setup]';
         if (!extension_loaded('ctype'))                                                                              $issues[] = 'Warn:  ctype extension is not loaded  [functionality]';
         if (!extension_loaded('json'))                                                                               $issues[] = 'Warn:  JSON extension is not loaded  [functionality]';
         if (!extension_loaded('iconv'))                                                                              $issues[] = 'Info:  iconv extension is not loaded  [functionality]';
@@ -336,7 +333,7 @@ class PHP extends StaticClass {
                         $name = trim(strtolower($name));
                         if (in_array($name, ['php', 'php-64bit', 'hhvm']) || strContains($name, '/')) continue;
                         if (strStartsWith($name, 'ext-')) $name = strRight($name, -4);
-                        if (!extension_loaded($name))                                                                $issues[] = 'Error: '.$name.' extension is not loaded  [Composer: project requirement]';
+                        if (!extension_loaded($name))                                                                $issues[] = 'Error: '.$name.' extension is not loaded  [Composer project requirement]';
                     }
                 }
             }
