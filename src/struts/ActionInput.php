@@ -52,6 +52,7 @@ class ActionInput extends CObject implements \ArrayAccess {
      * @param  ?string $default [optional] - value to return if the specified parameter was not transmitted (default: NULL)
      *
      * @return ?string
+     * @phpstan-return ($default is null ? ?string : string)
      */
     public function get($name, $default = null) {
         if (\key_exists($name, $this->parameters)) {

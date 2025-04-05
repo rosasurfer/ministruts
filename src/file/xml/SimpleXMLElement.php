@@ -59,10 +59,11 @@ class SimpleXMLElement extends \SimpleXMLElement {
         finally {
             restore_error_handler();
             if (!$xml) {
-                foreach ($errors as $i => $error) {
-                    $errors[$i] = strRightFrom($error[1], 'SimpleXMLElement::__construct(): ', 1, false, $error[1]);
+                $errorMsg = [];
+                foreach ($errors as $error) {
+                    $errorMsg[] = strRightFrom($error[1], 'SimpleXMLElement::__construct(): ', 1, false, $error[1]);
                 }
-                throw $ex->appendMessage(join(NL, $errors));
+                throw $ex->appendMessage(join(NL, $errorMsg));
             }
             if ($origHandler) {
                 foreach ($errors as $error) {
