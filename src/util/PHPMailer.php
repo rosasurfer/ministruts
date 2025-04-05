@@ -7,6 +7,7 @@ use rosasurfer\ministruts\config\ConfigInterface as Config;
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
+use rosasurfer\ministruts\core\exception\RuntimeException;
 
 use function rosasurfer\ministruts\normalizeEOL;
 use function rosasurfer\ministruts\strContains;
@@ -63,7 +64,7 @@ class PHPMailer extends CObject {
      * @param  string   $message            - mail body
      * @param  string[] $headers [optional] - additional MIME headers (default: none)
      *
-     * @return bool
+     * @return bool - whether the email was accepted for delivery (not whether it was indeed sent)
      */
     public function sendMail(?string $sender, string $receiver, string $subject, string $message, array $headers = []): bool {
         // delay sending to the script's shutdown if configured (e.g. as not to block other tasks)
@@ -145,14 +146,17 @@ class PHPMailer extends CObject {
         // add more needed headers
         $headers[] = 'X-Mailer: Microsoft Office Outlook 11';               // save us from Hotmail junk folder
         $headers[] = 'X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2900.2180';
-        $headers[] = 'Content-Type: text/plain; charset=utf-8';             // ASCII is a subset of UTF-8
+        $headers[] = 'Content-Type: text/plain; charset=utf-8';
+        $headers[] = 'Content-Transfer-Encoding: quoted-printable';
         $headers[] = 'From: '.trim($from['name'].' <'.$from['address'].'>');
-        if ($rcpt != $to)                                                   // on Linux mail() always adds another "To:" header (same as RCPT),
+        if ($rcpt != $to) {                                                 // on Linux mail() always adds another "To:" header (same as RCPT),
             $headers[] = 'To: '.trim($to['name'].' <'.$to['address'].'>');  // on Windows only if $headers is missing one
+        }
 
         // mail body
         $message = str_replace(chr(0), '\0', $message);                     // replace NUL bytes which destroy the mail
         $message = normalizeEOL($message, EOL_WINDOWS);                     // multiple lines must be separated by CRLF
+        $message = quoted_printable_encode($message);
 
         // TODO: wrap long lines into several shorter ones                  // max 998 chars per RFC but e.g. FastMail only accepts 990
                                                                             // @see https://tools.ietf.org/html/rfc2822 see 2.1 General description
@@ -160,7 +164,9 @@ class PHPMailer extends CObject {
         WINDOWS && PHP::ini_set('sendmail_from', $returnPath['address']);
         $receiver = trim($rcpt['name'].' <'.$rcpt['address'].'>');
 
-        mail($receiver, $subject, $message, join(EOL_WINDOWS, $headers), '-f '.$returnPath['address']);
+        error_clear_last();
+        $accepted = mail($receiver, $subject, $message, join(EOL_WINDOWS, $headers), '-f '.$returnPath['address']);
+        if (!$accepted) throw new RuntimeException(error_get_last()['message'] ?? __METHOD__.'(): email was not accepted for delivery');
 
         WINDOWS && PHP::ini_set('sendmail_from', $oldSendmail_from);
         return true;
@@ -180,7 +186,6 @@ class PHPMailer extends CObject {
      * @param  string[] $headers [optional] - additional MIME headers (default: none)
      *
      * @return bool - whether sending of the email was successfully delayed
-     *
      */
     protected function sendLater(?string $sender, string $receiver, string $subject, string $message, array $headers = []): bool {
         $callable = [$this, 'sendMail'];
@@ -277,9 +282,9 @@ class PHPMailer extends CObject {
 
 
     /**
-     * Encode non-ASCII characters with UTF-8. If the string doesn't contain non-ASCII characters it is not modified.
+     * Encode non-ASCII characters with UTF-8.
      *
-     * @param  string|string[] $value - a single or a list of values
+     * @param  string|string[] $value - a single value or a list of values
      *
      * @return ($value is string ? string : string[]) - the encoded value(s)
      */
