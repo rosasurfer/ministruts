@@ -91,7 +91,7 @@ class MailAppender extends BaseAppender {
             $sender = $this->parseAddress($sender);
             if (!$sender) throw new InvalidValueException("Invalid parameter \$options[sender]: \"$sender\"");
         }
-        if (!is_null($sender)) {
+        elseif (!is_null($sender)) {
             throw new InvalidTypeException('Invalid type of parameter $options[sender]: ('.gettype($sender).')');
         }
         else {
