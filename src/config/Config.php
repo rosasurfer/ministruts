@@ -543,9 +543,9 @@ class Config extends CObject implements ConfigInterface {
     /**
      * Dump the tree structure of a node into a flat format and return it.
      *
-     * @param  string[]             $node         [in ]
-     * @param  array<string, mixed> $values       [in ]
-     * @param  int                  $maxKeyLength [out]
+     * @param  string[] $node         [in ]
+     * @param  mixed[]  $values       [in ]
+     * @param  int      $maxKeyLength [out]
      *
      * @return array<string, ?scalar>
      */
@@ -553,6 +553,8 @@ class Config extends CObject implements ConfigInterface {
         $result = [];
 
         foreach ($values as $subkey => $value) {
+            $subkey = (string)$subkey;
+
             if ($subkey==trim($subkey) && (strlen($subkey) || sizeof($values) > 1)) {
                 $sSubkey = $subkey;
             }
