@@ -515,6 +515,8 @@ class Config extends CObject implements ConfigInterface {
         $result = [];
 
         foreach ($values as $subkey => $value) {
+            $subkey = (string)$subkey;
+
             if ($subkey==trim($subkey) && (strlen($subkey) || sizeof($values) > 1)) {
                 $sSubkey = $subkey;
             }
