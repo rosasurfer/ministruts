@@ -14,11 +14,7 @@ use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Type\NullType;
 
-use function rosasurfer\normalizeEOL;
-
-use const rosasurfer\ERROR_LOG_DEFAULT;
-use const rosasurfer\NL;
-use const rosasurfer\WINDOWS;
+use function rosasurfer\simpleClassName;
 
 
 /**
@@ -30,7 +26,7 @@ use const rosasurfer\WINDOWS;
 class CoreFunctionReturnType implements DynamicFunctionReturnTypeExtension {
 
     /** @var array<string, Type> */
-    protected $supportedFunctions;
+    protected $interceptedFunctions;
 
     /**
      * Constructor
@@ -39,10 +35,10 @@ class CoreFunctionReturnType implements DynamicFunctionReturnTypeExtension {
         $bool = new BooleanType();
         $null = new NullType();
 
-        $this->supportedFunctions = [
+        $this->interceptedFunctions = [
             // function            type to remove       original return type
             // -------------------------------------------------------------------------
-            'curl_init'            => $bool,            // resource|CurlHandle|false (2)    @see  https://www.php.net/manual/en/function.curl-init.php
+            'curl_init'            => $bool,            // resource|CurlHandle|false        @see  https://www.php.net/manual/en/function.curl-init.php
             'file'                 => $bool,            // array|false
             'file_get_contents'    => $bool,            // string|false                     @see  https://www.php.net/manual/en/function.file-get-contents.php
             'filemtime'            => $bool,            // int|false                        @see  https://www.php.net/manual/en/function.filemtime.php
@@ -61,8 +57,8 @@ class CoreFunctionReturnType implements DynamicFunctionReturnTypeExtension {
             'shell_exec'           => $bool,            // string|false|null                @see  https://www.php.net/manual/en/function.shell-exec.php
             'stream_get_contents'  => $bool,            // string|false                     @see  https://www.php.net/manual/en/function.stream-get-contents.php
 
-            // (1) either PHPStan or the PHP documentation is wrong
-            // (2) with PHPStan v1.11.10 the extension is not called
+            // (1) either PHPStan or the PHP documentation are wrong
+            // (2) the extension is not called by PHPStan
         ];
     }
 
@@ -71,7 +67,7 @@ class CoreFunctionReturnType implements DynamicFunctionReturnTypeExtension {
      */
     public function isFunctionSupported(FunctionReflection $function): bool {
         $name = $function->getName();
-        return isset($this->supportedFunctions[$name]);
+        return isset($this->interceptedFunctions[$name]);
     }
 
     /**
@@ -80,12 +76,13 @@ class CoreFunctionReturnType implements DynamicFunctionReturnTypeExtension {
     public function getTypeFromFunctionCall(FunctionReflection $function, FuncCall $call, Scope $scope): Type {
         $name = $function->getName();
 
-        if (\in_array($name, ['curl_init', 'preg_replace'])) {
-            $this->log(__METHOD__.'()  '.$name);
+        if (\in_array($name, ['preg_replace'])) {
+            // throw an exception to get notified when PHPStan bugs are fixed
+            throw new \Exception("pewa: PHPStan bugfix -> core function $name is now passed to the ".simpleClassName(__CLASS__).' extension');
         }
 
         $originalType = $this->getOriginalReturnType($function, $call, $scope);
-        $typeToRemove = $this->supportedFunctions[$name] ?? null;
+        $typeToRemove = $this->interceptedFunctions[$name] ?? null;
 
         if ($typeToRemove) {
             $newReturnType = $originalType->tryRemove($typeToRemove);
@@ -106,19 +103,5 @@ class CoreFunctionReturnType implements DynamicFunctionReturnTypeExtension {
 
         $signature = ParametersAcceptorSelector::selectFromArgs($scope, $args, $variants);
         return $signature->getReturnType();
-    }
-
-
-    /**
-     * Log to the system logger.
-     */
-    protected function log(string $message): void {
-        // replace NUL bytes which mess up the logfile
-        $message = str_replace(chr(0), '\0', $message);
-        $message = normalizeEOL($message);
-        if (WINDOWS) {
-            $message = str_replace(NL, PHP_EOL, $message);
-        }
-        error_log($message, ERROR_LOG_DEFAULT);
     }
 }
