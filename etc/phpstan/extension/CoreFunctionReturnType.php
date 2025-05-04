@@ -24,7 +24,7 @@ use function rosasurfer\ministruts\simpleClassName;
 class CoreFunctionReturnType extends Extension implements DynamicFunctionReturnTypeExtension {
 
     /** @var Type[] */
-    protected array $supportedFunctions;
+    protected array $interceptedFunctions;
 
 
     /**
@@ -34,7 +34,7 @@ class CoreFunctionReturnType extends Extension implements DynamicFunctionReturnT
         $bool = new BooleanType();
         $null = new NullType();
 
-        $this->supportedFunctions = [
+        $this->interceptedFunctions = [
             // function            type to remove       original return type
             // -------------------------------------------------------------------------
             'curl_init'            => $bool,            // resource|CurlHandle|false        @see  https://www.php.net/manual/en/function.curl-init.php
@@ -56,7 +56,7 @@ class CoreFunctionReturnType extends Extension implements DynamicFunctionReturnT
             'shell_exec'           => $bool,            // string|false|null                @see  https://www.php.net/manual/en/function.shell-exec.php
             'stream_get_contents'  => $bool,            // string|false                     @see  https://www.php.net/manual/en/function.stream-get-contents.php
 
-            // (1) either PHPStan or the PHP documentation is wrong
+            // (1) either PHPStan or the PHP documentation are wrong
             // (2) the extension is not called by PHPStan
         ];
     }
@@ -71,7 +71,7 @@ class CoreFunctionReturnType extends Extension implements DynamicFunctionReturnT
      */
     public function isFunctionSupported(FunctionReflection $function): bool {
         $name = $function->getName();
-        return isset($this->supportedFunctions[$name]);
+        return isset($this->interceptedFunctions[$name]);
     }
 
 
@@ -105,12 +105,12 @@ class CoreFunctionReturnType extends Extension implements DynamicFunctionReturnT
         $name = $function->getName();
 
         if (in_array($name, ['preg_replace'])) {
-            // throw an exception to get notified when PHPStan bugs get fixed
+            // throw an exception to get notified when PHPStan bugs are fixed
             throw new ExtensionException("pewa: PHPStan bugfix -> core function $name is now passed to the ".simpleClassName(__CLASS__).' extension');
         }
 
         $origType = $this->getOriginalTypeFromFunctionCall($function, $functionCall, $scope);
-        $typeToRemove = $this->supportedFunctions[$name] ?? null;
+        $typeToRemove = $this->interceptedFunctions[$name] ?? null;
 
         if ($typeToRemove) {
             $newType = $origType->tryRemove($typeToRemove);
