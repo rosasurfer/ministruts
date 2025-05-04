@@ -1,6 +1,6 @@
 {
     "name":        "rosasurfer/ministruts",
-    "description": "MVC micro framework inspired by Java Struts",
+    "description": "MVC micro framework for PHP inspired by Java Struts",
     "type":        "library",
     "license":     "Unlicense",
     "authors": [{
@@ -25,7 +25,7 @@
     },
     "require-dev": {
         "phpstan/phpstan": "^1.0",
-        "phpunit/phpunit": "^9.3"
+        "phpunit/phpunit": "^9.5"
     },
     "autoload": {
         "psr-4": {
