@@ -11,6 +11,8 @@ use rosasurfer\core\exception\IllegalStateException;
 use rosasurfer\core\exception\InvalidArgumentException;
 use rosasurfer\core\exception\RuntimeException;
 
+use function rosasurfer\simpleClassName;
+
 
 /**
  * Command
@@ -51,8 +53,12 @@ class Command extends CObject {
      *
      * Create a new command.
      */
-    public function __construct() {
+    final public function __construct() {
         $this->configure();
+
+        if ($this->name === '') {
+            $this->setName(simpleClassName($this));
+        }
     }
 
 
