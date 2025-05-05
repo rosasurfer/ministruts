@@ -10,10 +10,7 @@ use rosasurfer\ministruts\core\exception\RuntimeException;
 /**
  * An EntityMapping is an object encapsulating meta information about how to map a PHP class to a database table.
  *
- * @phpstan-import-type  EntityClass  from \rosasurfer\ministruts\db\orm\ORM
- * @phpstan-import-type  ORM_ENTITY   from \rosasurfer\ministruts\db\orm\ORM
- * @phpstan-import-type  ORM_PROPERTY from \rosasurfer\ministruts\db\orm\ORM
- * @phpstan-import-type  ORM_RELATION from \rosasurfer\ministruts\db\orm\ORM
+ * @phpstan-import-type ORM_ENTITY from \rosasurfer\ministruts\phpstan\CustomTypes
  */
 class EntityMapping extends CObject {
 
@@ -22,8 +19,10 @@ class EntityMapping extends CObject {
     protected $className;
 
     /**
-     * @var array<string, mixed>> - mapping information
+     * @var         array<string, mixed>> - mapping information
      * @phpstan-var ORM_ENTITY
+     *
+     * @see \rosasurfer\ministruts\phpstan\ORM_ENTITY
      */
     protected array $mapping;
 
@@ -40,9 +39,10 @@ class EntityMapping extends CObject {
     /**
      * Constructor
      *
-     * @param  array<string, mixed> $mapping - mapping information
-     *
+     * @param         array<string, mixed> $mapping - mapping information
      * @phpstan-param ORM_ENTITY $mapping
+     *
+     * @see \rosasurfer\ministruts\phpstan\ORM_ENTITY
      */
     public function __construct(array $mapping) {
         $this->mapping = $mapping;

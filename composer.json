@@ -33,7 +33,7 @@
         },
         "classmap": [
             "etc/phpstan/extension/",
-            "etc/phpstan/symbols/php8/"
+            "etc/phpstan/symbols/"
         ],        
         "files": ["src/load.php"]
     },

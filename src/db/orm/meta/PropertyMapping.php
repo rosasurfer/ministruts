@@ -11,10 +11,7 @@ use rosasurfer\ministruts\db\ConnectorInterface as IConnector;
 /**
  * A PropertyMapping is an object encapsulating meta information about how to map a PHP class property to a database column.
  *
- * @phpstan-import-type  EntityClass  from \rosasurfer\ministruts\db\orm\ORM
- * @phpstan-import-type  ORM_ENTITY   from \rosasurfer\ministruts\db\orm\ORM
- * @phpstan-import-type  ORM_PROPERTY from \rosasurfer\ministruts\db\orm\ORM
- * @phpstan-import-type  ORM_RELATION from \rosasurfer\ministruts\db\orm\ORM
+ * @phpstan-import-type ORM_PROPERTY from \rosasurfer\ministruts\phpstan\CustomTypes
  */
 class PropertyMapping extends CObject {
 
@@ -23,8 +20,10 @@ class PropertyMapping extends CObject {
     protected $entityMapping;
 
     /**
-     * @var scalar[] - mapping information
+     * @var         scalar[] - mapping information
      * @phpstan-var ORM_PROPERTY
+     *
+     * @see \rosasurfer\ministruts\phpstan\ORM_PROPERTY
      */
     protected array $mapping;
 
@@ -35,10 +34,11 @@ class PropertyMapping extends CObject {
     /**
      * Constructor
      *
-     * @param  EntityMapping $entity - the entity this property belongs to
-     * @param  scalar[]      $data   - raw property mapping information
+     * @param         EntityMapping $entity - the entity this property belongs to
+     * @param         scalar[]      $data   - raw property mapping information
+     * @phpstan-param ORM_PROPERTY  $data
      *
-     * @phpstan-param ORM_PROPERTY $data
+     * @see \rosasurfer\ministruts\phpstan\ORM_PROPERTY
      */
     public function __construct(EntityMapping $entity, array $data) {
         $this->entityMapping = $entity;

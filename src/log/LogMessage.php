@@ -25,7 +25,7 @@ use const rosasurfer\ministruts\NL;
 /**
  * LogMessage
  *
- * @phpstan-import-type  STACKFRAME from \rosasurfer\ministruts\Application
+ * @phpstan-import-type STACKFRAME from \rosasurfer\ministruts\phpstan\CustomTypes
  */
 class LogMessage extends CObject {
 
@@ -241,7 +241,7 @@ class LogMessage extends CObject {
                 if (!isset($this->context['stacktrace'])) {
                     $this->generateStackTrace();
                 }
-                /** @var STACKFRAME[] $stacktrace */
+                /** @phpstan-var STACKFRAME[] $stacktrace */
                 $stacktrace = $this->context['stacktrace'];
                 $detail  = $indent.'Stacktrace:'.NL .$indent.'-----------'.NL;
                 $detail .= ErrorHandler::formatStackTrace($stacktrace, $indent, $filter);
@@ -419,7 +419,7 @@ class LogMessage extends CObject {
         if (!isset($this->context['stacktrace'])) {
             $this->generateStackTrace();
         }
-        /** @var STACKFRAME[] $stacktrace */
+        /** @phpstan-var STACKFRAME[] $stacktrace */
         $stacktrace = $this->context['stacktrace'];
 
         foreach ($stacktrace as $frame) {

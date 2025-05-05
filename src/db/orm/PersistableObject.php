@@ -21,11 +21,8 @@ use function rosasurfer\ministruts\strLeft;
  *
  * Abstract base class for stored objects.
  *
- *
- * @phpstan-import-type  EntityClass  from \rosasurfer\ministruts\db\orm\ORM
- * @phpstan-import-type  ORM_ENTITY   from \rosasurfer\ministruts\db\orm\ORM
- * @phpstan-import-type  ORM_PROPERTY from \rosasurfer\ministruts\db\orm\ORM
- * @phpstan-import-type  ORM_RELATION from \rosasurfer\ministruts\db\orm\ORM
+ * @phpstan-import-type ORM_PROPERTY from \rosasurfer\ministruts\phpstan\CustomTypes
+ * @phpstan-import-type ORM_RELATION from \rosasurfer\ministruts\phpstan\CustomTypes
  */
 abstract class PersistableObject extends CObject {
 

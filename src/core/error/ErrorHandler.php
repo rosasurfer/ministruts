@@ -36,10 +36,9 @@ use const rosasurfer\ministruts\WINDOWS;
 /**
  * A handler for unhandled PHP errors and exceptions.
  *
- * @phpstan-import-type  STACKFRAME from \rosasurfer\ministruts\Application
+ * @phpstan-import-type STACKFRAME from \rosasurfer\ministruts\phpstan\CustomTypes
  */
 class ErrorHandler extends StaticClass {
-
 
     /** @var int - ignore PHP errors and exceptions */
     const MODE_IGNORE = 1;
@@ -527,13 +526,16 @@ class ErrorHandler extends StaticClass {
     /**
      * Takes a regular PHP stacktrace and adjusts it to be more readable.
      *
-     * @param  STACKFRAME[] $trace           - regular PHP stacktrace
-     * @param  string       $file [optional] - name of the file where the stacktrace was generated
-     * @param  int          $line [optional] - line of the file where the stacktrace was generated
+     * @param  array[] $trace           - regular PHP stacktrace
+     * @param  string  $file [optional] - name of the file where the stacktrace was generated
+     * @param  int     $line [optional] - line of the file where the stacktrace was generated
      *
-     * @return STACKFRAME[] - adjusted stacktrace
+     * @return array[] - adjusted stacktrace
      *
-     * @see \rosasurfer\ministruts\STACKFRAME
+     * @phpstan-param  STACKFRAME[] $trace
+     * @phpstan-return STACKFRAME[]
+     *
+     * @see \rosasurfer\ministruts\phpstan\STACKFRAME
      *
      * @example
      * before: The location in the frame points to the called statement.
@@ -630,13 +632,15 @@ class ErrorHandler extends StaticClass {
     /**
      * Return a formatted and more readable version of a stacktrace.
      *
-     * @param  STACKFRAME[]   $trace             - stacktrace
+     * @param  array[]        $trace             - stacktrace
      * @param  string         $indent [optional] - indent formatted lines by this value (default: no indenting)
      * @param  ?ContentFilter $filter [optional] - the content filter to apply (default: none)
      *
      * @return string - string representation ending with an EOL marker
      *
-     * @see \rosasurfer\ministruts\STACKFRAME
+     * @phpstan-param STACKFRAME[] $trace
+     *
+     * @see \rosasurfer\ministruts\phpstan\STACKFRAME
      */
     public static function formatStackTrace(array $trace, string $indent = '', ContentFilter $filter = null): string {
         /** @var string $appRoot */
@@ -693,12 +697,14 @@ class ErrorHandler extends StaticClass {
     /**
      * Return a stack frame's full method name similar to the constant __METHOD__. Used for generating a formatted stacktrace.
      *
-     * @param  STACKFRAME $frame                - stack frame
-     * @param  bool       $nsToLower [optional] - whether to return the namespace part in lower case (default: unmodified)
+     * @param  array $frame                - stack frame
+     * @param  bool  $nsToLower [optional] - whether to return the namespace part in lower case (default: unmodified)
      *
      * @return string - method name without trailing parentheses
      *
-     * @see \rosasurfer\ministruts\STACKFRAME
+     * @phpstan-param  STACKFRAME $frame
+     *
+     * @see \rosasurfer\ministruts\phpstan\STACKFRAME
      */
     public static function getStackFrameMethod(array $frame, bool $nsToLower = false): string {
         $class = $function = '';
@@ -725,15 +731,18 @@ class ErrorHandler extends StaticClass {
      * Shift all frames from the beginning of a stacktrace up to and including the specified file and line.
      * Effectively, this brings the stacktrace in line with the specified file location.
      *
-     * @param STACKFRAME[] $trace - stacktrace to process
-     * @param string       $file  - filename where an error was triggered
-     * @param int          $line  - line number where an error was triggered
+     * @param  array[] $trace - stacktrace to process
+     * @param  string  $file  - filename where an error was triggered
+     * @param  int     $line  - line number where an error was triggered
      *
-     * @return STACKFRAME[]
+     * @return array[] - modified stacktrace
      *
-     * @see \rosasurfer\ministruts\STACKFRAME
+     * @phpstan-param  STACKFRAME[] $trace
+     * @phpstan-return STACKFRAME[]
+     *
+     * @see \rosasurfer\ministruts\phpstan\STACKFRAME
      */
-    public static function shiftStackFramesByLocation(array $trace, string $file, int $line) {
+    public static function shiftStackFramesByLocation(array $trace, string $file, int $line): array {
         $result = $trace;
         $size = sizeof($trace);
 
@@ -785,16 +794,18 @@ class ErrorHandler extends StaticClass {
     /**
      * Set the properties of an {@link Exception}.
      *
-     * @param  Exception    $exception       - exception to modify
-     * @param  STACKFRAME[] $trace           - stacktrace
-     * @param  string       $file [optional] - filename of the error location (default: unchanged)
-     * @param  int          $line [optional] - line number of the error location (default: unchanged)
+     * @param  Exception $exception       - exception to modify
+     * @param  array[]   $trace           - stacktrace
+     * @param  string    $file [optional] - filename of the error location (default: unchanged)
+     * @param  int       $line [optional] - line number of the error location (default: unchanged)
      *
      * @return void
      *
-     * @see \rosasurfer\ministruts\STACKFRAME
+     * @phpstan-param STACKFRAME[] $trace
+     *
+     * @see \rosasurfer\ministruts\phpstan\STACKFRAME
      */
-    private static function setExceptionProperties(Exception $exception, array $trace, string $file = '', int $line = 0) {
+    private static function setExceptionProperties(Exception $exception, array $trace, string $file = '', int $line = 0): void {
         static $traceProperty = null;
         if (!$traceProperty) {
             $traceProperty = new \ReflectionProperty(Exception::class, 'trace');

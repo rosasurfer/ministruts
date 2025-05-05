@@ -19,10 +19,7 @@ use rosasurfer\ministruts\db\orm\meta\EntityMapping;
 /**
  * Abstract DAO base class.
  *
- * @phpstan-import-type  EntityClass  from \rosasurfer\ministruts\db\orm\ORM
- * @phpstan-import-type  ORM_ENTITY   from \rosasurfer\ministruts\db\orm\ORM
- * @phpstan-import-type  ORM_PROPERTY from \rosasurfer\ministruts\db\orm\ORM
- * @phpstan-import-type  ORM_RELATION from \rosasurfer\ministruts\db\orm\ORM
+ * @phpstan-import-type ORM_ENTITY from \rosasurfer\ministruts\phpstan\CustomTypes
  */
 abstract class DAO extends Singleton {
 
@@ -189,6 +186,8 @@ abstract class DAO extends Singleton {
      *
      * @return         array<string, mixed>
      * @phpstan-return ORM_ENTITY
+     *
+     * @see \rosasurfer\ministruts\phpstan\ORM_ENTITY
      */
     abstract public function getMapping(): array;
 
@@ -198,9 +197,10 @@ abstract class DAO extends Singleton {
      *
      * @param  array<mixed> $mapping - user provided mapping data
      *
-     * @return array<string, mixed> - validated full entity mapping
-     *
+     * @return         array<string, mixed> - validated full entity mapping
      * @phpstan-return ORM_ENTITY
+     *
+     * @see \rosasurfer\ministruts\phpstan\ORM_ENTITY
      */
     protected function parseMapping(array $mapping): array {
         $entityClass = '?';
