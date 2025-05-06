@@ -77,9 +77,9 @@ class PythonFixturesTest extends TestCase {
     }
 
     /**
-     * @param  string               $doc
-     * @param  string|string[]|null $args    [optional]
-     * @param  mixed[]              $options [optional]
+     * @param  string                     $doc
+     * @param  string|string[]|null       $args    [optional]
+     * @param  array<string, bool|string> $options [optional]
      *
      * @return DocoptResult
      */
