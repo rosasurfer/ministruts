@@ -1,12 +1,12 @@
 #!/bin/bash
 #
-# A wrapper around PHPStan to simplify working with PHPStan baseline files. All arguments are optional.
+# A wrapper around PHPStan to simplify working with different versions and/or baseline files. All arguments are optional.
 #
 # Usage:
 #   phpstan [COMMAND] [options] [--] [PATH...]
 #
 # Command:
-#   analyse                                 Analyse the code base using the configuration in "etc/phpstan/phpstan.neon" (default command).
+#   analyse                                 Analyse the code base using the configuration in "/etc/phpstan/" (default command).
 #   analyse PATH                            Analyse a custom PATH (default: the configured paths).
 #
 # Options:
@@ -19,29 +19,47 @@
 # Short option name/value separator are zero or more spaces.      e.g. "-l3" or "-l 4"
 # Long option name/value separator are space or equal sign "=".   e.g. "--level 5" or "--level=6"
 #
-# PHPStan can be executed using a non-standard PHP interpreter by setting the environment variable PHP='<php-cmd>'.
+# By default the script looks for a PHPStan binary installed in the "/vendor" directory of the project.
+# If PHPStan was not found in the project the script tries to find a PHPStan binary in the system path.
+# A custom PHPStan binary can be specified by setting the environment variable PHPSTAN='<phpstan-cmd>'.
+#
+# PHPStan can be executed using a custom PHP interpreter by setting the environment variable PHP='<php-cmd>'.
 #
 # Examples:
-#   phpstan                                 // analyse the code base with the configured settings
-#   phpstan --level=1 api/app               // analyse a single directory with a custom rule level
-#   phpstan --level=6 -b baseline.neon      // analyse the code base and save the result as file "baseline.neon"
-#   phpstan --level=7 -u baseline.neon      // analyse the code base using file "baseline.neon" as a filter
-#   PHP=php81 phpstan                       // run PHPStan using PHP interpreter "php81" instead of the standard "php"
+#   phpstan                                   // Analyse the code base with the configured settings.
+#   phpstan --level=1 api/app                 // Analyse a single directory with a custom rule level.
+#   phpstan --level=6 -b baseline.neon        // Analyse the code base and save the result as file "baseline.neon".
+#   phpstan --level=7 -u baseline.neon        // Analyse the code base using file "baseline.neon" as a filter.
+#   PHP='php81' phpstan                       // Run PHPStan using PHP command "php81" instead of the standard "php".
+#   PHPSTAN='phpstan-2.0.phar' phpstan        // Run a different PHPStan version instead of the standard installation.
 #
 set -eEuo pipefail
 
 
 # determine the PHP interpreter to use
-php=${PHP:-php}
-
+php="${PHP:-php}"
 
 # resolve directories and environment
 PROJECT_DIR="$(dirname "$(realpath "$(type -p "$0")")")/.."
 CONFIG_DIR="$PROJECT_DIR/etc/phpstan"
-IS_WINDOWS_PHP="$($php -r "echo (int)(PHP_OS_FAMILY == 'Windows');")"
-phpstan="$PROJECT_DIR/vendor/bin/phpstan"
-[[ -f "$phpstan" ]] || { echo "PHPStan executable not found: vendor/bin/phpstan"; exit 1; }
-((IS_WINDOWS_PHP)) && phpstan="$(cygpath -m "$phpstan")"  # normalize path if running a Windows PHP version
+IS_WINDOWS_PHP="$("$php" -r "echo (int)(PHP_OS_FAMILY == 'Windows');")"
+
+# determine the PHPStan binary to use
+phpstan="${PHPSTAN:-}"
+phpstanCmd="$phpstan"
+
+if [[ -n "$phpstan" ]]; then
+  phpstan="$(type -p "$phpstan")" || { echo "PHPStan executable not found: $phpstanCmd"; exit 1; }
+else
+  phpstanCmd="vendor/bin/phpstan"
+  phpstan="$PROJECT_DIR/$phpstanCmd"
+  if [[ ! -f "$phpstan" ]]; then
+    phpstanCmd="phpstan" && phpstan="$(type -p "$phpstanCmd")" || {
+      phpstanCmd="phpstan.phar" && phpstan="$(type -p "$phpstanCmd")" || { echo "PHPStan executable not found"; exit 1; }
+    }
+  fi
+fi
+((IS_WINDOWS_PHP)) && phpstan="$(cygpath -m "$phpstan")"          # normalize path if running a Windows PHP version
 
 
 # parse command line arguments and create a new argument set for PHPStan
@@ -169,7 +187,7 @@ set -- "${ARGS[@]}"
 
 # verbose output
 [[ -n "$VERBOSE_OPTION" ]] && {
-  echo "CMD: vendor/bin/phpstan" "$@"
+  echo "CMD: $phpstanCmd" "$@"
   [[ "$VERBOSE_OPTION" == -vv* && -n "$INCLUDE_CONFIG" ]] && cat "$INCLUDE_CONFIG"
 }
 
