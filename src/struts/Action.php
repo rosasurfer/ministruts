@@ -84,7 +84,7 @@ abstract class Action extends CObject {
      *
      * @return ?ActionForward - original or modified ActionForward (e.g. a route with added query parameters)
      */
-    public function executeAfter(Request $request, Response $response, ActionForward $forward = null) {
+    public function executeAfter(Request $request, Response $response, ?ActionForward $forward = null) {
         return $forward;
     }
 

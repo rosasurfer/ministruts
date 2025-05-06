@@ -67,7 +67,7 @@ class Tile extends CObject {
      * @param  Module $module            - the Module the Tile belongs to
      * @param  ?Tile  $parent [optional] - parent instance of the Tile
      */
-    public function __construct(Module $module, Tile $parent = null) {
+    public function __construct(Module $module, ?Tile $parent = null) {
         $this->module = $module;
         $this->parent = $parent;
     }
@@ -175,7 +175,7 @@ class Tile extends CObject {
      *
      * @return $this
      */
-    public function setNestedTile($name, Tile $tile = null) {
+    public function setNestedTile($name, ?Tile $tile = null) {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
         $this->nestedTiles[$name] = $tile;

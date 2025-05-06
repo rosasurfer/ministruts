@@ -149,7 +149,7 @@ class LogMessage extends CObject {
      *
      * @return string - message details (ending with a line break) or an empty string if not applicable
      */
-    public function getMessageDetails(bool $html, ContentFilter $filter = null): string {
+    public function getMessageDetails(bool $html, ?ContentFilter $filter = null): string {
         $key = 'messageDetails.'.($html ? 'web':'cli') . ($filter ? get_class($filter) : '');
 
         if (isset($this->context[$key])) {
@@ -200,7 +200,7 @@ class LogMessage extends CObject {
      *
      * @return string - stacktrace details (ending with a line break) or an empty string if not applicable
      */
-    public function getTraceDetails(bool $html, ContentFilter $filter = null): string {
+    public function getTraceDetails(bool $html, ?ContentFilter $filter = null): string {
         $key = 'traceDetails.'.($html ? 'web':'cli') . ($filter ? get_class($filter) : '');
 
         if (isset($this->context[$key])) {
@@ -262,7 +262,7 @@ class LogMessage extends CObject {
      *
      * @return string - request details (ending with a line break) or an empty string if not applicable
      */
-    public function getRequestDetails(bool $html, ContentFilter $filter = null): string {
+    public function getRequestDetails(bool $html, ?ContentFilter $filter = null): string {
         $key = 'requestDetails.'.($html ? 'web':'cli') . ($filter ? get_class($filter) : '');
 
         if (isset($this->context[$key])) {
@@ -293,7 +293,7 @@ class LogMessage extends CObject {
      *
      * @return string - session details (ending with a line break) or an empty string if not applicable
      */
-    public function getSessionDetails(bool $html, ContentFilter $filter = null): string {
+    public function getSessionDetails(bool $html, ?ContentFilter $filter = null): string {
         $key = 'sessionDetails.'.($html ? 'web':'cli') . ($filter ? get_class($filter) : '');
 
         if (isset($this->context[$key])) {
@@ -328,7 +328,7 @@ class LogMessage extends CObject {
      *
      * @return string - server details (ending with a line break) or an empty string if not applicable
      */
-    public function getServerDetails(bool $html, ContentFilter $filter = null): string {
+    public function getServerDetails(bool $html, ?ContentFilter $filter = null): string {
         $key = 'serverDetails.'.($html ? 'web':'cli') . ($filter ? get_class($filter) : '');
 
         if (isset($this->context[$key])) {

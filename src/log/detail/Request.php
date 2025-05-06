@@ -190,7 +190,7 @@ class Request extends CObject {
      *
      * @return string - request body or metadata
      */
-    public function getContent(ContentFilter $filter = null): string {
+    public function getContent(?ContentFilter $filter = null): string {
         if (!isset($this->content)) {
             $content = '';
 
@@ -306,7 +306,7 @@ class Request extends CObject {
      * @return string - root URL: protocol + hostname + port + "/" <br/>
      *                  e.g. "https://a.domain.tld/"
      */
-    public function getHostUrl(ContentFilter $filter = null): string {
+    public function getHostUrl(?ContentFilter $filter = null): string {
         if (!isset($this->hostUrl)) {
             $protocol = $this->isSecure() ? 'https':'http';
             $host     = $this->getHostName();
@@ -329,7 +329,7 @@ class Request extends CObject {
      * @return string - URI: path + query-string + anchor <br/>
      *                  e.g. "/path/application/module/foo/bar.html?key=value"
      */
-    public function getUri(ContentFilter $filter = null): string {
+    public function getUri(?ContentFilter $filter = null): string {
         $uri = $_SERVER['REQUEST_URI'] ?? '';
         return $filter ? $filter->filterUri($uri) : $uri;
     }
@@ -343,7 +343,7 @@ class Request extends CObject {
      * @return string - full URL: protocol + hostname + port + path + query-string + anchor <br/>
      *                  e.g. "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
      */
-    public static function getUrl(ContentFilter $filter = null): string {
+    public static function getUrl(?ContentFilter $filter = null): string {
         $request = self::instance();
         $hostUrl = $request->getHostUrl($filter);
         $uri     = $request->getUri($filter);
@@ -368,7 +368,7 @@ class Request extends CObject {
      *
      * @return string
      */
-    public static function stringify(ContentFilter $filter = null): string {
+    public static function stringify(?ContentFilter $filter = null): string {
         $request = self::instance();
 
         // request

@@ -502,7 +502,7 @@ class ErrorHandler extends StaticClass {
      *
      * @return string - message
      */
-    public static function getVerboseMessage(Throwable $throwable, string $indent = '', ContentFilter $filter = null): string {
+    public static function getVerboseMessage(Throwable $throwable, string $indent = '', ?ContentFilter $filter = null): string {
         $message = trim($throwable->getMessage());
         if ($filter) {
             $message = $filter->filterString($message);
@@ -615,7 +615,7 @@ class ErrorHandler extends StaticClass {
      *
      * @return string - string representation ending with an EOL marker
      */
-    public static function getAdjustedStackTraceAsString(Throwable $throwable, string $indent = '', ContentFilter $filter = null): string {
+    public static function getAdjustedStackTraceAsString(Throwable $throwable, string $indent = '', ?ContentFilter $filter = null): string {
         $trace = self::adjustStackTrace($throwable->getTrace(), $throwable->getFile(), $throwable->getLine());
         $result = self::formatStackTrace($trace, $indent, $filter);
 
@@ -642,7 +642,7 @@ class ErrorHandler extends StaticClass {
      *
      * @see \rosasurfer\ministruts\phpstan\STACKFRAME
      */
-    public static function formatStackTrace(array $trace, string $indent = '', ContentFilter $filter = null): string {
+    public static function formatStackTrace(array $trace, string $indent = '', ?ContentFilter $filter = null): string {
         /** @var string $appRoot */
         $appRoot = '';
         $di = Application::getDi();
