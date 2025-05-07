@@ -22,20 +22,20 @@ use const rosasurfer\ministruts\NL;
  */
 class Request extends CObject {
 
-    /** @var array<string, string> - all request headers (no multi-field headers) */
-    protected array $headers;
+    /** @var ?array<string, string> - all request headers (no multi-field headers) */
+    protected ?array $headers = null;
 
-    /** @var array<string, string[]> - normalized metadata of uploaded files */
-    protected array $files;
+    /** @var ?array<string, string[]> - normalized metadata of uploaded files */
+    protected ?array $files = null;
 
-    /** @var string - request body */
-    protected string $content;
+    /** @var ?string - request body */
+    protected ?string $content = null;
 
-    /** @var string - host URL */
-    protected string $hostUrl;
+    /** @var ?string - host URL */
+    protected ?string $hostUrl = null;
 
-    /** @var string - remote IP of the request */
-    protected string $remoteIP;
+    /** @var ?string - remote IP of the request */
+    protected ?string $remoteIP = null;
 
     /** @var self */
     protected static self $instance;
@@ -200,8 +200,7 @@ class Request extends CObject {
             }
             else {
                 $input = file_get_contents('php://input');  // not available with content type 'multipart/form-data'
-
-                if (is_string($input) && strlen($input)) {
+                if (strlen($input)) {
                     if ($filter && $this->getContentType()=='application/json') {
                         try {
                             $values = json_decode($input, true, 512, JSON_BIGINT_AS_STRING | JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR);

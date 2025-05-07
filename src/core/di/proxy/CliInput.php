@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\core\di\proxy;
 
+use rosasurfer\ministruts\console\docopt\DocoptResult;
+
 
 /**
  * CliInput
@@ -33,6 +35,8 @@ class CliInput extends Proxy {
      */
     protected static function getServiceName() {
         return 'input';
+
         return \rosasurfer\ministruts\console\io\Input::class;      // @phpstan-ignore deadCode.unreachable (keep for testing)
+        DocoptResult::class;                                        // prevent IDE warning "unused import"
     }
 }

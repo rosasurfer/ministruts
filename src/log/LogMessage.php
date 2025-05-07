@@ -57,7 +57,6 @@ class LogMessage extends CObject {
      */
     public function __construct($loggable, int $level, array $context) {
         if (!is_string($loggable)) {
-            if (!is_object($loggable))                   throw new InvalidTypeException('Illegal type of parameter $loggable: '.gettype($loggable).' (expected string|object)');
             if (!method_exists($loggable, '__toString')) throw new InvalidTypeException('Illegal type of parameter $loggable: '.get_class($loggable).' (expected object implementing "__toString()")');
             if (!$loggable instanceof Throwable) {
                 $loggable = (string)$loggable;
@@ -121,9 +120,6 @@ class LogMessage extends CObject {
      * @return string
      */
     public function getFile(): string {
-        if (!isset($this->file)) {
-            $this->resolveCallLocation();
-        }
         return $this->file;
     }
 
@@ -134,9 +130,6 @@ class LogMessage extends CObject {
      * @return int
      */
     public function getLine(): int {
-        if (!isset($this->line)) {
-            $this->resolveCallLocation();
-        }
         return $this->line;
     }
 

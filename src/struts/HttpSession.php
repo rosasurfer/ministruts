@@ -6,7 +6,6 @@ namespace rosasurfer\ministruts\struts;
 use Throwable;
 
 use rosasurfer\ministruts\core\Singleton;
-use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\di\proxy\Request as Request;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 use rosasurfer\ministruts\util\PHP;
@@ -88,9 +87,7 @@ class HttpSession extends Singleton {
      *
      * @return void
      */
-    public function reset($regenerateId) {
-        Assert::bool($regenerateId);
-
+    public function reset(bool $regenerateId): void {
         if ($regenerateId) {
             session_regenerate_id(true);                                            // generate new id and delete the old file
         }
@@ -159,9 +156,7 @@ class HttpSession extends Singleton {
      *
      * @return $this
      */
-    public function setAttribute($key, $value) {
-        Assert::string($key, '$key');
-
+    public function setAttribute(string $key, $value): self {
         if ($value !== null) {
             $_SESSION[$key] = $value;
         }
@@ -179,17 +174,15 @@ class HttpSession extends Singleton {
      *
      * @return void
      */
-    public function removeAttribute($key) {
+    public function removeAttribute($key): void {
         if (is_array($key)) {
-            foreach ($key as $i => $value) {
-                Assert::string($value, '$key['.$i.']');
+            foreach ($key as $value) {
                 unset($_SESSION[$value]);
             }
-            return;
         }
-
-        Assert::string($key);
-        unset($_SESSION[$key]);
+        else {
+            unset($_SESSION[$key]);
+        }
     }
 
 

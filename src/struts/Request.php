@@ -5,9 +5,7 @@ namespace rosasurfer\ministruts\struts;
 
 use rosasurfer\ministruts\config\ConfigInterface;
 use rosasurfer\ministruts\core\CObject;
-use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\exception\IllegalStateException;
-use rosasurfer\ministruts\core\exception\InvalidTypeException;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 
@@ -174,7 +172,7 @@ class Request extends CObject {
      * Return an object-oriented representation of the files uploaded with the request. The PHP array structure of $_FILES
      * is converted to normalized arrays.
      *
-     * @return scalar[][]- associative array of files
+     * @return scalar[][] - associative array of files
      *
      * @todo   convert the returned arrays to instances of UploadedFile
      */
@@ -214,14 +212,9 @@ class Request extends CObject {
      *
      * @todo   convert the returned array to instance of UploadedFile
      */
-    public function getFile($name) {
-        Assert::string($name);
-
+    public function getFile(string $name): ?array {
         $files = $this->getFiles();
-
-        if (isset($files[$name]))
-            return $files[$name];
-        return null;
+        return $files[$name] ?? null;
     }
 
 
@@ -640,8 +633,7 @@ class Request extends CObject {
      *
      * @return ?string - header value or NULL if no such header was transmitted
      */
-    public function getHeader($name) {
-        Assert::string($name);
+    public function getHeader(string $name): ?string {
         $headers = $this->getHeaders($name);
         return \array_shift($headers);
     }
@@ -654,17 +646,10 @@ class Request extends CObject {
      *
      * @return string[] - associative array of header values
      */
-    public function getHeaders($names = []) {
-        if (is_array($names)) {
-            foreach ($names as $i => $name) {
-                Assert::string($name, '$names['.$i.']');
-            }
-        }
-        else {
-            Assert::string($names, '$names');
+    public function getHeaders($names = []): array {
+        if (!is_array($names)) {
             $names = [$names];
         }
-
         static $headers = null;
         static $fixHeaderNames = [
             'CDN'     => 'CDN',
@@ -715,21 +700,12 @@ class Request extends CObject {
      *
      * @return ?string - value or NULL if no such headers have been transmitted
      */
-    public function getHeaderValue($names) {
+    public function getHeaderValue($names): ?string {
         if (is_string($names)) {
             $names = [$names];
         }
-        elseif (is_array($names)) {
-            foreach ($names as $i => $name) {
-                Assert::string($name, '$names['.$i.']');
-            }
-        }
-        else throw new InvalidTypeException('Invalid type of parameter $names: '.gettype($names));
-
         $headers = $this->getHeaders($names);
-        if ($headers)
-            return join(',', $headers);
-        return null;
+        return $headers ? join(',', $headers) : null;
     }
 
 
@@ -741,18 +717,12 @@ class Request extends CObject {
      * @return string[] - values or an empty array if no such headers have been transmitted
      */
     public function getHeaderValues($names) {
-        if (is_string($names))
+        if (is_string($names)) {
             $names = [$names];
-        elseif (is_array($names)) {
-            foreach ($names as $i => $name) {
-                Assert::string($name, '$names['.$i.']');
-            }
         }
-        else throw new InvalidTypeException('Illegal type of parameter $names: '.gettype($names));
-
         $headers = $this->getHeaders($names);
-        if (!$headers)
-            return [];
+        if (!$headers) return [];
+
         return \array_map('trim', explode(',', join(',', $headers)));
     }
 
@@ -764,8 +734,7 @@ class Request extends CObject {
      *
      * @return mixed - attribute value or NULL if no value is stored under the specified name
      */
-    public function getAttribute($name) {
-        Assert::string($name);
+    public function getAttribute(string $name) {
         if (\key_exists($name, $this->attributes))
             return $this->attributes[$name];
         return null;
@@ -777,7 +746,7 @@ class Request extends CObject {
      *
      * @return mixed[]
      */
-    public function getAttributes() {
+    public function getAttributes(): array {
         return $this->attributes;
     }
 
@@ -791,8 +760,7 @@ class Request extends CObject {
      *
      * @return $this
      */
-    public function setAttribute($name, $value) {
-        Assert::string($name);
+    public function setAttribute(string $name, $value): self {
         $this->attributes[$name] = $value;
         return $this;
     }
@@ -822,12 +790,7 @@ class Request extends CObject {
      *
      * @return $this
      */
-    public function setCookie($name, $value, $expires = 0, $path = null) {
-        Assert::string($name, '$name');
-        Assert::string($value, '$value');
-        Assert::int($expires, '$expires');
-        Assert::nullOrString($path, '$path');
-
+    public function setCookie(string $name, string $value, int $expires = 0, ?string $path = null) {
         if ($expires < 0) throw new InvalidValueException('Invalid parameter $expires: '.$expires);
 
         if (!isset($path)) {
@@ -845,9 +808,7 @@ class Request extends CObject {
      *
      * @return bool
      */
-    public function isUserInRole($role) {
-        Assert::string($role);
-
+    public function isUserInRole(string $role): bool {
         /** @var Module|null $module */
         $module = $this->getAttribute(Struts::MODULE_KEY);
         if (!$module) throw new RuntimeException('Current Struts module not found');
@@ -866,9 +827,7 @@ class Request extends CObject {
      *
      * @return ?string - message
      */
-    public function getActionMessage($key = null) {
-        Assert::nullOrString($key);
-
+    public function getActionMessage(?string $key = null): ?string {
         /** @var string[] $messages */
         $messages = $this->getAttribute(Struts::ACTION_MESSAGES_KEY) ?? [];
 
@@ -903,18 +862,18 @@ class Request extends CObject {
      *
      * @return bool
      */
-    public function isActionMessage($keys = null) {
+    public function isActionMessage($keys = null): bool {
         $messages = $this->getActionMessages();
 
-        if (!isset($keys))
+        if (!isset($keys)) {
             return (bool) $messages;
-
-        if (is_string($keys)) $keys = [$keys];
-        else                  Assert::isArray($keys);
-
-        if (!$keys)
+        }
+        if (is_string($keys)) {
+            $keys = [$keys];
+        }
+        if (!$keys) {
             return (bool) $messages;
-
+        }
         if ($messages) {
             foreach ($keys as $key) {
                 if (\key_exists($key, $messages)) return true;
@@ -932,10 +891,7 @@ class Request extends CObject {
      *
      * @return $this
      */
-    public function setActionMessage($key, $message) {
-        if (!is_string($key) && !is_int($key)) throw new InvalidTypeException('Illegal type of parameter $key: '.gettype($key));    // @phpstan-ignore booleanAnd.alwaysFalse (types come from PHPDoc)
-        Assert::nullOrString($message, '$message');
-
+    public function setActionMessage($key, ?string $message): self {
         if (!isset($message)) {
             unset($this->attributes[Struts::ACTION_MESSAGES_KEY][$key]);
         }
@@ -953,12 +909,11 @@ class Request extends CObject {
      *
      * @return string[] - the removed ActionMessages
      */
-    public function removeActionMessages(...$keys) {
+    public function removeActionMessages(...$keys): array {
         $messages = $this->getAttribute(Struts::ACTION_MESSAGES_KEY) ?? [];
         $removed = [];
 
         foreach ($keys as $key) {
-            Assert::string($key, '$keys');
             if (isset($messages[$key])) {
                 $removed[$key] = $messages[$key];
             }
@@ -1012,18 +967,18 @@ class Request extends CObject {
      *
      * @return bool
      */
-    public function isActionError($keys = null) {
+    public function isActionError($keys = null): bool {
         $errors = $this->getActionErrors();
 
-        if (!isset($keys))
+        if (!isset($keys)) {
             return (bool) $errors;
-
-        if (is_string($keys)) $keys = [$keys];
-        else                  Assert::isArray($keys);
-
-        if (!$keys)
+        }
+        if (is_string($keys)) {
+            $keys = [$keys];
+        }
+        if (!$keys) {
             return (bool) $errors;
-
+        }
         if ($errors) {
             foreach ($keys as $key) {
                 if (\key_exists($key, $errors)) return true;
@@ -1041,10 +996,7 @@ class Request extends CObject {
      *
      * @return $this
      */
-    public function setActionError($key, $message) {
-        if (!is_string($key) && !is_int($key)) throw new InvalidTypeException('Illegal type of parameter $key: '.gettype($key));    // @phpstan-ignore booleanAnd.alwaysFalse (types come from PHPDoc)
-        Assert::nullOrString($message, '$message');
-
+    public function setActionError($key, ?string $message): self {
         if (!isset($message)) {
             unset($this->attributes[Struts::ACTION_ERRORS_KEY][$key]);
         }
@@ -1067,7 +1019,6 @@ class Request extends CObject {
         $removed = [];
 
         foreach ($keys as $key) {
-            Assert::string($key, '$keys');
             if (isset($errors[$key])) {
                 $removed[$key] = $errors[$key];
             }

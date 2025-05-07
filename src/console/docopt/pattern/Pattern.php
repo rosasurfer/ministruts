@@ -15,13 +15,13 @@ abstract class Pattern extends CObject {
 
 
     /** @var ?string */
-    protected ?string $name;
+    protected ?string $name = null;
 
     /** @var mixed */
     public $value = null;
 
     /** @var Pattern[] */
-    public $children = [];
+    public array $children = [];
 
 
     /**
@@ -150,33 +150,27 @@ abstract class Pattern extends CObject {
 
         while ($groups) {
             $children = array_shift($groups);
-            $hasBranchPattern = false;
-            foreach ($children as $c) {
-                if ($c instanceof BranchPattern) {
-                    $hasBranchPattern = true;
+            $branchChild = null;
+
+            foreach ($children as $key => $child) {
+                if ($child instanceof BranchPattern) {
+                    $branchChild = $child;
+                    unset($children[$key]);
                     break;
                 }
             }
-            if ($hasBranchPattern) {
-                /** @var BranchPattern $child */
-                $child = null;
-                foreach ($children as $key => $currentChild) {
-                    if ($currentChild instanceof BranchPattern) {
-                        $child = $currentChild;
-                        unset($children[$key]);
-                        break;
+
+            if ($branchChild) {
+                if ($branchChild instanceof Either) {
+                    foreach ($branchChild->children as $child) {
+                        $groups[] = array_merge([$child], $children);
                     }
                 }
-                if ($child instanceof Either) {
-                    foreach ($child->children as $c) {
-                        $groups[] = array_merge([$c], $children);
-                    }
-                }
-                elseif ($child instanceof OneOrMore) {
-                    $groups[] = array_merge($child->children, $child->children, $children);
+                elseif ($branchChild instanceof OneOrMore) {
+                    $groups[] = array_merge($branchChild->children, $branchChild->children, $children);
                 }
                 else {
-                    $groups[] = array_merge($child->children, $children);
+                    $groups[] = array_merge($branchChild->children, $children);
                 }
             }
             else {
@@ -193,7 +187,7 @@ abstract class Pattern extends CObject {
 
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function __toString() {
         return serialize($this);

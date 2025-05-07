@@ -12,11 +12,6 @@ class OneOrMore extends BranchPattern {
 
     /**
      * {@inheritdoc}
-     *
-     * @param  Pattern[] $left
-     * @param  Pattern[] $collected [optional]
-     *
-     * @return array{bool, Pattern[], Pattern[]}
      */
     public function match(array $left, array $collected = []) {
         if (sizeof($this->children) != 1) throw new \UnexpectedValueException();

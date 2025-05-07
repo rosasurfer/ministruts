@@ -75,11 +75,11 @@ class TokenIterator extends \ArrayIterator {
     /**
      * @return string[]
      */
-    public function left() {
+    public function left(): array {
         $left = [];
-        while (($token=$this->move()) !== null) {
+        while (($token = $this->move()) !== null) { // @phpstan-ignore notIdentical.alwaysTrue (FIXME: refactor using Iterator->valid())
             $left[] = $token;
         }
-        return $left;               // @phpstan-ignore deadCode.unreachable (FIXME: refactor using iterator->valid())
+        return $left;                               // @phpstan-ignore deadCode.unreachable (FIXME: refactor using Iterator->valid())
     }
 }

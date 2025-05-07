@@ -5,7 +5,6 @@ namespace rosasurfer\ministruts\console\io;
 
 use rosasurfer\ministruts\console\docopt\DocoptResult;
 use rosasurfer\ministruts\core\CObject;
-use rosasurfer\ministruts\core\assert\Assert;
 
 
 /**
@@ -16,8 +15,8 @@ use rosasurfer\ministruts\core\assert\Assert;
 class Input extends CObject {
 
 
-    /** @var DocoptResult|null */
-    private $docoptResult = null;
+    /** @var ?DocoptResult */
+    private ?DocoptResult $docoptResult = null;
 
 
     /**
@@ -27,7 +26,7 @@ class Input extends CObject {
      *
      * @return $this
      */
-    public function setDocoptResult(DocoptResult $docopt) {
+    public function setDocoptResult(DocoptResult $docopt): self {
         $this->docoptResult = $docopt;
         return $this;
     }
@@ -38,7 +37,7 @@ class Input extends CObject {
      *
      * @return ?DocoptResult
      */
-    public function getDocoptResult() {
+    public function getDocoptResult(): ?DocoptResult {
         return $this->docoptResult;
     }
 
@@ -51,7 +50,7 @@ class Input extends CObject {
      *
      * @return bool
      */
-    public function isCommand(string $name) {
+    public function isCommand(string $name): bool {
         if (!$this->docoptResult) {
             return false;
         }
@@ -70,8 +69,7 @@ class Input extends CObject {
      *
      * @return bool|int - boolean value or number of times a repetitive command was specified
      */
-    public function hasCommand($name) {
-        Assert::string($name);
+    public function hasCommand(string $name) {
         if (!$this->docoptResult)
             return false;
 
@@ -93,8 +91,7 @@ class Input extends CObject {
      *
      * @return bool
      */
-    public function isArgument($name) {
-        Assert::string($name);
+    public function isArgument(string $name): bool {
         if (!$this->docoptResult) return false;
 
         if (!($len=strlen($name)) || !key_exists($name, $this->docoptResult->getArgs()))
@@ -115,8 +112,7 @@ class Input extends CObject {
      *
      * @return ?string - argument value or NULL if the argument was not specified
      */
-    public function getArgument($name) {
-        Assert::string($name);
+    public function getArgument(string $name): ?string {
         if (!$this->docoptResult) return null;
 
         if ($this->isArgument($name)) {
@@ -139,8 +135,7 @@ class Input extends CObject {
      *
      * @return string[] - argument values or an empty array if the argument was not specified
      */
-    public function getArguments($name) {
-        Assert::string($name);
+    public function getArguments(string $name): array {
         if (!$this->docoptResult) return [];
 
         if ($this->isArgument($name)) {
@@ -162,8 +157,7 @@ class Input extends CObject {
      *
      * @return bool
      */
-    public function isOption($name) {
-        Assert::string($name);
+    public function isOption(string $name): bool {
         if (!$this->docoptResult) return false;
 
         if (!strlen($name) || !key_exists($name, $this->docoptResult->getArgs()) || $name[0]!='-' || $name=='-' || $name=='--')
@@ -184,8 +178,7 @@ class Input extends CObject {
      *
      * @return bool|int|string - option value or FALSE if the option was not specified
      */
-    public function getOption($name) {
-        Assert::string($name);
+    public function getOption(string $name) {
         if (!$this->docoptResult) return false;
 
         if ($this->isOption($name)) {
@@ -209,8 +202,7 @@ class Input extends CObject {
      *
      * @return array<bool|int|string> - option values or an empty array if the option was not specified
      */
-    public function getOptions($name) {
-        Assert::string($name);
+    public function getOptions(string $name): array {
         if (!$this->docoptResult) return [];
 
         if ($this->isOption($name)) {

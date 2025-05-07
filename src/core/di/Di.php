@@ -6,7 +6,6 @@ namespace rosasurfer\ministruts\core\di;
 use Throwable;
 
 use rosasurfer\ministruts\core\CObject;
-use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\di\service\Service;
 use rosasurfer\ministruts\core\di\service\ServiceInterface as IService;
 use rosasurfer\ministruts\core\di\service\ServiceNotFoundException;
@@ -50,9 +49,8 @@ class Di extends CObject implements DiInterface {
      *
      * @param  ?string $configDir [optional] - directory to load service definitions from (default: no loading)
      */
-    public function __construct($configDir = null) {
+    public function __construct(?string $configDir = null) {
         if (isset($configDir)) {
-            Assert::string($configDir);
             $this->loadServices($configDir);
         }
     }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace rosasurfer\ministruts\util;
 
 use rosasurfer\ministruts\core\StaticClass;
-use rosasurfer\ministruts\core\assert\Assert;
 
 
 /**
@@ -33,9 +32,7 @@ class Windows extends StaticClass {
      *
      * @return string
      */
-    public static function errorToString($error) {
-        Assert::int($error);
-
+    public static function errorToString(int $error): string {
         if (\key_exists($error, self::$win32Errors)) {
             return self::$win32Errors[$error][0];
         }
@@ -50,9 +47,7 @@ class Windows extends StaticClass {
      *
      * @return string
      */
-    public static function errorDescription($error) {
-        Assert::int($error);
-
+    public static function errorDescription(int $error): string {
         if (\key_exists($error, self::$win32Errors)) {
             return self::$win32Errors[$error][1];
         }

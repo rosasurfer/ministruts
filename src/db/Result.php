@@ -8,9 +8,9 @@ use UnexpectedValueException;
 
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\error\ErrorHandler;
-use rosasurfer\ministruts\core\exception\InvalidTypeException;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\UnimplementedFeatureException;
+use rosasurfer\ministruts\db\ConnectorInterface as Connector;
 
 use function rosasurfer\ministruts\strIsNumeric;
 use function rosasurfer\ministruts\strToBool;
@@ -25,11 +25,26 @@ use const rosasurfer\ministruts\ARRAY_BOTH;
 abstract class Result extends CObject implements ResultInterface {
 
 
-    /** @var ConnectorInterface - the used database connector */
-    protected ConnectorInterface $connector;
+    /** @var Connector - the used database connector */
+    protected Connector $connector;
+
+    /** @var string - SQL statement the result was generated from */
+    protected string $sql;
 
     /** @var int - index of the row fetched by the next unqualified fetch* method call or -1 when hit the end */
     protected int $nextRowIndex = 0;
+
+
+    /**
+     * Constructor
+     *
+     * @param  Connector $connector - connector managing the database connection
+     * @param  string    $sql       - executed SQL statement
+     */
+    public function __construct(Connector $connector, string $sql) {
+        $this->connector = $connector;
+        $this->sql = $sql;
+    }
 
 
     /**
@@ -49,18 +64,9 @@ abstract class Result extends CObject implements ResultInterface {
 
     /**
      * {@inheritdoc}
-     *
-     * @param  string|int $column       [optional]
-     * @param  ?int       $row          [optional]
-     * @param  mixed      $onNull       [optional]
-     * @param  mixed      $onNoMoreRows [optional]
-     *
-     * @return mixed
      */
     public function fetchColumn($column=0, ?int $row=null, $onNull=null, $onNoMoreRows=null) {
-        // @phpstan-ignore booleanAnd.alwaysFalse (type comes from PHPDoc)
-        if (!is_int($column) && !is_string($column)) throw new InvalidTypeException('Illegal type of parameter $column: '.gettype($column));
-        if (isset($row))                             throw new UnimplementedFeatureException('$row='.$row.' (!= NULL)');
+        if (isset($row)) throw new UnimplementedFeatureException('$row='.$row.' (not NULL)');
 
         // Generic default implementation:
         // A connector-specific implementation will be faster and more efficient.
@@ -86,13 +92,6 @@ abstract class Result extends CObject implements ResultInterface {
 
     /**
      * {@inheritdoc}
-     *
-     * @param  string|int $column       [optional]
-     * @param  ?int       $row          [optional]
-     * @param  ?string    $onNull       [optional]
-     * @param  ?string    $onNoMoreRows [optional]
-     *
-     * @return ?string
      */
     public function fetchString($column=0, ?int $row=null, ?string $onNull=null, ?string $onNoMoreRows=null): ?string {
         if (func_num_args() < 4) $value = $this->fetchColumn($column, $row, null);
@@ -109,13 +108,6 @@ abstract class Result extends CObject implements ResultInterface {
 
     /**
      * {@inheritdoc}
-     *
-     * @param  string|int $column       [optional]
-     * @param  ?int       $row          [optional]
-     * @param  ?bool      $onNull       [optional]
-     * @param  ?bool      $onNoMoreRows [optional]
-     *
-     * @return ?bool
      */
     public function fetchBool($column=0, ?int $row=null, ?bool $onNull=null, ?bool $onNoMoreRows=null): ?bool {
         if (func_num_args() < 4) $value = $this->fetchColumn($column, $row, null);
@@ -137,13 +129,6 @@ abstract class Result extends CObject implements ResultInterface {
 
     /**
      * {@inheritdoc}
-     *
-     * @param  string|int $column       [optional]
-     * @param  ?int       $row          [optional]
-     * @param  ?int       $onNull       [optional]
-     * @param  ?int       $onNoMoreRows [optional]
-     *
-     * @return ?int
      */
     public function fetchInt($column=0, ?int $row=null, ?int $onNull=null, ?int $onNoMoreRows=null): ?int {
         if (func_num_args() < 4) $value = $this->fetchColumn($column, $row, null);
@@ -162,8 +147,9 @@ abstract class Result extends CObject implements ResultInterface {
         if (strIsNumeric($value)) {
             $fValue = (float) $value;              // skip leading zeros of numeric strings
             $iValue = (int) $fValue;
-            if ($iValue == $fValue)
+            if ($iValue == $fValue) {
                 return $iValue;
+            }
         }
         throw new UnexpectedValueException('unexpected string value: "'.$value.'" (not an integer)');
     }
@@ -171,13 +157,6 @@ abstract class Result extends CObject implements ResultInterface {
 
     /**
      * {@inheritdoc}
-     *
-     * @param  string|int $column       [optional]
-     * @param  ?int       $row          [optional]
-     * @param  ?float     $onNull       [optional]
-     * @param  ?float     $onNoMoreRows [optional]
-     *
-     * @return ?float
      */
     public function fetchFloat($column=0, ?int $row=null, ?float $onNull=null, ?float $onNoMoreRows=null): ?float {
         if (func_num_args() < 4) $value = $this->fetchColumn($column, $row, null);
@@ -192,19 +171,15 @@ abstract class Result extends CObject implements ResultInterface {
 
 
     /**
-     * Return the index of the row beeing fetched by the next unqualified fetch* method call.
-     *
-     * @return int - row index (starting at 0) or -1 after reaching the end
+     * {@inheritdoc}
      */
     public function nextRowIndex(): int {
-        return (int) $this->nextRowIndex;
+        return $this->nextRowIndex;
     }
 
 
     /**
-     * Return the type of the DBMS the result is generated from.
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getType(): string {
         return $this->connector->getType();
@@ -212,9 +187,7 @@ abstract class Result extends CObject implements ResultInterface {
 
 
     /**
-     * Return the version of the DBMS the result is generated from as a string.
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getVersionString(): string {
         return $this->connector->getVersionString();
@@ -222,9 +195,7 @@ abstract class Result extends CObject implements ResultInterface {
 
 
     /**
-     * Return the version ID of the DBMS the result is generated from as an integer.
-     *
-     * @return int
+     * {@inheritdoc}
      */
     public function getVersionNumber(): int {
         return $this->connector->getVersionNumber();

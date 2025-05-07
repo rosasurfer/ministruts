@@ -371,15 +371,14 @@ class Module extends CObject {
                 $include = (string) $tag['include'];
                 if (!$this->isIncludable($include, $xml)) Struts::configError('<mapping'.$sName.' path="'.$path.'" include="'.$include.'": '.(strStartsWith($include, '.') ? 'Tile definition':'File').' not found.');
 
-                /** @var ActionForward $forward */
-                $forward = null;
-
                 if ($this->isTileDefinition($include, $xml)) {
                     $tile = $this->getTile($include, $xml);
                     if ($tile->isAbstract()) Struts::configError('<mapping'.$sName.' path="'.$path.'" include="'.$include.'": The included tile is a template and cannot be used in a "mapping" definition.');
+                    /** @var ActionForward $forward */
                     $forward = new $this->forwardClass('generic', $include, false);
                 }
                 else {
+                    /** @var ActionForward $forward */
                     $forward = new $this->forwardClass('generic', $this->findFile($include), false);
                 }
                 $mapping->setForward($forward);
@@ -403,7 +402,7 @@ class Module extends CObject {
                 if ($mapping->getForward()) Struts::configError('<mapping'.$sName.' path="'.$path.'": Only one of "action", "include", "redirect", "forward" can be specified.');
                 $forwardAttr = (string) $tag['forward'];
 
-                /** @var ActionForward|null $forward */
+                /** @var ?ActionForward $forward */
                 $forward = $this->findForward($forwardAttr);
                 if (!$forward)              Struts::configError('<mapping'.$sName.' path="'.$path.'": Forward "'.$forwardAttr.'" not found.');
                 $mapping->setForward($forward);
@@ -634,9 +633,6 @@ class Module extends CObject {
             return $tile;
         }
 
-        /** @var Tile $tile */
-        $tile = null;
-
         // attribute "file" %ResourcePath; #IMPLIED
         if (is_string($file)) {
             if (is_string($extends)) Struts::configError("<tile name=\"$name\": Only one of \"file\", \"extends\" or \"alias\" can be specified.");
@@ -644,6 +640,7 @@ class Module extends CObject {
             $filePath = $this->findFile($file);
             if (!$filePath) Struts::configError("<tile name=\"$name\" file=\"$file\": File not found.");
 
+            /** @var Tile $tile */
             $tile = new $this->tilesClass($this);
             $tile->setName($name);
             $tile->setFileName($filePath);
@@ -681,7 +678,7 @@ class Module extends CObject {
      *
      * @return void
      */
-    private function processTileProperties(Tile $tile, SimpleXMLElement $xml) {
+    private function processTileProperties(Tile $tile, SimpleXMLElement $xml): void {
         // process <include> elements
         foreach ($xml->{'include'} as $tag) {
             $name = (string) $tag['name'];
@@ -717,10 +714,10 @@ class Module extends CObject {
         foreach ($xml->{'set'} as $tag) {
             $name = (string) $tag['name'];
             $nodes = $xml->xpath("/struts-config/tiles/tile[@name='".$tile->getName()."']/set[@name='".$name."']") ?: [];
-            if (sizeof($nodes) > 1)   Struts::configError('<tile name="'.$tile->getName().'"> <set name="'.$name.'": Multiple elements with the same name found.');
+            if (sizeof($nodes) > 1)            Struts::configError('<tile name="'.$tile->getName().'"> <set name="'.$name.'": Multiple elements with the same name found.');
 
-            if (isset($tag['value'])) {                                 // value is specified as an attribute
-                if (strlen($tag) > 0) Struts::configError('<tile name="'.$tile->getName().'"> <set name="'.$name.'": Only one of attribute value or tag body value can be specified.');
+            if (isset($tag['value'])) {                                 // value is specified as attribute
+                if (strlen((string) $tag) > 0) Struts::configError('<tile name="'.$tile->getName().'"> <set name="'.$name.'": Only one of attribute value or tag body value can be specified.');
                 $value = (string) $tag['value'];
             }
             else {                                                      // value is specified as tag content
@@ -728,7 +725,7 @@ class Module extends CObject {
             }
 
             // TODO: check that $value matches the specified type
-            switch (((string)$tag['type']) ?: 'string') {
+            switch (((string) $tag['type']) ?: 'string') {
                 case 'bool' : $value =  (bool) $value; break;
                 case 'int'  : $value =   (int) $value; break;
                 case 'float': $value = (float) $value; break;

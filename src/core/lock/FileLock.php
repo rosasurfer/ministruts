@@ -5,7 +5,6 @@ namespace rosasurfer\ministruts\core\lock;
 
 use Throwable;
 
-use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\error\ErrorHandler;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 
@@ -32,8 +31,7 @@ final class FileLock extends BaseLock {
      *
      * @param  string $filename
      */
-    public function __construct($filename) {
-        Assert::string($filename);
+    public function __construct(string $filename) {
         if (\key_exists($filename, self::$hFiles)) throw new RuntimeException("Dead-lock: re-entry detected for lock file \"$filename\"");
         self::$hFiles[$filename] = null;                // pre-define the index and handle re-entry if the constructor crashes
 

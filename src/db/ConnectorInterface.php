@@ -25,7 +25,7 @@ interface ConnectorInterface {
      *
      * @return $this
      */
-    public function connect();
+    public function connect(): self;
 
 
     /**
@@ -33,7 +33,7 @@ interface ConnectorInterface {
      *
      * @return $this
      */
-    public function disconnect();
+    public function disconnect(): self;
 
 
     /**
@@ -41,7 +41,7 @@ interface ConnectorInterface {
      *
      * @return bool
      */
-    public function isConnected();
+    public function isConnected(): bool;
 
 
     /**
@@ -52,7 +52,7 @@ interface ConnectorInterface {
      *
      * @return string - escaped and quoted identifier
      */
-    public function escapeIdentifier($name);
+    public function escapeIdentifier(string $name): string;
 
 
     /**
@@ -63,7 +63,7 @@ interface ConnectorInterface {
      *
      * @return string - escaped and quoted string or stringified scalar value if the value was not a string
      */
-    public function escapeLiteral($value);
+    public function escapeLiteral($value): string;
 
 
     /**
@@ -82,10 +82,8 @@ interface ConnectorInterface {
      * @param  string $sql - SQL statement
      *
      * @return IResult
-     *
-     * @throws DatabaseException on errors
      */
-    public function query($sql);
+    public function query(string $sql): IResult;
 
 
     /**
@@ -95,10 +93,8 @@ interface ConnectorInterface {
      * @param  string $sql - SQL statement
      *
      * @return $this
-     *
-     * @throws DatabaseException on errors
      */
-    public function execute($sql);
+    public function execute(string $sql): self;
 
 
     /**
@@ -107,8 +103,6 @@ interface ConnectorInterface {
      * @param  string $sql - SQL statement
      *
      * @return mixed - raw driver response
-     *
-     * @throws DatabaseException on errors
      */
     public function executeRaw(string $sql);
 
@@ -118,7 +112,7 @@ interface ConnectorInterface {
      *
      * @return $this
      */
-    public function begin();
+    public function begin(): self;
 
 
     /**
@@ -126,7 +120,7 @@ interface ConnectorInterface {
      *
      * @return $this
      */
-    public function commit();
+    public function commit(): self;
 
 
     /**
@@ -134,7 +128,7 @@ interface ConnectorInterface {
      *
      * @return $this
      */
-    public function rollback();
+    public function rollback(): self;
 
 
     /**
@@ -153,25 +147,25 @@ interface ConnectorInterface {
      *
      * @return bool
      */
-    public function isInTransaction();
+    public function isInTransaction(): bool;
 
 
     /**
      * Return the last ID generated for an AUTO_INCREMENT column by a SQL statement (connector specific, see the db README).
      *
-     * @return int - last generated ID or 0 (zero) if no ID was generated yet in the current session;
+     * @return int - last generated ID or 0 (zero) if no ID was generated yet in the current session; <br>
      *               -1 if the DBMS doesn't support this functionality
      */
-    public function lastInsertId();
+    public function lastInsertId(): int;
 
 
     /**
      * Return the number of rows affected by the last row modifying statement (connector specific, see the db README).
      *
-     * @return int - last number of affected rows or 0 (zero) if no rows were modified yet in the current session;
+     * @return int - last number of affected rows or 0 (zero) if no rows were affected yet in the current session; <br>
      *               -1 if the DBMS doesn't support this functionality
      */
-    public function lastAffectedRows();
+    public function lastAffectedRows(): int;
 
 
     /**
@@ -179,7 +173,7 @@ interface ConnectorInterface {
      *
      * @return bool
      */
-    public function supportsInsertReturn();
+    public function supportsInsertReturn(): bool;
 
 
     /**
@@ -195,7 +189,7 @@ interface ConnectorInterface {
      *
      * @return string
      */
-    public function getType();
+    public function getType(): string;
 
 
     /**
@@ -203,7 +197,7 @@ interface ConnectorInterface {
      *
      * @return string
      */
-    public function getVersionString();
+    public function getVersionString(): string;
 
 
     /**
@@ -211,5 +205,5 @@ interface ConnectorInterface {
      *
      * @return int
      */
-    public function getVersionNumber();
+    public function getVersionNumber(): int;
 }

@@ -14,7 +14,7 @@ use rosasurfer\ministruts\core\CObject;
 abstract class Messenger extends CObject {
 
     /** @var mixed[] */
-    protected array $options;
+    protected array $options = [];
 
 
     /**

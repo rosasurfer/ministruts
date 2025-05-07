@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace rosasurfer\ministruts\config;
 
 use rosasurfer\ministruts\core\CObject;
-use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 
@@ -78,8 +77,6 @@ class Config extends CObject implements ConfigInterface {
 
         // check and load existing files
         foreach ($files as $i => $file) {
-            Assert::string($file, "\$files[$i]");
-
             $success = false;
             if (is_file($file)) {
                 $success = $this->loadFile($file);
@@ -109,8 +106,6 @@ class Config extends CObject implements ConfigInterface {
      * @return static
      */
     public static function createFrom(string $location): self {
-        Assert::string($location);
-
         // collect applicable config files
         $configDir = $configFile = null;
 

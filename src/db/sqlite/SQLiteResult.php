@@ -20,11 +20,8 @@ use const rosasurfer\ministruts\ARRAY_NUM;
  */
 class SQLiteResult extends Result {
 
-    /** @var string - SQL statement the result was generated from */
-    protected string $sql;
-
-    /** @var SQLite3Result|null - the database connector's original result object */
-    protected $result = null;
+    /** @var ?SQLite3Result - the database connector's original result object */
+    protected ?SQLite3Result $result = null;
 
     /** @var int - last inserted row id of the connection at instance creation time (not reset between queries) */
     protected int $lastInsertId = 0;
@@ -33,7 +30,7 @@ class SQLiteResult extends Result {
     protected int $lastAffectedRows = 0;
 
     /** @var int - number of rows returned by the statement */
-    protected int $numRows;
+    protected int $numRows = -1;
 
 
     /**
@@ -48,9 +45,9 @@ class SQLiteResult extends Result {
      * @param  int           $lastAffectedRows - last number of affected rows of the connection
      */
     public function __construct(Connector $connector, string $sql, SQLite3Result $result, int $lastInsertId, int $lastAffectedRows) {
-        $this->connector        = $connector;
-        $this->sql              = $sql;
-        $this->lastInsertId     = $lastInsertId;
+        parent::__construct($connector, $sql);
+
+        $this->lastInsertId = $lastInsertId;
         $this->lastAffectedRows = $lastAffectedRows;
 
         if (!$result->numColumns()) {                           // close empty results and release them to prevent access
@@ -96,10 +93,8 @@ class SQLiteResult extends Result {
             $this->nextRowIndex++;
         }
         else {
-            if (!isset($this->numRows)) {                       // update $numRows on-the-fly if not yet happened
-                $this->numRows = $this->nextRowIndex;
-            }
-            $row                = null;                         // prevent fetchArray() to trigger an automatic reset()
+            $this->numRows = $this->nextRowIndex;               // update $numRows whenever we hit the end
+            $row = null;                                        // prevent fetchArray() to trigger an automatic reset()
             $this->nextRowIndex = -1;                           // on second $row == null
         }
         return $row;
@@ -113,7 +108,7 @@ class SQLiteResult extends Result {
      * @return int - last generated ID or 0 (zero) if no ID was generated yet in the current session
      */
     public function lastInsertId(): int {
-        return (int) $this->lastInsertId;
+        return $this->lastInsertId;
     }
 
 
@@ -125,31 +120,27 @@ class SQLiteResult extends Result {
      * @return int - last number of affected rows or 0 (zero) if no rows were affected yet in the current session
      */
     public function lastAffectedRows(): int {
-        return (int) $this->lastAffectedRows;
+        return $this->lastAffectedRows;
     }
 
 
     /**
-     * Return the number of rows returned by the query.
-     *
-     * @return int
+     * {@inheritdoc}
      */
     public function numRows(): int {
-        if (!isset($this->numRows)) {
-            if (!$this->result) {
-                throw new IllegalAccessException('Cannot call method '.__FUNCTION__.'() after the result has been released');
-            }
+        if ($this->numRows < 0) {
+            if (!$this->result) throw new IllegalAccessException('Cannot call method '.__FUNCTION__.'() after the result has been released');
 
             // no support for num_rows() in SQLite3, need to count manually
             $previous = $this->nextRowIndex;
 
             while ($this->fetchRow());                          // loop from current position to the end
 
-            // we hit the end
-            if ($this->numRows) {
+            // we hit the end, $numRows is updated
+            if ($this->numRows > 0) {                           // @phpstan-ignore greater.alwaysFalse ($this->fetchRow() has side effects PHPStan doesn't detect)
                 $this->result->reset();                         // back to start
                 $this->nextRowIndex = 0;
-                while ($previous--) {                           // loop back to former position
+                while ($previous--) {                           // loop back to restore previous position
                     $this->fetchRow();
                 }
             }
@@ -160,8 +151,6 @@ class SQLiteResult extends Result {
 
     /**
      * {@inheritdoc}
-     *
-     * @return void
      */
     public function release(): void {
         if ($this->result) {

@@ -18,13 +18,12 @@ use rosasurfer\ministruts\core\exception\InvalidValueException;
  * <pre>
  *  &lt;?php
  *  $dependency = FileDependency::create('/etc/crontab')
- *  ->andDependency(FileDependency::create('/etc/hosts'))
- *  ->andDependency(FileDependency::create('/etc/resolve.conf'));
- *
+ *                              ->andDependency(FileDependency::create('/etc/hosts'))
+ *                              ->andDependency(FileDependency::create('/etc/resolve.conf'));
  *  ...
  *
  *  if (!$dependency->isValid()) {
- *      // state of one of the files has changed, trigger some action...
+ *      // state of at least one file changed, trigger some action...
  *  }
  * </pre>
  *

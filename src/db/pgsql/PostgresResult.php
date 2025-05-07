@@ -5,7 +5,6 @@ namespace rosasurfer\ministruts\db\pgsql;
 
 use PgSql\Result as PgSqlResult;
 
-use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\db\ConnectorInterface as Connector;
 use rosasurfer\ministruts\db\Result;
 
@@ -20,7 +19,7 @@ use const rosasurfer\ministruts\ARRAY_NUM;
  */
 class PostgresResult extends Result {
 
-    // Status codes as returned by pg_result_status(PGSQL_STATUS_LONG)
+    // status codes as returned by pg_result_status(PGSQL_STATUS_LONG)
 
     /** @var int - The string sent to the server was empty. */
     const STATUS_EMPTY_QUERY    = \PGSQL_EMPTY_QUERY;
@@ -47,20 +46,17 @@ class PostgresResult extends Result {
     const STATUS_FATAL_ERROR    = \PGSQL_FATAL_ERROR;
 
 
-    /** @var string - SQL statement the result was generated from */
-    protected $sql;
-
     /**
-     * @var resource|PgSqlResult|null - the database connector's original result handle
+     * @var  resource|PgSqlResult|null - the database connector's original result handle
      * @phpstan-var PgSqlResultId|null
      */
     protected $result = null;
 
     /** @var int - last number of affected rows (not reset between queries) */
-    protected $lastAffectedRows = 0;
+    protected int $lastAffectedRows = 0;
 
     /** @var int - number of rows returned by the statement */
-    protected $numRows;
+    protected int $numRows;
 
 
     /**
@@ -68,18 +64,15 @@ class PostgresResult extends Result {
      *
      * Called only when execution of a SQL statement returned successfully.
      *
-     * @param  Connector            $connector        - the connector managing the database connection
-     * @param  string               $sql              - executed SQL statement
-     * @param  resource|PgSqlResult $result           - result handle
-     * @phpstan-param PgSqlResultId $result
-     * @param  int                  $lastAffectedRows - last number of affected rows of the connection
+     * @param         Connector            $connector        - the connector managing the database connection
+     * @param         string               $sql              - executed SQL statement
+     * @param         resource|PgSqlResult $result           - result handle or object (before/since PHP8.1+)
+     * @phpstan-param PgSqlResultId        $result
+     * @param         int                  $lastAffectedRows - last number of affected rows of the connection
      */
     public function __construct(Connector $connector, string $sql, $result, int $lastAffectedRows) {
-        // @phpstan-ignore booleanOr.alwaysTrue, instanceof.alwaysFalse (PHP80/81 incompatibility)
-        Assert::true(is_resource($result) || $result instanceof PgSqlResult, 'resource|PgSqlResult $result');
+        parent::__construct($connector, $sql);
 
-        $this->connector = $connector;
-        $this->sql = $sql;
         $this->result = $result;
         $this->lastAffectedRows = $lastAffectedRows;
 
@@ -144,7 +137,7 @@ class PostgresResult extends Result {
      * @return int - last number of affected rows or 0 (zero) if no rows were affected yet in the current session
      */
     public function lastAffectedRows(): int {
-        return (int) $this->lastAffectedRows;
+        return $this->lastAffectedRows;
     }
 
 
@@ -191,9 +184,7 @@ class PostgresResult extends Result {
      *
      * @return string
      */
-    public static function statusToStr($status): string {
-        Assert::int($status);
-
+    public static function statusToStr(int $status): string {
         switch ($status) {
             case PGSQL_EMPTY_QUERY   : return 'PGSQL_EMPTY_QUERY';
             case PGSQL_COMMAND_OK    : return 'PGSQL_COMMAND_OK';

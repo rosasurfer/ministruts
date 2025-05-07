@@ -21,22 +21,19 @@ class ApcCache extends CachePeer {
      * @param  ?string $label   [optional] - cache identifier (namespace, default: none)
      * @param  mixed[] $options [optional] - additional instantiation options (default: none)
      */
-    public function __construct(?string $label=null, array $options=[]) {
+    public function __construct(?string $label = null, array $options = []) {
         /** @var Config $config */
         $config = $this->di('config');
 
+        $label ??= '';
         $this->label     = $label;
-        $this->namespace = $label ?? md5($config['app.dir.root']);
+        $this->namespace = strlen($label) ? $label : md5($config['app.dir.root']);
         $this->options   = $options;
     }
 
 
     /**
      * {@inheritdoc}
-     *
-     * @param  string $key
-     *
-     * @return bool
      */
     public function isCached(string $key): bool {
         // The actual working horse. This method does not only check the key's existence, it also retrieves the value and
@@ -96,11 +93,6 @@ class ApcCache extends CachePeer {
 
     /**
      * {@inheritdoc}
-     *
-     * @param  string $key
-     * @param  mixed  $default [optional]
-     *
-     * @return mixed
      */
     public function get(string $key, $default = null) {
         if ($this->isCached($key)) {
@@ -112,10 +104,6 @@ class ApcCache extends CachePeer {
 
     /**
      * {@inheritdoc}
-     *
-     * @param  string $key
-     *
-     * @return bool
      */
     public function drop(string $key): bool {
         $this->getReferencePool()->drop($key);
@@ -125,13 +113,6 @@ class ApcCache extends CachePeer {
 
     /**
      * {@inheritdoc}
-     *
-     * @param  string      $key
-     * @param  mixed       $value
-     * @param  int         $expires    [optional]
-     * @param  ?Dependency $dependency [optional]
-     *
-     * @return bool
      */
     public function set(string $key, $value, int $expires=Cache::EXPIRES_NEVER, ?Dependency $dependency=null): bool {
         // stored data: [created, expires, serialized([value, dependency])]

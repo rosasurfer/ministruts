@@ -105,7 +105,7 @@ class PostgresConnector extends Connector {
      *
      * @return $this
      */
-    protected function setOptions(array $options) {
+    protected function setOptions(array $options): self {
         $this->options = $options;
         return $this;
     }
@@ -116,7 +116,7 @@ class PostgresConnector extends Connector {
      *
      * @return string
      */
-    private function getConnectionString() {
+    private function getConnectionString(): string {
         // supported keywords:  https://www.postgresql.org/docs/9.6/static/libpq-connect.html#LIBPQ-PARAMKEYWORDS
         $paramKeywords = [
             'host',
@@ -191,7 +191,7 @@ class PostgresConnector extends Connector {
      *
      * @return string
      */
-    protected function getConnectionDescription() {
+    protected function getConnectionDescription(): string {
         $options = $this->options;
 
         if ($this->connection) {
@@ -224,7 +224,7 @@ class PostgresConnector extends Connector {
      *
      * @return ?string - schema search path or NULL in case of errors
      */
-    protected function getSchemaSearchPath() {
+    protected function getSchemaSearchPath(): ?string {
         $options = $this->options;
         $path = null;
 
@@ -260,11 +260,9 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * Connect the adapter to the database.
-     *
-     * @return $this
+     * {@inheritdoc}
      */
-    public function connect() {
+    public function connect(): self {
         $connStr = $this->getConnectionString();
 
         try {
@@ -291,7 +289,7 @@ class PostgresConnector extends Connector {
      *
      * @return $this
      */
-    protected function setConnectionOptions() {
+    protected function setConnectionOptions(): self {
         $options = $this->sessionVars;
         //$options['time_zone'] = date_default_timezone_get();      // synchronize connection timezone with PHP timezone
 
@@ -305,11 +303,9 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * Disconnect the adapter from the database.
-     *
-     * @return $this
+     * {@inheritdoc}
      */
-    public function disconnect() {
+    public function disconnect(): self {
         if ($this->isConnected()) {
             /** @phpstan-var PgSqlConnectionId $connection */
             $connection = $this->connection;
@@ -325,23 +321,17 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * Whether the adapter is currently connected to the database.
-     *
-     * @return bool
+     * {@inheritdoc}
      */
-    public function isConnected() {
+    public function isConnected(): bool {
         return isset($this->connection);
     }
 
 
     /**
      * {@inheritdoc}
-     *
-     * @param  string $name
-     *
-     * @return string
      */
-    public function escapeIdentifier($name) {
+    public function escapeIdentifier(string $name): string {
         if (!$this->isConnected()) {
             $this->connect();
         }
@@ -365,11 +355,9 @@ class PostgresConnector extends Connector {
     /**
      * {@inheritdoc}
      */
-    public function escapeLiteral($value) {
+    public function escapeLiteral($value): string {
         // bug or feature: pg_escape_literal(null) => '' quoted empty string instead of 'null'
         if ($value === null)  return 'null';
-        Assert::scalar($value);
-
         if (is_bool ($value)) return $value ? 'true':'false';
         if (is_int  ($value)) return (string) $value;
         if (is_float($value)) return (string) $value;
@@ -388,10 +376,6 @@ class PostgresConnector extends Connector {
 
     /**
      * {@inheritdoc}
-     *
-     * @param  ?string $value
-     *
-     * @return ?string
      */
     public function escapeString(?string $value): ?string {
         // bug or feature: pg_escape_string(null) => empty string instead of NULL
@@ -413,7 +397,7 @@ class PostgresConnector extends Connector {
     /**
      * Fix the encoding of a potentially non-UTF-8 encoded value.
      *
-     * @param string $value - potentially non-UTF-8 encoded value
+     * @param  string $value - potentially non-UTF-8 encoded value
      *
      * @return string - UTF-8 encoded value
      *
@@ -429,31 +413,20 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * Execute a SQL statement and return the result. This method should be used for SQL statements returning rows.
-     *
-     * @param  string $sql - SQL statement
+     * {@inheritdoc}
      *
      * @return PostgresResult
-     *
-     * @throws DatabaseException on errors
      */
-    public function query($sql) {
+    public function query($sql): PostgresResult {
         $result = $this->executeRaw($sql);
         return new PostgresResult($this, $sql, $result, $this->lastAffectedRows());
     }
 
 
     /**
-     * Execute a SQL statement and skip potential result set processing. This method should be used for SQL statements not
-     * returning rows.
-     *
-     * @param  string $sql - SQL statement
-     *
-     * @return $this
-     *
-     * @throws DatabaseException on errors
+     * {@inheritdoc}
      */
-    public function execute($sql) {
+    public function execute(string $sql): self {
         $result = $this->executeRaw($sql);
         if (is_resource($result))
             pg_free_result($result);
@@ -462,14 +435,10 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * Execute a SQL statement and return the internal driver's raw response.
-     *
-     * @param  string $sql - SQL statement
+     * {@inheritdoc}
      *
      * @return resource|PgSqlResult - result
      * @phpstan-return PgSqlResultId
-     *
-     * @throws DatabaseException on errors
      */
     public function executeRaw(string $sql) {
         if (!$this->isConnected()) {
@@ -513,7 +482,7 @@ class PostgresConnector extends Connector {
      *
      * @return $this
      */
-    public function begin() {
+    public function begin(): self {
         if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
 
         if (!$this->transactionLevel) {
@@ -525,11 +494,9 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * Commit a pending transaction.
-     *
-     * @return $this
+     * {@inheritdoc}
      */
-    public function commit() {
+    public function commit(): self {
         if ($this->transactionLevel < 0) throw new RuntimeException("Negative transaction nesting level detected: $this->transactionLevel");
 
         // don't throw an exception; trigger a warning which goes to the log
@@ -555,7 +522,7 @@ class PostgresConnector extends Connector {
      *
      * @return $this
      */
-    public function rollback() {
+    public function rollback(): self {
         if ($this->transactionLevel < 0) throw new RuntimeException("Negative transaction nesting level detected: $this->transactionLevel");
 
         // don't throw an exception; trigger a warning which goes to the log
@@ -576,11 +543,9 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * Whether the connection currently is in a transaction.
-     *
-     * @return bool
+     * {@inheritdoc}
      */
-    public function isInTransaction() {
+    public function isInTransaction(): bool {
         if ($this->isConnected()) {
             return ($this->transactionLevel > 0);
         }
@@ -589,13 +554,13 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * Return the last ID generated for a SERIAL column by a SQL statement. The value is not reset between queries (see the
-     * db README).
+     * Return the last ID generated for a SERIAL column by a SQL statement. The value is not reset
+     * between queries (see the db README).
      *
      * @return int - last generated ID or 0 (zero) if no ID was generated yet in the current session
      *               -1 if the PostgreSQL version doesn't support this functionality
      */
-    public function lastInsertId() {
+    public function lastInsertId(): int {
         if (!isset($this->lastInsertId)) {
             $version = $this->getVersionNumber();
 
@@ -633,17 +598,15 @@ class PostgresConnector extends Connector {
      *
      * @return int - last number of affected rows or 0 (zero) if no rows were affected yet in the current session
      */
-    public function lastAffectedRows() {
+    public function lastAffectedRows(): int {
         return (int) $this->lastAffectedRows;
     }
 
 
     /**
-     * Whether the DBMS's SQL dialect supports 'insert into ... returning ...' syntax.
-     *
-     * @return bool
+     * {@inheritdoc}
      */
-    public function supportsInsertReturn() {
+    public function supportsInsertReturn(): bool {
         return true;
     }
 
@@ -666,21 +629,19 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * Return the type of the DBMS the connector is used for.
-     *
-     * @return string
+     * {@inheritdoc}
      */
-    public function getType() {
+    public function getType(): string {
         return $this->type;
     }
 
 
     /**
-     * Return the version of the DBMS the connector is used for as a string.
+     * {@inheritdoc}
      *
      * @return string - e.g. "9.1.23-rc"
      */
-    public function getVersionString() {
+    public function getVersionString(): string {
         if ($this->versionString === null) {
             if (!$this->isConnected()) {
                 $this->connect();
@@ -690,7 +651,7 @@ class PostgresConnector extends Connector {
 
             $version = pg_version($connection);
             $versionStr = (string)($version['server'] ?? '');
-            Assert::notEmpty($versionStr, "unexpected pgsql version string \"$versionStr\"");
+            Assert::stringNotEmpty($versionStr, "unexpected pgsql version string \"$versionStr\"");
 
             $this->versionString = $versionStr;
         }
@@ -699,11 +660,11 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * Return the version ID of the DBMS the connector is used for as an integer.
+     * {@inheritdoc}
      *
      * @return int - e.g. 9001023 for version string "9.1.23-rc"
      */
-    public function getVersionNumber() {
+    public function getVersionNumber(): int {
         if ($this->versionNumber === null) {
             $version = $this->getVersionString();
 

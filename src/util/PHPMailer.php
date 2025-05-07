@@ -76,7 +76,6 @@ class PHPMailer extends CObject {
 
         // first validate the additional headers
         foreach ($headers as $i => $header) {
-            Assert::string($header, '$headers['.$i.']');
             if (!preg_match('/^[a-z]+(-[a-z]+)*:/i', $header)) {
                 throw new InvalidValueException('Invalid parameter $headers['.$i.']: "'.$header.'"');
             }

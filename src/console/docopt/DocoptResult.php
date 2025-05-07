@@ -23,16 +23,16 @@ class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
 
 
     /** @var array<string, bool|int|string[]|null> */
-    protected $args;
+    protected array $args;
 
     /** @var string */
-    protected $usage;
+    protected string $usage;
 
     /** @var int */
-    protected $error;
+    protected int $error;
 
     /** @var string */
-    protected $errorMessage;
+    protected string $errorMessage;
 
 
     /**
@@ -56,9 +56,9 @@ class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
     /**
      * Return the parsed CLI arguments.
      *
-     * @return array<bool|int|string[]|null>
+     * @return array<string, bool|int|string[]|null>
      */
-    public function getArgs() {
+    public function getArgs(): array {
         return $this->args;
     }
 
@@ -68,7 +68,7 @@ class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
      *
      * @return string
      */
-    public function getUsage() {
+    public function getUsage(): string {
         return $this->usage;
     }
 
@@ -79,7 +79,7 @@ class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
      *
      * @return int
      */
-    public function getError() {
+    public function getError(): int {
         return $this->error;
     }
 
@@ -89,7 +89,7 @@ class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
      *
      * @return string
      */
-    public function getErrorMessage() {
+    public function getErrorMessage(): string {
         return $this->errorMessage;
     }
 
@@ -99,27 +99,21 @@ class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
      *
      * @return bool
      */
-    public function isSuccess() {
+    public function isSuccess(): bool {
         return (int)$this->error == 0;
     }
 
 
     /**
      * {@inheritdoc}
-     *
-     * @param  mixed $offset
-     *
-     * @return bool
      */
     public function offsetExists($offset): bool {
-        return isset($this->args[$offset]);
+        return key_exists($offset, $this->args);
     }
 
 
     /**
      * {@inheritdoc}
-     *
-     * @param  mixed $offset
      *
      * @return bool|int|string[]|null
      */
@@ -131,11 +125,6 @@ class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
 
     /**
      * {@inheritdoc}
-     *
-     * @param  mixed $offset
-     * @param  mixed $value
-     *
-     * @return void
      */
     public function offsetSet($offset, $value): void {
         throw new IllegalAccessException('Modification of CLI parse results denied');
@@ -144,10 +133,6 @@ class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
 
     /**
      * {@inheritdoc}
-     *
-     * @param  mixed $offset
-     *
-     * @return void
      */
     public function offsetUnset($offset): void {
         throw new IllegalAccessException('Modification of CLI parse results denied');
@@ -160,6 +145,6 @@ class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
      * @return ArrayIterator<string, bool|int|string[]|null>
      */
     public function getIterator(): ArrayIterator {
-        return new ArrayIterator($this->args);
-    }
+        return new ArrayIterator($this->args);                  // @phpstan-ignore return.type (false positive in PHPStan2+ levels 3-7)
+    }                                                           // Template type TValue on class ArrayIterator is not covariant.
 }

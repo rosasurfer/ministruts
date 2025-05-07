@@ -15,8 +15,8 @@ class ChainedDependency extends Dependency {
     /** @var Dependency[] - all dependencies of the instance */
     private array $dependencies;
 
-    /** @var string - logical dependency type of the instance (AND | OR) */
-    private string $type;
+    /** @var ?string - logical dependency type of the instance (AND | OR) */
+    private ?string $type = null;
 
 
     /**
@@ -44,8 +44,6 @@ class ChainedDependency extends Dependency {
 
     /**
      * {@inheritdoc}
-     *
-     * @return self
      */
     public function andDependency(Dependency $dependency): self {
         if ($dependency === $this) {
@@ -54,7 +52,6 @@ class ChainedDependency extends Dependency {
         if ($this->type == 'OR') {
             return self::create($this)->andDependency($dependency);
         }
-
         $this->type = 'AND';
         $this->dependencies[] = $dependency;
         $this->setMinValidity(max($this->getMinValidity(), $dependency->getMinValidity()));
@@ -65,8 +62,6 @@ class ChainedDependency extends Dependency {
 
     /**
      * {@inheritdoc}
-     *
-     * @return self
      */
     public function orDependency(Dependency $dependency): self {
         if ($dependency === $this) {
@@ -85,8 +80,6 @@ class ChainedDependency extends Dependency {
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
     public function isValid(): bool {
         if ($this->type == 'AND') {

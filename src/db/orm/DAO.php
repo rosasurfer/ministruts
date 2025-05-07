@@ -220,16 +220,14 @@ abstract class DAO extends Singleton {
 
         // [connection]
         $connection = $mapping['connection'] ?? $configError('missing element "connection"');
-        Assert::string($connection, 'invalid element "connection" (string expected)');
-        $connection = trim($connection);
-        Assert::notEmpty($connection, 'invalid element "connection" (non-empty-string expected)');
+        is_string($connection) && $connection = trim($connection);
+        Assert::stringNotEmpty($connection, 'invalid element "connection" (non-empty-string expected)');
         $entity['connection'] = $connection;
 
         // [table]
         $table = $mapping['table'] ?? $configError('missing element "table"');
-        Assert::string($table, 'invalid element "table" (string expected)');
-        $table = trim($table);
-        Assert::notEmpty($table, 'invalid element "table" (non-empty-string expected)');
+        is_string($table) && $table = trim($table);
+        Assert::stringNotEmpty($table, 'invalid element "table" (non-empty-string expected)');
         $entity['table'] = $table;
 
         // [properties]
@@ -241,28 +239,24 @@ abstract class DAO extends Singleton {
             $property = [];
 
             $name = $userdata['name'] ?? $configError("missing attribute [properties][$i][\"name\"]");
-            Assert::string($name, "invalid attribute [properties][$i][\"name\"] (string expected)");
-            $name = trim($name);
-            Assert::notEmpty($name, "invalid attribute [properties][$i][\"name\"] (non-empty-string expected)");
+            is_string($name) && $name = trim($name);
+            Assert::stringNotEmpty($name, "invalid attribute [properties][$i][\"name\"] (non-empty-string expected)");
             $property['name'] = $name;
 
             $type = $userdata['type'] ?? $configError("missing attribute [properties][$i][@name=$name \"type\"]");
-            Assert::string($type, "invalid attribute [properties][$i][@name=$name \"type\"] (string expected)");
-            $type = trim($type);
-            Assert::notEmpty($type, "invalid attribute [properties][$i][@name=$name \"type\"] (non-empty-string expected)");
+            is_string($type) && $type = trim($type);
+            Assert::stringNotEmpty($type, "invalid attribute [properties][$i][@name=$name \"type\"] (non-empty-string expected)");
             // TODO: validate "type" (can also be a custom type)
             $property['type'] = $type;
 
             $column = $userdata['column'] ?? $name;
-            Assert::string($column, "invalid attribute [properties][$i][@name=$name \"column\"] (string expected)");
-            $column = trim($column);
-            Assert::notEmpty($column, "invalid attribute [properties][$i][@name=$name \"column\"] (non-empty-string expected)");
+            is_string($column) && $column = trim($column);
+            Assert::stringNotEmpty($column, "invalid attribute [properties][$i][@name=$name \"column\"] (non-empty-string expected)");
             $property['column'] = $column;
 
             $columnType = $userdata['column-type'] ?? $type;
-            Assert::string($columnType, "invalid attribute [properties][$i][@name=$name \"column-type\"] (string expected)");
-            $columnType = trim($columnType);
-            Assert::notEmpty($columnType, "invalid attribute [properties][$i][@name=$name \"column-type\"] (non-empty-string expected)");
+            is_string($columnType) && $columnType = trim($columnType);
+            Assert::stringNotEmpty($columnType, "invalid attribute [properties][$i][@name=$name \"column-type\"] (non-empty-string expected)");
             // TODO: validate "column-type" (can also be a custom type)
             $property['column-type'] = $columnType;
 
@@ -309,9 +303,8 @@ abstract class DAO extends Singleton {
             $relation = [];
 
             $name = $userdata['name'] ?? $configError("missing attribute [relations][$i][\"name\"]");
-            Assert::string($name, "invalid attribute [relations][$i][\"name\"] (string expected)");
-            $name = trim($name);
-            Assert::notEmpty($name, "invalid attribute [relations][$i][\"name\"] (non-empty-string expected)");
+            is_string($name) && $name = trim($name);
+            Assert::stringNotEmpty($name, "invalid attribute [relations][$i][\"name\"] (non-empty-string expected)");
             $relation['name'] = $name;
 
             $type = $userdata['type'] ?? $configError("missing attribute [relations][$i][@name=$name \"type\"]");
@@ -336,16 +329,14 @@ abstract class DAO extends Singleton {
                     if (isset($userdata['column'])) {
                         // variant 1: local foreign-key column, optional ref-column, no join table
                         $column = $userdata['column'];
-                        Assert::string($column, "invalid attribute [relations][$i][@name=$name \"column\"] (string expected)");
-                        $column = trim($column);
-                        Assert::notEmpty($column, "invalid attribute [relations][$i][@name=$name \"column\"] (non-empty-string expected)");
+                        is_string($column) && $column = trim($column);
+                        Assert::stringNotEmpty($column, "invalid attribute [relations][$i][@name=$name \"column\"] (non-empty-string expected)");
                         $relation['column'] = $column;
 
                         if (isset($userdata['ref-column'])) {
                             $refColumn = $userdata['ref-column'];
-                            Assert::string($refColumn, "invalid attribute [relations][$i][@name=$name \"ref-column\"] (string expected)");
-                            $refColumn = trim($refColumn);
-                            Assert::notEmpty($refColumn, "invalid attribute [relations][$i][@name=$name \"ref-column\"] (non-empty-string expected)");
+                            is_string($refColumn) && $refColumn = trim($refColumn);
+                            Assert::stringNotEmpty($refColumn, "invalid attribute [relations][$i][@name=$name \"ref-column\"] (non-empty-string expected)");
                             $relation['ref-column'] = $refColumn;
                         }
                         if (isset($userdata['join-table'])) $configError("invalid relation [relations][$i][@name=$name] (attribute \"column\" cannot be combined with attribute \"join-table\")");
@@ -353,9 +344,8 @@ abstract class DAO extends Singleton {
                     else {
                         // variant 2: no local foreign-key column, required ref-column, optional join table
                         $refColumn = $userdata['ref-column'] ?? $configError("missing attribute [relations][$i][@name=$name \"ref-column\"]");
-                        Assert::string($refColumn, "invalid attribute [relations][$i][@name=$name \"ref-column\"] (string expected)");
-                        $refColumn = trim($refColumn);
-                        Assert::notEmpty($refColumn, "invalid attribute [relations][$i][@name=$name \"ref-column\"] (non-empty-string expected)");
+                        is_string($refColumn) && $refColumn = trim($refColumn);
+                        Assert::stringNotEmpty($refColumn, "invalid attribute [relations][$i][@name=$name \"ref-column\"] (non-empty-string expected)");
                         $relation['ref-column'] = $refColumn;
                     }
                     $relation = $this->validateJoinTableSettings($userdata, $relation, true, $i, $entityClass);
@@ -367,9 +357,8 @@ abstract class DAO extends Singleton {
                     if (isset($userdata['column'])) $configError("invalid relation [relations][$i][@name=$name] (type \"one-to-many\" cannot have attribute \"column\")");
 
                     $refColumn = $userdata['ref-column'] ?? $configError("missing attribute [relations][$i][@name=$name \"ref-column\"]");
-                    Assert::string($refColumn, "invalid attribute [relations][$i][@name=$name \"ref-column\"] (string expected)");
-                    $refColumn = trim($refColumn);
-                    Assert::notEmpty($refColumn, "invalid attribute [relations][$i][@name=$name \"ref-column\"] (non-empty-string expected)");
+                    is_string($refColumn) && $refColumn = trim($refColumn);
+                    Assert::stringNotEmpty($refColumn, "invalid attribute [relations][$i][@name=$name \"ref-column\"] (non-empty-string expected)");
                     $relation['ref-column'] = $refColumn;
 
                     $relation = $this->validateJoinTableSettings($userdata, $relation, true, $i, $entityClass);
@@ -379,16 +368,14 @@ abstract class DAO extends Singleton {
                 case 'many-to-one':
                     // required local foreign-key column, optional ref-column, no join table
                     $column = $userdata['column'] ?? $configError("missing attribute [relations][$i][@name=$name \"column\"]");
-                    Assert::string($column, "invalid attribute [relations][$i][@name=$name \"column\"] (string expected)");
-                    $column = trim($column);
-                    Assert::notEmpty($column, "invalid attribute [relations][$i][@name=$name \"column\"] (non-empty-string expected)");
+                    is_string($column) && $column = trim($column);
+                    Assert::stringNotEmpty($column, "invalid attribute [relations][$i][@name=$name \"column\"] (non-empty-string expected)");
                     $relation['column'] = $column;
 
                     if (isset($userdata['ref-column'])) {
                         $refColumn = $userdata['ref-column'];
-                        Assert::string($refColumn, "invalid attribute [relations][$i][@name=$name \"ref-column\"] (string expected)");
-                        $refColumn = trim($refColumn);
-                        Assert::notEmpty($refColumn, "invalid attribute [relations][$i][@name=$name \"ref-column\"] (non-empty-string expected)");
+                        is_string($refColumn) && $refColumn = trim($refColumn);
+                        Assert::stringNotEmpty($refColumn, "invalid attribute [relations][$i][@name=$name \"ref-column\"] (non-empty-string expected)");
                         $relation['ref-column'] = $refColumn;
                     }
 
@@ -473,33 +460,29 @@ abstract class DAO extends Singleton {
         else {
             // "join-table" (required)
             $joinTable = $userdata['join-table'] ?? $configError("missing attribute [relations][$i][@name=$name \"join-table\"]");
-            Assert::string($joinTable, "invalid attribute [relations][$i][@name=$name \"join-table\"] (string expected)");
-            $joinTable = trim($joinTable);
-            Assert::notEmpty($joinTable, "invalid attribute [relations][$i][@name=$name \"join-table\"] (non-empty-string expected)");
+            is_string($joinTable) && $joinTable = trim($joinTable);
+            Assert::stringNotEmpty($joinTable, "invalid attribute [relations][$i][@name=$name \"join-table\"] (non-empty-string expected)");
             $newData['join-table'] = $joinTable;
 
             // "ref-column" (required)
             if (!isset($relation['ref-column'])) {
                 $refColumn = $userdata['ref-column'] ?? $configError("missing attribute [relations][$i][@name=$name \"ref-column\"]");
-                Assert::string($refColumn, "invalid attribute [relations][$i][@name=$name \"ref-column\"] (string expected)");
-                $refColumn = trim($refColumn);
-                Assert::notEmpty($refColumn, "invalid attribute [relations][$i][@name=$name \"ref-column\"] (non-empty-string expected)");
+                is_string($refColumn) && $refColumn = trim($refColumn);
+                Assert::stringNotEmpty($refColumn, "invalid attribute [relations][$i][@name=$name \"ref-column\"] (non-empty-string expected)");
                 $newData['ref-column'] = $refColumn;
             }
 
             // "fk-ref-column" (required)
             $fkRefColumn = $userdata['fk-ref-column'] ?? $configError("missing attribute [relations][$i][@name=$name \"fk-ref-column\"]");
-            Assert::string($fkRefColumn, "invalid attribute [relations][$i][@name=$name \"fk-ref-column\"] (string expected)");
-            $fkRefColumn = trim($fkRefColumn);
-            Assert::notEmpty($fkRefColumn, "invalid attribute [relations][$i][@name=$name \"fk-ref-column\"] (non-empty-string expected)");
+            is_string($fkRefColumn) && $fkRefColumn = trim($fkRefColumn);
+            Assert::stringNotEmpty($fkRefColumn, "invalid attribute [relations][$i][@name=$name \"fk-ref-column\"] (non-empty-string expected)");
             $newData['fk-ref-column'] = $fkRefColumn;
 
             // "foreign-key" (optional)
             if (isset($userdata['foreign-key'])) {
                 $foreignKey = $userdata['foreign-key'];
-                Assert::string($foreignKey, "invalid attribute [relations][$i][@name=$name \"foreign-key\"] (string expected)");
-                $foreignKey = trim($foreignKey);
-                Assert::notEmpty($foreignKey, "invalid attribute [relations][$i][@name=$name \"foreign-key\"] (non-empty-string expected)");
+                is_string($foreignKey) && $foreignKey = trim($foreignKey);
+                Assert::stringNotEmpty($foreignKey, "invalid attribute [relations][$i][@name=$name \"foreign-key\"] (non-empty-string expected)");
                 $newData['foreign-key'] = $foreignKey;
             }
         }
