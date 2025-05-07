@@ -8,13 +8,10 @@
         "email": "ministruts@rosasurfer.com"
     }],
     "config": {
-        "platform": {
-            "php": "7.4"
-        },
         "optimize-autoloader": true
     },
     "require": {
-        "php":           "7.4 - 8",
+        "php":           "^7.4|^8.0",
         "ext-ctype":     "*",
         "ext-filter":    "*",
         "ext-json":      "*",
@@ -31,16 +28,16 @@
         "psr-4": {
             "rosasurfer\\ministruts\\": "src/"
         },
-        "classmap": [
-            "etc/phpstan/extension/",
-            "etc/phpstan/symbols/"
-        ],        
         "files": ["src/load.php"]
     },
     "autoload-dev": {
         "psr-4": {
             "rosasurfer\\ministruts\\test\\": "test/"
-        }
+        },
+        "classmap": [
+            "etc/phpstan/extension/",
+            "etc/phpstan/symbols/"
+        ]
     },
     "extra": {
         "branch-alias": {
