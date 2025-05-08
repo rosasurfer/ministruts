@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\struts;
 
+use Closure;
+
 use rosasurfer\ministruts\Application;
 use rosasurfer\ministruts\config\ConfigInterface as Config;
 use rosasurfer\ministruts\core\CObject;
@@ -279,7 +281,7 @@ class Tile extends CObject {
         if (Application::isAdminIP()) {
             /** @var Config $config */
             $config = $this->di('config');
-            $rootDir  = $config['app.dir.root'];
+            $rootDir  = $config->getString('app.dir.root');
             $file     = $this->fileName;
             $file     = strRightFrom($file, $rootDir.DIRECTORY_SEPARATOR, 1, false, $file);
             $file     = 'file="'.str_replace('\\', '/', $file).'"';
@@ -307,18 +309,17 @@ class Tile extends CObject {
      * @return void
      */
     protected function includeFile($file, array $properties) {
-        static $includeFile = null;
-        if (!$includeFile) {
-            // define scope isolated Closure
-            $includeFile = \Closure::bind(static function() {
-                foreach (func_get_args()[1] as $__name13ae1dbf8af83a86 => $__value13ae1dbf8af83a86) {
-                    $$__name13ae1dbf8af83a86 = $__value13ae1dbf8af83a86;        // We can't use extract() as it skips variables with
-                }                                                               // irregular names (e.g. with dots).
-                unset($__name13ae1dbf8af83a86, $__value13ae1dbf8af83a86);       // Surprisingly foreach() is even faster.
+        static $includeFile;
+        // define scope isolated Closure
+        $includeFile ??= Closure::bind(static function() {
+            // @phpstan-ignore foreach.nonIterable
+            foreach (func_get_args()[1] as $__key13ae1dbf8af83a86 => $__value13ae1dbf8af83a86) {
+                $$__key13ae1dbf8af83a86 = $__value13ae1dbf8af83a86;         // We can't use extract() as it skips variables with
+            }                                                               // irregular names (e.g. with dots).
+            unset($__key13ae1dbf8af83a86, $__value13ae1dbf8af83a86);        // Surprisingly foreach() is even faster.
 
-                include(func_get_args()[0]);
-            }, null, null);
-        }
+            include(func_get_args()[0]);
+        }, null, null);
 
         // include the file
         $includeFile($file, $properties);

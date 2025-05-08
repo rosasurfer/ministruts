@@ -151,7 +151,9 @@ class PrintAppender extends BaseAppender {
      */
     public static function getDefaultEnabled(): bool {
         // default: enabled on CLI, php.ini setting "display_errors=On" or white-listed web access
-        return CLI || ini_get_bool('display_errors') || Application::isAdminIP();
+        static $result;
+        $result ??= CLI || ini_get_bool('display_errors') || Application::isAdminIP();
+        return $result;
     }
 
 

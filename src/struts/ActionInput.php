@@ -13,19 +13,19 @@ use rosasurfer\ministruts\core\exception\IllegalAccessException;
  * An object providing access to the current HTTP request's raw user input.
  * Use {@link ActionForm} to access the request's validated and interpreted input.
  *
- * @implements \ArrayAccess<string, mixed>
+ * @implements \ArrayAccess<string, string|array<string>>
  */
 class ActionInput extends CObject implements \ArrayAccess {
 
 
-    /** @var array<string, mixed> */
+    /** @var array<string, string|array<string|array<string>>> */
     protected $parameters;
 
 
     /**
      * Constructor
      *
-     * @param  array<string, mixed> $parameters
+     * @param  array<string, string|array<string|array<string>>> $parameters
      */
     public function __construct(array $parameters) {
         $this->parameters = $parameters;
@@ -35,9 +35,9 @@ class ActionInput extends CObject implements \ArrayAccess {
     /**
      * Return all raw input parameters.
      *
-     * @return array<string, mixed>
+     * @return array<string, string|array<string|array<string>>>
      */
-    public function all() {
+    public function all(): array {
         return $this->parameters;
     }
 
@@ -72,7 +72,7 @@ class ActionInput extends CObject implements \ArrayAccess {
      * @param  string   $name               - parameter name
      * @param  string[] $default [optional] - values to return if the specified parameter array was not transmitted (default: empty array)
      *
-     * @return string[]
+     * @return array<string|string[]>
      */
     public function getArray($name, array $default = []) {
         if (\key_exists($name, $this->parameters)) {
@@ -133,7 +133,7 @@ class ActionInput extends CObject implements \ArrayAccess {
      *
      * @param  string $name
      *
-     * @return string|string[]|null - parameter or NULL if no such input parameter exists
+     * @return string|array<string|string[]>|null - parameter or NULL if no such input parameter exists
      */
     #[\ReturnTypeWillChange]
     public function offsetGet($name) {
@@ -151,8 +151,6 @@ class ActionInput extends CObject implements \ArrayAccess {
      * @param  mixed  $value
      *
      * @return void
-     *
-     * @throws IllegalAccessException
      */
     final public function offsetSet($name, $value): void {
         throw new IllegalAccessException('Cannot modify ActionInput parameters');
@@ -165,8 +163,6 @@ class ActionInput extends CObject implements \ArrayAccess {
      * @param  string $name
      *
      * @return void
-     *
-     * @throws IllegalAccessException
      */
     final public function offsetUnset($name): void {
         throw new IllegalAccessException('Cannot modify ActionInput parameters');

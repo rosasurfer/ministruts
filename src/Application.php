@@ -71,9 +71,7 @@ class Application extends CObject {
 
         /** @var Config $config */
         $config = $this->initConfig($options);
-
-        /** @var string $configDir */
-        $configDir = $config['app.dir.config'];
+        $configDir = $config->getString('app.dir.config');
         $di = $this->initDi($configDir);
         $di->set('app', $this);
         $di->set('config', $config);
@@ -204,7 +202,7 @@ class Application extends CObject {
 
         // ensure that we have an "app.id"
         $appId = $config->get('app.id', null);
-        if (!$appId) $config->set('app.id', substr(md5($config['app.dir.root']), 0, 16));
+        if (!$appId) $config->set('app.id', substr(md5($config->getString('app.dir.root')), 0, 16));
 
         // enforce mission-critical PHP requirements
         if (!php_ini_loaded_file()) {

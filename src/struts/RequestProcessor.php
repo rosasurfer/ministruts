@@ -491,21 +491,21 @@ PROCESS_METHOD_ERROR_SC_405;
      *
      * @return void
      */
-    protected function storeActionMessages(Request $request) {
+    protected function storeActionMessages(Request $request): void {
         $errors = $request->getActionErrors();
         if ($errors) {
             $request->getSession();                     // initialize session
-            if (isset($_SESSION[Struts::ACTION_ERRORS_KEY]))
-                $errors = \array_merge($_SESSION[Struts::ACTION_ERRORS_KEY], $errors);
-            $_SESSION[Struts::ACTION_ERRORS_KEY] = $errors;
+            /** @var string[] $existing */
+            $existing = $_SESSION[Struts::ACTION_ERRORS_KEY] ?? [];
+            $_SESSION[Struts::ACTION_ERRORS_KEY] = \array_merge($existing, $errors);
         }
 
         $messages = $request->getActionMessages();
         if ($messages) {
             $request->getSession();                     // initialize session
-            if (isset($_SESSION[Struts::ACTION_MESSAGES_KEY]))
-                $messages = \array_merge($_SESSION[Struts::ACTION_MESSAGES_KEY], $messages);
-            $_SESSION[Struts::ACTION_MESSAGES_KEY] = $messages;
+            /** @var string[] $existing */
+            $existing = $_SESSION[Struts::ACTION_MESSAGES_KEY] ?? [];
+            $_SESSION[Struts::ACTION_MESSAGES_KEY] = \array_merge($existing, $messages);
         }
     }
 
@@ -518,19 +518,17 @@ PROCESS_METHOD_ERROR_SC_405;
      *
      * @return void
      */
-    protected function restoreActionMessages(Request $request) {
+    protected function restoreActionMessages(Request $request): void {
         if ($request->hasSessionId()) {
             $request->getSession();                     // initialize session
-            $messages = $errors = [];
 
-            if (isset($_SESSION[Struts::ACTION_MESSAGES_KEY])) {
-                $messages = $_SESSION[Struts::ACTION_MESSAGES_KEY];
-                unset($_SESSION[Struts::ACTION_MESSAGES_KEY]);
-            }
-            if (isset($_SESSION[Struts::ACTION_ERRORS_KEY])) {
-                $errors = $_SESSION[Struts::ACTION_ERRORS_KEY];
-                unset($_SESSION[Struts::ACTION_ERRORS_KEY]);
-            }
+            /** @var string[] $messages */
+            $messages = $_SESSION[Struts::ACTION_MESSAGES_KEY] ?? [];
+            /** @var string[] $errors */
+            $errors = $_SESSION[Struts::ACTION_ERRORS_KEY] ?? [];
+
+            unset($_SESSION[Struts::ACTION_ERRORS_KEY]);
+
             $request->setAttribute(Struts::ACTION_MESSAGES_KEY, \array_merge($messages, $errors));
         }
     }

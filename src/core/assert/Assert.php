@@ -123,9 +123,9 @@ class Assert extends StaticClass {
      * @return bool
      *
      * @phpstan-return ($value is array ? true : false)
-     * @phpstan-assert array $value
+     * @phpstan-assert array<mixed> $value
      */
-    public static function isArray($value, $message = '', ...$args) {
+    public static function isArray($value, string $message = '', ...$args): bool {
         if (!is_array($value)) {
             throw new InvalidTypeException(static::illegalTypeMessage($value, 'array', $message, $args));
         }
@@ -406,9 +406,9 @@ class Assert extends StaticClass {
      * @return bool
      *
      * @phpstan-return ($value is ?array ? true : false)
-     * @phpstan-assert ?array $value
+     * @phpstan-assert ?array<mixed> $value
      */
-    public static function nullOrArray($value, $message = '', ...$args) {
+    public static function nullOrArray($value, string $message = '', ...$args): bool {
         if (isset($value) && !is_array($value)) {
             throw new InvalidTypeException(static::illegalTypeMessage($value, 'null or array', $message, $args));
         }

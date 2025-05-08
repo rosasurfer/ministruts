@@ -22,7 +22,7 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
     protected $request;
 
     /** @var string - dispatch action key, populated if the Action handling the request is a DispatchAction */
-    protected $actionKey;
+    protected string $actionKey = '';
 
     /** @var string[] */
     protected static $fileUploadErrors = [
@@ -109,11 +109,10 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
         //   )
         //
         $params = $this->request->input()->all();
-        if (isset($params['submit']['action'])) {
-            $key = $params['submit']['action'];
-            if (is_string($key)) {
-                $this->actionKey = $key;
-            }
+
+        $action = $params['submit']['action'] ?? null;
+        if (is_string($action)) {
+            $this->actionKey = $action;
         }
     }
 
@@ -121,11 +120,9 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
     /**
      * Return the dispatch action key (if the action is a {@link DispatchAction} and a key was submitted).
      *
-     * @return ?string - action key or NULL if no action key was submitted
-     *
-     * @see    java.struts.DispatchAction
+     * @return string - action key or an empty string if no action key was submitted
      */
-    public function getActionKey() {
+    public function getActionKey(): string {
         return $this->actionKey;
     }
 

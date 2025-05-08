@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\struts;
 
-use rosasurfer\ministruts\config\ConfigInterface;
+use rosasurfer\ministruts\config\ConfigInterface as Config;
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\exception\IllegalStateException;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
@@ -63,7 +63,7 @@ class Request extends CObject {
     protected $files = null;
 
     /** @var mixed[] - additional variables context */
-    protected $attributes = [];
+    protected array $attributes = [];
 
 
     /**
@@ -176,7 +176,7 @@ class Request extends CObject {
      *
      * @todo   convert the returned arrays to instances of UploadedFile
      */
-    public function getFiles() {
+    public function getFiles(): array {
         if (!isset($this->files)) {
             $normalizeLevel = null;
             $normalizeLevel = function(array $file) use (&$normalizeLevel) {
@@ -388,9 +388,10 @@ class Request extends CObject {
             $baseUri = $this->resolveBaseUriVar();
 
             if (!isset($baseUri)) {
-                /** @var ConfigInterface $config */
+                /** @var Config $config */
                 $config  = $this->di('config');
-                $baseUri = $config->get('app.base-uri', false);
+                /** @var ?string $baseUri */
+                $baseUri = $config->get('app.base-uri', null);
                 if (!$baseUri) throw new RuntimeException('Unknown application base URI, either $_SERVER["APP_BASE_URI"] or $config["app.base-uri"] needs to be configured.');
             }
             !strStartsWith($baseUri, '/') && $baseUri  = '/'.$baseUri;
@@ -688,7 +689,9 @@ class Request extends CObject {
         if (!$names) {
             return $headers;
         }
-        return \array_intersect_ukey($headers, \array_flip($names), 'strcasecmp');
+        /** @phpstan-var callable-string $func*/
+        $func = 'strcasecmp';
+        return \array_intersect_ukey($headers, \array_flip($names), $func);
     }
 
 
@@ -1070,11 +1073,9 @@ class Request extends CObject {
 
 
     /**
-     * Return a human-readable version of the request.
-     *
-     * @return string
+     * {@inheritdoc}
      */
-    public function __toString() {
+    public function __toString(): string {
         // request
         $string = $_SERVER['REQUEST_METHOD'].' '.$_SERVER['REQUEST_URI'].' '.$_SERVER['SERVER_PROTOCOL'].NL;
 
