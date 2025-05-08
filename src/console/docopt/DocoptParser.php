@@ -200,12 +200,12 @@ class DocoptParser extends CObject {
     protected static function parseArgs(TokenIterator $tokens, OptionIterator $options, $optionsFirst = false) {
         $parsed = [];
 
-        while ($tokens->current() !== null) {
+        while ($tokens->current() !== null) {               // @phpstan-ignore notIdentical.alwaysTrue (FIXME: refactor using Iterator->valid())
             if ($tokens->current() == '--') {
-                while ($tokens->current() !== null) {
+                while ($tokens->current() !== null) {       // @phpstan-ignore notIdentical.alwaysTrue (FIXME: refactor using Iterator->valid())
                     $parsed[] = new Argument(null, $tokens->move());
                 }
-                return $parsed;                             // @phpstan-ignore deadCode.unreachable (refactor using iterator->valid())
+                return $parsed;                             // @phpstan-ignore deadCode.unreachable (FIXME: refactor using Iterator->valid())
             }
             elseif (strStartsWith($tokens->current(), '--')) {
                 $parsed = array_merge($parsed, static::parseLong($tokens, $options));
@@ -222,7 +222,7 @@ class DocoptParser extends CObject {
                 $parsed[] = new Argument(null, $tokens->move());
             }
         }
-        return $parsed;                                     // @phpstan-ignore deadCode.unreachable (refactor using iterator->valid())
+        return $parsed;                                     // @phpstan-ignore deadCode.unreachable (FIXME: refactor using Iterator->valid())
     }
 
 
@@ -262,11 +262,11 @@ class DocoptParser extends CObject {
     protected static function parsePattern(string $source, OptionIterator $options): Required {
         $tokens = TokenIterator::fromPattern($source);
         $result = static::parseExpression($tokens, $options);
-        if ($tokens->current() !== null) {
+        if ($tokens->current() !== null) {                  // @phpstan-ignore notIdentical.alwaysTrue (FIXME: refactor using Iterator->valid())
             $error = $tokens->getErrorClass();
             throw new $error('Unexpected ending: '.join(' ', $tokens->left()));
         }
-        return new Required($result);                       // @phpstan-ignore deadCode.unreachable (refactor using iterator->valid())
+        return new Required($result);                       // @phpstan-ignore deadCode.unreachable (FIXME: refactor using Iterator->valid())
     }
 
 
@@ -298,21 +298,21 @@ class DocoptParser extends CObject {
      */
     protected static function parseExpression(TokenIterator $tokens, OptionIterator $options) {
         $seq = static::parseSequence($tokens, $options);
-        if ($tokens->current() != '|')
+        if ($tokens->current() !== '|') {
             return $seq;
-
+        }
         $result = null;
         if (sizeof($seq) > 1) $result = [new Required($seq)];
         else                  $result = $seq;
 
-        while ($tokens->current() == '|') {                 // @phpstan-ignore while.alwaysTrue (refactor using iterator->valid())
+        while ($tokens->current() === '|') {                // @phpstan-ignore while.alwaysTrue,identical.alwaysTrue (FIXME: refactor using Iterator->valid())
             $tokens->move();
             $seq = static::parseSequence($tokens, $options);
             if (sizeof($seq) > 1) $result[] = new Required($seq);
             else                  $result   = array_merge($result, $seq);
         }
 
-        if (sizeof($result) > 1)                            // @phpstan-ignore deadCode.unreachable (refactor using iterator->valid())
+        if (sizeof($result) > 1)                            // @phpstan-ignore deadCode.unreachable (FIXME: refactor using Iterator->valid())
             return new Either($result);
         return $result;
     }
@@ -359,7 +359,7 @@ class DocoptParser extends CObject {
 
         $left = ltrim($token, '-');
         $parsed = [];
-        while ($left != '') {
+        while ($left !== '') {
             $short = '-'.$left[0];
             $left = substr($left, 1);
             $similar = [];
@@ -385,8 +385,8 @@ class DocoptParser extends CObject {
                 $o = new Option($short, $similar[0]->long, $similar[0]->argcount, $similar[0]->value);
                 $value = null;
                 if ($o->argcount != 0) {
-                    if ($left == '') {
-                        if ($tokens->current()===null || $tokens->current()=='--') {    // @phpstan-ignore identical.alwaysFalse (refactor using iterator->valid())
+                    if ($left === '') {
+                        if ($tokens->current()===null || $tokens->current()=='--') {    // @phpstan-ignore identical.alwaysFalse (FIXME: refactor using Iterator->valid())
                             $error = $tokens->getErrorClass();
                             throw new $error($short.' requires an argument');
                         }
@@ -434,9 +434,6 @@ class DocoptParser extends CObject {
         if (strpos($long, '--') !== 0) {
             throw new \UnexpectedValueException("Expected long option, found '$long'");
         }
-
-        $value = (!$eq && !$value) ? null : $value;
-
         $similar = array_values(array_filter($options, function($o) use ($long) {
             return ($o->long && $o->long==$long);
         }));
@@ -445,7 +442,7 @@ class DocoptParser extends CObject {
                 return ($o->long && strpos($o->long, $long)===0);
             }));
         }
-        /** @var Option $o */
+        /** @var ?Option $o */
         $o = null;
 
         if (!$similar) {
@@ -468,7 +465,7 @@ class DocoptParser extends CObject {
                 if (isset($value)) throw new $tokenError("$o->long must not have an argument");
             }
             elseif ($value === null) {
-                // @phpstan-ignore identical.alwaysFalse (refactor using iterator->valid())
+                // @phpstan-ignore identical.alwaysFalse (FIXME: refactor using Iterator->valid())
                 if ($tokens->current()===null || $tokens->current()=='--') throw new $tokenError("$o->long requires an argument");
                 $value = $tokens->move();
             }

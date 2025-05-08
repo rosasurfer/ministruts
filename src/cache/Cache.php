@@ -5,11 +5,11 @@ namespace rosasurfer\ministruts\cache;
 
 use rosasurfer\ministruts\config\ConfigInterface as Config;
 use rosasurfer\ministruts\core\StaticClass;
+use rosasurfer\ministruts\core\exception\RuntimeException;
 
 use function rosasurfer\ministruts\ini_get_bool;
 
 use const rosasurfer\ministruts\CLI;
-use rosasurfer\ministruts\core\exception\RuntimeException;
 
 
 /**

@@ -10,7 +10,7 @@ includes:
 
 
 parameters:
-  level: 8                                          # default rule level, a rule level on the command line overrides this value
+  level: 5                                          # default rule level, a rule level on the command line overrides this value
 
   bootstrapFiles:                                   # initialize runtime environment before PHPStan runs
     - init.php
@@ -39,8 +39,9 @@ parameters:
   universalObjectCratesClasses:
     - rosasurfer\ministruts\struts\ActionForm
 
-  ignoreErrors:
-    # silence erroneous checks
+  checkUninitializedProperties: true
+
+  ignoreErrors:                                     # silence erroneous checks
     - '#^Unsafe usage of new static\(\)\.$#'
 
   reportUnmatchedIgnoredErrors: false
@@ -51,7 +52,7 @@ parameters:
   tipsOfTheDay: false
 
 
-services:                                           # must be loadable via Composer
+services:                                           # classes must be loadable by Composer
   - class: rosasurfer\ministruts\phpstan\CoreFunctionReturnType
     tags:
       - phpstan.broker.dynamicFunctionReturnTypeExtension

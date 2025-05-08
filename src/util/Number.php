@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace rosasurfer\ministruts\util;
 
 use rosasurfer\ministruts\core\StaticClass;
-use rosasurfer\ministruts\core\assert\Assert;
 
 
 /**
@@ -25,9 +24,6 @@ class Number extends StaticClass {
      * @return string
      */
     public static function formatMoney($value, int $decimals=2, string $decimalsSeparator='.', string $thousandsSeparator=''): string {
-        // @phpstan-ignore booleanOr.alwaysTrue (types come from PHPDoc)
-        Assert::true(is_int($value) || is_float($value), 'int|float $value');
-
         return number_format($value, $decimals, $decimalsSeparator, $thousandsSeparator);
     }
 }

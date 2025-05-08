@@ -29,7 +29,7 @@ class CurlHttpClient extends HttpClient {
 
     /**
      * @var resource|CurlHandle|null - cURL handle
-     * @phpstan-var CurlHandleId|null
+     * @phpstan-var ?CurlHandleId
      */
     protected $hCurl = null;
 
@@ -156,7 +156,7 @@ class CurlHttpClient extends HttpClient {
         try {
             if ($this->hCurl) {
                 $hTmp = $this->hCurl;
-                unset($this->hCurl);
+                $this->hCurl = null;
                 curl_close($hTmp);
             }
         }

@@ -12,11 +12,6 @@ class Either extends BranchPattern {
 
     /**
      * {@inheritdoc}
-     *
-     * @param  Pattern[] $left
-     * @param  Pattern[] $collected [optional]
-     *
-     * @return array{bool, Pattern[], Pattern[]}
      */
     public function match(array $left, array $collected = []) {
         $outcomes = [];

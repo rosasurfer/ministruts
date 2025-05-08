@@ -96,9 +96,10 @@ class DaoReturnType extends Extension implements DynamicMethodReturnTypeExtensio
         $scopeTypeDescr = $scopeType->describe(VerbosityLevel::typeOnly());
         $scopeDescr     = simpleClassName(get_class($scopeType)).'('.simpleClassName($scopeTypeDescr).')';
 
-        // validate the scope of the call
-        if (!$scopeType instanceof TypeWithClassName) throw new ExtensionException("$call: unexpected scope $scopeDescr (expected TypeWithClassName)");
-        $scopeClass = $scopeType->getClassName();
+        // get the class of the call
+        $classNames = $scopeType->getObjectClassNames();
+        if (sizeof($classNames) != 1) throw new ExtensionException("$call: unexpected scope class name: ".join(', ', $classNames).' (expected exactly one)');
+        $scopeClass = $classNames[0];
 
         // skip calls from the base DAO itself
         $origType = $this->getOriginalTypeFromMethodCall($method, $methodCall, $scope);
@@ -109,7 +110,9 @@ class DaoReturnType extends Extension implements DynamicMethodReturnTypeExtensio
         // validate the model class
         if (!strEndsWith($scopeClass, 'DAO')) throw new ExtensionException("$call: unexpected scope class $scopeClass (expected a model DAO)");
         $modelClass = strLeft($scopeClass, -3);
-        if (!is_subclass_of($modelClass, PersistableObject::class)) throw new ExtensionException("$call: invalid model class $modelClass (not an PersistableObject)");
+        if (!is_subclass_of($modelClass, PersistableObject::class)) {                                           // @phpstan-ignore phpstanApi.runtimeReflection (PHPStan 2.+)
+            throw new ExtensionException("$call: invalid model class $modelClass (not an PersistableObject)");  // Extensions only rule, but it doesn't check origin of arguments.
+        }
 
         // validate the supported return types
         $origTypeDescr = $origType->describe(VerbosityLevel::typeOnly());

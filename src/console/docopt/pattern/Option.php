@@ -80,9 +80,7 @@ class Option extends LeafPattern {
 
 
     /**
-     * @param  Pattern[] $left
-     *
-     * @return SingleMatch
+     * {@inheritdoc}
      */
     public function singleMatch(array $left) {
         foreach ($left as $i => $pattern) {
@@ -98,6 +96,6 @@ class Option extends LeafPattern {
      * @return string
      */
     public function name(): string {
-        return $this->long ?? $this->short;         // @phpstan-ignore  return.type (one of them is always set)
+        return $this->long ?? $this->short;         // @phpstan-ignore return.type (one of them is always set)
     }
 }

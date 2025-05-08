@@ -13,7 +13,6 @@ use Traversable;
 
 use rosasurfer\ministruts\console\docopt\DocoptParser;
 use rosasurfer\ministruts\console\docopt\DocoptResult;
-use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\di\proxy\Request;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
@@ -689,7 +688,6 @@ function objectToArray(object $object, int $access = ACCESS_PUBLIC): array {
  */
 function php_byte_value($value): int {
     if (is_int($value)) return $value;
-    Assert::string($value);
     if (!strlen($value)) return 0;
 
     $match = null;
@@ -736,16 +734,13 @@ function pluralize(int $count, string $singular='', string $plural='s'): string 
 function prettyBytes($value, int $decimals = 1): string {
     if (!is_int($value)) {
         if (is_string($value)) {
-            if (!strIsNumeric($value)) throw new InvalidValueException('Invalid parameter $value: "'.$value.'" (non-numeric)');
+            if (!strIsNumeric($value)) throw new InvalidValueException("Invalid parameter \$value: \"$value\" (non-numeric)");
             $value = (float) $value;
         }
-        else Assert::float($value, '$value');
-
-        if ($value < PHP_INT_MIN) throw new InvalidValueException('Invalid parameter $value: '.$value.' (out of range)');
-        if ($value > PHP_INT_MAX) throw new InvalidValueException('Invalid parameter $value: '.$value.' (out of range)');
+        if ($value < PHP_INT_MIN) throw new InvalidValueException("Invalid parameter \$value: $value (out of range)");
+        if ($value > PHP_INT_MAX) throw new InvalidValueException("Invalid parameter \$value: $value (out of range)");
         $value = (int) round($value);
     }
-    Assert::int($decimals, '$decimals');
 
     if ($value < 1024) {
         return (string) $value;
@@ -880,8 +875,6 @@ function simpleClassName($class): string {
     if (is_object($class)) {
         $class = get_class($class);
     }
-    else Assert::string($class);
-
     return strRightFrom($class, '\\', -1, false, $class);
 }
 
@@ -1019,8 +1012,6 @@ function strEndsWith(string $string, $suffix, bool $ignoreCase = false): bool {
         }
         return false;
     }
-    Assert::string($suffix, '$suffix');
-
     $stringLen = strlen($string);
     $suffixLen = strlen($suffix);
 
@@ -1233,9 +1224,8 @@ function strLeftTo(string $string, string $limiter, int $count=1, bool $includeL
 function strRight(string $string, int $length): string {
     if (!$length) return '';
 
-    /** @var string|false $result - since PHP8.0 substr() always returns string */
     $result = substr($string, -$length);
-    return $result===false ? '' : $result;
+    return $result===false ? '' : $result;          // @phpstan-ignore identical.alwaysFalse (since PHP8.0 substr() always returns string)
 }
 
 
@@ -1330,8 +1320,6 @@ function strStartsWith(string $string, $prefix, bool $ignoreCase = false): bool 
         }
         return false;
     }
-    Assert::string($prefix, '$prefix');
-
     if (!strlen($string) || !strlen($prefix)) {
         return false;
     }
@@ -1408,7 +1396,6 @@ function strToTimestamp(string $string, $format = 'Y-m-d'): ?int {
         }
         return null;
     }
-    Assert::string($format, '$format');
 
     $year = $month = $day = $hour = $minute = $second = $m = null;
 

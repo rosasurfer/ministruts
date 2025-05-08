@@ -17,7 +17,7 @@ final class ReferencePool extends CachePeer {
 
 
     /** @var array<string, mixed> */
-    private array $pool;
+    private array $pool = [];
 
 
     /**
@@ -26,14 +26,14 @@ final class ReferencePool extends CachePeer {
      * @param  ?string $label   [optional] - cache identifier (namespace, ignored for in-memory instances)
      * @param  mixed[] $options [optional] - additional instantiation options (default: none)
      */
-    public function __construct(?string $label=null, array $options=[]) {
-        $this->label   = $label;
+    public function __construct(?string $label = null, array $options = []) {
+        $this->label   = $label ?? '';
         $this->options = $options;
     }
 
 
     /**
-     * Return the {@link ReferencePool} instance of the cache (the identity manager).
+     * {@inheritdoc}
      *
      * @return $this
      */
@@ -44,10 +44,6 @@ final class ReferencePool extends CachePeer {
 
     /**
      * {@inheritdoc}
-     *
-     * @param  string $key
-     *
-     * @return bool
      */
     public function isCached($key): bool {
         if (!isset($this->pool[$key])) {
@@ -67,11 +63,6 @@ final class ReferencePool extends CachePeer {
 
     /**
      * {@inheritdoc}
-     *
-     * @param  string $key
-     * @param  mixed  $default [optional]
-     *
-     * @return mixed
      */
     public function get(string $key, $default = null) {
         if ($this->isCached($key)) {
@@ -83,10 +74,6 @@ final class ReferencePool extends CachePeer {
 
     /**
      * {@inheritdoc}
-     *
-     * @param  string $key
-     *
-     * @return bool
      */
     public function drop(string $key): bool {
         if (isset($this->pool[$key])) {
@@ -99,13 +86,6 @@ final class ReferencePool extends CachePeer {
 
     /**
      * {@inheritdoc}
-     *
-     * @param  string      $key
-     * @param  mixed       $value
-     * @param  int         $expires    [optional]
-     * @param  ?Dependency $dependency [optional]
-     *
-     * @return bool
      */
     public function set(string $key, $value, int $expires = Cache::EXPIRES_NEVER, ?Dependency $dependency = null): bool {
         // stored data: [created, value, expires, dependency]

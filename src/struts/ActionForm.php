@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace rosasurfer\ministruts\struts;
 
 use rosasurfer\ministruts\core\CObject;
-use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\exception\IllegalAccessException;
 
 
@@ -156,9 +155,7 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
      *
      * @return mixed
      */
-    public function get($name, $default = null) {
-        Assert::string($name);
-
+    public function get(string $name, $default = null) {
         switch ($name) {
             case 'request':
             case 'fileUploadErrors':
@@ -182,8 +179,6 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
      * @return bool
      */
     public function offsetExists($name): bool {
-        Assert::string($name);
-
         switch ($name) {
             case 'request':
             case 'fileUploadErrors':

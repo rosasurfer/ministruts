@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace rosasurfer\ministruts\struts;
 
 use rosasurfer\ministruts\core\CObject;
-use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\net\http\HttpResponse;
 
@@ -79,8 +78,7 @@ class ActionForward extends CObject {
      *
      * @return $this
      */
-    public function setName($name) {
-        Assert::string($name);
+    public function setName(string $name): self {
         if (!strlen($name)) throw new InvalidValueException('Invalid parameter $name: '.$name);
 
         $this->name = $name;
@@ -105,10 +103,8 @@ class ActionForward extends CObject {
      *
      * @return $this
      */
-    public function setPath($path) {
-        Assert::string($path);
+    public function setPath(string $path): self {
         if (!strlen($path)) throw new InvalidValueException('Invalid parameter $path: '.$path);
-
         $this->path = $path;
         return $this;
     }
@@ -131,8 +127,7 @@ class ActionForward extends CObject {
      *
      * @return $this
      */
-    public function setRedirect($status) {
-        Assert::bool($status);
+    public function setRedirect(bool $status): self {
         $this->redirect = $status;
         return $this;
     }
@@ -155,8 +150,7 @@ class ActionForward extends CObject {
      *
      * @return $this
      */
-    public function setRedirectType($type) {
-        Assert::int($type);
+    public function setRedirectType(int $type): self {
         $this->redirectType = $type;
         return $this;
     }
@@ -170,10 +164,8 @@ class ActionForward extends CObject {
      *
      * @return $this
      */
-    public function addQueryData($key, $value) {
+    public function addQueryData(string $key, $value): self {
         // TODO: freeze the instance after configuration and automatically call copy()
-        Assert::string      ($key,   '$key');
-        Assert::nullOrScalar($value, '$value');
 
         if (is_bool($value)) $value = (int) $value;
         $value = (string) $value;
@@ -194,9 +186,8 @@ class ActionForward extends CObject {
      *
      * @return $this
      */
-    public function setHash($value) {
+    public function setHash($value): self {
         // TODO: freeze the instance after configuration and automatically call copy()
-        Assert::scalar($value);
 
         if (is_bool($value)) $value = (int) $value;
         $value = (string) $value;

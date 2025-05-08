@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace rosasurfer\ministruts\db\orm\meta;
 
 use rosasurfer\ministruts\core\CObject;
-use rosasurfer\ministruts\core\exception\RuntimeException;
 
 
 /**
@@ -19,7 +18,7 @@ class EntityMapping extends CObject {
     protected $className;
 
     /**
-     * @var         array<string, mixed>> - mapping information
+     * @var         array<string, mixed> - mapping information
      * @phpstan-var ORM_ENTITY
      *
      * @see \rosasurfer\ministruts\phpstan\ORM_ENTITY
@@ -90,11 +89,9 @@ class EntityMapping extends CObject {
      *
      * @return PropertyMapping
      */
-    public function getIdentity() {
+    public function getIdentity(): PropertyMapping {
         if ($this->identity === null) {
-            $identity = $this->mapping['identity'] ?? null;
-            if (!$identity) throw new RuntimeException('Invalid mapping for "'.$this->getClassName().'" (primary key not found)');
-
+            $identity = $this->mapping['identity'];
             $this->identity = new PropertyMapping($this, $identity);
         }
         return $this->identity;

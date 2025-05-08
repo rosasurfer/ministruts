@@ -314,7 +314,7 @@ abstract class PersistableObject extends CObject {
     /**
      * Return the instance's identity value (i.e. the value of the primary key).
      *
-     * @return int|string - identity value
+     * @return int|string|null - identity value
      */
     final public function getObjectId() {
         $mapping = $this->dao()->getMapping();
@@ -328,7 +328,7 @@ abstract class PersistableObject extends CObject {
      *
      * @return bool
      */
-    final public function isPersistent() {
+    final public function isPersistent(): bool {
         // TODO: this check cannot yet handle composite primary keys
         $id = $this->getObjectId();
         return ($id !== null);
@@ -596,8 +596,8 @@ abstract class PersistableObject extends CObject {
         }                                                                   //        ...
         $sql  = strLeft($sql, -1);                                          //        ...
         $sql .= " where $idColumn = $idValue";                              //    where id = value
-        if ($versionMapping) {                                              //        ...                           @phpstan-ignore if.alwaysFalse      (keep for further development)
-            $op = $oldVersion=='null' ? 'is':'=';                           //        ...                           @phpstan-ignore ternary.alwaysFalse (keep for further development)
+        if ($versionMapping) {                                              //        ...                           @phpstan-ignore if.alwaysFalse        (keep for further development)
+            $op = $oldVersion==='null' ? 'is':'=';                           //        ...                          @phpstan-ignore identical.alwaysFalse (keep for further development)
             $sql .= " and $versionColumn $op $oldVersion";                  //      and version = oldVersion
         }
 

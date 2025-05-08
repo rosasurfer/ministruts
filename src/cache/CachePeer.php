@@ -24,17 +24,17 @@ use rosasurfer\ministruts\core\CObject;
 abstract class CachePeer extends CObject {
 
 
-    /** @var ?string */
-    protected ?string $label = null;
+    /** @var string */
+    protected string $label = '';
 
     /** @var string */
-    protected string $namespace;
+    protected string $namespace = '';
 
     /** @var mixed[] */
-    protected array $options;
+    protected array $options = [];
 
-    /** @var ReferencePool */
-    private ReferencePool $referencePool;
+    /** @var ?ReferencePool */
+    private ?ReferencePool $referencePool = null;
 
 
     /**

@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace rosasurfer\ministruts\struts;
 
 use rosasurfer\ministruts\core\CObject;
-use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\di\proxy\Request as RequestProxy;
 use rosasurfer\ministruts\core\exception\IllegalStateException;
 
@@ -139,8 +138,7 @@ class ActionMapping extends CObject {
      *
      * @return bool
      */
-    public function isSupportedMethod($method) {
-        Assert::string($method);
+    public function isSupportedMethod(string $method): bool {
         return isset($this->methods[strtoupper($method)]);
     }
 

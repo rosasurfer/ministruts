@@ -30,10 +30,6 @@ abstract class BranchPattern extends Pattern {
 
     /**
      * {@inheritdoc}
-     *
-     * @param  string[] $types [optional]
-     *
-     * @return Pattern[]
      */
     public function flat(array $types = []) {
         if (in_array(get_class($this), $types))

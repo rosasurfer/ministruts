@@ -19,10 +19,10 @@ class CurlHttpResponse extends HttpResponse {
     protected HeaderParser $headerParser;
 
     /** @var int - HTTP status code */
-    protected int $status;
+    protected int $status = 0;
 
     /** @var string - content */
-    protected string $content;
+    protected string $content = '';
 
     /** @var int - length of the currently read content in bytes */
     protected int $currentContentLength = 0;
@@ -38,8 +38,6 @@ class CurlHttpResponse extends HttpResponse {
 
     /**
      * {@inheritdoc}
-     *
-     * @return int
      */
     public function getStatus(): int {
         return $this->status;
@@ -102,7 +100,6 @@ class CurlHttpResponse extends HttpResponse {
      * @param  string   $line             - a single line from the received header section
      *
      * @return int - number of bytes read (the length of the received line)
-     *
      */
     public function writeHeader($hCurl, string $line): int {
         $this->headerParser->parseHeaderLine($line);
@@ -113,9 +110,9 @@ class CurlHttpResponse extends HttpResponse {
     /**
      * Callback for CurlHttpClient, called with the received HTTP content (in chunks).
      *
-     * @param  resource|CurlHandle $hCurl - cURL handle of the processed HTTP request
-     * @phpstan-param  CurlHandleId $hCurl
-     * @param  string   $data  - chunk of received content data
+     * @param         resource|CurlHandle $hCurl - cURL handle of the processed HTTP request
+     * @phpstan-param CurlHandleId        $hCurl
+     * @param         string              $data  - chunk of received content data
      *
      * @return int - number of bytes read (the length of the received content chunk)
      */
@@ -131,10 +128,8 @@ class CurlHttpResponse extends HttpResponse {
 
     /**
      * {@inheritdoc}
-     *
-     * @return string - content
      */
     public function getContent(): string {
-        return (string)$this->content;
+        return $this->content;
     }
 }

@@ -34,7 +34,7 @@ class Application extends CObject {
     protected static ?Di $di = null;
 
     /** @var Command[] - registered CLI commands */
-    private array $commands;
+    private array $commands = [];
 
 
     /**
@@ -325,7 +325,6 @@ class Application extends CObject {
                 $this->expandDirsRecursive($dir, $rootDir);
                 continue;
             }
-            Assert::string($dir, '$dir');
             if (isRelativePath($dir)) {
                 $dir = "$rootDir/$dir";
             }

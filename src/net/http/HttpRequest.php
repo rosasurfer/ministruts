@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace rosasurfer\ministruts\net\http;
 
 use rosasurfer\ministruts\core\CObject;
-use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 
 
@@ -169,16 +168,9 @@ class HttpRequest extends CObject {
      * @return string[] - array of name-value pairs or an empty array if no such headers were found
      */
     public function getHeaders($names = []): array {
-        if (is_array($names)) {
-            foreach ($names as $i => $name) {
-                Assert::string($name, "\$names[$i]");
-            }
-        }
-        else {
-            Assert::string($names, '$names');
+        if (!is_array($names)) {
             $names = [$names];
         }
-
         // without a name return all headers
         if (!$names) {
             return $this->headers;

@@ -4,10 +4,10 @@ declare(strict_types=1);
 namespace rosasurfer\ministruts\db\sqlite;
 
 use SQLite3;
+use SQLite3Result;
 use Throwable;
 
 use rosasurfer\ministruts\config\ConfigInterface as Config;
-use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
@@ -44,8 +44,8 @@ use const rosasurfer\ministruts\NL;
  * Notes:                                                                                                                   <br>
  * ------                                                                                                                   <br>
  * The php_sqlite3 module version v0.7-dev (at least PHP 5.6.12-5.6.40) has a bug. The first call of
- * {@link \SQLite3Result::fetchArray()} and calls after a {@link \SQLite3Result::reset()} trigger re-execution of an already
- * executed query. The workaround for DDL and DML statements is to check with {@link \SQLite3Result::numColumns()} for an
+ * {@link SQLite3Result::fetchArray()} and calls after a {@link SQLite3Result::reset()} trigger re-execution of an already
+ * executed query. The workaround for DDL and DML statements is to check with {@link SQLite3Result::numColumns()} for an
  * empty result before calling <tt>fetchArray()</tt>. There is <b>no</b> workaround to prevent multiple executions of SELECT
  * queries except using a different SQLite adapter, e.g. the PDO SQLite3 adapter.
  *
@@ -109,8 +109,7 @@ class SQLiteConnector extends Connector {
      *                        application's root directory.
      * @return $this
      */
-    protected function setFile($file) {
-        Assert::string($file);
+    protected function setFile(string $file): self {
         if (!strlen($file)) throw new InvalidValueException('Invalid parameter $file: "'.$file.'" (empty)');
 
         if ($file == ':memory:' || !isRelativePath($file)) {
@@ -133,22 +132,20 @@ class SQLiteConnector extends Connector {
      *
      * @return $this
      */
-    protected function setOptions(array $options) {
+    protected function setOptions(array $options): self {
         $this->options = $options;
         return $this;
     }
 
 
     /**
-     * Connect the adapter to the database.
-     *
-     * @return $this
+     * {@inheritdoc}
      */
-    public function connect() {
+    public function connect(): self {
         /** @var int $flags */
         $flags = SQLITE3_OPEN_READWRITE;                                        // available flags:
         try {                                                                   // 1: SQLITE3_OPEN_READONLY
-            $this->sqlite = new \SQLite3($this->file, $flags);                  // 2: SQLITE3_OPEN_READWRITE
+            $this->sqlite = new SQLite3($this->file, $flags);                   // 2: SQLITE3_OPEN_READWRITE
         }                                                                       // 4: SQLITE3_OPEN_CREATE
         catch (Throwable $ex) {
             if (!$ex instanceof IRosasurferException) {
@@ -179,7 +176,7 @@ class SQLiteConnector extends Connector {
      *
      * @return $this
      */
-    protected function setConnectionOptions() {
+    protected function setConnectionOptions(): self {
         //$options = $this->options;
         //foreach ($this->options as $option => $value) {
         //    $this->execute('set '.$option.' = '.$value);
@@ -193,11 +190,9 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * Disconnect the adapter from the database.
-     *
-     * @return $this
+     * {@inheritdoc}
      */
-    public function disconnect() {
+    public function disconnect(): self {
         if ($this->isConnected()) {
             /** @var SQLite3 $sqlite */
             $sqlite = $this->sqlite;
@@ -209,11 +204,9 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * Whether the adapter currently is connected to the database.
-     *
-     * @return bool
+     * {@inheritdoc}
      */
-    public function isConnected() {
+    public function isConnected(): bool {
         return ($this->sqlite !== null);
     }
 
@@ -221,8 +214,7 @@ class SQLiteConnector extends Connector {
     /**
      * {@inheritdoc}
      */
-    public function escapeIdentifier($name) {
-        Assert::string($name);
+    public function escapeIdentifier(string $name): string {
         return '"'.str_replace('"', '""', $name).'"';
     }
 
@@ -230,26 +222,20 @@ class SQLiteConnector extends Connector {
     /**
      * {@inheritdoc}
      */
-    public function escapeLiteral($value) {
+    public function escapeLiteral($value): string {
         // bug or feature: SQLite3::escapeString(null) => empty string instead of NULL
         if ($value === null)  return 'null';
-        Assert::scalar($value);
-
         if (is_bool ($value)) return (string)(int) $value;
         if (is_int  ($value)) return (string)      $value;
         if (is_float($value)) return (string)      $value;
 
         $escaped = $this->escapeString($value);
-        return "'".$escaped."'";
+        return "'$escaped'";
     }
 
 
     /**
      * {@inheritdoc}
-     *
-     * @param  ?string $value
-     *
-     * @return ?string
      */
     public function escapeString(?string $value): ?string {
         // bug or feature: SQLite3::escapeString(null) => empty string instead of NULL
@@ -267,20 +253,14 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * Execute a SQL statement and return the result. This method should be used for SQL statements returning rows.
-     *
-     * @param  string $sql - SQL statement
-     *
-     * @return SQLiteResult
-     *
-     * @throws DatabaseException on errors
+     * {@inheritdoc}
      */
-    public function query($sql) {
+    public function query($sql): SQLiteResult {
         try {
             $lastExecMode = $this->skipResults;
             $this->skipResults = false;
 
-            /** @var \SQLite3Result $result */
+            /** @var SQLite3Result $result */
             $result = $this->executeRaw($sql);
             return new SQLiteResult($this, $sql, $result, $this->lastInsertId(), $this->lastAffectedRows());
         }
@@ -297,10 +277,8 @@ class SQLiteConnector extends Connector {
      * @param  string $sql - SQL statement
      *
      * @return $this
-     *
-     * @throws DatabaseException on errors
      */
-    public function execute($sql) {
+    public function execute(string $sql): self {
         try {
             $lastExecMode = $this->skipResults;
             $this->skipResults = true;
@@ -315,13 +293,9 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * Execute a SQL statement and return the internal driver's raw response.
+     * {@inheritdoc}
      *
-     * @param  string $sql - SQL statement
-     *
-     * @return \SQLite3Result|bool
-     *
-     * @throws DatabaseException on errors
+     * @return SQLite3Result|bool
      */
     public function executeRaw(string $sql) {
         if (!$this->isConnected()) {
@@ -359,7 +333,7 @@ class SQLiteConnector extends Connector {
      *
      * @return $this
      */
-    public function begin() {
+    public function begin(): self {
         if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
 
         if (!$this->transactionLevel)
@@ -371,11 +345,9 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * Commit a pending transaction.
-     *
-     * @return $this
+     * {@inheritdoc}
      */
-    public function commit() {
+    public function commit(): self {
         if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
 
         if     (!$this->isConnected())    trigger_error('Not connected', E_USER_WARNING);
@@ -391,12 +363,12 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * Roll back an active transaction. If a nested transaction is active only the transaction nesting level is decreased.
+     * Roll back an active transaction. If a nested transaction is active only the nesting level is decreased.
      * If only one (the outer most) transaction is active the transaction is rolled back.
      *
      * @return $this
      */
-    public function rollback() {
+    public function rollback(): self {
         if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
 
         if     (!$this->isConnected())    trigger_error('Not connected', E_USER_WARNING);
@@ -412,11 +384,9 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * Whether the connection currently is in a transaction.
-     *
-     * @return bool
+     * {@inheritdoc}
      */
-    public function isInTransaction() {
+    public function isInTransaction(): bool {
         if ($this->isConnected()) {
             return ($this->transactionLevel > 0);
         }
@@ -425,12 +395,12 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * Return the last ID generated for an AUTO_INCREMENT column by a SQL statement. The value is not reset between queries.
-     * (see the db README)
+     * Return the last ID generated for an AUTO_INCREMENT column by a SQL statement.
+     * The value is not reset between queries (see the db README).
      *
      * @return int - last generated ID or 0 (zero) if no ID was generated yet in the current session
      */
-    public function lastInsertId() {
+    public function lastInsertId(): int {
         return (int) $this->lastInsertId;
     }
 
@@ -441,17 +411,15 @@ class SQLiteConnector extends Connector {
      *
      * @return int - last number of affected rows or 0 (zero) if no rows were affected yet in the current session
      */
-    public function lastAffectedRows() {
+    public function lastAffectedRows(): int {
         return (int) $this->lastAffectedRows;
     }
 
 
     /**
-     * Whether the DBMS's SQL dialect supports 'insert into ... returning ...' syntax.
-     *
-     * @return bool
+     * {@inheritdoc}
      */
-    public function supportsInsertReturn() {
+    public function supportsInsertReturn(): bool {
         return false;
     }
 
@@ -472,21 +440,19 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * Return the type of the DBMS the connector is used for.
-     *
-     * @return string
+     * {@inheritdoc}
      */
-    public function getType() {
+    public function getType(): string {
         return $this->type;
     }
 
 
     /**
-     * Return the version of the DBMS the connector is used for as a string.
+     * {@inheritdoc}
      *
      * @return string - e.g. "3.5.9-rc"
      */
-    public function getVersionString() {
+    public function getVersionString(): string {
         if (!isset($this->versionString)) {
             if (!$this->isConnected()) {
                 $this->connect();
@@ -500,11 +466,11 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * Return the version ID of the DBMS the connector is used for as an integer.
+     * {@inheritdoc}
      *
      * @return int - e.g. 3005009 for version string "3.5.9-rc"
      */
-    public function getVersionNumber() {
+    public function getVersionNumber(): int {
         if (!isset($this->versionNumber)) {
             if (!$this->isConnected()) {
                 $this->connect();

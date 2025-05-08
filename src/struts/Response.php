@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace rosasurfer\ministruts\struts;
 
 use rosasurfer\ministruts\core\Singleton;
-use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\di\proxy\Request as Request;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\RosasurferExceptionInterface as IRosasurferException;
@@ -57,10 +56,8 @@ class Response extends Singleton {
      *
      * @return $this
      */
-    public function setStatus($status) {
-        Assert::int($status);
+    public function setStatus(int $status): self {
         if ($status < 1) throw new InvalidValueException('Invalid parameter $status: '.$status);
-
         $this->status = $status;
         return $this;
     }
@@ -71,7 +68,7 @@ class Response extends Singleton {
      *
      * @return int
      */
-    public function getStatus() {
+    public function getStatus(): int {
         return $this->status;
     }
 

@@ -6,7 +6,6 @@ namespace rosasurfer\ministruts\core\lock;
 use Throwable;
 
 use rosasurfer\ministruts\config\ConfigInterface;
-use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\error\ErrorHandler;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 
@@ -34,8 +33,7 @@ class Lock extends BaseLock {
      *
      * @param  string $key - key a new lock should be aquired for
      */
-    public function __construct($key) {
-        Assert::string($key);
+    public function __construct(string $key) {
         if (isset(self::$lockedKeys[$key])) throw new RuntimeException('Dead-lock detected: already holding a lock for key "'.$key.'"');
 
         self::$lockedKeys[$key] = $this->key = $key;
