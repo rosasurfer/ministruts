@@ -97,8 +97,11 @@ class HttpRequest extends CObject {
         if (!strlen($name)) throw new InvalidValueException('Invalid parameter $name: "" (empty)');
 
         // drop existing headers of the same name (case-insensitive)
-        $existing = \array_intersect_ukey($this->headers, [$name => '1'], 'strCaseCmp');
-        foreach ($existing as $key => $v) {
+        /** @phpstan-var callable-string $func*/
+        $func = 'strcasecmp';
+        $existing = \array_intersect_ukey($this->headers, [$name => '1'], $func);
+
+        foreach ($existing as $key => $_) {
             unset($this->headers[$key]);
         }
 
@@ -128,8 +131,11 @@ class HttpRequest extends CObject {
         $value = trim($value);
 
         // memorize and drop existing headers of the same name (ignore case)
-        $existing = \array_intersect_ukey($this->headers, [$name => '1'], 'strCaseCmp');
-        foreach ($existing as $key => $v) {
+        /** @phpstan-var callable-string $func*/
+        $func = 'strcasecmp';
+        $existing = \array_intersect_ukey($this->headers, [$name => '1'], $func);
+
+        foreach ($existing as $key => $_) {
             unset($this->headers[$key]);
         }
 
@@ -175,6 +181,8 @@ class HttpRequest extends CObject {
         if (!$names) {
             return $this->headers;
         }
-        return \array_intersect_ukey($this->headers, \array_flip($names), 'strCaseCmp');
+        /** @phpstan-var callable-string $func*/
+        $func = 'strcasecmp';
+        return \array_intersect_ukey($this->headers, \array_flip($names), $func);
     }
 }

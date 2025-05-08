@@ -146,7 +146,7 @@ class PHP extends StaticClass {
                 }
                 do {
                     $handlers[(int)$stream]($line);                     // process incoming content
-                } while (!WINDOWS && ($line=fgets($stream))!==false);   // on Windows a second call blocks
+                } while (!WINDOWS && ($line=fgets($stream)) !== false); // on Windows a second call blocks
             }
         } while ($observed);                                            // loop until all observable streams are closed
 

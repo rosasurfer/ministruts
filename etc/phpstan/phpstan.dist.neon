@@ -11,7 +11,7 @@ includes:
 
 
 parameters:
-  level: 6                                          # default rule level, a rule level on the command line overrides this value
+  level: 8                                          # default rule level, a rule level on the command line overrides this value
 
   bootstrapFiles:                                   # initialize runtime environment before PHPStan runs
     - init.php

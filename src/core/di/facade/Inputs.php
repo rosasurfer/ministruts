@@ -20,9 +20,9 @@ class Inputs extends Facade {
     /**
      * Return all raw input parameters from the current and the previous HTTP request.
      *
-     * @return string[]
+     * @return array<string, string|array<string|array<string>>>
      */
-    public static function all() {
+    public static function all(): array {
         return Input::current()->all() + Input::old()->all();
     }
 
@@ -56,7 +56,7 @@ class Inputs extends Facade {
      * @param  string   $name               - parameter name
      * @param  string[] $default [optional] - values to return if the specified parameter array was not transmitted
      *                                        (default: empty array)
-     * @return string[]
+     * @return array<string|string[]>
      */
     public static function getArray($name, array $default = []) {
         $values = Input::current()->getArray($name);

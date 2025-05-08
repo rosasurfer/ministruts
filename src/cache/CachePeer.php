@@ -63,7 +63,7 @@ abstract class CachePeer extends CObject {
      * @param  string $key                - identifier of the stored value
      * @param  mixed  $default [optional] - default value
      *
-     * @return mixed - stored value (may be NULL itself) or the specified default value
+     * @return mixed - stored value or the specified default value
      */
     abstract public function get(string $key, $default = null);
 

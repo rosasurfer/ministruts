@@ -60,7 +60,7 @@ class Url extends CObject {
      *
      * @return string
      */
-    public function __toString() {
+    public function __toString(): string {
         $uri = $this->appRelativeUri;
         if ($this->parameters) {
             if (strpos($uri, '?') === false) $uri .= '?';

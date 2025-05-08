@@ -30,16 +30,16 @@ class ActionForward extends CObject {
 
 
     /** @var string */
-    protected $name;
+    protected string $name;
 
     /** @var string - a URI, a tile name (if starting with ".") or a filename (if not starting with ".") */
-    protected $path;
+    protected string $path;
 
     /** @var bool - whether $path is a URI and a redirect will be issued */
-    protected $redirect;
+    protected bool $redirect;
 
     /** @var int - type (HTTP status code) of the redirect to issue (if any) */
-    protected $redirectType = HttpResponse::SC_MOVED_TEMPORARILY;
+    protected int $redirectType = HttpResponse::SC_MOVED_TEMPORARILY;
 
 
     /**
@@ -50,7 +50,7 @@ class ActionForward extends CObject {
      * @param  bool   $redirect     [optional] - whether $resource is a redirect (default: no)
      * @param  int    $redirectType [optional] - redirect type (default: 302=SC_MOVED_TEMPORARILY)
      */
-    public function __construct($name, $resource, $redirect=false, $redirectType=HttpResponse::SC_MOVED_TEMPORARILY) {
+    public function __construct(string $name, string $resource, bool $redirect=false, int $redirectType=HttpResponse::SC_MOVED_TEMPORARILY) {
         $this->setName($name)
              ->setPath($resource)
              ->setRedirect($redirect);

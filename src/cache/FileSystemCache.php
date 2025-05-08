@@ -46,7 +46,7 @@ final class FileSystemCache extends CachePeer {
         if (!isset($directory)) throw new RuntimeException('Missing cache instantiation option "directory"');
 
         if (isRelativePath($directory)) {
-            $directory = $config['app.dir.root'].'/'.$directory;
+            $directory = $config->getString('app.dir.root').'/'.$directory;
         }
 
         // make sure the directory exists
@@ -72,12 +72,11 @@ final class FileSystemCache extends CachePeer {
         $file = $this->getFilePath($key);
         if (!is_file($file)) return false;  // cache miss
 
+        /** @var array{int, int, mixed, ?Dependency} $data */
         $data = $this->readFile($file);
 
         // cache hit
-        /** @var int $created */
-        $created    = $data[0];             // data: [created, $expires, $value, $dependency]
-        /** @var int $expires */
+        $created    = $data[0];
         $expires    = $data[1];
         $value      = $data[2];
         $dependency = $data[3];
@@ -93,7 +92,7 @@ final class FileSystemCache extends CachePeer {
             $minValid = $dependency->getMinValidity();
 
             if ($minValid) {
-                if (time() > $created+$minValid) {
+                if (time() > $created + $minValid) {
                     if (!$dependency->isValid()) {
                         $this->drop($key);
                         return false;

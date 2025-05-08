@@ -643,13 +643,12 @@ class ErrorHandler extends StaticClass {
      * @see \rosasurfer\ministruts\phpstan\STACKFRAME
      */
     public static function formatStackTrace(array $trace, string $indent = '', ?ContentFilter $filter = null): string {
-        /** @var string $appRoot */
         $appRoot = '';
         $di = Application::getDi();
         if ($di && $di->has('config')) {
             /** @var Config $config */
             $config = $di['config'];
-            $appRoot = $config['app.dir.root'];
+            $appRoot = $config->getString('app.dir.root');
         }
         $result = '';
         $size = sizeof($trace);

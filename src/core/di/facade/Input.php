@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\core\di\facade;
 
+use ReflectionClass;
+
 use rosasurfer\ministruts\core\di\proxy\Request as RequestProxy;
 use rosasurfer\ministruts\struts\ActionInput;
 use rosasurfer\ministruts\struts\Struts;
@@ -19,9 +21,9 @@ class Input extends Facade {
     /**
      * Return all raw input parameters of the current HTTP request.
      *
-     * @return array<string, mixed>
+     * @return array<string, string|array<string|array<string>>>
      */
-    public static function all() {
+    public static function all(): array {
         $input = static::current();
         return $input->all();
     }
@@ -52,7 +54,7 @@ class Input extends Facade {
      * @param  string   $name               - parameter name
      * @param  string[] $default [optional] - values to return if the specified parameter array was not transmitted
      *                                        (default: empty array)
-     * @return string[]
+     * @return array<string|string[]>
      */
     public static function getArray($name, array $default = []) {
         $input = static::current();
@@ -105,11 +107,12 @@ class Input extends Facade {
      *
      * @return ActionInput
      */
-    public static function old() {
+    public static function old(): ActionInput {
+        /** @var ?ActionInput $input */
         $input = RequestProxy::getAttribute(Struts::ACTION_INPUT_KEY.'.old');
         if ($input) return $input;
 
-        $class = new \ReflectionClass(ActionInput::class);
+        $class = new ReflectionClass(ActionInput::class);
         return $class->newInstanceWithoutConstructor();
     }
 }

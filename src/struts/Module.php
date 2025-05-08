@@ -226,30 +226,32 @@ class Module extends CObject {
 
         /** @var ConfigInterface $config */
         $config = $this->di('config');
-        $rootDirectory = $config['app.dir.root'];
 
         if (!isset($xml['file-base'])) {
             // not specified, apply global configuration
-            $location = $config->get('app.dir.view', null);
-            if (!$location) Struts::configError(
-                 'Missing view directory configuration: Neither $config[app.dir.view] nor <struts-config file-base="{base-directory}" are specified'.NL
+            /** @var string $viewDir */
+            $viewDir = $config->get('app.dir.view', null) ?? Struts::configError(
+                'Missing view directory configuration: Neither $config[app.dir.view] nor <struts-config file-base="{base-directory}" are specified'.NL
                 .'config: '.NL
-                .$config->dump());
-            isRelativePath($location) && $location = $rootDirectory.DIRECTORY_SEPARATOR.$location;
-            if (!is_dir($location)) Struts::configError('Resource location $config[app.dir.view]="'.$config['app.dir.view'].'" not found');
+                .$config->dump()
+            );
+            if (!is_dir($viewDir)) Struts::configError("View directory \$config[app.dir.view]=\"$viewDir\" not found");
 
-            $this->resourceLocations[] = realpath($location);
+            $this->resourceLocations[] = $viewDir;
             return $this;
         }
 
         $locations = explode(',', (string) $xml['file-base']);
+        $appRoot = null;
 
         foreach ($locations as $i => $location) {
             $location = trim($location);
             if (!strlen($location)) continue;
-
-            isRelativePath($location) && $location = $rootDirectory.DIRECTORY_SEPARATOR.$location;
-            if (!is_dir($location)) Struts::configError('<struts-config file-base="'.$locations[$i].'": Resource location not found');
+            if (isRelativePath($location)) {
+                $appRoot ??= $config->getString('app.dir.root');
+                $location = $appRoot.DIRECTORY_SEPARATOR.$location;
+            }
+            if (!is_dir($location)) Struts::configError("<struts-config file-base=\"$locations[$i]\": Resource location not found");
 
             $this->resourceLocations[] = realpath($location);
         }
@@ -292,7 +294,7 @@ class Module extends CObject {
                     $forward = new $this->forwardClass($name, $include, false);
                 }
                 else {
-                    $forward = new $this->forwardClass($name, $this->findFile($include), false);
+                    $forward = new $this->forwardClass($name, (string) $this->findFile($include), false);
                 }
             }
 
@@ -379,7 +381,7 @@ class Module extends CObject {
                 }
                 else {
                     /** @var ActionForward $forward */
-                    $forward = new $this->forwardClass('generic', $this->findFile($include), false);
+                    $forward = new $this->forwardClass('generic', (string) $this->findFile($include), false);
                 }
                 $mapping->setForward($forward);
             }
@@ -498,7 +500,7 @@ class Module extends CObject {
                         $forward = new $this->forwardClass($name, $include, false);
                     }
                     else {
-                        $forward = new $this->forwardClass($name, $this->findFile($include), false);
+                        $forward = new $this->forwardClass($name, (string) $this->findFile($include), false);
                     }
                 }
 
@@ -1179,7 +1181,7 @@ class Module extends CObject {
      *
      * @return ?string - full filename or NULL if no such file was found
      */
-    private function findFile($name) {
+    private function findFile(string $name): ?string {
         // strip a potential query string
         $parts = explode('?', $name, 2);
 

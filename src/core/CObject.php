@@ -20,7 +20,7 @@ class CObject {
      *
      * @return string
      */
-    public function __toString() {
+    public function __toString(): string {
         return print_r($this, true);
     }
 }

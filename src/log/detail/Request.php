@@ -128,7 +128,9 @@ class Request extends CObject {
         if (!$names) {
             return $allHeaders;
         }
-        return array_intersect_ukey($allHeaders, array_flip($names), 'strcasecmp');
+        /** @phpstan-var callable-string $func*/
+        $func = 'strcasecmp';
+        return array_intersect_ukey($allHeaders, array_flip($names), $func);
     }
 
 
