@@ -36,9 +36,15 @@ jobs:
         if: github.event_name == 'push'
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
-          echo "Branch: $GITHUB_REF_NAME"
-          prs=$(gh pr list --head "$GITHUB_REF_NAME" --json number --jq '.[].number')
-          echo "PRs: $prs"
+          
+          echo "gh pr checks:"
+          gh pr checks
+          
+          echo "gh pr list:"
+          gh pr list --head "$GITHUB_REF_NAME"
+
+          echo "gh pr list --json number:"
+          gh pr list --head "$GITHUB_REF_NAME" --json number --jq '.[].number'
 
           echo "exiting..."
           exit 1
@@ -92,4 +98,4 @@ jobs:
         if:   env.SKIP_PHPUNIT == 'false'
         run: |
           echo "Running PHPUnit tests..."
-          vendor/bin/phpunit test --no-interaction
+          vendor/bin/phpunit test --testdox --no-interaction --colors=always
