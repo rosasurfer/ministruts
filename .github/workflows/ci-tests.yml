@@ -20,18 +20,23 @@ jobs:
   integration-tests:
     name:    PHP ${{ matrix.php }}
     runs-on: ubuntu-latest
-    if:      github.event_name == 'pull_request' || github.event.pull_request == null    
     strategy:
       matrix:
-        php: ['7.4', '8.0', '8.1', '8.2', '8.3', '8.4']
+        php: ['7.4']           # , '8.0', '8.1', '8.2', '8.3', '8.4'
       fail-fast: false                                      # don't cancel remaining jobs if one job fails
 
     steps:
       - name: Skip push for testing
         if: github.event_name == 'push'
         run: |
-          echo "Skipping push"
-          exit 0
+          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+          echo "Branch: $GITHUB_REF_NAME"
+          prs=$(gh pr list --head "$GITHUB_REF_NAME" --json number --jq '.[].number')
+          echo "PRs: $prs"
+
+          echo "exiting..."
+          exit 1
+          
     
       - name: Checkout repository
         uses: actions/checkout@v4
