@@ -1073,11 +1073,9 @@ class Request extends CObject {
 
 
     /**
-     * Return a human-readable version of the request.
-     *
-     * @return string
+     * {@inheritdoc}
      */
-    public function __toString() {
+    public function __toString(): string {
         // request
         $string = $_SERVER['REQUEST_METHOD'].' '.$_SERVER['REQUEST_URI'].' '.$_SERVER['SERVER_PROTOCOL'].NL;
 

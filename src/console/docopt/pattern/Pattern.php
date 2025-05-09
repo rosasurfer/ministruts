@@ -189,7 +189,7 @@ abstract class Pattern extends CObject {
     /**
      * {@inheritdoc}
      */
-    public function __toString() {
+    public function __toString(): string {
         return serialize($this);
     }
 }
