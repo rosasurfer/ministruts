@@ -5,7 +5,6 @@ namespace rosasurfer\ministruts\test\docopt;
 
 use Exception;
 use PHPUnit\Framework\TestCase;
-use rosasurfer\ministruts\console\docopt\DocoptResult;
 
 use function rosasurfer\ministruts\docopt;
 
@@ -74,17 +73,5 @@ class PythonFixturesTest extends TestCase {
             }
         }
         return $cases;
-    }
-
-    /**
-     * @param  string                     $doc
-     * @param  string|string[]|null       $args    [optional]
-     * @param  array<string, bool|string> $options [optional]
-     *
-     * @return DocoptResult
-     */
-    protected function docopt($doc, $args='', array $options=[]): DocoptResult {
-        $options = array_merge(['exit'=>false, 'help'=>false], $options);
-        return docopt($doc, $args, $options);
     }
 }

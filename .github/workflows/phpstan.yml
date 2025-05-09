@@ -34,19 +34,25 @@ jobs:
 
       - name: Check commit message for "[skip phpstan]"
         run: |
-          SKIP_PHPSTAN=false
           REF_NAME=
           [[ "$GITHUB_EVENT_NAME" == "push"         ]] && REF_NAME="$GITHUB_REF_NAME"
           [[ "$GITHUB_EVENT_NAME" == "pull_request" ]] && REF_NAME="$GITHUB_HEAD_REF"
           [[ -z "$REF_NAME" ]] && { echo "ERROR: unsupported CI event: $GITHUB_EVENT_NAME"; exit 1; }
 
           COMMIT_MSG=$(git log -1 --format="%B" "origin/$REF_NAME")
+
+          SKIP_PHPSTAN=false
           grep -iq '\[skip phpstan\]' <<< "$COMMIT_MSG" && { echo "Magic commit message found: [skip phpstan]"; SKIP_PHPSTAN=true; }
           echo "Skip PHPStan: $SKIP_PHPSTAN"
           echo "SKIP_PHPSTAN=$SKIP_PHPSTAN" >> "$GITHUB_ENV"
 
+          SKIP_PHPUNIT=false
+          grep -iq '\[skip phpunit\]' <<< "$COMMIT_MSG" && { echo "Magic commit message found: [skip phpunit]"; SKIP_PHPUNIT=true; }
+          echo "Skip PHPUnit: $SKIP_PHPUNIT"
+          echo "SKIP_PHPUNIT=$SKIP_PHPUNIT" >> "$GITHUB_ENV"
+
       - name: Setup PHP ${{ matrix.php }} with PHPStan ${{ matrix.phpstan }}
-        if:   env.SKIP_PHPSTAN != 'true'
+        if:   env.SKIP_PHPSTAN == 'false' || env.SKIP_PHPUNIT == 'false'
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
@@ -56,7 +62,7 @@ jobs:
           fail-fast: true                                   # don't try to continue on setup errors
 
       - name: Install Composer dependencies
-        if:   env.SKIP_PHPSTAN != 'true'
+        if:   env.SKIP_PHPSTAN == 'false' || env.SKIP_PHPUNIT == 'false'
         run: |
           echo "Validating \"composer.json\"..."
           composer validate --strict
@@ -65,7 +71,13 @@ jobs:
           composer install --no-progress
 
       - name: Run PHPStan
-        if:   env.SKIP_PHPSTAN != 'true'
+        if:   env.SKIP_PHPSTAN == 'false'
         run: |
           echo "Generating PHPStan report..."
           PHPSTAN=phpstan bin/phpstan --no-progress -vvv
+
+      - name: Run PHPUnit
+        if:   env.SKIP_PHPUNIT == 'false'
+        run: |
+          echo "Running PHPUnit tests..."
+          vendor/bin/phpunit test --colors
