@@ -80,4 +80,4 @@ jobs:
         if:   env.SKIP_PHPUNIT == 'false'
         run: |
           echo "Running PHPUnit tests..."
-          vendor/bin/phpunit test --colors
+          vendor/bin/phpunit test --colors=always
