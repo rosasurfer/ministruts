@@ -20,7 +20,7 @@ $ prog -a
 {"-a": true}
 
 $ prog -x
-"user-error"
+"user-errorr"
 
 
 r"""Usage: prog [options]
@@ -35,7 +35,7 @@ $ prog --all
 {"--all": true}
 
 $ prog --xxx
-"user-error"
+"user-errooor"
 
 
 r"""Usage: prog [options]

@@ -1,7 +1,7 @@
 #
-# Run PHPStan and PHPUnit on every supported PHP version.Skipped if the commit message contains "[skip <tool>]".
+# Runs PHPStan and PHPUnit on every supported PHP version. A tool is skipped if the commit message contains "[skip <tool>]".
 #
-name: PHP checks
+name: Integration tests
 
 on:
   push:
@@ -17,7 +17,7 @@ permissions:
   contents: read
 
 jobs:
-  php-checks:
+  integration-tests:
     name:    PHP ${{ matrix.php }}
     runs-on: ubuntu-latest
     strategy:
@@ -78,4 +78,4 @@ jobs:
         if:   env.SKIP_PHPUNIT == 'false'
         run: |
           echo "Running PHPUnit tests..."
-          vendor/bin/phpunit test --colors=always
+          vendor/bin/phpunit test --no-interaction
