@@ -37,14 +37,11 @@ jobs:
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
           
-          echo "gh pr checks:"
-          gh pr checks
-          
           echo "gh pr list:"
-          gh pr list --head "$GITHUB_REF_NAME"
+          gh pr list --head "$GITHUB_REF_NAME" || :
 
           echo "gh pr list --json number:"
-          gh pr list --head "$GITHUB_REF_NAME" --json number --jq '.[].number'
+          gh pr list --head "$GITHUB_REF_NAME" --json number --jq '.[].number' || :
 
           echo "exiting..."
           exit 1
