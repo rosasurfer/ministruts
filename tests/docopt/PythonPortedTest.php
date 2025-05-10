@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace rosasurfer\ministruts\test\docopt;
+namespace rosasurfer\ministruts\tests\docopt;
 
 use PHPUnit\Framework\TestCase;
 

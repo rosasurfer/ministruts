@@ -84,6 +84,6 @@ jobs:
         if:   env.SKIP_PHPUNIT == 'false'
         run: |
           echo "Running PHPUnit tests..."
-          vendor/bin/phpunit test --testdox --no-interaction --colors=always
+          vendor/bin/phpunit tests --testdox --no-interaction --colors=always
 
       # ------------------------------------------------------------------------------------------------------------------------------------

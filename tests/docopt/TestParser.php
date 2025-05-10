@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace rosasurfer\ministruts\test\docopt;
+namespace rosasurfer\ministruts\tests\docopt;
 
 use rosasurfer\ministruts\console\docopt\DocoptParser;
 use rosasurfer\ministruts\console\docopt\OptionIterator;

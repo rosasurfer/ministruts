@@ -32,7 +32,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "rosasurfer\\ministruts\\test\\": "test/"
+            "rosasurfer\\ministruts\\tests\\": "tests/"
         },
         "classmap": [
             "etc/phpstan/extension/",

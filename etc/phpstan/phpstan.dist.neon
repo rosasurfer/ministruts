@@ -19,7 +19,7 @@ parameters:
   paths:                                            # analyzed paths, paths on the command line override these values
     - ../../bin
     - ../../src
-    - ../../test
+    - ../../tests
     - .                                             # etc/phpstan itself
 
   excludePaths:                                     # excludeAnalyze + excludeScan
