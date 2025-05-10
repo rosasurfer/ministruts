@@ -5,13 +5,7 @@ name: Integration tests
 
 on:
   push:
-    branches:
-      - master
-      - development
-
   pull_request:
-    branches:
-      - master
 
 permissions:
   contents: read
@@ -58,6 +52,8 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
+          coverage: none
+          tools:    none                                    # phpstan:2, phpunit:9
         env:
           GITHUB_TOKEN: ${{ secrets.GH_OAUTH_TOKEN }}
           fail-fast: true                                   # don't try to continue on setup errors
