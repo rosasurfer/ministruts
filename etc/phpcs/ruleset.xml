@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+
+<ruleset name="rosasurfer/ministruts" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:noNamespaceSchemaLocation="../../vendor/squizlabs/php_codesniffer/phpcs.xsd">
+
+    <description>
+      Custom ruleset configuration for PHPCodeSniffer
+      File format: 
+      @see  https://github.com/PHPCSStandards/PHP_CodeSniffer/wiki/Annotated-Ruleset
+    </description>
+
+    <config name="php_version" value="70499"/>          <!-- analyze for PHP 7.4                         -->
+
+    <!-- short command line options -->
+    <arg value="p"/>                                    <!-- show progress animation                     -->
+
+    <!-- long command line options -->
+    <arg name="extensions" value="php"/>                <!-- file extensions to analyze                  -->
+    <arg name="report"     value="full,source"/>        <!-- default: full display + summary             -->
+    <arg name="basepath"   value="../.."/>              <!-- base path to strip from reported file names -->
+    <arg name="colors"/>                                <!-- enable colors                               -->
+    
+
+    <!-- files to analyze (paths relative to this file) -->
+    <file>../../bin</file>
+    <file>../../src</file>
+    <file>../../tests</file>
+    <file>../phpstan</file>
+    <exclude-pattern>../phpstan/.tmp</exclude-pattern>
+
+
+    <!-- import Slevomat rules (path relative to the PHPCS binary) -->
+    <config name="installed_paths" value="../../slevomat/coding-standard"/>
+
+    <!-- rules to check -->
+    <rule ref="SlevomatCodingStandard.TypeHints">
+      <exclude name="SlevomatCodingStandard.TypeHints.ClassConstantTypeHint.UselessDocComment"/>
+      <exclude name="SlevomatCodingStandard.TypeHints.DisallowArrayTypeHintSyntax"/>
+      <exclude name="SlevomatCodingStandard.TypeHints.ParameterTypeHint.UselessAnnotation"/>
+      <exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHint.UselessAnnotation"/>
+      <exclude name="SlevomatCodingStandard.TypeHints.PropertyTypeHint.UselessAnnotation"/>
+      <exclude name="SlevomatCodingStandard.TypeHints.UnionTypeHintFormat"/>              <!-- deprecated, replaced by DNFTypeHintFormat -->
+      <exclude name="SlevomatCodingStandard.TypeHints.UselessConstantTypeHint.UselessDocComment"/>
+    </rule>
+    
+    <rule ref="SlevomatCodingStandard.TypeHints.DeclareStrictTypes">
+      <properties>
+        <property name="linesCountBeforeDeclare" value="0"/>
+        <property name="spacesCountAroundEqualsSign" value="0"/>
+      </properties>
+    </rule>
+    
+    <rule ref="SlevomatCodingStandard.TypeHints.DisallowMixedTypeHint.DisallowedMixedTypeHint">
+      <type>warning</type>
+      <message>Usage of "mixed" type hint is discouraged</message>
+      <severity>4</severity>                        <!-- tmp: lower the visibility -->
+    </rule>
+    
+    <!--
+     -->
+</ruleset>

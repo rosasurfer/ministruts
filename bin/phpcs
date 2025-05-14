@@ -1,0 +1,64 @@
+#!/bin/bash
+#
+# Conveniant wrapper of PHPCodeSniffer. Simplifies configuration and supports switching between
+# multiple PHP and/or PHPCS versions. All arguments are optional.
+#
+# PHPCS can be executed using a custom PHP interpreter by setting the environment variable PHP='<php-cmd>'.
+#
+# Examples:
+#  PHP=php81 phpcs                          # Use a different PHP version instead of the standard `php`.
+#
+set -eEuo pipefail
+
+# --- functions ----------------------------------------------------------------------------------------------------------------------------
+
+#
+# Print a message to STDERR and exit the script/subshell.
+#
+# @param $@ - any number of arguments
+#
+function fail() {
+  stderr "$@"
+  exit 127
+}
+
+#
+# Print a message to STDERR but don't exit the script/subshell.
+#
+# @param $@ - any number of arguments
+#
+function stderr() {
+  echo "$@" >&2
+}
+
+# --- end of functions ---------------------------------------------------------------------------------------------------------------------
+
+
+# determine the PHP interpreter to use
+php="${PHP:-php}"
+
+
+# resolve project root
+IS_WINDOWS_PHP="$("$php" -r "echo (int)(PHP_OS_FAMILY == 'Windows');")"
+PROJECT_DIR="$(realpath --relative-to=. "$(dirname "$(realpath "$(type -p "$0")")")"/..)"
+[[ "$PROJECT_DIR" == /* ]] && ((IS_WINDOWS_PHP)) && PROJECT_DIR="$(cygpath -m "$PROJECT_DIR")"
+
+
+# determine the PHPCS executable to use
+phpcs="$PROJECT_DIR/vendor/bin/phpcs"
+[[ -f "$phpcs" ]] || fail "PHPCS executable not found"
+
+
+# find and prepend config file
+CONFIG_DIR="$PROJECT_DIR/etc/phpcs"
+CONFIG_FILE="$CONFIG_DIR/ruleset.xml"
+[[ -f "$CONFIG_FILE" ]] || fail "No config file found in \"$CONFIG_DIR\""
+ARGS=("--standard=$CONFIG_FILE" "$@")
+
+
+# rebuild all positional arguments
+set -- "${ARGS[@]}"
+
+
+# call PHPCS
+"$php" "$phpcs" "$@"
