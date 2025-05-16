@@ -15,11 +15,11 @@ use rosasurfer\ministruts\core\exception\RuntimeException;
 final class FileLock extends BaseLock {
 
 
-    /** @var array<resource|null> - all file handles currently used for locking */
-    private static $hFiles = [];
+    /** @var array<?resource> - all file handles currently used for locking */
+    private static array $hFiles = [];
 
     /** @var string - name of the file used by the current instance */
-    private $filename;
+    private string $filename;
 
 
     /**

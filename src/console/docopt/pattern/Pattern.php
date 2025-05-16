@@ -29,7 +29,7 @@ abstract class Pattern extends CObject {
      *
      * @return Pattern[]
      */
-    abstract function flat(array $types = []);
+    abstract function flat(array $types = []): array;
 
 
     /**
@@ -38,7 +38,7 @@ abstract class Pattern extends CObject {
      *
      * @return array{bool, Pattern[], Pattern[]}
      */
-    abstract function match(array $left, array $collected = []);
+    abstract function match(array $left, array $collected = []): array;
 
 
     /**
@@ -52,7 +52,7 @@ abstract class Pattern extends CObject {
     /**
      * @return $this
      */
-    public function fix() {
+    public function fix(): self {
         $this->fixIdentities();
         $this->fixRepeatingArguments();
         return $this;
@@ -66,7 +66,7 @@ abstract class Pattern extends CObject {
      *
      * @return $this
      */
-    public function fixIdentities($unique = null) {
+    public function fixIdentities(?array $unique = null): self {
         if ($this->children) {
             if (!isset($unique))
                 $unique = array_unique($this->flat());
@@ -91,7 +91,7 @@ abstract class Pattern extends CObject {
      *
      * @return $this
      */
-    public function fixRepeatingArguments() {
+    public function fixRepeatingArguments(): self {
         $either = [];
         foreach (static::transform($this)->children as $child) {
             $either[] = $child->children;
@@ -144,7 +144,7 @@ abstract class Pattern extends CObject {
      *
      * @return Either
      */
-    protected static function transform(Pattern $pattern) {
+    protected static function transform(Pattern $pattern): Either {
         $result = [];
         $groups = [[$pattern]];
 
@@ -187,7 +187,7 @@ abstract class Pattern extends CObject {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function __toString(): string {
         return serialize($this);

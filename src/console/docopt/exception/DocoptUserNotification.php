@@ -15,14 +15,14 @@ class DocoptUserNotification extends RuntimeException {
 
 
     /** @var int */
-    public $status;
+    public int $status;
 
 
     /**
      * @param string $message [optional]
      * @param int    $status  [optional]
      */
-    public function __construct($message='', $status=1) {
+    public function __construct(string $message = '', int $status = 1) {
         parent::__construct($message);
         $this->status = $status;
     }

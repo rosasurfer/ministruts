@@ -19,7 +19,7 @@ class ActionInput extends CObject implements \ArrayAccess {
 
 
     /** @var array<string, string|array<string|array<string>>> */
-    protected $parameters;
+    protected array $parameters;
 
 
     /**
@@ -51,10 +51,10 @@ class ActionInput extends CObject implements \ArrayAccess {
      * @param  string  $name               - parameter name
      * @param  ?string $default [optional] - value to return if the specified parameter was not transmitted (default: NULL)
      *
-     * @return ?string
+     * @return         ?string
      * @phpstan-return ($default is null ? ?string : string)
      */
-    public function get($name, $default = null) {
+    public function get(string $name, ?string $default = null): ?string {
         if (\key_exists($name, $this->parameters)) {
             if (!is_array($this->parameters[$name])) {
                 return $this->parameters[$name];
@@ -74,7 +74,7 @@ class ActionInput extends CObject implements \ArrayAccess {
      *
      * @return array<string|string[]>
      */
-    public function getArray($name, array $default = []) {
+    public function getArray(string $name, array $default = []): array {
         if (\key_exists($name, $this->parameters)) {
             if (is_array($this->parameters[$name])) {
                 return $this->parameters[$name];
@@ -92,7 +92,7 @@ class ActionInput extends CObject implements \ArrayAccess {
      *
      * @return bool
      */
-    public function has($name) {
+    public function has(string $name): bool {
         if (\key_exists($name, $this->parameters)) {
             return !is_array($this->parameters[$name]);
         }
@@ -108,7 +108,7 @@ class ActionInput extends CObject implements \ArrayAccess {
      *
      * @return bool
      */
-    public function hasArray($name) {
+    public function hasArray(string $name): bool {
         if (\key_exists($name, $this->parameters)) {
             return is_array($this->parameters[$name]);
         }
@@ -119,9 +119,7 @@ class ActionInput extends CObject implements \ArrayAccess {
     /**
      * Whether a single or an array parameter with the specified name exists.
      *
-     * @param  string $name
-     *
-     * @return bool
+     * {@inheritDoc}
      */
     public function offsetExists($name): bool {
         return \key_exists($name, $this->parameters);
@@ -131,7 +129,7 @@ class ActionInput extends CObject implements \ArrayAccess {
     /**
      * Return the single or array input parameter with the specified name.
      *
-     * @param  string $name
+     * @param  mixed $name
      *
      * @return string|array<string|string[]>|null - parameter or NULL if no such input parameter exists
      */
@@ -147,10 +145,7 @@ class ActionInput extends CObject implements \ArrayAccess {
     /**
      * Prevent modification of input parameters.
      *
-     * @param  string $name
-     * @param  mixed  $value
-     *
-     * @return void
+     * {@inheritDoc}
      */
     final public function offsetSet($name, $value): void {
         throw new IllegalAccessException('Cannot modify ActionInput parameters');
@@ -160,9 +155,7 @@ class ActionInput extends CObject implements \ArrayAccess {
     /**
      * Prevent modification of input parameters.
      *
-     * @param  string $name
-     *
-     * @return void
+     * {@inheritDoc}
      */
     final public function offsetUnset($name): void {
         throw new IllegalAccessException('Cannot modify ActionInput parameters');

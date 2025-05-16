@@ -31,34 +31,34 @@ class Command extends CObject {
     const DOCOPT = '';
 
     /** @var string */
-    private $name = '';
+    private string $name = '';
 
     /** @var string[] */
-    private $aliases = [];
+    private array $aliases = [];
 
     /** @var string - syntax definition in Docopt format */
     private string $docoptDefinition;
 
-    /** @var DocoptResult|null - parsed and matched Docopt block */
-    private $docoptResult = null;
+    /** @var ?DocoptResult - parsed and matched Docopt block */
+    private ?DocoptResult $docoptResult = null;
 
-    /** @var Closure|null */
-    private $validator = null;
+    /** @var ?Closure */
+    private ?Closure $validator = null;
 
-    /** @var Closure|null */
-    private $task = null;
+    /** @var ?Closure */
+    private ?Closure $task = null;
 
     /** @var bool - whether the command configuration is frozen */
-    private $frozen = false;
+    private bool $frozen = false;
 
     /** @var Input */
-    protected $input;
+    protected Input $input;
 
     /** @var Output */
-    protected $output;
+    protected Output $output;
 
     /** @var int - the command's error status */
-    protected $status = 0;
+    protected int $status = 0;
 
 
     /**
@@ -83,7 +83,7 @@ class Command extends CObject {
      *
      * @return $this
      */
-    protected function configure() {
+    protected function configure(): self {
         if (strlen($docopt = static::DOCOPT)) {
             $this->setDocoptDefinition($docopt);
         }
@@ -135,7 +135,7 @@ class Command extends CObject {
      *
      * @return int - validation error status (0 for no error)
      */
-    protected function validate(Input $input, Output $output) {
+    protected function validate(Input $input, Output $output): int {
         return 0;
     }
 
@@ -160,7 +160,7 @@ class Command extends CObject {
      *
      * @return string
      */
-    public function getName() {
+    public function getName(): string {
         return $this->name;
     }
 
@@ -173,7 +173,7 @@ class Command extends CObject {
      *
      * @return $this
      */
-    public function setName($name) {
+    public function setName(string $name): self {
         if ($this->frozen) throw new RuntimeException('Configuration of "'.get_class($this).'" is frozen');
 
         $this->validateName($name);
@@ -194,7 +194,7 @@ class Command extends CObject {
      *
      * @return string[]
      */
-    public function getAliases() {
+    public function getAliases(): array {
         return $this->aliases;
     }
 
@@ -207,7 +207,7 @@ class Command extends CObject {
      *
      * @return $this
      */
-    public function setAliases(array $names) {
+    public function setAliases(array $names): self {
         if ($this->frozen)      throw new RuntimeException('Configuration of "'.get_class($this).'" is frozen');
         if ($this->name === '') throw new IllegalStateException('A default command (name="") cannot have aliases');
 
@@ -224,7 +224,7 @@ class Command extends CObject {
      *
      * @return string - syntax definition in Docopt format
      */
-    public function getDocoptDefinition() {
+    public function getDocoptDefinition(): string {
         return $this->docoptDefinition;
     }
 
@@ -238,7 +238,7 @@ class Command extends CObject {
      *
      * @link   https://docopt.org/
      */
-    public function setDocoptDefinition(string $doc) {
+    public function setDocoptDefinition(string $doc): self {
         if ($this->frozen) throw new RuntimeException('Configuration of "'.get_class($this).'" is frozen');
 
         $self = basename($_SERVER['PHP_SELF']);
@@ -255,9 +255,9 @@ class Command extends CObject {
     /**
      * Return the command's dynamic validation implementation.
      *
-     * @return ?\Closure
+     * @return ?Closure
      */
-    public function getValidator() {
+    public function getValidator(): ?Closure {
         return $this->validator;
     }
 
@@ -270,7 +270,7 @@ class Command extends CObject {
      *
      * @return $this
      */
-    public function setValidator(Closure $validator) {
+    public function setValidator(Closure $validator): self {
         $this->validator = $validator->bindTo($this);
         return $this;
     }
@@ -279,9 +279,9 @@ class Command extends CObject {
     /**
      * Return the command's dynamic task implementation.
      *
-     * @return ?\Closure
+     * @return ?Closure
      */
-    public function getTask() {
+    public function getTask(): ?Closure {
         return $this->task;
     }
 
@@ -294,7 +294,7 @@ class Command extends CObject {
      *
      * @return $this
      */
-    public function setTask(Closure $task) {
+    public function setTask(Closure $task): self {
         $this->task = $task->bindTo($this);
         return $this;
     }
@@ -306,7 +306,7 @@ class Command extends CObject {
      *
      * @return $this
      */
-    final public function freeze() {
+    final public function freeze(): self {
         if (!$this->frozen) {
             if ($this->name === '')   throw new IllegalStateException('Incomplete command configuration: no name');
             if (!$this->docoptResult) throw new IllegalStateException('Incomplete command configuration: no Docopt definition');

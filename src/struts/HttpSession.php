@@ -7,7 +7,6 @@ use Throwable;
 
 use rosasurfer\ministruts\core\Singleton;
 use rosasurfer\ministruts\core\di\proxy\Request as Request;
-use rosasurfer\ministruts\core\exception\RuntimeException;
 use rosasurfer\ministruts\util\PHP;
 
 
@@ -20,17 +19,15 @@ class HttpSession extends Singleton {
 
 
     /** @var bool - Whether the session is considered "new". A session is new if the client doesn't yet know the session id. */
-    protected $new;
+    protected bool $new;
 
 
     /**
      * Return the {@link Singleton} instance.
      *
      * @return static
-     *
-     * @throws RuntimeException if not called from the web interface
      */
-    public static function me() {
+    public static function me(): self {
         /** @var static $instance */
         $instance = self::getInstance(static::class);
         return $instance;
@@ -51,7 +48,7 @@ class HttpSession extends Singleton {
      *
      * @return void
      */
-    protected function init() {
+    protected function init(): void {
         // limit session cookie to application path to support multiple projects per domain
         $params = session_get_cookie_params();
         session_set_cookie_params($params['lifetime'],
@@ -107,7 +104,7 @@ class HttpSession extends Singleton {
      *
      * @return bool
      */
-    public function isNew() {
+    public function isNew(): bool {
         return $this->new;
     }
 
@@ -117,7 +114,7 @@ class HttpSession extends Singleton {
      *
      * @return string
      */
-    public function getName() {
+    public function getName(): string {
         return session_name();
     }
 
@@ -127,7 +124,7 @@ class HttpSession extends Singleton {
      *
      * @return string
      */
-    public function getId() {
+    public function getId(): string {
         return session_id();
     }
 
@@ -140,9 +137,10 @@ class HttpSession extends Singleton {
      *
      * @return mixed
      */
-    public function getAttribute($key, $default = null) {
-        if (\key_exists($key, $_SESSION))
+    public function getAttribute(string $key, $default = null) {
+        if (\key_exists($key, $_SESSION)) {
             return $_SESSION[$key];
+        }
         return $default;
     }
 
@@ -193,7 +191,7 @@ class HttpSession extends Singleton {
      *
      * @return bool
      */
-    public function isAttribute($key) {
+    public function isAttribute(string $key): bool {
         return \key_exists($key, $_SESSION);
     }
 }

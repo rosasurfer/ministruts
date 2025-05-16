@@ -46,22 +46,22 @@ class Module extends CObject {
      *
      * @var string
      */
-    protected $prefix;
+    protected string $prefix;
 
     /** @var string[] - imported class names (configurable) */
-    protected $uses;
+    protected array $uses = [];
 
     /** @var string[] - imported namespaces (configurable) */
-    protected $imports;
+    protected array $imports;
 
     /** @var string[] - base directory for file resources used by the module (configurable) */
-    protected $resourceLocations = [];
+    protected array $resourceLocations = [];
 
     /** @var ActionForward[] - global forwards of the module (configurable) */
-    protected $globalForwards = [];
+    protected array $globalForwards = [];
 
     /** @var ActionMapping[][] - action mappings of the module (configurable) */
-    protected $mappings = [
+    protected array $mappings = [
         'names' => [],
         'paths' => [],
     ];
@@ -69,39 +69,54 @@ class Module extends CObject {
     /**
      * Default action mapping of the module or NULL if undefined. Used when a request does not match any other action mapping (configurable).
      *
-     * @var ActionMapping|null
+     * @var ?ActionMapping
      */
-    protected $defaultMapping = null;
+    protected ?ActionMapping $defaultMapping = null;
 
     /** @var Tile[] - all tiles of the module (configurable) */
-    protected $tiles = [];
+    protected array $tiles = [];
 
     /** @var string - default view namespace for file resources and tiles (configurable) */
-    protected $viewNamespace = '';
+    protected string $viewNamespace = '';
 
-    /** @var class-string<RequestProcessor> - classname of the {@link RequestProcessor} implementation used by the module (configurable) */
-    protected $requestProcessorClass = RequestProcessor::class;
+    /**
+     * @var         string - classname of the {@link RequestProcessor} implementation used by the module (configurable)
+     * @phpstan-var class-string<RequestProcessor>
+     */
+    protected string $requestProcessorClass = RequestProcessor::class;
 
-    /** @var class-string<ActionForward> - classname of the {@link ActionForward} implementation used by the module (configurable) */
-    protected $forwardClass = ActionForward::class;
+    /**
+     * @var         string - classname of the {@link ActionForward} implementation used by the module (configurable)
+     * @phpstan-var class-string<ActionForward>
+     */
+    protected string $forwardClass = ActionForward::class;
 
-    /** @var class-string<ActionMapping> - classname of the {@link ActionMapping} implementation used by the module (configurable) */
-    protected $mappingClass = ActionMapping::class;
+    /**
+     * @var         string - classname of the {@link ActionMapping} implementation used by the module (configurable)
+     * @phpstan-var class-string<ActionMapping>
+     */
+    protected string $mappingClass = ActionMapping::class;
 
-    /** @var class-string<Tile> - classname of the {@link Tile} implementation used by the module (configurable) */
-    protected $tilesClass = Tile::class;
+    /**
+     * @var         string - classname of the {@link Tile} implementation used by the module (configurable)
+     * @phpstan-var class-string<Tile>
+     */
+    protected string $tilesClass = Tile::class;
 
-    /** @var ?class-string<RoleProcessor> - classname of the {@link RoleProcessor} implementation used by the module (configurable) */
-    protected $roleProcessorClass = null;
+    /**
+     * @var         ?string - classname of the {@link RoleProcessor} implementation used by the module (configurable)
+     * @phpstan-var ?class-string<RoleProcessor>
+     */
+    protected ?string $roleProcessorClass = null;
 
-    /** @var RoleProcessor|null - the RoleProcessor instance used by the module */
-    protected $roleProcessor = null;
+    /** @var ?RoleProcessor - the RoleProcessor instance used by the module */
+    protected ?RoleProcessor $roleProcessor = null;
 
     /** @var string[] - initialization context for detecting circular tile references */
     protected array $tilesContext = [];
 
     /** @var bool - whether this component is fully configured */
-    protected $configured = false;
+    protected bool $configured = false;
 
 
     /**
@@ -160,7 +175,7 @@ class Module extends CObject {
      * @return string - an empty string for the main module;
      *                  a path fragment not starting but ending with a slash "/" for a non-main module
      */
-    public function getPrefix() {
+    public function getPrefix(): string {
         return $this->prefix;
     }
 
@@ -172,7 +187,7 @@ class Module extends CObject {
      *                          prefixes of non-main modules must not start but must end with a slash "/"
      * @return $this
      */
-    protected function setPrefix($prefix) {
+    protected function setPrefix(string $prefix): self {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
         if ($len=strlen($prefix)) {
             if ($prefix[     0] == '/') Struts::configError('non-main module prefixes must not start with a slash "/" character, found: "'.$prefix.'"');
@@ -190,7 +205,7 @@ class Module extends CObject {
      *
      * @return $this
      */
-    protected function setNamespace(SimpleXMLElement $xml) {
+    protected function setNamespace(SimpleXMLElement $xml): self {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
         // default is the global namespace
@@ -221,7 +236,7 @@ class Module extends CObject {
      *
      * @return $this
      */
-    protected function setResourceBase(SimpleXMLElement $xml) {
+    protected function setResourceBase(SimpleXMLElement $xml): self {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
         /** @var ConfigInterface $config */
@@ -266,7 +281,7 @@ class Module extends CObject {
      *
      * @return void
      */
-    protected function processGlobalForwards(SimpleXMLElement $xml) {
+    protected function processGlobalForwards(SimpleXMLElement $xml): void {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
         // process all global forwards having no "forward" attribute
@@ -301,7 +316,7 @@ class Module extends CObject {
             if (isset($redirect)) {
                 if (isset($include) || isset($mapping) || isset($alias))  Struts::configError('<global-forwards> <forward name="'.$name.'": Only one of "include", "redirect", "mapping" or "forward" can be specified.');
                 $redirectType = $redirectType=='temporary' ? HttpResponse::SC_MOVED_TEMPORARILY : HttpResponse::SC_MOVED_PERMANENTLY;
-                $forward = new $this->forwardClass($name, $redirect, true, $redirectType);  // TODO: URL validieren
+                $forward = new $this->forwardClass($name, $redirect, true, $redirectType);  // TODO: validate URL
             }
             elseif (isset($tag['redirect-type']))                         Struts::configError('<global-forwards> <forward name="'.$name.'": The "redirect" attribute must be specified if "redirect-type" is defined.');
 
@@ -343,7 +358,7 @@ class Module extends CObject {
      *
      * @return void
      */
-    protected function processMappings(SimpleXMLElement $xml) {
+    protected function processMappings(SimpleXMLElement $xml): void {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
         $elements = $xml->xpath('/struts-config/action-mappings/mapping') ?: [];
 
@@ -552,7 +567,7 @@ class Module extends CObject {
      *
      * @return void
      */
-    protected function processTiles(SimpleXMLElement $xml) {
+    protected function processTiles(SimpleXMLElement $xml): void {
         $namespace = '';                                            // default is the global namespace
 
         if ($tiles = $xml->xpath('/struts-config/tiles') ?: []) {
@@ -602,10 +617,11 @@ class Module extends CObject {
      *
      * @return Tile
      */
-    private function getTile($name, SimpleXMLElement $xml) {
+    private function getTile(string $name, SimpleXMLElement $xml): Tile {
         // if the tile is already registered return it
-        if (isset($this->tiles[$name]))
+        if (isset($this->tiles[$name])) {
             return $this->tiles[$name];
+        }
 
         // detect and block circular tile references
         if (in_array($name, $this->tilesContext)) {
@@ -746,10 +762,10 @@ class Module extends CObject {
      *
      * @return void
      */
-    protected function addGlobalForward(ActionForward $forward, $alias = null) {
+    protected function addGlobalForward(ActionForward $forward, ?string $alias = null): void {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
-        $name = isset($alias) ? $alias : $forward->getName();
+        $name = $alias ?? $forward->getName();
 
         if (isset($this->globalForwards[$name])) Struts::configError('Non-unique name detected for global ActionForward "'.$name.'"');
         $this->globalForwards[$name] = $forward;
@@ -763,7 +779,7 @@ class Module extends CObject {
      *
      * @return void
      */
-    protected function addMapping(ActionMapping $mapping) {
+    protected function addMapping(ActionMapping $mapping): void {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
         if ($mapping->isDefault()) {
@@ -793,7 +809,7 @@ class Module extends CObject {
      *
      * @return void
      */
-    protected function addTile(Tile $tile, $alias = null) {
+    protected function addTile(Tile $tile, ?string $alias = null): void {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
         $name = $tile->getName();
@@ -812,9 +828,10 @@ class Module extends CObject {
      *
      * @return ?ActionMapping - mapping or NULL if no such mapping was found
      */
-    public function findMapping($path) {
-        if (!strEndsWith($path, '/'))
+    public function findMapping(string $path): ?ActionMapping {
+        if (!strEndsWith($path, '/')) {
             $path .= '/';
+        }
         // $path: /
         // $path: /action/
         // $path: /controller/action/
@@ -822,11 +839,13 @@ class Module extends CObject {
 
         $pattern = $path;
         while (strlen($pattern)) {
-            if (isset($this->mappings['paths'][$pattern]))          // path keys start and end with a slash "/"
+            if (isset($this->mappings['paths'][$pattern])) {    // path keys start and end with a slash "/"
                 return $this->mappings['paths'][$pattern];
+            }
             $pattern = strLeftTo($pattern, '/', -2, true);
-            if ($pattern == '/')
+            if ($pattern == '/') {
                 break;
+            }
         }
         return null;
     }
@@ -839,10 +858,8 @@ class Module extends CObject {
      *
      * @return ?ActionMapping - mapping or NULL if no such mapping exists
      */
-    public function getMapping($name) {
-        if (isset($this->mappings['names'][$name]))
-            return $this->mappings['names'][$name];
-        return null;
+    public function getMapping(string $name): ?ActionMapping {
+        return $this->mappings['names'][$name] ?? null;
     }
 
 
@@ -851,7 +868,7 @@ class Module extends CObject {
      *
      * @return ?ActionMapping - instance or NULL if no default mapping is configured
      */
-    public function getDefaultMapping() {
+    public function getDefaultMapping(): ?ActionMapping {
         return $this->defaultMapping;
     }
 
@@ -863,7 +880,7 @@ class Module extends CObject {
      *
      * @return void
      */
-    protected function processImports(SimpleXMLElement $xml) {
+    protected function processImports(SimpleXMLElement $xml): void {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
         $imports = $xml->xpath('/struts-config/imports/import') ?: [];
 
@@ -899,7 +916,7 @@ class Module extends CObject {
      *
      * @return void
      */
-    protected function processController(SimpleXMLElement $xml) {
+    protected function processController(SimpleXMLElement $xml): void {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
         $elements = $xml->xpath('/struts-config/controller') ?: [];
 
@@ -931,7 +948,7 @@ class Module extends CObject {
      *
      * @return $this
      */
-    protected function setRequestProcessorClass($className) {
+    protected function setRequestProcessorClass(string $className): self {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
         if (!is_subclass_of($className, RequestProcessor::class)) {
@@ -945,9 +962,10 @@ class Module extends CObject {
     /**
      * Return the classname of the {@link RequestProcessor} implementation used by the module.
      *
-     * @return class-string<RequestProcessor>
+     * @return         string
+     * @phpstan-return class-string<RequestProcessor>
      */
-    public function getRequestProcessorClass() {
+    public function getRequestProcessorClass(): string {
         return $this->requestProcessorClass;
     }
 
@@ -976,7 +994,7 @@ class Module extends CObject {
      *
      * @return ?RoleProcessor - instance or NULL if no RoleProcessor is configured for the module
      */
-    public function getRoleProcessor() {
+    public function getRoleProcessor(): ?RoleProcessor {
         if (!$this->roleProcessor) {
             $class = $this->roleProcessorClass;
             if (isset($class)) {
@@ -995,7 +1013,7 @@ class Module extends CObject {
      *
      * @return $this
      */
-    protected function setTilesClass($className) {
+    protected function setTilesClass(string $className): self {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
         if (!is_subclass_of($className, Tile::class)) {
@@ -1010,9 +1028,10 @@ class Module extends CObject {
     /**
      * Return the classname of the {@link Tile} implementation used by the module.
      *
-     * @return class-string<Tile>
+     * @return         string
+     * @phpstan-return class-string<Tile>
      */
-    public function getTilesClass() {
+    public function getTilesClass(): string {
         return $this->tilesClass;
     }
 
@@ -1025,7 +1044,7 @@ class Module extends CObject {
      *
      * @return $this
      */
-    protected function setMappingClass($className) {
+    protected function setMappingClass(string $className): self {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
         if (!is_subclass_of($className, ActionMapping::class)) {
@@ -1039,9 +1058,10 @@ class Module extends CObject {
     /**
      * Return the classname of the {@link ActionMapping} implementation used by the module.
      *
-     * @return class-string<ActionMapping>
+     * @return         string
+     * @phpstan-return class-string<ActionMapping>
      */
-    public function getMappingClass() {
+    public function getMappingClass(): string {
         return $this->mappingClass;
     }
 
@@ -1054,7 +1074,7 @@ class Module extends CObject {
      *
      * @return $this
      */
-    protected function setForwardClass($className) {
+    protected function setForwardClass(string $className): self {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
         if (!is_subclass_of($className, ActionForward::class)) {
@@ -1068,9 +1088,10 @@ class Module extends CObject {
     /**
      * Return the classname of the {@link ActionForward} implementation used by the module.
      *
-     * @return class-string<ActionForward>
+     * @return         string
+     * @phpstan-return class-string<ActionForward>
      */
-    public function getForwardClass() {
+    public function getForwardClass(): string {
         return $this->forwardClass;
     }
 
@@ -1080,7 +1101,7 @@ class Module extends CObject {
      *
      * @return string
      */
-    public function getViewNamespace() {
+    public function getViewNamespace(): string {
         return $this->viewNamespace;
     }
 
@@ -1091,7 +1112,7 @@ class Module extends CObject {
      *
      * @return $this
      */
-    public function freeze() {
+    public function freeze(): self {
         if (!$this->configured) {
             foreach ($this->mappings['paths'] as $mapping) {        // $mappings['paths'] contains all mapping, incl.
                 $mapping->freeze();                                 // those in $mappings['names']
@@ -1113,10 +1134,8 @@ class Module extends CObject {
      *
      * @return ?ActionForward - instance or NULL if no such forward was found
      */
-    public function findForward($name) {
-        if (isset($this->globalForwards[$name]))
-            return $this->globalForwards[$name];
-        return null;
+    public function findForward(string $name): ?ActionForward {
+        return $this->globalForwards[$name] ?? null;
     }
 
 
@@ -1127,10 +1146,8 @@ class Module extends CObject {
      *
      * @return ?Tile - instance or NULL if no such tile was found
      */
-    public function findTile($name) {
-        if (isset($this->tiles[$name]))
-            return $this->tiles[$name];
-        return null;
+    public function findTile(string $name): ?Tile {
+        return $this->tiles[$name] ?? null;
     }
 
 
@@ -1142,7 +1159,7 @@ class Module extends CObject {
      *
      * @return bool
      */
-    private function isIncludable($name, SimpleXMLElement $xml) {
+    private function isIncludable(string $name, SimpleXMLElement $xml): bool {
         return $this->isTileDefinition($name, $xml) || $this->isFile($name);
     }
 
@@ -1155,7 +1172,7 @@ class Module extends CObject {
      *
      * @return bool
      */
-    private function isTileDefinition($name, SimpleXMLElement $xml) {
+    private function isTileDefinition(string $name, SimpleXMLElement $xml): bool {
         $nodes = $xml->xpath("/struts-config/tiles/tile[@name='".$name."']") ?: [];
         return (bool) sizeof($nodes);
     }
@@ -1168,7 +1185,7 @@ class Module extends CObject {
      *
      * @return bool
      */
-    private function isFile($path) {
+    private function isFile(string $path): bool {
         $filename = $this->findFile($path);
         return ($filename !== null);
     }
@@ -1204,7 +1221,7 @@ class Module extends CObject {
      *
      * @return bool
      */
-    private function isValidNamespace($value) {
+    private function isValidNamespace(string $value): bool {
         $pattern = '/^\\\\?[a-z_][a-z0-9_]*(\\\\[a-z_][a-z0-9_]*)*\\\\?$/i';
         return (bool) preg_match($pattern, $value);
     }
@@ -1217,7 +1234,7 @@ class Module extends CObject {
      *
      * @return string[] - found class names or an empty array if the class name cannot be resolved
      */
-    private function resolveClassName($name) {
+    private function resolveClassName(string $name): array {
         $name = str_replace('/', '\\', trim($name));
 
         // no need to resolve a qualified name

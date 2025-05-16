@@ -33,34 +33,34 @@ class Request extends CObject {
 
 
     /** @var string */
-    protected $method;
+    protected string $method;
 
-    /** @var string */
-    protected $path;
+    /** @var ?string */
+    protected ?string $path = null;
 
-    /** @var string */
-    protected $hostUrl;
-
-    /** @var array<string, mixed> */
-    protected $_GET;
+    /** @var ?string */
+    protected ?string $hostUrl = null;
 
     /** @var array<string, mixed> */
-    protected $_POST;
+    protected array $_GET;
 
     /** @var array<string, mixed> */
-    protected $_REQUEST;
+    protected array $_POST;
 
-    /** @var ActionInput|null - all input */
-    protected $allInput = null;
+    /** @var array<string, mixed> */
+    protected array $_REQUEST;
 
-    /** @var ActionInput|null - GET input*/
-    protected $getInput = null;
+    /** @var ?ActionInput - all input */
+    protected ?ActionInput $allInput = null;
 
-    /** @var ActionInput|null - POST input */
-    protected $postInput = null;
+    /** @var ?ActionInput - GET input*/
+    protected ?ActionInput $getInput = null;
+
+    /** @var ?ActionInput - POST input */
+    protected ?ActionInput $postInput = null;
 
     /** @var ?scalar[][] - normalized array of files uploaded with the request */
-    protected $files = null;
+    protected ?array $files = null;
 
     /** @var mixed[] - additional variables context */
     protected array $attributes = [];
@@ -82,7 +82,7 @@ class Request extends CObject {
      *
      * @return string
      */
-    public function getMethod() {
+    public function getMethod(): string {
         return $this->method;
     }
 
@@ -92,7 +92,7 @@ class Request extends CObject {
      *
      * @return bool
      */
-    public function isGet() {
+    public function isGet(): bool {
         return ($this->method == 'GET');
     }
 
@@ -102,7 +102,7 @@ class Request extends CObject {
      *
      * @return bool
      */
-    public function isPost() {
+    public function isPost(): bool {
         return ($this->method == 'POST');
     }
 
@@ -112,7 +112,7 @@ class Request extends CObject {
      *
      * @return bool
      */
-    public function isAjax() {
+    public function isAjax(): bool {
         static $isAjax;
         !isset($isAjax) && $isAjax = strCompareI($this->getHeader('X-Requested-With'), 'XMLHttpRequest');
         return $isAjax;
@@ -124,7 +124,7 @@ class Request extends CObject {
      *
      * @return bool
      */
-    public function isSecure() {
+    public function isSecure(): bool {
         return !empty($_SERVER['HTTPS']) && !strCompareI($_SERVER['HTTPS'], 'off');
     }
 
@@ -134,10 +134,8 @@ class Request extends CObject {
      *
      * @return ActionInput
      */
-    public function input() {
-        if (!$this->allInput) {
-            $this->allInput = new ActionInput($this->_REQUEST);
-        }
+    public function input(): ActionInput {
+        $this->allInput ??= new ActionInput($this->_REQUEST);
         return $this->allInput;
     }
 
@@ -147,10 +145,8 @@ class Request extends CObject {
      *
      * @return ActionInput
      */
-    public function get() {
-        if (!$this->getInput) {
-            $this->getInput = new ActionInput($this->_GET);
-        }
+    public function get(): ActionInput {
+        $this->getInput ??= new ActionInput($this->_GET);
         return $this->getInput;
     }
 
@@ -160,10 +156,8 @@ class Request extends CObject {
      *
      * @return ActionInput
      */
-    public function post() {
-        if (!$this->postInput) {
-            $this->postInput = new ActionInput($this->_POST);
-        }
+    public function post(): ActionInput {
+        $this->postInput ??= new ActionInput($this->_POST);
         return $this->postInput;
     }
 
@@ -229,13 +223,13 @@ class Request extends CObject {
      *  $request->getHostname();        // "a.domain.tld"
      * </pre>
      */
-    public function getHostname() {
+    public function getHostname(): string {
         if (!empty($_SERVER['HTTP_HOST'])) {
             $httpHost = strtolower(trim($_SERVER['HTTP_HOST']));    // nginx doesn't set $_SERVER[SERVER_NAME]
             if (strlen($httpHost))                                  // automatically to $_SERVER[HTTP_HOST]
                 return $httpHost;
         }
-        return $_SERVER['SERVER_NAME'];
+        return $_SERVER['SERVER_NAME'] ?? '';
     }
 
 
@@ -250,13 +244,14 @@ class Request extends CObject {
      *  $request->getHostUrl();         // "http://a.domain.tld/"
      * </pre>
      */
-    public function getHostUrl() {
+    public function getHostUrl(): string {
         if (!$this->hostUrl) {
             $protocol = $this->isSecure() ? 'https' : 'http';
-            $host     = $this->getHostname();
-            $port     = ':'.$_SERVER['SERVER_PORT'];
-            if ($protocol.$port=='http:80' || $protocol.$port=='https:443')
+            $host = $this->getHostname();
+            $port = ':'.$_SERVER['SERVER_PORT'];
+            if ($protocol.$port=='http:80' || $protocol.$port=='https:443') {
                 $port = '';
+            }
             $this->hostUrl = $protocol.'://'.$host.$port.'/';
         }
         return $this->hostUrl;
@@ -273,7 +268,7 @@ class Request extends CObject {
      *  $request->getUrl();         // "http://a.domain.tld/path/application/module/foo/bar.html?key=value"
      * </pre>
      */
-    public function getUrl() {
+    public function getUrl(): string {
         return strLeft($this->getHostUrl(), -1).$this->getUri();
     }
 
@@ -290,8 +285,8 @@ class Request extends CObject {
      *  $request->getUri();         // "/path/application/module/foo/bar.html?key=value"
      * </pre>
      */
-    public function getUri() {
-        return $_SERVER['REQUEST_URI'];
+    public function getUri(): string {
+        return $_SERVER['REQUEST_URI'] ?? '';
     }
 
 
@@ -306,7 +301,7 @@ class Request extends CObject {
      *  $request->getPath():        // "/path/application/module/foo/bar.html"
      * </pre>
      */
-    public function getPath() {
+    public function getPath(): string {
         if (!$this->path) {
             $value = $this->getUri();
             $value = strLeftTo($value, '?');
@@ -329,7 +324,7 @@ class Request extends CObject {
      *  $request->getApplicationUrl();  // "http://a.domain.tld/path/application/"
      * </pre>
      */
-    public function getApplicationUrl() {
+    public function getApplicationUrl(): string {
         // TODO: Move to application as this is not a property of the request.
         return strLeft($this->getHostUrl(), -1).$this->getApplicationBaseUri();
     }
@@ -346,7 +341,7 @@ class Request extends CObject {
      *  $request->getApplicationRelativeUri();  // "/module/foo/bar.html?key=value"
      * </pre>
      */
-    public function getApplicationRelativeUri() {
+    public function getApplicationRelativeUri(): string {
         // TODO: Move to application as this is not a property of the request.
         return '/'.strRightFrom($this->getUri(), $this->getApplicationBaseUri());
     }
@@ -364,7 +359,7 @@ class Request extends CObject {
      *  $request->getApplicationRelativePath(); // "/module/foo/bar.html"
      * </pre>
      */
-    public function getApplicationRelativePath() {
+    public function getApplicationRelativePath(): string {
         // TODO: Move to application as this is not a property of the request.
         return '/'.strRightFrom($this->getPath(), $this->getApplicationBaseUri());
     }
@@ -381,7 +376,7 @@ class Request extends CObject {
      *  $request->getApplicationBaseUri();      // "/path/application/"
      * </pre>
      */
-    public function getApplicationBaseUri() {
+    public function getApplicationBaseUri(): string {
         // TODO: Move to application as this is not a property of the request.
         static $baseUri;
         if (!isset($baseUri)) {
@@ -406,7 +401,7 @@ class Request extends CObject {
      *
      * @return ?string - value or NULL if the variable is not defined
      */
-    private function resolveBaseUriVar() {
+    private function resolveBaseUriVar(): ?string {
         $envName = 'APP_BASE_URI';
         $envValue = null;
 
@@ -432,7 +427,7 @@ class Request extends CObject {
      *  $request->getQueryString();         // "key=value"
      * </pre>
      */
-    public function getQueryString() {
+    public function getQueryString(): string {
         // The variable $_SERVER['QUERY_STRING'] is set by the server and can differ from the transmitted query string.
         // The server variable may hold additional parameters, or it may be empty (e.g. on a mis-configured Nginx).
 
@@ -451,8 +446,8 @@ class Request extends CObject {
      *
      * @return string - IP address
      */
-    public function getRemoteAddress() {
-        return $_SERVER['REMOTE_ADDR'];
+    public function getRemoteAddress(): string {
+        return $_SERVER['REMOTE_ADDR'] ?? '';
     }
 
 
@@ -461,7 +456,7 @@ class Request extends CObject {
      *
      * @return string - host name
      */
-    public function getRemoteHostname() {
+    public function getRemoteHostname(): string {
         static $hostname = null;
         if (!$hostname) {
             /** @var string $hostname */
@@ -476,8 +471,8 @@ class Request extends CObject {
      *
      * @return ?string - header value (one or more ip addresses or hostnames) or NULL if the header was not transmitted
      */
-    public function getForwardedRemoteAddress() {
-        return $this->getHeaderValue(['X-Forwarded-For', 'X-UP-Forwarded-For']);
+    public function getForwardedRemoteAddress(): ?string {
+        return $this->getHeaderValue('X-Forwarded-For', 'X-UP-Forwarded-For');
     }
 
 
@@ -487,7 +482,7 @@ class Request extends CObject {
      *
      * @return string - request body or metadata
      */
-    public function getContent() {
+    public function getContent(): string {
         static $content  = '';
         static $isRead = false;
 
@@ -515,7 +510,7 @@ class Request extends CObject {
      *
      * @return ?string - "Content-Type" header or NULL if no "Content-Type" header was transmitted
      */
-    public function getContentType() {
+    public function getContentType(): ?string {
         $contentType = $this->getHeaderValue('Content-Type');
 
         if ($contentType) {
@@ -534,7 +529,7 @@ class Request extends CObject {
      *
      * @return HttpSession
      */
-    public function getSession() {
+    public function getSession(): HttpSession {
         return HttpSession::me();
     }
 
@@ -544,7 +539,7 @@ class Request extends CObject {
      *
      * @return bool
      */
-    public function isSession() {
+    public function isSession(): bool {
         return (session_id() !== '');
     }
 
@@ -556,7 +551,7 @@ class Request extends CObject {
      *
      * @return bool
      */
-    public function isSessionAttribute($key) {
+    public function isSessionAttribute(string $key): bool {
         if ($this->isSession() || $this->hasSessionId())
             return $this->getSession()->isAttribute($key);
         return false;
@@ -568,7 +563,7 @@ class Request extends CObject {
      *
      * @return string
      */
-    public function getSessionId() {
+    public function getSessionId(): string {
         $name = session_name();
 
         if (ini_get_bool('session.use_cookies'))
@@ -589,7 +584,7 @@ class Request extends CObject {
      *
      * @return bool
      */
-    public function hasSessionId() {
+    public function hasSessionId(): bool {
         $name = session_name();
 
         if (ini_get_bool('session.use_cookies'))
@@ -609,7 +604,7 @@ class Request extends CObject {
      *
      * @return void
      */
-    public function destroySession() {
+    public function destroySession(): void {
         if (session_status() == PHP_SESSION_ACTIVE) {
             // unset all session variables
             $_SESSION = [];
@@ -643,14 +638,11 @@ class Request extends CObject {
     /**
      * Return all headers with the specified name as an associative array of header values (in transmitted order).
      *
-     * @param  string|string[] $names [optional] - one or more header names (default: all headers)
+     * @param  string ...$names [optional] - one or more header names (default: all headers)
      *
      * @return string[] - associative array of header values
      */
-    public function getHeaders($names = []): array {
-        if (!is_array($names)) {
-            $names = [$names];
-        }
+    public function getHeaders(string ...$names): array {
         static $headers = null;
         static $fixHeaderNames = [
             'CDN'     => 'CDN',
@@ -699,15 +691,12 @@ class Request extends CObject {
      * Return a single value of the specified header/s. If multiple headers are specified or multiple headers have been
      * transmitted, return all values as one comma-separated value (in transmission order).
      *
-     * @param  string|string[] $names - one or multiple header names
+     * @param  string ...$names - one or multiple header names
      *
      * @return ?string - value or NULL if no such headers have been transmitted
      */
-    public function getHeaderValue($names): ?string {
-        if (is_string($names)) {
-            $names = [$names];
-        }
-        $headers = $this->getHeaders($names);
+    public function getHeaderValue(string ...$names): ?string {
+        $headers = $this->getHeaders(...$names);
         return $headers ? join(',', $headers) : null;
     }
 
@@ -715,15 +704,12 @@ class Request extends CObject {
     /**
      * Return the values of all specified header(s) as an array (in transmission order).
      *
-     * @param  string|string[] $names - one or multiple header names
+     * @param  string ...$names - one or multiple header names
      *
      * @return string[] - values or an empty array if no such headers have been transmitted
      */
-    public function getHeaderValues($names) {
-        if (is_string($names)) {
-            $names = [$names];
-        }
-        $headers = $this->getHeaders($names);
+    public function getHeaderValues(string ...$names): array {
+        $headers = $this->getHeaders(...$names);
         if (!$headers) return [];
 
         return \array_map('trim', explode(',', join(',', $headers)));
@@ -776,7 +762,7 @@ class Request extends CObject {
      *
      * @return void
      */
-    public function removeAttributes(...$names) {
+    public function removeAttributes(string ...$names): void {
         foreach ($names as $name) {
             unset($this->attributes[$name]);
         }
@@ -793,7 +779,7 @@ class Request extends CObject {
      *
      * @return $this
      */
-    public function setCookie(string $name, string $value, int $expires = 0, ?string $path = null) {
+    public function setCookie(string $name, string $value, int $expires = 0, ?string $path = null): self {
         if ($expires < 0) throw new InvalidValueException('Invalid parameter $expires: '.$expires);
 
         if (!isset($path)) {
@@ -851,7 +837,7 @@ class Request extends CObject {
      *
      * @return string[]
      */
-    public function getActionMessages() {
+    public function getActionMessages(): array {
         $messages = $this->getAttribute(Struts::ACTION_MESSAGES_KEY) ?? [];
         $errors = $this->getActionErrors();
         return \array_merge($messages, $errors);
@@ -861,19 +847,13 @@ class Request extends CObject {
     /**
      * Whether an ActionMessage exists for one of the specified keys, or for any key if no key was given.
      *
-     * @param  string|string[]|null $keys [optional] - message keys
+     * @param  string ...$keys [optional] - message keys
      *
      * @return bool
      */
-    public function isActionMessage($keys = null): bool {
+    public function isActionMessage(string ...$keys): bool {
         $messages = $this->getActionMessages();
 
-        if (!isset($keys)) {
-            return (bool) $messages;
-        }
-        if (is_string($keys)) {
-            $keys = [$keys];
-        }
         if (!$keys) {
             return (bool) $messages;
         }
@@ -912,7 +892,7 @@ class Request extends CObject {
      *
      * @return string[] - the removed ActionMessages
      */
-    public function removeActionMessages(...$keys): array {
+    public function removeActionMessages(string ...$keys): array {
         $messages = $this->getAttribute(Struts::ACTION_MESSAGES_KEY) ?? [];
         $removed = [];
 
@@ -937,7 +917,7 @@ class Request extends CObject {
      *
      * @return ?string - message
      */
-    public function getActionError(?string $key = null) {
+    public function getActionError(?string $key = null): ?string {
         /** @var string[] $errors */
         $errors = $this->getAttribute(Struts::ACTION_ERRORS_KEY) ?? [];
 
@@ -958,7 +938,7 @@ class Request extends CObject {
      *
      * @return string[]
      */
-    public function getActionErrors() {
+    public function getActionErrors(): array {
         return $this->getAttribute(Struts::ACTION_ERRORS_KEY) ?? [];
     }
 
@@ -966,19 +946,13 @@ class Request extends CObject {
     /**
      * Whether an ActionError exists for one of the specified keys, or for any key if no key was given.
      *
-     * @param  string|string[]|null $keys [optional] - error keys
+     * @param  string ...$keys [optional] - error keys
      *
      * @return bool
      */
-    public function isActionError($keys = null): bool {
+    public function isActionError(string ...$keys): bool {
         $errors = $this->getActionErrors();
 
-        if (!isset($keys)) {
-            return (bool) $errors;
-        }
-        if (is_string($keys)) {
-            $keys = [$keys];
-        }
         if (!$keys) {
             return (bool) $errors;
         }
@@ -1017,7 +991,7 @@ class Request extends CObject {
      *
      * @return string[] - the removed ActionErrors
      */
-    public function removeActionErrors(...$keys) {
+    public function removeActionErrors(string ...$keys): array {
         $errors = $this->getAttribute(Struts::ACTION_ERRORS_KEY) ?? [];
         $removed = [];
 
@@ -1041,7 +1015,7 @@ class Request extends CObject {
      *
      * @return ?ActionMapping - instance or NULL if the request doesn't match any of the configured mappings
      */
-    final public function getMapping() {
+    final public function getMapping(): ?ActionMapping {
         return $this->getAttribute(Struts::ACTION_MAPPING_KEY);
     }
 
@@ -1051,29 +1025,33 @@ class Request extends CObject {
      *
      * @return ?Module - instance or NULL if the request doesn't match any of the configured modules
      */
-    final public function getModule() {
+    final public function getModule(): ?Module {
         return $this->getAttribute(Struts::MODULE_KEY);
     }
 
 
     /**
      * Reject serialization of request instances.
+     *
+     * @return string[]
      */
-    final public function __sleep() {
+    final public function __sleep(): array {
         throw new IllegalStateException('You cannot serialize a '.get_class($this));
     }
 
 
     /**
      * Reject deserialization of Request instances.
+     *
+     * @return void
      */
-    final public function __wakeUp() {
+    final public function __wakeUp(): void {
         throw new IllegalStateException('You cannot deserialize a '.get_class($this));
     }
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function __toString(): string {
         // request
@@ -1096,19 +1074,5 @@ class Request extends CObject {
             $string .= NL.substr($content, 0, 2048).NL;                     // limit the request body to 2048 bytes
         }
         return $string;
-    }
-
-
-    /**
-     * Return the instance currently registered in the service container.
-     *
-     * @return static
-     *
-     * @deprecated
-     */
-    public static function me() {
-        /** @var static $request */
-        $request = self::di(__CLASS__);
-        return $request;
     }
 }

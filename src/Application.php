@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace rosasurfer\ministruts;
 
 use rosasurfer\ministruts\config\Config;
+use rosasurfer\ministruts\config\ConfigInterface as IConfig;
 use rosasurfer\ministruts\console\Command;
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\assert\Assert;
@@ -18,7 +19,6 @@ use rosasurfer\ministruts\struts\FrontController;
 use rosasurfer\ministruts\struts\Response;
 use rosasurfer\ministruts\util\PHP;
 
-
 /**
  * A class representing the application instance.
  */
@@ -27,8 +27,8 @@ class Application extends CObject {
     /** @var self - the application itself */
     protected static self $instance;
 
-    /** @var Config|null - the application's main configuration */
-    protected static ?Config $config = null;
+    /** @var ?IConfig - the application's main configuration */
+    protected static ?IConfig $config = null;
 
     /** @var Di|null - the application's service container */
     protected static ?Di $di = null;
@@ -69,7 +69,6 @@ class Application extends CObject {
         $errorMode  = $options['app.error.on-error'] ?? 'exception';
         $this->initErrorHandling($errorLevel, $errorMode);
 
-        /** @var Config $config */
         $config = $this->initConfig($options);
         $configDir = $config->getString('app.dir.config');
         $di = $this->initDi($configDir);
@@ -124,8 +123,8 @@ class Application extends CObject {
     /**
      * Initialize error handling.
      *
-     * @param mixed $level - error reporting level
-     * @param mixed $mode  - error handling: "ignore | log | exception"
+     * @param  mixed $level - error reporting level
+     * @param  mixed $mode  - error handling: "ignore | log | exception"
      *
      * @return void
      */
@@ -153,9 +152,9 @@ class Application extends CObject {
      *
      * @param  array<string, string> $options - configuration options as passed to the framework loader
      *
-     * @return Config
+     * @return IConfig
      */
-    protected function initConfig(array $options): Config {
+    protected function initConfig(array $options): IConfig {
         $config = Config::createFrom($options['app.dir.config'] ?? getcwd());
         $this->setConfig($config);
         unset($options['app.dir.config']);
@@ -216,13 +215,13 @@ class Application extends CObject {
         }
 
         // log excessive memory consumption
-        register_shutdown_function(static function() {
+        register_shutdown_function(static function(): void {
             if (!self::$config) return;
 
             $warnLimit = php_byte_value(self::$config->get('log.warn.memory_limit', PHP_INT_MAX));
             $usedBytes = memory_get_peak_usage(true);
             if ($usedBytes > $warnLimit) {
-                Logger::log('Memory consumption exceeded '.prettyBytes($warnLimit).' (peak usage: '.prettyBytes($usedBytes).')', L_WARN, ['class' => __CLASS__]);
+                Logger::log('Memory consumption exceeded '.prettyBytes($warnLimit).' (peak usage: '.prettyBytes($usedBytes).')', L_WARN, ['class' => self::class]);
             }
         });
     }
@@ -247,7 +246,7 @@ class Application extends CObject {
             if ($config && self::isAdminIP()) {
                 // execute "config-info" task if enabled
                 if ($configInfoTask) {
-                    $configFiles = $config->getMonitoredFiles();
+                    $configFiles = $config->getConfigFiles();
                     $files = [];
                     foreach ($configFiles as $file => $exists) {
                         $files[] = ($exists ? 'OK':'? ').'   '.str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $file);
@@ -335,11 +334,11 @@ class Application extends CObject {
     /**
      * Set the {@link Application}'s main configuration.
      *
-     * @param  Config $configuration
+     * @param  IConfig $configuration
      *
      * @return $this
      */
-    protected function setConfig(Config $configuration): self {
+    protected function setConfig(IConfig $configuration): self {
         $previous = self::$config;
         self::$config = $configuration;
 

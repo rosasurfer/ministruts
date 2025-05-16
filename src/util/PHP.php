@@ -39,7 +39,7 @@ class PHP extends StaticClass {
      *
      * @return void
      */
-    public static function collectGarbage() {
+    public static function collectGarbage(): void {
         $wasEnabled = gc_enabled();
         !$wasEnabled && gc_enable();
 
@@ -71,7 +71,7 @@ class PHP extends StaticClass {
      *
      * @return ?string - content of STDOUT or NULL if the process didn't produce any output
      */
-    public static function execProcess(string $cmd, &$stderr=null, &$exitCode=null, $dir=null, $env=null, array $options=[]): ?string {
+    public static function execProcess(string $cmd, ?string &$stderr=null, ?int &$exitCode=null, ?string $dir=null, ?array $env=null, array $options=[]): ?string {
         // check whether the process needs to be watched asynchronously
         $argc         = func_num_args();
         $needStderr   = ($argc > 1);
@@ -127,10 +127,10 @@ class PHP extends StaticClass {
         ];
         $stdout = $stderr = '';                                         // stream contents
         $handlers = [                                                   // a handler for each stream
-            (int)$pipes[$STDOUT] => function($line) use (&$stdout, $stdoutPassthrough) {
+            (int)$pipes[$STDOUT] => function($line) use (&$stdout, $stdoutPassthrough): void {
                 $stdout .= $line; if ($stdoutPassthrough) echo $line;
             },
-            (int)$pipes[$STDERR] => function($line) use (&$stderr, $stderrPassthrough) {
+            (int)$pipes[$STDERR] => function($line) use (&$stderr, $stderrPassthrough): void {
                 $stderr .= $line; if ($stderrPassthrough) stderr($line);
             },
         ];
@@ -169,7 +169,7 @@ class PHP extends StaticClass {
      * PHP_INI_SYSTEM - entry can be set in php.ini and in httpd.conf
      * PHP_INI_PERDIR - entry can be set in php.ini, httpd.conf, .htaccess and in .user.ini
      */
-    public static function phpinfo() {
+    public static function phpinfo(): void {
         /** @var Config $config */
         $config = self::di('config');
         $issues = [];
@@ -245,7 +245,7 @@ class PHP extends StaticClass {
                 $newOrder = '';
                 $len = strlen($order);
                 for ($i=0; $i < $len; $i++) {
-                    if (in_array($char=$order[$i], ['G','P','C'])) {
+                    if (in_array($char=$order[$i], ['G', 'P', 'C'])) {
                         $newOrder .= $char;
                     }
                 }

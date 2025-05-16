@@ -88,7 +88,7 @@ class FileDependency extends Dependency {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @return bool
      */

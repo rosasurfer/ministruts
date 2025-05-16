@@ -45,7 +45,7 @@ abstract class Connector extends CObject implements ConnectorInterface {
      *
      * @return ConnectorInterface
      */
-    public static function create($class, array $options) {
+    public static function create(string $class, array $options): ConnectorInterface {
         if (!is_subclass_of($class, ConnectorInterface::class)) {
             throw new InvalidTypeException($class.' does not implement '.ConnectorInterface::class);
         }

@@ -15,10 +15,10 @@ abstract class Action extends CObject {
 
 
     /** @var ActionMapping - encapsulates a single routing configuration */
-    protected $mapping;
+    protected ActionMapping $mapping;
 
     /** @var ActionForm - holds interpreted user input of the current request */
-    protected $form;
+    protected ActionForm $form;
 
 
     /**
@@ -38,7 +38,7 @@ abstract class Action extends CObject {
      *
      * @return ActionMapping
      */
-    public function getMapping() {
+    public function getMapping(): ActionMapping {
         return $this->mapping;
     }
 
@@ -84,7 +84,7 @@ abstract class Action extends CObject {
      *
      * @return ?ActionForward - original or modified ActionForward (e.g. a route with added query parameters)
      */
-    public function executeAfter(Request $request, Response $response, ?ActionForward $forward = null) {
+    public function executeAfter(Request $request, Response $response, ?ActionForward $forward = null): ?ActionForward {
         return $forward;
     }
 
@@ -96,7 +96,7 @@ abstract class Action extends CObject {
      *
      * @return ?ActionForward - found ActionForward or NULL if no such forward was found
      */
-    protected function findForward($name) {
+    protected function findForward(string $name): ?ActionForward {
         return $this->mapping->findForward($name);
     }
 }

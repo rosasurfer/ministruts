@@ -22,7 +22,7 @@ class ZipArchive extends \ZipArchive {
 
 
     /** @var string[][] */
-    protected static $errors = [
+    protected static array $errors = [
         parent::ER_OK          => ['ER_OK'             , 'no error'                             ],      //  0
         parent::ER_MULTIDISK   => ['ER_MULTIDISK'      , 'multi-disk zip archives not supported'],      //  1
         parent::ER_RENAME      => ['ER_RENAME'         , 'renaming temporary file failed'       ],      //  2
@@ -62,7 +62,7 @@ class ZipArchive extends \ZipArchive {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param  string $filename
      * @param  int    $flags [optional]

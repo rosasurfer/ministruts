@@ -51,22 +51,22 @@ class ErrorHandler extends StaticClass {
 
 
     /** @var int - the configured error handling mode */
-    protected static $errorHandling = 0;
+    protected static int $errorHandling = 0;
 
     /** @var ?callable - a previously active error handler (if any) */
     protected static $prevErrorHandler = null;
 
     /** @var bool - the configured exception handling status */
-    protected static $exceptionHandling = false;
+    protected static bool $exceptionHandling = false;
 
     /** @var ?callable - a previously active exception handler (if any) */
     protected static $prevExceptionHandler = null;
 
     /** @var bool - whether the script is in the shutdown phase */
-    protected static $inShutdown = false;
+    protected static bool $inShutdown = false;
 
     /** @var ?string - memory block reserved for handling out-of-memory errors */
-    protected static $oomEmergencyMemory = null;
+    protected static ?string $oomEmergencyMemory = null;
 
 
     /**
@@ -77,7 +77,7 @@ class ErrorHandler extends StaticClass {
      *
      * @return void
      */
-    public static function setupErrorHandling(int $level, int $mode) {
+    public static function setupErrorHandling(int $level, int $mode): void {
         if ($mode < self::MODE_IGNORE || $mode > self::MODE_EXCEPTION) {
             throw new InvalidValueException('Invalid parameter $mode: '.$mode);
         }
@@ -109,7 +109,7 @@ class ErrorHandler extends StaticClass {
      *
      * @return void
      */
-    protected static function setupShutdownHandler() {
+    protected static function setupShutdownHandler(): void {
         static $handlerRegistered = false;
 
         if (!$handlerRegistered) {
@@ -137,7 +137,7 @@ class ErrorHandler extends StaticClass {
      *
      * @throws PHPError
      */
-    public static function handleError($level, $message, $file, $line, array $symbols = []) {
+    public static function handleError(int $level, string $message, string $file, int $line, array $symbols = []): bool {
         //echof('ErrorHandler::handleError(inShutdown='.(int)self::$inShutdown.') '.self::errorLevelToStr($level).': '.$message.', in '.$file.', line '.$line);
         if (!self::$errorHandling) return false;
 
@@ -324,9 +324,9 @@ class ErrorHandler extends StaticClass {
      *
      * @link  https://www.php.net/manual/en/language.oop5.decon.php#language.oop5.decon.destructor
      */
-    public static function handleDestructorException($exception) {
+    public static function handleDestructorException(Throwable $exception): Throwable {
         if (self::$inShutdown) {
-            $currentHandler = set_exception_handler(function() {});
+            $currentHandler = set_exception_handler(function(): void {});
             restore_exception_handler();
 
             if ($currentHandler) {
@@ -379,7 +379,7 @@ class ErrorHandler extends StaticClass {
      *
      * @return string
      */
-    public static function errorLevelDescr(int $level) {
+    public static function errorLevelDescr(int $level): string {
         static $levels = [
             E_ERROR             => 'Error',                     //     1
             E_WARNING           => 'Warning',                   //     2
@@ -479,7 +479,7 @@ class ErrorHandler extends StaticClass {
                         case 205:
                             $msg .= 'namespace error';
                             break 2;
-                    };
+                    }
                 default:
                     $msg .= 'parser error';
             }
@@ -530,7 +530,7 @@ class ErrorHandler extends StaticClass {
      * @param  string  $file [optional] - name of the file where the stacktrace was generated
      * @param  int     $line [optional] - line of the file where the stacktrace was generated
      *
-     * @return array[] - adjusted stacktrace
+     * @return mixed[] - adjusted stacktrace
      *
      * @phpstan-param  STACKFRAME[] $trace
      * @phpstan-return STACKFRAME[]
@@ -734,7 +734,7 @@ class ErrorHandler extends StaticClass {
      * @param  string  $file  - filename where an error was triggered
      * @param  int     $line  - line number where an error was triggered
      *
-     * @return array[] - modified stacktrace
+     * @return mixed[] - modified stacktrace
      *
      * @phpstan-param  STACKFRAME[] $trace
      * @phpstan-return STACKFRAME[]

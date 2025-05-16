@@ -6,21 +6,19 @@ namespace rosasurfer\ministruts\core\di;
 use rosasurfer\ministruts\Application;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 
-
 /**
  * DiAwareTrait
  *
- * A trait adding the behavior "service locator awareness" to any class. Used to access dependencies in
- * the {@link Application}'s service container. Any class can easily be made service aware.
+ * A trait adding the behavior "service locator awareness" to any class. Provides access to dependencies in
+ * the application's service container. Using this trait any class can easily be made service aware.
  */
 trait DiAwareTrait {
 
-
     /**
-     * Return the {@link Application}'s service container, or resolve a named service and return its implementation.
-     * This method should be used to access services and the application's service container from a class-context.
+     * Return the application's service container or resolve a named service and return its implementation.
+     * This method should be used to access the service container from a class-context.
      *
-     * @param  ?string $name [optional] - service identifier (default: none to return the service container)
+     * @param  ?string $name [optional] - service identifier (default: none to return the service container itself)
      *
      * @return ($name is null ? DiInterface : object)
      */

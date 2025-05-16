@@ -19,13 +19,13 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
 
 
     /** @var Request [transient] - the request the form belongs to */
-    protected $request;
+    protected Request $request;
 
     /** @var string - dispatch action key, populated if the Action handling the request is a DispatchAction */
     protected string $actionKey = '';
 
     /** @var string[] */
-    protected static $fileUploadErrors = [
+    protected static array $fileUploadErrors = [
         UPLOAD_ERR_OK         => 'Success (UPLOAD_ERR_OK)',
         UPLOAD_ERR_INI_SIZE   => 'Upload error, file too big (UPLOAD_ERR_INI_SIZE)',
         UPLOAD_ERR_FORM_SIZE  => 'Upload error, file too big (UPLOAD_ERR_FORM_SIZE)',
@@ -71,7 +71,7 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
      *  &lt;img type="submit" name="submit[action]" value="{action-key}" src=... /&gt;
      * </pre>
      */
-    protected function initActionKey() {
+    protected function initActionKey(): void {
         //
         // PHP breaks transmitted parameters by silently converting dots "." and spaces " " in parameter names to underscores.
         // This especially breaks submit image elements, as the HTML standard appends the clicked image coordinates to the submit
@@ -132,7 +132,7 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
      *
      * @return void
      */
-    abstract protected function populate();
+    abstract protected function populate(): void;
 
 
     /**
@@ -140,7 +140,7 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
      *
      * @return bool - whether the submitted parameters are valid
      */
-    abstract public function validate();
+    abstract public function validate(): bool;
 
 
     /**
@@ -171,9 +171,7 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
     /**
      * Whether a form property with the specified name exists.
      *
-     * @param  string $name
-     *
-     * @return bool
+     * {@inheritDoc}
      */
     public function offsetExists($name): bool {
         switch ($name) {
@@ -189,9 +187,7 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
      * Return the property with the specified name. If a getter for the property exists the getter is called.
      * Otherwise the property is returned.
      *
-     * @param  string $name
-     *
-     * @return mixed
+     * {@inheritDoc}
      */
     #[\ReturnTypeWillChange]
     public function offsetGet($name) {
@@ -202,12 +198,7 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
     /**
      * Prevent modification of form properties.
      *
-     * @param  string $name
-     * @param  mixed  $value
-     *
-     * @return void
-     *
-     * @throws IllegalAccessException
+     * {@inheritDoc}
      */
     final public function offsetSet($name, $value): void {
         throw new IllegalAccessException('Cannot set/modify ActionForm properties');
@@ -217,11 +208,7 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
     /**
      * Unsetting form properties is not allowed.
      *
-     * @param  string $name
-     *
-     * @return void
-     *
-     * @throws IllegalAccessException
+     * {@inheritDoc}
      */
     final public function offsetUnset($name): void {
         throw new IllegalAccessException('Cannot set/modify ActionForm properties');
@@ -233,7 +220,7 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
      *
      * @return string[] - array of property names to serialize
      */
-    public function __sleep() {
+    public function __sleep(): array {
         $array = (array)$this;
         foreach ($array as $name => $property) {
             if (is_object($property) || is_resource($property)) {

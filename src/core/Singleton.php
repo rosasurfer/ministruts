@@ -5,6 +5,7 @@ namespace rosasurfer\ministruts\core;
 
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
+use rosasurfer\ministruts\core\exception\IllegalStateException;
 
 
 /**
@@ -16,7 +17,7 @@ abstract class Singleton extends CObject {
 
 
     /** @var self[] - existing instances */
-    private static $instances = [];
+    private static array $instances = [];
 
 
     /**
@@ -35,7 +36,7 @@ abstract class Singleton extends CObject {
      *
      * @return self
      */
-    final protected static function getInstance($class, ...$args) {
+    final protected static function getInstance(string $class, ...$args): self {
         if (isset(self::$instances[$class])) {
             return self::$instances[$class];
         }
@@ -57,6 +58,11 @@ abstract class Singleton extends CObject {
 
     /**
      * Prevent cloning of {@link Singleton} instances.
+     *
+     * @return never
      */
-    final protected function __clone() {}           // since PHP8.0 private functions can't be final anymore
+    final protected function __clone(): void {
+        // since PHP8.0 private functions can't be final anymore
+        throw new IllegalStateException('You cannot clone me: '.get_class($this));
+    }
 }

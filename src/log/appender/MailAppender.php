@@ -138,9 +138,9 @@ class MailAppender extends BaseAppender {
         // initialize message aggregation
         $this->aggregateMessages = filter_var($options['aggregate-messages'] ?? static::getDefaultAggregation(), FILTER_VALIDATE_BOOLEAN);
         if ($this->aggregateMessages) {
-            register_shutdown_function(function() {
+            register_shutdown_function(function(): void {
                 // add a nested handler to include log entries triggered during shutdown itself
-                register_shutdown_function(function() {
+                register_shutdown_function(function(): void {
                     $messages = $this->messages;
                     $this->messages = [];
                     $this->processMessages($messages);

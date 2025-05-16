@@ -51,26 +51,25 @@ use const rosasurfer\ministruts\NL;
  * User-defined options can be specified as nested suboptions and are sent to the database as system variables in the
  * scope of the active session.
  *
- *
  * @see  https://www.postgresql.org/docs/9.6/static/libpq-connect.html#LIBPQ-PARAMKEYWORDS)
  */
 class PostgresConnector extends Connector {
 
 
     /** @var string - DBMS type */
-    protected $type = 'pgsql';
+    protected string $type = 'pgsql';
 
-    /** @var string - DBMS version string */
-    protected $versionString;
+    /** @var ?string - DBMS version string */
+    protected ?string $versionString = null;
 
-    /** @var int - DBMS version number */
-    protected $versionNumber;
+    /** @var ?int - DBMS version number */
+    protected ?int $versionNumber = null;
 
     /** @var mixed[] - connection options */
-    protected $options = [];
+    protected array $options = [];
 
     /** @var string[] - session variables */
-    protected $sessionVars = [];
+    protected array $sessionVars = [];
 
     /**
      * @var resource|PgSqlConnection|null - PostgreSQL connection handle
@@ -79,13 +78,13 @@ class PostgresConnector extends Connector {
     protected $connection = null;
 
     /** @var int - transaction nesting level */
-    protected $transactionLevel = 0;
+    protected int $transactionLevel = 0;
 
     /** @var ?int - the last inserted row id (not reset between queries) */
-    protected $lastInsertId = null;        // distinguish between "not yet set" and "zero"
+    protected ?int $lastInsertId = null;    // distinguish between "not yet set" and "zero"
 
     /** @var int - the last number of affected rows (not reset between queries) */
-    protected $lastAffectedRows = 0;
+    protected int $lastAffectedRows = 0;
 
 
     /**
@@ -260,7 +259,7 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function connect(): self {
         $connStr = $this->getConnectionString();
@@ -303,7 +302,7 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function disconnect(): self {
         if ($this->isConnected()) {
@@ -321,7 +320,7 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isConnected(): bool {
         return isset($this->connection);
@@ -329,7 +328,7 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function escapeIdentifier(string $name): string {
         if (!$this->isConnected()) {
@@ -353,7 +352,7 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function escapeLiteral($value): string {
         // bug or feature: pg_escape_literal(null) => '' quoted empty string instead of 'null'
@@ -375,7 +374,7 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function escapeString(?string $value): ?string {
         // bug or feature: pg_escape_string(null) => empty string instead of NULL
@@ -413,7 +412,7 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @return PostgresResult
      */
@@ -424,7 +423,7 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function execute(string $sql): self {
         $result = $this->executeRaw($sql);
@@ -435,7 +434,7 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @return resource|PgSqlResult - result
      * @phpstan-return PgSqlResultId
@@ -494,7 +493,7 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function commit(): self {
         if ($this->transactionLevel < 0) throw new RuntimeException("Negative transaction nesting level detected: $this->transactionLevel");
@@ -543,7 +542,7 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isInTransaction(): bool {
         if ($this->isConnected()) {
@@ -604,7 +603,7 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function supportsInsertReturn(): bool {
         return true;
@@ -629,7 +628,7 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getType(): string {
         return $this->type;
@@ -637,7 +636,7 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @return string - e.g. "9.1.23-rc"
      */
@@ -660,7 +659,7 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @return int - e.g. 9001023 for version string "9.1.23-rc"
      */

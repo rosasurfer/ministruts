@@ -32,7 +32,7 @@ abstract class BaseLock extends CObject {
     /**
      * Prevent serialization of lock instances.
      *
-     * @return mixed[]
+     * @return string[]
      */
     final public function __sleep(): array {
         throw new IllegalStateException('You cannot serialize me: '.get_class($this));

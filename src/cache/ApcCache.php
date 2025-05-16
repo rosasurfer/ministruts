@@ -14,7 +14,6 @@ use rosasurfer\ministruts\config\ConfigInterface as Config;
  */
 class ApcCache extends CachePeer {
 
-
     /**
      * Constructor.
      *
@@ -33,7 +32,7 @@ class ApcCache extends CachePeer {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isCached(string $key): bool {
         // The actual working horse. This method does not only check the key's existence, it also retrieves the value and
@@ -93,7 +92,7 @@ class ApcCache extends CachePeer {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function get(string $key, $default = null) {
         if ($this->isCached($key)) {
@@ -104,7 +103,7 @@ class ApcCache extends CachePeer {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function drop(string $key): bool {
         $this->getReferencePool()->drop($key);
@@ -113,7 +112,7 @@ class ApcCache extends CachePeer {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function set(string $key, $value, int $expires=Cache::EXPIRES_NEVER, ?Dependency $dependency=null): bool {
         // stored data: [int-created, int-expires, serialized([mixed-value, ?Dependency])]

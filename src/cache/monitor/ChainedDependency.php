@@ -43,7 +43,7 @@ class ChainedDependency extends Dependency {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function andDependency(Dependency $dependency): self {
         if ($dependency === $this) {
@@ -61,7 +61,7 @@ class ChainedDependency extends Dependency {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function orDependency(Dependency $dependency): self {
         if ($dependency === $this) {
@@ -79,7 +79,7 @@ class ChainedDependency extends Dependency {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isValid(): bool {
         if ($this->type == 'AND') {

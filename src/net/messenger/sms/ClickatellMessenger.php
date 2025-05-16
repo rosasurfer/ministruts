@@ -18,7 +18,7 @@ class ClickatellMessenger extends Messenger {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param  mixed[] $options
      */

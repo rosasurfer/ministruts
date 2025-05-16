@@ -29,11 +29,9 @@ class CliInput extends Proxy {
 
 
     /**
-     * {@inheritdoc}
-     *
-     * @return string
+     * {@inheritDoc}
      */
-    protected static function getServiceName() {
+    protected static function getServiceName(): string {
         return 'input';
 
         return \rosasurfer\ministruts\console\io\Input::class;      // @phpstan-ignore deadCode.unreachable (keep for testing)

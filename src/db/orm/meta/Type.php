@@ -32,5 +32,5 @@ abstract class Type extends CObject {
      *
      * @return string - database representation
      */
-    abstract public function convertToDBValue($value, PropertyMapping $mapping, Connector $connector);
+    abstract public function convertToDBValue($value, PropertyMapping $mapping, Connector $connector): string;
 }
