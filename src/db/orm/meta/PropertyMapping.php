@@ -17,7 +17,7 @@ class PropertyMapping extends CObject {
 
 
     /** @var EntityMapping - the entity mapping this mapping is a part of */
-    protected $entityMapping;
+    protected EntityMapping $entityMapping;
 
     /**
      * @var         scalar[] - mapping information
@@ -28,7 +28,7 @@ class PropertyMapping extends CObject {
     protected array $mapping;
 
     /** @var string - the property's PHP name */
-    protected $name;
+    protected string $name;
 
 
     /**
@@ -52,7 +52,7 @@ class PropertyMapping extends CObject {
      *
      * @return string
      */
-    public function getName() {
+    public function getName(): string {
         return $this->name;
     }
 
@@ -87,7 +87,7 @@ class PropertyMapping extends CObject {
      *
      * @return string - database representation
      */
-    public function convertToDBValue($value, IConnector $connector) {
+    public function convertToDBValue($value, IConnector $connector): string {
         if ($value === null) {
             $value = 'null';
         }

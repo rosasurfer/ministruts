@@ -921,7 +921,7 @@ function strCollapseWhiteSpace(string $string, bool $joinLines=true, string $sep
     if ($joinLines) {
         $string = str_replace(EOL_UNIX, $separator, $string);
     }
-    /** @var string result */
+    /** @var string $result */
     $result = preg_replace('/\s+/', ' ', $string);
     return $result;
 }

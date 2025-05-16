@@ -62,12 +62,12 @@ interface ConfigInterface extends \ArrayAccess, \Countable {
     /**
      * Set/modify the config setting with the specified key.
      *
-     * @param  string $key   - case-insensitive key
-     * @param  mixed  $value - new value
+     * @param  int|string $key   - case-insensitive key
+     * @param  mixed      $value - new value
      *
      * @return $this
      */
-    public function set(string $key, $value): self;
+    public function set($key, $value): self;
 
 
     /**
@@ -89,4 +89,13 @@ interface ConfigInterface extends \ArrayAccess, \Countable {
      * @return array<string, string>
      */
     public function export(array $options = []): array;
+
+
+    /**
+     * Return the names of originating configuration files. The returned array can contain
+     * names of existing and non-existing files, together with their status (found/not found).
+     *
+     * @return array<string, bool>
+     */
+    public function getConfigFiles(): array;
 }

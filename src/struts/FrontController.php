@@ -32,7 +32,7 @@ class FrontController extends Singleton {
 
 
     /** @var Module[] - all registered Struts modules with the module prefix as index */
-    private $modules = [];
+    private array $modules = [];
 
 
     /**
@@ -40,7 +40,7 @@ class FrontController extends Singleton {
      *
      * @return static
      */
-    public static function me() {
+    public static function me(): self {
         if (CLI) throw new IllegalStateException('Can not use '.static::class.' in this context.');
 
         $cache = Cache::me();
@@ -121,7 +121,7 @@ class FrontController extends Singleton {
      *
      * @return Response - response wrapper
      */
-    public static function processRequest(array $options = []) {
+    public static function processRequest(array $options = []): Response {
         $controller = self::me();
         $request = RequestProxy::instance();
         $response = Response::me();
@@ -166,18 +166,18 @@ FRONTCONTROLLER_PROCESS_REQUEST_ERROR_SC_404;
      *
      * @return string - Module prefix
      */
-    protected function getModulePrefix(Request $request) {
+    protected function getModulePrefix(Request $request): string {
         $requestPath = $request->getPath();
         $baseUri     = $request->getApplicationBaseUri();
 
-        if (!strStartsWith($requestPath, $baseUri))
+        if (!strStartsWith($requestPath, $baseUri)) {
             throw new RuntimeException('Can not resolve module prefix from request path "'.$requestPath.'" (application base URI: "'.$baseUri.'")');
+        }
 
         $value = substr($requestPath, strlen($baseUri));        // baseUri ends with and prefix doesn't start with a slash
         if (strlen($value)) {
             $value = strLeftTo($value, '/').'/';                // the prefix ends with a slash only for non-main modules
         }
-
         return isset($this->modules[$value]) ? $value : '';
     }
 
@@ -190,7 +190,7 @@ FRONTCONTROLLER_PROCESS_REQUEST_ERROR_SC_404;
      *
      * @return RequestProcessor
      */
-    protected function getRequestProcessor(Module $module, array $options) {
+    protected function getRequestProcessor(Module $module, array $options): RequestProcessor {
         $class = $module->getRequestProcessorClass();
         return new $class($module, $options);
     }

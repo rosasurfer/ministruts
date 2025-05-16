@@ -40,7 +40,7 @@ class Input extends Facade {
      *
      * @return ?string
      */
-    public static function get($name, $default = null) {
+    public static function get(string $name, ?string $default = null): ?string {
         $input = static::current();
         return $input->get($name, $default);
     }
@@ -56,7 +56,7 @@ class Input extends Facade {
      *                                        (default: empty array)
      * @return array<string|string[]>
      */
-    public static function getArray($name, array $default = []) {
+    public static function getArray(string $name, array $default = []): array {
         $input = static::current();
         return $input->getArray($name, $default);
     }
@@ -71,7 +71,7 @@ class Input extends Facade {
      *
      * @return bool
      */
-    public static function has($name) {
+    public static function has(string $name): bool {
         $input = static::current();
         return $input->has($name);
     }
@@ -85,7 +85,7 @@ class Input extends Facade {
      *
      * @return bool
      */
-    public static function hasArray($name) {
+    public static function hasArray(string $name): bool {
         $input = static::current();
         return $input->hasArray($name);
     }
@@ -96,7 +96,7 @@ class Input extends Facade {
      *
      * @return ActionInput
      */
-    public static function current() {
+    public static function current(): ActionInput {
         return RequestProxy::input();
     }
 

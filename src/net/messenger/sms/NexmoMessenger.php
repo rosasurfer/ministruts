@@ -18,7 +18,7 @@ class NexmoMessenger extends Messenger {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param  mixed[] $options
      */

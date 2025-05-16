@@ -18,7 +18,7 @@ interface ServiceInterface {
      * @param  string        $name       - service name
      * @param  string|object $definition - service definition
      */
-    public function __construct($name, $definition);
+    public function __construct(string $name, $definition);
 
 
     /**
@@ -26,7 +26,7 @@ interface ServiceInterface {
      *
      * @return string
      */
-    public function getName();
+    public function getName(): string;
 
 
     /**
@@ -42,7 +42,7 @@ interface ServiceInterface {
      *
      * @return string[] - list of aliases (including the original name)
      */
-    public function getAliases();
+    public function getAliases(): array;
 
 
     /**
@@ -52,7 +52,7 @@ interface ServiceInterface {
      *
      * @return $this
      */
-    public function addAlias($name);
+    public function addAlias(string $name): self;
 
 
     /**
@@ -63,5 +63,5 @@ interface ServiceInterface {
      *
      * @return object
      */
-    public function resolve($factory=false, $args=[]);
+    public function resolve(bool $factory = false, array $args = []): object;
 }

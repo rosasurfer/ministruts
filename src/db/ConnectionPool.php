@@ -21,10 +21,10 @@ final class ConnectionPool extends Singleton {
 
 
     /** @var IConnector[] - adapter pool */
-    private $pool = [];
+    private array $pool = [];
 
     /** @var string[] - common adapter aliases */
-    private static $aliases = [
+    private static array $aliases = [
         'pgsql'                                     => PostgresConnector::class,
         'postgres'                                  => PostgresConnector::class,
         'postgresql'                                => PostgresConnector::class,
@@ -41,7 +41,7 @@ final class ConnectionPool extends Singleton {
      *
      * @return static
      */
-    public static function me() {
+    public static function me(): self {
         /** @var static $instance */
         $instance = self::getInstance(static::class);
         return $instance;

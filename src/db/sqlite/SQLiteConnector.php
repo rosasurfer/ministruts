@@ -55,34 +55,34 @@ class SQLiteConnector extends Connector {
 
 
     /** @var string - DBMS type */
-    protected $type = 'sqlite';
+    protected string $type = 'sqlite';
 
     /** @var ?string - DBMS version string */
-    protected $versionString = null;
+    protected ?string $versionString = null;
 
     /** @var ?int - DBMS version number */
-    protected $versionNumber = null;
+    protected ?int $versionNumber = null;
 
     /** @var string - database file to connect to */
-    protected $file;
+    protected string $file;
 
     /** @var array<string, string> - configuration options */
-    protected $options = [];
+    protected array $options = [];
 
-    /** @var SQLite3|null - internal database handler instance */
-    protected $sqlite = null;
+    /** @var ?SQLite3 - internal database handler instance */
+    protected ?SQLite3 $sqlite = null;
 
     /** @var int - transaction nesting level */
-    protected $transactionLevel = 0;
+    protected int $transactionLevel = 0;
 
     /** @var int - the last inserted row id (not reset between queries) */
-    protected $lastInsertId = 0;
+    protected int $lastInsertId = 0;
 
     /** @var int - the last number of affected rows (not reset between queries) */
-    protected $lastAffectedRows = 0;
+    protected int $lastAffectedRows = 0;
 
     /** @var bool - whether a query to execute can skip results */
-    private $skipResults = false;
+    private bool $skipResults = false;
 
 
     /**
@@ -139,7 +139,7 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function connect(): self {
         /** @var int $flags */
@@ -190,7 +190,7 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function disconnect(): self {
         if ($this->isConnected()) {
@@ -204,7 +204,7 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isConnected(): bool {
         return ($this->sqlite !== null);
@@ -212,7 +212,7 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function escapeIdentifier(string $name): string {
         return '"'.str_replace('"', '""', $name).'"';
@@ -220,7 +220,7 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function escapeLiteral($value): string {
         // bug or feature: SQLite3::escapeString(null) => empty string instead of NULL
@@ -235,7 +235,7 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function escapeString(?string $value): ?string {
         // bug or feature: SQLite3::escapeString(null) => empty string instead of NULL
@@ -253,7 +253,7 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function query($sql): SQLiteResult {
         try {
@@ -293,7 +293,7 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @return SQLite3Result|bool
      */
@@ -345,7 +345,7 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function commit(): self {
         if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
@@ -384,7 +384,7 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isInTransaction(): bool {
         if ($this->isConnected()) {
@@ -417,7 +417,7 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function supportsInsertReturn(): bool {
         return false;
@@ -440,7 +440,7 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getType(): string {
         return $this->type;
@@ -448,7 +448,7 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @return string - e.g. "3.5.9-rc"
      */
@@ -461,12 +461,14 @@ class SQLiteConnector extends Connector {
             $sqlite = $this->sqlite;
             $this->versionString = $sqlite->version()['versionString'];
         }
-        return $this->versionString;
+        /** @var string $versionString */
+        $versionString = $this->versionString;
+        return $versionString;
     }
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @return int - e.g. 3005009 for version string "3.5.9-rc"
      */
@@ -479,6 +481,8 @@ class SQLiteConnector extends Connector {
             $sqlite = $this->sqlite;
             $this->versionNumber = $sqlite->version()['versionNumber'];
         }
-        return $this->versionNumber;
+        /** @var int $versionNumber */
+        $versionNumber = $this->versionNumber;
+        return $versionNumber;
     }
 }

@@ -41,7 +41,7 @@ class Di extends CObject implements DiInterface {
 
 
     /** @var IService[] - list of registered services */
-    protected $services = [];
+    protected array $services = [];
 
 
     /**
@@ -63,7 +63,7 @@ class Di extends CObject implements DiInterface {
      *
      * @return $this
      */
-    protected function addService(IService $service) {
+    protected function addService(IService $service): self {
         foreach ($service->getAliases() as $alias) {
             $this->services[$alias] = $service;
         }
@@ -78,7 +78,7 @@ class Di extends CObject implements DiInterface {
      *
      * @return bool - whether service definitions have been found and successfully processed
      */
-    protected function loadServices($configDir) {
+    protected function loadServices(string $configDir): bool {
         if (!is_file($file = $configDir.'/services.php'))
             return false;
 
@@ -95,26 +95,17 @@ class Di extends CObject implements DiInterface {
 
 
     /**
-     * {@inheritdoc}
-     *
-     * @param  string $name - service identifier
-     *
-     * @return bool
+     * {@inheritDoc}
      */
-    public function has($name) {
+    public function has(string $name): bool {
         return isset($this->services[$name]);
     }
 
 
     /**
-     * {@inheritdoc}
-     *
-     * @param  string   $name
-     * @param  mixed ...$args - instantiation arguments
-     *
-     * @return object
+     * {@inheritDoc}
      */
-    public function create($name, ...$args) {
+    public function create(string $name, ...$args): object {
         if (!isset($this->services[$name])) throw new ServiceNotFoundException('Service "'.$name.'" not found.');
         try {
             return $this->services[$name]->resolve(true, $args);
@@ -126,13 +117,9 @@ class Di extends CObject implements DiInterface {
 
 
     /**
-     * {@inheritdoc}
-     *
-     * @param  string $name
-     *
-     * @return object
+     * {@inheritDoc}
      */
-    public function get($name) {
+    public function get(string $name): object {
         if (!isset($this->services[$name])) throw new ServiceNotFoundException('Service "'.$name.'" not found.');
         try {
             return $this->services[$name]->resolve(false);
@@ -144,13 +131,7 @@ class Di extends CObject implements DiInterface {
 
 
     /**
-     * {@inheritdoc}
-     *
-     * @param  string        $name               - service identifier
-     * @param  string|object $definition         - a class name, an instance or a \Closure acting as an instance factory
-     * @param  string[]      $aliases [optional] - service identifier aliases (default: none)
-     *
-     * @return string|object - the same definition
+     * {@inheritDoc}
      */
     public function set($name, $definition, array $aliases = []) {
         $service = new Service($name, $definition);
@@ -164,13 +145,9 @@ class Di extends CObject implements DiInterface {
 
 
     /**
-     * {@inheritdoc}
-     *
-     * @param  string $name - service identifier
-     *
-     * @return IService|null - the removed service wrapper or NULL if no such service was found
+     * {@inheritDoc}
      */
-    public function remove($name) {
+    public function remove(string $name): ?IService {
         $service = null;
         if ($this->has($name)) {
             $service = $this->services[$name];
@@ -186,9 +163,7 @@ class Di extends CObject implements DiInterface {
     /**
      * Check whether a service with the specified name is registered using {@link \ArrayAccess} syntax.
      *
-     * @param  mixed $name
-     *
-     * @return bool
+     * {@inheritDoc}
      */
     public function offsetExists($name): bool {
         return $this->has($name);
@@ -196,12 +171,10 @@ class Di extends CObject implements DiInterface {
 
 
     /**
+     * {@inheritDoc}
+     *
      * Resolve a named service and return its implementation using {@link \ArrayAccess} syntax. This method always returns
      * the same instance.
-     *
-     * @param  string $name
-     *
-     * @return object
      *
      * @throws ServiceNotFoundException if the service was not found
      * @throws ContainerException       if the dependency could not be resolved
@@ -214,7 +187,7 @@ class Di extends CObject implements DiInterface {
     /**
      * Register a service in the container using {@link \ArrayAccess} syntax.
      *
-     * @param  string        $name       - service identifier
+     * @param  mixed         $name       - service identifier
      * @param  string|object $definition - a class name, an instance or a Closure acting as an instance factory
      *
      * @return void
@@ -227,9 +200,7 @@ class Di extends CObject implements DiInterface {
     /**
      * Remove a service from the container using {@link \ArrayAccess} syntax.
      *
-     * @param  string $name - service identifier
-     *
-     * @return void
+     * {@inheritDoc}
      */
     public function offsetUnset($name): void {
         $this->remove($name);

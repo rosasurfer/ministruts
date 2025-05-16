@@ -206,7 +206,7 @@ Used @link elements reference PHP classes in namespace \rosasurfer\ministruts\st
                          calling the {@link Action}. Set to "false" if validation is performed by the configured Action.
                          Optional if the "form" attribute is specified, else not valid.
 
-                         The default behaviour is "false" if an Action or an {@link ActionForward} are configured, and "true"
+                         The default behaviour is "false" if an Action or {@link ActionForward} is configured, and "true"
                          if no Action and no ActionForward are configured. Framework validation requires the configuration of
                          two nested "forward" elements named "success" and "error".
 

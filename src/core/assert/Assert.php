@@ -29,7 +29,7 @@ class Assert extends StaticClass {
      * @phpstan-return ($value is null ? true : false)
      * @phpstan-assert null $value
      */
-    public static function null($value, $message = '', ...$args) {
+    public static function null($value, string $message = '', ...$args): bool {
         if (isset($value)) {
             throw new InvalidValueException("Not NULL: $message");
         }
@@ -49,7 +49,7 @@ class Assert extends StaticClass {
      * @phpstan-return ($value is empty ? true : false)
      * @phpstan-assert empty $value
      */
-    public static function empty($value, $message = '', ...$args) {
+    public static function empty($value, string $message = '', ...$args): bool {
         if (!empty($value)) {
             throw new InvalidValueException("Not empty: $message");
         }
@@ -69,7 +69,7 @@ class Assert extends StaticClass {
      * @phpstan-return ($value is empty ? false : true)
      * @phpstan-assert !empty $value
      */
-    public static function notEmpty($value, $message = '', ...$args) {
+    public static function notEmpty($value, string $message = '', ...$args): bool {
         if (empty($value)) {
             throw new InvalidValueException("Empty: $message");
         }
@@ -87,7 +87,7 @@ class Assert extends StaticClass {
      *
      * @return bool
      */
-    public static function equal($value1, $value2, $message = '', ...$args) {
+    public static function equal($value1, $value2, string $message = '', ...$args): bool {
         if ($value1 != $value2) {
             throw new InvalidValueException("Not equal: $message");
         }
@@ -105,7 +105,7 @@ class Assert extends StaticClass {
      *
      * @return bool
      */
-    public static function notEqual($value1, $value2, $message = '', ...$args) {
+    public static function notEqual($value1, $value2, string $message = '', ...$args): bool {
         if ($value1 == $value2) {
             throw new InvalidValueException("Not different: $message");
         }
@@ -145,7 +145,7 @@ class Assert extends StaticClass {
      * @phpstan-return ($value is bool ? true : false)
      * @phpstan-assert bool $value
      */
-    public static function bool($value, $message = '', ...$args) {
+    public static function bool($value, string $message = '', ...$args): bool {
         if (!is_bool($value)) {
             throw new InvalidTypeException(static::illegalTypeMessage($value, 'bool', $message, $args));
         }
@@ -165,7 +165,7 @@ class Assert extends StaticClass {
      * @phpstan-return ($value is true ? true : false)
      * @phpstan-assert true $value
      */
-    public static function true($value, $message = '', ...$args) {
+    public static function true($value, string $message = '', ...$args): bool {
         if ($value !== true) {
             throw new InvalidValueException("Not true: $message");
         }
@@ -185,7 +185,7 @@ class Assert extends StaticClass {
      * @phpstan-return ($value is false ? true : false)
      * @phpstan-assert false $value
      */
-    public static function false($value, $message = '', ...$args) {
+    public static function false($value, string $message = '', ...$args): bool {
         if ($value !== false) {
             throw new InvalidValueException("Not false: $message");
         }
@@ -205,7 +205,7 @@ class Assert extends StaticClass {
      * @phpstan-return ($value is int ? true : false)
      * @phpstan-assert int $value
      */
-    public static function int($value, $message = '', ...$args) {
+    public static function int($value, string $message = '', ...$args): bool {
         if (!is_int($value)) {
             throw new InvalidTypeException(static::illegalTypeMessage($value, 'int', $message, $args));
         }
@@ -225,7 +225,7 @@ class Assert extends StaticClass {
      * @phpstan-return ($value is float ? true : false)
      * @phpstan-assert float $value
      */
-    public static function float($value, $message = '', ...$args) {
+    public static function float($value, string $message = '', ...$args): bool {
         if (!is_float($value)) {
             throw new InvalidTypeException(static::illegalTypeMessage($value, 'float', $message, $args));
         }
@@ -245,7 +245,7 @@ class Assert extends StaticClass {
      * @phpstan-return ($value is string ? true : false)
      * @phpstan-assert string $value
      */
-    public static function string($value, $message = '', ...$args) {
+    public static function string($value, string $message = '', ...$args): bool {
         if (!is_string($value)) {
             throw new InvalidTypeException(static::illegalTypeMessage($value, 'string', $message, $args));
         }
@@ -265,7 +265,7 @@ class Assert extends StaticClass {
      * @phpstan-return ($value is non-empty-string ? true : false)
      * @phpstan-assert non-empty-string $value
      */
-    public static function stringNotEmpty($value, $message = '', ...$args) {
+    public static function stringNotEmpty($value, string $message = '', ...$args): bool {
         static::string($value, $message, ...$args);
         static::notEqual($value, '', $message, ...$args);
         return true;
@@ -284,7 +284,7 @@ class Assert extends StaticClass {
      * @phpstan-return ($value is scalar ? true : false)
      * @phpstan-assert scalar $value
      */
-    public static function scalar($value, $message = '', ...$args) {
+    public static function scalar($value, string $message = '', ...$args): bool {
         if (!is_scalar($value)) {
             throw new InvalidTypeException(static::illegalTypeMessage($value, 'scalar', $message, $args));
         }
@@ -304,7 +304,7 @@ class Assert extends StaticClass {
      * @phpstan-return ($value is object ? true : false)
      * @phpstan-assert object $value
      */
-    public static function object($value, $message = '', ...$args) {
+    public static function object($value, string $message = '', ...$args): bool {
         if (!is_object($value)) {
             throw new InvalidTypeException(static::illegalTypeMessage($value, 'object', $message, $args));
         }
@@ -327,7 +327,7 @@ class Assert extends StaticClass {
      * @phpstan-return ($value is T ? true : false)
      * @phpstan-assert T $value
      */
-    public static function instanceOf($value, string $class, string $message = '', ...$args) {
+    public static function instanceOf($value, string $class, string $message = '', ...$args): bool {
         if (!$value instanceof $class) {
             throw new InvalidTypeException(static::illegalTypeMessage($value, $class, $message, $args));
         }
@@ -347,7 +347,7 @@ class Assert extends StaticClass {
      * @phpstan-return ($value is Throwable ? true : false)
      * @phpstan-assert Throwable $value
      */
-    public static function throwable($value, $message = '', ...$args) {
+    public static function throwable($value, string $message = '', ...$args): bool {
         if (!$value instanceof Throwable) {
             throw new InvalidTypeException(static::illegalTypeMessage($value, 'Throwable', $message, $args));
         }
@@ -365,7 +365,7 @@ class Assert extends StaticClass {
      *
      * @return bool - whether the assertion is TRUE
      */
-    public static function hasMethod($objectOrClass, $method, $message = '', ...$args) {
+    public static function hasMethod($objectOrClass, string $method, string $message = '', ...$args): bool {
         if (is_string($objectOrClass) || is_object($objectOrClass)) {
             if (method_exists($objectOrClass, $method)) {
                 return true;
@@ -388,7 +388,7 @@ class Assert extends StaticClass {
      * @phpstan-return ($value is resource ? true : false)
      * @phpstan-assert resource $value
      */
-    public static function resource($value, $message = '', ...$args) {
+    public static function resource($value, string $message = '', ...$args): bool {
         if (!is_resource($value)) {
             throw new InvalidTypeException(static::illegalTypeMessage($value, 'resource', $message, $args));
         }
@@ -428,7 +428,7 @@ class Assert extends StaticClass {
      * @phpstan-return ($value is ?bool ? true : false)
      * @phpstan-assert ?bool $value
      */
-    public static function nullOrBool($value, $message = '', ...$args) {
+    public static function nullOrBool($value, string $message = '', ...$args): bool {
         if (isset($value) && !is_bool($value)) {
             throw new InvalidTypeException(static::illegalTypeMessage($value, 'null or bool', $message, $args));
         }
@@ -448,7 +448,7 @@ class Assert extends StaticClass {
      * @phpstan-return ($value is ?int ? true : false)
      * @phpstan-assert ?int $value
      */
-    public static function nullOrInt($value, $message = '', ...$args) {
+    public static function nullOrInt($value, string $message = '', ...$args): bool {
         if (isset($value) && !is_int($value)) {
             throw new InvalidTypeException(static::illegalTypeMessage($value, 'null or int', $message, $args));
         }
@@ -468,7 +468,7 @@ class Assert extends StaticClass {
      * @phpstan-return ($value is ?float ? true : false)
      * @phpstan-assert ?float $value
      */
-    public static function nullOrFloat($value, $message = '', ...$args) {
+    public static function nullOrFloat($value, string $message = '', ...$args): bool {
         if (isset($value) && !is_float($value)) {
             throw new InvalidTypeException(static::illegalTypeMessage($value, 'null or float', $message, $args));
         }
@@ -488,7 +488,7 @@ class Assert extends StaticClass {
      * @phpstan-return ($value is ?string ? true : false)
      * @phpstan-assert ?string $value
      */
-    public static function nullOrString($value, $message = '', ...$args) {
+    public static function nullOrString($value, string $message = '', ...$args): bool {
         if (isset($value) && !is_string($value)) {
             throw new InvalidTypeException(static::illegalTypeMessage($value, 'null or string', $message, $args));
         }
@@ -508,7 +508,7 @@ class Assert extends StaticClass {
      * @phpstan-return ($value is ?scalar ? true : false)
      * @phpstan-assert ?scalar $value
      */
-    public static function nullOrScalar($value, $message = '', ...$args) {
+    public static function nullOrScalar($value, string $message = '', ...$args): bool {
         if (isset($value) && !is_scalar($value)) {
             throw new InvalidTypeException(static::illegalTypeMessage($value, 'null or scalar', $message, $args));
         }
@@ -528,7 +528,7 @@ class Assert extends StaticClass {
      * @phpstan-return ($value is ?object ? true : false)
      * @phpstan-assert ?object $value
      */
-    public static function nullOrObject($value, $message = '', ...$args) {
+    public static function nullOrObject($value, string $message = '', ...$args): bool {
         if (isset($value) && !is_object($value)) {
             throw new InvalidTypeException(static::illegalTypeMessage($value, 'null or object', $message, $args));
         }
@@ -548,7 +548,7 @@ class Assert extends StaticClass {
      * @phpstan-return ($value is ?resource ? true : false)
      * @phpstan-assert ?resource $value
      */
-    public static function nullOrResource($value, $message = '', ...$args) {
+    public static function nullOrResource($value, string $message = '', ...$args): bool {
         if (isset($value)) {
             if (!is_resource($value)) {
                 throw new InvalidTypeException(static::illegalTypeMessage($value, 'null or resource', $message, $args));
@@ -568,7 +568,7 @@ class Assert extends StaticClass {
      *
      * @return string - generated error message
      */
-    protected static function illegalTypeMessage($value, $expectedType, $message, array $args) {
+    protected static function illegalTypeMessage($value, string $expectedType, string $message, array $args): string {
         $message = (string) $message;
         if (strlen($message)) {
             if (strContains($message, '%')) {
@@ -595,7 +595,7 @@ class Assert extends StaticClass {
      *
      * @return string
      */
-    protected static function typeToStr($value) {
+    protected static function typeToStr($value): string {
         return is_object($value) ? get_class($value) : gettype($value);
     }
 
@@ -607,7 +607,7 @@ class Assert extends StaticClass {
      *
      * @return string
      */
-    protected static function valueToStr($value) {
+    protected static function valueToStr($value): string {
         if ($value === null )    return '(null)';
         if ($value === true )    return '(true)';
         if ($value === false)    return '(false)';

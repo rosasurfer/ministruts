@@ -46,7 +46,7 @@ class TokenIterator extends \ArrayIterator {
      *
      * @return TokenIterator
      */
-    public static function fromPattern($source) {
+    public static function fromPattern(string $source): TokenIterator {
         /** @var string $source */
         $source = preg_replace('/([\[\]\(\)\|]|\.\.\.)/', ' $1 ', $source);
         $source = preg_split('/\s+|(\S*<.*?'.'>)/', $source, 0, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
@@ -63,9 +63,9 @@ class TokenIterator extends \ArrayIterator {
 
 
     /**
-     * @return string
+     * @return ?string
      */
-    public function move() {
+    public function move(): ?string {
         $item = $this->current();
         $this->next();
         return $item;

@@ -23,7 +23,7 @@ class CliServiceContainer extends Di {
      *
      * @param  string $configDir - directory to load custom service definitions from
      */
-    public function __construct($configDir) {
+    public function __construct(string $configDir) {
         $services = [
             (new Service('input',  Input::class))->addAlias(Input::class),
             (new Service('output', Output::class))->addAlias(Output::class),

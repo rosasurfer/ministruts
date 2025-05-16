@@ -22,7 +22,7 @@ class Page extends Singleton {
 
 
     /** @var mixed[] - stored variables */
-    protected $properties = [];
+    protected array $properties = [];
 
 
     /**
@@ -30,7 +30,7 @@ class Page extends Singleton {
      *
      * @return static
      */
-    public static function me() {
+    public static function me(): self {
         /** @var static $instance */
         $instance = self::getInstance(static::class);
         return $instance;
@@ -45,7 +45,7 @@ class Page extends Singleton {
      *
      * @return mixed - value
      */
-    public static function get($name, $default = null) {
+    public static function get(string $name, $default = null) {
         $page = self::me();
 
         if (\key_exists($name, $page->properties))
@@ -63,7 +63,7 @@ class Page extends Singleton {
      *
      * @return mixed - the same value
      */
-    public static function set($name, $value) {
+    public static function set(string $name, $value) {
         self::me()->__set($name, $value);
         return $value;
     }
@@ -76,7 +76,7 @@ class Page extends Singleton {
      *
      * @return mixed - value
      */
-    public function __get($name) {
+    public function __get(string $name) {
         if (\key_exists($name, $this->properties))
             return $this->properties[$name];
         return null;
@@ -88,8 +88,10 @@ class Page extends Singleton {
      *
      * @param  string $name  - variable name
      * @param  mixed  $value - variable value
+     *
+     * @return void
      */
-    public function __set($name, $value) {
+    public function __set(string $name, $value): void {
         if (isset($value)) {
             $this->properties[$name] = $value;
         }
@@ -104,7 +106,7 @@ class Page extends Singleton {
      *
      * @return mixed[] - values
      */
-    public function values() {
+    public function values(): array {
         return self::me()->properties;
     }
 }

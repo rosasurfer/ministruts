@@ -139,7 +139,7 @@ class PythonPortedTest extends TestCase {
             [
              new Option('-h', null, 0, true),
              new Option('-f', '--file', 1, 'f.txt'),
-             new Argument(null, 'arg')
+             new Argument(null, 'arg'),
             ]
         );
         $this->assertEquals(
@@ -148,7 +148,7 @@ class PythonPortedTest extends TestCase {
              new Option('-h', null, 0, true),
              new Option('-f', '--file', 1, 'f.txt'),
              new Argument(null, 'arg'),
-             new Argument(null, 'arg2')
+             new Argument(null, 'arg2'),
             ]
         );
         $this->assertEquals(
@@ -157,7 +157,7 @@ class PythonPortedTest extends TestCase {
              new Option('-h', null, 0, true),
              new Argument(null, 'arg'),
              new Argument(null, '--'),
-             new Argument(null, '-v')
+             new Argument(null, '-v'),
             ]
         );
     }
@@ -1064,7 +1064,7 @@ TEST_PARSE_SECTION;
                 "PROGRAM USAGE:\n foo\n bar",
                 "usage:\n\ttoo\n\ttar",
                 "Usage: eggs spam",
-                "usage: pit stop"
+                "usage: pit stop",
             )
         );
     }
@@ -1087,7 +1087,7 @@ TEST_PARSE_SECTION;
      *
      * @return DocoptResult
      */
-    protected function docopt($doc, $args='', array $options=[]): DocoptResult {
+    protected function docopt(string $doc, $args='', array $options=[]): DocoptResult {
         $options = array_merge(['exit'=>false, 'help'=>false], $options);
         return docopt($doc, $args, $options);
     }

@@ -34,22 +34,22 @@ class DocoptParser extends CObject {
 
 
     /** @var bool */
-    protected $optionsFirst = false;
+    protected bool $optionsFirst = false;
 
     /** @var bool */
-    protected $help = true;
+    protected bool $help = true;
 
     /** @var bool */
-    protected $exit = true;
+    protected bool $exit = true;
 
     /** @var bool */
-    protected $exitFullUsage = false;
+    protected bool $exitFullUsage = false;
 
     /** @var ?string - help text displayed with every parser generated output */
-    protected $autoHelp = null;
+    protected ?string $autoHelp = null;
 
     /** @var string */
-    protected $version;
+    protected string $version = '';
 
 
     /**
@@ -76,7 +76,7 @@ class DocoptParser extends CObject {
      *
      * @return DocoptResult
      */
-    public function parse($doc, $args = null) {
+    public function parse(string $doc, $args = null): DocoptResult {
         try {
             if (!isset($args)) {
                 $args = array_slice($_SERVER['argv'] ?? [], 1);
@@ -130,7 +130,7 @@ class DocoptParser extends CObject {
      *
      * @return void
      */
-    protected function handleSpecials($help, $version, $argv, $doc) {
+    protected function handleSpecials(bool $help, string $version, array $argv, string $doc): void {
         $hfound = $vfound = false;
 
         foreach ($argv as $o) {
@@ -159,7 +159,7 @@ class DocoptParser extends CObject {
      *
      * @return void
      */
-    protected function handleExit(DocoptUserNotification $exception) {
+    protected function handleExit(DocoptUserNotification $exception): void {
         if ($this->exit) {
             echo trim($exception->getMessage().NL.$this->autoHelp).NL;
             exit($exception->status);
@@ -197,7 +197,7 @@ class DocoptParser extends CObject {
      *
      * @return Pattern[]
      */
-    protected static function parseArgs(TokenIterator $tokens, OptionIterator $options, $optionsFirst = false) {
+    protected static function parseArgs(TokenIterator $tokens, OptionIterator $options, bool $optionsFirst = false): array {
         $parsed = [];
 
         while ($tokens->current() !== null) {               // @phpstan-ignore notIdentical.alwaysTrue (FIXME: refactor using Iterator->valid())
@@ -231,7 +231,7 @@ class DocoptParser extends CObject {
      *
      * @return OptionIterator
      */
-    protected static function parseDefaults($doc) {
+    protected static function parseDefaults(string $doc): OptionIterator {
         $defaults = [];
         foreach (static::parseSection('options:', $doc) as $section) {
             # FIXME corner case "bla: options: --foo"
@@ -276,7 +276,7 @@ class DocoptParser extends CObject {
      *
      * @return string[]
      */
-    protected static function parseSection($name, $source) {
+    protected static function parseSection(string $name, string $source): array {
         $matches = null;
         $result = [];
         if (preg_match_all('/^([^\n]*'.$name.'[^\n]*\n?(?:[ \t].*?(?:\n|$))*)/im', $source, $matches, PREG_SET_ORDER)) {
@@ -326,7 +326,7 @@ class DocoptParser extends CObject {
      *
      * @return Pattern[]
      */
-    protected static function parseSequence(TokenIterator $tokens, OptionIterator $options) {
+    protected static function parseSequence(TokenIterator $tokens, OptionIterator $options): array {
         $result = [];
         $not = [null, '', ']', ')', '|'];
         while (!in_array($tokens->current(), $not, true)) {
@@ -351,14 +351,16 @@ class DocoptParser extends CObject {
      *
      * @return Option[]
      */
-    protected static function parseShort(TokenIterator $tokens, OptionIterator $options) {
+    protected static function parseShort(TokenIterator $tokens, OptionIterator $options): array {
         $token = $tokens->move();
 
-        if (strpos($token, '-') !== 0 || strpos($token, '--') === 0)
+        if (!isset($token) || strpos($token, '-') !== 0 || strpos($token, '--') === 0) {
             throw new \UnexpectedValueException("short token '$token' does not start with '-' or '--'");
+        }
 
         $left = ltrim($token, '-');
         $parsed = [];
+
         while ($left !== '') {
             $short = '-'.$left[0];
             $left = substr($left, 1);
@@ -415,9 +417,9 @@ class DocoptParser extends CObject {
      *
      * @return Option[]
      */
-    protected static function parseLong(TokenIterator $tokens, OptionIterator $options) {
+    protected static function parseLong(TokenIterator $tokens, OptionIterator $options): array {
         $tokenError = $tokens->getErrorClass();
-        $token      = $tokens->move();
+        $token      = (string) $tokens->move();
         $exploded   = explode('=', $token, 2);
 
         if (sizeof($exploded) == 2) {
@@ -485,7 +487,7 @@ class DocoptParser extends CObject {
      *
      * @return Pattern[]
      */
-    protected static function parseAtom(TokenIterator $tokens, OptionIterator $options) {
+    protected static function parseAtom(TokenIterator $tokens, OptionIterator $options): array {
         $tokenError = $tokens->getErrorClass();
         $token = $tokens->current();
         $result = [];
@@ -531,7 +533,7 @@ class DocoptParser extends CObject {
      *
      * @return bool
      */
-    protected static function isUpperCase($string) {
+    protected static function isUpperCase(string $string): bool {
         return preg_match('/[A-Z]/', $string) && !preg_match('/[a-z]/', $string);
     }
 }

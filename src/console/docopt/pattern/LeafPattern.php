@@ -19,7 +19,7 @@ abstract class LeafPattern extends Pattern {
      * @param  ?string $name
      * @param  mixed   $value [optional]
      */
-    public function __construct($name, $value = null) {
+    public function __construct(?string $name, $value = null) {
         $this->name = $name;
         $this->value = $value;
     }
@@ -30,13 +30,13 @@ abstract class LeafPattern extends Pattern {
      *
      * @return SingleMatch
      */
-    abstract public function singleMatch(array $left);
+    abstract public function singleMatch(array $left): SingleMatch;
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function flat(array $types = []) {
+    public function flat(array $types = []): array {
         if (!$types || in_array(get_class($this), $types)) {
             return [$this];
         }
@@ -45,9 +45,9 @@ abstract class LeafPattern extends Pattern {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function match(array $left, array $collected = []) {
+    public function match(array $left, array $collected = []): array {
         list($pos, $match) = $this->singleMatch($left)->toArray();
         if (!$match) {
             return [false, $left, $collected];

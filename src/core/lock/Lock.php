@@ -19,13 +19,13 @@ class Lock extends BaseLock {
 
 
     /** @var string[] - keys of all currently aquired locks */
-    private static $lockedKeys;
+    private static array $lockedKeys;
 
-    /** @var BaseLock|null - lock implementation */
-    private $impl = null;
+    /** @var ?BaseLock - lock implementation */
+    private ?BaseLock $impl = null;
 
     /** @var string - key of the locking implementation */
-    private $key;
+    private string $key;
 
 
     /**

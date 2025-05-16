@@ -15,18 +15,20 @@ final class EmptyActionForm extends ActionForm {
 
 
     /**
-     * This implementation intentionally does nothing.
+     * {@inheritDoc}
+     *
+     * Intentionally this implementation does nothing.
      */
-    protected function populate() {
+    protected function populate(): void {
     }
 
 
     /**
-     * This implementation always returns FALSE.
+     * {@inheritDoc}
      *
-     * @return bool - whether the submitted parameters are valid
+     * This implementation always returns FALSE.
      */
-    public function validate() {
+    public function validate(): bool {
         return false;
     }
 }

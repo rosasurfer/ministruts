@@ -13,5 +13,6 @@ abstract class StaticClass extends CObject {
     /**
      * Locked constructor
      */
-    final private function __construct() {}
+    final private function __construct() {
+    }
 }

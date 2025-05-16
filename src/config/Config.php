@@ -119,6 +119,7 @@ class Config extends CObject implements ConfigInterface {
         else throw new InvalidValueException('Location not found: "'.$location.'"');
 
         // versioned/distributable config file
+        $files = [];
         $files[] = $configDir.'/config.dist.properties';
 
         // runtime environment
@@ -233,18 +234,15 @@ class Config extends CObject implements ConfigInterface {
 
 
     /**
-     * Return the names of the monitored configuration files. The returned array will contain
-     * names of existing and non-existing files, together with their status (loaded/not loaded).
-     *
-     * @return array<string, bool>
+     * {@inheritDoc}
      */
-    public function getMonitoredFiles(): array {
+    public function getConfigFiles(): array {
         return $this->files;
     }
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function get(string $key, $default = null) {
         $notFound = false;
@@ -259,7 +257,7 @@ class Config extends CObject implements ConfigInterface {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getBool(string $key, bool $strict=false, bool $default=false): bool {
         $notFound = false;
@@ -290,7 +288,7 @@ class Config extends CObject implements ConfigInterface {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getString(string $key, string $default = ''): string {
         $notFound = false;
@@ -313,9 +311,11 @@ class Config extends CObject implements ConfigInterface {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
+     *
+     * @param  int|string $key - case-insensitive key
      */
-    public function set(string $key, $value): self {
+    public function set($key, $value): self {
         $this->setProperty($key, $value);
         return $this;
     }
@@ -355,12 +355,14 @@ class Config extends CObject implements ConfigInterface {
     /**
      * Set/modify the property with the specified key.
      *
-     * @param  string $key
-     * @param  mixed  $value
+     * @param  int|string $key
+     * @param  mixed      $value
      *
      * @return void
      */
-    protected function setProperty(string $key, $value): void {
+    protected function setProperty($key, $value): void {
+        $key = (string) $key;
+
         // convert string representations of special values
         if (is_string($value)) {
             switch (strtolower($value)) {
@@ -495,7 +497,7 @@ class Config extends CObject implements ConfigInterface {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function dump(array $options = []): string {
         $lines = [];
@@ -583,7 +585,7 @@ class Config extends CObject implements ConfigInterface {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function export(array $options = []): array {
         $maxKeyLength = 0;
@@ -636,9 +638,7 @@ class Config extends CObject implements ConfigInterface {
     /**
      * Whether a config setting with the specified key exists.
      *
-     * @param  string $key - case-insensitive key
-     *
-     * @return bool
+     * {@inheritDoc}
      */
     public function offsetExists($key): bool {
         $notFound = false;
@@ -650,9 +650,7 @@ class Config extends CObject implements ConfigInterface {
     /**
      * Return the config setting with the specified key.
      *
-     * @param  string $key - case-insensitive key
-     *
-     * @return mixed - config setting
+     * {@inheritDoc}
      *
      * @throws RuntimeException if the setting does not exist
      */
@@ -665,10 +663,9 @@ class Config extends CObject implements ConfigInterface {
     /**
      * Set/modify the config setting with the specified key.
      *
-     * @param  string $key   - case-insensitive key
-     * @param  mixed  $value - new value
+     * @param  int|string $key - case-insensitive key
      *
-     * @return void
+     * {@inheritDoc}
      */
     public function offsetSet($key, $value): void {
         $this->set($key, $value);
@@ -678,9 +675,7 @@ class Config extends CObject implements ConfigInterface {
     /**
      * Unset the config setting with the specified key.
      *
-     * @param  string $key - case-insensitive key
-     *
-     * @return void
+     * {@inheritDoc}
      */
     public function offsetUnset($key): void {
         $this->set($key, null);
@@ -690,7 +685,7 @@ class Config extends CObject implements ConfigInterface {
     /**
      * Count the root properties of the configuration.
      *
-     * @return int
+     * {@inheritDoc}
      */
     public function count(): int {
         return sizeof($this->properties);

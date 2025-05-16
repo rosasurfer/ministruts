@@ -16,7 +16,7 @@ class DateTime extends \DateTime {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function __toString(): string {
         return $this->format('l, d-M-Y H:i:s O (T)');           // e.g. "Monday, 13-Mar-2017 13:19:59 +0200 (EET)"

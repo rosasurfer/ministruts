@@ -15,7 +15,7 @@ class EntityMapping extends CObject {
 
 
     /** @var string - the entity's class name */
-    protected $className;
+    protected string $className;
 
     /**
      * @var         array<string, mixed> - mapping information
@@ -26,10 +26,10 @@ class EntityMapping extends CObject {
     protected array $mapping;
 
     /** @var PropertyMapping[] - property mapping instances */
-    protected $properties;
+    protected array $properties = [];
 
-    /** @var PropertyMapping - identity mapping of the entity */
-    protected $identity;
+    /** @var ?PropertyMapping - identity mapping of the entity */
+    protected ?PropertyMapping $identity = null;
 
     /** @var PropertyMapping|false - version mapping of the entity or FALSE for non-versioned entities */
     protected $version;
@@ -54,7 +54,7 @@ class EntityMapping extends CObject {
      *
      * @return string
      */
-    public function getClassName() {
+    public function getClassName(): string {
         return $this->className;
     }
 
@@ -64,7 +64,7 @@ class EntityMapping extends CObject {
      *
      * @return string
      */
-    public function getTableName() {
+    public function getTableName(): string {
         return $this->mapping['table'];
     }
 
@@ -76,7 +76,7 @@ class EntityMapping extends CObject {
      *
      * @return ?PropertyMapping - mapping or NULL if no such property exists
      */
-    public function getProperty($name) {
+    public function getProperty(string $name): ?PropertyMapping {
         if (isset($this->mapping['properties'][$name])) {
             return $this->properties[$name] ??= new PropertyMapping($this, $this->mapping['properties'][$name]);
         }
@@ -90,11 +90,7 @@ class EntityMapping extends CObject {
      * @return PropertyMapping
      */
     public function getIdentity(): PropertyMapping {
-        if ($this->identity === null) {
-            $identity = $this->mapping['identity'];
-            $this->identity = new PropertyMapping($this, $identity);
-        }
-        return $this->identity;
+        return $this->identity ??= new PropertyMapping($this, $this->mapping['identity']);
     }
 
 
@@ -103,7 +99,7 @@ class EntityMapping extends CObject {
      *
      * @return ?PropertyMapping - mapping or NULL if versioning is not configured
      */
-    public function getVersion() {
+    public function getVersion(): ?PropertyMapping {
         if ($this->version === null) {
             $version = $this->mapping['version'] ?? null;
             $this->version = $version ? new PropertyMapping($this, $version) : false;

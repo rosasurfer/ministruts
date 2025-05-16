@@ -21,7 +21,7 @@ class Option extends LeafPattern {
     public ?string $long = null;
 
     /** @var int */
-    public $argcount;
+    public int $argcount;
 
 
     /**
@@ -47,7 +47,7 @@ class Option extends LeafPattern {
      *
      * @return Option
      */
-    public static function parse($optionDescription) {
+    public static function parse(string $optionDescription): Option {
         $short    = null;
         $long     = null;
         $argcount = 0;
@@ -80,9 +80,9 @@ class Option extends LeafPattern {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function singleMatch(array $left) {
+    public function singleMatch(array $left): SingleMatch {
         foreach ($left as $i => $pattern) {
             if ($this->name() == $pattern->name()) {
                 return new SingleMatch($i, $pattern);

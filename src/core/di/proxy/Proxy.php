@@ -18,7 +18,7 @@ abstract class Proxy extends StaticClass {
 
 
     /** @var object[] - resolved instances of proxied objects */
-    protected static $resolvedInstances;
+    protected static array $resolvedInstances;
 
 
     /**
@@ -26,7 +26,7 @@ abstract class Proxy extends StaticClass {
      *
      * @return string
      */
-    protected static function getServiceName() {
+    protected static function getServiceName(): string {
         throw new UnimplementedFeatureException(static::class.' must implement Proxy::'.__FUNCTION__.'()');
     }
 
@@ -37,7 +37,7 @@ abstract class Proxy extends StaticClass {
      *
      * @return object
      */
-    public static function instance() {
+    public static function instance(): object {
         $key = static::getServiceName();
 
         if (isset(static::$resolvedInstances[$key]))
@@ -55,7 +55,7 @@ abstract class Proxy extends StaticClass {
      *
      * @return mixed
      */
-    public static function __callStatic($method, array $args) {
+    public static function __callStatic(string $method, array $args) {
         if (substr($method, 0, 2) == '__') {
             throw new IllegalAccessException('Cannot call internal method '.get_class(static::instance()).'::'.$method.'()');
         }

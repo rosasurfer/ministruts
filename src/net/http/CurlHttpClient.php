@@ -167,7 +167,7 @@ class CurlHttpClient extends HttpClient {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param  HttpRequest $request
      *
@@ -242,7 +242,7 @@ class CurlHttpClient extends HttpClient {
      */
     protected function prepareCurlOptions(HttpRequest $request, CurlHttpResponse $response): array {
         $options = $this->options;                                  // options passed to the constructor
-        $options    [CURLOPT_URL]      =  $request->getUrl();       // set or overwrite an existing URL
+        $options[CURLOPT_URL] = $request->getUrl();                 // set or overwrite an existing URL
         $options += [CURLOPT_TIMEOUT   => $this->timeout  ];        // set but don't overwrite these existing options
         $options += [CURLOPT_USERAGENT => $this->userAgent];
         $options += [CURLOPT_ENCODING  => ''              ];        // an empty string activates all supported encodings

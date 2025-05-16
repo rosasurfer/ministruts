@@ -17,13 +17,13 @@ class Url extends CObject {
 
 
     /** @var string - URI as passed to the constructor */
-    protected $uri;
+    protected string $uri;
 
     /** @var string - application relative URI */
-    protected $appRelativeUri;
+    protected string $appRelativeUri;
 
     /** @var string[] */
-    protected $parameters = [];
+    protected array $parameters = [];
 
 
     /**

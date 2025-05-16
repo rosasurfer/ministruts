@@ -168,15 +168,12 @@ class HttpRequest extends CObject {
     /**
      * Return the request headers with the specified names.  This method returns a key-value pair for each found header.
      *
-     * @param  string|string[] $names [optional] - one or more header names (case insensitive)
-     *                                             (default: without a name all headers are returned)
+     * @param  string ...$names [optional] - one or more header names (case insensitive)
+     *                                       (default: without a name all headers are returned)
      *
      * @return string[] - array of name-value pairs or an empty array if no such headers were found
      */
-    public function getHeaders($names = []): array {
-        if (!is_array($names)) {
-            $names = [$names];
-        }
+    public function getHeaders(string ...$names): array {
         // without a name return all headers
         if (!$names) {
             return $this->headers;

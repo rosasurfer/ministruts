@@ -34,7 +34,7 @@ class FileSystem extends StaticClass {
      *
      * @return bool - success status
      */
-    public static function mkDir($path, $mode=0775, $recursive=true, $context=null) {
+    public static function mkDir(string $path, int $mode=0775, bool $recursive=true, $context=null): bool {
         if (!is_dir($path)) {
             if (is_file($path)) throw new RuntimeException('Cannot create directory "'.$path.'" (existing file of the same name)');
 
@@ -94,7 +94,7 @@ class FileSystem extends StaticClass {
      *
      * @return bool - success status
      */
-    public static function copy($source, $destination, $context = null) {
+    public static function copy(string $source, string $destination, $context = null): bool {
         $dir = dirname($destination);
         !is_dir($dir) && static::mkDir($dir);
 

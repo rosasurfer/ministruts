@@ -29,10 +29,10 @@ use const rosasurfer\ministruts\WINDOWS;
 class PHPMailer extends CObject {
 
     /** @var scalar[] */
-    protected $options;
+    protected array $options;
 
     /** @var string */
-    protected $hostName;
+    protected string $hostName;
 
 
     /**
@@ -205,9 +205,9 @@ class PHPMailer extends CObject {
      *
      * @param  string $value
      *
-     * @return ?string[] - array with name and address part or NULL if the specified address is invalid
+     * @return string[] - name and address part or an empty array if the specified address is invalid
      */
-    public function parseAddress(string $value) {
+    public function parseAddress(string $value): array {
         $value = trim($value);
 
         if (strEndsWith($value, '>')) {
@@ -225,10 +225,10 @@ class PHPMailer extends CObject {
         if (strlen($address) && filter_var($address, FILTER_VALIDATE_EMAIL)) {
             return [
                 'name'    => $name,
-                'address' => $address
+                'address' => $address,
             ];
         }
-        return null;
+        return [];
     }
 
 
@@ -289,7 +289,7 @@ class PHPMailer extends CObject {
      */
     protected function encodeNonAsciiChars($value) {
         if (is_array($value)) {
-            /** @var string[] */
+            /** @var string[] $result */
             $result = [];
             foreach ($value as $k => $v) {
                 $result[$k] = $this->encodeNonAsciiChars($v);

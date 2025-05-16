@@ -14,7 +14,7 @@ class VersionedUrl extends Url {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function __toString(): string {
         $uri = parent::__toString();

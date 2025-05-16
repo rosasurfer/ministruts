@@ -23,10 +23,10 @@ class Worker extends CObject {
 
 
     /** @var DAO - DAO of the worker's entity */
-    private $dao;
+    private DAO $dao;
 
     /** @var string - name of the worker's entity class */
-    protected $entityClass;
+    protected string $entityClass;
 
     /** @var Connector|null - db adapter used for the worker's entity */
     private ?Connector $connector = null;
@@ -73,7 +73,7 @@ class Worker extends CObject {
      *
      * @return PersistableObject[]
      */
-    public function findAll($query) {
+    public function findAll(string $query): array {
         $result = $this->query($query);
         return $this->makeObjects($result);
     }
@@ -86,7 +86,7 @@ class Worker extends CObject {
      *
      * @return IResult
      */
-    public function query($sql) {
+    public function query(string $sql): IResult {
         $sql = $this->translateQuery($sql);
         return $this->getConnector()->query($sql);
     }
@@ -100,7 +100,7 @@ class Worker extends CObject {
      *
      * @return $this
      */
-    public function execute($sql) {
+    public function execute(string $sql): self {
         $sql = $this->translateQuery($sql);
         $this->getConnector()->execute($sql);
         return $this;
@@ -115,7 +115,7 @@ class Worker extends CObject {
      *
      * @return string - translated SQL query
      */
-    private function translateQuery($sql) {
+    private function translateQuery(string $sql): string {
         // model name pattern: ":User" => "t_user" (will also convert matching names in literals and comments)
         $pattern = '/[^:]:([a-z_]\w*)\b/i';
         $matches = null;
@@ -164,7 +164,7 @@ class Worker extends CObject {
      *
      * @return PersistableObject[] - array of instances or an empty array if the result doesn't hold any more rows
      */
-    protected function makeObjects(IResult $result) {
+    protected function makeObjects(IResult $result): array {
 
         // TODO: Prefer to return existing instances from IdentityMap
 
@@ -181,7 +181,7 @@ class Worker extends CObject {
      *
      * @return Connector
      */
-    public function getConnector() {
+    public function getConnector(): Connector {
         if (!$this->connector) {
             $mapping = $this->dao->getMapping();
             $this->connector = ConnectionPool::getConnector($mapping['connection']);

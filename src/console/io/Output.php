@@ -23,7 +23,7 @@ class Output extends CObject {
      *
      * @return void
      */
-    public function out($message) {
+    public function out($message): void {
         stdout(print_p($message, true));
     }
 
@@ -35,7 +35,7 @@ class Output extends CObject {
      *
      * @return void
      */
-    public function error($message) {
+    public function error($message): void {
         stderr(print_p($message, true));
     }
 }

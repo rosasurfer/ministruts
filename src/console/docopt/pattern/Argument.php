@@ -13,9 +13,9 @@ class Argument extends LeafPattern {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function singleMatch(array $left) {
+    public function singleMatch(array $left): SingleMatch {
         foreach ($left as $i => $pattern) {
             if ($pattern instanceof Argument) {
                 return new SingleMatch($i, new Argument($this->name(), $pattern->value));
@@ -30,7 +30,7 @@ class Argument extends LeafPattern {
      *
      * @return Argument
      */
-    public static function parse($source) {
+    public static function parse(string $source): self {
         $name = $value = $matches = null;
 
         if (preg_match_all('@(<\S*?'.'>)@', $source, $matches)) {

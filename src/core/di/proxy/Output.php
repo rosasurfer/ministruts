@@ -19,11 +19,9 @@ class Output extends Proxy {
 
 
     /**
-     * {@inheritdoc}
-     *
-     * @return string
+     * {@inheritDoc}
      */
-    protected static function getServiceName() {
+    protected static function getServiceName(): string {
         return 'output';
         return \rosasurfer\ministruts\console\io\Output::class;     // @phpstan-ignore deadCode.unreachable (keep for testing)
     }

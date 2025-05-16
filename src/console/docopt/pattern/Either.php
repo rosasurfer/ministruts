@@ -11,9 +11,9 @@ class Either extends BranchPattern {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function match(array $left, array $collected = []) {
+    public function match(array $left, array $collected = []): array {
         $outcomes = [];
         foreach ($this->children as $pattern) {
             list($matched) = $outcome = $pattern->match($left, $collected);

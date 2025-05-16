@@ -25,10 +25,7 @@ class Forms extends Facade {
      *                                      (default: none)
      * @return mixed
      */
-    public static function get($name, $default = null) {
-        $value = Form::current()->get($name);
-        if (!isset($value))
-            $value = Form::old()->get($name, $default);
-        return $value;
+    public static function get(string $name, $default = null) {
+        return Form::current()->get($name) ?? Form::old()->get($name, $default);
     }
 }

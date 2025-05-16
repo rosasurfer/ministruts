@@ -43,9 +43,9 @@ namespace rosasurfer\ministruts\core\di\proxy;
  * @method static bool                                         hasSessionId()                                                            Whether a valid session id was transmitted with the request. An invalid id is a URL based session id when the php.ini setting "session.use_only_cookies" is enabled.
  * @method static void                                         destroySession()                                                          Destroy the current session and it's data.
  * @method static ?string                                      getHeader(string $name)                                                   Return the first transmitted header with the specified name.
- * @method static string[]                                     getHeaders(string|string[] $names=[])                                     Return all headers with the specified name as an associative array of header values (in transmitted order).
- * @method static ?string                                      getHeaderValue(string|string[] $names)                                    Return a single value of all specified header(s). If multiple headers are specified or multiple headers have been transmitted, return all values as one comma-separated value (in transmission order).
- * @method static string[]                                     getHeaderValues(string|string[] $names)                                   Return the values of all specified header(s) as an array (in transmission order).
+ * @method static string[]                                     getHeaders(string ...$names)                                              Return all headers with the specified name as an associative array of header values (in transmitted order).
+ * @method static ?string                                      getHeaderValue(string ...$names)                                          Return a single value of all specified header(s). If multiple headers are specified or multiple headers have been transmitted, return all values as one comma-separated value (in transmission order).
+ * @method static string[]                                     getHeaderValues(string ...$names)                                         Return the values of all specified header(s) as an array (in transmission order).
  * @method static mixed                                        getAttribute(string $name)                                                Return a value stored in the request's variables context under the specified name.
  * @method static mixed[]                                      getAttributes()                                                           Return all values stored in the request's variables context.
  * @method static void                                         setAttribute(string $name, mixed $value)                                  Store a value in the request's variables context. May be used to transfer data from controllers or {@link \rosasurfer\ministruts\struts\Action}s * to views.
@@ -54,12 +54,12 @@ namespace rosasurfer\ministruts\core\di\proxy;
  * @method static bool                                         isUserInRole(string $role)                                                Whether the current web user owns the specified role.
  * @method static ?string                                      getActionMessage(string $key=null)                                        Return the stored ActionMessage for the specified key, or the first ActionMessage if no key was given.
  * @method static string[]                                     getActionMessages()                                                       Return all stored ActionMessages, including ActionErrors.
- * @method static bool                                         isActionMessage(string|string[] $keys=null)                               Whether an ActionMessage exists for one of the specified keys, or for any key if no key was given.
+ * @method static bool                                         isActionMessage(string ...$keys)                                          Whether an ActionMessage exists for one of the specified keys, or for any key if no key was given.
  * @method static void                                         setActionMessage(string $key, string $message)                            Store an ActionMessage for the specified key.
  * @method static string[]                                     removeActionMessages(string ...$keys)                                     Remove the ActionMessage(s) with the specified key(s).
  * @method static ?string                                      getActionError(string $key=null)                                          Return the stored ActionError for the specified key, or the first ActionError if no key was given.
  * @method static string[]                                     getActionErrors()                                                         Return all stored ActionErrors.
- * @method static bool                                         isActionError(string|string[] $keys=null)                                 Whether an ActionError exists for one of the specified keys, or for any key if no key was given.
+ * @method static bool                                         isActionError(string ...$keys)                                            Whether an ActionError exists for one of the specified keys, or for any key if no key was given.
  * @method static void                                         setActionError(string $key, string $message)                              Store an ActionError for the specified key.
  * @method static string[]                                     removeActionErrors(string ...$keys)                                       Remove the ActionError(s) with the specified key(s).
  * @method static ?\rosasurfer\ministruts\struts\ActionMapping getMapping()                                                              Return the MiniStruts {@link \rosasurfer\ministruts\struts\ActionMapping} responsible for processing the current request.
@@ -69,11 +69,9 @@ class Request extends Proxy {
 
 
     /**
-     * {@inheritdoc}
-     *
-     * @return string
+     * {@inheritDoc}
      */
-    protected static function getServiceName() {
+    protected static function getServiceName(): string {
         return 'request';
         return \rosasurfer\ministruts\struts\Request::class;    // @phpstan-ignore deadCode.unreachable (keep for testing)
     }

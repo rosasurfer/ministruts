@@ -36,7 +36,7 @@ class SimpleXMLElement extends \SimpleXMLElement {
      *
      * @return static
      */
-    public static function from($data, $options=0, $dataIsUri=false, $ns='', $nsIsPrefix=false) {
+    public static function from(string $data, int $options=0, bool $dataIsUri=false, string $ns='', bool $nsIsPrefix=false): self {
         $errors = [];
         $origHandler = null;
         $origHandler = set_error_handler(function($level, $message, $file, $line, $context=null) use (&$errors, &$origHandler) {
