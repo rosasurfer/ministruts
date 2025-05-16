@@ -1,7 +1,6 @@
 #!/bin/bash
 #
-# Conveniant wrapper of PHPCodeSniffer. Simplifies configuration and supports switching between
-# multiple PHP and/or PHPCS versions. All arguments are optional.
+# Conveniant wrapper of PHPCodeSniffer. Simplifies switching between PHP/PHPCS versions and configurations.
 #
 # PHPCS can be executed using a custom PHP interpreter by setting the environment variable PHP='<php-cmd>'.
 #
@@ -49,14 +48,18 @@ phpcs="$PROJECT_DIR/vendor/bin/phpcs"
 [[ -f "$phpcs" ]] || fail "PHPCS executable not found"
 
 
-# find and prepend config file
+# create a new argument list
+ARGS=("$@")
+
+
+# find and prepend the config file
 CONFIG_DIR="$PROJECT_DIR/etc/phpcs"
-CONFIG_FILE="$CONFIG_DIR/ruleset.xml"
+CONFIG_FILE="$CONFIG_DIR/slevomat.xml"
 [[ -f "$CONFIG_FILE" ]] || fail "No config file found in \"$CONFIG_DIR\""
-ARGS=("--standard=$CONFIG_FILE" "$@")
+#ARGS=("--standard=$CONFIG_FILE" "${ARGS[@]}")
 
 
-# rebuild all positional arguments
+# rebuild all arguments
 set -- "${ARGS[@]}"
 
 

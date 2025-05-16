@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://github.com/PHPCSStandards/PHP_CodeSniffer/raw/refs/heads/master/phpcs.xsd"
+         name="rosasurfer/ministruts">
+
+    <!-- PHP version to apply -->
+    <config name="php_version" value="70499"/>
+
+    <!-- files to analyze (paths relative to this file) -->
+    <file>./bin</file>
+    <file>./src</file>
+    <file>./tests</file>
+    <file>./etc/phpstan</file>
+    <exclude-pattern>./etc/phpstan/.tmp</exclude-pattern>
+    <arg name="extensions" value="php"/>
+
+    <!-- include custom rules -->
+    <rule ref="./etc/phpcs/slevomat.xml"/>
+
+    <!-- 
+    <rule ref="./etc/phpcs/psr12.xml"/>
+     -->
+</ruleset>

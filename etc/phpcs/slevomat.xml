@@ -1,0 +1,117 @@
+<?xml version="1.0"?>
+
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://github.com/PHPCSStandards/PHP_CodeSniffer/raw/refs/heads/master/phpcs.xsd"
+         name="custom-slevomat">
+    <!--
+    @see  https://github.com/PHPCSStandards/PHP_CodeSniffer/wiki/Annotated-Ruleset
+    @see  https://github.com/slevomat/coding-standard#alphabetical-list-of-sniffs
+    -->
+
+    <description>
+      Customized Slevomat rules
+    </description>
+
+
+    <!-- display options -->
+    <arg name="report" value="full,source"/>  <!-- default: full display + summary             -->
+    <arg name="basepath" value="../.."/>      <!-- base path to strip from reported file names -->
+    <arg name="colors"/>                      <!-- enable colors                               -->
+    <arg value="p"/>                          <!-- show progress                               -->
+
+
+    <!-- path relative to the PHPCS binary -->
+    <config name="installed_paths" value="../../slevomat/coding-standard"/>
+
+    <rule ref="SlevomatCodingStandard">
+      <exclude name="SlevomatCodingStandard.Arrays.AlphabeticallySortedByKeys"/>
+      <exclude name="SlevomatCodingStandard.Arrays.SingleLineArrayWhitespace.SpaceAfterComma"/>
+      <exclude name="SlevomatCodingStandard.Arrays.SingleLineArrayWhitespace.SpaceBeforeArrayClose"/>
+      <exclude name="SlevomatCodingStandard.Attributes"/>
+      <exclude name="SlevomatCodingStandard.Classes.RequireAbstractOrFinal"/>
+      <exclude name="SlevomatCodingStandard.Commenting.DisallowCommentAfterCode"/>
+      <exclude name="SlevomatCodingStandard.Commenting.DisallowOneLinePropertyDocComment"/>
+      <exclude name="SlevomatCodingStandard.Commenting.DocCommentSpacing.IncorrectLinesCountBetweenDescriptionAndAnnotations"/>
+      <exclude name="SlevomatCodingStandard.Commenting.DocCommentSpacing.IncorrectLinesCountBetweenDifferentAnnotationsTypes"/>
+      <exclude name="SlevomatCodingStandard.Commenting.EmptyComment"/>
+      <exclude name="SlevomatCodingStandard.Commenting.InlineDocCommentDeclaration.MissingVariable"/>
+      <exclude name="SlevomatCodingStandard.Commenting.RequireOneLineDocComment"/>
+      <exclude name="SlevomatCodingStandard.Commenting.RequireOneLinePropertyDocComment"/>
+      <exclude name="SlevomatCodingStandard.Commenting.UselessFunctionDocComment"/>
+      <exclude name="SlevomatCodingStandard.Commenting.UselessInheritDocComment"/>
+      <exclude name="SlevomatCodingStandard.PHP.RequireExplicitAssertion"/>
+      
+      <!--
+      TODO: SlevomatCodingStandard.Classes.ClassStructure.IncorrectGroupOrder
+      -->
+
+      <exclude name="SlevomatCodingStandard.PHP"/>
+      <exclude name="SlevomatCodingStandard.Classes"/>
+      <exclude name="SlevomatCodingStandard.Complexity"/>
+      <exclude name="SlevomatCodingStandard.ControlStructures"/>
+      <exclude name="SlevomatCodingStandard.Exceptions"/>
+      <exclude name="SlevomatCodingStandard.Files"/>
+      <exclude name="SlevomatCodingStandard.Functions"/>
+      <exclude name="SlevomatCodingStandard.Namespaces"/>
+      <exclude name="SlevomatCodingStandard.Numbers"/>
+      <exclude name="SlevomatCodingStandard.Operators"/>
+      <exclude name="SlevomatCodingStandard.Strings"/>
+      <exclude name="SlevomatCodingStandard.Variables"/>
+      <exclude name="SlevomatCodingStandard.Whitespaces"/>
+
+      <exclude name="SlevomatCodingStandard.TypeHints.ClassConstantTypeHint.UselessDocComment"/>
+      <exclude name="SlevomatCodingStandard.TypeHints.DisallowArrayTypeHintSyntax"/>
+      <exclude name="SlevomatCodingStandard.TypeHints.ParameterTypeHint.UselessAnnotation"/>
+      <exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHint.UselessAnnotation"/>
+      <exclude name="SlevomatCodingStandard.TypeHints.PropertyTypeHint.UselessAnnotation"/>
+      <exclude name="SlevomatCodingStandard.TypeHints.UnionTypeHintFormat"/>  <!-- replaced by DNFTypeHintFormat -->
+      <exclude name="SlevomatCodingStandard.TypeHints.UselessConstantTypeHint.UselessDocComment"/>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.Classes.EmptyLinesAroundClassBraces">
+      <properties>
+        <property name="linesCountAfterOpeningBrace" value="1"/>
+        <property name="linesCountBeforeClosingBrace" value="0"/>
+      </properties>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.Classes.MethodSpacing">
+      <properties>
+        <!-- empty lines between multiple class methods -->
+        <property name="minLinesCount" value="1"/>
+        <property name="maxLinesCount" value="2"/>
+      </properties>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.Classes.ClassMemberSpacing">
+      <properties>
+        <!-- empty lines between class properties and methods -->
+        <property name="linesCountBetweenMembers" value="2"/>
+      </properties>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.PHP.DisallowReference.DisallowedAssigningByReference">
+      <type>warning</type>
+      <severity>4</severity>  
+      <message>Assigning by reference is discouraged.</message>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.PHP.DisallowReference.DisallowedPassingByReference">
+      <type>warning</type>
+      <severity>4</severity>  
+      <message>Passing by reference is discouraged.</message>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.TypeHints.DeclareStrictTypes">
+      <properties>
+        <property name="linesCountBeforeDeclare" value="0"/>
+        <property name="spacesCountAroundEqualsSign" value="0"/>
+      </properties>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.TypeHints.DisallowMixedTypeHint.DisallowedMixedTypeHint">
+      <type>warning</type>
+      <severity>4</severity>
+      <message>Usage of "mixed" type hint is discouraged.</message>
+    </rule>
+</ruleset>
