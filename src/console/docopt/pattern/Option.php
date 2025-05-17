@@ -7,6 +7,8 @@ use InvalidArgumentException;
 
 use rosasurfer\ministruts\console\docopt\SingleMatch;
 
+use function rosasurfer\ministruts\preg_split;
+
 
 /**
  * Option
@@ -58,6 +60,7 @@ class Option extends LeafPattern {
         $description = isset($exp[1]) ? $exp[1] : '';
 
         $options = str_replace(',', ' ', str_replace('=', ' ', $options));
+
         foreach (preg_split('/\s+/', $options) as $s) {
             if (strpos($s, '--')===0) {
                 $long = $s;
@@ -72,8 +75,9 @@ class Option extends LeafPattern {
 
         if ($argcount) {
             $value = $match = null;
-            if (preg_match('@\[default: (.*)\]@i', $description, $match))
+            if (preg_match('@\[default: (.*)\]@i', $description, $match)) {
                 $value = $match[1];
+            }
         }
         return new static($short, $long, $argcount, $value);
     }

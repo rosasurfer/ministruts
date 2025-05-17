@@ -19,6 +19,7 @@ use rosasurfer\ministruts\console\docopt\pattern\Required;
 
 use function rosasurfer\ministruts\array_filter;
 use function rosasurfer\ministruts\array_merge;
+use function rosasurfer\ministruts\preg_split;
 use function rosasurfer\ministruts\strEndsWith;
 use function rosasurfer\ministruts\strStartsWith;
 
@@ -236,7 +237,11 @@ class DocoptParser extends CObject {
         foreach (static::parseSection('options:', $doc) as $section) {
             # FIXME corner case "bla: options: --foo"
             list (, $section) = explode(':', $section, 2);
-            $splitTmp = array_slice(preg_split("/\n[ \t]*(-\S+?)/", "\n".$section, 0, PREG_SPLIT_DELIM_CAPTURE), 1);
+
+            /** @var string[] $split */
+            $split = preg_split("/\n[ \t]*(-\S+?)/", "\n".$section, 0, PREG_SPLIT_DELIM_CAPTURE);
+            $splitTmp = array_slice($split, 1);
+
             $split = [];
             for ($size=sizeof($splitTmp), $i=0; $i < $size; $i+=2) {
                 $split[] = $splitTmp[$i].(isset($splitTmp[$i+1]) ? $splitTmp[$i+1] : '');

@@ -9,6 +9,8 @@ use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 use rosasurfer\ministruts\net\http\HttpResponse;
 
+use function rosasurfer\ministruts\preg_replace;
+
 
 /**
  * RequestProcessor
@@ -120,8 +122,6 @@ class RequestProcessor extends CObject {
      */
     protected function processMapping(Request $request, Response $response): ?ActionMapping {
         // resolve the full request path
-
-        /** @var string $requestPath */
         $requestPath = preg_replace('|/{2,}|', '/', $request->getPath());
         $requestPath = '/'.trim($requestPath, '/').'/';
         if ($requestPath=='//') $requestPath = '/';
