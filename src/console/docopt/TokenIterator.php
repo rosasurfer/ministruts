@@ -7,6 +7,7 @@ use rosasurfer\ministruts\console\docopt\exception\DocoptFormatError;
 use rosasurfer\ministruts\console\docopt\exception\DocoptUserNotification;
 use rosasurfer\ministruts\core\ObjectTrait;
 use rosasurfer\ministruts\core\di\DiAwareTrait;
+use rosasurfer\ministruts\core\exception\RuntimeException;
 
 
 /**
@@ -33,7 +34,14 @@ class TokenIterator extends \ArrayIterator {
     public function __construct($source, string $errorClass = DocoptUserNotification::class) {
         if (!is_array($source)) {
             $source = trim($source);
-            $source = strlen($source) ? preg_split('/\s+/', $source) : [];
+
+            if (strlen($source)) {
+                $source = preg_split('/\s+/', $source);
+                if ($source === false || preg_last_error() != PREG_NO_ERROR) throw new RuntimeException(preg_last_error_msg());
+            }
+            else {
+                $source = [];
+            }
         }
         parent::__construct($source);
 

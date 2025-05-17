@@ -49,8 +49,6 @@ class CoreFunctionReturnType extends Extension implements DynamicFunctionReturnT
             'opendir'              => $bool,            // resource|false
             'pg_escape_identifier' => $bool,     // (1) // string                           @see  https://www.php.net/manual/en/function.pg-escape-identifier.php
             'pg_escape_literal'    => $bool,     // (1) // string                           @see  https://www.php.net/manual/en/function.pg-escape-literal.php
-            'preg_replace'         => $null,     // (2) // string|array|null
-            'preg_split'           => $bool,            // array|false
             'proc_open'            => $bool,            // resource|false                   @see  https://www.php.net/manual/en/function.proc-open.php
             'session_id'           => $bool,            // string|false                     @see  https://www.php.net/manual/en/function.session-id.php
             'session_name'         => $bool,            // string|false                     @see  https://www.php.net/manual/en/function.session-name.php
@@ -106,7 +104,7 @@ class CoreFunctionReturnType extends Extension implements DynamicFunctionReturnT
         $name = $function->getName();
 
         // throw an exception to get notified when PHPStan bugs are fixed
-        if (in_array($name, ['filter_var', 'preg_replace'])) {
+        if (in_array($name, ['filter_var'])) {
             throw new ExtensionException("pewa: PHPStan bugfix -> core function $name is now passed to the ".simpleClassName(__CLASS__).' extension');
         }
 

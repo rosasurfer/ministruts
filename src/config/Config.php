@@ -414,7 +414,10 @@ class Config extends CObject implements ConfigInterface {
             else {
                 // the last subkey: check for bracket notation
                 $match = null;
-                if (preg_match('/(.+)\b *\[ *\]$/', $subkey, $match)) {
+                $result = preg_match('/(.+)\b *\[ *\]$/', $subkey, $match);
+                if ($result === false || preg_last_error() != PREG_NO_ERROR) throw new RuntimeException(preg_last_error_msg());
+
+                if ($result) {
                     // bracket notation
                     $subkey = $match[1];
                     if (!\key_exists($subkey, $properties)) {

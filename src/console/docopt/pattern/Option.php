@@ -6,6 +6,7 @@ namespace rosasurfer\ministruts\console\docopt\pattern;
 use InvalidArgumentException;
 
 use rosasurfer\ministruts\console\docopt\SingleMatch;
+use rosasurfer\ministruts\core\exception\RuntimeException;
 
 
 /**
@@ -58,7 +59,11 @@ class Option extends LeafPattern {
         $description = isset($exp[1]) ? $exp[1] : '';
 
         $options = str_replace(',', ' ', str_replace('=', ' ', $options));
-        foreach (preg_split('/\s+/', $options) as $s) {
+
+        $split = preg_split('/\s+/', $options);
+        if ($split === false || preg_last_error() != PREG_NO_ERROR) throw new RuntimeException(preg_last_error_msg());
+
+        foreach ($split as $s) {
             if (strpos($s, '--')===0) {
                 $long = $s;
             }
@@ -72,8 +77,9 @@ class Option extends LeafPattern {
 
         if ($argcount) {
             $value = $match = null;
-            if (preg_match('@\[default: (.*)\]@i', $description, $match))
+            if (preg_match('@\[default: (.*)\]@i', $description, $match)) {
                 $value = $match[1];
+            }
         }
         return new static($short, $long, $argcount, $value);
     }
