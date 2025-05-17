@@ -16,10 +16,10 @@ use rosasurfer\ministruts\console\docopt\pattern\Optional;
 use rosasurfer\ministruts\console\docopt\pattern\OptionsShortcut;
 use rosasurfer\ministruts\console\docopt\pattern\Pattern;
 use rosasurfer\ministruts\console\docopt\pattern\Required;
-use rosasurfer\ministruts\core\exception\RuntimeException;
 
 use function rosasurfer\ministruts\array_filter;
 use function rosasurfer\ministruts\array_merge;
+use function rosasurfer\ministruts\preg_split;
 use function rosasurfer\ministruts\strEndsWith;
 use function rosasurfer\ministruts\strStartsWith;
 
@@ -175,9 +175,7 @@ class DocoptParser extends CObject {
      */
     protected static function formalUsage(string $section): string {
         list(, $section) = explode(':', $section, 2);       // drop "usage:"
-
         $pu = preg_split('/\s+/', trim($section));
-        if ($pu === false || preg_last_error() != PREG_NO_ERROR) throw new RuntimeException(preg_last_error_msg());
 
         $ret = [];
         foreach (array_slice($pu, 1) as $s) {
@@ -240,8 +238,8 @@ class DocoptParser extends CObject {
             # FIXME corner case "bla: options: --foo"
             list (, $section) = explode(':', $section, 2);
 
+            /** @var string[] $split */
             $split = preg_split("/\n[ \t]*(-\S+?)/", "\n".$section, 0, PREG_SPLIT_DELIM_CAPTURE);
-            if ($split === false || preg_last_error() != PREG_NO_ERROR) throw new RuntimeException(preg_last_error_msg());
             $splitTmp = array_slice($split, 1);
 
             $split = [];

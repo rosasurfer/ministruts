@@ -7,6 +7,7 @@ use Exception;
 use PHPUnit\Framework\TestCase;
 
 use function rosasurfer\ministruts\docopt;
+use function rosasurfer\ministruts\preg_replace;
 
 use const rosasurfer\ministruts\NL;
 
@@ -54,7 +55,6 @@ class PythonFixturesTest extends TestCase {
         if (!file_exists($filename)) throw new Exception("Python fixtures \"$filename\" not found.");
         $content .= file_get_contents($filename);
 
-        /** @var string $content */
         $content = preg_replace('/#.*$/m', '', $content);           // drop inline comments
         $content = trim($content);
 
