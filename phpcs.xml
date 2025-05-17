@@ -17,8 +17,4 @@
 
     <!-- include custom rules -->
     <rule ref="./etc/phpcs/slevomat.xml"/>
-
-    <!-- 
-    <rule ref="./etc/phpcs/psr12.xml"/>
-     -->
 </ruleset>
