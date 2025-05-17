@@ -15,7 +15,6 @@ use rosasurfer\ministruts\core\CObject;
  */
 abstract class HttpResponse extends CObject {
 
-
     // HTTP status codes; @see RFC 2068
 
     /**
@@ -244,9 +243,7 @@ abstract class HttpResponse extends CObject {
     const SC_HTTP_VERSION_NOT_SUPPORTED = 505;
 
 
-    /**
-     * @var string[] - HTTP status code descriptions
-     */
+    /** @var string[] - HTTP status code descriptions */
     public static array $statusCodes = [
         self::SC_CONTINUE                        => 'SC_CONTINUE'                       ,
         self::SC_SWITCHING_PROTOCOLS             => 'SC_SWITCHING_PROTOCOLS'            ,

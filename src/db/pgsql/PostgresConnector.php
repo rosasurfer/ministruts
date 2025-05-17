@@ -51,7 +51,6 @@ use const rosasurfer\ministruts\NL;
  * User-defined options can be specified as nested suboptions and are sent to the database as system variables in the
  * scope of the active session.
  *
- *
  * @see  https://www.postgresql.org/docs/9.6/static/libpq-connect.html#LIBPQ-PARAMKEYWORDS)
  */
 class PostgresConnector extends Connector {

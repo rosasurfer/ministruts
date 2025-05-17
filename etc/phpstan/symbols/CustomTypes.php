@@ -8,7 +8,6 @@ namespace rosasurfer\ministruts\phpstan;
  * Custom PHPStan type definitions and matching classes to enable IntelliSense and code completion.
  * Add this file to the project's library path and use the types in PHPStan annotations only.
  *
- *
  * @phpstan-type  EntityClass = \rosasurfer\ministruts\db\orm\PersistableObject
  *
  * @phpstan-type  ORM_ENTITY = array{
