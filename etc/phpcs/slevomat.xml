@@ -46,10 +46,10 @@
 
 
       <!--
-      <exclude name="SlevomatCodingStandard.Commenting.EmptyComment.EmptyComment"/>
       -->
 
       <!-- @todo: reduce message keys -->
+      <exclude name="SlevomatCodingStandard.Commenting.EmptyComment.EmptyComment"/>
       <exclude name="SlevomatCodingStandard.Commenting.InlineDocCommentDeclaration.MissingVariable"/>
       <exclude name="SlevomatCodingStandard.Commenting.RequireOneLineDocComment.MultiLineDocComment"/>
       <exclude name="SlevomatCodingStandard.Commenting.UselessFunctionDocComment.UselessDocComment"/>

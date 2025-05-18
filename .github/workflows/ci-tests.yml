@@ -1,7 +1,8 @@
 #
-# Runs PHPStan and PHPUnit on every supported PHP version. A tool is skipped if the commit message contains "[skip <tool>]".
+# Runs PHPStan, PHPCodeSniffer and PHPUnit on every supported PHP version.
+# A tool is skipped if the commit message contains "[skip <tool>]".
 #
-name: Integration tests
+name: CI tests
 
 on:
   push:
@@ -41,6 +42,11 @@ jobs:
           echo "Skip PHPStan: $SKIP_PHPSTAN"
           echo "SKIP_PHPSTAN=$SKIP_PHPSTAN" >> "$GITHUB_ENV"
 
+          SKIP_PHPCS=false
+          grep -iq '\[skip phpcs\]' <<< "$COMMIT_MSG" && { echo "Magic commit message found: [skip phpcs]"; SKIP_PHPCS=true; }
+          echo "Skip PHPCodeSniffer: $SKIP_PHPCS"
+          echo "SKIP_PHPCS=$SKIP_PHPCS" >> "$GITHUB_ENV"
+
           SKIP_PHPUNIT=false
           grep -iq '\[skip phpunit\]' <<< "$COMMIT_MSG" && { echo "Magic commit message found: [skip phpunit]"; SKIP_PHPUNIT=true; }
           echo "Skip PHPUnit: $SKIP_PHPUNIT"
@@ -48,7 +54,7 @@ jobs:
 
       # ------------------------------------------------------------------------------------------------------------------------------------
       - name: Setup PHP ${{ matrix.php }}
-        if:   env.SKIP_PHPSTAN == 'false' || env.SKIP_PHPUNIT == 'false'
+        if:   env.SKIP_PHPSTAN == 'false' || env.SKIP_PHPCS == 'false' || env.SKIP_PHPUNIT == 'false'
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
@@ -60,7 +66,7 @@ jobs:
 
       # ------------------------------------------------------------------------------------------------------------------------------------
       - name: Install Composer dependencies
-        if:   env.SKIP_PHPSTAN == 'false' || env.SKIP_PHPUNIT == 'false'
+        if:   env.SKIP_PHPSTAN == 'false' || env.SKIP_PHPCS == 'false' || env.SKIP_PHPUNIT == 'false'
         run: |
           echo "Validating \"composer.json\"..."
           composer validate --strict
@@ -74,6 +80,13 @@ jobs:
         run: |
           echo "Generating PHPStan report..."
           bin/phpstan --no-progress -vvv
+
+      # ------------------------------------------------------------------------------------------------------------------------------------
+      - name: Run PHPCodeSniffer
+        if:   env.SKIP_PHPCS == 'false'
+        run: |
+          echo "Generating PHPCodeSniffer report..."
+          bin/phpcs --show-cmd
 
       # ------------------------------------------------------------------------------------------------------------------------------------
       - name: Run PHPUnit
