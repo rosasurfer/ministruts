@@ -23,8 +23,8 @@ parameters:
     - .                                             # etc/phpstan itself
 
   excludePaths:                                     # excludeAnalyze + excludeScan
-    - .tmp
     - symbols
+    - ../tmp
     - ../../vendor
 
   scanFiles:                                        # scanned for symbols only, not analyzed (for legacy or future code)
@@ -49,5 +49,5 @@ parameters:
 
   parallel:
     maximumNumberOfProcesses: 4
-  tmpDir:       .tmp
+  tmpDir:       ../tmp/phpstan
   tipsOfTheDay: false

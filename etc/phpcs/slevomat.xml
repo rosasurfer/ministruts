@@ -2,16 +2,11 @@
 
 <ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="https://github.com/PHPCSStandards/PHP_CodeSniffer/raw/refs/heads/master/phpcs.xsd"
-         name="custom-slevomat">
+         name="customized-slevomat">
     <!--
     @see  https://github.com/PHPCSStandards/PHP_CodeSniffer/wiki/Annotated-Ruleset
     @see  https://github.com/slevomat/coding-standard#alphabetical-list-of-sniffs
     -->
-
-    <description>
-      A customized ruleset optimized for readability.
-    </description>
-
 
     <!-- display options -->
     <arg name="report" value="full,source"/>  <!-- default: full display + summary             -->
@@ -20,21 +15,38 @@
     <arg value="p"/>                          <!-- show progress                               -->
 
 
-    <!-- path relative to the PHPCS binary -->
+    <!-- PHP version to test against -->
+    <config name="php_version" value="70499"/>
+
+    <!-- files to analyze (paths relative to this file) -->
+    <file>../../bin</file>
+    <file>../../etc/phpstan</file>
+    <file>../../src</file>
+    <file>../../tests</file>
+    <arg name="extensions" value="php"/>
+
+
+    <!-- Slevomat rules: path relative to the PHPCS binary -->
     <config name="installed_paths" value="../../slevomat/coding-standard"/>
 
     <rule ref="SlevomatCodingStandard">
+      <!-- disable broken sniffs -->
+      <exclude name="SlevomatCodingStandard.Attributes"/>
+      <exclude name="SlevomatCodingStandard.Commenting.DocCommentSpacing.IncorrectLinesCountBetweenDifferentAnnotationsTypes"/>
+
+      <!-- disable sniffs which decrease code quality and/or readability -->
       <exclude name="SlevomatCodingStandard.Arrays.AlphabeticallySortedByKeys"/>
       <exclude name="SlevomatCodingStandard.Arrays.SingleLineArrayWhitespace.SpaceAfterComma"/>
       <exclude name="SlevomatCodingStandard.Arrays.SingleLineArrayWhitespace.SpaceBeforeArrayClose"/>
-      <exclude name="SlevomatCodingStandard.Attributes"/>
       <exclude name="SlevomatCodingStandard.Classes.RequireAbstractOrFinal"/>
       <exclude name="SlevomatCodingStandard.Commenting.DisallowCommentAfterCode"/>
       <exclude name="SlevomatCodingStandard.Commenting.DisallowOneLinePropertyDocComment"/>
-      <exclude name="SlevomatCodingStandard.Commenting.DocCommentSpacing.IncorrectLinesCountBetweenDifferentAnnotationsTypes"/>
+
 
       <!--
       -->
+
+      <!-- @todo: reduce message keys -->
       <exclude name="SlevomatCodingStandard.Commenting.EmptyComment.EmptyComment"/>
       <exclude name="SlevomatCodingStandard.Commenting.InlineDocCommentDeclaration.MissingVariable"/>
       <exclude name="SlevomatCodingStandard.Commenting.RequireOneLineDocComment.MultiLineDocComment"/>
@@ -46,8 +58,8 @@
       <exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedGlobalConstants.NonFullyQualified"/>
       <exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedGlobalFunctions.NonFullyQualified"/>
       <exclude name="SlevomatCodingStandard.Namespaces.UseOnlyWhitelistedNamespaces.NonFullyQualified"/>
-      <exclude name="SlevomatCodingStandard.PHP.RequireExplicitAssertion.RequiredExplicitAssertion"/>
-      
+      <exclude name="SlevomatCodingStandard.PHP.RequireExplicitAssertion.RequiredExplicitAssertion"/>      <!-- @todo: check occurrences -->
+
       <!--
       -->
       <exclude name="SlevomatCodingStandard.PHP"/>
@@ -72,7 +84,7 @@
       <exclude name="SlevomatCodingStandard.TypeHints.UnionTypeHintFormat"/>  <!-- replaced by DNFTypeHintFormat -->
       <exclude name="SlevomatCodingStandard.TypeHints.UselessConstantTypeHint.UselessDocComment"/>
     </rule>
-    
+
 
 
 
@@ -106,7 +118,7 @@
         <property name="allowFullyQualifiedGlobalFunctions" value="true"/>
       </properties>
     </rule>
-    
+
     <rule ref="SlevomatCodingStandard.Namespaces.UnusedUses">
       <properties>
         <property name="searchAnnotations" value="true"/>
@@ -120,21 +132,21 @@
       </properties>
     </rule>
 
-    
-    
+
+
     <!-- Severity of the following errors is lowered to keep them for later inspection. -->
     <rule ref="SlevomatCodingStandard.PHP.DisallowReference.DisallowedAssigningByReference">
       <type>warning</type>
-      <severity>4</severity>  
+      <severity>4</severity>
       <message>Assigning by reference is discouraged.</message>
     </rule>
 
     <rule ref="SlevomatCodingStandard.PHP.DisallowReference.DisallowedPassingByReference">
       <type>warning</type>
-      <severity>4</severity>  
+      <severity>4</severity>
       <message>Passing by reference is discouraged.</message>
     </rule>
-    
+
     <rule ref="SlevomatCodingStandard.TypeHints.DisallowMixedTypeHint.DisallowedMixedTypeHint">
       <type>warning</type>
       <severity>4</severity>

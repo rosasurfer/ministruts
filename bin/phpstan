@@ -72,6 +72,7 @@ IS_WINDOWS_PHP="$("$php" -r "echo (int)(PHP_OS_FAMILY == 'Windows');")"
 PROJECT_DIR="$(realpath --relative-to=. "$(dirname "$(realpath "$(type -p "$0")")")"/..)"
 [[ "$PROJECT_DIR" == /* ]] && ((IS_WINDOWS_PHP)) && PROJECT_DIR="$(cygpath -m "$PROJECT_DIR")"
 CONFIG_DIR="$PROJECT_DIR/etc/phpstan"
+CONFIG_DIR="${CONFIG_DIR#./}"
 AUTOLOAD=
 
 # determine the PHPStan binary to use
@@ -84,12 +85,14 @@ if [[ -n "$phpstan" ]]; then
   # if we are not in PROJECT_DIR then "vendor/autoload.php" must be specified manually
   if [[ "$(pwd -P)" != "$PROJECT_DIR" ]]; then
     AUTOLOAD="$PROJECT_DIR/vendor/autoload.php"
+    AUTOLOAD="${AUTOLOAD#./}"
     [[ -f "$AUTOLOAD" ]] || fail "vendor/autoload.php not found"
     AUTOLOAD="--autoload-file=$AUTOLOAD"
   fi
 else
   phpstanCmd="vendor/bin/phpstan"
   phpstan="$PROJECT_DIR/$phpstanCmd"
+  phpstan="${phpstan#./}"
   if [[ ! -f "$phpstan" ]]; then
     phpstanCmd="phpstan" && phpstan="$(type -p "$phpstanCmd")" || {
       phpstanCmd="phpstan.phar" && phpstan="$(type -p "$phpstanCmd")" || fail "PHPStan executable not found"

@@ -4,17 +4,16 @@
          xsi:noNamespaceSchemaLocation="https://github.com/PHPCSStandards/PHP_CodeSniffer/raw/refs/heads/master/phpcs.xsd"
          name="rosasurfer/ministruts">
 
-    <!-- PHP version to apply -->
+    <!-- PHP version to test against -->
     <config name="php_version" value="70499"/>
 
     <!-- files to analyze (paths relative to this file) -->
-    <file>./bin</file>
-    <file>./src</file>
-    <file>./tests</file>
-    <file>./etc/phpstan</file>
-    <exclude-pattern>./etc/phpstan/.tmp</exclude-pattern>
+    <file>bin</file>
+    <file>etc/phpstan</file>
+    <file>src</file>
+    <file>tests</file>
     <arg name="extensions" value="php"/>
 
-    <!-- include custom rules -->
-    <rule ref="./etc/phpcs/slevomat.xml"/>
+    <!-- import custom rules -->
+    <rule ref="etc/phpcs/slevomat.xml"/>
 </ruleset>

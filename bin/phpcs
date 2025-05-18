@@ -45,6 +45,7 @@ PROJECT_DIR="$(realpath --relative-to=. "$(dirname "$(realpath "$(type -p "$0")"
 
 # determine the PHPCS executable to use
 phpcs="$PROJECT_DIR/vendor/bin/phpcs"
+phpcs="${phpcs#./}"
 [[ -f "$phpcs" ]] || fail "PHPCS executable not found"
 
 
@@ -54,9 +55,10 @@ ARGS=("$@")
 
 # find and prepend the config file
 CONFIG_DIR="$PROJECT_DIR/etc/phpcs"
+CONFIG_DIR="${CONFIG_DIR#./}"
 CONFIG_FILE="$CONFIG_DIR/slevomat.xml"
 [[ -f "$CONFIG_FILE" ]] || fail "No config file found in \"$CONFIG_DIR\""
-#ARGS=("--standard=$CONFIG_FILE" "${ARGS[@]}")
+ARGS=("--standard=$CONFIG_FILE" "${ARGS[@]}")
 
 
 # rebuild all arguments
@@ -64,4 +66,5 @@ set -- "${ARGS[@]}"
 
 
 # call PHPCS
+echo "CMD: $phpcs" "$@"
 "$php" "$phpcs" "$@"
