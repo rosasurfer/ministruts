@@ -11,7 +11,6 @@
     <!-- display options -->
     <arg name="report" value="full,source"/>  <!-- default: full display + summary             -->
     <arg name="basepath" value="../.."/>      <!-- base path to strip from reported file names -->
-    <arg name="colors"/>                      <!-- enable colors                               -->
     <arg value="p"/>                          <!-- show progress                               -->
 
 
@@ -34,6 +33,9 @@
       <exclude name="SlevomatCodingStandard.Attributes"/>
       <exclude name="SlevomatCodingStandard.Commenting.DocCommentSpacing.IncorrectLinesCountBetweenDifferentAnnotationsTypes"/>
 
+      <!-- disable deprecated and replaced sniffs -->
+      <exclude name="SlevomatCodingStandard.TypeHints.UnionTypeHintFormat"/> <!-- replaced by DNFTypeHintFormat -->
+
       <!-- disable sniffs which decrease code quality and/or readability -->
       <exclude name="SlevomatCodingStandard.Arrays.AlphabeticallySortedByKeys"/>
       <exclude name="SlevomatCodingStandard.Arrays.SingleLineArrayWhitespace.SpaceAfterComma"/>
@@ -44,10 +46,10 @@
 
 
       <!--
+      <exclude name="SlevomatCodingStandard.Commenting.EmptyComment.EmptyComment"/>
       -->
 
       <!-- @todo: reduce message keys -->
-      <exclude name="SlevomatCodingStandard.Commenting.EmptyComment.EmptyComment"/>
       <exclude name="SlevomatCodingStandard.Commenting.InlineDocCommentDeclaration.MissingVariable"/>
       <exclude name="SlevomatCodingStandard.Commenting.RequireOneLineDocComment.MultiLineDocComment"/>
       <exclude name="SlevomatCodingStandard.Commenting.UselessFunctionDocComment.UselessDocComment"/>
@@ -81,15 +83,32 @@
       <exclude name="SlevomatCodingStandard.TypeHints.ParameterTypeHint.UselessAnnotation"/>
       <exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHint.UselessAnnotation"/>
       <exclude name="SlevomatCodingStandard.TypeHints.PropertyTypeHint.UselessAnnotation"/>
-      <exclude name="SlevomatCodingStandard.TypeHints.UnionTypeHintFormat"/>  <!-- replaced by DNFTypeHintFormat -->
       <exclude name="SlevomatCodingStandard.TypeHints.UselessConstantTypeHint.UselessDocComment"/>
     </rule>
 
 
+    <!-- @todo: inspect occurrences -->
+    <rule ref="SlevomatCodingStandard.PHP.DisallowReference.DisallowedAssigningByReference">
+      <type>warning</type>
+      <severity>4</severity>
+      <message>Assigning by reference is discouraged.</message>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.PHP.DisallowReference.DisallowedPassingByReference">
+      <type>warning</type>
+      <severity>4</severity>
+      <message>Passing by reference is discouraged.</message>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.TypeHints.DisallowMixedTypeHint.DisallowedMixedTypeHint">
+      <type>warning</type>
+      <severity>4</severity>
+      <message>Usage of "mixed" type hint is discouraged.</message>
+    </rule>
 
 
 
-
+    <!-- regular sniff customizations -->
     <rule ref="SlevomatCodingStandard.Classes.EmptyLinesAroundClassBraces">
       <properties>
         <property name="linesCountAfterOpeningBrace" value="1"/>
@@ -130,26 +149,5 @@
         <property name="linesCountBeforeDeclare" value="0"/>
         <property name="spacesCountAroundEqualsSign" value="0"/>
       </properties>
-    </rule>
-
-
-
-    <!-- Severity of the following errors is lowered to keep them for later inspection. -->
-    <rule ref="SlevomatCodingStandard.PHP.DisallowReference.DisallowedAssigningByReference">
-      <type>warning</type>
-      <severity>4</severity>
-      <message>Assigning by reference is discouraged.</message>
-    </rule>
-
-    <rule ref="SlevomatCodingStandard.PHP.DisallowReference.DisallowedPassingByReference">
-      <type>warning</type>
-      <severity>4</severity>
-      <message>Passing by reference is discouraged.</message>
-    </rule>
-
-    <rule ref="SlevomatCodingStandard.TypeHints.DisallowMixedTypeHint.DisallowedMixedTypeHint">
-      <type>warning</type>
-      <severity>4</severity>
-      <message>Usage of "mixed" type hint is discouraged.</message>
     </rule>
 </ruleset>
