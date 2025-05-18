@@ -1,13 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace rosasurfer\ministruts\test\docopt;
+namespace rosasurfer\ministruts\tests\docopt;
 
 use Exception;
 use PHPUnit\Framework\TestCase;
-use rosasurfer\ministruts\console\docopt\DocoptResult;
 
 use function rosasurfer\ministruts\docopt;
+use function rosasurfer\ministruts\preg_replace;
+
+use const rosasurfer\ministruts\NL;
 
 
 /**
@@ -33,27 +35,32 @@ class PythonFixturesTest extends TestCase {
     }
 
     /**
-     * @return array<array{string, string, mixed}>
+     * Provide the original Python fixtures as an array of test cases.
+     *
+     * - Tests are separated by `r"""`.
+     * - A test's Docopt definition and the following test(s) are separated by `"""`.
+     * - Each test case starts with `$` and a command prompt (one line).
+     * - All following lines are expected output in JSON format.
+     * - Inline comments start with `#`.
+     * - Empty lines are skipped.
+     *
+     * @return array<array{string, string, mixed}> - test cases
      */
     public function dataProvider(): array {
         $filename = __DIR__.'/../fixtures/docopt.txt';
         if (!file_exists($filename)) throw new Exception("Python fixtures \"$filename\" not found.");
-        $raw = file_get_contents($filename);
+        $content = file_get_contents($filename);
 
         $filename = __DIR__.'/../fixtures/docopt-extra.txt';
         if (!file_exists($filename)) throw new Exception("Python fixtures \"$filename\" not found.");
-        $raw .= file_get_contents($filename);
+        $content .= file_get_contents($filename);
 
-        /** @var string $raw */
-        $raw = preg_replace('/#.*$/m', '', $raw);
-        $raw = trim($raw);                                          // drop file comments
-        if (strpos($raw, '"""') === 0) {
-            $raw = substr($raw, 3);
-        }
+        $content = preg_replace('/#.*$/m', '', $content);           // drop inline comments
+        $content = trim($content);
 
         $cases = [];
         $i = 1;
-        foreach (explode('r"""', $raw) as $fixture) {               // split fixtures
+        foreach (explode('r"""', $content) as $fixture) {           // split fixtures
             if (!strlen($fixture)) continue;
 
             $parts = explode('"""', $fixture, 2);
@@ -62,7 +69,7 @@ class PythonFixturesTest extends TestCase {
                                                                     // split test cases
             foreach (array_slice(explode('$', $body), 1) as $testCase) {
                 $testCase = trim($testCase);
-                list($argv, $expected) = explode("\n", $testCase, 2);
+                list($argv, $expected) = explode(NL, $testCase, 2);
                 $expected = json_decode($expected, true, 512, JSON_THROW_ON_ERROR);
 
                 $name = "$i: $argv";
@@ -74,17 +81,5 @@ class PythonFixturesTest extends TestCase {
             }
         }
         return $cases;
-    }
-
-    /**
-     * @param  string                     $doc
-     * @param  string|string[]|null       $args    [optional]
-     * @param  array<string, bool|string> $options [optional]
-     *
-     * @return DocoptResult
-     */
-    protected function docopt($doc, $args='', array $options=[]): DocoptResult {
-        $options = array_merge(['exit'=>false, 'help'=>false], $options);
-        return docopt($doc, $args, $options);
     }
 }

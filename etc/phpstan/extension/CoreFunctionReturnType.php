@@ -23,7 +23,7 @@ use function rosasurfer\ministruts\simpleClassName;
  */
 class CoreFunctionReturnType extends Extension implements DynamicFunctionReturnTypeExtension {
 
-    /** @var Type[] */
+    /** @var array<?Type> */
     protected array $interceptedFunctions;
 
 
@@ -41,15 +41,14 @@ class CoreFunctionReturnType extends Extension implements DynamicFunctionReturnT
             'file'                 => $bool,            // array|false
             'file_get_contents'    => $bool,            // string|false                     @see  https://www.php.net/manual/en/function.file-get-contents.php
             'filemtime'            => $bool,            // int|false                        @see  https://www.php.net/manual/en/function.filemtime.php
+            'filter_var'           => null,      // (2) // mixed (NULL is wrongly removed)  @see  https://www.php.net/manual/en/function.filter-var.php
             'fopen'                => $bool,            // resource|false
             'getcwd'               => $bool,            // string|false
             'ini_get_all'          => $bool,            // array|false                      @see  https://www.php.net/manual/en/function.ini-get-all.php
             'ob_get_clean'         => $bool,            // string|false
             'opendir'              => $bool,            // resource|false
-            'pg_escape_identifier' => $bool,            // string (1)                       @see  https://www.php.net/manual/en/function.pg-escape-identifier.php
-            'pg_escape_literal'    => $bool,            // string (1)                       @see  https://www.php.net/manual/en/function.pg-escape-literal.php
-            'preg_replace'         => $null,            // string|array|null (2)
-            'preg_split'           => $bool,            // array|false
+            'pg_escape_identifier' => $bool,     // (1) // string                           @see  https://www.php.net/manual/en/function.pg-escape-identifier.php
+            'pg_escape_literal'    => $bool,     // (1) // string                           @see  https://www.php.net/manual/en/function.pg-escape-literal.php
             'proc_open'            => $bool,            // resource|false                   @see  https://www.php.net/manual/en/function.proc-open.php
             'session_id'           => $bool,            // string|false                     @see  https://www.php.net/manual/en/function.session-id.php
             'session_name'         => $bool,            // string|false                     @see  https://www.php.net/manual/en/function.session-name.php
@@ -104,8 +103,8 @@ class CoreFunctionReturnType extends Extension implements DynamicFunctionReturnT
     public function getTypeFromFunctionCall(FunctionReflection $function, FuncCall $functionCall, Scope $scope): Type {
         $name = $function->getName();
 
-        if (in_array($name, ['preg_replace'])) {
-            // throw an exception to get notified when PHPStan bugs are fixed
+        // throw an exception to get notified when PHPStan bugs are fixed
+        if (in_array($name, ['filter_var'])) {
             throw new ExtensionException("pewa: PHPStan bugfix -> core function $name is now passed to the ".simpleClassName(__CLASS__).' extension');
         }
 

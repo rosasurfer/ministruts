@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\core\di\facade;
 
+use ReflectionClass;
+
 use rosasurfer\ministruts\core\di\proxy\Request as RequestProxy;
 use rosasurfer\ministruts\struts\ActionInput;
 use rosasurfer\ministruts\struts\Struts;
@@ -19,9 +21,9 @@ class Input extends Facade {
     /**
      * Return all raw input parameters of the current HTTP request.
      *
-     * @return array<string, mixed>
+     * @return array<string, string|array<string|array<string>>>
      */
-    public static function all() {
+    public static function all(): array {
         $input = static::current();
         return $input->all();
     }
@@ -38,7 +40,7 @@ class Input extends Facade {
      *
      * @return ?string
      */
-    public static function get($name, $default = null) {
+    public static function get(string $name, ?string $default = null): ?string {
         $input = static::current();
         return $input->get($name, $default);
     }
@@ -52,9 +54,9 @@ class Input extends Facade {
      * @param  string   $name               - parameter name
      * @param  string[] $default [optional] - values to return if the specified parameter array was not transmitted
      *                                        (default: empty array)
-     * @return string[]
+     * @return array<string|string[]>
      */
-    public static function getArray($name, array $default = []) {
+    public static function getArray(string $name, array $default = []): array {
         $input = static::current();
         return $input->getArray($name, $default);
     }
@@ -69,7 +71,7 @@ class Input extends Facade {
      *
      * @return bool
      */
-    public static function has($name) {
+    public static function has(string $name): bool {
         $input = static::current();
         return $input->has($name);
     }
@@ -83,7 +85,7 @@ class Input extends Facade {
      *
      * @return bool
      */
-    public static function hasArray($name) {
+    public static function hasArray(string $name): bool {
         $input = static::current();
         return $input->hasArray($name);
     }
@@ -94,7 +96,7 @@ class Input extends Facade {
      *
      * @return ActionInput
      */
-    public static function current() {
+    public static function current(): ActionInput {
         return RequestProxy::input();
     }
 
@@ -105,11 +107,12 @@ class Input extends Facade {
      *
      * @return ActionInput
      */
-    public static function old() {
+    public static function old(): ActionInput {
+        /** @var ?ActionInput $input */
         $input = RequestProxy::getAttribute(Struts::ACTION_INPUT_KEY.'.old');
         if ($input) return $input;
 
-        $class = new \ReflectionClass(ActionInput::class);
+        $class = new ReflectionClass(ActionInput::class);
         return $class->newInstanceWithoutConstructor();
     }
 }

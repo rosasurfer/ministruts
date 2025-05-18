@@ -16,7 +16,7 @@ class Windows extends StaticClass {
     const MAX_PATH = 260;
 
     /** @var array<string[]> - Win32 errors and descriptions */
-    private static $win32Errors = [
+    private static array $win32Errors = [
           0 => ['0',                    'The system is out of memory or resources.'                      ],
           2 => ['ERROR_FILE_NOT_FOUND', 'The system cannot find the file specified.'                     ],
           3 => ['ERROR_PATH_NOT_FOUND', 'The system cannot find the path specified.'                     ],

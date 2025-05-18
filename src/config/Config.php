@@ -60,7 +60,7 @@ class Config extends CObject implements ConfigInterface {
     /** @var array<string, bool> - config file names and their existence status */
     protected array $files = [];
 
-    /** @var array<string, mixed> - tree structure of config values */
+    /** @var array<(?scalar)|array<?scalar>> - tree structure of config values */
     protected array $properties = [];
 
 
@@ -111,7 +111,7 @@ class Config extends CObject implements ConfigInterface {
 
         if (is_file($location)) {
             $configFile = realpath($location);
-            $configDir  = dirname($configFile);
+            $configDir = dirname($configFile);
         }
         elseif (is_dir($location)) {
             $configDir = realpath($location);
@@ -119,15 +119,26 @@ class Config extends CObject implements ConfigInterface {
         else throw new InvalidValueException('Location not found: "'.$location.'"');
 
         // versioned/distributable config file
+        $files = [];
         $files[] = $configDir.'/config.dist.properties';
 
         // runtime environment
         if (CLI) $files[] = $configDir.'/config.cli.properties';
 
         // application environment: user or staging configuration
-        if ($configFile)                             $files[] = $configFile;                            // explicit
-        elseif (!empty($_SERVER['APP_ENVIRONMENT'])) $files[] = $configDir.'/config.'.$_SERVER['APP_ENVIRONMENT'].'.properties';
-        else                                         $files[] = $configDir.'/config.properties';        // default
+        if ($configFile) {
+            $files[] = $configFile;                                 // explicit
+        }
+        else {
+            /** @var string $appEnv */
+            $appEnv = $_SERVER['APP_ENVIRONMENT'] ?? '';
+            if (strlen($appEnv)) {
+                $files[] = $configDir."/config.$appEnv.properties";
+            }
+            else {
+                $files[] = $configDir.'/config.properties';         // default
+            }
+        }
 
         // load all files (do not pass a provided $baseDir but apply it manually in the next step)
         $instance = new static($files);
@@ -223,30 +234,22 @@ class Config extends CObject implements ConfigInterface {
 
 
     /**
-     * Return the names of the monitored configuration files. The returned array will contain
-     * names of existing and non-existing files, together with their status (loaded/not loaded).
-     *
-     * @return array<string, bool>
+     * {@inheritDoc}
      */
-    public function getMonitoredFiles(): array {
+    public function getConfigFiles(): array {
         return $this->files;
     }
 
 
     /**
-     * Return the config setting with the specified key or the default value if no such setting is found.
-     *
-     * @param  string $key                - case-insensitive key
-     * @param  mixed  $default [optional] - default value
-     *
-     * @return mixed - config setting
+     * {@inheritDoc}
      */
     public function get(string $key, $default = null) {
         $notFound = false;
         $value = $this->getProperty($key, $notFound);
 
         if ($notFound) {
-            if (func_num_args() == 1) throw new RuntimeException("No configuration found for key \"$key\"");
+            if (func_num_args() == 1) throw new RuntimeException("Config key '$key' not found (no default value specified)");
             return $default;
         }
         return $value;
@@ -254,21 +257,40 @@ class Config extends CObject implements ConfigInterface {
 
 
     /**
-     * Return the config setting with the specified key as a boolean. Accepted strict boolean value representations are "1" and "0",
-     * "true" and "false", "on" and "off", "yes" and "no" (case-insensitive).
-     *
-     * @param  string  $key                - case-insensitive key
-     * @param  ?bool   $default [optional] - value to return if the config setting does not exist (default: exception)
-     * @param  bool    $strict  [optional] - whether to validate a found value strictly:
-     *                                       FALSE - returns true only for "1", "true", "on" and "yes", and false otherwise (default)
-     *                                       TRUE  - as above but false is returned only for "0", "false", "off" and "no", and null
-     *                                               is returned for all other values
-     *
-     * @return ?bool - boolean value or NULL if the found setting does not represent a requested strict boolean value
-     *
-     * @throws RuntimeException if the setting is not found and no default value was specified
+     * {@inheritDoc}
      */
-    public function getBool(string $key, ?bool $default=false, bool $strict=false): ?bool {
+    public function getBool(string $key, bool $strict=false, bool $default=false): bool {
+        $notFound = false;
+        $value = $this->getProperty($key, $notFound);
+
+        if ($notFound) {
+            // key not found: return a passed default value
+            if (func_num_args() > 2) {
+                return $default;
+            }
+            throw new RuntimeException("Config key '$key' not found (no default value specified)");
+        }
+
+        // key found: validate it as a boolean
+        $flags = 0;
+        if ($strict) {
+            if ($value===null || $value==='') {     // filter_var() considers NULL and an empty string '' as valid strict booleans
+                throw new RuntimeException("Invalid type of config key '$key': ".gettype($value).' (boolean expected)');
+            }
+            $flags = FILTER_NULL_ON_FAILURE;
+        }
+        $result = filter_var($value, FILTER_VALIDATE_BOOLEAN, $flags);
+        if ($result === null) {                     // @phpstan-ignore identical.alwaysFalse (PHPStan doesn't see flag FILTER_NULL_ON_FAILURE)
+            throw new RuntimeException("Invalid type of config key '$key': ".gettype($value).' (boolean expected)');
+        }
+        return $result;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getString(string $key, string $default = ''): string {
         $notFound = false;
         $value = $this->getProperty($key, $notFound);
 
@@ -277,30 +299,23 @@ class Config extends CObject implements ConfigInterface {
             if (func_num_args() > 1) {
                 return $default;
             }
-            throw new RuntimeException('No configuration found for key "'.$key.'"');
+            throw new RuntimeException("Config key '$key' not found (no default value specified)");
         }
 
-        // key found: validate it as a boolean
-        $flags = 0;
-        if ($strict) {
-            if ($value===null || $value==='') {             // PHP considers NULL and '' strict boolean values
-                return null;
-            }
-            $flags = FILTER_NULL_ON_FAILURE;
+        // key found
+        if (is_scalar($value)) {
+            return (string) $value;
         }
-        return filter_var($value, FILTER_VALIDATE_BOOLEAN, $flags);
+        throw new RuntimeException("Invalid type of config key '$key': ".gettype($value).' (scalar expected)');
     }
 
 
     /**
-     * Set/modify the config setting with the specified key.
+     * {@inheritDoc}
      *
-     * @param  string $key   - case-insensitive key
-     * @param  mixed  $value - new value
-     *
-     * @return $this
+     * @param  int|string $key - case-insensitive key
      */
-    public function set(string $key, $value): self {
+    public function set($key, $value): self {
         $this->setProperty($key, $value);
         return $this;
     }
@@ -340,12 +355,14 @@ class Config extends CObject implements ConfigInterface {
     /**
      * Set/modify the property with the specified key.
      *
-     * @param  string $key
-     * @param  mixed  $value
+     * @param  int|string $key
+     * @param  mixed      $value
      *
      * @return void
      */
-    protected function setProperty(string $key, $value): void {
+    protected function setProperty($key, $value): void {
+        $key = (string) $key;
+
         // convert string representations of special values
         if (is_string($value)) {
             switch (strtolower($value)) {
@@ -397,7 +414,10 @@ class Config extends CObject implements ConfigInterface {
             else {
                 // the last subkey: check for bracket notation
                 $match = null;
-                if (preg_match('/(.+)\b *\[ *\]$/', $subkey, $match)) {
+                $result = preg_match('/(.+)\b *\[ *\]$/', $subkey, $match);
+                if ($result === false || preg_last_error() != PREG_NO_ERROR) throw new RuntimeException(preg_last_error_msg());
+
+                if ($result) {
                     // bracket notation
                     $subkey = $match[1];
                     if (!\key_exists($subkey, $properties)) {
@@ -480,11 +500,7 @@ class Config extends CObject implements ConfigInterface {
 
 
     /**
-     * {@inheritdoc}
-     *
-     * @param  array<string, int|string> $options [optional]
-     *
-     * @return string
+     * {@inheritDoc}
      */
     public function dump(array $options = []): string {
         $lines = [];
@@ -538,9 +554,9 @@ class Config extends CObject implements ConfigInterface {
     /**
      * Dump the tree structure of a node into a flat format and return it.
      *
-     * @param  string[] $node         [in ]
-     * @param  mixed[]  $values       [in ]
-     * @param  int      $maxKeyLength [out]
+     * @param  string[]                        $node         [in ]
+     * @param  array<(?scalar)|array<?scalar>> $values       [in ]
+     * @param  int                             $maxKeyLength [out]
      *
      * @return array<string, ?scalar>
      */
@@ -572,11 +588,7 @@ class Config extends CObject implements ConfigInterface {
 
 
     /**
-     * {@inheritdoc}
-     *
-     * @param  array<string, int> $options [optional]
-     *
-     * @return array<string, string>
+     * {@inheritDoc}
      */
     public function export(array $options = []): array {
         $maxKeyLength = 0;
@@ -629,9 +641,7 @@ class Config extends CObject implements ConfigInterface {
     /**
      * Whether a config setting with the specified key exists.
      *
-     * @param  string $key - case-insensitive key
-     *
-     * @return bool
+     * {@inheritDoc}
      */
     public function offsetExists($key): bool {
         $notFound = false;
@@ -643,9 +653,7 @@ class Config extends CObject implements ConfigInterface {
     /**
      * Return the config setting with the specified key.
      *
-     * @param  string $key - case-insensitive key
-     *
-     * @return mixed - config setting
+     * {@inheritDoc}
      *
      * @throws RuntimeException if the setting does not exist
      */
@@ -658,10 +666,9 @@ class Config extends CObject implements ConfigInterface {
     /**
      * Set/modify the config setting with the specified key.
      *
-     * @param  string $key   - case-insensitive key
-     * @param  mixed  $value - new value
+     * @param  int|string $key - case-insensitive key
      *
-     * @return void
+     * {@inheritDoc}
      */
     public function offsetSet($key, $value): void {
         $this->set($key, $value);
@@ -671,9 +678,7 @@ class Config extends CObject implements ConfigInterface {
     /**
      * Unset the config setting with the specified key.
      *
-     * @param  string $key - case-insensitive key
-     *
-     * @return void
+     * {@inheritDoc}
      */
     public function offsetUnset($key): void {
         $this->set($key, null);
@@ -683,7 +688,7 @@ class Config extends CObject implements ConfigInterface {
     /**
      * Count the root properties of the configuration.
      *
-     * @return int
+     * {@inheritDoc}
      */
     public function count(): int {
         return sizeof($this->properties);

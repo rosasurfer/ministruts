@@ -63,7 +63,7 @@ abstract class Result extends CObject implements ResultInterface {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function fetchColumn($column=0, ?int $row=null, $onNull=null, $onNoMoreRows=null) {
         if (isset($row)) throw new UnimplementedFeatureException('$row='.$row.' (not NULL)');
@@ -91,7 +91,7 @@ abstract class Result extends CObject implements ResultInterface {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function fetchString($column=0, ?int $row=null, ?string $onNull=null, ?string $onNoMoreRows=null): ?string {
         if (func_num_args() < 4) $value = $this->fetchColumn($column, $row, null);
@@ -107,7 +107,7 @@ abstract class Result extends CObject implements ResultInterface {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function fetchBool($column=0, ?int $row=null, ?bool $onNull=null, ?bool $onNoMoreRows=null): ?bool {
         if (func_num_args() < 4) $value = $this->fetchColumn($column, $row, null);
@@ -128,7 +128,7 @@ abstract class Result extends CObject implements ResultInterface {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function fetchInt($column=0, ?int $row=null, ?int $onNull=null, ?int $onNoMoreRows=null): ?int {
         if (func_num_args() < 4) $value = $this->fetchColumn($column, $row, null);
@@ -156,7 +156,7 @@ abstract class Result extends CObject implements ResultInterface {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function fetchFloat($column=0, ?int $row=null, ?float $onNull=null, ?float $onNoMoreRows=null): ?float {
         if (func_num_args() < 4) $value = $this->fetchColumn($column, $row, null);
@@ -171,7 +171,7 @@ abstract class Result extends CObject implements ResultInterface {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function nextRowIndex(): int {
         return $this->nextRowIndex;
@@ -179,7 +179,7 @@ abstract class Result extends CObject implements ResultInterface {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getType(): string {
         return $this->connector->getType();
@@ -187,7 +187,7 @@ abstract class Result extends CObject implements ResultInterface {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getVersionString(): string {
         return $this->connector->getVersionString();
@@ -195,7 +195,7 @@ abstract class Result extends CObject implements ResultInterface {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getVersionNumber(): int {
         return $this->connector->getVersionNumber();

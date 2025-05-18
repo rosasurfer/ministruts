@@ -22,7 +22,7 @@ abstract class RoleProcessor extends CObject {
      *
      * @return bool
      */
-    abstract public function isUserInRole(Request $request, $role);
+    abstract public function isUserInRole(Request $request, string $role): bool;
 
 
     /**

@@ -17,7 +17,7 @@ class Command extends Argument {
      *
      * @return SingleMatch
      */
-    public function singleMatch(array $left) {
+    public function singleMatch(array $left): SingleMatch {
         foreach ($left as $i => $pattern) {
             if ($pattern instanceof Argument) {
                 if ($pattern->value == $this->name()) {

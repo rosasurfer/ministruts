@@ -14,11 +14,9 @@ class VersionedUrl extends Url {
 
 
     /**
-     * {@inheritdoc}
-     *
-     * @return string
+     * {@inheritDoc}
      */
-    public function __toString() {
+    public function __toString(): string {
         $uri = parent::__toString();
         $relativeUri = $this->appRelativeUri;
         if (($pos=strpos($relativeUri, '?')) === false) $name = $relativeUri;
@@ -26,9 +24,9 @@ class VersionedUrl extends Url {
 
         /** @var Config $config */
         $config = $this->di('config');
-        $webDir = $config->get('app.dir.web', null);
+        $webDir = $config->getString('app.dir.web', '');
 
-        if ($webDir && file_exists($fileName=$webDir.'/'.$name)) {
+        if ($webDir && file_exists($fileName = $webDir.'/'.$name)) {
             if ($pos === false) $uri .= '?';
             else                $uri .= '&';
             $uri .= dechex(crc32(filesize($fileName).'|'.filemtime($fileName)));

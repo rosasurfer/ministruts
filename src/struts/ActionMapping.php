@@ -15,48 +15,45 @@ use function rosasurfer\ministruts\strLeftTo;
  * ActionMapping
  *
  * An ActionMapping encapsulates the processing instructions for a single route.
- * For in-depth documentation of properties and configuration see the reference:
- *
- * @link  https://github.com/rosasurfer/ministruts/blob/master/src/struts/dtd/struts-config.dtd#L141
  */
 class ActionMapping extends CObject {
 
 
     /** @var bool - whether this component is fully configured */
-    protected $configured = false;
+    protected bool $configured = false;
 
     /** @var string */
-    protected $name;
+    protected string $name = '';
 
     /** @var string */
-    protected $path;
-
-    /** @var string */
-    protected $actionClass;
-
-    /** @var string */
-    protected $formClass;
-
-    /** @var bool */
-    protected $formValidateFirst;
-
-    /** @var bool[] */
-    protected $methods;
+    protected string $path = '';
 
     /** @var ?string */
-    protected $roles = null;
+    protected ?string $actionClass = null;
+
+    /** @var ?string */
+    protected ?string $formClass = null;
+
+    /** @var ?bool */
+    protected ?bool $formValidateFirst = null;
+
+    /** @var array<string, bool> */
+    protected array $methods = [];
+
+    /** @var ?string */
+    protected ?string $roles = null;
 
     /** @var bool */
-    protected $default = false;
+    protected bool $default = false;
 
-    /** @var ActionForward|null - the mapping's explicitly specified ActionForward. */
-    protected $forward = null;
+    /** @var ?ActionForward - the mapping's explicitly specified ActionForward. */
+    protected ?ActionForward $forward = null;
 
     /** @var ActionForward[] - the mapping's local forwards */
-    protected $forwards = [];
+    protected array $forwards = [];
 
     /** @var Module - Module the mapping belongs to */
-    protected $module;
+    protected Module $module;
 
 
     /**
@@ -74,7 +71,7 @@ class ActionMapping extends CObject {
      *
      * @return Module
      */
-    public function getModule() {
+    public function getModule(): Module {
         return $this->module;
     }
 
@@ -86,7 +83,7 @@ class ActionMapping extends CObject {
      *
      * @return $this
      */
-    public function setName($name) {
+    public function setName(string $name): self {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
         if (!strlen($name=trim($name))) Struts::configError('<mapping name="'.func_get_arg(0).'"'.($this->path ? ' path="'.$this->path.'"':'').': Illegal name (empty value).');
 
@@ -100,7 +97,7 @@ class ActionMapping extends CObject {
      *
      * @return string
      */
-    public function getName() {
+    public function getName(): string {
         return $this->name;
     }
 
@@ -112,9 +109,9 @@ class ActionMapping extends CObject {
      *
      * @return $this
      */
-    public function setPath($path) {
+    public function setPath(string $path): self {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-        if ($path[0] != '/') Struts::configError('<mapping'.($this->name ? ' name="'.$this->name.'"':'').' path="'.$path.'": Illegal path (value must start with a slash "/").');
+        if ($path[0] != '/') Struts::configError('<mapping name="'.$this->name.'" path="'.$path.'": Illegal path (value must start with a slash "/").');
 
         $this->path = $path;
         return $this;
@@ -126,7 +123,7 @@ class ActionMapping extends CObject {
      *
      * @return string
      */
-    public function getPath() {
+    public function getPath(): string {
         return $this->path;
     }
 
@@ -150,13 +147,11 @@ class ActionMapping extends CObject {
      *
      * @return $this
      */
-    public function setMethod($method) {
+    public function setMethod(string $method): self {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-        $name = $this->name ? ' name="'.$this->name.'"':'';
-        $path = $this->path ? ' path="'.$this->path.'"':'';
 
         $method = strtoupper($method);
-        if ($method!='GET' && $method!='POST') Struts::configError('<mapping'.$name.''.$path.' methods="'.func_get_arg(0).'":  Invalid HTTP method.');
+        if ($method!='GET' && $method!='POST') Struts::configError('<mapping name="'.$this->name.'" path="'.$this->path.'" methods="'.func_get_arg(0).'":  Invalid HTTP method.');
 
         $this->methods[$method] = true;
         return $this;
@@ -181,21 +176,19 @@ class ActionMapping extends CObject {
      *
      * @return $this
      */
-    public function setRoles($roles) {
+    public function setRoles(string $roles): self {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-        $name = $this->name ? ' name="'.$this->name.'"':'';
-        $path = $this->path ? ' path="'.$this->path.'"':'';
 
         //static $pattern = '/^!?[A-Za-z_][A-Za-z0-9_]*(,!?[A-Za-z_][A-Za-z0-9_]*)*$/';
         static $pattern = '/^!?[A-Za-z_][A-Za-z0-9_]*$/';
-        if (!strlen($roles) || !preg_match($pattern, $roles)) Struts::configError('<mapping'.$name.$path.' roles="'.$roles.'": Invalid roles expression.');
+        if (!strlen($roles) || !preg_match($pattern, $roles)) Struts::configError('<mapping name="'.$this->name.'" path="'.$this->path.'" roles="'.$roles.'": Invalid roles expression.');
 
         // check for invalid id combinations, e.g. "Member,!Member"
         $tokens = explode(',', $roles);
         $keys = \array_flip($tokens);
 
         foreach ($tokens as $role) {
-            if (isset($keys['!'.$role])) Struts::configError('<mapping'.$name.$path.' roles="'.$roles.'": Invalid roles expression.');
+            if (isset($keys['!'.$role])) Struts::configError('<mapping name="'.$this->name.'" path="'.$this->path.'" roles="'.$roles.'": Invalid roles expression.');
         }
 
         // remove duplicates
@@ -211,12 +204,12 @@ class ActionMapping extends CObject {
      *
      * @return $this
      */
-    public function setForward(ActionForward $forward) {
+    public function setForward(ActionForward $forward): self {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-        $name = $this->name ? ' name="'.$this->name.'"':'';
-        $path = $this->path ? ' path="'.$this->path.'"':'';
 
-        if ($this->actionClass) Struts::configError('<mapping'.$name.$path.': Only one of "action", "include", "forward" or "redirect" can be specified.');
+        if (isset($this->actionClass)) {
+            Struts::configError('<mapping name="'.$this->name.'" path="'.$this->path.'": Only one of "action", "include", "forward" or "redirect" can be specified.');
+        }
 
         $this->forward = $forward;
         return $this;
@@ -230,16 +223,14 @@ class ActionMapping extends CObject {
      *
      * @return $this
      */
-    public function setActionClass($className) {
+    public function setActionClass(string $className): self {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-        $name = $this->name ? ' name="'.$this->name.'"':'';
-        $path = $this->path ? ' path="'.$this->path.'"':'';
 
         if (!is_subclass_of($className, Action::class)) {
-            Struts::configError('<mapping'.$name.$path.' action="'.$className.'": Not a subclass of '.Action::class.'.');
+            Struts::configError('<mapping name="'.$this->name.'" path="'.$this->path.'" action="'.$className.'": Not a subclass of '.Action::class.'.');
         }
         if ($this->forward) {
-            Struts::configError('<mapping'.$name.$path.': Only one of "action", "include", "forward" or "redirect" can be specified.');
+            Struts::configError('<mapping name="'.$this->name.'" path="'.$this->path.'": Only one of "action", "include", "forward" or "redirect" can be specified.');
         }
 
         $this->actionClass = $className;
@@ -252,7 +243,7 @@ class ActionMapping extends CObject {
      *
      * @return ?string - Action class or NULL if no Action is configured
      */
-    public function getActionClass() {
+    public function getActionClass(): ?string {
         return $this->actionClass;
     }
 
@@ -264,13 +255,11 @@ class ActionMapping extends CObject {
      *
      * @return $this
      */
-    public function setFormClass($className) {
+    public function setFormClass(string $className): self {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-        $name = $this->name ? ' name="'.$this->name.'"':'';
-        $path = $this->path ? ' path="'.$this->path.'"':'';
 
         if (!is_subclass_of($className, ActionForm::class)) {
-            Struts::configError('<mapping'.$name.$path.' form="'.$className.'": Not a subclass of '.ActionForm::class.'.');
+            Struts::configError('<mapping name="'.$this->name.'" path="'.$this->path.'" form="'.$className.'": Not a subclass of '.ActionForm::class.'.');
         }
 
         $this->formClass = $className;
@@ -281,9 +270,9 @@ class ActionMapping extends CObject {
     /**
      * Return the class name of the {@link ActionForm} used by the mapping.
      *
-     * @return string - ActionForm class name
+     * @return ?string - ActionForm class name
      */
-    public function getFormClass() {
+    public function getFormClass(): ?string {
         return $this->formClass;
     }
 
@@ -297,7 +286,7 @@ class ActionMapping extends CObject {
      *
      * @return $this
      */
-    public function setFormValidateFirst($mode) {
+    public function setFormValidateFirst(bool $mode): self {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
         $this->formValidateFirst = $mode;
         return $this;
@@ -309,7 +298,7 @@ class ActionMapping extends CObject {
      *
      * @return bool
      */
-    public function isFormValidateFirst() {
+    public function isFormValidateFirst(): bool {
         return (bool) $this->formValidateFirst;
     }
 
@@ -322,7 +311,7 @@ class ActionMapping extends CObject {
      *
      * @return $this
      */
-    public function setDefault($default) {
+    public function setDefault(bool $default): self {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
         $this->default = $default;
         return $this;
@@ -336,7 +325,7 @@ class ActionMapping extends CObject {
      *
      * @see setDefault()
      */
-    public function isDefault() {
+    public function isDefault(): bool {
         return (bool) $this->default;
     }
 
@@ -349,13 +338,10 @@ class ActionMapping extends CObject {
      *
      * @return $this
      */
-    public function addForward($name, ActionForward $forward) {
+    public function addForward(string $name, ActionForward $forward): self {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-        $mName = $this->name ? ' name="'.$this->name.'"':'';
-        $mPath = $this->path ? ' path="'.$this->path.'"':'';
-        $mapping = $mName.$mPath;
 
-        if (isset($this->forwards[$name])) Struts::configError('<mapping'.$mapping.'> <forward name="'.$name.'": Non-unique forward identifier.');
+        if (isset($this->forwards[$name])) Struts::configError('<mapping name="'.$this->name.'" path="'.$this->path.'"> <forward name="'.$name.'": Non-unique forward identifier.');
 
         $this->forwards[$name] = $forward;
         return $this;
@@ -367,27 +353,23 @@ class ActionMapping extends CObject {
      *
      * @return $this
      */
-    public function freeze() {
+    public function freeze(): self {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-        $name    = $this->name ? ' name="'.$this->name.'"':'';
-        $path    = $this->path ? ' path="'.$this->path.'"':'';
-        $mapping = $name.$path;
+        if (!$this->path)                                  Struts::configError('<mapping name="'.$this->name.'" path="'.$this->path.'": A "path" attribute must be configured for '.$this);
+        if (!$this->formClass && $this->formValidateFirst) Struts::configError('<mapping name="'.$this->name.'" path="'.$this->path.'": A form must be configured if "form-validate-first" is set to "true".');
 
-        if (!$this->path)                                  Struts::configError('<mapping'.$mapping.': A "path" attribute must be configured for '.$this);
-        if (!$this->formClass && $this->formValidateFirst) Struts::configError('<mapping'.$mapping.': A form must be configured if "form-validate-first" is set to "true".');
-
-        if (!$this->actionClass && !$this->forward) {
+        if (!isset($this->actionClass) && !isset($this->forward)) {
             // In general either an "action" or a "forward" resource is required to process a request. Except if a "form"
             // is configured as "form-validate-first" (implicit or explicit). Only in that case the "forward" resource is
             // looked-up from child elements "forward[@name=error|success]" and the mapping may define neither an "action"
             // nor a "forward".
 
             if (!$this->formClass || !$this->formValidateFirst) {
-                Struts::configError('<mapping'.$mapping.': Either an "action", "include", "redirect" or "forward" attribute must be specified.');
+                Struts::configError('<mapping name="'.$this->name.'" path="'.$this->path.'": Either an "action", "include", "redirect" or "forward" attribute must be specified.');
             }
 
             if (!isset($this->forwards[ActionForward::VALIDATION_SUCCESS_KEY]) || !isset($this->forwards[ActionForward::VALIDATION_ERROR_KEY])) {
-                Struts::configError('<mapping'.$mapping.' form="'.$this->formClass.'": A "success" and "error" forward must be configured to automatically validate the form.');
+                Struts::configError('<mapping name="'.$this->name.'" path="'.$this->path.'" form="'.$this->formClass.'": A "success" and "error" forward must be configured to automatically validate the form.');
             }
         }
 
@@ -405,7 +387,7 @@ class ActionMapping extends CObject {
      *
      * @return ?ActionForward - ActionForward or NULL if no such forward was found
      */
-    public function findForward($name) {
+    public function findForward(string $name): ?ActionForward {
         $forward = null;
 
         if (isset($this->forwards[$name])) {
@@ -452,7 +434,7 @@ class ActionMapping extends CObject {
             return $this->forward;
         }
         return $this->findForward($name) ?: Struts::configError(
-            '<mapping name="'.$this->getName().'"  path="'.$this->getPath()."\": ActionForward \"$name\" not found."
+            "<mapping name=\"$this->name\"  path=\"$this->path\": ActionForward \"$name\" not found."
         );
     }
 }

@@ -60,7 +60,7 @@ final class Struts extends StaticClass {
      *
      * @return never
      */
-    public static function configError(string $message) {
+    public static function configError(string $message): void {
         throw new StrutsException("Struts config error: $message");
     }
 }

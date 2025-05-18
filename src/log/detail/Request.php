@@ -119,16 +119,18 @@ class Request extends CObject {
      * Return the received headers with the specified names as an associative array of header values.
      * Any received multi-field headers are combined into a single header line.
      *
-     * @param  string[] $names [optional] - zero or more header names (default: return all received headers)
+     * @param  string ...$names [optional] - zero or more header names (default: return all received headers)
      *
      * @return array<string, string> - associative array of header values
      */
-    public function getHeaders(array $names = []): array {
+    public function getHeaders(string ...$names): array {
         $allHeaders = $this->getNormalizedHeaders();
         if (!$names) {
             return $allHeaders;
         }
-        return array_intersect_ukey($allHeaders, array_flip($names), 'strcasecmp');
+        /** @phpstan-var callable-string $func*/
+        $func = 'strcasecmp';
+        return array_intersect_ukey($allHeaders, array_flip($names), $func);
     }
 
 
@@ -139,8 +141,8 @@ class Request extends CObject {
      *
      * @return ?string - received header value, or NULL if no such header was received
      */
-    public function getHeaderValue(string $name) {
-        $header = $this->getHeaders([$name]);
+    public function getHeaderValue(string $name): ?string {
+        $header = $this->getHeaders($name);
 
         foreach ($header as $value) {
             return $value;
@@ -155,7 +157,7 @@ class Request extends CObject {
      *
      * @return array<string, string[]> - associative array of files
      */
-    public function getFiles() {
+    public function getFiles(): array {
         if (!isset($this->files)) {
             $normalizeArrayLevel = null;
             $normalizeArrayLevel = static function(array $file) use (&$normalizeArrayLevel) {

@@ -24,17 +24,17 @@ use rosasurfer\ministruts\db\orm\meta\EntityMapping;
 abstract class DAO extends Singleton {
 
 
-    /** @var IConnector|null - the db connector for this DAO */
-    private $connector = null;
+    /** @var ?IConnector - the db connector for this DAO */
+    private ?IConnector $connector = null;
 
-    /** @var Worker|null - the worker this DAO uses */
-    private $worker = null;
+    /** @var ?Worker - the worker this DAO uses */
+    private ?Worker $worker = null;
 
-    /** @var EntityMapping|null - the mapping of the DAO's entity */
-    private $entityMapping = null;
+    /** @var ?EntityMapping - the mapping of the DAO's entity */
+    private ?EntityMapping $entityMapping = null;
 
     /** @var string - the PHP class name of the DAO's entity */
-    protected $entityClass;
+    protected string $entityClass;
 
 
     /**
@@ -55,7 +55,7 @@ abstract class DAO extends Singleton {
      *
      * @return DAO
      */
-    final public static function getImplementation($class) {
+    final public static function getImplementation(string $class): DAO {
         if (!is_subclass_of($class, __CLASS__, true)) {
             throw new InvalidValueException("Invalid parameter \$class: $class (not a subclass of ".__CLASS__.')');
         }
@@ -87,7 +87,7 @@ abstract class DAO extends Singleton {
      *
      * @return PersistableObject[]
      */
-    public function findAll($query = null) {
+    public function findAll(?string $query = null): array {
         if ($query === null) {
             $mapping = $this->getMapping();
             $table = $this->escapeIdentifier($mapping['table']);
@@ -120,13 +120,12 @@ abstract class DAO extends Singleton {
      *
      * @param  ?string $query [optional] - SQL query with optional ORM syntax; without a query all instances are returned
      *
-     * @return PersistableObject[] - at least one instance
-     *
+     * @return         PersistableObject[] - at least one instance
      * @phpstan-return non-empty-array<PersistableObject>
      *
      * @throws NoSuchRecordException  if the query returned no rows
      */
-    public function getAll($query = null) {
+    public function getAll(?string $query = null): array {
         $results = $this->findAll($query);
         if (!$results) throw new NoSuchRecordException((string)$query);
         return $results;
@@ -140,7 +139,7 @@ abstract class DAO extends Singleton {
      *
      * @return IResult
      */
-    public function query($sql) {
+    public function query(string $sql): IResult {
         return $this->getWorker()->query($sql);
     }
 
@@ -153,7 +152,7 @@ abstract class DAO extends Singleton {
      *
      * @return $this
      */
-    public function execute($sql) {
+    public function execute(string $sql): self {
         $this->getWorker()->execute($sql);
         return $this;
     }
@@ -204,7 +203,7 @@ abstract class DAO extends Singleton {
      */
     protected function parseMapping(array $mapping): array {
         $entityClass = '?';
-        $configError = function(string $message) use (&$entityClass) {
+        $configError = function(string $message) use (&$entityClass): void {
             ORM::configError("$message in mapping of $entityClass");
         };
         $entity = [];
@@ -297,7 +296,7 @@ abstract class DAO extends Singleton {
         // [relations]
         $relations = $mapping['relations'] ?? [];
         Assert::isArray($relations, 'invalid element "relations" (array expected)');
-        $relationTypes = ['one-to-one','one-to-many','many-to-one','many-to-many'];
+        $relationTypes = ['one-to-one', 'one-to-many', 'many-to-one', 'many-to-many'];
 
         foreach ($relations as $i => $userdata) {
             $relation = [];
@@ -443,7 +442,7 @@ abstract class DAO extends Singleton {
     private function validateJoinTableSettings(array $userdata, array $relation, bool $optional, int $pos, string $class): array {
         $name = $relation['name'] ?? '';
         $i = $pos;
-        $configError = function(string $message) use ($class) {
+        $configError = function(string $message) use ($class): void {
             ORM::configError("$message in mapping of $class");
         };
         $newData = [];
@@ -495,7 +494,7 @@ abstract class DAO extends Singleton {
      *
      * @return EntityMapping
      */
-    public function getEntityMapping() {
+    public function getEntityMapping(): EntityMapping {
         return $this->entityMapping ??= new EntityMapping($this->getMapping());
     }
 
@@ -505,7 +504,7 @@ abstract class DAO extends Singleton {
      *
      * @return string
      */
-    public function getEntityClass() {
+    public function getEntityClass(): string {
         return $this->entityClass;
     }
 
@@ -515,7 +514,7 @@ abstract class DAO extends Singleton {
      *
      * @return IConnector
      */
-    final public function db() {
+    final public function db(): IConnector {
         return $this->connector ??= $this->getWorker()->getConnector();
     }
 
@@ -525,7 +524,7 @@ abstract class DAO extends Singleton {
      *
      * @return Worker
      */
-    private function getWorker() {
+    private function getWorker(): Worker {
         return $this->worker ??= new Worker($this);
     }
 
@@ -538,7 +537,7 @@ abstract class DAO extends Singleton {
      *
      * @return string - escaped and quoted identifier
      */
-    public function escapeIdentifier($name) {
+    public function escapeIdentifier(string $name): string {
         return $this->db()->escapeIdentifier($name);
     }
 
@@ -551,7 +550,7 @@ abstract class DAO extends Singleton {
      *
      * @return string - escaped and quoted string or stringified scalar value if the value was not a string
      */
-    public function escapeLiteral($value) {
+    public function escapeLiteral($value): string {
         return $this->db()->escapeLiteral($value);
     }
 

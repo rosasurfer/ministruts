@@ -1,0 +1,153 @@
+<?xml version="1.0"?>
+
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://github.com/PHPCSStandards/PHP_CodeSniffer/raw/refs/heads/master/phpcs.xsd"
+         name="customized-slevomat">
+    <!--
+    @see  https://github.com/PHPCSStandards/PHP_CodeSniffer/wiki/Annotated-Ruleset
+    @see  https://github.com/slevomat/coding-standard#alphabetical-list-of-sniffs
+    -->
+
+    <!-- display options -->
+    <arg name="report" value="full,source"/>  <!-- default: full display + summary             -->
+    <arg name="basepath" value="../.."/>      <!-- base path to strip from reported file names -->
+    <arg value="p"/>                          <!-- show progress                               -->
+
+
+    <!-- PHP version to test against -->
+    <config name="php_version" value="70499"/>
+
+    <!-- files to analyze (paths relative to this file) -->
+    <file>../../bin</file>
+    <file>../../etc/phpstan</file>
+    <file>../../src</file>
+    <file>../../tests</file>
+    <arg name="extensions" value="php"/>
+
+
+    <!-- Slevomat rules: path relative to the PHPCS binary -->
+    <config name="installed_paths" value="../../slevomat/coding-standard"/>
+
+    <rule ref="SlevomatCodingStandard">
+      <!-- disable broken sniffs -->
+      <exclude name="SlevomatCodingStandard.Attributes"/>
+      <exclude name="SlevomatCodingStandard.Commenting.DocCommentSpacing.IncorrectLinesCountBetweenDifferentAnnotationsTypes"/>
+
+      <!-- disable deprecated and replaced sniffs -->
+      <exclude name="SlevomatCodingStandard.TypeHints.UnionTypeHintFormat"/> <!-- replaced by DNFTypeHintFormat -->
+
+      <!-- disable sniffs which decrease code quality and/or readability -->
+      <exclude name="SlevomatCodingStandard.Arrays.AlphabeticallySortedByKeys"/>
+      <exclude name="SlevomatCodingStandard.Arrays.SingleLineArrayWhitespace.SpaceAfterComma"/>
+      <exclude name="SlevomatCodingStandard.Arrays.SingleLineArrayWhitespace.SpaceBeforeArrayClose"/>
+      <exclude name="SlevomatCodingStandard.Classes.RequireAbstractOrFinal"/>
+      <exclude name="SlevomatCodingStandard.Commenting.DisallowCommentAfterCode"/>
+      <exclude name="SlevomatCodingStandard.Commenting.DisallowOneLinePropertyDocComment"/>
+
+
+      <!--
+      -->
+
+      <!-- @todo: reduce message keys -->
+      <exclude name="SlevomatCodingStandard.Commenting.EmptyComment.EmptyComment"/>
+      <exclude name="SlevomatCodingStandard.Commenting.InlineDocCommentDeclaration.MissingVariable"/>
+      <exclude name="SlevomatCodingStandard.Commenting.RequireOneLineDocComment.MultiLineDocComment"/>
+      <exclude name="SlevomatCodingStandard.Commenting.UselessFunctionDocComment.UselessDocComment"/>
+      <exclude name="SlevomatCodingStandard.Commenting.UselessInheritDocComment.UselessInheritDocComment"/>
+      <exclude name="SlevomatCodingStandard.Namespaces.AlphabeticallySortedUses.IncorrectlyOrderedUses"/>
+      <exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedClassNameInAnnotation.NonFullyQualifiedClassName"/>
+      <exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedExceptions.NonFullyQualifiedException"/>
+      <exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedGlobalConstants.NonFullyQualified"/>
+      <exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedGlobalFunctions.NonFullyQualified"/>
+      <exclude name="SlevomatCodingStandard.Namespaces.UseOnlyWhitelistedNamespaces.NonFullyQualified"/>
+      <exclude name="SlevomatCodingStandard.PHP.RequireExplicitAssertion.RequiredExplicitAssertion"/>      <!-- @todo: check occurrences -->
+
+      <!--
+      -->
+      <exclude name="SlevomatCodingStandard.PHP"/>
+      <exclude name="SlevomatCodingStandard.Namespaces"/>
+      <exclude name="SlevomatCodingStandard.Classes"/>
+      <exclude name="SlevomatCodingStandard.Complexity"/>
+      <exclude name="SlevomatCodingStandard.ControlStructures"/>
+      <exclude name="SlevomatCodingStandard.Exceptions"/>
+      <exclude name="SlevomatCodingStandard.Files"/>
+      <exclude name="SlevomatCodingStandard.Functions"/>
+      <exclude name="SlevomatCodingStandard.Numbers"/>
+      <exclude name="SlevomatCodingStandard.Operators"/>
+      <exclude name="SlevomatCodingStandard.Strings"/>
+      <exclude name="SlevomatCodingStandard.Variables"/>
+      <exclude name="SlevomatCodingStandard.Whitespaces"/>
+
+      <exclude name="SlevomatCodingStandard.TypeHints.ClassConstantTypeHint.UselessDocComment"/>
+      <exclude name="SlevomatCodingStandard.TypeHints.DisallowArrayTypeHintSyntax"/>
+      <exclude name="SlevomatCodingStandard.TypeHints.ParameterTypeHint.UselessAnnotation"/>
+      <exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHint.UselessAnnotation"/>
+      <exclude name="SlevomatCodingStandard.TypeHints.PropertyTypeHint.UselessAnnotation"/>
+      <exclude name="SlevomatCodingStandard.TypeHints.UselessConstantTypeHint.UselessDocComment"/>
+    </rule>
+
+
+    <!-- @todo: inspect occurrences -->
+    <rule ref="SlevomatCodingStandard.PHP.DisallowReference.DisallowedAssigningByReference">
+      <type>warning</type>
+      <severity>4</severity>
+      <message>Assigning by reference is discouraged.</message>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.PHP.DisallowReference.DisallowedPassingByReference">
+      <type>warning</type>
+      <severity>4</severity>
+      <message>Passing by reference is discouraged.</message>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.TypeHints.DisallowMixedTypeHint.DisallowedMixedTypeHint">
+      <type>warning</type>
+      <severity>4</severity>
+      <message>Usage of "mixed" type hint is discouraged.</message>
+    </rule>
+
+
+
+    <!-- regular sniff customizations -->
+    <rule ref="SlevomatCodingStandard.Classes.EmptyLinesAroundClassBraces">
+      <properties>
+        <property name="linesCountAfterOpeningBrace" value="1"/>
+        <property name="linesCountBeforeClosingBrace" value="0"/>
+      </properties>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.Classes.ClassMemberSpacing">
+      <properties>
+        <!-- empty lines between class properties and methods -->
+        <property name="linesCountBetweenMembers" value="2"/>
+      </properties>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.Classes.MethodSpacing">
+      <properties>
+        <!-- empty lines between multiple class methods -->
+        <property name="minLinesCount" value="1"/>
+        <property name="maxLinesCount" value="2"/>
+      </properties>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly">
+      <properties>
+        <property name="searchAnnotations" value="true"/>
+        <property name="allowFullyQualifiedGlobalFunctions" value="true"/>
+      </properties>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.Namespaces.UnusedUses">
+      <properties>
+        <property name="searchAnnotations" value="true"/>
+      </properties>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.TypeHints.DeclareStrictTypes">
+      <properties>
+        <property name="linesCountBeforeDeclare" value="0"/>
+        <property name="spacesCountAroundEqualsSign" value="0"/>
+      </properties>
+    </rule>
+</ruleset>

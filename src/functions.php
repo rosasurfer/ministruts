@@ -9,6 +9,7 @@ namespace rosasurfer\ministruts;
 use ArrayAccess;
 use Closure;
 use ErrorException;
+use InvalidArgumentException;
 use Traversable;
 
 use rosasurfer\ministruts\console\docopt\DocoptParser;
@@ -724,6 +725,61 @@ function pluralize(int $count, string $singular='', string $plural='s'): string 
 
 
 /**
+ * Wrapper for preg_replace() with better error handling.
+ *
+ * Perform a regular expression search and replace
+ *
+ * @param string|string[] $pattern          - pattern(s) to search for
+ * @param string|string[] $replacement      - string or array with strings to replace
+ * @param string|string[] $subject          - string or array with strings to search and replace
+ * @param int             $limit [optional] - max replacements for each pattern (default: no limit)
+ * @param ?int            $count [optional] - a variable to be filled with the number of replacements done
+ *
+ * @return         string|string[] - array if the subject is an array, or a string otherwise
+ * @phpstan-return ($subject is array ? string[] : string)
+ *
+ * @throws InvalidArgumentException in case of errors
+ *
+ * @link http://www.php.net/manual/en/function.preg-replace.php
+ */
+function preg_replace($pattern, $replacement, $subject, int $limit = -1, ?int &$count = null) {
+    $result = \preg_replace(...func_get_args());
+
+    if ($result === null || preg_last_error() != PREG_NO_ERROR) {
+        throw new InvalidArgumentException('preg_replace(): '.preg_last_error_msg());
+    }
+    return $result;
+}
+
+
+/**
+ * Wrapper for preg_split() with better error handling.
+ *
+ * Split a string by a regular expression.
+ *
+ * @param  string $pattern          - pattern to search for
+ * @param  string $subject          - input string
+ * @param  int    $limit [optional] - how many substrings to return at most (default: no limit)
+ * @param  int    $flags [optional] - combination of: PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_OFFSET_CAPTURE
+ *
+ * @return         string[] - the splitted substrings
+ * @phpstan-return ($flags is empty ? string[] : array<string|array<int|string>>)
+ *
+ * @throws InvalidArgumentException in case of errors
+ *
+ * @link http://www.php.net/manual/en/function.preg-split.php
+ */
+function preg_split(string $pattern, string $subject, int $limit = -1, int $flags = 0): array {
+    $result = \preg_split($pattern, $subject, $limit, $flags);
+
+    if ($result === false || preg_last_error() != PREG_NO_ERROR) {
+        throw new InvalidArgumentException('preg_split(): '.preg_last_error_msg());
+    }
+    return $result;
+}
+
+
+/**
  * Format a byte value.
  *
  * @param  int|float|string $value               - byte value
@@ -921,9 +977,7 @@ function strCollapseWhiteSpace(string $string, bool $joinLines=true, string $sep
     if ($joinLines) {
         $string = str_replace(EOL_UNIX, $separator, $string);
     }
-    /** @var string result */
-    $result = preg_replace('/\s+/', ' ', $string);
-    return $result;
+    return preg_replace('/\s+/', ' ', $string);
 }
 
 

@@ -30,7 +30,7 @@ class Form extends Facade {
      *
      * @return mixed
      */
-    public static function get($name, $default = null) {
+    public static function get(string $name, $default = null) {
         $form = static::current();
         return $form->get($name, $default);
     }
@@ -44,7 +44,7 @@ class Form extends Facade {
      *                                    EmptyActionForm if this is not the case (default: no type restriction)
      * @return ActionForm
      */
-    public static function current($type = null) {
+    public static function current(?string $type = null): ActionForm {
         $form = Request::getAttribute(Struts::ACTION_FORM_KEY);
 
         if ($form && (!isset($type) || $form instanceof $type)) {
@@ -63,7 +63,7 @@ class Form extends Facade {
      *                                    EmptyActionForm if this is not the case (default: no type restriction)
      * @return ActionForm
      */
-    public static function old($type = null) {
+    public static function old(?string $type = null): ActionForm {
         $form = Request::getAttribute(Struts::ACTION_FORM_KEY.'.old');
 
         if ($form && (!isset($type) || $form instanceof $type)) {

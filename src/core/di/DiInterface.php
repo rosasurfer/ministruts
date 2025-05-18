@@ -26,7 +26,7 @@ interface DiInterface extends \ArrayAccess, ContainerInterface {
      *
      * @return bool
      */
-    public function has($name);
+    public function has(string $name): bool;
 
 
     /**
@@ -40,7 +40,7 @@ interface DiInterface extends \ArrayAccess, ContainerInterface {
      * @throws ServiceNotFoundException if the service was not found
      * @throws ContainerException       if the dependency could not be resolved
      */
-    public function create($name, ...$args);
+    public function create(string $name, ...$args): object;
 
 
     /**
@@ -53,7 +53,7 @@ interface DiInterface extends \ArrayAccess, ContainerInterface {
      * @throws ServiceNotFoundException if the service was not found
      * @throws ContainerException       if the dependency could not be resolved
      */
-    public function get($name);
+    public function get(string $name): object;
 
 
     /**
@@ -67,7 +67,7 @@ interface DiInterface extends \ArrayAccess, ContainerInterface {
      *
      * @return string|object - the same definition
      */
-    public function set($name, $definition, array $aliases = []);
+    public function set(string $name, $definition, array $aliases = []);
 
 
     /**
@@ -75,7 +75,7 @@ interface DiInterface extends \ArrayAccess, ContainerInterface {
      *
      * @param  string $name - service identifier
      *
-     * @return IService|null - the removed service or NULL if no such service was found
+     * @return ?IService - the removed service or NULL if no such service was found
      */
-    public function remove($name);
+    public function remove(string $name): ?IService;
 }

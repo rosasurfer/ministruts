@@ -1,0 +1,15 @@
+#
+# Configuration of custom PHPStan extensions. Add this file to the include section of your main configuration file.
+#
+#  @see  https://phpstan.org/config-reference#multiple-files
+#
+
+# classes must be loadable by Composer
+services:                                           
+  - class: rosasurfer\ministruts\phpstan\CoreFunctionReturnType
+    tags:
+      - phpstan.broker.dynamicFunctionReturnTypeExtension
+
+  - class: rosasurfer\ministruts\phpstan\DaoReturnType
+    tags:
+      - phpstan.broker.dynamicMethodReturnTypeExtension

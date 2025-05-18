@@ -22,16 +22,16 @@ class Service implements ServiceInterface {
 
 
     /** @var string */
-    protected $name;
+    protected string $name;
 
     /** @var string[] */
-    protected $aliases;
+    protected array $aliases;
 
     /** @var string|object */
     protected $definition;
 
     /** @var ?object */
-    protected $instance = null;
+    protected ?object $instance = null;
 
 
     /**
@@ -40,7 +40,7 @@ class Service implements ServiceInterface {
      * @param  string        $name       - service name
      * @param  string|object $definition - a class name, an instance or a Closure acting as an instance factory
      */
-    public function __construct($name, $definition) {
+    public function __construct(string $name, $definition) {
         $this->name       = $name;
         $this->aliases[]  = $name;
         $this->definition = $definition;
@@ -48,19 +48,15 @@ class Service implements ServiceInterface {
 
 
     /**
-     * {@inheritdoc}
-     *
-     * @return string
+     * {@inheritDoc}
      */
-    public function getName() {
+    public function getName(): string {
         return $this->name;
     }
 
 
     /**
-     * {@inheritdoc}
-     *
-     * @return string|object $definition - a class name, an instance or a Closure acting as an instance factory
+     * {@inheritDoc}
      */
     public function getDefinition() {
         return $this->definition;
@@ -68,38 +64,28 @@ class Service implements ServiceInterface {
 
 
     /**
-     * {@inheritdoc}
-     *
-     * @return string[] - list of aliases (including the original name)
+     * {@inheritDoc}
      */
-    public function getAliases() {
+    public function getAliases(): array {
         return $this->aliases;
     }
 
 
     /**
-     * {@inheritdoc}
-     *
-     * @param  string $name - alias name
-     *
-     * @return $this
+     * {@inheritDoc}
      */
-    public function addAlias($name) {
-        if (!in_array($name, $this->aliases))
+    public function addAlias(string $name): self {
+        if (!in_array($name, $this->aliases)) {
             $this->aliases[] = $name;
+        }
         return $this;
     }
 
 
     /**
-     * {@inheritdoc}
-     *
-     * @param  bool    $factory [optional] - whether to return a new instance (default: no)
-     * @param  mixed[] $args [optional]    - additional instantiation arguments of a factory call (default: none)
-     *
-     * @return object
+     * {@inheritDoc}
      */
-    public function resolve($factory=false, $args=[]) {
+    public function resolve(bool $factory = false, array $args = []): object {
         if (!$factory && $this->instance) {
             return $this->instance;
         }

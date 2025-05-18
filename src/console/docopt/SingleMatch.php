@@ -14,10 +14,10 @@ class SingleMatch extends CObject {
 
 
     /** @var ?int */
-    public $pos = null;
+    public ?int $pos = null;
 
-    /** @var Pattern|null */
-    public $pattern = null;
+    /** @var ?Pattern */
+    public ?Pattern $pattern = null;
 
 
     /**
@@ -33,7 +33,7 @@ class SingleMatch extends CObject {
     /**
      * @return array{?int, ?Pattern}
      */
-    public function toArray() {
+    public function toArray(): array {
         return [$this->pos, $this->pattern];
     }
 }

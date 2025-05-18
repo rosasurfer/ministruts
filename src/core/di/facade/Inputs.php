@@ -20,9 +20,9 @@ class Inputs extends Facade {
     /**
      * Return all raw input parameters from the current and the previous HTTP request.
      *
-     * @return string[]
+     * @return array<string, string|array<string|array<string>>>
      */
-    public static function all() {
+    public static function all(): array {
         return Input::current()->all() + Input::old()->all();
     }
 
@@ -39,11 +39,8 @@ class Inputs extends Facade {
      *
      * @return ?string
      */
-    public static function get($name, $default = null) {
-        $value = Input::current()->get($name);
-        if (!isset($value))
-            $value = Input::old()->get($name, $default);
-        return $value;
+    public static function get(string $name, ?string $default = null): ?string {
+        return Input::current()->get($name) ?? Input::old()->get($name, $default);
     }
 
 
@@ -56,13 +53,10 @@ class Inputs extends Facade {
      * @param  string   $name               - parameter name
      * @param  string[] $default [optional] - values to return if the specified parameter array was not transmitted
      *                                        (default: empty array)
-     * @return string[]
+     * @return array<string|string[]>
      */
-    public static function getArray($name, array $default = []) {
-        $values = Input::current()->getArray($name);
-        if (!$values)
-            $values = Input::old()->getArray($name, $default);
-        return $values;
+    public static function getArray(string $name, array $default = []): array {
+        return Input::current()->getArray($name) ?: Input::old()->getArray($name, $default);
     }
 
 
@@ -75,11 +69,8 @@ class Inputs extends Facade {
      *
      * @return bool
      */
-    public static function has($name) {
-        $result = Input::current()->has($name);
-        if (!$result)
-            $result = Input::old()->has($name);
-        return $result;
+    public static function has(string $name): bool {
+        return Input::current()->has($name) ?: Input::old()->has($name);
     }
 
 
@@ -92,7 +83,7 @@ class Inputs extends Facade {
      *
      * @return bool
      */
-    public static function hasArray($name) {
+    public static function hasArray(string $name): bool {
         $result = Input::current()->hasArray($name);
         if (!$result)
             $result = Input::old()->hasArray($name);

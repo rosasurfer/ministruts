@@ -27,20 +27,18 @@ class Response extends Singleton {
 
 
     /** @var int - HTTP status code */
-    protected $status = 0;
+    protected int $status = 0;
 
     /** @var mixed[] - additional variables context */
-    protected $attributes = [];
+    protected array $attributes = [];
 
 
     /**
      * Return the {@link Singleton} instance of this class.
      *
      * @return static
-     *
-     * @throws RuntimeException if not called from the web interface
      */
-    public static function me() {
+    public static function me(): self {
         if (CLI) throw new RuntimeException('Cannot create a '.static::class.' instance in a non-web context.');
 
         /** @var static $instance */
@@ -81,7 +79,7 @@ class Response extends Singleton {
      *
      * @return $this
      */
-    public function setAttribute($name, $value) {
+    public function setAttribute(string $name, $value): self {
         $this->attributes[$name] = $value;
         return $this;
     }
@@ -94,7 +92,7 @@ class Response extends Singleton {
      *
      * @return mixed - attribute value or NULL if no value is stored under the specified name
      */
-    public function getAttribute($name) {
+    public function getAttribute(string $name) {
         if (\key_exists($name, $this->attributes)) {
             return $this->attributes[$name];
         }
@@ -110,7 +108,7 @@ class Response extends Singleton {
      *
      * @return never
      */
-    public function redirect($uri, $type = HttpResponse::SC_MOVED_TEMPORARILY) {
+    public function redirect(string $uri, int $type = HttpResponse::SC_MOVED_TEMPORARILY): void {
         $currentUrl = Request::getUrl();
 
         $url = self::relativeToAbsoluteUrl($uri, $currentUrl);  // HTTP/1.1 requires an absolute 'Location' value

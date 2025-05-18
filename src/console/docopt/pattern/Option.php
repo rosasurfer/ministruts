@@ -7,6 +7,8 @@ use InvalidArgumentException;
 
 use rosasurfer\ministruts\console\docopt\SingleMatch;
 
+use function rosasurfer\ministruts\preg_split;
+
 
 /**
  * Option
@@ -21,7 +23,7 @@ class Option extends LeafPattern {
     public ?string $long = null;
 
     /** @var int */
-    public $argcount;
+    public int $argcount;
 
 
     /**
@@ -47,7 +49,7 @@ class Option extends LeafPattern {
      *
      * @return Option
      */
-    public static function parse($optionDescription) {
+    public static function parse(string $optionDescription): Option {
         $short    = null;
         $long     = null;
         $argcount = 0;
@@ -58,6 +60,7 @@ class Option extends LeafPattern {
         $description = isset($exp[1]) ? $exp[1] : '';
 
         $options = str_replace(',', ' ', str_replace('=', ' ', $options));
+
         foreach (preg_split('/\s+/', $options) as $s) {
             if (strpos($s, '--')===0) {
                 $long = $s;
@@ -72,17 +75,18 @@ class Option extends LeafPattern {
 
         if ($argcount) {
             $value = $match = null;
-            if (preg_match('@\[default: (.*)\]@i', $description, $match))
+            if (preg_match('@\[default: (.*)\]@i', $description, $match)) {
                 $value = $match[1];
+            }
         }
         return new static($short, $long, $argcount, $value);
     }
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function singleMatch(array $left) {
+    public function singleMatch(array $left): SingleMatch {
         foreach ($left as $i => $pattern) {
             if ($this->name() == $pattern->name()) {
                 return new SingleMatch($i, $pattern);

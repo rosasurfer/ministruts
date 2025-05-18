@@ -14,7 +14,6 @@ use rosasurfer\ministruts\config\ConfigInterface as Config;
  */
 class ApcCache extends CachePeer {
 
-
     /**
      * Constructor.
      *
@@ -27,13 +26,13 @@ class ApcCache extends CachePeer {
 
         $label ??= '';
         $this->label     = $label;
-        $this->namespace = strlen($label) ? $label : md5($config['app.dir.root']);
+        $this->namespace = strlen($label) ? $label : md5($config->getString('app.dir.root'));
         $this->options   = $options;
     }
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isCached(string $key): bool {
         // The actual working horse. This method does not only check the key's existence, it also retrieves the value and
@@ -45,25 +44,26 @@ class ApcCache extends CachePeer {
         }
 
         // query APC cache
-        $data = apc_fetch($this->namespace.'::'.$key);
-        if (!$data) return false;                       // cache miss
+        $found = false;
+        /** @var array{int, int, string} $data - [int-created, int-expires, serialized([mixed-value, ?Dependency])] */
+        $data = apc_fetch($this->namespace.'::'.$key, $found);
+        if (!$found) return false;                      // cache miss
 
         // cache hit
-        /** @var int $created */
-        $created = $data[0];                            // data: [created, expires, serialized([$value, $dependency])]
-        /** @var int $expires */
+        $created = $data[0];
         $expires = $data[1];
 
         // check expiration
-        if ($expires && $created+$expires < time()) {
+        if ($expires && $created + $expires < time()) {
             $this->drop($key);
             return false;
         }
 
         // unpack serialized value
-        $data[2]    = unserialize($data[2]);
-        $value      = $data[2][0];
-        $dependency = $data[2][1];
+        /** @var array{mixed, ?Dependency} $data */
+        $data = unserialize($data[2]);
+        $value      = $data[0];
+        $dependency = $data[1];
 
         // check dependency
         if ($dependency) {
@@ -92,7 +92,7 @@ class ApcCache extends CachePeer {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function get(string $key, $default = null) {
         if ($this->isCached($key)) {
@@ -103,7 +103,7 @@ class ApcCache extends CachePeer {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function drop(string $key): bool {
         $this->getReferencePool()->drop($key);
@@ -112,13 +112,14 @@ class ApcCache extends CachePeer {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function set(string $key, $value, int $expires=Cache::EXPIRES_NEVER, ?Dependency $dependency=null): bool {
-        // stored data: [created, expires, serialized([value, dependency])]
+        // stored data: [int-created, int-expires, serialized([mixed-value, ?Dependency])]
+
         $fullKey = $this->namespace.'::'.$key;
         $created = time();
-        $data    = [$value, $dependency];
+        $data = [$value, $dependency];
 
         /**
          * PHP 5.3.3/APC 3.1.3

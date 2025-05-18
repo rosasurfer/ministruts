@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\struts;
 
+use Closure;
+
 use rosasurfer\ministruts\Application;
 use rosasurfer\ministruts\config\ConfigInterface as Config;
 use rosasurfer\ministruts\core\CObject;
@@ -28,7 +30,6 @@ use const rosasurfer\ministruts\NL;
  */
 class Tile extends CObject {
 
-
     /**
      * @var string - runtime generated name for anonymous tiles
      *
@@ -37,28 +38,28 @@ class Tile extends CObject {
     const GENERIC_NAME = 'generic';
 
     /** @var Module - the Module this Tile belongs to */
-    protected $module;
+    protected Module $module;
 
     /** @var string - unique name of the Tile */
-    protected $name;
+    protected string $name = '';
 
     /** @var string - full filename of the Tile */
-    protected $fileName;
+    protected string $fileName = '';
 
     /** @var ?bool - whether the MVC push model is enabled for the Tile */
-    protected $pushModelSupport = null;
+    protected ?bool $pushModelSupport = null;
 
     /** @var array<string, Tile|null> - nested Tiles */
-    protected $nestedTiles = [];
+    protected array $nestedTiles = [];
 
     /** @var mixed[] - additional Tile properties */
-    protected $properties = [];
+    protected array $properties = [];
 
     /** @var Tile|null - parent instance containing this Tile or NULL if this Tile is the outermost fragment of the generated view */
-    protected $parent;
+    protected ?Tile $parent;
 
     /** @var bool - whether this component can still be modified or configuration is frozen */
-    protected $configured = false;
+    protected bool $configured = false;
 
 
     /**
@@ -78,7 +79,7 @@ class Tile extends CObject {
      *
      * @return string
      */
-    public function getName() {
+    public function getName(): string {
         return $this->name;
     }
 
@@ -90,7 +91,7 @@ class Tile extends CObject {
      *
      * @return $this
      */
-    public function setName($name) {
+    public function setName(string $name): self {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
         $this->name = $name;
@@ -105,7 +106,7 @@ class Tile extends CObject {
      *
      * @return $this
      */
-    public function setParent(self $parent) {
+    public function setParent(self $parent): self {
         $this->parent = $parent;
         return $this;
     }
@@ -116,7 +117,7 @@ class Tile extends CObject {
      *
      * @return string
      */
-    public function getFileName() {
+    public function getFileName(): string {
         return $this->fileName;
     }
 
@@ -128,7 +129,7 @@ class Tile extends CObject {
      *
      * @return $this
      */
-    public function setFileName($filename) {
+    public function setFileName(string $filename): self {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
         $this->fileName = $filename;
@@ -141,7 +142,7 @@ class Tile extends CObject {
      *
      * @return ?bool - configured state or NULL if the state is inherited from a surrounding element
      */
-    public function isPushModelSupport() {
+    public function isPushModelSupport(): ?bool {
         return $this->pushModelSupport;
     }
 
@@ -153,7 +154,7 @@ class Tile extends CObject {
      *
      * @return $this
      */
-    public function setPushModelSupport($state) {
+    public function setPushModelSupport(bool $state): self {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
         $this->pushModelSupport = (bool) $state;
@@ -175,7 +176,7 @@ class Tile extends CObject {
      *
      * @return $this
      */
-    public function setNestedTile($name, ?Tile $tile = null) {
+    public function setNestedTile(string $name, ?Tile $tile = null): self {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
         $this->nestedTiles[$name] = $tile;
@@ -191,7 +192,7 @@ class Tile extends CObject {
      *
      * @return $this
      */
-    public function setProperty($name, $value) {
+    public function setProperty(string $name, $value): self {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
         $this->properties[$name] = $value;
@@ -205,7 +206,7 @@ class Tile extends CObject {
      *
      * @return mixed[] - properties
      */
-    protected function getMergedProperties() {
+    protected function getMergedProperties(): array {
         $parentProperties = $this->parent ? $this->parent->getMergedProperties() : [];
         return \array_merge($parentProperties, $this->properties);
     }
@@ -216,7 +217,7 @@ class Tile extends CObject {
      *
      * @return bool
      */
-    public function isAbstract() {
+    public function isAbstract(): bool {
         return in_array(null, $this->nestedTiles, true);
     }
 
@@ -226,9 +227,9 @@ class Tile extends CObject {
      *
      * @return $this
      */
-    public function freeze() {
+    public function freeze(): self {
         if (!$this->configured) {
-            if (!$this->fileName) Struts::configError('<tile name="'.$this->name.'": No file configured.');
+            if (!strlen($this->fileName)) Struts::configError('<tile name="'.$this->fileName.'": No file configured.');
 
             foreach ($this->nestedTiles as $tile) {
                 if ($tile) $tile->freeze();
@@ -244,7 +245,7 @@ class Tile extends CObject {
      *
      * @return $this
      */
-    public function render() {
+    public function render(): self {
         $request     = Request::instance();
         $namespace   = $this->module->getViewNamespace();
         $appUri      = $request->getApplicationBaseUri();
@@ -279,19 +280,19 @@ class Tile extends CObject {
         if (Application::isAdminIP()) {
             /** @var Config $config */
             $config = $this->di('config');
-            $rootDir  = $config['app.dir.root'];
+            $rootDir  = $config->getString('app.dir.root');
             $file     = $this->fileName;
             $file     = strRightFrom($file, $rootDir.DIRECTORY_SEPARATOR, 1, false, $file);
             $file     = 'file="'.str_replace('\\', '/', $file).'"';
-            $tile     = $this->name==self::GENERIC_NAME ? '':'tile="'.$this->name.'" ';
+            $tile     = $this->name == self::GENERIC_NAME ? '' : "tile=\"$this->name\" ";
             $tileHint = $tile.$file;
-            echo ($this->parent ? NL:'').'<!-- #begin: '.$tileHint.' -->'.NL;
+            echo ($this->parent ? NL : '')."<!-- #begin: $tileHint -->".NL;
         }
 
         $this->includeFile($this->fileName, $nestedTiles + $properties);
 
         if ($tileHint) {
-            echo NL.'<!-- #end: '.$tileHint.' -->'.NL;
+            echo NL."<!-- #end: $tileHint -->".NL;
         }
         return $this;
     }
@@ -306,19 +307,18 @@ class Tile extends CObject {
      *
      * @return void
      */
-    protected function includeFile($file, array $properties) {
-        static $includeFile = null;
-        if (!$includeFile) {
-            // define scope isolated Closure
-            $includeFile = \Closure::bind(static function() {
-                foreach (func_get_args()[1] as $__name13ae1dbf8af83a86 => $__value13ae1dbf8af83a86) {
-                    $$__name13ae1dbf8af83a86 = $__value13ae1dbf8af83a86;        // We can't use extract() as it skips variables with
-                }                                                               // irregular names (e.g. with dots).
-                unset($__name13ae1dbf8af83a86, $__value13ae1dbf8af83a86);       // Surprisingly foreach() is even faster.
+    protected function includeFile(string $file, array $properties): void {
+        // define a scope isolated Closure
+        static $includeFile;
+        $includeFile ??= Closure::bind(static function(): void {
+            // @phpstan-ignore foreach.nonIterable
+            foreach (func_get_args()[1] as $__key_13ae1dbf8af83a86 => $__value_13ae1dbf8af83a86) {
+                $$__key_13ae1dbf8af83a86 = $__value_13ae1dbf8af83a86;       // We can't use extract() as it skips variables with
+            }                                                               // irregular names (e.g. with dots).
+            unset($__key_13ae1dbf8af83a86, $__value_13ae1dbf8af83a86);      // Surprisingly foreach() is even faster.
 
-                include(func_get_args()[0]);
-            }, null, null);
-        }
+            include(func_get_args()[0]);
+        }, null, null);
 
         // include the file
         $includeFile($file, $properties);

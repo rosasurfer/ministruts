@@ -33,7 +33,7 @@ final class ORM extends StaticClass {
      *
      * @return never
      */
-    public static function configError(string $message) {
+    public static function configError(string $message): void {
         throw new ConfigException("ORM config error: $message");
     }
 }

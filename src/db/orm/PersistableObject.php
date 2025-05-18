@@ -28,13 +28,13 @@ abstract class PersistableObject extends CObject {
 
 
     /** @var bool - dirty checking status */
-    private $__modified = false;
+    private bool $__modified = false;
 
     /** @var bool - flag to detect and handle recursive $this->save() calls */
-    private $__inSave = false;
+    private bool $__inSave = false;
 
     /** @var bool - flag to detect and handle recursive $this->delete() calls */
-    private $__inDelete = false;
+    private bool $__inDelete = false;
 
 
     /**
@@ -56,7 +56,7 @@ abstract class PersistableObject extends CObject {
      *
      * @return mixed - return value of the intercepted call
      */
-    public function __call($method, array $args) {
+    public function __call(string $method, array $args) {
         $dao = $this->dao();
         $mapping = $dao->getMapping();
         $methodL = strtolower($method);
@@ -85,7 +85,7 @@ abstract class PersistableObject extends CObject {
      *
      * @return string[] - array of property names to serialize
      */
-    public function __sleep() {
+    public function __sleep(): array {
         $mapping = $this->dao()->getMapping();
         $array = (array) $this;
 
@@ -132,7 +132,7 @@ abstract class PersistableObject extends CObject {
      *
      * @return mixed - property value
      */
-    private function getNonRelationValue($property) {
+    private function getNonRelationValue(string $property) {
         return $this->$property;
     }
 
@@ -145,7 +145,7 @@ abstract class PersistableObject extends CObject {
      *
      * @return PersistableObject|PersistableObject[]|null - property value
      */
-    private function getRelationValue($property) {
+    private function getRelationValue(string $property) {
         $propertyName = $property;
         /** @var PersistableObject|PersistableObject[]|int|false|null $value */
         $value = &$this->$propertyName;                                                 // existing property value
@@ -259,7 +259,7 @@ abstract class PersistableObject extends CObject {
      *
      * @return mixed - column value
      */
-    private function getPhysicalValue($column, $type = null) {
+    private function getPhysicalValue(string $column, ?string $type = null) {
         $mapping = $this->dao()->getMapping();
         $column  = strtolower($column);
         if (!isset($mapping['columns'][$column])) throw new RuntimeException("Not a mapped column \"$column\"");
@@ -340,7 +340,7 @@ abstract class PersistableObject extends CObject {
      *
      * @return bool
      */
-    public function isDeleted() {
+    public function isDeleted(): bool {
         $mapping = $this->dao()->getMapping();
         $property = $mapping['soft-delete'] ?? null;
         if ($property) {
@@ -356,7 +356,7 @@ abstract class PersistableObject extends CObject {
      *
      * @return bool
      */
-    final public function isModified() {
+    final public function isModified(): bool {
         return (bool) $this->__modified;
     }
 
@@ -366,7 +366,7 @@ abstract class PersistableObject extends CObject {
      *
      * @return $this
      */
-    final protected function modified() {
+    final protected function modified(): self {
         $this->__modified = true;
         return $this;
     }
@@ -377,7 +377,7 @@ abstract class PersistableObject extends CObject {
      *
      * @return $this
      */
-    public function save() {
+    public function save(): self {
         if ($this->__inSave) {
             return $this;                                           // skip recursive calls from pre/post-processing hooks
         }
@@ -419,7 +419,7 @@ abstract class PersistableObject extends CObject {
      *
      * @return $this
      */
-    private function insert() {
+    private function insert(): self {
         if ($this->isPersistent()) throw new RuntimeException('Cannot insert already persistent '.$this);
 
         // pre-processing hook
@@ -431,9 +431,9 @@ abstract class PersistableObject extends CObject {
 
         // collect column values
         $values = [];
-        foreach ($mapping['columns'] as $column => $v) {
+        foreach ($mapping['columns'] as $column => $_) {
             $values[$column] = $this->getPhysicalValue($column);
-        };
+        }
 
         // perform insertion
         $id = $this->doInsert($values);
@@ -456,7 +456,7 @@ abstract class PersistableObject extends CObject {
      *
      * @return $this
      */
-    private function update() {
+    private function update(): self {
         // pre-processing hook
         if ($this->beforeUpdate() !== true) {
             return $this;
@@ -487,7 +487,7 @@ abstract class PersistableObject extends CObject {
      *
      * @return $this
      */
-    public function delete() {
+    public function delete(): self {
         if ($this->__inDelete) {
             return $this;                                               // skip recursive calls from pre/post-processing hooks
         }
@@ -566,7 +566,7 @@ abstract class PersistableObject extends CObject {
      *
      * @return bool - success status
      */
-    private function doUpdate(array $changes) {
+    private function doUpdate(array $changes): bool {
         $db     = $this->db();
         $entity = $this->dao()->getEntityMapping();
         $table  = $entity->getTableName();
@@ -619,7 +619,7 @@ abstract class PersistableObject extends CObject {
      *
      * @return bool - success status
      */
-    private function doDelete() {
+    private function doDelete(): bool {
         $db     = $this->db();
         $entity = $this->dao()->getEntityMapping();
         $table  = $entity->getTableName();
@@ -648,7 +648,7 @@ abstract class PersistableObject extends CObject {
      *
      * @return $this
      */
-    private function populate(array $row) {
+    private function populate(array $row): self {
         $row = \array_change_key_case($row, CASE_LOWER);
         $mapping = $this->dao()->getMapping();
         $dbType = $this->dao()->db()->getType();
@@ -748,7 +748,7 @@ abstract class PersistableObject extends CObject {
      *                                           (default: no)
      * @return $this
      */
-    public function reload($resetRelations = false) {   // TODO: implement and set default=TRUE
+    public function reload(bool $resetRelations = false): self {   // TODO: implement and set default=TRUE
         if (!$this->isPersistent()) throw new IllegalStateException('Cannot reload non-persistent '.get_class($this));
 
         // TODO: This method cannot yet handle composite primary keys.
@@ -783,7 +783,7 @@ abstract class PersistableObject extends CObject {
      *
      * @return void
      */
-    protected function afterCreate() {
+    protected function afterCreate(): void {
     }
 
 
@@ -794,7 +794,7 @@ abstract class PersistableObject extends CObject {
      *
      * @return bool - If the method does not return boolean TRUE the "save" operation is canceled.
      */
-    protected function beforeSave() {
+    protected function beforeSave(): bool {
         return true;
     }
 
@@ -806,7 +806,7 @@ abstract class PersistableObject extends CObject {
      *
      * @return void
      */
-    protected function afterSave() {
+    protected function afterSave(): void {
     }
 
 
@@ -817,7 +817,7 @@ abstract class PersistableObject extends CObject {
      *
      * @return bool - If the method does not return boolean TRUE the "insert" operation is canceled.
      */
-    protected function beforeInsert() {
+    protected function beforeInsert(): bool {
         return true;
     }
 
@@ -829,7 +829,7 @@ abstract class PersistableObject extends CObject {
      *
      * @return void
      */
-    protected function afterInsert() {
+    protected function afterInsert(): void {
     }
 
 
@@ -840,7 +840,7 @@ abstract class PersistableObject extends CObject {
      *
      * @return bool - If the method does not return boolean TRUE the "update" operation is canceled.
      */
-    protected function beforeUpdate() {
+    protected function beforeUpdate(): bool {
         return true;
     }
 
@@ -852,7 +852,7 @@ abstract class PersistableObject extends CObject {
      *
      * @return void
      */
-    protected function afterUpdate() {
+    protected function afterUpdate(): void {
     }
 
 
@@ -863,7 +863,7 @@ abstract class PersistableObject extends CObject {
      *
      * @return bool - If the method does not return boolean TRUE the "delete" operation is canceled.
      */
-    protected function beforeDelete() {
+    protected function beforeDelete(): bool {
         return true;
     }
 
@@ -875,7 +875,7 @@ abstract class PersistableObject extends CObject {
      *
      * @return void
      */
-    protected function afterDelete() {
+    protected function afterDelete(): void {
     }
 
 
@@ -884,7 +884,7 @@ abstract class PersistableObject extends CObject {
      *
      * @return DAO
      */
-    public static function dao() {
+    public static function dao(): DAO {
         if (static::class == __CLASS__) throw new IllegalAccessException('Use an entity class to access method '.__METHOD__.'()');
         return DAO::getImplementation(static::class.'DAO');
         // TODO: The calling class may be a derived class with the entity class being one of its parents.
@@ -896,7 +896,7 @@ abstract class PersistableObject extends CObject {
      *
      * @return Connector
      */
-    public static function db() {
+    public static function db(): Connector {
         if (static::class == __CLASS__) throw new IllegalAccessException('Use an entity class to access method '.__METHOD__.'()');
         return self::dao()->db();
     }

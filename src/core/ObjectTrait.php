@@ -19,10 +19,8 @@ trait ObjectTrait {
      * @param  string $property - property name
      *
      * @return mixed
-     *
-     * @throws RuntimeException
      */
-    public function __get($property) {
+    public function __get(string $property) {
         $ex = new RuntimeException('Read access to undefined property '.static::class.'::$'.$property);
         ErrorHandler::shiftStackFramesByMethod($ex, __FUNCTION__);
         throw $ex;
@@ -36,10 +34,8 @@ trait ObjectTrait {
      * @param  mixed  $value    - property value
      *
      * @return void
-     *
-     * @throws RuntimeException
      */
-    public function __set($property, $value) {
+    public function __set(string $property, $value): void {
         $ex = new RuntimeException('Write access to undefined property '.static::class.'::$'.$property);
         ErrorHandler::shiftStackFramesByMethod($ex, __FUNCTION__);
         throw $ex;
@@ -53,10 +49,8 @@ trait ObjectTrait {
      * @param  mixed[] $args   - arguments passed to the method call
      *
      * @return mixed
-     *
-     * @throws RuntimeException
      */
-    public function __call($method, array $args) {
+    public function __call(string $method, array $args) {
         $ex = new RuntimeException('Call of undefined or inaccessible method '.static::class.'->'.$method.'()');
         ErrorHandler::shiftStackFramesByMethod($ex, __FUNCTION__);
         throw $ex;
@@ -70,10 +64,8 @@ trait ObjectTrait {
      * @param  mixed[] $args   - arguments passed to the method call
      *
      * @return mixed
-     *
-     * @throws RuntimeException
      */
-    public static function __callStatic($method, array $args) {
+    public static function __callStatic(string $method, array $args) {
         $ex = new RuntimeException('Call of undefined or inaccessible method '.static::class.'::'.$method.'()');
         ErrorHandler::shiftStackFramesByMethod($ex, __FUNCTION__);
         throw $ex;

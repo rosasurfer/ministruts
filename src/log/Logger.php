@@ -64,7 +64,7 @@ class Logger extends StaticClass {
     ];
 
     /** @var int - the application's default loglevel */
-    private static $appLogLevel;
+    private static int $appLogLevel;
 
     /** @var LogAppender[] - enabled appenders and their ids */
     private static array $logAppenders = [];
@@ -77,33 +77,32 @@ class Logger extends StaticClass {
      */
     private static function init(): void {
         static $initialized = false;
-        if ($initialized) return;
+        if (!$initialized) {
+            // read the configured application loglevel
+            /** @var Config $config */
+            $config = self::di('config');
+            $value = $config['log.level.default'] ?? '';
+            $logLevel = 0;
 
-        // read the configured application loglevel
-        /** @var Config $config */
-        $config = self::di('config');
-        $value = $config['log.level.default'] ?? '';
-        $logLevel = 0;
+            if (is_string($value))  $logLevel = self::strToLogLevel($value);
+            elseif (is_int($value)) $logLevel = self::isLogLevel($value) ? $value : 0;
+            if (!$logLevel)         $logLevel = self::DEFAULT_LOGLEVEL;
+            self::$appLogLevel = $logLevel;
 
-        if (is_string($value))  $logLevel = self::strToLogLevel($value);
-        elseif (is_int($value)) $logLevel = self::isLogLevel($value) ? $value : 0;
-        if (!$logLevel)         $logLevel = self::DEFAULT_LOGLEVEL;
-        self::$appLogLevel = $logLevel;
-
-        // initialize log appenders
-        if (self::isAppenderEnabled($id = 'print')) {
-            self::$logAppenders[$id] = new PrintAppender($config["log.appender.$id"] ?? []);
+            // initialize log appenders
+            if (self::isAppenderEnabled($id = 'print')) {
+                self::$logAppenders[$id] = new PrintAppender($config["log.appender.$id"] ?? []);
+            }
+            if (self::isAppenderEnabled($id = 'errorlog')) {
+                // the ErrorLogAppender needs to know the status of the PrintAppender
+                $options = $config["log.appender.$id"] ?? [];
+                $options += ['print.enabled' => isset(self::$logAppenders['print'])];
+                self::$logAppenders[$id] = new ErrorLogAppender($options);
+            }
+            if (self::isAppenderEnabled($id = 'mail')) {
+                self::$logAppenders[$id] = new MailAppender($config["log.appender.$id"] ?? []);
+            }
         }
-        if (self::isAppenderEnabled($id = 'errorlog')) {
-            // the ErrorLogAppender needs to know the status of the PrintAppender
-            $options = $config["log.appender.$id"] ?? [];
-            $options += ['print.enabled' => isset(self::$logAppenders['print'])];
-            self::$logAppenders[$id] = new ErrorLogAppender($options);
-        }
-        if (self::isAppenderEnabled($id = 'mail')) {
-            self::$logAppenders[$id] = new MailAppender($config["log.appender.$id"] ?? []);
-        }
-
         $initialized = true;
     }
 
@@ -123,11 +122,11 @@ class Logger extends StaticClass {
         }
 
         switch ($id) {
-            case 'print':    return $config->getBool("log.appender.$id.enabled", null, true) ?? PrintAppender::getDefaultEnabled();
-            case 'errorlog': return $config->getBool("log.appender.$id.enabled", null, true) ?? ErrorLogAppender::getDefaultEnabled();
-            case 'mail':     return $config->getBool("log.appender.$id.enabled", null, true) ?? MailAppender::getDefaultEnabled();
+            case 'print':    return $config->getBool("log.appender.$id.enabled", true, PrintAppender::getDefaultEnabled());
+            case 'errorlog': return $config->getBool("log.appender.$id.enabled", true, ErrorLogAppender::getDefaultEnabled());
+            case 'mail':     return $config->getBool("log.appender.$id.enabled", true, MailAppender::getDefaultEnabled());
         }
-        return $config->getBool("log.appender.$id.enabled", false);
+        return $config->getBool("log.appender.$id.enabled", true);
     }
 
 
@@ -140,7 +139,7 @@ class Logger extends StaticClass {
      *
      * @return bool - success status
      */
-    public static function log($loggable, int $level, array $context = []) {
+    public static function log($loggable, int $level, array $context = []): bool {
         // prevent recursive calls
         static $recursion = false;
         if ($recursion) throw new IllegalStateException('Recursive call detected, aborting...');

@@ -30,16 +30,16 @@ class ActionForward extends CObject {
 
 
     /** @var string */
-    protected $name;
+    protected string $name;
 
     /** @var string - a URI, a tile name (if starting with ".") or a filename (if not starting with ".") */
-    protected $path;
+    protected string $path;
 
     /** @var bool - whether $path is a URI and a redirect will be issued */
-    protected $redirect;
+    protected bool $redirect;
 
     /** @var int - type (HTTP status code) of the redirect to issue (if any) */
-    protected $redirectType = HttpResponse::SC_MOVED_TEMPORARILY;
+    protected int $redirectType = HttpResponse::SC_MOVED_TEMPORARILY;
 
 
     /**
@@ -50,7 +50,7 @@ class ActionForward extends CObject {
      * @param  bool   $redirect     [optional] - whether $resource is a redirect (default: no)
      * @param  int    $redirectType [optional] - redirect type (default: 302=SC_MOVED_TEMPORARILY)
      */
-    public function __construct($name, $resource, $redirect=false, $redirectType=HttpResponse::SC_MOVED_TEMPORARILY) {
+    public function __construct(string $name, string $resource, bool $redirect=false, int $redirectType=HttpResponse::SC_MOVED_TEMPORARILY) {
         $this->setName($name)
              ->setPath($resource)
              ->setRedirect($redirect);
@@ -66,7 +66,7 @@ class ActionForward extends CObject {
      *
      * @return string
      */
-    public function getName() {
+    public function getName(): string {
         return $this->name;
     }
 
@@ -91,7 +91,7 @@ class ActionForward extends CObject {
      *
      * @return string
      */
-    public function getPath() {
+    public function getPath(): string {
         return $this->path;
     }
 
@@ -115,7 +115,7 @@ class ActionForward extends CObject {
      *
      * @return bool
      */
-    public function isRedirect() {
+    public function isRedirect(): bool {
         return $this->redirect;
     }
 
@@ -138,8 +138,8 @@ class ActionForward extends CObject {
      *
      * @return int - HTTP status code
      */
-    public function getRedirectType() {
-        return (int) $this->redirectType;
+    public function getRedirectType(): int {
+        return $this->redirectType;
     }
 
 
@@ -173,7 +173,7 @@ class ActionForward extends CObject {
         // TODO: extend to process multiple parameters at once
         $path = $this->getPath();
         $separator = (strpos($path, '?')!==false) ? '&' : '?';
-        $this->setPath($path.$separator.$key.'='.str_replace([' ','#','&'], ['%20','%23','%26'], $value));
+        $this->setPath($path.$separator.$key.'='.str_replace([' ', '#', '&'], ['%20', '%23', '%26'], $value));
 
         return $this;
     }
@@ -202,9 +202,9 @@ class ActionForward extends CObject {
     /**
      * Return an identical copy of the instance.
      *
-     * @return ActionForward
+     * @return self
      */
-    public function copy() {
+    public function copy(): self {
         return clone $this;
     }
 }

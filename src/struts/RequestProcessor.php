@@ -9,6 +9,8 @@ use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 use rosasurfer\ministruts\net\http\HttpResponse;
 
+use function rosasurfer\ministruts\preg_replace;
+
 
 /**
  * RequestProcessor
@@ -24,10 +26,10 @@ class RequestProcessor extends CObject {
 
 
     /** @var Module - the Module the instance belongs to */
-    protected $module;
+    protected Module $module;
 
     /** @var scalar[] - additional runtime options */
-    protected $options;
+    protected array $options;
 
 
     /**
@@ -51,7 +53,7 @@ class RequestProcessor extends CObject {
      *
      * @return void
      */
-    public function process(Request $request, Response $response) {
+    public function process(Request $request, Response $response): void {
         // Start or continue a session (if applicable).
         $this->processSession($request);
 
@@ -102,7 +104,7 @@ class RequestProcessor extends CObject {
      *
      * @return void
      */
-    protected function processSession(Request $request) {
+    protected function processSession(Request $request): void {
         $this->restoreActionForm($request);
         $this->restoreActionMessages($request);
     }
@@ -118,10 +120,8 @@ class RequestProcessor extends CObject {
      *
      * @return ?ActionMapping - ActionMapping or NULL if no mapping responsible for processing the request was found
      */
-    protected function processMapping(Request $request, Response $response) {
+    protected function processMapping(Request $request, Response $response): ?ActionMapping {
         // resolve the full request path
-
-        /** @var string $requestPath */
         $requestPath = preg_replace('|/{2,}|', '/', $request->getPath());
         $requestPath = '/'.trim($requestPath, '/').'/';
         if ($requestPath=='//') $requestPath = '/';
@@ -190,7 +190,7 @@ PROCESS_MAPPING_ERROR_SC_404;
      *
      * @return bool
      */
-    protected function processMethod(Request $request, Response $response, ActionMapping $mapping) {
+    protected function processMethod(Request $request, Response $response, ActionMapping $mapping): bool {
         if ($mapping->isSupportedMethod($request->getMethod()))
             return true;
 
@@ -234,7 +234,7 @@ PROCESS_METHOD_ERROR_SC_405;
      *
      * @return bool
      */
-    protected function processRoles(Request $request, Response $response, ActionMapping $mapping) {
+    protected function processRoles(Request $request, Response $response, ActionMapping $mapping): bool {
         if (empty($mapping->getRoles())) {
             return true;
         }
@@ -265,7 +265,7 @@ PROCESS_METHOD_ERROR_SC_405;
      *
      * @return ActionForm
      */
-    protected function processActionFormCreate(Request $request, ActionMapping $mapping) {
+    protected function processActionFormCreate(Request $request, ActionMapping $mapping): ActionForm {
         $formClass = $mapping->getFormClass();
 
         /** @var ActionForm $form */
@@ -290,7 +290,7 @@ PROCESS_METHOD_ERROR_SC_405;
      *
      * @return bool
      */
-    protected function processActionFormValidate(Request $request, Response $response, ActionMapping $mapping, ActionForm $form) {
+    protected function processActionFormValidate(Request $request, Response $response, ActionMapping $mapping, ActionForm $form): bool {
         if (!$mapping->isFormValidateFirst())
             return true;
 
@@ -325,7 +325,7 @@ PROCESS_METHOD_ERROR_SC_405;
      *
      * @return bool
      */
-    protected function processMappingForward(Request $request, Response $response, ActionMapping $mapping) {
+    protected function processMappingForward(Request $request, Response $response, ActionMapping $mapping): bool {
         $forward = $mapping->getForward();
         if (!$forward)
             return true;
@@ -343,7 +343,7 @@ PROCESS_METHOD_ERROR_SC_405;
      *
      * @return Action
      */
-    protected function processActionCreate(ActionMapping $mapping, ActionForm $form) {
+    protected function processActionCreate(ActionMapping $mapping, ActionForm $form): Action {
         $className = $mapping->getActionClass();
         return new $className($mapping, $form);
     }
@@ -362,7 +362,7 @@ PROCESS_METHOD_ERROR_SC_405;
      *
      * @return ?ActionForward - ActionForward or NULL if the request has already been completed
      */
-    protected function processActionExecute(Request $request, Response $response, Action $action) {
+    protected function processActionExecute(Request $request, Response $response, Action $action): ?ActionForward {
         $forward = $ex = null;
 
         // wrap everything in try-catch, so Action::executeAfter() can be called after any errors
@@ -403,7 +403,7 @@ PROCESS_METHOD_ERROR_SC_405;
      *
      * @return void
      */
-    protected function processActionForward(Request $request, Response $response, ActionForward $forward) {
+    protected function processActionForward(Request $request, Response $response, ActionForward $forward): void {
         $module = $this->module;
 
         if ($forward->isRedirect()) {
@@ -452,7 +452,7 @@ PROCESS_METHOD_ERROR_SC_405;
      *
      * @return void
      */
-    protected function storeActionForm(Request $request) {
+    protected function storeActionForm(Request $request): void {
         $form = $request->getAttribute(Struts::ACTION_FORM_KEY);
         if (!$form || $form instanceof EmptyActionForm)
             return;
@@ -469,7 +469,7 @@ PROCESS_METHOD_ERROR_SC_405;
      *
      * @return void
      */
-    protected function restoreActionForm(Request $request) {
+    protected function restoreActionForm(Request $request): void {
         if ($request->hasSessionId()) {
             $request->getSession();                     // initialize session
             $oldFormKey = Struts::ACTION_FORM_KEY.'.old';
@@ -491,21 +491,21 @@ PROCESS_METHOD_ERROR_SC_405;
      *
      * @return void
      */
-    protected function storeActionMessages(Request $request) {
+    protected function storeActionMessages(Request $request): void {
         $errors = $request->getActionErrors();
         if ($errors) {
             $request->getSession();                     // initialize session
-            if (isset($_SESSION[Struts::ACTION_ERRORS_KEY]))
-                $errors = \array_merge($_SESSION[Struts::ACTION_ERRORS_KEY], $errors);
-            $_SESSION[Struts::ACTION_ERRORS_KEY] = $errors;
+            /** @var string[] $existing */
+            $existing = $_SESSION[Struts::ACTION_ERRORS_KEY] ?? [];
+            $_SESSION[Struts::ACTION_ERRORS_KEY] = \array_merge($existing, $errors);
         }
 
         $messages = $request->getActionMessages();
         if ($messages) {
             $request->getSession();                     // initialize session
-            if (isset($_SESSION[Struts::ACTION_MESSAGES_KEY]))
-                $messages = \array_merge($_SESSION[Struts::ACTION_MESSAGES_KEY], $messages);
-            $_SESSION[Struts::ACTION_MESSAGES_KEY] = $messages;
+            /** @var string[] $existing */
+            $existing = $_SESSION[Struts::ACTION_MESSAGES_KEY] ?? [];
+            $_SESSION[Struts::ACTION_MESSAGES_KEY] = \array_merge($existing, $messages);
         }
     }
 
@@ -518,19 +518,17 @@ PROCESS_METHOD_ERROR_SC_405;
      *
      * @return void
      */
-    protected function restoreActionMessages(Request $request) {
+    protected function restoreActionMessages(Request $request): void {
         if ($request->hasSessionId()) {
             $request->getSession();                     // initialize session
-            $messages = $errors = [];
 
-            if (isset($_SESSION[Struts::ACTION_MESSAGES_KEY])) {
-                $messages = $_SESSION[Struts::ACTION_MESSAGES_KEY];
-                unset($_SESSION[Struts::ACTION_MESSAGES_KEY]);
-            }
-            if (isset($_SESSION[Struts::ACTION_ERRORS_KEY])) {
-                $errors = $_SESSION[Struts::ACTION_ERRORS_KEY];
-                unset($_SESSION[Struts::ACTION_ERRORS_KEY]);
-            }
+            /** @var string[] $messages */
+            $messages = $_SESSION[Struts::ACTION_MESSAGES_KEY] ?? [];
+            /** @var string[] $errors */
+            $errors = $_SESSION[Struts::ACTION_ERRORS_KEY] ?? [];
+
+            unset($_SESSION[Struts::ACTION_ERRORS_KEY]);
+
             $request->setAttribute(Struts::ACTION_MESSAGES_KEY, \array_merge($messages, $errors));
         }
     }

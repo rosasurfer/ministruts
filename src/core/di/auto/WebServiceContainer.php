@@ -23,7 +23,7 @@ class WebServiceContainer extends Di {
      *
      * @param  string $configDir - directory to load service definitions from
      */
-    public function __construct($configDir) {
+    public function __construct(string $configDir) {
         $services = [
             (new Service('output',  Output::class ))->addAlias(Output::class),
             (new Service('request', Request::class))->addAlias(Request::class),
