@@ -20,7 +20,8 @@ trait DiAwareTrait {
      *
      * @param  ?string $name [optional] - service identifier (default: none to return the service container itself)
      *
-     * @return ($name is null ? DiInterface : object)
+     * @return         object
+     * @phpstan-return ($name is null ? DiInterface : object)
      */
     protected static function di(?string $name = null): object {
         $di = Application::getDi();

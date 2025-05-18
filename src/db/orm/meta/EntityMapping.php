@@ -13,7 +13,6 @@ use rosasurfer\ministruts\core\CObject;
  */
 class EntityMapping extends CObject {
 
-
     /** @var string - the entity's class name */
     protected string $className;
 

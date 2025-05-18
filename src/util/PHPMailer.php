@@ -285,7 +285,8 @@ class PHPMailer extends CObject {
      *
      * @param  string|string[] $value - a single value or a list of values
      *
-     * @return ($value is string ? string : string[]) - the encoded value(s)
+     * @return         string|string[] - the encoded value/s
+     * @phpstan-return ($value is string ? string : string[])
      */
     protected function encodeNonAsciiChars($value) {
         if (is_array($value)) {

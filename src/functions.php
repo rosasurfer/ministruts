@@ -251,7 +251,8 @@ function docopt(string $doc, $args=null, array $options=[]): DocoptResult {
  *                                          FALSE, if the variable is to be dumped to the standard output device (default)
  * @param  bool  $flushBuffers [optional] - whether to flush output buffers on output (default: yes)
  *
- * @return ($return is true ? string : null)
+ * @return         ?string
+ * @phpstan-return ($return is true ? string : null)
  */
 function dump($var, bool $return = false, bool $flushBuffers = true): ?string {
     if ($return) ob_start();
@@ -821,7 +822,8 @@ function prettyBytes($value, int $decimals = 1): string {
  *                                          FALSE, if the result is to be printed to the screen (default)
  * @param  bool  $flushBuffers [optional] - whether to flush output buffers on output (default: TRUE)
  *
- * @return ($return is true ? string : null)
+ * @return         ?string
+ * @phpstan-return ($return is true ? string : null)
  */
 function print_p($var, bool $return = false, bool $flushBuffers = true): ?string {
     if (is_object($var) && method_exists($var, '__toString') && !$var instanceof \SimpleXMLElement) {
