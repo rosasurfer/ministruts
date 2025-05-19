@@ -6,6 +6,7 @@ namespace rosasurfer\ministruts\console\docopt\pattern;
 use rosasurfer\ministruts\core\CObject;
 
 use function rosasurfer\ministruts\array_merge;
+use function rosasurfer\ministruts\preg_split;
 
 
 /**
@@ -187,7 +188,7 @@ abstract class Pattern extends CObject {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function __toString(): string {
         return serialize($this);

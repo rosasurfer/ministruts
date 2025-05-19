@@ -8,6 +8,8 @@ use rosasurfer\ministruts\console\docopt\exception\DocoptUserNotification;
 use rosasurfer\ministruts\core\ObjectTrait;
 use rosasurfer\ministruts\core\di\DiAwareTrait;
 
+use function rosasurfer\ministruts\preg_split;
+use function rosasurfer\ministruts\preg_replace;
 
 /**
  * TokenIterator
@@ -33,7 +35,13 @@ class TokenIterator extends \ArrayIterator {
     public function __construct($source, string $errorClass = DocoptUserNotification::class) {
         if (!is_array($source)) {
             $source = trim($source);
-            $source = strlen($source) ? preg_split('/\s+/', $source) : [];
+
+            if (strlen($source)) {
+                $source = preg_split('/\s+/', $source);
+            }
+            else {
+                $source = [];
+            }
         }
         parent::__construct($source);
 
@@ -47,7 +55,6 @@ class TokenIterator extends \ArrayIterator {
      * @return TokenIterator
      */
     public static function fromPattern($source) {
-        /** @var string $source */
         $source = preg_replace('/([\[\]\(\)\|]|\.\.\.)/', ' $1 ', $source);
         $source = preg_split('/\s+|(\S*<.*?'.'>)/', $source, 0, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
         return new static($source, DocoptFormatError::class);
