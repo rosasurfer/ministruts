@@ -43,6 +43,12 @@
       <exclude name="SlevomatCodingStandard.Classes.RequireAbstractOrFinal"/>
       <exclude name="SlevomatCodingStandard.Commenting.DisallowCommentAfterCode"/>
       <exclude name="SlevomatCodingStandard.Commenting.DisallowOneLinePropertyDocComment"/>
+      <exclude name="SlevomatCodingStandard.TypeHints.ClassConstantTypeHint.UselessDocComment"/>
+      <exclude name="SlevomatCodingStandard.TypeHints.DisallowArrayTypeHintSyntax"/>
+      <exclude name="SlevomatCodingStandard.TypeHints.ParameterTypeHint.UselessAnnotation"/>
+      <exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHint.UselessAnnotation"/>
+      <exclude name="SlevomatCodingStandard.TypeHints.PropertyTypeHint.UselessAnnotation"/>
+      <exclude name="SlevomatCodingStandard.TypeHints.UselessConstantTypeHint.UselessDocComment"/>
 
 
       <!--
@@ -77,13 +83,6 @@
       <exclude name="SlevomatCodingStandard.Strings"/>
       <exclude name="SlevomatCodingStandard.Variables"/>
       <exclude name="SlevomatCodingStandard.Whitespaces"/>
-
-      <exclude name="SlevomatCodingStandard.TypeHints.ClassConstantTypeHint.UselessDocComment"/>
-      <exclude name="SlevomatCodingStandard.TypeHints.DisallowArrayTypeHintSyntax"/>
-      <exclude name="SlevomatCodingStandard.TypeHints.ParameterTypeHint.UselessAnnotation"/>
-      <exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHint.UselessAnnotation"/>
-      <exclude name="SlevomatCodingStandard.TypeHints.PropertyTypeHint.UselessAnnotation"/>
-      <exclude name="SlevomatCodingStandard.TypeHints.UselessConstantTypeHint.UselessDocComment"/>
     </rule>
 
 
