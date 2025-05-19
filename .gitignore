@@ -25,17 +25,13 @@ nbactions.xml
 /.vscode
 
 # ignore the following folders and files
-/etc/httpd/cgi/php.ini
-/etc/httpd/log
 /etc/phpstan/phpstan.neon
 /etc/tmp
-/php-error.log
-
-/vendor
 /composer
 /composer.phar
 /composer*.lock
-
-config*.properties
-!config.dist.properties
+/config*.properties
+/php-error.log
+/phpstan.neon
 /services.php
+/vendor
