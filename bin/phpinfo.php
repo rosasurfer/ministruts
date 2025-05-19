@@ -10,12 +10,13 @@ namespace rosasurfer\ministruts;
  * Checks the PHP runtime configuration and reports found issues.
  */
 if (!\is_file($autoload = __DIR__.'/../vendor/autoload.php')) {
-    echo "File \"$autoload\" not found".NL;
+    echo "ERROR: file \"/vendor/autoload.php\" not found".PHP_EOL;
     exit(1);
 }
 
 require($autoload);
 
-echo NL;
+echo PHP_EOL;
 \rosasurfer\ministruts\util\PHP::phpinfo();
-echo NL.'loaded php.ini: "'.\php_ini_loaded_file().'"'.NL;
+$iniFile = \php_ini_loaded_file();
+echo PHP_EOL."loaded php.ini: \"$iniFile\"".PHP_EOL;
