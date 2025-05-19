@@ -15,6 +15,7 @@ jobs:
   integration-checks:
 
     name:    PHP ${{ matrix.php }}
+    if:      ${{ !startsWith(github.ref, 'refs/tags/') }}   # skip the job if the push is just a tag
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -31,11 +32,11 @@ jobs:
       - name: Check commit message for "[skip <tool>]"
         run: |
           REF_NAME=
-          [[ "$GITHUB_EVENT_NAME" == "push"         ]] && REF_NAME="$GITHUB_REF_NAME"
-          [[ "$GITHUB_EVENT_NAME" == "pull_request" ]] && REF_NAME="$GITHUB_HEAD_REF"
+          [[ "$GITHUB_EVENT_NAME" == "push"         ]] && REF_NAME="$GITHUB_REF"
+          [[ "$GITHUB_EVENT_NAME" == "pull_request" ]] && REF_NAME="origin/$GITHUB_HEAD_REF"
           [[ -z "$REF_NAME" ]] && { echo "ERROR: unsupported CI event: $GITHUB_EVENT_NAME"; exit 1; }
 
-          COMMIT_MSG=$(git log -1 --format="%B" "origin/$REF_NAME")
+          COMMIT_MSG=$(git log -1 --format="%B" "$REF_NAME")
 
           SKIP_PHPSTAN=false
           grep -iq '\[skip phpstan\]' <<< "$COMMIT_MSG" && { echo "Magic commit message found: [skip phpstan]"; SKIP_PHPSTAN=true; }
