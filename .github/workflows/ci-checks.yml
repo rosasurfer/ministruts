@@ -1,7 +1,8 @@
 #
-# Runs PHPStan and PHPUnit on every supported PHP version. A tool is skipped if the commit message contains "[skip <tool>]".
+# Runs PHPStan and PHPUnit on every supported PHP version.
+# A tool is skipped if the commit message contains "[skip phpstan]" or "[skip phpunit]".
 #
-name: Integration tests
+name: CI checks
 
 on:
   push:
@@ -11,7 +12,7 @@ permissions:
   contents: read
 
 jobs:
-  integration-tests:
+  integration-checks:
 
     name:    PHP ${{ matrix.php }}
     runs-on: ubuntu-latest
@@ -53,7 +54,6 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           coverage: none
-          tools:    none                                    # phpstan:2, phpunit:9
         env:
           GITHUB_TOKEN: ${{ secrets.GH_OAUTH_TOKEN }}
           fail-fast: true                                   # don't try to continue on setup errors
