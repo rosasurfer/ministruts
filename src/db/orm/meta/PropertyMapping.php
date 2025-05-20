@@ -6,15 +6,14 @@ namespace rosasurfer\ministruts\db\orm\meta;
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\db\ConnectorInterface as IConnector;
-
+use rosasurfer\ministruts\phpstan\CustomTypes;
 
 /**
  * A PropertyMapping is an object encapsulating meta information about how to map a PHP class property to a database column.
  *
- * @phpstan-import-type ORM_PROPERTY from \rosasurfer\ministruts\phpstan\CustomTypes
+ * @phpstan-import-type ORM_PROPERTY from CustomTypes
  */
 class PropertyMapping extends CObject {
-
 
     /** @var EntityMapping - the entity mapping this mapping is a part of */
     protected EntityMapping $entityMapping;

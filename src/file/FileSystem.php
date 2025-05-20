@@ -9,14 +9,12 @@ use rosasurfer\ministruts\core\StaticClass;
 use rosasurfer\ministruts\core\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 
-
 /**
  * FileSystem
  *
  * File system related functionality
  */
 class FileSystem extends StaticClass {
-
 
     /**
      * Drop-in replacement for the built-in PHP function {@link \mkdir()}.

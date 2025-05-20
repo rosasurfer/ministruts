@@ -20,7 +20,6 @@ use rosasurfer\ministruts\console\docopt\pattern\Required;
 
 use function rosasurfer\ministruts\docopt;
 
-
 /**
  * Tests ported from Python to PHPUnit
  */
@@ -37,6 +36,7 @@ class PythonPortedTest extends TestCase {
             [new Argument('N'), new Option('-a'), new Argument('M')]
         );
     }
+
 
     /**
      *
@@ -66,6 +66,7 @@ class PythonPortedTest extends TestCase {
         $this->assertEquals(Option::parse('-h TOPIC  Description... [dEfAuLt: 2]'),       new Option('-h', null, 1, '2'));
     }
 
+
     /**
      *
      */
@@ -79,6 +80,7 @@ class PythonPortedTest extends TestCase {
         $option = new Option(null, '--help');
         $this->assertSame($option->name(), '--help');
     }
+
 
     /**
      *
@@ -95,6 +97,7 @@ class PythonPortedTest extends TestCase {
         $this->assertSame($this->docopt('Usage: prog a b', 'b a')->getError(), 1);
     }
 
+
     /**
      *
      */
@@ -103,14 +106,14 @@ class PythonPortedTest extends TestCase {
             "Usage: prog [-hv] ARG\n"
            ."           prog N M\n"
            ."\n"
-           ."prog is a program"
-        ;
+           ."prog is a program";
 
-        list($usage, ) = TestParser::parseSection('usage:', $doc);
+        [$usage, ] = TestParser::parseSection('usage:', $doc);
 
         $this->assertSame($usage, "Usage: prog [-hv] ARG\n           prog N M");
         $this->assertSame(TestParser::formalUsage($usage), "( [-hv] ARG ) | ( N M )");
     }
+
 
     /**
      *
@@ -161,6 +164,7 @@ class PythonPortedTest extends TestCase {
             ]
         );
     }
+
 
     /**
      *
@@ -225,6 +229,7 @@ class PythonPortedTest extends TestCase {
         $this->assertEquals(TestParser::parsePattern('add',   $o), new Required(new Command('add')));
     }
 
+
     /**
      *
      */
@@ -260,6 +265,7 @@ class PythonPortedTest extends TestCase {
         );
     }
 
+
     /**
      *
      */
@@ -289,6 +295,7 @@ class PythonPortedTest extends TestCase {
         );
     }
 
+
     /**
      *
      */
@@ -317,6 +324,7 @@ class PythonPortedTest extends TestCase {
             [true, [], [new Command('rm', true)]]
         );
     }
+
 
     /**
      *
@@ -371,6 +379,7 @@ class PythonPortedTest extends TestCase {
         );
     }
 
+
     /**
      *
      */
@@ -399,6 +408,7 @@ class PythonPortedTest extends TestCase {
             [false, array(new Option('-a')), []]
         );
     }
+
 
     /**
      *
@@ -434,6 +444,7 @@ class PythonPortedTest extends TestCase {
             array(true, [], array(new Argument('N', 1), new Argument('M', 2)))
         );
     }
+
 
     /**
      *
@@ -494,6 +505,7 @@ class PythonPortedTest extends TestCase {
         );
     }
 
+
     /**
      *
      */
@@ -524,6 +536,7 @@ class PythonPortedTest extends TestCase {
         );
     }
 
+
     /**
      *
      */
@@ -549,6 +562,7 @@ class PythonPortedTest extends TestCase {
             array(false, array(new Option('-x'), new Argument(null, 9), new Argument(null, 5)), [])
         );
     }
+
 
     /**
      *
@@ -601,6 +615,7 @@ class PythonPortedTest extends TestCase {
         );
     }
 
+
     /**
      *
      */
@@ -624,6 +639,7 @@ class PythonPortedTest extends TestCase {
         );
     }
 
+
     /**
      *
      */
@@ -634,6 +650,7 @@ class PythonPortedTest extends TestCase {
             array(new Argument('N'))
         );
     }
+
 
     /**
      *
@@ -646,6 +663,7 @@ class PythonPortedTest extends TestCase {
         $this->assertSame($pattern->children[0], $pattern->children[1]);
     }
 
+
     /**
      *
      */
@@ -656,6 +674,7 @@ class PythonPortedTest extends TestCase {
         $pattern->fixIdentities();
         $this->assertSame($pattern->children[0]->children[1], $pattern->children[1]);
     }
+
 
     /**
      *
@@ -675,6 +694,7 @@ class PythonPortedTest extends TestCase {
         $this->assertFalse($result->isSuccess());
     }
 
+
     /**
      *
      */
@@ -682,6 +702,7 @@ class PythonPortedTest extends TestCase {
         $this->expectException(DocoptFormatError::class);
         $this->docopt("Usage: prog --long\nOptions: --long ARG");
     }
+
 
     /**
      *
@@ -691,6 +712,7 @@ class PythonPortedTest extends TestCase {
         $this->assertFalse($result->isSuccess());
     }
 
+
     /**
      *
      */
@@ -698,6 +720,7 @@ class PythonPortedTest extends TestCase {
         $this->expectException(DocoptFormatError::class);
         $this->docopt("Usage: prog --long=ARG\nOptions: --long");
     }
+
 
     /**
      *
@@ -707,6 +730,7 @@ class PythonPortedTest extends TestCase {
         $this->assertFalse($result->isSuccess());
     }
 
+
     /**
      *
      */
@@ -714,6 +738,7 @@ class PythonPortedTest extends TestCase {
         $this->expectException(DocoptFormatError::class);
         $this->docopt("Usage: prog -x\nOptions: -x  this\n -x  that");
     }
+
 
     /**
      *
@@ -723,6 +748,7 @@ class PythonPortedTest extends TestCase {
         $this->assertFalse($result->isSuccess());
     }
 
+
     /**
      *
      */
@@ -730,6 +756,7 @@ class PythonPortedTest extends TestCase {
         $this->expectException(DocoptFormatError::class);
         $this->docopt("Usage: prog -o\nOptions: -o ARG");
     }
+
 
     /**
      *
@@ -739,6 +766,7 @@ class PythonPortedTest extends TestCase {
         $this->assertFalse($result->isSuccess());
     }
 
+
     /**
      *
      */
@@ -747,6 +775,7 @@ class PythonPortedTest extends TestCase {
         $this->docopt('Usage: prog [a [b]');
     }
 
+
     /**
      *
      */
@@ -754,6 +783,7 @@ class PythonPortedTest extends TestCase {
         $this->expectException(DocoptFormatError::class);
         $this->docopt('Usage: prog [a [b] ] c )');
     }
+
 
     /**
      *
@@ -772,6 +802,7 @@ class PythonPortedTest extends TestCase {
         $result = $this->docopt("usage: prog [-o] <arg>\nOptions: -o", '-- -o');    // "--" is not allowed; FIXME?
         $this->assertFalse($result->isSuccess());
     }
+
 
     /**
      *
@@ -816,6 +847,7 @@ class PythonPortedTest extends TestCase {
         $this->assertTrue($result['--help']);
     }
 
+
     /**
      *
      */
@@ -824,6 +856,7 @@ class PythonPortedTest extends TestCase {
         $this->docopt('no usage with colon here');
     }
 
+
     /**
      *
      */
@@ -831,6 +864,7 @@ class PythonPortedTest extends TestCase {
         $this->expectException(DocoptFormatError::class);
         $this->docopt("usage: here \n\n and again usage: here");
     }
+
 
     /**
      *
@@ -844,6 +878,7 @@ class PythonPortedTest extends TestCase {
             array('--aabb'=>false, '--aa'=>true)
         );
     }
+
 
     /**
      *
@@ -861,6 +896,7 @@ class PythonPortedTest extends TestCase {
         $this->assertEquals($this->docopt('usage: prog -v...', '-vvvvvv')->getArgs(), array('-v'=>6));
         $this->assertEquals($this->docopt('usage: prog [--ver --ver]', '--ver --ver')->getArgs(), array('--ver'=>2));
     }
+
 
     /**
      *
@@ -899,16 +935,17 @@ class PythonPortedTest extends TestCase {
         //);
     }
 
-    #def test_options_shortcut_multiple_commands():
-    #    # any_options is disabled
-    #    $this->assertEquals(
-    #        $this->docopt('usage: prog c1 [options] prog c2 [options]', 'c2 -o', $any_options=true),
-    #        array('-o'=>true, 'c1'=>false, 'c2'=>true)
-    #    );
-    #    $this->assertEquals(
-    #        $this->docopt('usage: prog c1 [options] prog c2 [options]', 'c1 -o', $any_options=true),
-    #        array('-o'=>true, 'c1'=>true, 'c2'=>false)
-    #    );
+    // def test_options_shortcut_multiple_commands():
+    //     # any_options is disabled
+    //     $this->assertEquals(
+    //         $this->docopt('usage: prog c1 [options] prog c2 [options]', 'c2 -o', $any_options=true),
+    //         array('-o'=>true, 'c1'=>false, 'c2'=>true)
+    //     );
+    //     $this->assertEquals(
+    //         $this->docopt('usage: prog c1 [options] prog c2 [options]', 'c1 -o', $any_options=true),
+    //         array('-o'=>true, 'c1'=>true, 'c2'=>false)
+    //     );
+
 
     /**
      * for some reason removed in the Python version
@@ -922,6 +959,7 @@ class PythonPortedTest extends TestCase {
         $result = $this->docopt("usage: prog [options] [-a]\nOptions: -a -b", '-aa');
         $this->assertFalse($result->isSuccess());
     }
+
 
     /**
      *
@@ -949,26 +987,27 @@ class PythonPortedTest extends TestCase {
         //$this->assertEquals($args, ['--data'=>['hello world']]);
     }
 
-    #def test_parse_defaults():
-    #    $this->assertEquals(parse_defaults("""usage: prog
-    #
-    #                          -o, --option <o>
-    #                          --another <a>  description
-    #                                         [default: x]
-    #                          <a>
-    #                          <another>  description [default: y]"""),
-    #           ([new Option('-o', '--option', 1, null),
-    #             new Option(null, '--another', 1, 'x')],
-    #            [new Argument('<a>', null),
-    #             new Argument('<another>', 'y')])
-    #
-    #    doc = '''
-    #    -h, --help  Print help message.
-    #    -o FILE     Output file.
-    #    --verbose   Verbose mode.'''
-    #    $this->assertEquals(parse_defaults(doc)[0], [new Option('-h', '--help'),
-    #                                      new Option('-o', null, 1),
-    #                                      new Option(null, '--verbose')]
+    // def test_parse_defaults():
+    //     $this->assertEquals(parse_defaults("""usage: prog
+    //
+    //                           -o, --option <o>
+    //                           --another <a>  description
+    //                                          [default: x]
+    //                           <a>
+    //                           <another>  description [default: y]"""),
+    //            ([new Option('-o', '--option', 1, null),
+    //              new Option(null, '--another', 1, 'x')],
+    //             [new Argument('<a>', null),
+    //              new Argument('<another>', 'y')])
+    //
+    //     doc = '''
+    //     -h, --help  Print help message.
+    //     -o FILE     Output file.
+    //     --verbose   Verbose mode.'''
+    //     $this->assertEquals(parse_defaults(doc)[0], [new Option('-h', '--help'),
+    //                                       new Option('-o', null, 1),
+    //                                       new Option(null, '--verbose')]
+
 
     /**
      *
@@ -977,6 +1016,7 @@ class PythonPortedTest extends TestCase {
         $this->assertEquals($this->docopt("usage: prog --long=<a>", '--long=')->getArgs(), array('--long'=>''));
         $this->assertEquals($this->docopt("usage: prog -l <a>\noptions: -l <a>", array('-l', ''))->getArgs(), array('-l'=>''));
     }
+
 
     /**
      *
@@ -1004,6 +1044,7 @@ class PythonPortedTest extends TestCase {
         );
     }
 
+
     /**
      *
      */
@@ -1014,6 +1055,7 @@ class PythonPortedTest extends TestCase {
         $this->assertTrue($args['-x']);
         $this->assertFalse($args['-y']);
     }
+
 
     /**
      *
@@ -1026,6 +1068,7 @@ class PythonPortedTest extends TestCase {
         $this->assertFalse($result->isSuccess());
     }
 
+
     /**
      *
      */
@@ -1034,7 +1077,7 @@ class PythonPortedTest extends TestCase {
         $this->assertEquals(TestParser::parseSection('usage:', 'usage: prog'), array('usage: prog'));
         $this->assertEquals(TestParser::parseSection('usage:', "usage: -x\n -y"), array("usage: -x\n -y"));
 
-        $usage = <<<TEST_PARSE_SECTION
+        $usage = <<<'PARSE_SECTION'
 usage: this
 
 usage:hai
@@ -1052,7 +1095,7 @@ usage:
 Usage: eggs spam
 BAZZ
 usage: pit stop
-TEST_PARSE_SECTION;
+PARSE_SECTION;
 
         $this->assertEquals(
             TestParser::parseSection("usage:", $usage),
@@ -1069,6 +1112,7 @@ TEST_PARSE_SECTION;
         );
     }
 
+
     /**
      *
      */
@@ -1079,6 +1123,7 @@ TEST_PARSE_SECTION;
             array(new Option(null, '--foo', 1, 'bar'))
         );
     }
+
 
     /**
      * @param  string                     $doc

@@ -14,9 +14,8 @@ use PHPStan\Type\Type;
 
 use function rosasurfer\ministruts\simpleClassName;
 
-
 /**
- * Overwrites the return type of many PHP core functions, taking into account the installed error handler.
+ * Overwrites the return type of PHP core functions, taking into account the installed error handler.
  * If a function emits an internal PHP error on failure, the error handler ensures that an exception is thrown instead.
  * Removing the return type of the error condition (usually FALSE or NULL) from the resulting return type
  * simplifies PHPStan analysis considerably.

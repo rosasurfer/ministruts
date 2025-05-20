@@ -11,7 +11,6 @@ use function rosasurfer\ministruts\preg_replace;
 
 use const rosasurfer\ministruts\NL;
 
-
 /**
  * Unit tests using original Python fixtures
  */
@@ -33,6 +32,7 @@ class PythonFixturesTest extends TestCase {
 
         $this->assertEquals($expected, $actual);
     }
+
 
     /**
      * Provide the original Python fixtures as an array of test cases.
@@ -65,11 +65,11 @@ class PythonFixturesTest extends TestCase {
 
             $parts = explode('"""', $fixture, 2);
             if (sizeof($parts) < 2) throw new Exception('Missing string close marker');
-            list($usage, $body) = $parts;
+            [$usage, $body] = $parts;
                                                                     // split test cases
             foreach (array_slice(explode('$', $body), 1) as $testCase) {
                 $testCase = trim($testCase);
-                list($argv, $expected) = explode(NL, $testCase, 2);
+                [$argv, $expected] = explode(NL, $testCase, 2);
                 $expected = json_decode($expected, true, 512, JSON_THROW_ON_ERROR);
 
                 $name = "$i: $argv";

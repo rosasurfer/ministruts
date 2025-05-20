@@ -8,7 +8,6 @@ use rosasurfer\ministruts\struts\ActionForm;
 use rosasurfer\ministruts\struts\EmptyActionForm;
 use rosasurfer\ministruts\struts\Struts;
 
-
 /**
  * Form
  *
@@ -20,7 +19,6 @@ use rosasurfer\ministruts\struts\Struts;
  * of both forms together in a single API call.
  */
 class Form extends Facade {
-
 
     /**
      * Return the current HTTP request's {@link ActionForm} property with the specified name.

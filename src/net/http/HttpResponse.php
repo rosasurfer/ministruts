@@ -5,7 +5,6 @@ namespace rosasurfer\ministruts\net\http;
 
 use rosasurfer\ministruts\core\CObject;
 
-
 /**
  * HttpResponse
  *
@@ -18,229 +17,218 @@ abstract class HttpResponse extends CObject {
     // HTTP status codes; @see RFC 2068
 
     /**
-     * @var int - Status code (100) indicating the client can continue.
+     * Status code (100) indicating the client can continue.
      */
-    const SC_CONTINUE = 100;
+    public const SC_CONTINUE = 100;
 
     /**
-     * @var int - Status code (101) indicating the server is switching protocols according to Upgrade header.
+     * Status code (101) indicating the server is switching protocols according to Upgrade header.
      */
-    const SC_SWITCHING_PROTOCOLS = 101;
+    public const SC_SWITCHING_PROTOCOLS = 101;
 
     /**
-     * @var int - Status code (200) indicating the request succeeded normally.
+     * Status code (200) indicating the request succeeded normally.
      */
-    const SC_OK = 200;
+    public const SC_OK = 200;
 
     /**
-     * @var int - Status code (201) indicating the request succeeded and created a new resource on the server.
+     * Status code (201) indicating the request succeeded and created a new resource on the server.
      */
-    const SC_CREATED = 201;
+    public const SC_CREATED = 201;
 
     /**
-     * @var int - Status code (202) indicating that a request was accepted for processing, but was not completed.
+     * Status code (202) indicating that a request was accepted for processing, but was not completed.
      */
-    const SC_ACCEPTED = 202;
+    public const SC_ACCEPTED = 202;
 
     /**
-     * @var int - Status code (203) indicating that the meta information presented by the client did not originate from
-     *            the server.
+     * Status code (203) indicating that the meta information presented by the client did not originate from the server.
      */
-    const SC_NON_AUTHORITATIVE_INFORMATION = 203;
+    public const SC_NON_AUTHORITATIVE_INFORMATION = 203;
 
     /**
-     * @var int - Status code (204) indicating that the request succeeded but that there was no new information to return.
+     * Status code (204) indicating that the request succeeded but that there was no new information to return.
      */
-    const SC_NO_CONTENT = 204;
+    public const SC_NO_CONTENT = 204;
 
     /**
-     * @var int - Status code (205) indicating that the agent should reset the document view which caused the request to be
-     *            sent.
+     * Status code (205) indicating that the agent should reset the document view which caused the request to be sent.
      */
-    const SC_RESET_CONTENT = 205;
+    public const SC_RESET_CONTENT = 205;
 
     /**
-     * @var int - Status code (206) indicating that the server has fulfilled the partial GET request for the resource.
+     * Status code (206) indicating that the server has fulfilled the partial GET request for the resource.
      */
-    const SC_PARTIAL_CONTENT = 206;
+    public const SC_PARTIAL_CONTENT = 206;
 
     /**
-     * @var int - Status code (300) indicating that the requested resource corresponds to any one of a set of
-     *            representations, each with its own specific location.
+     * Status code (300) indicating that the requested resource corresponds to any one of a set of
+     * representations, each with its own specific location.
      */
-    const SC_MULTIPLE_CHOICES = 300;
+    public const SC_MULTIPLE_CHOICES = 300;
 
     /**
-     * @var int - Status code (301) indicating that the resource has permanently moved to a new location, and that future
-     *            references should use a new URI with their requests.
+     * Status code (301) indicating that the resource has permanently moved to a new location, and that future
+     * references should use a new URI with their requests.
      */
-    const SC_MOVED_PERMANENTLY = 301;
+    public const SC_MOVED_PERMANENTLY = 301;
 
     /**
-     * @var int - Status code (302) indicating that the resource has temporarily moved to another location, but that future
-     *            references should still use the original URI to access the resource.
+     * Status code (302) indicating that the resource has temporarily moved to another location, but that future
+     * references should still use the original URI to access the resource.
      */
-    const SC_MOVED_TEMPORARILY = 302;
+    public const SC_MOVED_TEMPORARILY = 302;
 
     /**
-     * @var int - Status code (303) indicating that the response to the request can be found under a different URI.
+     * Status code (303) indicating that the response to the request can be found under a different URI.
      */
-    const SC_SEE_OTHER = 303;
+    public const SC_SEE_OTHER = 303;
 
     /**
-     * @var int - Status code (304) indicating that a conditional GET operation found that the resource was available and
-     *            not modified.
+     * Status code (304) indicating that a conditional GET operation found that the resource was available and not modified.
      */
-    const SC_NOT_MODIFIED = 304;
+    public const SC_NOT_MODIFIED = 304;
 
     /**
-     * @var int - Status code (305) indicating that the requested resource must be accessed through the proxy given by the
-     *            "Location" header.
+     * Status code (305) indicating that the requested resource must be accessed through the proxy given by the "Location" header.
      */
-    const SC_USE_PROXY = 305;
+    public const SC_USE_PROXY = 305;
 
     /**
-     * @var int - Status code (307) indicating that the requested resource resides temporarily under a different URI. The
-     *            temporary URI should be given by the "Location" header of the response.
+     * Status code (307) indicating that the requested resource resides temporarily under a different URI. The
+     * temporary URI should be given by the "Location" header of the response.
      */
-    const SC_TEMPORARY_REDIRECT = 307;
+    public const SC_TEMPORARY_REDIRECT = 307;
 
     /**
-     * @var int - Status code (400) indicating the request sent by the client was syntactically incorrect.
+     * Status code (400) indicating the request sent by the client was syntactically incorrect.
      */
-    const SC_BAD_REQUEST = 400;
+    public const SC_BAD_REQUEST = 400;
 
     /**
-     * @var int - Status code (401) indicating that the request requires HTTP authentication.
+     * Status code (401) indicating that the request requires HTTP authentication.
      */
-    const SC_UNAUTHORIZED = 401;
+    public const SC_UNAUTHORIZED = 401;
 
     /**
-     * @var int - Status code (402) reserved for future use.
+     * Status code (402) reserved for future use.
      */
-    const SC_PAYMENT_REQUIRED = 402;
+    public const SC_PAYMENT_REQUIRED = 402;
 
     /**
-     * @var int - Status code (403) indicating the server understood the request but refused to fulfill it.
+     * Status code (403) indicating the server understood the request but refused to fulfill it.
      */
-    const SC_FORBIDDEN = 403;
+    public const SC_FORBIDDEN = 403;
 
     /**
-     * @var int - Status code (404) indicating that the requested resource is not available.
+     * Status code (404) indicating that the requested resource is not available.
      */
-    const SC_NOT_FOUND = 404;
+    public const SC_NOT_FOUND = 404;
 
     /**
-     * @var int - Status code (405) indicating that the method specified in the "Request-Line" is not allowed for the
-     *            resource identified by the "Request-URI".
+     * Status code (405) indicating that the method specified in the "Request-Line" is not allowed for the
+     * resource identified by the "Request-URI".
      */
-    const SC_METHOD_NOT_ALLOWED = 405;
+    public const SC_METHOD_NOT_ALLOWED = 405;
 
     /**
-     * @var int - Status code (406) indicating that the resource identified by the request is only capable of generating
-     *            response entities which have content characteristics not acceptable according to the accept headers sent
-     *            in the request.
+     * Status code (406) indicating that the resource identified by the request is only capable of generating response entities
+     * which have content characteristics not acceptable according to the accept headers sent in the request.
      */
-    const SC_NOT_ACCEPTABLE = 406;
+    public const SC_NOT_ACCEPTABLE = 406;
 
     /**
-     * @var int - Status code (407) indicating that the client must first authenticate itself with the proxy.
+     * Status code (407) indicating that the client must first authenticate itself with the proxy.
      */
-    const SC_PROXY_AUTHENTICATION_REQUIRED = 407;
+    public const SC_PROXY_AUTHENTICATION_REQUIRED = 407;
 
     /**
-     * @var int - Status code (408) indicating that the client did not produce a request within the time that the server was
-     *            prepared to wait.
+     * Status code (408) indicating that the client did not produce a request within the time that the server was prepared to wait.
      */
-    const SC_REQUEST_TIMEOUT = 408;
+    public const SC_REQUEST_TIMEOUT = 408;
 
     /**
-     * @var int - Status code (409) indicating that the request could not be completed due to a conflict with the current
-     *            state of the resource.
+     * Status code (409) indicating that the request could not be completed due to a conflict with the current state of the resource.
      */
-    const SC_CONFLICT = 409;
+    public const SC_CONFLICT = 409;
 
     /**
-     * @var int - Status code (410) indicating that the resource is no longer available at the server and no forwarding
-     *            address is known. This condition should be considered permanent.
+     * Status code (410) indicating that the resource is no longer available at the server and no forwarding
+     * address is known. This condition should be considered permanent.
      */
-    const SC_GONE = 410;
+    public const SC_GONE = 410;
 
     /**
-     * @var int - Status code (411) indicating that the request cannot be handled without a defined "Content-Length" header.
+     * Status code (411) indicating that the request cannot be handled without a defined "Content-Length" header.
      */
-    const SC_LENGTH_REQUIRED = 411;
+    public const SC_LENGTH_REQUIRED = 411;
 
     /**
-     * @var int - Status code (412) indicating that the precondition given in one or more of the request headers evaluated
-     *            to FALSE when it was tested on the server.
+     * Status code (412) indicating that the precondition given in one or more of the request headers evaluated
+     * to FALSE when it was tested on the server.
      */
-    const SC_PRECONDITION_FAILED = 412;
+    public const SC_PRECONDITION_FAILED = 412;
 
     /**
-     * @var int - Status code (413) indicating that the server is refusing to process the request because the request entity
-     *            is larger than the server is willing or able to process.
+     * Status code (413) indicating that the server is refusing to process the request because the request entity
+     * is larger than the server is willing or able to process.
      */
-    const SC_REQUEST_ENTITY_TOO_LARGE = 413;
+    public const SC_REQUEST_ENTITY_TOO_LARGE = 413;
 
     /**
-     * @var int - Status code (414) indicating that the server is refusing to service the request because the "Request-URI"
-     *            is longer than the server is willing to interpret.
+     * Status code (414) indicating that the server is refusing to service the request because the "Request-URI"
+     * is longer than the server is willing to interpret.
      */
-    const SC_REQUEST_URI_TOO_LONG = 414;
+    public const SC_REQUEST_URI_TOO_LONG = 414;
 
     /**
-     * @var int - Status code (415) indicating that the server is refusing to service the request because the entity of the
-     *            request is in a format not supported by the requested resource for the requested method.
+     * Status code (415) indicating that the server is refusing to service the request because the entity of the
+     * request is in a format not supported by the requested resource for the requested method.
      */
-    const SC_UNSUPPORTED_MEDIA_TYPE = 415;
+    public const SC_UNSUPPORTED_MEDIA_TYPE = 415;
 
     /**
-     * @var int - Status code (416) indicating that the server cannot serve the requested byte range.
+     * Status code (416) indicating that the server cannot serve the requested byte range.
      */
-    const SC_REQUESTED_RANGE_NOT_SATISFIABLE = 416;
+    public const SC_REQUESTED_RANGE_NOT_SATISFIABLE = 416;
 
     /**
-     * @var int - Status code (417) indicating that the server could not meet the expectation given in the "Expect" request
-     *            header.
+     * Status code (417) indicating that the server could not meet the expectation given in the "Expect" request header.
      */
-    const SC_EXPECTATION_FAILED = 417;
+    public const SC_EXPECTATION_FAILED = 417;
 
     /**
-     * @var int - Status code (500) indicating an error inside the HTTP server which prevented it from fulfilling the
-     *            request.
+     * Status code (500) indicating an error inside the HTTP server which prevented it from fulfilling the request.
      */
-    const SC_INTERNAL_SERVER_ERROR = 500;
+    public const SC_INTERNAL_SERVER_ERROR = 500;
 
     /**
-     * @var int - Status code (501) indicating the HTTP server does not support the functionality needed to fulfill the
-     *            request.
+     * Status code (501) indicating the HTTP server does not support the functionality needed to fulfill the request.
      */
-    const SC_NOT_IMPLEMENTED = 501;
+    public const SC_NOT_IMPLEMENTED = 501;
 
     /**
-     * @var int - Status code (502) indicating that the HTTP server received an invalid response from a server it consulted
-     *            when acting as a proxy or gateway.
+     * Status code (502) indicating that the HTTP server received an invalid response from a server it consulted
+     * when acting as a proxy or gateway.
      */
-    const SC_BAD_GATEWAY = 502;
+    public const SC_BAD_GATEWAY = 502;
 
     /**
-     * @var int - Status code (503) indicating that the HTTP server is temporarily overloaded, and unable to handle the
-     *            request.
+     * Status code (503) indicating that the HTTP server is temporarily overloaded, and unable to handle the request.
      */
-    const SC_SERVICE_UNAVAILABLE = 503;
+    public const SC_SERVICE_UNAVAILABLE = 503;
 
     /**
-     * @var int - Status code (504) indicating that the server did not receive a timely response from the upstream server
-     *            while acting as a gateway or proxy.
+     * Status code (504) indicating that the server did not receive a timely response from the upstream server
+     * while acting as a gateway or proxy.
      */
-    const SC_GATEWAY_TIMEOUT = 504;
+    public const SC_GATEWAY_TIMEOUT = 504;
 
     /**
-     * @var int - Status code (505) indicating that the server does not support or refuses to support the HTTP protocol
-     *            version that was used in the request message.
+     * Status code (505) indicating that the server does not support or refuses to support the HTTP protocol
+     * version that was used in the request message.
      */
-    const SC_HTTP_VERSION_NOT_SUPPORTED = 505;
+    public const SC_HTTP_VERSION_NOT_SUPPORTED = 505;
 
 
     /** @var string[] - HTTP status code descriptions */

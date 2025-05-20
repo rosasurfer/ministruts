@@ -6,7 +6,6 @@ namespace rosasurfer\ministruts\cache\monitor;
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 
-
 /**
  * Base class for dependencies on states or conditions, to be used to trigger actions depending on state changes.
  *
@@ -33,7 +32,6 @@ use rosasurfer\ministruts\core\exception\InvalidValueException;
  */
 abstract class Dependency extends CObject {
 
-
     /** @var int - min. validity of the instance in seconds */
     private int $minValidity = 0;
 
@@ -52,9 +50,9 @@ abstract class Dependency extends CObject {
      *
      * @param  Dependency $dependency
      *
-     * @return self
+     * @return Dependency
      */
-    public function andDependency(Dependency $dependency): self {
+    public function andDependency(self $dependency): self {
         if ($dependency === $this) {
             return $this;
         }
@@ -67,9 +65,9 @@ abstract class Dependency extends CObject {
      *
      * @param  Dependency $dependency
      *
-     * @return self
+     * @return Dependency
      */
-    public function orDependency(Dependency $dependency): self {
+    public function orDependency(self $dependency): self {
         if ($dependency === $this) {
             return $this;
         }

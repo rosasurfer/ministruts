@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\core\di\facade;
 
-
 /**
  * Forms
  *
@@ -14,7 +13,6 @@ namespace rosasurfer\ministruts\core\di\facade;
  * access properties of both forms together in a single API call.
  */
 class Forms extends Facade {
-
 
     /**
      * Return the {@link \rosasurfer\ministruts\struts\ActionForm} property with the specified name from any of the current or the

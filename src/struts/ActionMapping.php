@@ -10,14 +10,12 @@ use rosasurfer\ministruts\core\exception\IllegalStateException;
 use function rosasurfer\ministruts\strCompareI;
 use function rosasurfer\ministruts\strLeftTo;
 
-
 /**
  * ActionMapping
  *
  * An ActionMapping encapsulates the processing instructions for a single route.
  */
 class ActionMapping extends CObject {
-
 
     /** @var bool - whether this component is fully configured */
     protected bool $configured = false;

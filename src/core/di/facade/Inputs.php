@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\core\di\facade;
 
-
 /**
  * Inputs
  *
@@ -15,7 +14,6 @@ namespace rosasurfer\ministruts\core\di\facade;
  * to access both input parameters together in a single API call.
  */
 class Inputs extends Facade {
-
 
     /**
      * Return all raw input parameters from the current and the previous HTTP request.

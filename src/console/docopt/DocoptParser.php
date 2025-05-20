@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\console\docopt;
 
+use UnexpectedValueException;
+
 use rosasurfer\ministruts\core\CObject;
 
 use rosasurfer\ministruts\console\docopt\exception\DocoptFormatError;
@@ -25,14 +27,12 @@ use function rosasurfer\ministruts\strStartsWith;
 
 use const rosasurfer\ministruts\NL;
 
-
 /**
  * DocoptParser
  *
  * A command line argument parser for the {@link https://docopt.org/#} language format.
  */
 class DocoptParser extends CObject {
-
 
     /** @var bool */
     protected bool $optionsFirst = false;
@@ -103,7 +103,7 @@ class DocoptParser extends CObject {
 
             $this->handleSpecials($this->help, $this->version, $args, $doc);
 
-            list($matched, $left, $collected) = $pattern->fix()->match($args);
+            [$matched, $left, $collected] = $pattern->fix()->match($args);
             if ($matched && !$left) {
                 $result = [];
                 foreach (array_merge($pattern->flat(), $collected) as $pattern) {
@@ -174,7 +174,7 @@ class DocoptParser extends CObject {
      * @return string
      */
     protected static function formalUsage(string $section): string {
-        list(, $section) = explode(':', $section, 2);       // drop "usage:"
+        [, $section] = explode(':', $section, 2);       // drop "usage:"
         $pu = preg_split('/\s+/', trim($section));
 
         $ret = [];
@@ -236,7 +236,7 @@ class DocoptParser extends CObject {
         $defaults = [];
         foreach (static::parseSection('options:', $doc) as $section) {
             # FIXME corner case "bla: options: --foo"
-            list (, $section) = explode(':', $section, 2);
+            [, $section] = explode(':', $section, 2);
 
             /** @var string[] $split */
             $split = preg_split("/\n[ \t]*(-\S+?)/", "\n".$section, 0, PREG_SPLIT_DELIM_CAPTURE);
@@ -244,7 +244,7 @@ class DocoptParser extends CObject {
 
             $split = [];
             for ($size=sizeof($splitTmp), $i=0; $i < $size; $i+=2) {
-                $split[] = $splitTmp[$i].(isset($splitTmp[$i+1]) ? $splitTmp[$i+1] : '');
+                $split[] = $splitTmp[$i].($splitTmp[$i+1] ?? '');
             }
             $options = [];
             foreach ($split as $value) {
@@ -360,7 +360,7 @@ class DocoptParser extends CObject {
         $token = $tokens->move();
 
         if (!isset($token) || strpos($token, '-') !== 0 || strpos($token, '--') === 0) {
-            throw new \UnexpectedValueException("short token '$token' does not start with '-' or '--'");
+            throw new UnexpectedValueException("short token '$token' does not start with '-' or '--'");
         }
 
         $left = ltrim($token, '-');
@@ -405,7 +405,7 @@ class DocoptParser extends CObject {
                     }
                 }
                 if ($tokens->getErrorClass() == DocoptUserNotification::class) {
-                    $o->value = isset($value) ? $value : true;
+                    $o->value = $value ?? true;
                 }
             }
             $parsed[] = $o;
@@ -439,14 +439,14 @@ class DocoptParser extends CObject {
         }
 
         if (strpos($long, '--') !== 0) {
-            throw new \UnexpectedValueException("Expected long option, found '$long'");
+            throw new UnexpectedValueException("Expected long option, found '$long'");
         }
         $similar = array_values(array_filter($options, function($o) use ($long) {
-            return ($o->long && $o->long==$long);
+            return $o->long && $o->long==$long;
         }));
         if ($tokenError==DocoptUserNotification::class && !$similar) {
             $similar = array_values(array_filter($options, function($o) use ($long) {
-                return ($o->long && strpos($o->long, $long)===0);
+                return $o->long && strpos($o->long, $long)===0;
             }));
         }
         /** @var ?Option $o */
@@ -506,7 +506,7 @@ class DocoptParser extends CObject {
                 '(' => [')', Required::class],
                 '[' => [']', Optional::class],
             ];
-            list($matching, $patternClass) = $index[$token];
+            [$matching, $patternClass] = $index[$token];
 
             $result = new $patternClass(static::parseExpression($tokens, $options));
             if ($tokens->move() != $matching) throw new $tokenError("Unmatched \"$token\"");
@@ -519,7 +519,7 @@ class DocoptParser extends CObject {
         elseif (strpos($token, '--')===0 && $token!='--') {
             return static::parseLong($tokens, $options);
         }
-        elseif (strpos($token, '-')===0 && $token!='-' && $token!='--') {
+        elseif (strpos($token, '-')===0 && $token!=='-' && $token!=='--') {
             return static::parseShort($tokens, $options);
         }
         elseif ((strpos($token, '<')===0 && strEndsWith($token, '>')) || static::isUpperCase($token)) {

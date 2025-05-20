@@ -5,7 +5,6 @@ namespace rosasurfer\ministruts\db\orm;
 
 use rosasurfer\ministruts\core\exception\RosasurferException;
 
-
 /**
  * ConfigException
  *

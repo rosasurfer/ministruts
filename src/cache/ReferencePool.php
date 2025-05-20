@@ -5,7 +5,6 @@ namespace rosasurfer\ministruts\cache;
 
 use rosasurfer\ministruts\cache\monitor\Dependency;
 
-
 /**
  * ReferencePool
  *
@@ -14,7 +13,6 @@ use rosasurfer\ministruts\cache\monitor\Dependency;
  * key always yield the same data instance. Every cache implementation uses a ReferencePool instance as it's identy manager.
  */
 final class ReferencePool extends CachePeer {
-
 
     /** @var array<string, mixed> */
     private array $pool = [];
@@ -27,7 +25,7 @@ final class ReferencePool extends CachePeer {
      * @param  mixed[] $options [optional] - additional instantiation options (default: none)
      */
     public function __construct(?string $label = null, array $options = []) {
-        $this->label   = $label ?? '';
+        $this->label = $label ?? '';
         $this->options = $options;
     }
 
@@ -44,9 +42,7 @@ final class ReferencePool extends CachePeer {
      * {@inheritDoc}
      */
     public function isCached($key): bool {
-        if (!isset($this->pool[$key])) {
-            return false;
-        }
+        return isset($this->pool[$key]);
 
         // @todo: As long as we don't have the $created value from the real cache, we can't check $expires or $minValidity.
         //$dependency = $this->pool[$key][3];
@@ -55,7 +51,7 @@ final class ReferencePool extends CachePeer {
         //    unSet($this->pool[$key]);
         //    return false;
         //}
-        return true;
+        //return true;
     }
 
 

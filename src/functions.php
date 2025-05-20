@@ -1,15 +1,16 @@
 <?php
-declare(strict_types=1);
-
 /**
  * Helper functions and constants
  */
+declare(strict_types=1);
+
 namespace rosasurfer\ministruts;
 
 use ArrayAccess;
 use Closure;
 use ErrorException;
 use InvalidArgumentException;
+use SimpleXMLElement;
 use Traversable;
 
 use rosasurfer\ministruts\console\docopt\DocoptParser;
@@ -27,7 +28,7 @@ define('rosasurfer\ministruts\_MACOS',      strtoupper(PHP_OS) == 'DARWIN');
 define('rosasurfer\ministruts\_WINDOWS',    defined('\PHP_WINDOWS_VERSION_BUILD'));
 define('rosasurfer\ministruts\_NUL_DEVICE', _WINDOWS ? 'nul' : '/dev/null');
 
-/** @var bool - whether we run on a command line interface */       // constant declarations improve IDE auto-completion
+/** @var bool - whether we run on a command line interface */       // constant declarations improve IDE support
 const CLI = _CLI;
 /** @var bool - whether we run on MacOS */
 const MACOS = _MACOS;
@@ -70,9 +71,9 @@ const FRIDAY            = 5;
 const SATURDAY          = 6;
 
 // byte sizes
-const KB                = 1024;
-const MB                = 1024 << 10;
-const GB                = 1024 << 20;
+const KB                = 1_024;
+const MB                = 1_024 << 10;
+const GB                = 1_024 << 20;
 
 // array indexing types
 const ARRAY_ASSOC       = 1;
@@ -251,7 +252,8 @@ function docopt(string $doc, $args=null, array $options=[]): DocoptResult {
  *                                          FALSE, if the variable is to be dumped to the standard output device (default)
  * @param  bool  $flushBuffers [optional] - whether to flush output buffers on output (default: yes)
  *
- * @return ($return is true ? string : null)
+ * @return         ?string
+ * @phpstan-return ($return is true ? string : null)
  */
 function dump($var, bool $return = false, bool $flushBuffers = true): ?string {
     if ($return) ob_start();
@@ -471,7 +473,7 @@ function ini_get_int(string $option, bool $strict = true): ?int {
  * @return bool
  */
 function is_array_like($var): bool {
-    return \is_array($var) || $var instanceof \ArrayAccess;
+    return \is_array($var) || $var instanceof ArrayAccess;
 }
 
 
@@ -481,7 +483,7 @@ function is_array_like($var): bool {
  * @return bool
  */
 function isLittleEndian(): bool {
-    return (pack('S', 1) == "\x01\x00");
+    return pack('S', 1) == "\x01\x00";
 }
 
 
@@ -798,14 +800,14 @@ function prettyBytes($value, int $decimals = 1): string {
         $value = (int) round($value);
     }
 
-    if ($value < 1024) {
+    if ($value < 1_024) {
         return (string) $value;
     }
 
     $unit = '';
     foreach (['K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'] as $unit) {
-        $value /= 1024;
-        if ($value < 1024)
+        $value /= 1_024;
+        if ($value < 1_024)
             break;
     }
 
@@ -821,10 +823,11 @@ function prettyBytes($value, int $decimals = 1): string {
  *                                          FALSE, if the result is to be printed to the screen (default)
  * @param  bool  $flushBuffers [optional] - whether to flush output buffers on output (default: TRUE)
  *
- * @return ($return is true ? string : null)
+ * @return         ?string
+ * @phpstan-return ($return is true ? string : null)
  */
 function print_p($var, bool $return = false, bool $flushBuffers = true): ?string {
-    if (is_object($var) && method_exists($var, '__toString') && !$var instanceof \SimpleXMLElement) {
+    if (is_object($var) && method_exists($var, '__toString') && !$var instanceof SimpleXMLElement) {
         $str = (string) $var;
     }
     elseif (is_object($var) || is_array($var)) {
@@ -911,7 +914,7 @@ function route(string $name): Url {
 
     $path = $mapping->getPath();
     if ($path[0] == '/') {
-        $path = ($path=='/') ? '' : substr($path, 1);   // substr() returns FALSE on start==length
+        $path = $path == '/' ? '' : substr($path, 1);       // substr() returns FALSE on start==length
     }
     if ($query) $path .= $query;
     if ($hash)  $path .= $hash;
@@ -997,7 +1000,7 @@ function strCompare(?string $a, ?string $b, bool $ignoreCase = false): bool {
             $b = strtolower($b);
         }
     }
-    return ($a === $b);
+    return $a === $b;
 }
 
 
@@ -1028,9 +1031,9 @@ function strContains(string $haystack, string $needle, bool $ignoreCase = false)
         return false;
     }
     if ($ignoreCase) {
-        return (stripos($haystack, $needle) !== false);
+        return stripos($haystack, $needle) !== false;
     }
-    return (strpos($haystack, $needle) !== false);
+    return strpos($haystack, $needle) !== false;
 }
 
 
@@ -1073,9 +1076,9 @@ function strEndsWith(string $string, $suffix, bool $ignoreCase = false): bool {
         return false;
     }
     if ($ignoreCase) {
-        return (strripos($string, $suffix) === $stringLen-$suffixLen);
+        return strripos($string, $suffix) === $stringLen-$suffixLen;
     }
-    return (strrpos($string, $suffix) === $stringLen-$suffixLen);
+    return strrpos($string, $suffix) === $stringLen-$suffixLen;
 }
 
 
@@ -1115,7 +1118,7 @@ function strIsDigits(string $string): bool {
 function strIsDoubleQuoted(string $string): bool {
     $len = strlen($string);
     if ($len > 1) {
-        return ($string[0]=='"' && $string[--$len]=='"');
+        return $string[0]=='"' && $string[--$len]=='"';
     }
     return false;
 }
@@ -1148,7 +1151,7 @@ function strIsNumeric(string $string): bool {
 function strIsQuoted(string $string): bool {
     $len = strlen($string);
     if ($len > 1) {
-        return (strIsSingleQuoted($string) || strIsDoubleQuoted($string));
+        return strIsSingleQuoted($string) || strIsDoubleQuoted($string);
     }
     return false;
 }
@@ -1164,7 +1167,7 @@ function strIsQuoted(string $string): bool {
 function strIsSingleQuoted(string $string): bool {
     $len = strlen($string);
     if ($len > 1) {
-        return ($string[0]=="'" && $string[--$len]=="'");
+        return $string[0]=="'" && $string[--$len]=="'";
     }
     return false;
 }
@@ -1321,7 +1324,7 @@ function strRightFrom(string $string, string $limiter, int $count=1, bool $inclu
             $count--;
         }
         $pos += strlen($limiter);
-        $result = ($pos >= strlen($string)) ? '' : substr($string, $pos);
+        $result = $pos >= strlen($string) ? '' : substr($string, $pos);
         if ($includeLimiter) {
             $result = $limiter.$result;
         }
@@ -1343,7 +1346,7 @@ function strRightFrom(string $string, string $limiter, int $count=1, bool $inclu
             $count++;
         }
         $pos += strlen($limiter);
-        $result = ($pos >= strlen($string)) ? '' : substr($string, $pos);
+        $result = $pos >= strlen($string) ? '' : substr($string, $pos);
         if ($includeLimiter) {
             $result = $limiter.$result;
         }
@@ -1378,9 +1381,9 @@ function strStartsWith(string $string, $prefix, bool $ignoreCase = false): bool 
         return false;
     }
     if ($ignoreCase) {
-        return (stripos($string, $prefix) === 0);
+        return stripos($string, $prefix) === 0;
     }
-    return (strpos($string, $prefix) === 0);
+    return strpos($string, $prefix) === 0;
 }
 
 

@@ -3,24 +3,25 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\console\docopt;
 
+use ArrayAccess;
 use ArrayIterator;
+use IteratorAggregate;
+use ReturnTypeWillChange;
 
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\exception\IllegalAccessException;
 
 use const rosasurfer\ministruts\NL;
 
-
 /**
  * DocoptResult
  *
  * Represents the parsing result of a {@link DocoptParser::parse()} call.
  *
- * @implements \ArrayAccess<string, bool|int|string[]|null>
- * @implements \IteratorAggregate<string, bool|int|string[]|null>
+ * @implements ArrayAccess<string, bool|int|string[]|null>
+ * @implements IteratorAggregate<string, bool|int|string[]|null>
  */
-class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
-
+class DocoptResult extends CObject implements ArrayAccess, IteratorAggregate {
 
     /** @var array<string, bool|int|string[]|null> */
     protected array $args;
@@ -117,7 +118,7 @@ class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
      *
      * @return bool|int|string[]|null
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function offsetGet($offset) {
         return $this->args[$offset];
     }

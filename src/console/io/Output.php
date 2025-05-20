@@ -9,12 +9,10 @@ use function rosasurfer\ministruts\print_p;
 use function rosasurfer\ministruts\stderr;
 use function rosasurfer\ministruts\stdout;
 
-
 /**
  * Output
  */
 class Output extends CObject {
-
 
     /**
      * Write a message to STDOUT.

@@ -5,12 +5,10 @@ namespace rosasurfer\ministruts\process;
 
 use rosasurfer\ministruts\core\StaticClass;
 
-
 /**
  * Process handling functionalities.
  */
 class Process extends StaticClass {
-
 
     /**
      * Call signal handlers to handle pending signals.

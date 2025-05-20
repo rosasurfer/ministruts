@@ -5,13 +5,11 @@ namespace rosasurfer\ministruts\struts\url;
 
 use rosasurfer\ministruts\config\ConfigInterface as Config;
 
-
 /**
  * Version-aware URL generation helper. Appends a hash of size and last modification time of a
  * local file to the generated URL to automatically invalidate browser and proxy caches.
  */
 class VersionedUrl extends Url {
-
 
     /**
      * {@inheritDoc}
@@ -19,8 +17,10 @@ class VersionedUrl extends Url {
     public function __toString(): string {
         $uri = parent::__toString();
         $relativeUri = $this->appRelativeUri;
-        if (($pos=strpos($relativeUri, '?')) === false) $name = $relativeUri;
-        else                                            $name = substr($relativeUri, 0, $pos);
+
+        $pos = strpos($relativeUri, '?');
+        if ($pos === false) $name = $relativeUri;
+        else                $name = substr($relativeUri, 0, $pos);
 
         /** @var Config $config */
         $config = $this->di('config');

@@ -3,12 +3,10 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\log\filter;
 
-
 /**
  * An interface for content filters.
  */
 interface ContentFilterInterface {
-
 
     /**
      * Filter a plain string.

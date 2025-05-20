@@ -5,7 +5,6 @@ namespace rosasurfer\ministruts\struts;
 
 use rosasurfer\ministruts\core\Singleton;
 
-
 /**
  * Page
  *
@@ -19,7 +18,6 @@ use rosasurfer\ministruts\core\Singleton;
  * </pre>
  */
 class Page extends Singleton {
-
 
     /** @var mixed[] - stored variables */
     protected array $properties = [];

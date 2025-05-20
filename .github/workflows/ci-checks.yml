@@ -86,7 +86,7 @@ jobs:
         if:   env.SKIP_PHPCS == 'false'
         run: |
           echo "Generating PHPCodeSniffer report..."
-          bin/phpcs --show-cmd
+          bin/phpcs --no-cache --show-cmd
 
       # ------------------------------------------------------------------------------------------------------------------------------------
       - name: Run PHPUnit

@@ -8,7 +8,6 @@ use rosasurfer\ministruts\core\exception\InvalidValueException;
 use function rosasurfer\ministruts\isRelativePath;
 use function rosasurfer\ministruts\realpath;
 
-
 /**
  * FileDependency - dependence on the last time a file was changed.
  *
@@ -32,7 +31,6 @@ use function rosasurfer\ministruts\realpath;
  * calling $dependency->isValid() returns FALSE.
  */
 class FileDependency extends Dependency {
-
 
     /** @var string - name of the monitored file */
     private string $fileName;

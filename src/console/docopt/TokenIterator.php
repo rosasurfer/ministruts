@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\console\docopt;
 
+use ArrayIterator;
+use Throwable;
+
 use rosasurfer\ministruts\console\docopt\exception\DocoptFormatError;
 use rosasurfer\ministruts\console\docopt\exception\DocoptUserNotification;
 use rosasurfer\ministruts\core\ObjectTrait;
@@ -11,27 +14,25 @@ use rosasurfer\ministruts\core\di\DiAwareTrait;
 use function rosasurfer\ministruts\preg_split;
 use function rosasurfer\ministruts\preg_replace;
 
-
 /**
  * TokenIterator
  *
- * @extends \ArrayIterator<int, string>
+ * @extends ArrayIterator<int, string>
  */
-class TokenIterator extends \ArrayIterator {
+class TokenIterator extends ArrayIterator {
 
     use ObjectTrait, DiAwareTrait;
 
-
-    /** @var class-string<\Throwable> */
+    /** @var class-string<Throwable> */
     protected string $errorClass;
 
 
     /**
      * Constructor
      *
-     * @param  string|string[]           $source
-     * @param  class-string<\Throwable>  $errorClass [optional] - classname of token errors used for error output
-     *                                                            (default: 'DocoptUserNotification')
+     * @param  string|string[]          $source
+     * @param  class-string<Throwable>  $errorClass [optional] - classname of token errors used for error output
+     *                                                           (default: DocoptUserNotification)
      */
     public function __construct($source, string $errorClass = DocoptUserNotification::class) {
         if (!is_array($source)) {
@@ -55,7 +56,7 @@ class TokenIterator extends \ArrayIterator {
      *
      * @return TokenIterator
      */
-    public static function fromPattern(string $source): TokenIterator {
+    public static function fromPattern(string $source): self {
         $source = preg_replace('/([\[\]\(\)\|]|\.\.\.)/', ' $1 ', $source);
         $source = preg_split('/\s+|(\S*<.*?'.'>)/', $source, 0, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
         return new static($source, DocoptFormatError::class);
@@ -63,7 +64,7 @@ class TokenIterator extends \ArrayIterator {
 
 
     /**
-     * @return class-string<\Throwable> - classname of token errors
+     * @return class-string<Throwable> - classname of token errors
      */
     public function getErrorClass(): string {
         return $this->errorClass;

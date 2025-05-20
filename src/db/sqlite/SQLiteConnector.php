@@ -19,7 +19,6 @@ use function rosasurfer\ministruts\realpath;
 
 use const rosasurfer\ministruts\NL;
 
-
 /**
  * SQLiteConnector
  *
@@ -52,7 +51,6 @@ use const rosasurfer\ministruts\NL;
  * @see  https://bugs.php.net/bug.php?id=64531
  */
 class SQLiteConnector extends Connector {
-
 
     /** @var string - DBMS type */
     protected string $type = 'sqlite';
@@ -160,7 +158,7 @@ class SQLiteConnector extends Connector {
                 }
             }
             else {
-                $doWhat = ($flags & SQLITE3_OPEN_CREATE) ? 'create' : 'find';
+                $doWhat = $flags & SQLITE3_OPEN_CREATE ? 'create' : 'find';
                 if (isRelativePath($file)) $where=' in "'.getcwd().'"';
             }
             throw $ex->appendMessage("Cannot $doWhat database file \"$file\"$where");
@@ -207,7 +205,7 @@ class SQLiteConnector extends Connector {
      * {@inheritDoc}
      */
     public function isConnected(): bool {
-        return ($this->sqlite !== null);
+        return $this->sqlite !== null;
     }
 
 
@@ -388,7 +386,7 @@ class SQLiteConnector extends Connector {
      */
     public function isInTransaction(): bool {
         if ($this->isConnected()) {
-            return ($this->transactionLevel > 0);
+            return $this->transactionLevel > 0;
         }
         return false;
     }

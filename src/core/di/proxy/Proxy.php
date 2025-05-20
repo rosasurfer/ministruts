@@ -7,7 +7,6 @@ use rosasurfer\ministruts\core\StaticClass;
 use rosasurfer\ministruts\core\exception\IllegalAccessException;
 use rosasurfer\ministruts\core\exception\UnimplementedFeatureException;
 
-
 /**
  * A {@link Proxy} forwards API calls from one object to another. It doesn't modify the called API.
  *
@@ -15,7 +14,6 @@ use rosasurfer\ministruts\core\exception\UnimplementedFeatureException;
  * a look-up in the application's default service container. Override {@link Proxy::instance()} to change that behavior.
  */
 abstract class Proxy extends StaticClass {
-
 
     /** @var object[] - resolved instances of proxied objects */
     protected static array $resolvedInstances;

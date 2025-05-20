@@ -7,7 +7,6 @@ use Closure;
 
 use rosasurfer\ministruts\core\exception\ClassNotFoundException;
 
-
 /**
  * Service
  *
@@ -19,7 +18,6 @@ use rosasurfer\ministruts\core\exception\ClassNotFoundException;
  * </pre>
  */
 class Service implements ServiceInterface {
-
 
     /** @var string */
     protected string $name;

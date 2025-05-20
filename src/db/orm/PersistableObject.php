@@ -11,21 +11,20 @@ use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 use rosasurfer\ministruts\db\ConnectorInterface as Connector;
 use rosasurfer\ministruts\db\orm\meta\PropertyMapping;
+use rosasurfer\ministruts\phpstan\CustomTypes;
 
 use function rosasurfer\ministruts\strEndsWith;
 use function rosasurfer\ministruts\strLeft;
-
 
 /**
  * PersistableObject
  *
  * Abstract base class for stored objects.
  *
- * @phpstan-import-type ORM_PROPERTY from \rosasurfer\ministruts\phpstan\CustomTypes
- * @phpstan-import-type ORM_RELATION from \rosasurfer\ministruts\phpstan\CustomTypes
+ * @phpstan-import-type ORM_PROPERTY from CustomTypes
+ * @phpstan-import-type ORM_RELATION from CustomTypes
  */
 abstract class PersistableObject extends CObject {
-
 
     /** @var bool - dirty checking status */
     private bool $__modified = false;
@@ -89,7 +88,7 @@ abstract class PersistableObject extends CObject {
         $mapping = $this->dao()->getMapping();
         $array = (array) $this;
 
-        foreach ($mapping['relations'] as $name => $v) {
+        foreach ($mapping['relations'] as $name => $_) {
             if (is_object($this->$name)) {
                 /** @var PersistableObject $object */
                 $object = $this->$name;
@@ -283,8 +282,8 @@ abstract class PersistableObject extends CObject {
                 if ($type !== null) throw new RuntimeException('Unexpected parameter $type="'.$type.'" (not null) for relation [name="'.$propertyName.'", column="'.$column.'", ...] of entity "'.$mapping['class'].'"');
                 return $value;
             }
-            /** @var PersistableObject $object */               // a single fetched instance of a "one-to-one"|"many-to-one" relation, no join table
-            $object = $value;                                   // (1) use reference and update all properties with related entity settings
+            /** @var PersistableObject $object                  // a single fetched instance of a "one-to-one"|"many-to-one" relation, no join table */
+            $object = $value;                                   // use reference and update all properties with related entity settings
             $relation['ref-column'] ??= $object->dao()->getMapping()['identity']['column'];
             $fkColumn = $relation['ref-column'];
             return $object->getPhysicalValue($fkColumn);
@@ -331,7 +330,7 @@ abstract class PersistableObject extends CObject {
     final public function isPersistent(): bool {
         // TODO: this check cannot yet handle composite primary keys
         $id = $this->getObjectId();
-        return ($id !== null);
+        return $id !== null;
     }
 
 
@@ -345,7 +344,7 @@ abstract class PersistableObject extends CObject {
         $property = $mapping['soft-delete'] ?? null;
         if ($property) {
             $name = $property['name'];
-            return ($this->$name !== null);     // any db value != NULL is considered as "deleted" flag
+            return $this->$name !== null;       // any db value != NULL is considered as "deleted" flag
         }
         return false;
     }
@@ -495,7 +494,7 @@ abstract class PersistableObject extends CObject {
         try {
             $this->__inDelete = true;
 
-            if (!$this->isPersistent()) throw new IllegalStateException('Cannot delete non-persistent '.get_class($this));
+            if (!$this->isPersistent()) throw new IllegalStateException('Cannot delete non-persistent '.static::class);
 
             $this->dao()->transaction(function() {
                 if ($this->beforeDelete() !== true) {                   // pre-processing hook
@@ -608,7 +607,7 @@ abstract class PersistableObject extends CObject {
                 $this->reload();
                 $msg = "expected version: $oldVersion, found version: $this->$versionName";
             }
-            throw new ConcurrentModificationException('Error updating '.get_class($this).' (oid='.$this->getObjectId().'), '.$msg);
+            throw new ConcurrentModificationException('Error updating '.static::class.' (oid='.$this->getObjectId()."), $msg");
         }
         return true;
     }
@@ -635,7 +634,7 @@ abstract class PersistableObject extends CObject {
 
         // execute SQL and check for concurrent modifications
         if ($db->execute($sql)->lastAffectedRows() != 1)
-            throw new ConcurrentModificationException('Error deleting '.get_class($this).' (oid='.$this->getObjectId().'): record not found');
+            throw new ConcurrentModificationException('Error deleting '.static::class.' (oid='.$this->getObjectId().'): record not found');
         return true;
     }
 
@@ -670,8 +669,6 @@ abstract class PersistableObject extends CObject {
             }
             else {
                 if (isset($propertyOrRelation['class'])) {
-                    /** @phpstan-var ORM_RELATION $relation */
-                    $relation = $propertyOrRelation;
                     $this->$name = $row[$column];               // the foreign-key column is stored as is
 
                     //if (!isset($property['column-type'])) {
@@ -693,7 +690,7 @@ abstract class PersistableObject extends CObject {
                             if ($dbType == 'pgsql') {
                                 if     ($row[$column] == 't') $row[$column] = 1;
                                 elseif ($row[$column] == 'f') $row[$column] = 0;
-                            };
+                            }
                             $this->$name = (bool)(int) $row[$column];
                             break;
 
@@ -729,7 +726,7 @@ abstract class PersistableObject extends CObject {
      *
      * @return PersistableObject
      */
-    public static function populateNew(string $class, array $row): PersistableObject {
+    public static function populateNew(string $class, array $row): self {
         if (static::class != __CLASS__)         throw new IllegalAccessException('Cannot access method '.__METHOD__.'() on a derived class.');
         if (!is_subclass_of($class, __CLASS__)) throw new InvalidValueException("Invalid parameter \$class: $class (not a subclass of ".__CLASS__.')');
 
@@ -749,7 +746,7 @@ abstract class PersistableObject extends CObject {
      * @return $this
      */
     public function reload(bool $resetRelations = false): self {   // TODO: implement and set default=TRUE
-        if (!$this->isPersistent()) throw new IllegalStateException('Cannot reload non-persistent '.get_class($this));
+        if (!$this->isPersistent()) throw new IllegalStateException('Cannot reload non-persistent '.static::class);
 
         // TODO: This method cannot yet handle composite primary keys.
 
@@ -769,7 +766,7 @@ abstract class PersistableObject extends CObject {
                    from '.$table.'
                    where '.$idColumn.' = '.$idValue;
         $row = $db->query($sql)->fetchRow();
-        if ($row === null) throw new ConcurrentModificationException('Error reloading '.get_class($this).' ('.$this->getObjectId().'), record not found');
+        if ($row === null) throw new ConcurrentModificationException('Error reloading '.static::class.' ('.$this->getObjectId().'), record not found');
 
         // apply record values
         return $this->populate($row);
@@ -885,8 +882,12 @@ abstract class PersistableObject extends CObject {
      * @return DAO
      */
     public static function dao(): DAO {
-        if (static::class == __CLASS__) throw new IllegalAccessException('Use an entity class to access method '.__METHOD__.'()');
-        return DAO::getImplementation(static::class.'DAO');
+        if (static::class == __CLASS__) {
+            throw new IllegalAccessException('Use an entity class to access method '.__METHOD__.'()');
+        }
+        /** @var class-string<DAO> $dao */
+        $dao = static::class.'DAO';
+        return DAO::getImplementation($dao);
         // TODO: The calling class may be a derived class with the entity class being one of its parents.
     }
 

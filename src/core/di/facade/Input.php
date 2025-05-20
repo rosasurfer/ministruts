@@ -9,14 +9,12 @@ use rosasurfer\ministruts\core\di\proxy\Request as RequestProxy;
 use rosasurfer\ministruts\struts\ActionInput;
 use rosasurfer\ministruts\struts\Struts;
 
-
 /**
  * Input
  *
  * A {@link Facade} for accessing the raw input parameters of the current or the previous HTTP {@link \rosasurfer\ministruts\struts\Request}.
  */
 class Input extends Facade {
-
 
     /**
      * Return all raw input parameters of the current HTTP request.

@@ -5,14 +5,12 @@ namespace rosasurfer\ministruts\struts;
 
 use rosasurfer\ministruts\core\CObject;
 
-
 /**
  * RoleProcessor
  *
  * Abstract base class for concrete implementations performing access control checks for the application.
  */
 abstract class RoleProcessor extends CObject {
-
 
     /**
      * Whether the current web user owns the specified role.

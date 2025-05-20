@@ -3,12 +3,10 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\console\docopt\pattern;
 
-
 /**
  * Required
  */
 class Required extends BranchPattern {
-
 
     /**
      * {@inheritDoc}
@@ -18,7 +16,7 @@ class Required extends BranchPattern {
         $c = $collected;
 
         foreach ($this->children as $pattern) {
-            list ($matched, $l, $c) = $pattern->match($l, $c);
+            [$matched, $l, $c] = $pattern->match($l, $c);
             if (!$matched) {
                 return [false, $left, $collected];
             }

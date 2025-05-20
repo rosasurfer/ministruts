@@ -6,7 +6,6 @@ namespace rosasurfer\ministruts\cache;
 use rosasurfer\ministruts\cache\monitor\Dependency;
 use rosasurfer\ministruts\config\ConfigInterface as Config;
 
-
 /**
  * ApcCache
  *

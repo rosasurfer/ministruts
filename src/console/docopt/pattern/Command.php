@@ -5,12 +5,10 @@ namespace rosasurfer\ministruts\console\docopt\pattern;
 
 use rosasurfer\ministruts\console\docopt\SingleMatch;
 
-
 /**
  * Command
  */
 class Command extends Argument {
-
 
     /**
      * @param  Pattern[] $left
@@ -21,7 +19,7 @@ class Command extends Argument {
         foreach ($left as $i => $pattern) {
             if ($pattern instanceof Argument) {
                 if ($pattern->value == $this->name()) {
-                    return new SingleMatch($i, new Command($this->name(), true));
+                    return new SingleMatch($i, new self($this->name(), true));
                 }
                 else {
                     break;

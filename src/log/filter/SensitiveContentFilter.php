@@ -6,15 +6,14 @@ namespace rosasurfer\ministruts\log\filter;
 use Throwable;
 use rosasurfer\ministruts\core\CObject;
 
-
 /**
  * A filter for sensitive named values. The filter matches if the key/name of a value contains one of the configured name patterns.
  * Redacted values are replaced by asterisk "*" characters.
  */
 class SensitiveContentFilter extends CObject implements ContentFilterInterface {
 
-    /** @var string - replacement value for sensitive strings */
-    const SUBSTITUTE = '******';
+    /** replacement value for sensitive strings */
+    private const SUBSTITUTE = '******';
 
 
     /**

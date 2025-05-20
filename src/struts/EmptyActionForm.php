@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\struts;
 
-
 /**
  * EmptyActionForm
  *
@@ -12,7 +11,6 @@ namespace rosasurfer\ministruts\struts;
  * and don't have to deal with potential NULL values. Property getters and array access of properties return NULL for all properties.
  */
 final class EmptyActionForm extends ActionForm {
-
 
     /**
      * {@inheritDoc}

@@ -3,19 +3,19 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\core\error;
 
+use ErrorException;
+
 use rosasurfer\ministruts\core\ObjectTrait;
 use rosasurfer\ministruts\core\di\DiAwareTrait;
 use rosasurfer\ministruts\core\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\ministruts\core\exception\RosasurferExceptionTrait;
 
-
 /**
  * An exception representing a PHP error. Provides some additional convenient helpers.
  */
-class PHPError extends \ErrorException implements IRosasurferException {
+class PHPError extends ErrorException implements IRosasurferException {
 
     use RosasurferExceptionTrait, ObjectTrait, DiAwareTrait;
-
 
     /**
      * Create a new instance. Parameters are identical to the built-in PHP {@link \ErrorException} but stronger typed.

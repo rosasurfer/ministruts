@@ -6,12 +6,10 @@ namespace rosasurfer\ministruts\core\lock;
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\exception\IllegalStateException;
 
-
 /**
  * BaseLock
  */
 abstract class BaseLock extends CObject {
-
 
     /**
      * Whether the lock is aquired.
@@ -35,7 +33,7 @@ abstract class BaseLock extends CObject {
      * @return string[]
      */
     final public function __sleep(): array {
-        throw new IllegalStateException('You cannot serialize me: '.get_class($this));
+        throw new IllegalStateException('You cannot serialize me: '.static::class);
     }
 
 
@@ -45,6 +43,6 @@ abstract class BaseLock extends CObject {
      * @return void
      */
     final public function __wakeUp(): void {
-        throw new IllegalStateException('You cannot deserialize me: '.get_class($this));
+        throw new IllegalStateException('You cannot deserialize me: '.static::class);
     }
 }

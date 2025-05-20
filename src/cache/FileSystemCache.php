@@ -11,7 +11,6 @@ use rosasurfer\ministruts\file\FileSystem as FS;
 use function rosasurfer\ministruts\isRelativePath;
 use function rosasurfer\ministruts\realpath;
 
-
 /**
  * FileSystemCache
  *
@@ -20,7 +19,6 @@ use function rosasurfer\ministruts\realpath;
  * @todo  store values in an additional wrapper object and process parameters, CREATED, EXPIRES, DEPENDENCY
  */
 final class FileSystemCache extends CachePeer {
-
 
     /** @var string - filepath of the chaching directory */
     private string $directory;

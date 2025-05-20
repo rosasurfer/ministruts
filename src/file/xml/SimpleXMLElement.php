@@ -14,7 +14,6 @@ use function rosasurfer\ministruts\strRightFrom;
 
 use const rosasurfer\ministruts\NL;
 
-
 /**
  * SimpleXMLElement
  *
@@ -23,7 +22,6 @@ use const rosasurfer\ministruts\NL;
 class SimpleXMLElement extends \SimpleXMLElement {
 
     use ObjectTrait, DiAwareTrait;
-
 
     /**
      * Create a new SimpleXMLElement instance.

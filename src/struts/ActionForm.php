@@ -3,9 +3,11 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\struts;
 
+use ArrayAccess;
+use ReturnTypeWillChange;
+
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\exception\IllegalAccessException;
-
 
 /**
  * ActionForm
@@ -13,10 +15,9 @@ use rosasurfer\ministruts\core\exception\IllegalAccessException;
  * An ActionForm encapsulates and represents interpreted user input. It provides an interface for {@link Action}s
  * and business layer to access and validate this input. Use {@link ActionInput} to access the raw input parameters.
  *
- * @implements \ArrayAccess<string, mixed>
+ * @implements ArrayAccess<string, mixed>
  */
-abstract class ActionForm extends CObject implements \ArrayAccess {
-
+abstract class ActionForm extends CObject implements ArrayAccess {
 
     /** @var Request [transient] - the request the form belongs to */
     protected Request $request;
@@ -189,7 +190,7 @@ abstract class ActionForm extends CObject implements \ArrayAccess {
      *
      * {@inheritDoc}
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function offsetGet($name) {
         return $this->get($name);
     }

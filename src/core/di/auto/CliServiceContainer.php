@@ -8,7 +8,6 @@ use rosasurfer\ministruts\console\io\Output;
 use rosasurfer\ministruts\core\di\Di;
 use rosasurfer\ministruts\core\di\service\Service;
 
-
 /**
  * Default dependency injector automatically created for command-line applications.
  *
@@ -16,7 +15,6 @@ use rosasurfer\ministruts\core\di\service\Service;
  * services provided by the framework and user-defined services loaded from the file "{app.dir.config}/services.php".
  */
 class CliServiceContainer extends Di {
-
 
     /**
      * Constructor

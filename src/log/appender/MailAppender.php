@@ -29,7 +29,6 @@ use const rosasurfer\ministruts\L_WARN;
 use const rosasurfer\ministruts\NL;
 use const rosasurfer\ministruts\WINDOWS;
 
-
 /**
  * MailAppender
  *
@@ -282,7 +281,7 @@ class MailAppender extends BaseAppender {
             $name   = $match[1];
             $value  = $this->encodeNonAsciiChars(trim($match[2]));
             $header = "$name: $value";
-        };
+        }
         unset($header);
 
         $headers[] = 'X-Mailer: Microsoft Office Outlook 11';           // save us from Hotmail junk folder

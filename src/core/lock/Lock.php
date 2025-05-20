@@ -9,14 +9,12 @@ use rosasurfer\ministruts\config\ConfigInterface;
 use rosasurfer\ministruts\core\error\ErrorHandler;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 
-
 /**
  * Lock
  *
  * Delegate to a specific lock implementation.
  */
 class Lock extends BaseLock {
-
 
     /** @var string[] - keys of all currently aquired locks */
     private static array $lockedKeys;

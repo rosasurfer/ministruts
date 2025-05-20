@@ -5,15 +5,13 @@ namespace rosasurfer\ministruts\util;
 
 use rosasurfer\ministruts\core\StaticClass;
 
-
 /**
  * Windows constants
  */
 class Windows extends StaticClass {
 
-
-    /** @var int - for example the maximum path on drive D is "D:\some-256-character-path-string<NUL>" */
-    const MAX_PATH = 260;
+    /** for example the maximum path on drive D is "D:\some-256-character-path-string<NUL>" */
+    public const MAX_PATH = 260;
 
     /** @var array<string[]> - Win32 errors and descriptions */
     private static array $win32Errors = [

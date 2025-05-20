@@ -5,12 +5,10 @@ namespace rosasurfer\ministruts\cache\monitor;
 
 use rosasurfer\ministruts\core\exception\RuntimeException;
 
-
 /**
  * ChainedDependency
  */
 class ChainedDependency extends Dependency {
-
 
     /** @var Dependency[] - all dependencies of the instance */
     private array $dependencies;

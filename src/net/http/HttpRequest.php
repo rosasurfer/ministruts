@@ -6,12 +6,10 @@ namespace rosasurfer\ministruts\net\http;
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 
-
 /**
  * HttpRequest
  */
 class HttpRequest extends CObject {
-
 
     /** @var string */
     protected string $url = '';

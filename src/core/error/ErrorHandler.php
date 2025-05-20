@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\core\error;
 
-use Exception;
+use ErrorException;
+use LibXMLError;
+use ReflectionProperty;
 use Throwable;
 
 use rosasurfer\ministruts\Application;
@@ -12,8 +14,8 @@ use rosasurfer\ministruts\core\StaticClass;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\log\Logger;
 use rosasurfer\ministruts\log\filter\ContentFilterInterface as ContentFilter;
+use rosasurfer\ministruts\phpstan\CustomTypes;
 
-use function rosasurfer\ministruts\echof;
 use function rosasurfer\ministruts\normalizeEOL;
 use function rosasurfer\ministruts\strEndsWith;
 use function rosasurfer\ministruts\strLeftTo;
@@ -32,22 +34,21 @@ use const rosasurfer\ministruts\MB;
 use const rosasurfer\ministruts\NL;
 use const rosasurfer\ministruts\WINDOWS;
 
-
 /**
  * A handler for unhandled PHP errors and exceptions.
  *
- * @phpstan-import-type STACKFRAME from \rosasurfer\ministruts\phpstan\CustomTypes
+ * @phpstan-import-type STACKFRAME from CustomTypes
  */
 class ErrorHandler extends StaticClass {
 
-    /** @var int - ignore PHP errors and exceptions */
-    const MODE_IGNORE = 1;
+    /** ignore PHP errors and exceptions */
+    public const MODE_IGNORE = 1;
 
-    /** @var int - log PHP errors and exceptions */
-    const MODE_LOG = 2;
+    /** log PHP errors and exceptions */
+    public const MODE_LOG = 2;
 
-    /** @var int - convert PHP errors to exceptions, log both */
-    const MODE_EXCEPTION = 3;
+    /** convert PHP errors to exceptions, log both */
+    public const MODE_EXCEPTION = 3;
 
 
     /** @var int - the configured error handling mode */
@@ -138,7 +139,7 @@ class ErrorHandler extends StaticClass {
      * @throws PHPError
      */
     public static function handleError(int $level, string $message, string $file, int $line, array $symbols = []): bool {
-        //echof('ErrorHandler::handleError(inShutdown='.(int)self::$inShutdown.') '.self::errorLevelToStr($level).': '.$message.', in '.$file.', line '.$line);
+        //\rosasurfer\ministruts\echof('ErrorHandler::handleError(inShutdown='.(int)self::$inShutdown.') '.self::errorLevelToStr($level).': '.$message.', in '.$file.', line '.$line);
         if (!self::$errorHandling) return false;
 
         // anonymous function to chain a previously active handler
@@ -234,7 +235,7 @@ class ErrorHandler extends StaticClass {
      * @return void
      */
     public static function handleException(Throwable $exception): void {
-        //echof('ErrorHandler::handleException(inShutdown='.(int)self::$inShutdown.') '.$exception->getMessage());
+        //\rosasurfer\ministruts\echof('ErrorHandler::handleException(inShutdown='.(int)self::$inShutdown.') '.$exception->getMessage());
         if (!self::$exceptionHandling) return;
 
         // catch exceptions thrown by logger or chained exception handler
@@ -269,25 +270,25 @@ class ErrorHandler extends StaticClass {
      * @return void
      */
     private static function handle2ndException(Throwable $first, Throwable $second): void {
-        //echof('ErrorHandler::handle2ndException(inShutdown='.(int)self::$inShutdown.') '.$second->getMessage());
+        //\rosasurfer\ministruts\echof('ErrorHandler::handle2ndException(inShutdown='.(int)self::$inShutdown.') '.$second->getMessage());
         try {
             $indent = ' ';
-            $msg  = trim(ErrorHandler::getVerboseMessage($first, $indent));
+            $msg  = trim(self::getVerboseMessage($first, $indent));
             $msg  = $indent.($first instanceof PHPError ? '':'[FATAL] Unhandled ').$msg.NL;
             $msg .= $indent.'in '.$first->getFile().' on line '.$first->getLine().NL;
             $msg .= NL;
             $msg .= $indent.'Stacktrace:'.NL;
             $msg .= $indent.'-----------'.NL;
-            $msg .= ErrorHandler::getAdjustedStackTraceAsString($first, $indent);
+            $msg .= self::getAdjustedStackTraceAsString($first, $indent);
             $msg .= NL;
             $msg .= NL;
             $msg .= $indent.'followed by'.NL;
-            $msg .= $indent.trim(ErrorHandler::getVerboseMessage($second, $indent)).NL;
+            $msg .= $indent.trim(self::getVerboseMessage($second, $indent)).NL;
             $msg .= $indent.'in '.$second->getFile().' on line '.$second->getLine().NL;
             $msg .= NL;
             $msg .= $indent.'Stacktrace:'.NL;
             $msg .= $indent.'-----------'.NL;
-            $msg .= ErrorHandler::getAdjustedStackTraceAsString($second, $indent);
+            $msg .= self::getAdjustedStackTraceAsString($second, $indent);
             $msg .= NL;
 
             // log everything to the system logger (never throws an error)
@@ -452,8 +453,8 @@ class ErrorHandler extends StaticClass {
     /**
      * Return a readable representation of the specified LibXML errors.
      *
-     * @param  \LibXMLError[] $errors - array of LibXML errors, e.g. as returned by <tt>libxml_get_errors()</tt>
-     * @param  string[]       $lines  - the XML causing the errors split by line
+     * @param  LibXMLError[] $errors - array of LibXML errors, e.g. as returned by <tt>libxml_get_errors()</tt>
+     * @param  string[]      $lines  - the XML causing the errors split by line
      *
      * @return string - readable error representation or an empty string if parameter $errors is empty
      */
@@ -510,7 +511,7 @@ class ErrorHandler extends StaticClass {
 
         if (!$throwable instanceof PHPError) {              // PHP errors are verbose enough
             $class = get_class($throwable);
-            if ($throwable instanceof \ErrorException) {    // a PHP error not created by this ErrorHandler
+            if ($throwable instanceof ErrorException) {     // a PHP error not created by this ErrorHandler
                 $class .= '('.self::errorLevelDescr($throwable->getSeverity()).')';
             }
             $message = $class.(strlen($message) ? ': ':'').$message;
@@ -758,12 +759,12 @@ class ErrorHandler extends StaticClass {
     /**
      * Shift all frames from the beginning of a stacktrace pointing to the specified method.
      *
-     * @param  Exception $exception - exception to modify
+     * @param  Throwable $exception - exception to modify
      * @param  string    $method    - method name
      *
      * @return int - number of removed frames
      */
-    public static function shiftStackFramesByMethod(Exception $exception, string $method): int {
+    public static function shiftStackFramesByMethod(Throwable $exception, string $method): int {
         $trace  = $exception->getTrace();
         $size   = sizeof($trace);
         $file   = $exception->getFile();
@@ -793,7 +794,7 @@ class ErrorHandler extends StaticClass {
     /**
      * Set the properties of an {@link Exception}.
      *
-     * @param  Exception $exception       - exception to modify
+     * @param  Throwable $exception       - exception to modify
      * @param  array[]   $trace           - stacktrace
      * @param  string    $file [optional] - filename of the error location (default: unchanged)
      * @param  int       $line [optional] - line number of the error location (default: unchanged)
@@ -804,20 +805,20 @@ class ErrorHandler extends StaticClass {
      *
      * @see \rosasurfer\ministruts\phpstan\STACKFRAME
      */
-    private static function setExceptionProperties(Exception $exception, array $trace, string $file = '', int $line = 0): void {
+    private static function setExceptionProperties(Throwable $exception, array $trace, string $file = '', int $line = 0): void {
         static $traceProperty = null;
         if (!$traceProperty) {
-            $traceProperty = new \ReflectionProperty(Exception::class, 'trace');
+            $traceProperty = new ReflectionProperty(Throwable::class, 'trace');
             $traceProperty->setAccessible(true);
         }
         static $fileProperty = null;
         if (!$fileProperty) {
-            $fileProperty = new \ReflectionProperty(Exception::class, 'file');
+            $fileProperty = new ReflectionProperty(Throwable::class, 'file');
             $fileProperty->setAccessible(true);
         }
         static $lineProperty = null;
         if (!$lineProperty) {
-            $lineProperty = new \ReflectionProperty(Exception::class, 'line');
+            $lineProperty = new ReflectionProperty(Throwable::class, 'line');
             $lineProperty->setAccessible(true);
         }
 

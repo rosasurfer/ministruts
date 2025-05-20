@@ -12,7 +12,6 @@ use const rosasurfer\ministruts\ARRAY_ASSOC;
 use const rosasurfer\ministruts\ARRAY_BOTH;
 use const rosasurfer\ministruts\ARRAY_NUM;
 
-
 /**
  * Represents the result of an executed SQL statement. Depending on the statement type the result may or may not contain
  * returned rows.
@@ -21,29 +20,29 @@ class PostgresResult extends Result {
 
     // status codes as returned by pg_result_status(PGSQL_STATUS_LONG)
 
-    /** @var int - The string sent to the server was empty. */
-    const STATUS_EMPTY_QUERY    = \PGSQL_EMPTY_QUERY;
+    /** The string sent to the server was empty. */
+    public const STATUS_EMPTY_QUERY = \PGSQL_EMPTY_QUERY;
 
-    /** @var int - Successful completion of a command returning no rows. */
-    const STATUS_COMMAND_OK     = \PGSQL_COMMAND_OK;
+    /** Successful completion of a command returning no rows. */
+    public const STATUS_COMMAND_OK = \PGSQL_COMMAND_OK;
 
-    /** @var int - Successful completion of a command returning rows. */
-    const STATUS_TUPLES_OK      = \PGSQL_TUPLES_OK;
+    /** Successful completion of a command returning rows. */
+    public const STATUS_TUPLES_OK = \PGSQL_TUPLES_OK;
 
-    /** @var int - Copy Out (from server) data transfer started. */
-    const STATUS_COPY_OUT       = \PGSQL_COPY_OUT;
+    /** Copy Out (from server) data transfer started. */
+    public const STATUS_COPY_OUT = \PGSQL_COPY_OUT;
 
-    /** @var int - Copy In (to server) data transfer started. */
-    const STATUS_COPY_IN        = \PGSQL_COPY_IN;
+    /** Copy In (to server) data transfer started. */
+    public const STATUS_COPY_IN = \PGSQL_COPY_IN;
 
-    /** @var int - The server's response was not understood. */
-    const STATUS_BAD_RESPONSE   = \PGSQL_BAD_RESPONSE;
+    /** The server's response was not understood. */
+    public const STATUS_BAD_RESPONSE = \PGSQL_BAD_RESPONSE;
 
-    /** @var int - A nonfatal error (a notice or warning) occurred. */
-    const STATUS_NONFATAL_ERROR = \PGSQL_NONFATAL_ERROR;
+    /** A nonfatal error (a notice or warning) occurred. */
+    public const STATUS_NONFATAL_ERROR = \PGSQL_NONFATAL_ERROR;
 
-    /** @var int - A fatal error occurred. */
-    const STATUS_FATAL_ERROR    = \PGSQL_FATAL_ERROR;
+    /** A fatal error occurred. */
+    public const STATUS_FATAL_ERROR = \PGSQL_FATAL_ERROR;
 
 
     /**

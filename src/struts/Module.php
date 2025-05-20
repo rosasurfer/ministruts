@@ -22,7 +22,6 @@ use function rosasurfer\ministruts\strStartsWith;
 
 use const rosasurfer\ministruts\NL;
 
-
 /**
  * Module
  *
@@ -38,7 +37,6 @@ use const rosasurfer\ministruts\NL;
  * The full URI of a route to a specific module's {@link ActionMapping} is "/{app-base-path}/{module-prefix}/{mapping-path}".
  */
 class Module extends CObject {
-
 
     /**
      * Module prefix relative to the base URI of the web application. All module prefixes in an application are unique.
@@ -743,7 +741,7 @@ class Module extends CObject {
             }
 
             // TODO: check that $value matches the specified type
-            switch (((string) $tag['type']) ?: 'string') {
+            switch ((string) $tag['type'] ?: 'string') {
                 case 'bool' : $value =  (bool) $value; break;
                 case 'int'  : $value =   (int) $value; break;
                 case 'float': $value = (float) $value; break;
@@ -1187,7 +1185,7 @@ class Module extends CObject {
      */
     private function isFile(string $path): bool {
         $filename = $this->findFile($path);
-        return ($filename !== null);
+        return $filename !== null;
     }
 
 
