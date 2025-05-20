@@ -31,33 +31,31 @@ function stderr() {
 }
 
 #
-# Resolve the color setting to apply if no color-specific command line options are supplied.
+# Resolve the color status to apply in the current runtime environment.
 #
-# @param _InOut_ $1 - named reference to the default and resolved value
+# @param _InOut_ $1 - named reference to initial status [on|off|auto], will be overridden by the result
 #
 function resolveColorSetting() {
   ((BASH_SUBSHELL)) && fail "${FUNCNAME[0]}() can't write to outer scope from subshell"
   local -n inout="$1"
 
+  if [[ "$inout" == 'auto' ]]; then
+    local isTerminal=0 isPipe=0
+    [[ -t 1 ]] && isTerminal=1
+    [[ -p /proc/self/fd/1 ]] && isPipe=1
+    ((isTerminal || isPipe)) && inout='on' || inout='off'
+  fi
+
   case "$inout" in
     on)   # enable color as long as not explicitly disabled
-      [[ -n "${NO_COLOR:-}" ]] && inout='off';;
+      [[ -n "${NO_COLOR:-}" ]] && inout='off' || :;;
 
     off)  # disable color as long as not explicitly enabled
-      [[ -z "${NO_COLOR:-}" && -n "${FORCE_COLOR:-}" && "$FORCE_COLOR" != '0' ]] && inout='on';;
-
-    auto) # determine setting depending on the runtime environment
-      local isTerminal=0 isPipe=0 localColor
-      [[ -t 1 ]] && isTerminal=1                    # inspect STDOUT
-      [[ -p /proc/self/fd/1 ]] && isPipe=1
-      ((isTerminal || isPipe)) && localColor='on' || localColor='off'
-      resolveColorSetting 'localColor'              # recurse to inspect environment (must not use the same var as in global)
-      inout="$localColor";;
+      [[ -z "${NO_COLOR:-}" ]] && inout='on' || :;;
 
     *)
       fail "${FUNCNAME[0]}() invalid color status \"$inout\"";;
   esac
-  :                                                 # make sure the last command returns with success
 }
 
 # --- end of functions ---------------------------------------------------------------------------------------------------------------------
