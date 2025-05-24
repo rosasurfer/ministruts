@@ -50,12 +50,12 @@ abstract class DAO extends Singleton {
     /**
      * Get the specified DAO implementation.
      *
-     * @param  string $class - concrete DAO class name
+     * @param  class-string<DAO> $class - concrete DAO class name
      *
      * @return DAO
      */
     final public static function getImplementation(string $class): DAO {
-        if (!is_subclass_of($class, __CLASS__, true)) {
+        if (!is_subclass_of($class, __CLASS__, true)) {     // @phpstan-ignore function.alreadyNarrowedType ("class-string" is not a native type)
             throw new InvalidValueException("Invalid parameter \$class: $class (not a subclass of ".__CLASS__.')');
         }
         /** @var self $dao */

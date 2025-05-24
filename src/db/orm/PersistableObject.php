@@ -884,8 +884,12 @@ abstract class PersistableObject extends CObject {
      * @return DAO
      */
     public static function dao(): DAO {
-        if (static::class == __CLASS__) throw new IllegalAccessException('Use an entity class to access method '.__METHOD__.'()');
-        return DAO::getImplementation(static::class.'DAO');
+        if (static::class == __CLASS__) {
+            throw new IllegalAccessException('Use an entity class to access method '.__METHOD__.'()');
+        }
+        /** @var class-string<DAO> $dao */
+        $dao = static::class.'DAO';
+        return DAO::getImplementation($dao);
         // TODO: The calling class may be a derived class with the entity class being one of its parents.
     }
 

@@ -14,4 +14,5 @@ use rosasurfer\ministruts\core\di\DiAwareTrait;
 class RosasurferException extends Exception implements RosasurferExceptionInterface {
 
     use RosasurferExceptionTrait, ObjectTrait, DiAwareTrait;
+
 }

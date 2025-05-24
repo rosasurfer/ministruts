@@ -29,8 +29,8 @@ abstract class Singleton extends CObject {
     /**
      * Creates a Singleton instance of the specified class.
      *
-     * @param  string   $class - class name
-     * @param  mixed ...$args  - constructor arguments
+     * @param  class-string<self> $class - class name
+     * @param  mixed           ...$args  - constructor arguments
      *
      * @return self
      */
@@ -44,7 +44,7 @@ abstract class Singleton extends CObject {
         if (isset($recursion[$class])) throw new RuntimeException('Recursive call: '.__METHOD__."($class)");
         $recursion[$class] = true;
 
-        if (!is_subclass_of($class, __CLASS__)) {
+        if (!is_subclass_of($class, __CLASS__)) {   // @phpstan-ignore function.alreadyNarrowedType ("class-string" is not a native type)
             throw new InvalidValueException("Invalid parameter \$class: $class (not a subclass of ".__CLASS__.')');
         }
         self::$instances[$class] = new $class(...$args);

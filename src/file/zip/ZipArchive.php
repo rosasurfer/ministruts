@@ -18,7 +18,6 @@ class ZipArchive extends \ZipArchive {
 
     use ObjectTrait, DiAwareTrait;
 
-
     /** @var string[][] */
     protected static array $errors = [
         parent::ER_OK          => ['ER_OK'             , 'no error'                             ],      //  0

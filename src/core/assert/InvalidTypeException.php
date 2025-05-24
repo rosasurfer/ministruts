@@ -11,4 +11,5 @@ namespace rosasurfer\ministruts\core\assert;
 class InvalidTypeException extends \rosasurfer\ministruts\core\exception\InvalidTypeException {
 
     use FailedAssertionTrait;
+
 }

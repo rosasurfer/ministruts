@@ -13,7 +13,6 @@ class DateTime extends \DateTime {
 
     use ObjectTrait, DiAwareTrait;
 
-
     /**
      * {@inheritDoc}
      */

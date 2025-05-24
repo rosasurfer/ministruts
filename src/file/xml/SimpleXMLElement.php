@@ -23,7 +23,6 @@ class SimpleXMLElement extends \SimpleXMLElement {
 
     use ObjectTrait, DiAwareTrait;
 
-
     /**
      * Create a new SimpleXMLElement instance.
      *

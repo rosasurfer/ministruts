@@ -8,11 +8,14 @@
     @see  https://github.com/slevomat/coding-standard#alphabetical-list-of-sniffs
     -->
 
-    <!-- display options -->
-    <arg name="report" value="full,source"/>  <!-- default: full display + summary             -->
-    <arg name="basepath" value="../.."/>      <!-- base path to strip from reported file names -->
-    <arg value="p"/>                          <!-- show progress                               -->
 
+    <!-- runtime options -->
+    <arg name="cache" value="../tmp/phpcs-cache.json"/> <!-- use result cache                            -->
+    <arg name="report" value="full,source"/>            <!-- full display + summary                      -->
+    <arg name="basepath" value="../.."/>                <!-- base path to strip from reported file names -->
+    <arg value="p"/>                                    <!-- show progress                               -->
+    
+    
 
     <!-- PHP version to test against -->
     <config name="php_version" value="70499"/>
@@ -39,32 +42,34 @@
       <exclude name="SlevomatCodingStandard.TypeHints.UnionTypeHintFormat"/>  <!-- replaced by DNFTypeHintFormat -->
 
       <!-- exclude sniffs which decrease code quality and/or readability -->
-      <exclude name="SlevomatCodingStandard.Arrays.AlphabeticallySortedByKeys"/>
+      <exclude name="SlevomatCodingStandard.Arrays.AlphabeticallySortedByKeys.IncorrectKeyOrder"/>
       <exclude name="SlevomatCodingStandard.Arrays.SingleLineArrayWhitespace.SpaceAfterComma"/>
       <exclude name="SlevomatCodingStandard.Arrays.SingleLineArrayWhitespace.SpaceBeforeArrayClose"/>
-      <exclude name="SlevomatCodingStandard.Classes.RequireAbstractOrFinal"/>
-      <exclude name="SlevomatCodingStandard.Commenting.DisallowCommentAfterCode"/>
-      <exclude name="SlevomatCodingStandard.Commenting.DisallowOneLinePropertyDocComment"/>
-      <exclude name="SlevomatCodingStandard.Commenting.EmptyComment"/>
-      <exclude name="SlevomatCodingStandard.Commenting.RequireOneLineDocComment"/>
-      <exclude name="SlevomatCodingStandard.Commenting.UselessFunctionDocComment"/>
-      <exclude name="SlevomatCodingStandard.Commenting.UselessInheritDocComment"/>
-      <exclude name="SlevomatCodingStandard.ControlStructures.RequireYodaComparison"/>
-      <exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedClassNameInAnnotation"/>
-      <exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedExceptions"/>
-      <exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedGlobalConstants"/>
-      <exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedGlobalFunctions"/>
-      <exclude name="SlevomatCodingStandard.Namespaces.NamespaceSpacing.IncorrectLinesCountBeforeNamespace"/>
-      <exclude name="SlevomatCodingStandard.Namespaces.UseOnlyWhitelistedNamespaces"/>
+      <exclude name="SlevomatCodingStandard.Classes.RequireAbstractOrFinal.ClassNeitherAbstractNorFinal"/>
+      <exclude name="SlevomatCodingStandard.Classes.SuperfluousErrorNaming.SuperfluousSuffix"/>
+      <exclude name="SlevomatCodingStandard.Classes.SuperfluousExceptionNaming.SuperfluousSuffix"/>
+      <exclude name="SlevomatCodingStandard.Classes.SuperfluousInterfaceNaming.SuperfluousSuffix"/>
+      <exclude name="SlevomatCodingStandard.Classes.SuperfluousTraitNaming.SuperfluousSuffix"/>
+      <exclude name="SlevomatCodingStandard.Classes.TraitUseDeclaration.MultipleTraitsPerDeclaration"/>
+      <exclude name="SlevomatCodingStandard.Commenting.DisallowCommentAfterCode.DisallowedCommentAfterCode"/>
+      <exclude name="SlevomatCodingStandard.Commenting.DisallowOneLinePropertyDocComment.OneLinePropertyComment"/>
+      <exclude name="SlevomatCodingStandard.Commenting.EmptyComment.EmptyComment"/>
+      <exclude name="SlevomatCodingStandard.Commenting.RequireOneLineDocComment.MultiLineDocComment"/>
+      <exclude name="SlevomatCodingStandard.Commenting.UselessFunctionDocComment.UselessDocComment"/>
+      <exclude name="SlevomatCodingStandard.Commenting.UselessInheritDocComment.UselessInheritDocComment"/>
+      <exclude name="SlevomatCodingStandard.ControlStructures.RequireYodaComparison.RequiredYodaComparison"/>
+      <exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedClassNameInAnnotation.NonFullyQualifiedClassName"/>
+      <exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedExceptions.NonFullyQualifiedException"/>
+      <exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedGlobalConstants.NonFullyQualified"/>
+      <exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedGlobalFunctions.NonFullyQualified"/>
+      <exclude name="SlevomatCodingStandard.Namespaces.UseOnlyWhitelistedNamespaces.NonFullyQualified"/>
       <exclude name="SlevomatCodingStandard.Namespaces.UseSpacing.IncorrectLinesCountBetweenSameTypeOfUse"/>
-      <exclude name="SlevomatCodingStandard.Numbers.DisallowNumericLiteralSeparator"/>
-      <exclude name="SlevomatCodingStandard.TypeHints.DisallowArrayTypeHintSyntax"/>
+      <exclude name="SlevomatCodingStandard.Numbers.DisallowNumericLiteralSeparator.DisallowedNumericLiteralSeparator"/>
+      <exclude name="SlevomatCodingStandard.TypeHints.DisallowArrayTypeHintSyntax.DisallowedArrayTypeHintSyntax"/>
       <exclude name="SlevomatCodingStandard.TypeHints.ParameterTypeHint.UselessAnnotation"/>
       <exclude name="SlevomatCodingStandard.TypeHints.PropertyTypeHint.UselessAnnotation"/>
       <exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHint.UselessAnnotation"/>
-      <exclude name="SlevomatCodingStandard.TypeHints.UselessConstantTypeHint.UselessDocComment"/>
-      <exclude name="SlevomatCodingStandard.Whitespaces.DuplicateSpaces"/>
-
+      <exclude name="SlevomatCodingStandard.Whitespaces.DuplicateSpaces.DuplicateSpaces"/>
 
       <!--
       -->
@@ -82,13 +87,6 @@
       <exclude name="SlevomatCodingStandard.Classes.ParentCallSpacing.IncorrectLinesCountBeforeControlStructure"/>
       <exclude name="SlevomatCodingStandard.Classes.RequireMultiLineMethodSignature.RequiredMultiLineSignature"/>
       <exclude name="SlevomatCodingStandard.Classes.RequireSelfReference.RequiredSelfReference"/>
-      <exclude name="SlevomatCodingStandard.Classes.SuperfluousErrorNaming.SuperfluousSuffix"/>
-      <exclude name="SlevomatCodingStandard.Classes.SuperfluousExceptionNaming.SuperfluousSuffix"/>
-      <exclude name="SlevomatCodingStandard.Classes.SuperfluousInterfaceNaming.SuperfluousSuffix"/>
-      <exclude name="SlevomatCodingStandard.Classes.SuperfluousTraitNaming.SuperfluousSuffix"/>
-      <exclude name="SlevomatCodingStandard.Classes.TraitUseDeclaration.MultipleTraitsPerDeclaration"/>
-      <exclude name="SlevomatCodingStandard.Classes.TraitUseSpacing.IncorrectLinesCountAfterLastUse"/>
-      <exclude name="SlevomatCodingStandard.Classes.UselessLateStaticBinding.UselessLateStaticBinding"/>
 
 
       <exclude name="SlevomatCodingStandard.Complexity"/>
@@ -121,7 +119,7 @@
     </rule>
 
 
-    <!-- regular sniff customizations ================================================================================================== -->
+    <!-- sniff customizations ========================================================================================================== -->
     <rule ref="SlevomatCodingStandard.Classes.ClassLength">
       <properties>
         <property name="maxLinesLength" value="250"/> <!-- default: 250 -->
@@ -163,5 +161,9 @@
         <property name="linesCountBeforeDeclare" value="0"/>
         <property name="spacesCountAroundEqualsSign" value="0"/>
       </properties>
+    </rule>
+    
+    <rule ref="SlevomatCodingStandard.TypeHints.UselessConstantTypeHint.UselessDocComment">
+      <exclude-pattern>*/src/functions.php</exclude-pattern>  <!-- ignore types in constant redeclarations -->
     </rule>
 </ruleset>

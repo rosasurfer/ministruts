@@ -1,9 +1,9 @@
 <?php
-declare(strict_types=1);
-
 /**
  * Helper functions and constants
  */
+declare(strict_types=1);
+
 namespace rosasurfer\ministruts;
 
 use ArrayAccess;
@@ -28,7 +28,7 @@ define('rosasurfer\ministruts\_MACOS',      strtoupper(PHP_OS) == 'DARWIN');
 define('rosasurfer\ministruts\_WINDOWS',    defined('\PHP_WINDOWS_VERSION_BUILD'));
 define('rosasurfer\ministruts\_NUL_DEVICE', _WINDOWS ? 'nul' : '/dev/null');
 
-/** @var bool - whether we run on a command line interface */       // constant declarations improve IDE auto-completion
+/** @var bool - whether we run on a command line interface */       // constant declarations improve IDE support
 const CLI = _CLI;
 /** @var bool - whether we run on MacOS */
 const MACOS = _MACOS;

@@ -18,4 +18,5 @@ use rosasurfer\ministruts\core\ObjectTrait;
 class OptionIterator extends ArrayIterator {
 
     use ObjectTrait;
+
 }
