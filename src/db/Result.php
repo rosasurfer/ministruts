@@ -23,7 +23,6 @@ use const rosasurfer\ministruts\ARRAY_BOTH;
  */
 abstract class Result extends CObject implements ResultInterface {
 
-
     /** @var Connector - the used database connector */
     protected Connector $connector;
 

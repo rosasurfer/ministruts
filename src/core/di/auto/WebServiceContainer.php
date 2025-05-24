@@ -16,7 +16,6 @@ use rosasurfer\ministruts\struts\Request;
  */
 class WebServiceContainer extends Di {
 
-
     /**
      * Constructor
      *

@@ -16,7 +16,6 @@ use rosasurfer\ministruts\core\exception\RuntimeException;
  */
 class Lock extends BaseLock {
 
-
     /** @var string[] - keys of all currently aquired locks */
     private static array $lockedKeys;
 

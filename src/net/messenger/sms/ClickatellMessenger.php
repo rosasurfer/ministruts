@@ -15,7 +15,6 @@ use rosasurfer\ministruts\net\messenger\Messenger;
  */
 class ClickatellMessenger extends Messenger {
 
-
     /**
      * {@inheritDoc}
      *

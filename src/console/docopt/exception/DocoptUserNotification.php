@@ -12,7 +12,6 @@ use rosasurfer\ministruts\core\exception\RuntimeException;
  */
 class DocoptUserNotification extends RuntimeException {
 
-
     /** @var int */
     public int $status;
 

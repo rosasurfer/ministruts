@@ -16,7 +16,6 @@ use rosasurfer\ministruts\struts\Struts;
  */
 class Input extends Facade {
 
-
     /**
      * Return all raw input parameters of the current HTTP request.
      *

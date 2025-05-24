@@ -10,7 +10,6 @@ use rosasurfer\ministruts\db\ResultInterface as IResult;
  */
 interface ConnectorInterface {
 
-
     /**
      * Constructor.
      *

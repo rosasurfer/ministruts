@@ -55,7 +55,8 @@ use rosasurfer\ministruts\db\orm\PersistableObject;
  *   __adjusted?: int,
  * }
  */
-final class CustomTypes {}
+final class CustomTypes {
+}
 
 
 /**
@@ -80,7 +81,8 @@ final class CustomTypes {}
  * @see \rosasurfer\ministruts\phpstan\ORM_PROPERTY
  * @see \rosasurfer\ministruts\phpstan\ORM_RELATION
  */
-final class ORM_ENTITY {}
+final class ORM_ENTITY {
+}
 
 
 /**
@@ -98,7 +100,8 @@ final class ORM_ENTITY {}
  * )
  * </pre>
  */
-final class ORM_PROPERTY {}
+final class ORM_PROPERTY {
+}
 
 
 /**
@@ -120,7 +123,8 @@ final class ORM_PROPERTY {}
  *
  * @see \rosasurfer\ministruts\phpstan\PersistableObject
  */
-final class ORM_RELATION {}
+final class ORM_RELATION {
+}
 
 
 /**
@@ -139,4 +143,5 @@ final class ORM_RELATION {}
  * )
  * </pre>
  */
-final class STACKFRAME {}
+final class STACKFRAME {
+}

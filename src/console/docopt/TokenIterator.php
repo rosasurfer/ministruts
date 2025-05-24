@@ -23,7 +23,6 @@ class TokenIterator extends ArrayIterator {
 
     use ObjectTrait, DiAwareTrait;
 
-
     /** @var class-string<Throwable> */
     protected string $errorClass;
 

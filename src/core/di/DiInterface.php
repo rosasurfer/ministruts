@@ -19,7 +19,6 @@ use Psr\Container\ContainerInterface;
  */
 interface DiInterface extends ArrayAccess, ContainerInterface {
 
-
     /**
      * Whether a service with the specified name is registered in the container.
      *

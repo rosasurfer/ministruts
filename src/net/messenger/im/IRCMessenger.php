@@ -13,7 +13,6 @@ use rosasurfer\ministruts\net\messenger\Messenger;
  */
 class IRCMessenger extends Messenger {
 
-
     /**
      * {@inheritDoc}
      *

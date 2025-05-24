@@ -19,7 +19,6 @@ use rosasurfer\ministruts\core\exception\IllegalAccessException;
  */
 abstract class ActionForm extends CObject implements ArrayAccess {
 
-
     /** @var Request [transient] - the request the form belongs to */
     protected Request $request;
 

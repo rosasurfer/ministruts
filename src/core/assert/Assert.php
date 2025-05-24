@@ -15,7 +15,6 @@ use function rosasurfer\ministruts\strContains;
  */
 class Assert extends StaticClass {
 
-
     /**
      * Ensure that the passed value is NULL.
      *

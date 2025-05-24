@@ -15,7 +15,6 @@ use rosasurfer\ministruts\phpstan\CustomTypes;
  */
 class PropertyMapping extends CObject {
 
-
     /** @var EntityMapping - the entity mapping this mapping is a part of */
     protected EntityMapping $entityMapping;
 

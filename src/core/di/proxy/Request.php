@@ -72,7 +72,6 @@ use rosasurfer\ministruts\struts\Request as StrutsRequest;
  */
 class Request extends Proxy {
 
-
     /**
      * {@inheritDoc}
      */

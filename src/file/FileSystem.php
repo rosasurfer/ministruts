@@ -16,7 +16,6 @@ use rosasurfer\ministruts\core\exception\RuntimeException;
  */
 class FileSystem extends StaticClass {
 
-
     /**
      * Drop-in replacement for the built-in PHP function {@link \mkdir()}.
      *

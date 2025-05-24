@@ -48,8 +48,8 @@ use const rosasurfer\ministruts\L_WARN;
  */
 class Logger extends StaticClass {
 
-    /** @var int - default if no application loglevel is configured */
-    const DEFAULT_LOGLEVEL = L_NOTICE;
+    /** default if no application loglevel is configured */
+    public const DEFAULT_LOGLEVEL = L_NOTICE;
 
 
     /** @var string[] - loglevels and their string representations */

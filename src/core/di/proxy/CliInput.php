@@ -27,7 +27,6 @@ use rosasurfer\ministruts\console\docopt\DocoptResult;
  */
 class CliInput extends Proxy {
 
-
     /**
      * {@inheritDoc}
      */

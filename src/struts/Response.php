@@ -24,7 +24,6 @@ use const rosasurfer\ministruts\CLI;
  */
 class Response extends Singleton {
 
-
     /** @var int - HTTP status code */
     protected int $status = 0;
 

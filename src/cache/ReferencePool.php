@@ -14,7 +14,6 @@ use rosasurfer\ministruts\cache\monitor\Dependency;
  */
 final class ReferencePool extends CachePeer {
 
-
     /** @var array<string, mixed> */
     private array $pool = [];
 

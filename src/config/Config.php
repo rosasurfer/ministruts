@@ -57,7 +57,6 @@ use const rosasurfer\ministruts\CLI;
  */
 class Config extends CObject implements ConfigInterface {
 
-
     /** @var array<string, bool> - config file names and their existence status */
     protected array $files = [];
 

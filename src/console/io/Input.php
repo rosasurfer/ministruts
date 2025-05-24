@@ -13,7 +13,6 @@ use rosasurfer\ministruts\core\CObject;
  */
 class Input extends CObject {
 
-
     /** @var ?DocoptResult */
     private ?DocoptResult $docoptResult = null;
 

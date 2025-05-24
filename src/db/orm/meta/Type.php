@@ -13,7 +13,6 @@ use rosasurfer\ministruts\db\ConnectorInterface as Connector;
  */
 abstract class Type extends CObject {
 
-
     /**
      * @param  mixed           $value     - result set representation of a property value as returned by the RDBMS
      * @param  PropertyMapping $mapping   - the property mapping

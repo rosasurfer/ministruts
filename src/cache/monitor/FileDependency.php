@@ -32,7 +32,6 @@ use function rosasurfer\ministruts\realpath;
  */
 class FileDependency extends Dependency {
 
-
     /** @var string - name of the monitored file */
     private string $fileName;
 

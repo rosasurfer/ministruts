@@ -39,7 +39,6 @@ use const rosasurfer\ministruts\NL;
  */
 class PrintAppender extends BaseAppender {
 
-
     /** @var int - counter for all displayed messages */
     protected int $msgCounter = 0;
 

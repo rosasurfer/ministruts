@@ -11,7 +11,6 @@ use rosasurfer\ministruts\config\ConfigInterface as Config;
  */
 class VersionedUrl extends Url {
 
-
     /**
      * {@inheritDoc}
      */

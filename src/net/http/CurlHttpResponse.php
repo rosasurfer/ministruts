@@ -13,7 +13,6 @@ use rosasurfer\ministruts\core\exception\InvalidValueException;
  */
 class CurlHttpResponse extends HttpResponse {
 
-
     /** @var HeaderParser */
     protected HeaderParser $headerParser;
 

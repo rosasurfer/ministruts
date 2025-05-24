@@ -16,7 +16,6 @@ use rosasurfer\ministruts\core\exception\InvalidTypeException;
  */
 abstract class Connector extends CObject implements ConnectorInterface {
 
-
     /**
      * Destructor
      *

@@ -8,7 +8,6 @@ namespace rosasurfer\ministruts\console\docopt\pattern;
  */
 class Required extends BranchPattern {
 
-
     /**
      * {@inheritDoc}
      */

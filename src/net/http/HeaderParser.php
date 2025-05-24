@@ -10,7 +10,6 @@ use rosasurfer\ministruts\core\CObject;
  */
 class HeaderParser extends CObject {
 
-
     /** @var array<string, string[]> */
     protected array $headers = [];
 

@@ -26,7 +26,6 @@ use function rosasurfer\ministruts\strLeft;
  */
 abstract class PersistableObject extends CObject {
 
-
     /** @var bool - dirty checking status */
     private bool $__modified = false;
 

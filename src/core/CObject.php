@@ -13,7 +13,6 @@ class CObject {
 
     use ObjectTrait, DiAwareTrait;
 
-
     /**
      * Return a readable version of the instance.
      *

@@ -34,7 +34,6 @@ use const rosasurfer\ministruts\NL;
  */
 class DocoptParser extends CObject {
 
-
     /** @var bool */
     protected bool $optionsFirst = false;
 

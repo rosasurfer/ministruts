@@ -15,7 +15,6 @@ use rosasurfer\ministruts\core\exception\UnimplementedFeatureException;
  */
 abstract class Proxy extends StaticClass {
 
-
     /** @var object[] - resolved instances of proxied objects */
     protected static array $resolvedInstances;
 

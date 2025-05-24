@@ -12,7 +12,6 @@ use rosasurfer\ministruts\core\CObject;
  */
 abstract class Action extends CObject {
 
-
     /** @var ActionMapping - encapsulates a single routing configuration */
     protected ActionMapping $mapping;
 

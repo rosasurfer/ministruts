@@ -10,7 +10,6 @@ use UnexpectedValueException;
  */
 class OneOrMore extends BranchPattern {
 
-
     /**
      * {@inheritDoc}
      */

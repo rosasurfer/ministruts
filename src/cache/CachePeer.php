@@ -22,7 +22,6 @@ use rosasurfer\ministruts\core\CObject;
  */
 abstract class CachePeer extends CObject {
 
-
     /** @var string */
     protected string $label = '';
 

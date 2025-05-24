@@ -15,7 +15,6 @@ use rosasurfer\ministruts\core\exception\RuntimeException;
  */
 interface ConfigInterface extends ArrayAccess, Countable {
 
-
     /**
      * Return the config setting with the specified key or the default value if no such setting is found.
      *

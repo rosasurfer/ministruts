@@ -38,7 +38,6 @@ use rosasurfer\ministruts\core\di\service\ServiceNotFoundException;
  */
 class Di extends CObject implements DiInterface {
 
-
     /** @var IService[] - list of registered services */
     protected array $services = [];
 

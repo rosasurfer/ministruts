@@ -30,11 +30,11 @@ use const rosasurfer\ministruts\NL;
 class Tile extends CObject {
 
     /**
-     * @var string - runtime generated name for anonymous tiles
+     * runtime generated name for anonymous tiles
      *
-     * @todo  make generic names unique
+     * @todo make generic names unique
      */
-    const GENERIC_NAME = 'generic';
+    public const GENERIC_NAME = 'generic';
 
     /** @var Module - the Module this Tile belongs to */
     protected Module $module;

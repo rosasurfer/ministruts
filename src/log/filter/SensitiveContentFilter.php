@@ -12,8 +12,8 @@ use rosasurfer\ministruts\core\CObject;
  */
 class SensitiveContentFilter extends CObject implements ContentFilterInterface {
 
-    /** @var string - replacement value for sensitive strings */
-    const SUBSTITUTE = '******';
+    /** replacement value for sensitive strings */
+    private const SUBSTITUTE = '******';
 
 
     /**

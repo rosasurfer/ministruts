@@ -12,7 +12,6 @@ use rosasurfer\ministruts\core\exception\RuntimeException;
  */
 class Url extends CObject {
 
-
     /** @var string - URI as passed to the constructor */
     protected string $uri;
 

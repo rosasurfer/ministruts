@@ -18,7 +18,6 @@ use rosasurfer\ministruts\db\sqlite\SQLiteConnector;
  */
 final class ConnectionPool extends Singleton {
 
-
     /** @var IConnector[] - adapter pool */
     private array $pool = [];
 

@@ -32,7 +32,6 @@ use rosasurfer\ministruts\core\exception\InvalidValueException;
  */
 abstract class Dependency extends CObject {
 
-
     /** @var int - min. validity of the instance in seconds */
     private int $minValidity = 0;
 

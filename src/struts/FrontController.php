@@ -29,7 +29,6 @@ use const rosasurfer\ministruts\CLI;
  */
 class FrontController extends Singleton {
 
-
     /** @var Module[] - all registered Struts modules with the module prefix as index */
     private array $modules = [];
 

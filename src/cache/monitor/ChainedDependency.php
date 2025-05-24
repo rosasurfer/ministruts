@@ -10,7 +10,6 @@ use rosasurfer\ministruts\core\exception\RuntimeException;
  */
 class ChainedDependency extends Dependency {
 
-
     /** @var Dependency[] - all dependencies of the instance */
     private array $dependencies;
 

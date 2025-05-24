@@ -15,7 +15,6 @@ use function rosasurfer\ministruts\array_merge;
  */
 abstract class LeafPattern extends Pattern {
 
-
     /**
      * @param  ?string $name
      * @param  mixed   $value [optional]

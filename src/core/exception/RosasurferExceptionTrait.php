@@ -10,7 +10,6 @@ use rosasurfer\ministruts\core\error\ErrorHandler;
  */
 trait RosasurferExceptionTrait {
 
-
     /**
      * Prepend a message to the exception's existing message. Used to enrich the exception with additional data.
      *

@@ -20,7 +20,6 @@ use rosasurfer\ministruts\struts\Struts;
  */
 class Form extends Facade {
 
-
     /**
      * Return the current HTTP request's {@link ActionForm} property with the specified name.
      *

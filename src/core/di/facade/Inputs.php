@@ -15,7 +15,6 @@ namespace rosasurfer\ministruts\core\di\facade;
  */
 class Inputs extends Facade {
 
-
     /**
      * Return all raw input parameters from the current and the previous HTTP request.
      *

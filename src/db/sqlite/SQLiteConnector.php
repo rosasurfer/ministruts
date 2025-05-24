@@ -52,7 +52,6 @@ use const rosasurfer\ministruts\NL;
  */
 class SQLiteConnector extends Connector {
 
-
     /** @var string - DBMS type */
     protected string $type = 'sqlite';
 

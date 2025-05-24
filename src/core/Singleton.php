@@ -14,7 +14,6 @@ use rosasurfer\ministruts\core\exception\IllegalStateException;
  */
 abstract class Singleton extends CObject {
 
-
     /** @var self[] - existing instances */
     private static array $instances = [];
 

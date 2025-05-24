@@ -38,7 +38,6 @@ use const rosasurfer\ministruts\NL;
  */
 class Module extends CObject {
 
-
     /**
      * Module prefix relative to the base URI of the web application. All module prefixes in an application are unique.
      * The module with the prefix "" (empty string) is the main module of an application.

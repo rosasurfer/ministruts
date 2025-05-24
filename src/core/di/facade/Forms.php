@@ -14,7 +14,6 @@ namespace rosasurfer\ministruts\core\di\facade;
  */
 class Forms extends Facade {
 
-
     /**
      * Return the {@link \rosasurfer\ministruts\struts\ActionForm} property with the specified name from any of the current or the
      * previous ActionForm. If the property exists in both forms the current value is returned.

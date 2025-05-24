@@ -11,7 +11,6 @@ use rosasurfer\ministruts\core\exception\InvalidValueException;
  */
 class HttpRequest extends CObject {
 
-
     /** @var string */
     protected string $url = '';
 

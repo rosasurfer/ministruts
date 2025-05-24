@@ -23,7 +23,6 @@ use rosasurfer\ministruts\phpstan\CustomTypes;
  */
 abstract class DAO extends Singleton {
 
-
     /** @var ?IConnector - the db connector for this DAO */
     private ?IConnector $connector = null;
 

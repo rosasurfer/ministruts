@@ -8,7 +8,6 @@ namespace rosasurfer\ministruts\log\filter;
  */
 interface ContentFilterInterface {
 
-
     /**
      * Filter a plain string.
      *

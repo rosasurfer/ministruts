@@ -10,7 +10,6 @@ use function rosasurfer\ministruts\array_merge;
  */
 abstract class BranchPattern extends Pattern {
 
-
     /**
      * @param  Pattern|Pattern[]|null $children [optional]
      */

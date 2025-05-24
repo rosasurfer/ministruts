@@ -8,7 +8,6 @@ namespace rosasurfer\ministruts\core;
  */
 abstract class StaticClass extends CObject {
 
-
     /**
      * Locked constructor
      */

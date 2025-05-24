@@ -26,8 +26,7 @@ use function rosasurfer\ministruts\simpleClassName;
  */
 class Command extends CObject {
 
-    /** @var string */
-    const DOCOPT = '';
+    public const DOCOPT = '';
 
     /** @var string */
     private string $name = '';

@@ -10,7 +10,6 @@ use rosasurfer\ministruts\console\docopt\SingleMatch;
  */
 class Argument extends LeafPattern {
 
-
     /**
      * {@inheritDoc}
      */

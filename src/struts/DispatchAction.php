@@ -12,7 +12,6 @@ namespace rosasurfer\ministruts\struts;
  */
 class DispatchAction extends Action {
 
-
     /**
      * Fall-back {@link Action} method called if no dispatch action key is submitted or a method matching the dispatch
      * action key is not found.

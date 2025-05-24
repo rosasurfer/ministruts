@@ -11,7 +11,6 @@ use rosasurfer\ministruts\core\exception\RuntimeException;
  */
 trait ObjectTrait {
 
-
     /**
      * Method signaling possibly unnoticed read access to undefined instance properties.
      *

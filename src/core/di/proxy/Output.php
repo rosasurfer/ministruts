@@ -18,7 +18,6 @@ use rosasurfer\ministruts\console\io\Output as ConsoleOutput;
  */
 class Output extends Proxy {
 
-
     /**
      * {@inheritDoc}
      */

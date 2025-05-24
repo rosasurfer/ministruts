@@ -54,7 +54,6 @@ use const rosasurfer\ministruts\NL;
  */
 class PostgresConnector extends Connector {
 
-
     /** @var string - DBMS type */
     protected string $type = 'pgsql';
 

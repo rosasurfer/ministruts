@@ -17,15 +17,14 @@ use function rosasurfer\ministruts\strLeftTo;
  */
 class ActionForward extends CObject {
 
+    /** reserved identifier which references a forward to the currently used ActionMapping */
+    public const SELF = 'self';
 
-    /** @var string - reserved identifier which references a forward to the currently used ActionMapping */
-    const SELF = 'self';
+    /** default identifier for looking up a forward after a successful form validation */
+    public const VALIDATION_SUCCESS_KEY = 'success';
 
-    /** @var string - default identifier for looking up a forward after a successful form validation */
-    const VALIDATION_SUCCESS_KEY = 'success';
-
-    /** @var string - default identifier for looking up a forward after a failed form validation */
-    const VALIDATION_ERROR_KEY = 'error';
+    /** default identifier for looking up a forward after a failed form validation */
+    public const VALIDATION_ERROR_KEY = 'error';
 
 
     /** @var string */

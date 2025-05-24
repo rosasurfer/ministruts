@@ -23,7 +23,6 @@ use const rosasurfer\ministruts\NL;
  */
 class DocoptResult extends CObject implements ArrayAccess, IteratorAggregate {
 
-
     /** @var array<string, bool|int|string[]|null> */
     protected array $args;
 

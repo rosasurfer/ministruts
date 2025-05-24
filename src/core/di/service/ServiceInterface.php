@@ -10,7 +10,6 @@ namespace rosasurfer\ministruts\core\di\service;
  */
 interface ServiceInterface {
 
-
     /**
      * Constructor
      *

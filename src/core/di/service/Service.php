@@ -19,7 +19,6 @@ use rosasurfer\ministruts\core\exception\ClassNotFoundException;
  */
 class Service implements ServiceInterface {
 
-
     /** @var string */
     protected string $name;
 

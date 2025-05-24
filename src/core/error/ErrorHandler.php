@@ -41,14 +41,14 @@ use const rosasurfer\ministruts\WINDOWS;
  */
 class ErrorHandler extends StaticClass {
 
-    /** @var int - ignore PHP errors and exceptions */
-    const MODE_IGNORE = 1;
+    /** ignore PHP errors and exceptions */
+    public const MODE_IGNORE = 1;
 
-    /** @var int - log PHP errors and exceptions */
-    const MODE_LOG = 2;
+    /** log PHP errors and exceptions */
+    public const MODE_LOG = 2;
 
-    /** @var int - convert PHP errors to exceptions, log both */
-    const MODE_EXCEPTION = 3;
+    /** convert PHP errors to exceptions, log both */
+    public const MODE_EXCEPTION = 3;
 
 
     /** @var int - the configured error handling mode */

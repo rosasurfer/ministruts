@@ -12,7 +12,6 @@ namespace rosasurfer\ministruts\struts;
  */
 final class EmptyActionForm extends ActionForm {
 
-
     /**
      * {@inheritDoc}
      *

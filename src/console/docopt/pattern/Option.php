@@ -14,7 +14,6 @@ use function rosasurfer\ministruts\preg_split;
  */
 class Option extends LeafPattern {
 
-
     /** @var ?string */
     public ?string $short = null;
 

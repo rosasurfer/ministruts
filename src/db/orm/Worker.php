@@ -20,7 +20,6 @@ use const rosasurfer\ministruts\ARRAY_ASSOC;
  */
 class Worker extends CObject {
 
-
     /** @var DAO - DAO of the worker's entity */
     private DAO $dao;
 

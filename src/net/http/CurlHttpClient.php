@@ -25,7 +25,6 @@ use const rosasurfer\ministruts\NL;
  */
 class CurlHttpClient extends HttpClient {
 
-
     /**
      * @var resource|CurlHandle|null - cURL handle
      * @phpstan-var ?CurlHandleId

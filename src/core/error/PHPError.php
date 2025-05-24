@@ -17,7 +17,6 @@ class PHPError extends ErrorException implements IRosasurferException {
 
     use RosasurferExceptionTrait, ObjectTrait, DiAwareTrait;
 
-
     /**
      * Create a new instance. Parameters are identical to the built-in PHP {@link \ErrorException} but stronger typed.
      *

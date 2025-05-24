@@ -16,7 +16,6 @@ use rosasurfer\ministruts\core\di\service\Service;
  */
 class CliServiceContainer extends Di {
 
-
     /**
      * Constructor
      *

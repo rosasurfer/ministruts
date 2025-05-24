@@ -14,7 +14,6 @@ use function rosasurfer\ministruts\stdout;
  */
 class Output extends CObject {
 
-
     /**
      * Write a message to STDOUT.
      *

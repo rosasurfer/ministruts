@@ -15,7 +15,6 @@ use const rosasurfer\ministruts\WINDOWS;
  */
 abstract class Extension extends CObject {
 
-
     /**
      * Log a message to the system logger.
      *

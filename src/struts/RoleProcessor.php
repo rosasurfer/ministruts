@@ -12,7 +12,6 @@ use rosasurfer\ministruts\core\CObject;
  */
 abstract class RoleProcessor extends CObject {
 
-
     /**
      * Whether the current web user owns the specified role.
      *

@@ -19,7 +19,6 @@ use rosasurfer\ministruts\core\Singleton;
  */
 class Page extends Singleton {
 
-
     /** @var mixed[] - stored variables */
     protected array $properties = [];
 

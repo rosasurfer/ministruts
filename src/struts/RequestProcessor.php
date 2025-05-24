@@ -23,7 +23,6 @@ use function rosasurfer\ministruts\preg_replace;
  */
 class RequestProcessor extends CObject {
 
-
     /** @var Module - the Module the instance belongs to */
     protected Module $module;
 

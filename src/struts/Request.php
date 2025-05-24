@@ -30,7 +30,6 @@ use const rosasurfer\ministruts\NL;
  */
 class Request extends CObject {
 
-
     /** @var string */
     protected string $method;
 

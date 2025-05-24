@@ -10,7 +10,6 @@ use rosasurfer\ministruts\core\StaticClass;
  */
 class Process extends StaticClass {
 
-
     /**
      * Call signal handlers to handle pending signals.
      * On platforms which do not support POSIX signal handling (e.g. on Windows) the call does nothing.

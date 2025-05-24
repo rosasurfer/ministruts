@@ -11,7 +11,6 @@ use rosasurfer\ministruts\console\docopt\pattern\Pattern;
  */
 class SingleMatch extends CObject {
 
-
     /** @var ?int */
     public ?int $pos = null;
 

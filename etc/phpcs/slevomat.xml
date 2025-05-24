@@ -58,7 +58,6 @@
       <exclude name="SlevomatCodingStandard.Namespaces.UseOnlyWhitelistedNamespaces"/>
       <exclude name="SlevomatCodingStandard.Namespaces.UseSpacing.IncorrectLinesCountBetweenSameTypeOfUse"/>
       <exclude name="SlevomatCodingStandard.Numbers.DisallowNumericLiteralSeparator"/>
-      <exclude name="SlevomatCodingStandard.TypeHints.ClassConstantTypeHint.UselessDocComment"/>
       <exclude name="SlevomatCodingStandard.TypeHints.DisallowArrayTypeHintSyntax"/>
       <exclude name="SlevomatCodingStandard.TypeHints.ParameterTypeHint.UselessAnnotation"/>
       <exclude name="SlevomatCodingStandard.TypeHints.PropertyTypeHint.UselessAnnotation"/>
@@ -69,8 +68,29 @@
 
       <!--
       -->
+      <exclude name="SlevomatCodingStandard.Classes.ClassMemberSpacing.IncorrectCountOfBlankLinesBetweenMembers"/>
+      <exclude name="SlevomatCodingStandard.Classes.ClassStructure.IncorrectGroupOrder"/>
+      <exclude name="SlevomatCodingStandard.Classes.DisallowLateStaticBindingForConstants.DisallowedLateStaticBindingForConstant"/>
+      <exclude name="SlevomatCodingStandard.Classes.DisallowStringExpressionPropertyFetch.DisallowedStringExpressionPropertyFetch"/>
+      <exclude name="SlevomatCodingStandard.Classes.EmptyLinesAroundClassBraces.IncorrectEmptyLinesBeforeClosingBrace"/>
+      <exclude name="SlevomatCodingStandard.Classes.EmptyLinesAroundClassBraces.NoEmptyLineAfterOpeningBrace"/>
+      <exclude name="SlevomatCodingStandard.Classes.ForbiddenPublicProperty.ForbiddenPublicProperty"/>
+      <exclude name="SlevomatCodingStandard.Classes.MethodSpacing.IncorrectLinesCountBetweenMethods"/>
+      <exclude name="SlevomatCodingStandard.Classes.ModernClassNameReference.ClassNameReferencedViaFunctionCall"/>
+      <exclude name="SlevomatCodingStandard.Classes.ModernClassNameReference.ClassNameReferencedViaMagicConstant"/>
+      <exclude name="SlevomatCodingStandard.Classes.ParentCallSpacing.IncorrectLinesCountAfterControlStructure"/>
+      <exclude name="SlevomatCodingStandard.Classes.ParentCallSpacing.IncorrectLinesCountBeforeControlStructure"/>
+      <exclude name="SlevomatCodingStandard.Classes.RequireMultiLineMethodSignature.RequiredMultiLineSignature"/>
+      <exclude name="SlevomatCodingStandard.Classes.RequireSelfReference.RequiredSelfReference"/>
+      <exclude name="SlevomatCodingStandard.Classes.SuperfluousErrorNaming.SuperfluousSuffix"/>
+      <exclude name="SlevomatCodingStandard.Classes.SuperfluousExceptionNaming.SuperfluousSuffix"/>
+      <exclude name="SlevomatCodingStandard.Classes.SuperfluousInterfaceNaming.SuperfluousSuffix"/>
+      <exclude name="SlevomatCodingStandard.Classes.SuperfluousTraitNaming.SuperfluousSuffix"/>
+      <exclude name="SlevomatCodingStandard.Classes.TraitUseDeclaration.MultipleTraitsPerDeclaration"/>
+      <exclude name="SlevomatCodingStandard.Classes.TraitUseSpacing.IncorrectLinesCountAfterLastUse"/>
+      <exclude name="SlevomatCodingStandard.Classes.UselessLateStaticBinding.UselessLateStaticBinding"/>
 
-      <exclude name="SlevomatCodingStandard.Classes"/>
+
       <exclude name="SlevomatCodingStandard.Complexity"/>
       <exclude name="SlevomatCodingStandard.ControlStructures"/>
       <exclude name="SlevomatCodingStandard.Files"/>
@@ -78,52 +98,43 @@
       <exclude name="SlevomatCodingStandard.Operators"/>
       <exclude name="SlevomatCodingStandard.PHP"/>
       <exclude name="SlevomatCodingStandard.Variables"/>
+
     </rule>
 
 
-    <!-- @todo: inspect occurrences -->
+    <!-- @todo: inspect/fix occurrences ================================================================================================ -->
+    <rule ref="SlevomatCodingStandard.Classes.ClassLength.ClassTooLong">
+      <type>warning</type>
+      <severity>4</severity>
+    </rule>
     <rule ref="SlevomatCodingStandard.PHP.DisallowReference.DisallowedAssigningByReference">
       <type>warning</type>
       <severity>4</severity>
-      <message>Assigning by reference is discouraged.</message>
     </rule>
-
     <rule ref="SlevomatCodingStandard.PHP.DisallowReference.DisallowedPassingByReference">
       <type>warning</type>
       <severity>4</severity>
-      <message>Passing by reference is discouraged.</message>
     </rule>
-
     <rule ref="SlevomatCodingStandard.TypeHints.DisallowMixedTypeHint.DisallowedMixedTypeHint">
       <type>warning</type>
       <severity>4</severity>
-      <message>Usage of "mixed" type hint is discouraged.</message>
     </rule>
 
 
-    <!-- regular sniff customizations -->
+    <!-- regular sniff customizations ================================================================================================== -->
+    <rule ref="SlevomatCodingStandard.Classes.ClassLength">
+      <properties>
+        <property name="maxLinesLength" value="250"/> <!-- default: 250 -->
+      </properties>
+    </rule>
+    
     <rule ref="SlevomatCodingStandard.Classes.EmptyLinesAroundClassBraces">
       <properties>
         <property name="linesCountAfterOpeningBrace" value="1"/>
         <property name="linesCountBeforeClosingBrace" value="0"/>
       </properties>
     </rule>
-
-    <rule ref="SlevomatCodingStandard.Classes.ClassMemberSpacing">
-      <properties>
-        <!-- empty lines between class properties and methods -->
-        <property name="linesCountBetweenMembers" value="2"/>
-      </properties>
-    </rule>
-
-    <rule ref="SlevomatCodingStandard.Classes.MethodSpacing">
-      <properties>
-        <!-- empty lines between multiple class methods -->
-        <property name="minLinesCount" value="1"/>
-        <property name="maxLinesCount" value="2"/>
-      </properties>
-    </rule>
-
+    
     <rule ref="SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly">
       <properties>
         <property name="searchAnnotations" value="true"/>
@@ -134,13 +145,13 @@
         <property name="allowFullyQualifiedGlobalConstants" value="true"/>
       </properties>
     </rule>
-
+    
     <rule ref="SlevomatCodingStandard.Namespaces.UnusedUses">
       <properties>
         <property name="searchAnnotations" value="true"/>
       </properties>
     </rule>
-
+    
     <rule ref="SlevomatCodingStandard.Namespaces.UseSpacing">
       <properties>
         <property name="linesCountBetweenUseTypes" value="1"/>

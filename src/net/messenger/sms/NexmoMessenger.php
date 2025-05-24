@@ -15,7 +15,6 @@ use rosasurfer\ministruts\net\messenger\Messenger;
  */
 class NexmoMessenger extends Messenger {
 
-
     /**
      * {@inheritDoc}
      *

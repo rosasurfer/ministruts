@@ -13,7 +13,6 @@ use const rosasurfer\ministruts\ARRAY_BOTH;
  */
 interface ResultInterface {
 
-
     /**
      * Fetch the next row from the result set.
      *

@@ -17,7 +17,6 @@ use function rosasurfer\ministruts\strLeftTo;
  */
 class ActionMapping extends CObject {
 
-
     /** @var bool - whether this component is fully configured */
     protected bool $configured = false;
 
