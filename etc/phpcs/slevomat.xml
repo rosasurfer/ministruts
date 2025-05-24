@@ -49,6 +49,7 @@
       <exclude name="SlevomatCodingStandard.Commenting.RequireOneLineDocComment"/>
       <exclude name="SlevomatCodingStandard.Commenting.UselessFunctionDocComment"/>
       <exclude name="SlevomatCodingStandard.Commenting.UselessInheritDocComment"/>
+      <exclude name="SlevomatCodingStandard.ControlStructures.RequireYodaComparison"/>
       <exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedClassNameInAnnotation"/>
       <exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedExceptions"/>
       <exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedGlobalConstants"/>
@@ -63,21 +64,20 @@
       <exclude name="SlevomatCodingStandard.TypeHints.PropertyTypeHint.UselessAnnotation"/>
       <exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHint.UselessAnnotation"/>
       <exclude name="SlevomatCodingStandard.TypeHints.UselessConstantTypeHint.UselessDocComment"/>
+      <exclude name="SlevomatCodingStandard.Whitespaces.DuplicateSpaces"/>
 
 
       <!--
       -->
-      
-      <exclude name="SlevomatCodingStandard.Functions"/>
-      <exclude name="SlevomatCodingStandard.PHP.RequireExplicitAssertion.RequiredExplicitAssertion"/>      <!-- @todo: check occurrences -->
-      <exclude name="SlevomatCodingStandard.PHP"/>
+
       <exclude name="SlevomatCodingStandard.Classes"/>
       <exclude name="SlevomatCodingStandard.Complexity"/>
       <exclude name="SlevomatCodingStandard.ControlStructures"/>
       <exclude name="SlevomatCodingStandard.Files"/>
+      <exclude name="SlevomatCodingStandard.Functions"/>
       <exclude name="SlevomatCodingStandard.Operators"/>
+      <exclude name="SlevomatCodingStandard.PHP"/>
       <exclude name="SlevomatCodingStandard.Variables"/>
-      <exclude name="SlevomatCodingStandard.Whitespaces"/>
     </rule>
 
 
@@ -99,7 +99,6 @@
       <severity>4</severity>
       <message>Usage of "mixed" type hint is discouraged.</message>
     </rule>
-
 
 
     <!-- regular sniff customizations -->
