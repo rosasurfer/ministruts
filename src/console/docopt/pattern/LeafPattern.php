@@ -3,11 +3,12 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\console\docopt\pattern;
 
+use Traversable;
+
 use rosasurfer\ministruts\console\docopt\SingleMatch;
 
 use function rosasurfer\ministruts\array_filter;
 use function rosasurfer\ministruts\array_merge;
-
 
 /**
  * LeafPattern
@@ -62,7 +63,7 @@ abstract class LeafPattern extends Pattern {
             return ($pattern->name() == $name);
         }));
 
-        if (is_int($this->value) || is_array($this->value) || $this->value instanceof \Traversable) {
+        if (is_int($this->value) || is_array($this->value) || $this->value instanceof Traversable) {
             if (is_int($this->value)) {
                 $increment = 1;
             }
@@ -74,7 +75,7 @@ abstract class LeafPattern extends Pattern {
                 $match->value = $increment;
                 return [true, $left_, array_merge($collected, [$match])];
             }
-            if (is_array($increment) || $increment instanceof \Traversable) {
+            if (is_array($increment) || $increment instanceof Traversable) {
                 $sameName[0]->value = array_merge($sameName[0]->value, $increment);
             }
             else {

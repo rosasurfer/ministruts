@@ -3,7 +3,10 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\core\error;
 
+use ErrorException;
 use Exception;
+use LibXMLError;
+use ReflectionProperty;
 use Throwable;
 
 use rosasurfer\ministruts\Application;
@@ -12,8 +15,8 @@ use rosasurfer\ministruts\core\StaticClass;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\log\Logger;
 use rosasurfer\ministruts\log\filter\ContentFilterInterface as ContentFilter;
+use rosasurfer\ministruts\phpstan\CustomTypes;
 
-use function rosasurfer\ministruts\echof;
 use function rosasurfer\ministruts\normalizeEOL;
 use function rosasurfer\ministruts\strEndsWith;
 use function rosasurfer\ministruts\strLeftTo;
@@ -32,11 +35,10 @@ use const rosasurfer\ministruts\MB;
 use const rosasurfer\ministruts\NL;
 use const rosasurfer\ministruts\WINDOWS;
 
-
 /**
  * A handler for unhandled PHP errors and exceptions.
  *
- * @phpstan-import-type STACKFRAME from \rosasurfer\ministruts\phpstan\CustomTypes
+ * @phpstan-import-type STACKFRAME from CustomTypes
  */
 class ErrorHandler extends StaticClass {
 
@@ -138,7 +140,7 @@ class ErrorHandler extends StaticClass {
      * @throws PHPError
      */
     public static function handleError(int $level, string $message, string $file, int $line, array $symbols = []): bool {
-        //echof('ErrorHandler::handleError(inShutdown='.(int)self::$inShutdown.') '.self::errorLevelToStr($level).': '.$message.', in '.$file.', line '.$line);
+        //\rosasurfer\ministruts\echof('ErrorHandler::handleError(inShutdown='.(int)self::$inShutdown.') '.self::errorLevelToStr($level).': '.$message.', in '.$file.', line '.$line);
         if (!self::$errorHandling) return false;
 
         // anonymous function to chain a previously active handler
@@ -234,7 +236,7 @@ class ErrorHandler extends StaticClass {
      * @return void
      */
     public static function handleException(Throwable $exception): void {
-        //echof('ErrorHandler::handleException(inShutdown='.(int)self::$inShutdown.') '.$exception->getMessage());
+        //\rosasurfer\ministruts\echof('ErrorHandler::handleException(inShutdown='.(int)self::$inShutdown.') '.$exception->getMessage());
         if (!self::$exceptionHandling) return;
 
         // catch exceptions thrown by logger or chained exception handler
@@ -269,7 +271,7 @@ class ErrorHandler extends StaticClass {
      * @return void
      */
     private static function handle2ndException(Throwable $first, Throwable $second): void {
-        //echof('ErrorHandler::handle2ndException(inShutdown='.(int)self::$inShutdown.') '.$second->getMessage());
+        //\rosasurfer\ministruts\echof('ErrorHandler::handle2ndException(inShutdown='.(int)self::$inShutdown.') '.$second->getMessage());
         try {
             $indent = ' ';
             $msg  = trim(ErrorHandler::getVerboseMessage($first, $indent));
@@ -452,8 +454,8 @@ class ErrorHandler extends StaticClass {
     /**
      * Return a readable representation of the specified LibXML errors.
      *
-     * @param  \LibXMLError[] $errors - array of LibXML errors, e.g. as returned by <tt>libxml_get_errors()</tt>
-     * @param  string[]       $lines  - the XML causing the errors split by line
+     * @param  LibXMLError[] $errors - array of LibXML errors, e.g. as returned by <tt>libxml_get_errors()</tt>
+     * @param  string[]      $lines  - the XML causing the errors split by line
      *
      * @return string - readable error representation or an empty string if parameter $errors is empty
      */
@@ -510,7 +512,7 @@ class ErrorHandler extends StaticClass {
 
         if (!$throwable instanceof PHPError) {              // PHP errors are verbose enough
             $class = get_class($throwable);
-            if ($throwable instanceof \ErrorException) {    // a PHP error not created by this ErrorHandler
+            if ($throwable instanceof ErrorException) {     // a PHP error not created by this ErrorHandler
                 $class .= '('.self::errorLevelDescr($throwable->getSeverity()).')';
             }
             $message = $class.(strlen($message) ? ': ':'').$message;
@@ -807,17 +809,17 @@ class ErrorHandler extends StaticClass {
     private static function setExceptionProperties(Exception $exception, array $trace, string $file = '', int $line = 0): void {
         static $traceProperty = null;
         if (!$traceProperty) {
-            $traceProperty = new \ReflectionProperty(Exception::class, 'trace');
+            $traceProperty = new ReflectionProperty(Exception::class, 'trace');
             $traceProperty->setAccessible(true);
         }
         static $fileProperty = null;
         if (!$fileProperty) {
-            $fileProperty = new \ReflectionProperty(Exception::class, 'file');
+            $fileProperty = new ReflectionProperty(Exception::class, 'file');
             $fileProperty->setAccessible(true);
         }
         static $lineProperty = null;
         if (!$lineProperty) {
-            $lineProperty = new \ReflectionProperty(Exception::class, 'line');
+            $lineProperty = new ReflectionProperty(Exception::class, 'line');
             $lineProperty->setAccessible(true);
         }
 

@@ -7,7 +7,6 @@ use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 use rosasurfer\ministruts\core\exception\IllegalStateException;
 
-
 /**
  * Singleton
  *

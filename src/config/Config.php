@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\config;
 
+use ReturnTypeWillChange;
+
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
@@ -18,7 +20,6 @@ use function rosasurfer\ministruts\strStartsWith;
 use const rosasurfer\ministruts\ERROR_LOG_DEFAULT;
 use const rosasurfer\ministruts\NL;
 use const rosasurfer\ministruts\CLI;
-
 
 /**
  * A configuration mechanism using Java-like property files.
@@ -657,7 +658,7 @@ class Config extends CObject implements ConfigInterface {
      *
      * @throws RuntimeException if the setting does not exist
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function offsetGet($key) {
         return $this->get($key);
     }

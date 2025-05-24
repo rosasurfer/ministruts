@@ -5,7 +5,6 @@ namespace rosasurfer\ministruts\console\docopt\pattern;
 
 use function rosasurfer\ministruts\array_merge;
 
-
 /**
  * BranchPattern
  */

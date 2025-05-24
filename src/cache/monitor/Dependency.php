@@ -6,7 +6,6 @@ namespace rosasurfer\ministruts\cache\monitor;
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 
-
 /**
  * Base class for dependencies on states or conditions, to be used to trigger actions depending on state changes.
  *

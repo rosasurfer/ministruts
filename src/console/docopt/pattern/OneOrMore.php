@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\console\docopt\pattern;
 
+use UnexpectedValueException;
 
 /**
  * OneOrMore
@@ -14,7 +15,7 @@ class OneOrMore extends BranchPattern {
      * {@inheritDoc}
      */
     public function match(array $left, array $collected = []): array {
-        if (sizeof($this->children) != 1) throw new \UnexpectedValueException();
+        if (sizeof($this->children) != 1) throw new UnexpectedValueException();
 
         $l = $left;
         $c = $collected;

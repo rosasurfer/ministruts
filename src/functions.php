@@ -10,6 +10,7 @@ use ArrayAccess;
 use Closure;
 use ErrorException;
 use InvalidArgumentException;
+use SimpleXMLElement;
 use Traversable;
 
 use rosasurfer\ministruts\console\docopt\DocoptParser;
@@ -472,7 +473,7 @@ function ini_get_int(string $option, bool $strict = true): ?int {
  * @return bool
  */
 function is_array_like($var): bool {
-    return \is_array($var) || $var instanceof \ArrayAccess;
+    return \is_array($var) || $var instanceof ArrayAccess;
 }
 
 
@@ -826,7 +827,7 @@ function prettyBytes($value, int $decimals = 1): string {
  * @phpstan-return ($return is true ? string : null)
  */
 function print_p($var, bool $return = false, bool $flushBuffers = true): ?string {
-    if (is_object($var) && method_exists($var, '__toString') && !$var instanceof \SimpleXMLElement) {
+    if (is_object($var) && method_exists($var, '__toString') && !$var instanceof SimpleXMLElement) {
         $str = (string) $var;
     }
     elseif (is_object($var) || is_array($var)) {

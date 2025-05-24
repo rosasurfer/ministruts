@@ -12,7 +12,6 @@ use function rosasurfer\ministruts\strToTimestamp;
 use const rosasurfer\ministruts\DAYS;
 use const rosasurfer\ministruts\L_WARN;
 
-
 /**
  * Date
  */

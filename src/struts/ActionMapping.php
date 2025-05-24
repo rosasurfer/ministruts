@@ -10,7 +10,6 @@ use rosasurfer\ministruts\core\exception\IllegalStateException;
 use function rosasurfer\ministruts\strCompareI;
 use function rosasurfer\ministruts\strLeftTo;
 
-
 /**
  * ActionMapping
  *

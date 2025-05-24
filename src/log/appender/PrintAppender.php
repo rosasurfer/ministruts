@@ -13,7 +13,6 @@ use function rosasurfer\ministruts\stdout;
 use const rosasurfer\ministruts\CLI;
 use const rosasurfer\ministruts\NL;
 
-
 /**
  * PrintAppender
  *

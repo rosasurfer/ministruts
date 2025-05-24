@@ -3,20 +3,21 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\core\di;
 
+use ArrayAccess;
+
 use rosasurfer\ministruts\core\di\service\ServiceInterface as IService;
 use rosasurfer\ministruts\core\di\service\ServiceNotFoundException;
 
 use Psr\Container\ContainerInterface;
-
 
 /**
  * DiInterface
  *
  * Interface to be implemented by dependency injection containers.
  *
- * @extends \ArrayAccess<string, object>
+ * @extends ArrayAccess<string, object>
  */
-interface DiInterface extends \ArrayAccess, ContainerInterface {
+interface DiInterface extends ArrayAccess, ContainerInterface {
 
 
     /**

@@ -8,7 +8,6 @@ use rosasurfer\ministruts\core\StaticClass;
 
 use function rosasurfer\ministruts\strContains;
 
-
 /**
  * Assert
  *

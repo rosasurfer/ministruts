@@ -10,7 +10,6 @@ use rosasurfer\ministruts\core\exception\InvalidValueException;
 
 use const rosasurfer\ministruts\CLI;
 
-
 /**
  * BaseAppender
  *

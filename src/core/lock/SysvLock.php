@@ -16,7 +16,6 @@ use function rosasurfer\ministruts\strStartsWith;
 use const rosasurfer\ministruts\L_DEBUG;
 use const rosasurfer\ministruts\NL;
 
-
 /**
  * SysvLock
  *

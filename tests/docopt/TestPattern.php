@@ -6,7 +6,6 @@ namespace rosasurfer\ministruts\tests\docopt;
 use rosasurfer\ministruts\console\docopt\pattern\Either;
 use rosasurfer\ministruts\console\docopt\pattern\Pattern;
 
-
 /**
  *
  */

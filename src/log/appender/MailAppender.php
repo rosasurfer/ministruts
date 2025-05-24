@@ -29,7 +29,6 @@ use const rosasurfer\ministruts\L_WARN;
 use const rosasurfer\ministruts\NL;
 use const rosasurfer\ministruts\WINDOWS;
 
-
 /**
  * MailAppender
  *

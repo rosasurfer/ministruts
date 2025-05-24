@@ -11,7 +11,6 @@ use rosasurfer\ministruts\db\ConnectorInterface as IConnector;
 use rosasurfer\ministruts\db\pgsql\PostgresConnector;
 use rosasurfer\ministruts\db\sqlite\SQLiteConnector;
 
-
 /**
  * ConnectionPool
  *

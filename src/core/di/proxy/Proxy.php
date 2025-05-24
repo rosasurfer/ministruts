@@ -7,7 +7,6 @@ use rosasurfer\ministruts\core\StaticClass;
 use rosasurfer\ministruts\core\exception\IllegalAccessException;
 use rosasurfer\ministruts\core\exception\UnimplementedFeatureException;
 
-
 /**
  * A {@link Proxy} forwards API calls from one object to another. It doesn't modify the called API.
  *

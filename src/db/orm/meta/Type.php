@@ -6,7 +6,6 @@ namespace rosasurfer\ministruts\db\orm\meta;
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\db\ConnectorInterface as Connector;
 
-
 /**
  * Type
  *

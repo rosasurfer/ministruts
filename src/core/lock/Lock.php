@@ -9,7 +9,6 @@ use rosasurfer\ministruts\config\ConfigInterface;
 use rosasurfer\ministruts\core\error\ErrorHandler;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 
-
 /**
  * Lock
  *

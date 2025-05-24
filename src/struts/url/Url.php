@@ -7,9 +7,6 @@ use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\di\proxy\Request;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 
-use const rosasurfer\ministruts\CLI;
-
-
 /**
  * URL generation helper
  */

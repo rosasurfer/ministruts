@@ -3,11 +3,13 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\console\docopt\pattern;
 
+use Traversable;
+use UnexpectedValueException;
+
 use rosasurfer\ministruts\core\CObject;
 
 use function rosasurfer\ministruts\array_merge;
 use function rosasurfer\ministruts\preg_split;
-
 
 /**
  * Pattern
@@ -75,7 +77,7 @@ abstract class Pattern extends CObject {
             foreach ($this->children as $i => $child) {
                 if (!$child instanceof BranchPattern) {
                     if (!in_array($child, $unique))               // Not sure if this is a true substitute for 'assert c in uniq'
-                        throw new \UnexpectedValueException();
+                        throw new UnexpectedValueException();
                     $this->children[$i] = $unique[array_search($child, $unique)];
                 }
                 else {
@@ -122,7 +124,7 @@ abstract class Pattern extends CObject {
                     if (!$e->value) {
                         $e->value = [];
                     }
-                    elseif (!is_array($e->value) && !$e->value instanceof \Traversable) {
+                    elseif (!is_array($e->value) && !$e->value instanceof Traversable) {
                         $e->value = preg_split('/\s+/', $e->value);
                     }
                 }

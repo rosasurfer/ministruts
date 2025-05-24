@@ -5,7 +5,6 @@ namespace rosasurfer\ministruts\net\messenger;
 
 use rosasurfer\ministruts\core\CObject;
 
-
 /**
  * Messenger
  *

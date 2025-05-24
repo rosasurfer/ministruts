@@ -6,7 +6,6 @@ namespace rosasurfer\ministruts\console\docopt;
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\console\docopt\pattern\Pattern;
 
-
 /**
  * SingleMatch
  */

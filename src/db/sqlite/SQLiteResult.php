@@ -13,7 +13,6 @@ use const rosasurfer\ministruts\ARRAY_ASSOC;
 use const rosasurfer\ministruts\ARRAY_BOTH;
 use const rosasurfer\ministruts\ARRAY_NUM;
 
-
 /**
  * Represents the result of an executed SQL statement. Depending on the statement type the result may or may not contain
  * a result set.

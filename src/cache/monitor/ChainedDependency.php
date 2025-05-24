@@ -5,7 +5,6 @@ namespace rosasurfer\ministruts\cache\monitor;
 
 use rosasurfer\ministruts\core\exception\RuntimeException;
 
-
 /**
  * ChainedDependency
  */

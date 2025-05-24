@@ -7,7 +7,6 @@ use Closure;
 
 use rosasurfer\ministruts\core\exception\ClassNotFoundException;
 
-
 /**
  * Service
  *

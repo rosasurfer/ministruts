@@ -8,7 +8,6 @@ use rosasurfer\ministruts\struts\ActionForm;
 use rosasurfer\ministruts\struts\EmptyActionForm;
 use rosasurfer\ministruts\struts\Struts;
 
-
 /**
  * Form
  *

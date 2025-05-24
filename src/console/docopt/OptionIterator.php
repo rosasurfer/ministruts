@@ -3,17 +3,19 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\console\docopt;
 
-use rosasurfer\ministruts\core\ObjectTrait;
+use ArrayIterator;
 
+use rosasurfer\ministruts\console\docopt\pattern\Option;
+use rosasurfer\ministruts\core\ObjectTrait;
 
 /**
  * OptionIterator
  *
  * An empty ArrayIterator without further functionality saves us from IDE incompatibilities with non-standard PHPStan annotations.
  *
- * @extends \ArrayIterator<int, \rosasurfer\ministruts\console\docopt\pattern\Option>
+ * @extends ArrayIterator<int, Option>
  */
-class OptionIterator extends \ArrayIterator {
+class OptionIterator extends ArrayIterator {
 
     use ObjectTrait;
 }

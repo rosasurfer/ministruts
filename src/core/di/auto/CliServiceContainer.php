@@ -8,7 +8,6 @@ use rosasurfer\ministruts\console\io\Output;
 use rosasurfer\ministruts\core\di\Di;
 use rosasurfer\ministruts\core\di\service\Service;
 
-
 /**
  * Default dependency injector automatically created for command-line applications.
  *

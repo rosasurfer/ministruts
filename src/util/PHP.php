@@ -27,7 +27,6 @@ use const rosasurfer\ministruts\MB;
 use const rosasurfer\ministruts\NL;
 use const rosasurfer\ministruts\WINDOWS;
 
-
 /**
  * PHP core related functionality
  */

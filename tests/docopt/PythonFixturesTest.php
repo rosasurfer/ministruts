@@ -11,7 +11,6 @@ use function rosasurfer\ministruts\preg_replace;
 
 use const rosasurfer\ministruts\NL;
 
-
 /**
  * Unit tests using original Python fixtures
  */

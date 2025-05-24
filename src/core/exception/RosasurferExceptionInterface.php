@@ -5,7 +5,6 @@ namespace rosasurfer\ministruts\core\exception;
 
 use Throwable;
 
-
 /**
  * An interface defining common functionality for all "rosasurfer" exceptions.
  */

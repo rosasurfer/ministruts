@@ -9,7 +9,6 @@ use rosasurfer\ministruts\core\StaticClass;
 use rosasurfer\ministruts\core\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 
-
 /**
  * FileSystem
  *

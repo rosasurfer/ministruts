@@ -5,7 +5,6 @@ namespace rosasurfer\ministruts\core\exception;
 
 use rosasurfer\ministruts\core\error\ErrorHandler;
 
-
 /**
  * A trait adding the behavior of a {@link RosasurferException} to any custom {@link \Throwable}.
  */

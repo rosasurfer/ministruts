@@ -6,7 +6,6 @@ declare(strict_types=1);
  */
 namespace rosasurfer\ministruts\util;
 
-
 /** @var int - stdin */
 const STDIN = 0;
 

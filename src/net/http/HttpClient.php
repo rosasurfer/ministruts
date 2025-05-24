@@ -7,7 +7,6 @@ use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\IOException;
 
-
 /**
  * Base class for concrete HTTP clients.
  */

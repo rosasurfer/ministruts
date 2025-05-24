@@ -8,7 +8,6 @@ use Throwable;
 use rosasurfer\ministruts\core\error\ErrorHandler;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 
-
 /**
  * A lock using files as the resource to synchronize access on.
  */

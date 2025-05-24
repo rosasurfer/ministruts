@@ -6,7 +6,6 @@ namespace rosasurfer\ministruts\core\lock;
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\exception\IllegalStateException;
 
-
 /**
  * BaseLock
  */

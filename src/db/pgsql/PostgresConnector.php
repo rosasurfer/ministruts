@@ -19,7 +19,6 @@ use function rosasurfer\ministruts\strStartsWithI;
 
 use const rosasurfer\ministruts\NL;
 
-
 /**
  * PostgresConnector
  *

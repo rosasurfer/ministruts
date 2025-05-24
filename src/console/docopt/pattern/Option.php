@@ -9,7 +9,6 @@ use rosasurfer\ministruts\console\docopt\SingleMatch;
 
 use function rosasurfer\ministruts\preg_split;
 
-
 /**
  * Option
  */

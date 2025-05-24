@@ -19,7 +19,6 @@ use function rosasurfer\ministruts\realpath;
 
 use const rosasurfer\ministruts\NL;
 
-
 /**
  * SQLiteConnector
  *

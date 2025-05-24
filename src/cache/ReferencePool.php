@@ -5,7 +5,6 @@ namespace rosasurfer\ministruts\cache;
 
 use rosasurfer\ministruts\cache\monitor\Dependency;
 
-
 /**
  * ReferencePool
  *

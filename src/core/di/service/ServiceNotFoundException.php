@@ -7,7 +7,6 @@ use rosasurfer\ministruts\core\di\ContainerException;
 
 use Psr\Container\NotFoundExceptionInterface;
 
-
 /**
  * ServiceNotFoundException
  */

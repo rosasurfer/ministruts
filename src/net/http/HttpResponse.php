@@ -5,7 +5,6 @@ namespace rosasurfer\ministruts\net\http;
 
 use rosasurfer\ministruts\core\CObject;
 
-
 /**
  * HttpResponse
  *

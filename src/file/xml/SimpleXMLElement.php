@@ -14,7 +14,6 @@ use function rosasurfer\ministruts\strRightFrom;
 
 use const rosasurfer\ministruts\NL;
 
-
 /**
  * SimpleXMLElement
  *

@@ -18,7 +18,6 @@ use rosasurfer\ministruts\core\exception\RuntimeException;
 
 use function rosasurfer\ministruts\simpleClassName;
 
-
 /**
  * Command
  *

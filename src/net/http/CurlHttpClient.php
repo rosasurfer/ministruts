@@ -18,7 +18,6 @@ use const rosasurfer\ministruts\L_INFO;
 use const rosasurfer\ministruts\L_WARN;
 use const rosasurfer\ministruts\NL;
 
-
 /**
  * CurlHttpClient
  *

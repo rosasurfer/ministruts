@@ -9,7 +9,6 @@ use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\error\ErrorHandler;
 use rosasurfer\ministruts\core\exception\InvalidTypeException;
 
-
 /**
  * Connector
  *

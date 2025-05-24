@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\console\docopt;
 
+use UnexpectedValueException;
+
 use rosasurfer\ministruts\core\CObject;
 
 use rosasurfer\ministruts\console\docopt\exception\DocoptFormatError;
@@ -24,7 +26,6 @@ use function rosasurfer\ministruts\strEndsWith;
 use function rosasurfer\ministruts\strStartsWith;
 
 use const rosasurfer\ministruts\NL;
-
 
 /**
  * DocoptParser
@@ -360,7 +361,7 @@ class DocoptParser extends CObject {
         $token = $tokens->move();
 
         if (!isset($token) || strpos($token, '-') !== 0 || strpos($token, '--') === 0) {
-            throw new \UnexpectedValueException("short token '$token' does not start with '-' or '--'");
+            throw new UnexpectedValueException("short token '$token' does not start with '-' or '--'");
         }
 
         $left = ltrim($token, '-');
@@ -439,7 +440,7 @@ class DocoptParser extends CObject {
         }
 
         if (strpos($long, '--') !== 0) {
-            throw new \UnexpectedValueException("Expected long option, found '$long'");
+            throw new UnexpectedValueException("Expected long option, found '$long'");
         }
         $similar = array_values(array_filter($options, function($o) use ($long) {
             return ($o->long && $o->long==$long);

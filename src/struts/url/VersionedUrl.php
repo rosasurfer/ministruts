@@ -5,7 +5,6 @@ namespace rosasurfer\ministruts\struts\url;
 
 use rosasurfer\ministruts\config\ConfigInterface as Config;
 
-
 /**
  * Version-aware URL generation helper. Appends a hash of size and last modification time of a
  * local file to the generated URL to automatically invalidate browser and proxy caches.

@@ -11,18 +11,18 @@ use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 use rosasurfer\ministruts\db\ConnectorInterface as Connector;
 use rosasurfer\ministruts\db\orm\meta\PropertyMapping;
+use rosasurfer\ministruts\phpstan\CustomTypes;
 
 use function rosasurfer\ministruts\strEndsWith;
 use function rosasurfer\ministruts\strLeft;
-
 
 /**
  * PersistableObject
  *
  * Abstract base class for stored objects.
  *
- * @phpstan-import-type ORM_PROPERTY from \rosasurfer\ministruts\phpstan\CustomTypes
- * @phpstan-import-type ORM_RELATION from \rosasurfer\ministruts\phpstan\CustomTypes
+ * @phpstan-import-type ORM_PROPERTY from CustomTypes
+ * @phpstan-import-type ORM_RELATION from CustomTypes
  */
 abstract class PersistableObject extends CObject {
 
@@ -283,8 +283,8 @@ abstract class PersistableObject extends CObject {
                 if ($type !== null) throw new RuntimeException('Unexpected parameter $type="'.$type.'" (not null) for relation [name="'.$propertyName.'", column="'.$column.'", ...] of entity "'.$mapping['class'].'"');
                 return $value;
             }
-            /** @var PersistableObject $object */               // a single fetched instance of a "one-to-one"|"many-to-one" relation, no join table
-            $object = $value;                                   // (1) use reference and update all properties with related entity settings
+            /** @var PersistableObject $object                  // a single fetched instance of a "one-to-one"|"many-to-one" relation, no join table */
+            $object = $value;                                   // use reference and update all properties with related entity settings
             $relation['ref-column'] ??= $object->dao()->getMapping()['identity']['column'];
             $fkColumn = $relation['ref-column'];
             return $object->getPhysicalValue($fkColumn);

@@ -8,14 +8,13 @@ use Closure;
 use rosasurfer\ministruts\Application;
 use rosasurfer\ministruts\config\ConfigInterface as Config;
 use rosasurfer\ministruts\core\CObject;
-use rosasurfer\ministruts\core\di\proxy\Request as Request;
+use rosasurfer\ministruts\core\di\proxy\Request as RequestProxy;
 use rosasurfer\ministruts\core\exception\IllegalStateException;
 
 use function rosasurfer\ministruts\strLeft;
 use function rosasurfer\ministruts\strRightFrom;
 
 use const rosasurfer\ministruts\NL;
-
 
 /**
  * Tile
@@ -246,7 +245,7 @@ class Tile extends CObject {
      * @return $this
      */
     public function render(): self {
-        $request     = Request::instance();
+        $request     = RequestProxy::instance();
         $namespace   = $this->module->getViewNamespace();
         $appUri      = $request->getApplicationBaseUri();
         $nestedTiles = $this->nestedTiles;

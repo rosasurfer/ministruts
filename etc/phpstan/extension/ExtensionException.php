@@ -10,7 +10,6 @@ use rosasurfer\ministruts\core\exception\RosasurferException;
 
 use const rosasurfer\ministruts\NL;
 
-
 /**
  * An exception to enforce meaningful output during a PHPStan analysis.
  */

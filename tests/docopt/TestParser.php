@@ -8,7 +8,6 @@ use rosasurfer\ministruts\console\docopt\OptionIterator;
 use rosasurfer\ministruts\console\docopt\TokenIterator;
 use rosasurfer\ministruts\console\docopt\pattern\Required;
 
-
 /**
  *
  */

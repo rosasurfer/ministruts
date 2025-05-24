@@ -20,7 +20,6 @@ use rosasurfer\ministruts\console\docopt\pattern\Required;
 
 use function rosasurfer\ministruts\docopt;
 
-
 /**
  * Tests ported from Python to PHPUnit
  */

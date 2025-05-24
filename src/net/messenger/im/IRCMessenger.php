@@ -6,7 +6,6 @@ namespace rosasurfer\ministruts\net\messenger\im;
 use rosasurfer\ministruts\core\exception\UnimplementedFeatureException;
 use rosasurfer\ministruts\net\messenger\Messenger;
 
-
 /**
  * IRCMessenger
  *

@@ -6,7 +6,6 @@ namespace rosasurfer\ministruts\console\io;
 use rosasurfer\ministruts\console\docopt\DocoptResult;
 use rosasurfer\ministruts\core\CObject;
 
-
 /**
  * Input
  *

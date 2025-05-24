@@ -5,7 +5,6 @@ namespace rosasurfer\ministruts\log\appender;
 
 use rosasurfer\ministruts\log\LogMessage;
 
-
 /**
  * Interface for log appenders.
  */

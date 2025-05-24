@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts;
 
+use rosasurfer\ministruts\util\PHP;
+
 /**
  * CLI version of the framework's phpinfo() task.
  *
@@ -17,6 +19,6 @@ if (!\is_file($autoload = __DIR__.'/../vendor/autoload.php')) {
 require($autoload);
 
 echo PHP_EOL;
-\rosasurfer\ministruts\util\PHP::phpinfo();
+PHP::phpinfo();
 $iniFile = \php_ini_loaded_file();
 echo PHP_EOL."loaded php.ini: \"$iniFile\"".PHP_EOL;

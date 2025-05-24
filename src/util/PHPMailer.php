@@ -20,7 +20,6 @@ use function rosasurfer\ministruts\strStartsWithI;
 use const rosasurfer\ministruts\EOL_WINDOWS;
 use const rosasurfer\ministruts\WINDOWS;
 
-
 /**
  * PHPMailer
  *

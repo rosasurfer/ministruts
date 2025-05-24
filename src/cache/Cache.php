@@ -11,7 +11,6 @@ use function rosasurfer\ministruts\ini_get_bool;
 
 use const rosasurfer\ministruts\CLI;
 
-
 /**
  * Cache
  *

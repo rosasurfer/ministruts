@@ -13,7 +13,6 @@ use function rosasurfer\ministruts\strLeftTo;
 
 use const rosasurfer\ministruts\ARRAY_ASSOC;
 
-
 /**
  * Worker
  *

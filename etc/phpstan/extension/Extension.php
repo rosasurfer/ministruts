@@ -10,7 +10,6 @@ use function rosasurfer\ministruts\normalizeEOL;
 use const rosasurfer\ministruts\NL;
 use const rosasurfer\ministruts\WINDOWS;
 
-
 /**
  * Helper for custom PHPStan extensions.
  */

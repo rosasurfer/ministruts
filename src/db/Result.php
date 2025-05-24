@@ -17,7 +17,6 @@ use function rosasurfer\ministruts\strToBool;
 
 use const rosasurfer\ministruts\ARRAY_BOTH;
 
-
 /**
  * Represents the result of an executed SQL statement. Depending on the statement type the result may or may not contain
  * a result set.

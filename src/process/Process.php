@@ -5,7 +5,6 @@ namespace rosasurfer\ministruts\process;
 
 use rosasurfer\ministruts\core\StaticClass;
 
-
 /**
  * Process handling functionalities.
  */

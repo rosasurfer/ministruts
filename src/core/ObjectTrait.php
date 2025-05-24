@@ -6,7 +6,6 @@ namespace rosasurfer\ministruts\core;
 use rosasurfer\ministruts\core\error\ErrorHandler;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 
-
 /**
  * A trait capable of adding {@link CObject} behavior to any class. Used to add error detection features.
  */

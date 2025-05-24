@@ -8,7 +8,6 @@ use rosasurfer\ministruts\core\di\Di;
 use rosasurfer\ministruts\core\di\service\Service;
 use rosasurfer\ministruts\struts\Request;
 
-
 /**
  * Default dependency injector automatically created for web applications.
  *

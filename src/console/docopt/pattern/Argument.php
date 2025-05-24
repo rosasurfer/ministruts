@@ -5,7 +5,6 @@ namespace rosasurfer\ministruts\console\docopt\pattern;
 
 use rosasurfer\ministruts\console\docopt\SingleMatch;
 
-
 /**
  * Argument
  */

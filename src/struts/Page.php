@@ -5,7 +5,6 @@ namespace rosasurfer\ministruts\struts;
 
 use rosasurfer\ministruts\core\Singleton;
 
-
 /**
  * Page
  *

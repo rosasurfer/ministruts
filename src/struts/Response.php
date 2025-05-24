@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace rosasurfer\ministruts\struts;
 
 use rosasurfer\ministruts\core\Singleton;
-use rosasurfer\ministruts\core\di\proxy\Request as Request;
+use rosasurfer\ministruts\core\di\proxy\Request as RequestProxy;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\RosasurferExceptionInterface as IRosasurferException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
@@ -15,7 +15,6 @@ use function rosasurfer\ministruts\strLeftTo;
 use function rosasurfer\ministruts\strRightFrom;
 
 use const rosasurfer\ministruts\CLI;
-
 
 /**
  * Response
@@ -109,7 +108,7 @@ class Response extends Singleton {
      * @return never
      */
     public function redirect(string $uri, int $type = HttpResponse::SC_MOVED_TEMPORARILY): void {
-        $currentUrl = Request::getUrl();
+        $currentUrl = RequestProxy::getUrl();
 
         $url = self::relativeToAbsoluteUrl($uri, $currentUrl);  // HTTP/1.1 requires an absolute 'Location' value
         header('Location: '.$url, true, $type);                 // set the header

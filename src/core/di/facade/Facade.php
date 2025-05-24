@@ -5,7 +5,6 @@ namespace rosasurfer\ministruts\core\di\facade;
 
 use rosasurfer\ministruts\core\StaticClass;
 
-
 /**
  * A {@link Facade} simplifies access to an underlying API (it modifies the API).
  *

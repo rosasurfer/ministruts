@@ -11,7 +11,6 @@ use rosasurfer\ministruts\file\FileSystem as FS;
 use function rosasurfer\ministruts\isRelativePath;
 use function rosasurfer\ministruts\realpath;
 
-
 /**
  * FileSystemCache
  *

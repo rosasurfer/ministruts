@@ -14,7 +14,6 @@ use function rosasurfer\ministruts\strLeftTo;
 use const rosasurfer\ministruts\CLI;
 use const rosasurfer\ministruts\NL;
 
-
 /**
  * Request
  *

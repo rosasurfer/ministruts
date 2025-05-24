@@ -6,7 +6,6 @@ namespace rosasurfer\ministruts\net\http;
 use CurlHandle;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 
-
 /**
  * CurlHttpResponse
  *

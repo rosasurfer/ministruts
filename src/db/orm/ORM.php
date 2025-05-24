@@ -5,7 +5,6 @@ namespace rosasurfer\ministruts\db\orm;
 
 use rosasurfer\ministruts\core\StaticClass;
 
-
 /**
  * A class holding ORM related helper functions and constants.
  */

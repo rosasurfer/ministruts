@@ -22,7 +22,6 @@ use function rosasurfer\ministruts\strStartsWith;
 
 use const rosasurfer\ministruts\NL;
 
-
 /**
  * Module
  *

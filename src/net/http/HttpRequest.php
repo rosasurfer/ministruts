@@ -6,7 +6,6 @@ namespace rosasurfer\ministruts\net\http;
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 
-
 /**
  * HttpRequest
  */

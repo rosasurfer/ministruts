@@ -9,7 +9,6 @@ use rosasurfer\ministruts\core\di\proxy\Request as RequestProxy;
 use rosasurfer\ministruts\struts\ActionInput;
 use rosasurfer\ministruts\struts\Struts;
 
-
 /**
  * Input
  *

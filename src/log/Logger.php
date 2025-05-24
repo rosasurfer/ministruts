@@ -19,7 +19,6 @@ use const rosasurfer\ministruts\L_INFO;
 use const rosasurfer\ministruts\L_NOTICE;
 use const rosasurfer\ministruts\L_WARN;
 
-
 /**
  * Logger
  *

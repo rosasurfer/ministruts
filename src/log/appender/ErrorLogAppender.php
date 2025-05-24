@@ -16,7 +16,6 @@ use const rosasurfer\ministruts\ERROR_LOG_SAPI;
 use const rosasurfer\ministruts\NL;
 use const rosasurfer\ministruts\WINDOWS;
 
-
 /**
  * ErrorLogAppender
  *

@@ -8,7 +8,6 @@ use rosasurfer\ministruts\core\exception\InvalidValueException;
 use function rosasurfer\ministruts\isRelativePath;
 use function rosasurfer\ministruts\realpath;
 
-
 /**
  * FileDependency - dependence on the last time a file was changed.
  *

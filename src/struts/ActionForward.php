@@ -9,7 +9,6 @@ use rosasurfer\ministruts\net\http\HttpResponse;
 
 use function rosasurfer\ministruts\strLeftTo;
 
-
 /**
  * ActionForward
  *

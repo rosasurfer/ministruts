@@ -10,7 +10,6 @@ use rosasurfer\ministruts\core\di\service\Service;
 use rosasurfer\ministruts\core\di\service\ServiceInterface as IService;
 use rosasurfer\ministruts\core\di\service\ServiceNotFoundException;
 
-
 /**
  * Di
  *
