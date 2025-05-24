@@ -71,9 +71,9 @@ const FRIDAY            = 5;
 const SATURDAY          = 6;
 
 // byte sizes
-const KB                = 1024;
-const MB                = 1024 << 10;
-const GB                = 1024 << 20;
+const KB                = 1_024;
+const MB                = 1_024 << 10;
+const GB                = 1_024 << 20;
 
 // array indexing types
 const ARRAY_ASSOC       = 1;
@@ -800,14 +800,14 @@ function prettyBytes($value, int $decimals = 1): string {
         $value = (int) round($value);
     }
 
-    if ($value < 1024) {
+    if ($value < 1_024) {
         return (string) $value;
     }
 
     $unit = '';
     foreach (['K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'] as $unit) {
-        $value /= 1024;
-        if ($value < 1024)
+        $value /= 1_024;
+        if ($value < 1_024)
             break;
     }
 

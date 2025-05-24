@@ -562,7 +562,7 @@ class PostgresConnector extends Connector {
         if (!isset($this->lastInsertId)) {
             $version = $this->getVersionNumber();
 
-            if ($version < 8001000) {              // 8.1
+            if ($version < 8_001_000) {            // 8.1
                 $this->lastInsertId = -1;
             }
             else {
@@ -674,7 +674,7 @@ class PostgresConnector extends Connector {
             $minor   = (int) $match[2];
             $release = (int) $match[3];
 
-            $this->versionNumber = $major*1000000 + $minor*1000 + $release;
+            $this->versionNumber = $major*1_000_000 + $minor*1_000 + $release;
         }
         return $this->versionNumber;
     }

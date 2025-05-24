@@ -34,7 +34,8 @@ abstract class BaseLock extends CObject {
      * @return string[]
      */
     final public function __sleep(): array {
-        throw new IllegalStateException('You cannot serialize me: '.get_class($this));
+        $a = 5;
+        throw new IllegalStateException("You cannot serialize me: {$a} ".get_class($this));
     }
 
 

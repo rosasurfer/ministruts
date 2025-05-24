@@ -1070,7 +1070,7 @@ class Request extends CObject {
         // content (request body)
         $content = $this->getContent();
         if (strlen($content)) {
-            $string .= NL.substr($content, 0, 2048).NL;                     // limit the request body to 2048 bytes
+            $string .= NL.substr($content, 0, 2_048).NL;                    // limit the request body to 2048 bytes
         }
         return $string;
     }

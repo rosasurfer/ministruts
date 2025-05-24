@@ -136,7 +136,7 @@ class PHP extends StaticClass {
         $null = null;
         do {
             $readable = $observed;
-            stream_select($readable, $null, $null, 0, 200000);          // timeout = 0.2 sec
+            stream_select($readable, $null, $null, 0, 200_000);         // timeout = 0.2 sec = 200'000 µsec
             foreach ($readable as $stream) {
                 if (($line=fgets($stream)) === false) {                 // this covers fEof() too
                     fclose($stream);

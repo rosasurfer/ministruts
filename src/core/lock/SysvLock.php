@@ -85,7 +85,7 @@ class SysvLock extends BaseLock {
                 if (++$i < $trials && strStartsWith($message, $prefixes)) {
                     Logger::log("$message, trying again...", L_DEBUG);
                     $messages[] = $message;
-                    usleep(200000);                         // wait 200 msec
+                    usleep(200_000);                        // wait 200 msec = 200'000 µsec
                     continue;
                 }
 

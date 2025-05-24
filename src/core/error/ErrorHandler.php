@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace rosasurfer\ministruts\core\error;
 
 use ErrorException;
-use Exception;
 use LibXMLError;
 use ReflectionProperty;
 use Throwable;
@@ -760,12 +759,12 @@ class ErrorHandler extends StaticClass {
     /**
      * Shift all frames from the beginning of a stacktrace pointing to the specified method.
      *
-     * @param  Exception $exception - exception to modify
+     * @param  Throwable $exception - exception to modify
      * @param  string    $method    - method name
      *
      * @return int - number of removed frames
      */
-    public static function shiftStackFramesByMethod(Exception $exception, string $method): int {
+    public static function shiftStackFramesByMethod(Throwable $exception, string $method): int {
         $trace  = $exception->getTrace();
         $size   = sizeof($trace);
         $file   = $exception->getFile();
@@ -795,7 +794,7 @@ class ErrorHandler extends StaticClass {
     /**
      * Set the properties of an {@link Exception}.
      *
-     * @param  Exception $exception       - exception to modify
+     * @param  Throwable $exception       - exception to modify
      * @param  array[]   $trace           - stacktrace
      * @param  string    $file [optional] - filename of the error location (default: unchanged)
      * @param  int       $line [optional] - line number of the error location (default: unchanged)
@@ -806,20 +805,20 @@ class ErrorHandler extends StaticClass {
      *
      * @see \rosasurfer\ministruts\phpstan\STACKFRAME
      */
-    private static function setExceptionProperties(Exception $exception, array $trace, string $file = '', int $line = 0): void {
+    private static function setExceptionProperties(Throwable $exception, array $trace, string $file = '', int $line = 0): void {
         static $traceProperty = null;
         if (!$traceProperty) {
-            $traceProperty = new ReflectionProperty(Exception::class, 'trace');
+            $traceProperty = new ReflectionProperty(Throwable::class, 'trace');
             $traceProperty->setAccessible(true);
         }
         static $fileProperty = null;
         if (!$fileProperty) {
-            $fileProperty = new ReflectionProperty(Exception::class, 'file');
+            $fileProperty = new ReflectionProperty(Throwable::class, 'file');
             $fileProperty->setAccessible(true);
         }
         static $lineProperty = null;
         if (!$lineProperty) {
-            $lineProperty = new ReflectionProperty(Exception::class, 'line');
+            $lineProperty = new ReflectionProperty(Throwable::class, 'line');
             $lineProperty->setAccessible(true);
         }
 

@@ -56,6 +56,7 @@
       <exclude name="SlevomatCodingStandard.Namespaces.NamespaceSpacing.IncorrectLinesCountBeforeNamespace"/>
       <exclude name="SlevomatCodingStandard.Namespaces.UseOnlyWhitelistedNamespaces"/>
       <exclude name="SlevomatCodingStandard.Namespaces.UseSpacing.IncorrectLinesCountBetweenSameTypeOfUse"/>
+      <exclude name="SlevomatCodingStandard.Numbers.DisallowNumericLiteralSeparator"/>
       <exclude name="SlevomatCodingStandard.TypeHints.ClassConstantTypeHint.UselessDocComment"/>
       <exclude name="SlevomatCodingStandard.TypeHints.DisallowArrayTypeHintSyntax"/>
       <exclude name="SlevomatCodingStandard.TypeHints.ParameterTypeHint.UselessAnnotation"/>
@@ -63,25 +64,18 @@
       <exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHint.UselessAnnotation"/>
       <exclude name="SlevomatCodingStandard.TypeHints.UselessConstantTypeHint.UselessDocComment"/>
 
+
       <!--
       -->
-
-
-      <!-- @todo: reduce message keys -->
+      
+      <exclude name="SlevomatCodingStandard.Functions"/>
       <exclude name="SlevomatCodingStandard.PHP.RequireExplicitAssertion.RequiredExplicitAssertion"/>      <!-- @todo: check occurrences -->
-
-      <!--
-      -->
       <exclude name="SlevomatCodingStandard.PHP"/>
       <exclude name="SlevomatCodingStandard.Classes"/>
       <exclude name="SlevomatCodingStandard.Complexity"/>
       <exclude name="SlevomatCodingStandard.ControlStructures"/>
-      <exclude name="SlevomatCodingStandard.Exceptions"/>
       <exclude name="SlevomatCodingStandard.Files"/>
-      <exclude name="SlevomatCodingStandard.Functions"/>
-      <exclude name="SlevomatCodingStandard.Numbers"/>
       <exclude name="SlevomatCodingStandard.Operators"/>
-      <exclude name="SlevomatCodingStandard.Strings"/>
       <exclude name="SlevomatCodingStandard.Variables"/>
       <exclude name="SlevomatCodingStandard.Whitespaces"/>
     </rule>
