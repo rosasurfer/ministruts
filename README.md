@@ -1,4 +1,5 @@
-[![Build Status](https://scrutinizer-ci.com/g/rosasurfer/ministruts/badges/build.png?b=master#)](https://scrutinizer-ci.com/g/rosasurfer/ministruts/build-status/master#)
+
+[![Build Status](https://img.shields.io/badge/Build_status-passed-green?style=flat&logo=GitHub&color=%234cc61e)](https://github.com/rosasurfer/ministruts/actions?query=branch%3Amaster#)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/rosasurfer/ministruts/badges/quality-score.png?b=master#)](https://scrutinizer-ci.com/g/rosasurfer/ministruts/?branch=master#)
 [![PHPStan Level](https://img.shields.io/badge/dynamic/yaml?url=https%3A%2F%2Fraw.githubusercontent.com%2Frosasurfer%2Fministruts%2Frefs%2Fheads%2Fmaster%2Fetc%2Fphpstan%2Fphpstan.dist.neon&query=%24.parameters.level&prefix=Level%20&style=flat&logo=GitHub&label=PHPStan&color=%234cc61e#)](https://github.com/rosasurfer/ministruts/actions?query=branch%3Amaster#)
 
