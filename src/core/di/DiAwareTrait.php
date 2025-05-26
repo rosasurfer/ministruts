@@ -9,8 +9,8 @@ use rosasurfer\ministruts\core\exception\RuntimeException;
 /**
  * DiAwareTrait
  *
- * A trait adding the behavior "service locator awareness" to any class. Provides access to dependencies in
- * the application's service container. Using this trait any class can easily be made service aware.
+ * A trait adding the behavior "service awareness" to any class. Provides access to dependencies in
+ * the application's service container. By using this trait any class can easily made service aware.
  */
 trait DiAwareTrait {
 

@@ -36,10 +36,10 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "rosasurfer\\ministruts\\tests\\": "tests/"
+            "rosasurfer\\ministruts\\tests\\":   "tests/",
+            "rosasurfer\\ministruts\\phpstan\\": "etc/phpstan/extension/"
         },
         "classmap": [
-            "etc/phpstan/extension/",
             "etc/phpstan/symbols/"
         ]
     },

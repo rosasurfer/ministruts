@@ -40,7 +40,6 @@
       <exclude name="SlevomatCodingStandard.Arrays.AlphabeticallySortedByKeys.IncorrectKeyOrder"/>
       <exclude name="SlevomatCodingStandard.Arrays.SingleLineArrayWhitespace.SpaceAfterComma"/>
       <exclude name="SlevomatCodingStandard.Arrays.SingleLineArrayWhitespace.SpaceBeforeArrayClose"/>
-      <exclude name="SlevomatCodingStandard.Classes.DisallowStringExpressionPropertyFetch.DisallowedStringExpressionPropertyFetch"/>
       <exclude name="SlevomatCodingStandard.Classes.EmptyLinesAroundClassBraces.IncorrectEmptyLinesBeforeClosingBrace"/>
       <exclude name="SlevomatCodingStandard.Classes.EmptyLinesAroundClassBraces.NoEmptyLineAfterOpeningBrace"/>
       <exclude name="SlevomatCodingStandard.Classes.ModernClassNameReference.ClassNameReferencedViaMagicConstant"/>
@@ -71,6 +70,7 @@
       <exclude name="SlevomatCodingStandard.ControlStructures.RequireTernaryOperator.TernaryOperatorNotUsed"/>
       <exclude name="SlevomatCodingStandard.ControlStructures.RequireYodaComparison.RequiredYodaComparison"/>
       <exclude name="SlevomatCodingStandard.ControlStructures.UselessIfConditionWithReturn.UselessIfCondition"/>
+      <exclude name="SlevomatCodingStandard.Files.LineLength.LineTooLong"/>
       <exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedClassNameInAnnotation.NonFullyQualifiedClassName"/>
       <exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedExceptions.NonFullyQualifiedException"/>
       <exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedGlobalConstants.NonFullyQualified"/>
@@ -86,20 +86,21 @@
       <exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHint.UselessAnnotation"/>
       <exclude name="SlevomatCodingStandard.Whitespaces.DuplicateSpaces.DuplicateSpaces"/>
 
-      <!-- intentionally broken -->
-      <exclude name="SlevomatCodingStandard.ControlStructures.EarlyExit"/>
       <!-- rewrite DocOpt parser -->
       <exclude name="SlevomatCodingStandard.Classes.ForbiddenPublicProperty.ForbiddenPublicProperty"/>
 
-      <!--
-      @todo
-      [x] SlevomatCodingStandard.PHP.RequireExplicitAssertion.RequiredExplicitAssertion         76
-      -->
+      <!-- broken -->
+      <exclude name="SlevomatCodingStandard.ControlStructures.EarlyExit"/>
 
+      <!-- implement PHPStan extension ServiceContainerReturnType -->
       <exclude name="SlevomatCodingStandard.PHP.RequireExplicitAssertion.RequiredExplicitAssertion"/>
 
+
+      <!--
+      @todo
+      -->
+
       <exclude name="SlevomatCodingStandard.Complexity"/>
-      <exclude name="SlevomatCodingStandard.Files"/>
       <exclude name="SlevomatCodingStandard.Functions"/>
       <exclude name="SlevomatCodingStandard.Operators"/>
       <exclude name="SlevomatCodingStandard.Variables"/>
@@ -107,8 +108,12 @@
 
 
     <!-- @todo ========================================================================================================================= -->
+    <rule ref="SlevomatCodingStandard.Files.FileLength.FileTooLong">
+      <type>warning</type> <!-- Your file is too long. Currently using %d lines. Can be up to 250 lines. -->
+      <severity>4</severity>
+    </rule>
     <rule ref="SlevomatCodingStandard.Classes.ClassLength.ClassTooLong">
-      <type>warning</type> <!-- Your class is too long. Currently using %d lines. Can be up to %d lines. -->
+      <type>warning</type> <!-- Your class is too long. Currently using %d lines. Can be up to 250 lines. -->
       <severity>4</severity>
     </rule>
     <rule ref="SlevomatCodingStandard.Classes.ClassStructure.IncorrectGroupOrder">
@@ -144,6 +149,10 @@
 
 
     <!-- sniff customizations ========================================================================================================== -->
+    <rule ref="SlevomatCodingStandard.Classes.DisallowStringExpressionPropertyFetch.DisallowedStringExpressionPropertyFetch">
+      <exclude-pattern>*/src/struts/Module.php</exclude-pattern> <!-- allow for SimpleXMLElement -->
+    </rule>
+
     <rule ref="SlevomatCodingStandard.Classes.EmptyLinesAroundClassBraces">
       <properties>
         <property name="linesCountBeforeClosingBrace" value="0"/>
@@ -157,6 +166,23 @@
       </properties>
     </rule>
 
+    <rule ref="SlevomatCodingStandard.Classes.RequireMultiLineMethodSignature">
+      <properties>
+        <property name="minLineLength" value="141"/>
+      </properties>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.Files.TypeNameMatchesFileName">
+      <properties>
+        <property name="rootNamespaces" type="array">
+          <element key="src" value="rosasurfer\ministruts"/>
+          <element key="tests" value="rosasurfer\ministruts\tests"/>
+          <element key="etc/phpstan/extension" value="rosasurfer\ministruts\phpstan"/>
+        </property>
+      </properties>
+      <exclude-pattern>*/etc/phpstan/symbols/*</exclude-pattern> <!-- ignore for custom types -->
+    </rule>
+
     <rule ref="SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly">
       <properties>
         <property name="searchAnnotations" value="true"/>
@@ -165,12 +191,6 @@
         <property name="allowFullyQualifiedNameForCollidingConstants" value="true"/>
         <property name="allowFullyQualifiedGlobalFunctions" value="true"/>
         <property name="allowFullyQualifiedGlobalConstants" value="true"/>
-      </properties>
-    </rule>
-
-    <rule ref="SlevomatCodingStandard.Classes.RequireMultiLineMethodSignature">
-      <properties>
-        <property name="minLineLength" value="141"/>
       </properties>
     </rule>
 
@@ -194,6 +214,6 @@
     </rule>
 
     <rule ref="SlevomatCodingStandard.TypeHints.UselessConstantTypeHint.UselessDocComment">
-      <exclude-pattern>*/src/functions.php</exclude-pattern>  <!-- skip types in const redeclarations -->
+      <exclude-pattern>*/src/functions.php</exclude-pattern> <!-- allow for const redeclarations -->
     </rule>
 </ruleset>
