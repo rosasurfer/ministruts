@@ -132,11 +132,13 @@ class PHP extends StaticClass {
         ];
         $stdout = $stderr = '';                                         // stream contents
         $handlers = [                                                   // a handler for each stream
-            (int)$pipes[$STDOUT] => function($line) use (&$stdout, $stdoutPassthrough): void {
-                $stdout .= $line; if ($stdoutPassthrough) echo $line;
+            (int)$pipes[$STDOUT] => static function($line) use (&$stdout, $stdoutPassthrough): void {
+                $stdout .= $line;
+                if ($stdoutPassthrough) echo $line;
             },
-            (int)$pipes[$STDERR] => function($line) use (&$stderr, $stderrPassthrough): void {
-                $stderr .= $line; if ($stderrPassthrough) stderr($line);
+            (int)$pipes[$STDERR] => static function($line) use (&$stderr, $stderrPassthrough): void {
+                $stderr .= $line;
+                if ($stderrPassthrough) stderr($line);
             },
         ];
         $null = null;
@@ -252,7 +254,7 @@ class PHP extends StaticClass {
                 $newOrder = '';
                 $len = strlen($order);
                 for ($i=0; $i < $len; $i++) {
-                    if (in_array($char=$order[$i], ['G', 'P', 'C'])) {
+                    if (\in_array($char=$order[$i], ['G', 'P', 'C'], true)) {
                         $newOrder .= $char;
                     }
                 }
@@ -331,7 +333,7 @@ class PHP extends StaticClass {
             if (isset($composer['require']) && is_array($composer['require'])) {
                 foreach ($composer['require'] as $name => $_) {
                     $name = trim(strtolower($name));
-                    if (in_array($name, ['php', 'php-64bit', 'hhvm']) || strContains($name, '/')) continue;
+                    if (\in_array($name, ['php', 'php-64bit', 'hhvm'], true) || strContains($name, '/')) continue;
                     if (strStartsWith($name, 'ext-')) $name = strRight($name, -4);
                     if (!extension_loaded($name))                                                                  $issues[] = 'Error: '.$name.' extension is not loaded [Composer project requirement]';
                 }

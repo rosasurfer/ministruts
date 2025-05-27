@@ -18,6 +18,7 @@ final class EmptyActionForm extends ActionForm {
      * Intentionally this implementation does nothing.
      */
     protected function populate(): void {
+        // does nothing
     }
 
 

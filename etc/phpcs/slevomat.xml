@@ -26,11 +26,12 @@
     <config name="installed_paths" value="../../slevomat/coding-standard"/>
 
     <rule ref="SlevomatCodingStandard">
-      <!-- exclude broken sniffs -->
+      <!-- exclude broken/invalid sniffs -->
       <exclude name="SlevomatCodingStandard.Attributes"/>
       <exclude name="SlevomatCodingStandard.Classes.ClassMemberSpacing.IncorrectCountOfBlankLinesBetweenMembers"/>
       <exclude name="SlevomatCodingStandard.Commenting.DocCommentSpacing.IncorrectLinesCountBetweenDifferentAnnotationsTypes"/>
       <exclude name="SlevomatCodingStandard.ControlStructures.RequireMultiLineTernaryOperator.MultiLineTernaryOperatorNotUsed"/>
+      <exclude name="SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter"/>
       <exclude name="SlevomatCodingStandard.Namespaces.AlphabeticallySortedUses"/>
 
       <!-- exclude deprecated sniffs -->
@@ -71,6 +72,9 @@
       <exclude name="SlevomatCodingStandard.ControlStructures.RequireYodaComparison.RequiredYodaComparison"/>
       <exclude name="SlevomatCodingStandard.ControlStructures.UselessIfConditionWithReturn.UselessIfCondition"/>
       <exclude name="SlevomatCodingStandard.Files.LineLength.LineTooLong"/>
+      <exclude name="SlevomatCodingStandard.Functions.DisallowArrowFunction.DisallowedArrowFunction"/>
+      <exclude name="SlevomatCodingStandard.Functions.RequireSingleLineCall.RequiredSingleLineCall"/>
+      <exclude name="SlevomatCodingStandard.Functions.StrictCall.NonStrictComparison"/>
       <exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedClassNameInAnnotation.NonFullyQualifiedClassName"/>
       <exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedExceptions.NonFullyQualifiedException"/>
       <exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedGlobalConstants.NonFullyQualified"/>
@@ -86,7 +90,6 @@
       <exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHint.UselessAnnotation"/>
       <exclude name="SlevomatCodingStandard.Whitespaces.DuplicateSpaces.DuplicateSpaces"/>
 
-
       <!-- rewrite DocOpt parser -->
       <exclude name="SlevomatCodingStandard.Classes.ForbiddenPublicProperty.ForbiddenPublicProperty"/>
 
@@ -99,9 +102,12 @@
       <!--
       @todo
       -->
+      
+      
 
-      <exclude name="SlevomatCodingStandard.Complexity"/>
-      <exclude name="SlevomatCodingStandard.Functions"/>
+      <exclude name="SlevomatCodingStandard.Functions.FunctionLength.FunctionLength"/>
+      <exclude name="SlevomatCodingStandard.Functions.RequireMultiLineCall.RequiredMultiLineCall"/>
+
       <exclude name="SlevomatCodingStandard.Operators"/>
       <exclude name="SlevomatCodingStandard.Variables"/>
     </rule>
@@ -126,6 +132,10 @@
       @see https://github.com/slevomat/coding-standard/issues/853
       -->
     </rule>
+    <rule ref="SlevomatCodingStandard.Complexity.Cognitive.ComplexityTooHigh">
+      <type>warning</type> <!-- Cognitive complexity for "<method-name>" is %d but has to be less than or equal to 5. -->
+      <severity>3</severity>
+    </rule>
     <rule ref="SlevomatCodingStandard.ControlStructures.AssignmentInCondition">
       <type>warning</type> <!-- Assignment in if condition is not allowed. -->
       <severity>4</severity>
@@ -146,6 +156,7 @@
       <type>warning</type> <!-- Usage of "mixed" type hint is disallowed. -->
       <severity>4</severity>
     </rule>
+
 
 
     <!-- sniff customizations ========================================================================================================== -->
@@ -181,6 +192,18 @@
         </property>
       </properties>
       <exclude-pattern>*/etc/phpstan/symbols/*</exclude-pattern> <!-- skip custom types -->
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.Functions.ArrowFunctionDeclaration">
+      <properties>
+        <property name="spacesCountAfterKeyword" value="0"/>
+      </properties>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.Functions.DisallowTrailingCommaInCall">
+      <properties>
+        <property name="onlySingleLine" value="true"/>
+      </properties>
     </rule>
 
     <rule ref="SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly">

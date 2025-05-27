@@ -69,7 +69,7 @@ class FileSystem extends StaticClass {
             if ($entry=='.' || $entry=='..') {
                 continue;
             }
-            if (!in_array($entry, $ignore)) {
+            if (!\in_array($entry, $ignore, true)) {
                 $isEmpty = false;
                 break;
             }

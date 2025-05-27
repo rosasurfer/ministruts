@@ -217,7 +217,7 @@ class Tile extends CObject {
      * @return bool
      */
     public function isAbstract(): bool {
-        return in_array(null, $this->nestedTiles, true);
+        return \in_array(null, $this->nestedTiles, true);
     }
 
 

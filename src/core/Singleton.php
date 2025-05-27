@@ -24,6 +24,7 @@ abstract class Singleton extends CObject {
      * Enforces the use of {@link self::getInstance()} to create instances.
      */
     protected function __construct() {
+        // block public access
     }
 
 

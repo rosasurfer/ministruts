@@ -144,7 +144,7 @@ class ErrorHandler extends StaticClass {
 
         // anonymous function to chain a previously active handler
         $args = func_get_args();
-        $prevErrorHandler = function() use ($args) {
+        $prevErrorHandler = static function() use ($args) {
             if (self::$prevErrorHandler) {
                 (self::$prevErrorHandler)(...$args);
             }
@@ -327,7 +327,7 @@ class ErrorHandler extends StaticClass {
      */
     public static function handleDestructorException(Throwable $exception): Throwable {
         if (self::$inShutdown) {
-            $currentHandler = set_exception_handler(function(): void {});
+            $currentHandler = set_exception_handler(static function(): void {});
             restore_exception_handler();
 
             if ($currentHandler) {

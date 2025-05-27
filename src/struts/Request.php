@@ -171,7 +171,7 @@ class Request extends CObject {
     public function getFiles(): array {
         if (!isset($this->files)) {
             $normalizeLevel = null;
-            $normalizeLevel = function(array $file) use (&$normalizeLevel) {
+            $normalizeLevel = static function(array $file) use (&$normalizeLevel) {
                 if (isset($file['name']) && is_array($file['name'])) {
                     $properties = \array_keys($file);
                     $normalized = [];

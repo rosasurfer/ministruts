@@ -189,7 +189,7 @@ class Config extends CObject implements ConfigInterface {
             $rawValue = trim($parts[1]);
 
             // drop possible comments
-            if (strpos($rawValue, '#')!==false && strlen($comment=$this->getLineComment($rawValue))) {
+            if (strContains($rawValue, '#') && strlen($comment = $this->getLineComment($rawValue))) {
                 $value = trim(strLeft($rawValue, -strlen($comment)));
             }
             else {

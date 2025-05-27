@@ -311,7 +311,7 @@ HTML_SNIPPET;
 
             if (!$forward) throw new RuntimeException(
                 '<mapping path="'.$mapping->getPath().'" form-validate-first="true": '
-               .'ActionForward "'.$key.'" not found (module validation error, should never happen)'
+               .'ActionForward "'.$key.'" not found (module validation error, should never happen)',
             );
         }
         $this->processActionForward($request, $response, $forward);

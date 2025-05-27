@@ -246,7 +246,7 @@ class Module extends CObject {
             $viewDir = $config->get('app.dir.view', null) ?? Struts::configError(
                 'Missing view directory configuration: Neither $config[app.dir.view] nor <struts-config file-base="{base-directory}" are specified'.NL
                 .'config: '.NL
-                .$config->dump()
+                .$config->dump(),
             );
             if (!is_dir($viewDir)) Struts::configError("View directory \$config[app.dir.view]=\"$viewDir\" not found");
 
@@ -622,7 +622,7 @@ class Module extends CObject {
         }
 
         // detect and block circular tile references
-        if (in_array($name, $this->tilesContext)) {
+        if (\in_array($name, $this->tilesContext, true)) {
             $this->tilesContext[] = $name;
             Struts::configError('Circular tile reference detected: "'.join('" -> "', $this->tilesContext).'"');
         }

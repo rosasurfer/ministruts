@@ -781,6 +781,7 @@ abstract class PersistableObject extends CObject {
      * @return void
      */
     protected function afterCreate(): void {
+        // can be overridden by a model class
     }
 
 
@@ -792,6 +793,7 @@ abstract class PersistableObject extends CObject {
      * @return bool - If the method does not return boolean TRUE the "save" operation is canceled.
      */
     protected function beforeSave(): bool {
+        // can be overridden by a model class
         return true;
     }
 
@@ -804,6 +806,7 @@ abstract class PersistableObject extends CObject {
      * @return void
      */
     protected function afterSave(): void {
+        // can be overridden by a model class
     }
 
 
@@ -815,6 +818,7 @@ abstract class PersistableObject extends CObject {
      * @return bool - If the method does not return boolean TRUE the "insert" operation is canceled.
      */
     protected function beforeInsert(): bool {
+        // can be overridden by a model class
         return true;
     }
 
@@ -827,6 +831,7 @@ abstract class PersistableObject extends CObject {
      * @return void
      */
     protected function afterInsert(): void {
+        // can be overridden by a model class
     }
 
 
@@ -838,6 +843,7 @@ abstract class PersistableObject extends CObject {
      * @return bool - If the method does not return boolean TRUE the "update" operation is canceled.
      */
     protected function beforeUpdate(): bool {
+        // can be overridden by a model class
         return true;
     }
 
@@ -850,6 +856,7 @@ abstract class PersistableObject extends CObject {
      * @return void
      */
     protected function afterUpdate(): void {
+        // can be overridden by a model class
     }
 
 
@@ -861,6 +868,7 @@ abstract class PersistableObject extends CObject {
      * @return bool - If the method does not return boolean TRUE the "delete" operation is canceled.
      */
     protected function beforeDelete(): bool {
+        // can be overridden by a model class
         return true;
     }
 
@@ -873,6 +881,7 @@ abstract class PersistableObject extends CObject {
      * @return void
      */
     protected function afterDelete(): void {
+        // can be overridden by a model class
     }
 
 

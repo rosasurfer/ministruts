@@ -5,7 +5,7 @@ namespace rosasurfer\ministruts\db\orm\meta;
 
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
-use rosasurfer\ministruts\db\ConnectorInterface as IConnector;
+use rosasurfer\ministruts\db\ConnectorInterface as Connector;
 use rosasurfer\ministruts\phpstan\ArrayShapes;
 
 /**
@@ -69,24 +69,25 @@ class PropertyMapping extends CObject {
     /**
      * Convert a query result value to its PHP representation.
      *
-     * @param  mixed      $value     - result set representation of a property value as returned by the DBMS
-     * @param  IConnector $connector - the used database connector
+     * @param  mixed     $value     - result set representation of a property value as returned by the DBMS
+     * @param  Connector $connector - the used database connector
      *
      * @return mixed - PHP value
      */
-    public function convertToPHPValue($value, IConnector $connector) {
+    public function convertToPHPValue($value, Connector $connector) {
+        // @todo implement me (not yet used)
     }
 
 
     /**
      * Convert a PHP value to its SQL representation.
      *
-     * @param  mixed      $value     - PHP representation of a property value
-     * @param  IConnector $connector - the used database connector
+     * @param  mixed     $value     - PHP representation of a property value
+     * @param  Connector $connector - the used database connector
      *
      * @return string - database representation
      */
-    public function convertToDBValue($value, IConnector $connector): string {
+    public function convertToDBValue($value, Connector $connector): string {
         if ($value === null) {
             $value = 'null';
         }

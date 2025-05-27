@@ -8,6 +8,7 @@ use InvalidArgumentException;
 use rosasurfer\ministruts\console\docopt\SingleMatch;
 
 use function rosasurfer\ministruts\preg_split;
+use function rosasurfer\ministruts\strStartsWith;
 
 /**
  * Option
@@ -60,7 +61,7 @@ class Option extends LeafPattern {
         $options = str_replace(',', ' ', str_replace('=', ' ', $options));
 
         foreach (preg_split('/\s+/', $options) as $s) {
-            if (strpos($s, '--')===0) {
+            if (strStartsWith($s, '--')) {
                 $long = $s;
             }
             elseif ($s && $s[0] == '-') {

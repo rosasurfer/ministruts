@@ -37,8 +37,8 @@ class SimpleXMLElement extends \SimpleXMLElement {
     public static function from(string $data, int $options=0, bool $dataIsUri=false, string $ns='', bool $nsIsPrefix=false): self {
         $errors = [];
         $origHandler = null;
-        $origHandler = set_error_handler(function($level, $message, $file, $line, $context=null) use (&$errors, &$origHandler) {
-            if ($origHandler && in_array($level, [E_DEPRECATED, E_USER_DEPRECATED, E_USER_NOTICE, E_USER_WARNING])) {
+        $origHandler = set_error_handler(static function($level, $message, $file, $line, $context=null) use (&$errors, &$origHandler) {
+            if ($origHandler && \in_array($level, [E_DEPRECATED, E_USER_DEPRECATED, E_USER_NOTICE, E_USER_WARNING], true)) {
                 return ($origHandler)(...func_get_args());
             }
             $errors[] = func_get_args();

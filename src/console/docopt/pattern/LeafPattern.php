@@ -37,7 +37,7 @@ abstract class LeafPattern extends Pattern {
      * {@inheritDoc}
      */
     public function flat(array $types = []): array {
-        if (!$types || in_array(static::class, $types)) {
+        if (!$types || \in_array(static::class, $types, true)) {
             return [$this];
         }
         return [];
@@ -57,10 +57,7 @@ abstract class LeafPattern extends Pattern {
         unset($left_[$pos]);
         $left_ = array_values($left_);
 
-        $name = $this->name();
-        $sameName = array_values(array_filter($collected, function(Pattern $pattern) use ($name) {
-            return $pattern->name() == $name;
-        }));
+        $sameName = array_values(array_filter($collected, fn(Pattern $pattern): bool => $pattern->name() == $this->name()));
 
         if (is_int($this->value) || is_array($this->value) || $this->value instanceof Traversable) {
             if (is_int($this->value)) {

@@ -75,9 +75,9 @@ abstract class Pattern extends CObject {
 
             foreach ($this->children as $i => $child) {
                 if (!$child instanceof BranchPattern) {
-                    if (!in_array($child, $unique))               // Not sure if this is a true substitute for 'assert c in uniq'
+                    if (!\in_array($child, $unique, false))         // Not sure if this is a true substitute for 'assert child in unique'
                         throw new UnexpectedValueException();
-                    $this->children[$i] = $unique[array_search($child, $unique)];
+                    $this->children[$i] = $unique[array_search($child, $unique, false)];
                 }
                 else {
                     $child->fixIdentities($unique);

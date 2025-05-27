@@ -432,7 +432,7 @@ class ActionMapping extends CObject {
             return $this->forward;
         }
         return $this->findForward($name) ?: Struts::configError(
-            "<mapping name=\"$this->name\"  path=\"$this->path\": ActionForward \"$name\" not found."
+            "<mapping name=\"$this->name\"  path=\"$this->path\": ActionForward \"$name\" not found.",
         );
     }
 }

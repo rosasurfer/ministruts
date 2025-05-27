@@ -8,7 +8,7 @@ require __DIR__.'/functions.php';
 
 // CLI mode: register a SIGINT handler to catch Ctrl-C
 if (CLI && \function_exists('pcntl_signal')) {
-    \pcntl_signal(SIGINT, function(int $signo, $signinfo = null): void {
+    \pcntl_signal(SIGINT, static function(int $signo, $signinfo = null): void {
         // calling exit() is sufficient to execute destructors
         exit(1);
     });

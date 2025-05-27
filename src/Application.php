@@ -280,7 +280,7 @@ class Application extends CObject {
                     if (!$phpInfoTask) exit(0);
                 }
 
-                // execute "phpinfo" task if enabled
+                // execute "php-info" task if enabled
                 if ($phpInfoTask) {
                     PHP::phpinfo();
                     exit(0);
@@ -411,6 +411,6 @@ class Application extends CObject {
         }
         $list = \array_merge($whiteList ?? [], ['127.0.0.1', $_SERVER['SERVER_ADDR']]);
 
-        return \in_array($_SERVER['REMOTE_ADDR'], $list);
+        return \in_array($_SERVER['REMOTE_ADDR'], $list, true);
     }
 }

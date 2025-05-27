@@ -103,7 +103,7 @@ class CoreFunctionReturnType extends Extension implements DynamicFunctionReturnT
         $name = $function->getName();
 
         // throw an exception to get notified when PHPStan bugs are fixed
-        if (in_array($name, ['filter_var'])) {
+        if (\in_array($name, ['filter_var'], true)) {
             throw new ExtensionException("pewa: PHPStan bugfix -> core function $name is now passed to the ".simpleClassName(__CLASS__).' extension');
         }
 

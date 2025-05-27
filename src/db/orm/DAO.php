@@ -202,7 +202,7 @@ abstract class DAO extends Singleton {
      */
     protected function parseMapping(array $mapping): array {
         $entityClass = '?';
-        $configError = function(string $message) use (&$entityClass): void {
+        $configError = static function(string $message) use (&$entityClass): void {
             ORM::configError("$message in mapping of $entityClass");
         };
         $entity = [];
@@ -308,7 +308,7 @@ abstract class DAO extends Singleton {
             $type = $userdata['type'] ?? $configError("missing attribute [relations][$i][@name=$name \"type\"]");
             Assert::string($type, "invalid attribute [relations][$i][@name=$name \"type\"] (string expected)");
             $type = trim($type);
-            if (!in_array($type, $relationTypes)) {
+            if (!\in_array($type, $relationTypes, true)) {
                 $configError("invalid attribute [relations][$i][@name=$name \"type\"] (one of \"".join('|', $relationTypes)."\" expected)");
             }
             $relation['type'] = $type;
@@ -441,7 +441,7 @@ abstract class DAO extends Singleton {
     private function validateJoinTableSettings(array $userdata, array $relation, bool $optional, int $pos, string $class): array {
         $name = $relation['name'] ?? '';
         $i = $pos;
-        $configError = function(string $message) use ($class): void {
+        $configError = static function(string $message) use ($class): void {
             ORM::configError("$message in mapping of $class");
         };
         $newData = [];

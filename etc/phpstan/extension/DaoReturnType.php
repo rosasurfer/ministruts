@@ -115,7 +115,7 @@ class DaoReturnType extends Extension implements DynamicMethodReturnTypeExtensio
         // validate the supported return types
         $origTypeDescr = $origType->describe(VerbosityLevel::typeOnly());
         $expectedDescr = self::$supportedMethods[$methodName];
-        if (!in_array($origTypeDescr, self::$supportedMethods)) throw new ExtensionException("$call: unexpected return type $origTypeDescr (expected $expectedDescr)");
+        if (!\in_array($origTypeDescr, self::$supportedMethods, true)) throw new ExtensionException("$call: unexpected return type $origTypeDescr (expected $expectedDescr)");
 
         // branch according to the original return type
         $newType = null;

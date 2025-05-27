@@ -30,7 +30,7 @@ abstract class BranchPattern extends Pattern {
      * {@inheritDoc}
      */
     public function flat(array $types = []): array {
-        if (in_array(static::class, $types)) {
+        if (\in_array(static::class, $types, true)) {
             return [$this];
         }
         $flat = [];
