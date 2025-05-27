@@ -55,7 +55,7 @@ use rosasurfer\ministruts\db\orm\PersistableObject;
  *   __adjusted?: int,
  * }
  */
-final class CustomTypes {
+final class ArrayShapes {
 }
 
 

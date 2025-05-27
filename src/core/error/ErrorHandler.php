@@ -14,7 +14,7 @@ use rosasurfer\ministruts\core\StaticClass;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\log\Logger;
 use rosasurfer\ministruts\log\filter\ContentFilterInterface as ContentFilter;
-use rosasurfer\ministruts\phpstan\CustomTypes;
+use rosasurfer\ministruts\phpstan\ArrayShapes;
 
 use function rosasurfer\ministruts\normalizeEOL;
 use function rosasurfer\ministruts\strEndsWith;
@@ -37,7 +37,7 @@ use const rosasurfer\ministruts\WINDOWS;
 /**
  * A handler for unhandled PHP errors and exceptions.
  *
- * @phpstan-import-type STACKFRAME from CustomTypes
+ * @phpstan-import-type STACKFRAME from ArrayShapes
  */
 class ErrorHandler extends StaticClass {
 

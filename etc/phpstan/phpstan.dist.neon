@@ -42,7 +42,7 @@ parameters:
 
   checkUninitializedProperties: true
 
-  ignoreErrors:                                     # silence erroneous checks
+  ignoreErrors:                                     # silence opinionated checks
     - '#^Unsafe usage of new static\(\)\.$#'
 
   reportUnmatchedIgnoredErrors: false

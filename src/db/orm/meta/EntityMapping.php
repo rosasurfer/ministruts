@@ -4,12 +4,12 @@ declare(strict_types=1);
 namespace rosasurfer\ministruts\db\orm\meta;
 
 use rosasurfer\ministruts\core\CObject;
-use rosasurfer\ministruts\phpstan\CustomTypes;
+use rosasurfer\ministruts\phpstan\ArrayShapes;
 
 /**
  * An EntityMapping is an object encapsulating meta information about how to map a PHP class to a database table.
  *
- * @phpstan-import-type ORM_ENTITY from CustomTypes
+ * @phpstan-import-type ORM_ENTITY from ArrayShapes
  */
 class EntityMapping extends CObject {
 
