@@ -86,6 +86,7 @@
       <exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHint.UselessAnnotation"/>
       <exclude name="SlevomatCodingStandard.Whitespaces.DuplicateSpaces.DuplicateSpaces"/>
 
+
       <!-- rewrite DocOpt parser -->
       <exclude name="SlevomatCodingStandard.Classes.ForbiddenPublicProperty.ForbiddenPublicProperty"/>
 
@@ -94,7 +95,6 @@
 
       <!-- implement PHPStan extension ServiceContainerReturnType -->
       <exclude name="SlevomatCodingStandard.PHP.RequireExplicitAssertion.RequiredExplicitAssertion"/>
-
 
       <!--
       @todo
@@ -180,7 +180,7 @@
           <element key="etc/phpstan/extension" value="rosasurfer\ministruts\phpstan"/>
         </property>
       </properties>
-      <exclude-pattern>*/etc/phpstan/symbols/*</exclude-pattern> <!-- ignore for custom types -->
+      <exclude-pattern>*/etc/phpstan/symbols/*</exclude-pattern> <!-- skip custom types -->
     </rule>
 
     <rule ref="SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly">
