@@ -15,7 +15,7 @@ use function rosasurfer\ministruts\strContains;
 use function rosasurfer\ministruts\strEndsWith;
 use function rosasurfer\ministruts\strLeftTo;
 use function rosasurfer\ministruts\strRightFrom;
-use function rosasurfer\ministruts\strStartsWith;
+use function rosasurfer\ministruts\strStartsWithI;
 
 use const rosasurfer\ministruts\CLI;
 use const rosasurfer\ministruts\EOL_UNIX;
@@ -416,7 +416,7 @@ class MailAppender extends BaseAppender {
         $result = null;
 
         foreach ($headers as $i => $header) {
-            if (strStartsWith($header, "$name:", true)) {
+            if (strStartsWithI($header, "$name:")) {
                 $result = trim(substr($header, strlen($name) + 1));
                 unset($headers[$i]);
             }

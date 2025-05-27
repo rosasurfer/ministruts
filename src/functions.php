@@ -1359,45 +1359,48 @@ function strRightFrom(string $string, string $limiter, int $count=1, bool $inclu
 
 
 /**
- * Whether a string starts with a substring. If multiple prefixes are given, whether the string
- * starts with one of them.
+ * Whether a string starts with a case-sensitive substring. If multiple prefixes are given,
+ * whether the string starts with one of them.
  *
- * @param  string          $string
- * @param  string|string[] $prefix                - one or more prefixes
- * @param  bool            $ignoreCase [optional] - default: no
+ * @param  string    $string
+ * @param  string ...$prefix - one or multiple prefixes
  *
  * @return bool
  */
-function strStartsWith(string $string, $prefix, bool $ignoreCase = false): bool {
-    if (is_array($prefix)) {
-        foreach ($prefix as $p) {
-            if (strStartsWith($string, $p, $ignoreCase)) {
-                return true;
-            }
+function strStartsWith(string $string, string ...$prefix): bool {
+    if (!strlen($string)) {
+        return false;
+    }
+    foreach ($prefix as $p) {
+        $lenPrefix = strlen($p);
+        if ($lenPrefix && strncmp($string, $p, $lenPrefix)===0) {
+            return true;
         }
-        return false;
     }
-    if (!strlen($string) || !strlen($prefix)) {
-        return false;
-    }
-    if ($ignoreCase) {
-        return stripos($string, $prefix) === 0;
-    }
-    return strpos($string, $prefix) === 0;
+    return false;
 }
 
 
 /**
- * Whether a string starts with a substring ignoring case differences. If multiple prefixes
- * are given, whether the string starts with one of them.
+ * Whether a string starts with a case-insensitive substring. If multiple prefixes are given,
+ * whether the string starts with one of them.
  *
- * @param  string          $string
- * @param  string|string[] $prefix - one or more prefixes
+ * @param  string    $string
+ * @param  string ...$prefix - one or multiple prefixes
  *
  * @return bool
  */
-function strStartsWithI(string $string, $prefix): bool  {
-    return strStartsWith($string, $prefix, true);
+function strStartsWithI(string $string, string ...$prefix): bool  {
+    if (!strlen($string)) {
+        return false;
+    }
+    foreach ($prefix as $p) {
+        $lenPrefix = strlen($p);
+        if ($lenPrefix && strncasecmp($string, $p, $lenPrefix)===0) {
+            return true;
+        }
+    }
+    return false;
 }
 
 
