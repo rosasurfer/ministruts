@@ -1003,27 +1003,23 @@ function strCompareI(?string $a, ?string $b): bool {
 
 
 /**
- * Whether a string contains a substring.
+ * Whether a string contains a case-sensitive substring.
  *
  * @param  string $haystack
  * @param  string $needle
- * @param  bool   $ignoreCase [optional] - default: no
  *
  * @return bool
  */
-function strContains(string $haystack, string $needle, bool $ignoreCase = false): bool {
+function strContains(string $haystack, string $needle): bool {
     if (!strlen($haystack) || !strlen($needle)) {
         return false;
-    }
-    if ($ignoreCase) {
-        return stripos($haystack, $needle) !== false;
     }
     return strpos($haystack, $needle) !== false;
 }
 
 
 /**
- * Whether a string contains a substring ignoring case differences.
+ * Whether a string contains a case-insensitive substring.
  *
  * @param  string $haystack
  * @param  string $needle
@@ -1031,7 +1027,10 @@ function strContains(string $haystack, string $needle, bool $ignoreCase = false)
  * @return bool
  */
 function strContainsI(string $haystack, string $needle): bool {
-    return strContains($haystack, $needle, true);
+    if (!strlen($haystack) || !strlen($needle)) {
+        return false;
+    }
+    return stripos($haystack, $needle) !== false;
 }
 
 
