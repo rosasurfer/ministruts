@@ -985,27 +985,7 @@ function strCollapseWhiteSpace(string $string, bool $joinLines=true, string $sep
 
 
 /**
- * Functional replacement for ($a === $b).
- *
- * @param  ?string $a
- * @param  ?string $b
- * @param  bool    $ignoreCase [optional] - default: no
- *
- * @return bool
- */
-function strCompare(?string $a, ?string $b, bool $ignoreCase = false): bool {
-    if ($ignoreCase) {
-        if (isset($a, $b)) {
-            $a = strtolower($a);
-            $b = strtolower($b);
-        }
-    }
-    return $a === $b;
-}
-
-
-/**
- * Functional replacement for ($a === $b) ignoring case differences.
+ * Functional replacement for case-insensitive ($a === $b).
  *
  * @param  ?string $a
  * @param  ?string $b
@@ -1013,7 +993,12 @@ function strCompare(?string $a, ?string $b, bool $ignoreCase = false): bool {
  * @return bool
  */
 function strCompareI(?string $a, ?string $b): bool {
-    return strCompare($a, $b, true);
+    if (isset($a, $b)) {
+        $lenA = strlen($a);
+        $lenB = strlen($b);
+        return $lenA==$lenB && strncasecmp($a, $b, $lenA)===0;
+    }
+    return $a === $b;
 }
 
 
@@ -1051,48 +1036,56 @@ function strContainsI(string $haystack, string $needle): bool {
 
 
 /**
- * Whether a string ends with a substring. If multiple suffixes are given, whether the string
- * ends with one of them.
+ * Whether a string ends with a case-sensitive substring. If multiple suffixes are given,
+ * whether the string ends with one of them.
  *
- * @param  string          $string
- * @param  string|string[] $suffix                - one or more suffixes
- * @param  bool            $ignoreCase [optional] - default: no
+ * @param  string    $string
+ * @param  string ...$suffix - one or multiple suffixes
  *
  * @return bool
  */
-function strEndsWith(string $string, $suffix, bool $ignoreCase = false): bool {
-    if (is_array($suffix)) {
-        foreach ($suffix as $s) {
-            if (strEndsWith($string, $s, $ignoreCase)) {
+function strEndsWith(string $string, string ...$suffix): bool {
+    $lenString = strlen($string);
+    if (!$lenString) {
+        return false;
+    }
+    foreach ($suffix as $s) {
+        $lenSuffix = strlen($s);
+        if ($lenSuffix && $lenString >= $lenSuffix) {
+            $end = substr($string, -$lenSuffix);
+            if (strncmp($end, $s, $lenSuffix) === 0) {
                 return true;
             }
         }
-        return false;
     }
-    $stringLen = strlen($string);
-    $suffixLen = strlen($suffix);
-
-    if (!$stringLen || !$suffixLen) {
-        return false;
-    }
-    if ($ignoreCase) {
-        return strripos($string, $suffix) === $stringLen-$suffixLen;
-    }
-    return strrpos($string, $suffix) === $stringLen-$suffixLen;
+    return false;
 }
 
 
 /**
- * Whether a string ends with a substring ignoring case differences. If multiple suffixes
- * are given, whether the string ends with one of them.
+ * Whether a string ends with a case-insensitive substring. If multiple suffixes are given,
+ * whether the string ends with one of them.
  *
- * @param  string          $string
- * @param  string|string[] $suffix - one or more suffixes
+ * @param  string    $string
+ * @param  string ...$suffix - one or multiple suffixes
  *
  * @return bool
  */
-function strEndsWithI(string $string, $suffix): bool {
-    return strEndsWith($string, $suffix, true);
+function strEndsWithI(string $string, string ...$suffix): bool {
+    $lenString = strlen($string);
+    if (!$lenString) {
+        return false;
+    }
+    foreach ($suffix as $s) {
+        $lenSuffix = strlen($s);
+        if ($lenSuffix && $lenString >= $lenSuffix) {
+            $end = substr($string, -$lenSuffix);
+            if (strncasecmp($end, $s, $lenSuffix) === 0) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 
