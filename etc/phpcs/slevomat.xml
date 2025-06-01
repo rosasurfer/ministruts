@@ -74,6 +74,7 @@
       <exclude name="SlevomatCodingStandard.Files.LineLength.LineTooLong"/>
       <exclude name="SlevomatCodingStandard.Functions.DisallowArrowFunction.DisallowedArrowFunction"/>
       <exclude name="SlevomatCodingStandard.Functions.RequireSingleLineCall.RequiredSingleLineCall"/>
+      <exclude name="SlevomatCodingStandard.Functions.RequireMultiLineCall.RequiredMultiLineCall"/>
       <exclude name="SlevomatCodingStandard.Functions.StrictCall.NonStrictComparison"/>
       <exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedClassNameInAnnotation.NonFullyQualifiedClassName"/>
       <exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedExceptions.NonFullyQualifiedException"/>
@@ -90,11 +91,11 @@
       <exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHint.UselessAnnotation"/>
       <exclude name="SlevomatCodingStandard.Whitespaces.DuplicateSpaces.DuplicateSpaces"/>
 
-      <!-- rewrite DocOpt parser -->
-      <exclude name="SlevomatCodingStandard.Classes.ForbiddenPublicProperty.ForbiddenPublicProperty"/>
-
       <!-- broken -->
       <exclude name="SlevomatCodingStandard.ControlStructures.EarlyExit"/>
+
+      <!-- rewrite DocOpt parser -->
+      <exclude name="SlevomatCodingStandard.Classes.ForbiddenPublicProperty.ForbiddenPublicProperty"/>
 
       <!-- implement PHPStan extension ServiceContainerReturnType -->
       <exclude name="SlevomatCodingStandard.PHP.RequireExplicitAssertion.RequiredExplicitAssertion"/>
@@ -102,14 +103,9 @@
       <!--
       @todo
       -->
-      
-      
 
-      <exclude name="SlevomatCodingStandard.Functions.FunctionLength.FunctionLength"/>
-      <exclude name="SlevomatCodingStandard.Functions.RequireMultiLineCall.RequiredMultiLineCall"/>
-
-      <exclude name="SlevomatCodingStandard.Operators"/>
       <exclude name="SlevomatCodingStandard.Variables"/>
+      <exclude name="SlevomatCodingStandard.Operators"/>
     </rule>
 
 
@@ -144,6 +140,10 @@
       <type>warning</type> <!-- Use of empty() is disallowed. -->
       <severity>4</severity>
     </rule>
+    <rule ref="SlevomatCodingStandard.Functions.FunctionLength.FunctionLength">
+      <type>warning</type> <!-- Your function is too long. Currently using %d lines. Can be up to 20 lines. -->
+      <severity>4</severity>
+    </rule>
     <rule ref="SlevomatCodingStandard.PHP.DisallowReference.DisallowedAssigningByReference">
       <type>warning</type> <!-- Assigning by reference is disallowed. -->
       <severity>4</severity>
@@ -156,7 +156,6 @@
       <type>warning</type> <!-- Usage of "mixed" type hint is disallowed. -->
       <severity>4</severity>
     </rule>
-
 
 
     <!-- sniff customizations ========================================================================================================== -->
