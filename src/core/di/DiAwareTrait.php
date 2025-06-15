@@ -25,7 +25,7 @@ trait DiAwareTrait {
      */
     protected static function di(?string $name = null): object {
         $di = Application::getDi();
-        if (!$di) throw new RuntimeException('Service container not available');
+        if (!$di) throw new RuntimeException('Application not initialized');
 
         if (isset($name)) {
             return $di->get($name);
