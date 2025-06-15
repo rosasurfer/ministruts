@@ -214,7 +214,7 @@ fi
 
 # complete PHPStan arguments
 if [[ "$CMD" == 'analyse' || "$CMD" == 'analyze' ]]; then
-  ARGS=('--memory-limit=-1' "${ARGS[@]}")                                       # prepend memory option
+  ARGS=('--memory-limit=-1' "${ARGS[@]+"${ARGS[@]}"}")                          # prepend memory option
   [[ -n "$AUTOLOAD" ]] && ARGS=("$AUTOLOAD" "${ARGS[@]}")                       # prepend auto-load option
 fi
 if [[ "$CMD" == 'analyse' || "$CMD" == 'analyze' || "$CMD" == 'clear-result-cache' || "$CMD" == 'diagnose' || "$CMD" == 'dump-parameters' || "$CMD" == 'worker' || "$CMD" == 'fixer:worker' ]]; then
