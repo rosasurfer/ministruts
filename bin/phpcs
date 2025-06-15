@@ -105,8 +105,12 @@ phpcs="${phpcs#./}"
 
 
 declare args=() arg
+args+=('-d')                                                # always increase the memory limit
+args+=('memory_limit=-1')
+
 declare -A options
 options=()
+
 
 # parse arguments
 while (("$#")); do
@@ -142,6 +146,11 @@ while (("$#")); do
       options['--color']='--no-colors'
       shift
       continue;;
+
+    -d)                                                     # a "php.ini" setting
+      args+=("$1")
+      shift
+      ((!"$#")) && fail 'missing value for option -d'
   esac
   args+=("$1")
   shift
@@ -166,7 +175,7 @@ fi
 
 
 # rebuild all arguments
-args=("${options[@]}" "${args[@]}")
+args=("${options[@]}" "${args[@]+"${args[@]}"}")
 set -- "${args[@]}"
 
 
