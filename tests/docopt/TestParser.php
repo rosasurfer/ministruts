@@ -8,7 +8,6 @@ use rosasurfer\ministruts\console\docopt\OptionIterator;
 use rosasurfer\ministruts\console\docopt\TokenIterator;
 use rosasurfer\ministruts\console\docopt\pattern\Required;
 
-
 /**
  *
  */
@@ -23,6 +22,7 @@ class TestParser extends DocoptParser {
         return parent::formalUsage($section);
     }
 
+
     /**
      * {@inheritDoc}
      *
@@ -31,6 +31,7 @@ class TestParser extends DocoptParser {
     public static function parseArgs(TokenIterator $tokens, OptionIterator $options, bool $optionsFirst = false): array {
         return parent::parseArgs($tokens, $options, $optionsFirst);
     }
+
 
     /**
      * {@inheritDoc}
@@ -41,6 +42,7 @@ class TestParser extends DocoptParser {
         return parent::parseDefaults($doc);
     }
 
+
     /**
      * {@inheritDoc}
      *
@@ -49,6 +51,7 @@ class TestParser extends DocoptParser {
     public static function parsePattern(string $source, OptionIterator $options): Required {
         return parent::parsePattern($source, $options);
     }
+
 
     /**
      * {@inheritDoc}

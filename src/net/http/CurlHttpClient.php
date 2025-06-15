@@ -18,14 +18,12 @@ use const rosasurfer\ministruts\L_INFO;
 use const rosasurfer\ministruts\L_WARN;
 use const rosasurfer\ministruts\NL;
 
-
 /**
  * CurlHttpClient
  *
  * An HTTP client executing HTTP requests using CURL.
  */
 class CurlHttpClient extends HttpClient {
-
 
     /**
      * @var resource|CurlHandle|null - cURL handle

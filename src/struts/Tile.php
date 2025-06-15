@@ -8,14 +8,13 @@ use Closure;
 use rosasurfer\ministruts\Application;
 use rosasurfer\ministruts\config\ConfigInterface as Config;
 use rosasurfer\ministruts\core\CObject;
-use rosasurfer\ministruts\core\di\proxy\Request as Request;
+use rosasurfer\ministruts\core\di\proxy\Request as RequestProxy;
 use rosasurfer\ministruts\core\exception\IllegalStateException;
 
 use function rosasurfer\ministruts\strLeft;
 use function rosasurfer\ministruts\strRightFrom;
 
 use const rosasurfer\ministruts\NL;
-
 
 /**
  * Tile
@@ -31,11 +30,11 @@ use const rosasurfer\ministruts\NL;
 class Tile extends CObject {
 
     /**
-     * @var string - runtime generated name for anonymous tiles
+     * runtime generated name for anonymous tiles
      *
-     * @todo  make generic names unique
+     * @todo make generic names unique
      */
-    const GENERIC_NAME = 'generic';
+    public const GENERIC_NAME = 'generic';
 
     /** @var Module - the Module this Tile belongs to */
     protected Module $module;
@@ -55,8 +54,8 @@ class Tile extends CObject {
     /** @var mixed[] - additional Tile properties */
     protected array $properties = [];
 
-    /** @var Tile|null - parent instance containing this Tile or NULL if this Tile is the outermost fragment of the generated view */
-    protected ?Tile $parent;
+    /** @var ?Tile - parent instance containing this Tile or NULL if this Tile is the outermost fragment of the generated view */
+    protected ?self $parent;
 
     /** @var bool - whether this component can still be modified or configuration is frozen */
     protected bool $configured = false;
@@ -68,7 +67,7 @@ class Tile extends CObject {
      * @param  Module $module            - the Module the Tile belongs to
      * @param  ?Tile  $parent [optional] - parent instance of the Tile
      */
-    public function __construct(Module $module, ?Tile $parent = null) {
+    public function __construct(Module $module, ?self $parent = null) {
         $this->module = $module;
         $this->parent = $parent;
     }
@@ -102,7 +101,7 @@ class Tile extends CObject {
     /**
      * Set the parent of the Tile.
      *
-     * @param  self $parent
+     * @param  Tile $parent
      *
      * @return $this
      */
@@ -176,7 +175,7 @@ class Tile extends CObject {
      *
      * @return $this
      */
-    public function setNestedTile(string $name, ?Tile $tile = null): self {
+    public function setNestedTile(string $name, ?self $tile = null): self {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
         $this->nestedTiles[$name] = $tile;
@@ -218,7 +217,7 @@ class Tile extends CObject {
      * @return bool
      */
     public function isAbstract(): bool {
-        return in_array(null, $this->nestedTiles, true);
+        return \in_array(null, $this->nestedTiles, true);
     }
 
 
@@ -229,8 +228,9 @@ class Tile extends CObject {
      */
     public function freeze(): self {
         if (!$this->configured) {
-            if (!strlen($this->fileName)) Struts::configError('<tile name="'.$this->fileName.'": No file configured.');
-
+            if (!strlen($this->fileName)) {
+                Struts::configError('<tile name="'.$this->fileName.'": No file configured.');
+            }
             foreach ($this->nestedTiles as $tile) {
                 if ($tile) $tile->freeze();
             }
@@ -246,7 +246,7 @@ class Tile extends CObject {
      * @return $this
      */
     public function render(): self {
-        $request     = Request::instance();
+        $request     = RequestProxy::instance();
         $namespace   = $this->module->getViewNamespace();
         $appUri      = $request->getApplicationBaseUri();
         $nestedTiles = $this->nestedTiles;
@@ -317,7 +317,7 @@ class Tile extends CObject {
             }                                                               // irregular names (e.g. with dots).
             unset($__key_13ae1dbf8af83a86, $__value_13ae1dbf8af83a86);      // Surprisingly foreach() is even faster.
 
-            include(func_get_args()[0]);
+            include func_get_args()[0];
         }, null, null);
 
         // include the file

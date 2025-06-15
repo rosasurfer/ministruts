@@ -9,9 +9,9 @@ if (!is_file($autoload = __DIR__.'/../../../../vendor/autoload.php')) {
     echo "File \"$autoload\" not found".PHP_EOL;
     exit(1);
 }
-require($autoload);
+require $autoload;
 
-$doc = <<<DOCOPT
+$doc = <<<'DOCOPT'
 Example of a program which uses the [options] shortcut.
 
 Usage: {:cmd:}  [options] <port>

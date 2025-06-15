@@ -11,6 +11,7 @@ use rosasurfer\ministruts\net\http\HttpResponse;
 
 use function rosasurfer\ministruts\first;
 use function rosasurfer\ministruts\isRelativePath;
+use function rosasurfer\ministruts\preg_match;
 use function rosasurfer\ministruts\realpath;
 use function rosasurfer\ministruts\simpleClassName;
 use function rosasurfer\ministruts\strCompareI;
@@ -21,7 +22,6 @@ use function rosasurfer\ministruts\strLeftTo;
 use function rosasurfer\ministruts\strStartsWith;
 
 use const rosasurfer\ministruts\NL;
-
 
 /**
  * Module
@@ -38,7 +38,6 @@ use const rosasurfer\ministruts\NL;
  * The full URI of a route to a specific module's {@link ActionMapping} is "/{app-base-path}/{module-prefix}/{mapping-path}".
  */
 class Module extends CObject {
-
 
     /**
      * Module prefix relative to the base URI of the web application. All module prefixes in an application are unique.
@@ -248,7 +247,7 @@ class Module extends CObject {
             $viewDir = $config->get('app.dir.view', null) ?? Struts::configError(
                 'Missing view directory configuration: Neither $config[app.dir.view] nor <struts-config file-base="{base-directory}" are specified'.NL
                 .'config: '.NL
-                .$config->dump()
+                .$config->dump(),
             );
             if (!is_dir($viewDir)) Struts::configError("View directory \$config[app.dir.view]=\"$viewDir\" not found");
 
@@ -624,7 +623,7 @@ class Module extends CObject {
         }
 
         // detect and block circular tile references
-        if (in_array($name, $this->tilesContext)) {
+        if (\in_array($name, $this->tilesContext, true)) {
             $this->tilesContext[] = $name;
             Struts::configError('Circular tile reference detected: "'.join('" -> "', $this->tilesContext).'"');
         }
@@ -743,7 +742,7 @@ class Module extends CObject {
             }
 
             // TODO: check that $value matches the specified type
-            switch (((string) $tag['type']) ?: 'string') {
+            switch ((string) $tag['type'] ?: 'string') {
                 case 'bool' : $value =  (bool) $value; break;
                 case 'int'  : $value =   (int) $value; break;
                 case 'float': $value = (float) $value; break;
@@ -1187,7 +1186,7 @@ class Module extends CObject {
      */
     private function isFile(string $path): bool {
         $filename = $this->findFile($path);
-        return ($filename !== null);
+        return $filename !== null;
     }
 
 

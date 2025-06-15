@@ -6,14 +6,12 @@ namespace rosasurfer\ministruts\net\messenger\im;
 use rosasurfer\ministruts\core\exception\UnimplementedFeatureException;
 use rosasurfer\ministruts\net\messenger\Messenger;
 
-
 /**
  * IRCMessenger
  *
  * A {@link rosasurfer\ministruts\net\messenger\Messenger} for sending messages to an IRC channel.
  */
 class IRCMessenger extends Messenger {
-
 
     /**
      * {@inheritDoc}

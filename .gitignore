@@ -34,4 +34,5 @@ nbactions.xml
 /php-error.log
 /phpstan.neon
 /services.php
+/tests/.phpunit*
 /vendor

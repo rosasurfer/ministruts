@@ -3,12 +3,10 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\console\docopt\pattern;
 
-
 /**
  * Either
  */
 class Either extends BranchPattern {
-
 
     /**
      * {@inheritDoc}
@@ -16,8 +14,10 @@ class Either extends BranchPattern {
     public function match(array $left, array $collected = []): array {
         $outcomes = [];
         foreach ($this->children as $pattern) {
-            list($matched) = $outcome = $pattern->match($left, $collected);
-            if ($matched) $outcomes[] = $outcome;
+            [$matched] = $outcome = $pattern->match($left, $collected);
+            if ($matched) {
+                $outcomes[] = $outcome;
+            }
         }
         if ($outcomes) {
             // return min(outcomes, key=lambda outcome: len(outcome[1]))
@@ -25,7 +25,7 @@ class Either extends BranchPattern {
             foreach ($outcomes as $o) {
                 $size = sizeof($o[1]);
                 if ($min === null || $size < $min) {
-                   $min    = $size;
+                   $min = $size;
                    $result = $o;
                 }
             }

@@ -7,12 +7,12 @@ use rosasurfer\ministruts\Application;
 use rosasurfer\ministruts\log\LogMessage;
 
 use function rosasurfer\ministruts\ini_get_bool;
+use function rosasurfer\ministruts\preg_match;
 use function rosasurfer\ministruts\stderr;
 use function rosasurfer\ministruts\stdout;
 
 use const rosasurfer\ministruts\CLI;
 use const rosasurfer\ministruts\NL;
-
 
 /**
  * PrintAppender
@@ -39,7 +39,6 @@ use const rosasurfer\ministruts\NL;
  * </pre>
  */
 class PrintAppender extends BaseAppender {
-
 
     /** @var int - counter for all displayed messages */
     protected int $msgCounter = 0;

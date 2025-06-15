@@ -9,8 +9,8 @@ use rosasurfer\ministruts\core\exception\RuntimeException;
 /**
  * DiAwareTrait
  *
- * A trait adding the behavior "service locator awareness" to any class. Provides access to dependencies in
- * the application's service container. Using this trait any class can easily be made service aware.
+ * A trait adding the behavior "service awareness" to any class. Provides access to dependencies in
+ * the application's service container. By using this trait any class can easily made service aware.
  */
 trait DiAwareTrait {
 
@@ -20,11 +20,12 @@ trait DiAwareTrait {
      *
      * @param  ?string $name [optional] - service identifier (default: none to return the service container itself)
      *
-     * @return ($name is null ? DiInterface : object)
+     * @return         object
+     * @phpstan-return ($name is null ? DiInterface : object)
      */
     protected static function di(?string $name = null): object {
         $di = Application::getDi();
-        if (!$di) throw new RuntimeException('Service container not available');
+        if (!$di) throw new RuntimeException('Application not initialized');
 
         if (isset($name)) {
             return $di->get($name);

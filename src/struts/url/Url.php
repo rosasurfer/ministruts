@@ -7,14 +7,10 @@ use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\di\proxy\Request;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 
-use const rosasurfer\ministruts\CLI;
-
-
 /**
  * URL generation helper
  */
 class Url extends CObject {
-
 
     /** @var string - URI as passed to the constructor */
     protected string $uri;

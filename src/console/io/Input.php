@@ -6,6 +6,7 @@ namespace rosasurfer\ministruts\console\io;
 use rosasurfer\ministruts\console\docopt\DocoptResult;
 use rosasurfer\ministruts\core\CObject;
 
+use function rosasurfer\ministruts\preg_match;
 
 /**
  * Input
@@ -13,7 +14,6 @@ use rosasurfer\ministruts\core\CObject;
  * An object providing access to parsed command line arguments.
  */
 class Input extends CObject {
-
 
     /** @var ?DocoptResult */
     private ?DocoptResult $docoptResult = null;
@@ -92,15 +92,17 @@ class Input extends CObject {
      * @return bool
      */
     public function isArgument(string $name): bool {
-        if (!$this->docoptResult) return false;
-
-        if (!($len=strlen($name)) || !key_exists($name, $this->docoptResult->getArgs()))
+        if (!$this->docoptResult) {
             return false;
+        }
+        if (!($len=strlen($name)) || !key_exists($name, $this->docoptResult->getArgs())) {
+            return false;
+        }
 
-        $isBracketed = ('<'==$name[0] && $name[$len-1]=='>');
+        $isBracketed = ($name[0]=='<' && $name[$len-1]=='>');
         $isUpperCase = ($name == strtoupper($name));
 
-        return ($isBracketed || $isUpperCase);
+        return $isBracketed || $isUpperCase;
     }
 
 
@@ -113,8 +115,9 @@ class Input extends CObject {
      * @return ?string - argument value or NULL if the argument was not specified
      */
     public function getArgument(string $name): ?string {
-        if (!$this->docoptResult) return null;
-
+        if (!$this->docoptResult) {
+            return null;
+        }
         if ($this->isArgument($name)) {
             /** @var string|string[]|null $value */
             $value = $this->docoptResult[$name];
@@ -136,8 +139,9 @@ class Input extends CObject {
      * @return string[] - argument values or an empty array if the argument was not specified
      */
     public function getArguments(string $name): array {
-        if (!$this->docoptResult) return [];
-
+        if (!$this->docoptResult) {
+            return [];
+        }
         if ($this->isArgument($name)) {
             /** @var string|string[]|null $value */
             $value = $this->docoptResult[$name];

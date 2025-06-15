@@ -5,12 +5,12 @@ namespace rosasurfer\ministruts\net\http;
 
 use rosasurfer\ministruts\core\CObject;
 
+use function rosasurfer\ministruts\preg_match;
 
 /**
  * HeaderParser
  */
 class HeaderParser extends CObject {
-
 
     /** @var array<string, string[]> */
     protected array $headers = [];

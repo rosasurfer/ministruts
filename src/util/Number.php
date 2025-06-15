@@ -5,7 +5,6 @@ namespace rosasurfer\ministruts\util;
 
 use rosasurfer\ministruts\core\StaticClass;
 
-
 /**
  * Number
  */

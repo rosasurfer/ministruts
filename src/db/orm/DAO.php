@@ -14,15 +14,14 @@ use rosasurfer\ministruts\db\MultipleRecordsException;
 use rosasurfer\ministruts\db\NoSuchRecordException;
 use rosasurfer\ministruts\db\ResultInterface as IResult;
 use rosasurfer\ministruts\db\orm\meta\EntityMapping;
-
+use rosasurfer\ministruts\phpstan\ArrayShapes;
 
 /**
  * Abstract DAO base class.
  *
- * @phpstan-import-type ORM_ENTITY from \rosasurfer\ministruts\phpstan\CustomTypes
+ * @phpstan-import-type ORM_ENTITY from ArrayShapes
  */
 abstract class DAO extends Singleton {
-
 
     /** @var ?IConnector - the db connector for this DAO */
     private ?IConnector $connector = null;
@@ -44,19 +43,19 @@ abstract class DAO extends Singleton {
      */
     protected function __construct() {
         parent::__construct();
-        $this->entityClass = substr(get_class($this), 0, -3);
+        $this->entityClass = substr(static::class, 0, -3);
     }
 
 
     /**
      * Get the specified DAO implementation.
      *
-     * @param  string $class - concrete DAO class name
+     * @param  class-string<DAO> $class - concrete DAO class name
      *
      * @return DAO
      */
-    final public static function getImplementation(string $class): DAO {
-        if (!is_subclass_of($class, __CLASS__, true)) {
+    final public static function getImplementation(string $class): self {
+        if (!is_subclass_of($class, __CLASS__, true)) {     // @phpstan-ignore function.alreadyNarrowedType ("class-string" is not a native type)
             throw new InvalidValueException("Invalid parameter \$class: $class (not a subclass of ".__CLASS__.')');
         }
         /** @var self $dao */
@@ -203,7 +202,7 @@ abstract class DAO extends Singleton {
      */
     protected function parseMapping(array $mapping): array {
         $entityClass = '?';
-        $configError = function(string $message) use (&$entityClass): void {
+        $configError = static function(string $message) use (&$entityClass): void {
             ORM::configError("$message in mapping of $entityClass");
         };
         $entity = [];
@@ -309,7 +308,7 @@ abstract class DAO extends Singleton {
             $type = $userdata['type'] ?? $configError("missing attribute [relations][$i][@name=$name \"type\"]");
             Assert::string($type, "invalid attribute [relations][$i][@name=$name \"type\"] (string expected)");
             $type = trim($type);
-            if (!in_array($type, $relationTypes)) {
+            if (!\in_array($type, $relationTypes, true)) {
                 $configError("invalid attribute [relations][$i][@name=$name \"type\"] (one of \"".join('|', $relationTypes)."\" expected)");
             }
             $relation['type'] = $type;
@@ -442,7 +441,7 @@ abstract class DAO extends Singleton {
     private function validateJoinTableSettings(array $userdata, array $relation, bool $optional, int $pos, string $class): array {
         $name = $relation['name'] ?? '';
         $i = $pos;
-        $configError = function(string $message) use ($class): void {
+        $configError = static function(string $message) use ($class): void {
             ORM::configError("$message in mapping of $class");
         };
         $newData = [];

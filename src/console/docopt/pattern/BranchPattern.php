@@ -5,12 +5,10 @@ namespace rosasurfer\ministruts\console\docopt\pattern;
 
 use function rosasurfer\ministruts\array_merge;
 
-
 /**
  * BranchPattern
  */
 abstract class BranchPattern extends Pattern {
-
 
     /**
      * @param  Pattern|Pattern[]|null $children [optional]
@@ -32,8 +30,9 @@ abstract class BranchPattern extends Pattern {
      * {@inheritDoc}
      */
     public function flat(array $types = []): array {
-        if (in_array(get_class($this), $types))
+        if (\in_array(static::class, $types, true)) {
             return [$this];
+        }
         $flat = [];
         foreach ($this->children as $c) {
             $flat = array_merge($flat, $c->flat($types));

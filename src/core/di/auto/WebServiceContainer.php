@@ -8,7 +8,6 @@ use rosasurfer\ministruts\core\di\Di;
 use rosasurfer\ministruts\core\di\service\Service;
 use rosasurfer\ministruts\struts\Request;
 
-
 /**
  * Default dependency injector automatically created for web applications.
  *
@@ -16,7 +15,6 @@ use rosasurfer\ministruts\struts\Request;
  * related services provided by the framework and user-defined services loaded from the file "{app.dir.config}/services.php".
  */
 class WebServiceContainer extends Di {
-
 
     /**
      * Constructor

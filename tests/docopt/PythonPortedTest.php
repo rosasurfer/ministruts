@@ -20,7 +20,6 @@ use rosasurfer\ministruts\console\docopt\pattern\Required;
 
 use function rosasurfer\ministruts\docopt;
 
-
 /**
  * Tests ported from Python to PHPUnit
  */
@@ -34,9 +33,10 @@ class PythonPortedTest extends TestCase {
 
         $this->assertEquals(
             $required->flat(),
-            [new Argument('N'), new Option('-a'), new Argument('M')]
+            [new Argument('N'), new Option('-a'), new Argument('M')],
         );
     }
+
 
     /**
      *
@@ -66,6 +66,7 @@ class PythonPortedTest extends TestCase {
         $this->assertEquals(Option::parse('-h TOPIC  Description... [dEfAuLt: 2]'),       new Option('-h', null, 1, '2'));
     }
 
+
     /**
      *
      */
@@ -79,6 +80,7 @@ class PythonPortedTest extends TestCase {
         $option = new Option(null, '--help');
         $this->assertSame($option->name(), '--help');
     }
+
 
     /**
      *
@@ -95,6 +97,7 @@ class PythonPortedTest extends TestCase {
         $this->assertSame($this->docopt('Usage: prog a b', 'b a')->getError(), 1);
     }
 
+
     /**
      *
      */
@@ -103,36 +106,40 @@ class PythonPortedTest extends TestCase {
             "Usage: prog [-hv] ARG\n"
            ."           prog N M\n"
            ."\n"
-           ."prog is a program"
-        ;
+           ."prog is a program";
 
-        list($usage, ) = TestParser::parseSection('usage:', $doc);
+        [$usage, ] = TestParser::parseSection('usage:', $doc);
 
         $this->assertSame($usage, "Usage: prog [-hv] ARG\n           prog N M");
         $this->assertSame(TestParser::formalUsage($usage), "( [-hv] ARG ) | ( N M )");
     }
+
 
     /**
      *
      */
     public function testParseArgv(): void {
         $o = new OptionIterator([new Option('-h'), new Option('-v', '--verbose'), new Option('-f', '--file', 1)]);
-        $ts = function($src) {
-            return new TokenIterator($src);
-        };
+        $ts = static fn(string $src) => new TokenIterator($src);
 
         $this->assertEquals(TestParser::parseArgs($ts(''), $o), []);
         $this->assertEquals(
             TestParser::parseArgs($ts('-h'), $o),
-            [new Option('-h', null, 0, true)]
+            [new Option('-h', null, 0, true)],
         );
         $this->assertEquals(
             TestParser::parseArgs($ts('-h --verbose'), $o),
-            [new Option('-h', null, 0, true), new Option('-v', '--verbose', 0, true)]
+            [
+             new Option('-h', null, 0, true),
+             new Option('-v', '--verbose', 0, true),
+            ],
         );
         $this->assertEquals(
             TestParser::parseArgs($ts('-h --file f.txt'), $o),
-            [new Option('-h', null, 0, true), new Option('-f', '--file', 1, 'f.txt')]
+            [
+             new Option('-h', null, 0, true),
+             new Option('-f', '--file', 1, 'f.txt'),
+            ],
         );
         $this->assertEquals(
             TestParser::parseArgs($ts('-h --file f.txt arg'), $o),
@@ -140,7 +147,7 @@ class PythonPortedTest extends TestCase {
              new Option('-h', null, 0, true),
              new Option('-f', '--file', 1, 'f.txt'),
              new Argument(null, 'arg'),
-            ]
+            ],
         );
         $this->assertEquals(
             TestParser::parseArgs($ts('-h --file f.txt arg arg2'), $o),
@@ -149,7 +156,7 @@ class PythonPortedTest extends TestCase {
              new Option('-f', '--file', 1, 'f.txt'),
              new Argument(null, 'arg'),
              new Argument(null, 'arg2'),
-            ]
+            ],
         );
         $this->assertEquals(
             TestParser::parseArgs($ts('-h arg -- -v'), $o),
@@ -158,9 +165,10 @@ class PythonPortedTest extends TestCase {
              new Argument(null, 'arg'),
              new Argument(null, '--'),
              new Argument(null, '-v'),
-            ]
+            ],
         );
     }
+
 
     /**
      *
@@ -170,60 +178,61 @@ class PythonPortedTest extends TestCase {
 
         $this->assertEquals(
             TestParser::parsePattern('[ -h ]', $o),
-            new Required(new Optional(new Option('-h')))
+            new Required(new Optional(new Option('-h'))),
         );
         $this->assertEquals(
             TestParser::parsePattern('[ ARG ... ]', $o),
-            new Required(new Optional(new OneOrMore(new Argument('ARG'))))
+            new Required(new Optional(new OneOrMore(new Argument('ARG')))),
         );
         $this->assertEquals(
             TestParser::parsePattern('[ -h | -v ]', $o),
-            new Required(new Optional(
-                new Either(new Option('-h'), new Option('-v', '--verbose'))
-            ))
+            new Required(new Optional(new Either(new Option('-h'), new Option('-v', '--verbose')))),
         );
         $this->assertEquals(
             TestParser::parsePattern('( -h | -v [ --file <f> ] )', $o),
-            new Required(new Required(new Either(new Option('-h'), new Required(new Option('-v', '--verbose'), new Optional(new Option('-f', '--file', 1, null))))))
+            new Required(new Required(new Either(new Option('-h'), new Required(new Option('-v', '--verbose'), new Optional(new Option('-f', '--file', 1, null)))))),
         );
         $this->assertEquals(
             TestParser::parsePattern('(-h|-v[--file=<f>]N...)', $o),
             new Required(new Required(new Either(new Option('-h'),
             new Required(new Option('-v', '--verbose'),
             new Optional(new Option('-f', '--file', 1, null)),
-            new OneOrMore(new Argument('N'))))))
+            new OneOrMore(new Argument('N')))))),
         );
         $this->assertEquals(
             TestParser::parsePattern('(N [M | (K | L)] | O P)', new OptionIterator([])),
             new Required(new Required(new Either(new Required(new Argument('N'),
             new Optional(new Either(new Argument('M'), new Required(
             new Either(new Argument('K'), new Argument('L')))))),
-            new Required(new Argument('O'), new Argument('P')))))
+            new Required(new Argument('O'), new Argument('P'))))),
         );
         $this->assertEquals(
             TestParser::parsePattern('[ -h ] [N]', $o),
             new Required(
                 new Optional(new Option('-h')),
-                new Optional(new Argument('N'))
-            )
+                new Optional(new Argument('N')),
+            ),
         );
         $this->assertEquals(
             TestParser::parsePattern('[options]', $o),
-            new Required(new Optional(new OptionsShortcut()))
+            new Required(new Optional(new OptionsShortcut())),
         );
-        $this->assertEquals(TestParser::parsePattern('[options] A', $o),
+        $this->assertEquals(
+            TestParser::parsePattern('[options] A', $o),
             new Required(
             new Optional(new OptionsShortcut()),
-            new Argument('A'))
+            new Argument('A')),
         );
-        $this->assertEquals(TestParser::parsePattern('-v [options]', $o),
+        $this->assertEquals(
+            TestParser::parsePattern('-v [options]', $o),
             new Required(new Option('-v', '--verbose'),
-            new Optional(new OptionsShortcut()))
+            new Optional(new OptionsShortcut())),
         );
         $this->assertEquals(TestParser::parsePattern('ADD',   $o), new Required(new Argument('ADD')));
         $this->assertEquals(TestParser::parsePattern('<add>', $o), new Required(new Argument('<add>')));
         $this->assertEquals(TestParser::parsePattern('add',   $o), new Required(new Command('add')));
     }
+
 
     /**
      *
@@ -232,33 +241,34 @@ class PythonPortedTest extends TestCase {
         $option = new Option('-a');
         $this->assertEquals(
             $option->match([new Option('-a', null, 0, true)]),
-            [true, [], [new Option('-a', null, 0, true)]]
+            [true, [], [new Option('-a', null, 0, true)]],
         );
 
         $option = new Option('-a');
         $this->assertEquals(
             $option->match([new Option('-x')]),
-            [false, array(new Option('-x')), []]
+            [false, array(new Option('-x')), []],
         );
 
         $option = new Option('-a');
         $this->assertEquals(
             $option->match([new Argument('N')]),
-            [false, array(new Argument('N')), []]
+            [false, array(new Argument('N')), []],
         );
 
         $option = new Option('-a');
         $this->assertEquals(
             $option->match([new Option('-x'), new Option('-a'), new Argument('N')]),
-            [true, array(new Option('-x'), new Argument('N')), array(new Option('-a'))]
+            [true, array(new Option('-x'), new Argument('N')), array(new Option('-a'))],
         );
 
         $option = new Option('-a');
         $this->assertEquals(
             $option->match([new Option('-a', null, 0, true), new Option('-a')]),
-            [true, array(new Option('-a')), array(new Option('-a', null, 0, true))]
+            [true, array(new Option('-a')), array(new Option('-a', null, 0, true))],
         );
     }
+
 
     /**
      *
@@ -267,27 +277,28 @@ class PythonPortedTest extends TestCase {
         $argument = new Argument('N');
         $this->assertEquals(
             $argument->match([new Argument(null, 9)]),
-            [true, [], [new Argument('N', 9)]]
+            [true, [], [new Argument('N', 9)]],
         );
 
         $argument = new Argument('N');
         $this->assertEquals(
             $argument->match([new Option('-x')]),
-            [false, [new Option('-x')], []]
+            [false, [new Option('-x')], []],
         );
 
         $argument = new Argument('N');
         $this->assertEquals(
             $argument->match([new Option('-x'), new Option('-a'), new Argument(null, 5)]),
-            [true, [new Option('-x'), new Option('-a')], [new Argument('N', 5)]]
+            [true, [new Option('-x'), new Option('-a')], [new Argument('N', 5)]],
         );
 
         $argument = new Argument('N');
         $this->assertEquals(
             $argument->match([new Argument(null, 9), new Argument(null, 0)]),
-            [true, [new Argument(null, 0)], [new Argument('N', 9)]]
+            [true, [new Argument(null, 0)], [new Argument('N', 9)]],
         );
     }
+
 
     /**
      *
@@ -296,27 +307,28 @@ class PythonPortedTest extends TestCase {
         $command = new Command('c');
         $this->assertEquals(
             $command->match([new Argument(null, 'c')]),
-            [true, [], [new Command('c', true)]]
+            [true, [], [new Command('c', true)]],
         );
 
         $command = new Command('c');
         $this->assertEquals(
             $command->match([new Option('-x')]),
-            [false, [new Option('-x')], []]
+            [false, [new Option('-x')], []],
         );
 
         $command = new Command('c');
         $this->assertEquals(
             $command->match([new Option('-x'), new Option('-a'), new Argument(null, 'c')]),
-            [true, [new Option('-x'), new Option('-a')], [new Command('c', true)]]
+            [true, [new Option('-x'), new Option('-a')], [new Command('c', true)]],
         );
 
         $either = new Either(new Command('add', false), new Command('rm', false));
         $this->assertEquals(
             $either->match([new Argument(null, 'rm')]),
-            [true, [], [new Command('rm', true)]]
+            [true, [], [new Command('rm', true)]],
         );
     }
+
 
     /**
      *
@@ -325,51 +337,52 @@ class PythonPortedTest extends TestCase {
         $optional = new Optional(new Option('-a'));
         $this->assertEquals(
             $optional->match([new Option('-a')]),
-            [true, [], [new Option('-a')]]
+            [true, [], [new Option('-a')]],
         );
 
         $optional = new Optional(new Option('-a'));
         $this->assertEquals(
             $optional->match([]),
-            [true, [], []]
+            [true, [], []],
         );
 
         $optional = new Optional(new Option('-a'));
         $this->assertEquals(
             $optional->match([new Option('-x')]),
-            [true, [new Option('-x')], []]
+            [true, [new Option('-x')], []],
         );
 
         $optional = new Optional(new Option('-a'), new Option('-b'));
         $this->assertEquals(
             $optional->match([new Option('-a')]),
-            [true, [], [new Option('-a')]]
+            [true, [], [new Option('-a')]],
         );
 
         $optional = new Optional(new Option('-a'), new Option('-b'));
         $this->assertEquals(
             $optional->match([new Option('-b')]),
-            [true, [], [new Option('-b')]]
+            [true, [], [new Option('-b')]],
         );
 
         $optional = new Optional(new Option('-a'), new Option('-b'));
         $this->assertEquals(
             $optional->match([new Option('-x')]),
-            [true, [new Option('-x')], []]
+            [true, [new Option('-x')], []],
         );
 
         $optional = new Optional(new Argument('N'));
         $this->assertEquals(
             $optional->match([new Argument(null, 9)]),
-            [true, [], [new Argument('N', 9)]]
+            [true, [], [new Argument('N', 9)]],
         );
 
         $optional = new Optional(new Option('-a'), new Option('-b'));
         $this->assertEquals(
             $optional->match([new Option('-b'), new Option('-x'), new Option('-a')]),
-            [true, [new Option('-x')], [new Option('-a'), new Option('-b')]]
+            [true, [new Option('-x')], [new Option('-a'), new Option('-b')]],
         );
     }
+
 
     /**
      *
@@ -378,27 +391,28 @@ class PythonPortedTest extends TestCase {
         $required = new Required(new Option('-a'));
         $this->assertEquals(
             $required->match([new Option('-a')]),
-            [true, [], array(new Option('-a'))]
+            [true, [], array(new Option('-a'))],
         );
 
         $required = new Required(new Option('-a'));
         $this->assertEquals(
             $required->match([]),
-            [false, [], []]
+            [false, [], []],
         );
 
         $required = new Required(new Option('-a'));
         $this->assertEquals(
             $required->match([new Option('-x')]),
-            [false, array(new Option('-x')), []]
+            [false, array(new Option('-x')), []],
         );
 
         $required = new Required(new Option('-a'), new Option('-b'));
         $this->assertEquals(
             $required->match([new Option('-a')]),
-            [false, array(new Option('-a')), []]
+            [false, array(new Option('-a')), []],
         );
     }
+
 
     /**
      *
@@ -407,33 +421,34 @@ class PythonPortedTest extends TestCase {
         $either = new Either(new Option('-a'), new Option('-b'));
         $this->assertEquals(
             $either->match([new Option('-a')]),
-            [true, [], [new Option('-a')]]
+            [true, [], [new Option('-a')]],
         );
 
         $either = new Either(new Option('-a'), new Option('-b'));
         $this->assertEquals(
             $either->match([new Option('-a'), new Option('-b')]),
-            [true, [new Option('-b')], [new Option('-a')]]
+            [true, [new Option('-b')], [new Option('-a')]],
         );
 
         $either = new Either(new Option('-a'), new Option('-b'));
         $this->assertEquals(
-            $either->match(array(new Option('-x'))),
-            array(false, array(new Option('-x')), [])
+            $either->match([new Option('-x')]),
+            [false, [new Option('-x')], []],
         );
 
         $either = new Either(new Option('-a'), new Option('-b'), new Option('-c'));
         $this->assertEquals(
-            $either->match(array(new Option('-x'), new Option('-b'))),
-            array(true, array(new Option('-x')), array(new Option('-b')))
+            $either->match([new Option('-x'), new Option('-b')]),
+            [true, [new Option('-x')], [new Option('-b')]],
         );
 
         $either = new Either(new Argument('M'), new Required(new Argument('N'), new Argument('M')));
         $this->assertEquals(
-            $either->match(array(new Argument(null, 1), new Argument(null, 2))),
-            array(true, [], array(new Argument('N', 1), new Argument('M', 2)))
+            $either->match([new Argument(null, 1), new Argument(null, 2)]),
+            [true, [], [new Argument('N', 1), new Argument('M', 2)]],
         );
     }
+
 
     /**
      *
@@ -442,57 +457,58 @@ class PythonPortedTest extends TestCase {
         $oneOrMore = new OneOrMore(new Argument('N'));
         $this->assertEquals(
             $oneOrMore->match(array(new Argument(null, 9))),
-            array(true, [], array(new Argument('N', 9)))
+            array(true, [], array(new Argument('N', 9))),
         );
 
         $oneOrMore = new OneOrMore(new Argument('N'));
         $this->assertEquals(
             $oneOrMore->match([]),
-            array(false, [], [])
+            [false, [], []],
         );
 
         $oneOrMore = new OneOrMore(new Argument('N'));
         $this->assertEquals(
             $oneOrMore->match(array(new Option('-x'))),
-            array(false, array(new Option('-x')), [])
+            [false, array(new Option('-x')), []],
         );
 
         $oneOrMore = new OneOrMore(new Argument('N'));
         $this->assertEquals(
             $oneOrMore->match(array(new Argument(null, 9), new Argument(null, 8))),
-            array(true, [], array(new Argument('N', 9), new Argument('N', 8)))
+            array(true, [], array(new Argument('N', 9), new Argument('N', 8))),
         );
 
         $oneOrMore = new OneOrMore(new Argument('N'));
         $this->assertEquals(
             $oneOrMore->match(array(new Argument(null, 9), new Option('-x'), new Argument(null, 8))),
-            array(true, array(new Option('-x')), array(new Argument('N', 9), new Argument('N', 8)))
+            array(true, array(new Option('-x')), array(new Argument('N', 9), new Argument('N', 8))),
         );
 
         $oneOrMore = new OneOrMore(new Option('-a'));
         $this->assertEquals(
             $oneOrMore->match(array(new Option('-a'), new Argument(null, 8), new Option('-a'))),
-            array(true, array(new Argument(null, 8)), array(new Option('-a'), new Option('-a')))
+            array(true, array(new Argument(null, 8)), array(new Option('-a'), new Option('-a'))),
         );
 
         $oneOrMore = new OneOrMore(new Option('-a'));
         $this->assertEquals(
             $oneOrMore->match(array(new Argument(null, 8), new Option('-x'))),
-            array(false, array(new Argument(null, 8), new Option('-x')), [])
+            array(false, array(new Argument(null, 8), new Option('-x')), []),
         );
 
         $oneOrMore = new OneOrMore(new Required(new Option('-a'), new Argument('N')));
         $this->assertEquals(
             $oneOrMore->match(array(new Option('-a'), new Argument(null, 1), new Option('-x'), new Option('-a'), new Argument(null, 2))),
-            array(true, array(new Option('-x')), array(new Option('-a'), new Argument('N', 1), new Option('-a'), new Argument('N', 2)))
+            array(true, array(new Option('-x')), array(new Option('-a'), new Argument('N', 1), new Option('-a'), new Argument('N', 2))),
         );
 
         $oneOrMore = new OneOrMore(new Optional(new Argument('N')));
         $this->assertEquals(
             $oneOrMore->match(array(new Argument(null, 9))),
-            array(true, [], array(new Argument('N', 9)))
+            array(true, [], array(new Argument('N', 9))),
         );
     }
+
 
     /**
      *
@@ -502,27 +518,28 @@ class PythonPortedTest extends TestCase {
 
         $this->assertEquals(
             $input->fix()->match([new Argument(null, '1'), new Argument(null, '2')]),
-            [true, [], [new Argument('N', ['1', '2'])]]
+            [true, [], [new Argument('N', ['1', '2'])]],
         );
 
         $input = new OneOrMore(new Argument('N'));
         $this->assertEquals(
             $input->fix()->match(array(new Argument(null, '1'), new Argument(null, '2'), new Argument(null, '3'))),
-            array(true, [], array(new Argument('N', array('1', '2', '3'))))
+            array(true, [], array(new Argument('N', array('1', '2', '3')))),
         );
 
         $input = new Required(new Argument('N'), new OneOrMore(new Argument('N')));
         $this->assertEquals(
             $input->fix()->match(array(new Argument(null, '1'), new Argument(null, '2'), new Argument(null, '3'))),
-            array(true, [], array(new Argument('N', array('1', '2', '3'))))
+            array(true, [], array(new Argument('N', array('1', '2', '3')))),
         );
 
         $input = new Required(new Argument('N'), new Required(new Argument('N')));
         $this->assertEquals(
             $input->fix()->match(array(new Argument(null, '1'), new Argument(null, '2'))),
-            array(true, [], array(new Argument('N', array('1', '2'))))
+            array(true, [], array(new Argument('N', array('1', '2')))),
         );
     }
+
 
     /**
      *
@@ -534,21 +551,22 @@ class PythonPortedTest extends TestCase {
         // -a N
         $this->assertEquals(
             $pattern->match(array(new Option('-a'), new Argument(null, 9))),
-            array(true, [], array(new Option('-a'), new Argument('N', 9)))
+            array(true, [], array(new Option('-a'), new Argument('N', 9))),
         );
 
         // -a -x N Z
         $this->assertEquals(
             $pattern->match(array(new Option('-a'), new Option('-x'), new Argument(null, 9), new Argument(null, 5))),
-            array(true, [], array(new Option('-a'), new Argument('N', 9), new Option('-x'), new Argument('Z', 5)))
+            array(true, [], array(new Option('-a'), new Argument('N', 9), new Option('-x'), new Argument('Z', 5))),
         );
 
         // -x N Z  # BZZ!
         $this->assertEquals(
             $pattern->match(array(new Option('-x'), new Argument(null, 9), new Argument(null, 5))),
-            array(false, array(new Option('-x'), new Argument(null, 9), new Argument(null, 5)), [])
+            array(false, array(new Option('-x'), new Argument(null, 9), new Argument(null, 5)), []),
         );
     }
+
 
     /**
      *
@@ -557,13 +575,13 @@ class PythonPortedTest extends TestCase {
         $input = new Option('-a');
         $this->assertEquals(
             TestPattern::transform($input),
-            new Either(new Required(new Option('-a')))
+            new Either(new Required(new Option('-a'))),
         );
 
         $input = new Argument('A');
         $this->assertEquals(
             TestPattern::transform($input),
-            new Either(new Required(new Argument('A')))
+            new Either(new Required(new Argument('A'))),
         );
 
         $input = new Required(new Either(new Option('-a'), new Option('-b')), new Option('-c'));
@@ -571,8 +589,8 @@ class PythonPortedTest extends TestCase {
             TestPattern::transform($input),
             new Either(
                 new Required(new Option('-a'), new Option('-c')),
-                new Required(new Option('-b'), new Option('-c'))
-            )
+                new Required(new Option('-b'), new Option('-c')),
+            ),
         );
 
         $input = new Optional(new Option('-a'), new Either(new Option('-b'), new Option('-c')));
@@ -580,26 +598,34 @@ class PythonPortedTest extends TestCase {
             TestPattern::transform($input),
             new Either(
                 new Required(new Option('-b'), new Option('-a')),
-                new Required(new Option('-c'), new Option('-a'))
-            )
+                new Required(new Option('-c'), new Option('-a')),
+            ),
         );
 
         $input = new Either(new Option('-x'), new Either(new Option('-y'), new Option('-z')));
         $this->assertEquals(
             TestPattern::transform($input),
             new Either(
-                new Required(new Option('-x')),
+               new Required(new Option('-x')),
                new Required(new Option('-y')),
-               new Required(new Option('-z'))
-            )
+               new Required(new Option('-z')),
+            ),
         );
 
         $input = new OneOrMore(new Argument('N'), new Argument('M'));
         $this->assertEquals(
             TestPattern::transform($input),
-            new Either(new Required(new Argument('N'), new Argument('M'), new Argument('N'), new Argument('M')))
+            new Either(
+                new Required(
+                    new Argument('N'),
+                    new Argument('M'),
+                    new Argument('N'),
+                    new Argument('M'),
+                ),
+            ),
         );
     }
+
 
     /**
      *
@@ -614,15 +640,16 @@ class PythonPortedTest extends TestCase {
         $input = new Required(new Argument('N'), new Argument('N'));
         $this->assertEquals(
             $input->fixRepeatingArguments(),
-            new Required(new Argument('N', []), new Argument('N', []))
+            new Required(new Argument('N', []), new Argument('N', [])),
         );
 
         $input = new Either(new Argument('N'), new OneOrMore(new Argument('N')));
         $this->assertEquals(
             $input->fix(),
-            new Either(new Argument('N', []), new OneOrMore(new Argument('N', [])))
+            new Either(new Argument('N', []), new OneOrMore(new Argument('N', []))),
         );
     }
+
 
     /**
      *
@@ -631,9 +658,10 @@ class PythonPortedTest extends TestCase {
         $this->assertEquals(new Argument('N'), new Argument('N'));
         $this->assertEquals(
             array_unique(array(new Argument('N'), new Argument('N'))),
-            array(new Argument('N'))
+            array(new Argument('N')),
         );
     }
+
 
     /**
      *
@@ -646,6 +674,7 @@ class PythonPortedTest extends TestCase {
         $this->assertSame($pattern->children[0], $pattern->children[1]);
     }
 
+
     /**
      *
      */
@@ -656,6 +685,7 @@ class PythonPortedTest extends TestCase {
         $pattern->fixIdentities();
         $this->assertSame($pattern->children[0]->children[1], $pattern->children[1]);
     }
+
 
     /**
      *
@@ -675,6 +705,7 @@ class PythonPortedTest extends TestCase {
         $this->assertFalse($result->isSuccess());
     }
 
+
     /**
      *
      */
@@ -682,6 +713,7 @@ class PythonPortedTest extends TestCase {
         $this->expectException(DocoptFormatError::class);
         $this->docopt("Usage: prog --long\nOptions: --long ARG");
     }
+
 
     /**
      *
@@ -691,6 +723,7 @@ class PythonPortedTest extends TestCase {
         $this->assertFalse($result->isSuccess());
     }
 
+
     /**
      *
      */
@@ -698,6 +731,7 @@ class PythonPortedTest extends TestCase {
         $this->expectException(DocoptFormatError::class);
         $this->docopt("Usage: prog --long=ARG\nOptions: --long");
     }
+
 
     /**
      *
@@ -707,6 +741,7 @@ class PythonPortedTest extends TestCase {
         $this->assertFalse($result->isSuccess());
     }
 
+
     /**
      *
      */
@@ -714,6 +749,7 @@ class PythonPortedTest extends TestCase {
         $this->expectException(DocoptFormatError::class);
         $this->docopt("Usage: prog -x\nOptions: -x  this\n -x  that");
     }
+
 
     /**
      *
@@ -723,6 +759,7 @@ class PythonPortedTest extends TestCase {
         $this->assertFalse($result->isSuccess());
     }
 
+
     /**
      *
      */
@@ -730,6 +767,7 @@ class PythonPortedTest extends TestCase {
         $this->expectException(DocoptFormatError::class);
         $this->docopt("Usage: prog -o\nOptions: -o ARG");
     }
+
 
     /**
      *
@@ -739,6 +777,7 @@ class PythonPortedTest extends TestCase {
         $this->assertFalse($result->isSuccess());
     }
 
+
     /**
      *
      */
@@ -746,6 +785,7 @@ class PythonPortedTest extends TestCase {
         $this->expectException(DocoptFormatError::class);
         $this->docopt('Usage: prog [a [b]');
     }
+
 
     /**
      *
@@ -755,23 +795,25 @@ class PythonPortedTest extends TestCase {
         $this->docopt('Usage: prog [a [b] ] c )');
     }
 
+
     /**
      *
      */
     function testAllowDoubleDash(): void {
         $this->assertEquals(
             $this->docopt("usage: prog [-o] [--] <arg>\nOptions: -o", '-- -o')->getArgs(),
-            array('-o'=> false, '<arg>'=>'-o', '--'=>true)
+            array('-o'=> false, '<arg>'=>'-o', '--'=>true),
         );
 
         $this->assertEquals(
             $this->docopt("usage: prog [-o] [--] <arg>\nOptions: -o", '-o 1')->getArgs(),
-            array('-o'=>true, '<arg>'=>'1', '--'=>false)
+            array('-o'=>true, '<arg>'=>'1', '--'=>false),
         );
 
         $result = $this->docopt("usage: prog [-o] <arg>\nOptions: -o", '-- -o');    // "--" is not allowed; FIXME?
         $this->assertFalse($result->isSuccess());
     }
+
 
     /**
      *
@@ -797,13 +839,13 @@ class PythonPortedTest extends TestCase {
         $a = $this->docopt($doc, '-v file.py');
         $this->assertEquals(
             $a->getArgs(),
-            array('-v'=>true, '-q'=>false, '-r'=>false, '--help'=>false, 'FILE'=>'file.py', 'INPUT'=>null, 'OUTPUT'=>null)
+            array('-v'=>true, '-q'=>false, '-r'=>false, '--help'=>false, 'FILE'=>'file.py', 'INPUT'=>null, 'OUTPUT'=>null),
         );
 
         $a = $this->docopt($doc, '-v');
         $this->assertEquals(
             $a->getArgs(),
-            array('-v'=>true, '-q'=>false, '-r'=>false, '--help'=>false, 'FILE'=>null, 'INPUT'=>null, 'OUTPUT'=>null)
+            array('-v'=>true, '-q'=>false, '-r'=>false, '--help'=>false, 'FILE'=>null, 'INPUT'=>null, 'OUTPUT'=>null),
         );
 
         $result = $this->docopt($doc, '-v input.py output.py');
@@ -816,6 +858,7 @@ class PythonPortedTest extends TestCase {
         $this->assertTrue($result['--help']);
     }
 
+
     /**
      *
      */
@@ -824,6 +867,7 @@ class PythonPortedTest extends TestCase {
         $this->docopt('no usage with colon here');
     }
 
+
     /**
      *
      */
@@ -831,6 +875,7 @@ class PythonPortedTest extends TestCase {
         $this->expectException(DocoptFormatError::class);
         $this->docopt("usage: here \n\n and again usage: here");
     }
+
 
     /**
      *
@@ -841,9 +886,10 @@ class PythonPortedTest extends TestCase {
 
         $this->assertEquals(
             $this->docopt('usage: prog --aabb | --aa', '--aa')->getArgs(),
-            array('--aabb'=>false, '--aa'=>true)
+            array('--aabb'=>false, '--aa'=>true),
         );
     }
+
 
     /**
      *
@@ -861,6 +907,7 @@ class PythonPortedTest extends TestCase {
         $this->assertEquals($this->docopt('usage: prog -v...', '-vvvvvv')->getArgs(), array('-v'=>6));
         $this->assertEquals($this->docopt('usage: prog [--ver --ver]', '--ver --ver')->getArgs(), array('--ver'=>2));
     }
+
 
     /**
      *
@@ -899,16 +946,17 @@ class PythonPortedTest extends TestCase {
         //);
     }
 
-    #def test_options_shortcut_multiple_commands():
-    #    # any_options is disabled
-    #    $this->assertEquals(
-    #        $this->docopt('usage: prog c1 [options] prog c2 [options]', 'c2 -o', $any_options=true),
-    #        array('-o'=>true, 'c1'=>false, 'c2'=>true)
-    #    );
-    #    $this->assertEquals(
-    #        $this->docopt('usage: prog c1 [options] prog c2 [options]', 'c1 -o', $any_options=true),
-    #        array('-o'=>true, 'c1'=>true, 'c2'=>false)
-    #    );
+    // def test_options_shortcut_multiple_commands():
+    //     # any_options is disabled
+    //     $this->assertEquals(
+    //         $this->docopt('usage: prog c1 [options] prog c2 [options]', 'c2 -o', $any_options=true),
+    //         array('-o'=>true, 'c1'=>false, 'c2'=>true)
+    //     );
+    //     $this->assertEquals(
+    //         $this->docopt('usage: prog c1 [options] prog c2 [options]', 'c1 -o', $any_options=true),
+    //         array('-o'=>true, 'c1'=>true, 'c2'=>false)
+    //     );
+
 
     /**
      * for some reason removed in the Python version
@@ -916,12 +964,13 @@ class PythonPortedTest extends TestCase {
     public function testOptionsShortcutDoesNotAddOptionsToPatternSecondTime(): void {
         $this->assertEquals(
             $this->docopt("usage: prog [options] [-a]\nOptions: -a -b", '-a')->getArgs(),
-            array('-a'=>true, '-b'=>false)
+            ['-a'=>true, '-b'=>false],
         );
 
         $result = $this->docopt("usage: prog [options] [-a]\nOptions: -a -b", '-aa');
         $this->assertFalse($result->isSuccess());
     }
+
 
     /**
      *
@@ -949,26 +998,27 @@ class PythonPortedTest extends TestCase {
         //$this->assertEquals($args, ['--data'=>['hello world']]);
     }
 
-    #def test_parse_defaults():
-    #    $this->assertEquals(parse_defaults("""usage: prog
-    #
-    #                          -o, --option <o>
-    #                          --another <a>  description
-    #                                         [default: x]
-    #                          <a>
-    #                          <another>  description [default: y]"""),
-    #           ([new Option('-o', '--option', 1, null),
-    #             new Option(null, '--another', 1, 'x')],
-    #            [new Argument('<a>', null),
-    #             new Argument('<another>', 'y')])
-    #
-    #    doc = '''
-    #    -h, --help  Print help message.
-    #    -o FILE     Output file.
-    #    --verbose   Verbose mode.'''
-    #    $this->assertEquals(parse_defaults(doc)[0], [new Option('-h', '--help'),
-    #                                      new Option('-o', null, 1),
-    #                                      new Option(null, '--verbose')]
+    // def test_parse_defaults():
+    //     $this->assertEquals(parse_defaults("""usage: prog
+    //
+    //                           -o, --option <o>
+    //                           --another <a>  description
+    //                                          [default: x]
+    //                           <a>
+    //                           <another>  description [default: y]"""),
+    //            ([new Option('-o', '--option', 1, null),
+    //              new Option(null, '--another', 1, 'x')],
+    //             [new Argument('<a>', null),
+    //              new Argument('<another>', 'y')])
+    //
+    //     doc = '''
+    //     -h, --help  Print help message.
+    //     -o FILE     Output file.
+    //     --verbose   Verbose mode.'''
+    //     $this->assertEquals(parse_defaults(doc)[0], [new Option('-h', '--help'),
+    //                                       new Option('-o', null, 1),
+    //                                       new Option(null, '--verbose')]
+
 
     /**
      *
@@ -978,31 +1028,33 @@ class PythonPortedTest extends TestCase {
         $this->assertEquals($this->docopt("usage: prog -l <a>\noptions: -l <a>", array('-l', ''))->getArgs(), array('-l'=>''));
     }
 
+
     /**
      *
      */
     public function testOptionsFirst(): void {
         $this->assertEquals(
             $this->docopt('usage: prog [--opt] [<args>...]', '--opt this that')->getArgs(),
-            ['--opt'=>true, '<args>'=>['this', 'that']]
+            ['--opt'=>true, '<args>'=>['this', 'that']],
         );
 
         $this->assertEquals(
             $this->docopt('usage: prog [--opt] [<args>...]', 'this that --opt')->getArgs(),
-            ['--opt'=>true, '<args>'=>['this', 'that']]
+            ['--opt'=>true, '<args>'=>['this', 'that']],
         );
 
         $this->assertEquals(
             $this->docopt('usage: prog [--opt] [<args>...]', 'this that --opt', array('optionsFirst'=>true))->getArgs(),
-            array('--opt'=>false, '<args>'=>array('this', 'that', '--opt'))
+            array('--opt'=>false, '<args>'=>array('this', 'that', '--opt')),
         );
 
         // found issue with PHP version in this situation
         $this->assertEquals(
             $this->docopt('usage: prog [--opt=<val>] [<args>...]', ' --opt=foo this that --opt', array('optionsFirst'=>true))->getArgs(),
-            array('--opt'=>'foo', '<args>'=>array('this', 'that', '--opt'))
+            array('--opt'=>'foo', '<args>'=>array('this', 'that', '--opt')),
         );
     }
+
 
     /**
      *
@@ -1015,6 +1067,7 @@ class PythonPortedTest extends TestCase {
         $this->assertFalse($args['-y']);
     }
 
+
     /**
      *
      */
@@ -1026,6 +1079,7 @@ class PythonPortedTest extends TestCase {
         $this->assertFalse($result->isSuccess());
     }
 
+
     /**
      *
      */
@@ -1034,7 +1088,7 @@ class PythonPortedTest extends TestCase {
         $this->assertEquals(TestParser::parseSection('usage:', 'usage: prog'), array('usage: prog'));
         $this->assertEquals(TestParser::parseSection('usage:', "usage: -x\n -y"), array("usage: -x\n -y"));
 
-        $usage = <<<TEST_PARSE_SECTION
+        $usage = <<<PARSE_SECTION
 usage: this
 
 usage:hai
@@ -1052,22 +1106,23 @@ usage:
 Usage: eggs spam
 BAZZ
 usage: pit stop
-TEST_PARSE_SECTION;
+PARSE_SECTION;
 
         $this->assertEquals(
             TestParser::parseSection("usage:", $usage),
-            array(
-                "usage: this",
-                "usage:hai",
-                "usage: this that",
-                "usage: foo\n       bar",
-                "PROGRAM USAGE:\n foo\n bar",
-                "usage:\n\ttoo\n\ttar",
-                "Usage: eggs spam",
-                "usage: pit stop",
-            )
+            [
+             "usage: this",
+             "usage:hai",
+             "usage: this that",
+             "usage: foo\n       bar",
+             "PROGRAM USAGE:\n foo\n bar",
+             "usage:\n\ttoo\n\ttar",
+             "Usage: eggs spam",
+             "usage: pit stop",
+            ],
         );
     }
+
 
     /**
      *
@@ -1076,9 +1131,10 @@ TEST_PARSE_SECTION;
         $section = "Options:\n\t--foo=<arg>  [default: bar]";
         $this->assertEquals(
             TestParser::parseDefaults($section)->getArrayCopy(),
-            array(new Option(null, '--foo', 1, 'bar'))
+            array(new Option(null, '--foo', 1, 'bar')),
         );
     }
+
 
     /**
      * @param  string                     $doc

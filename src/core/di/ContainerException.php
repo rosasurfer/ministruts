@@ -7,7 +7,6 @@ use rosasurfer\ministruts\core\exception\RuntimeException;
 
 use Psr\Container\ContainerExceptionInterface;
 
-
 /**
  * ContainerException
  */

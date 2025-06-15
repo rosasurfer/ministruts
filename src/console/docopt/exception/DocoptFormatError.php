@@ -5,7 +5,6 @@ namespace rosasurfer\ministruts\console\docopt\exception;
 
 use rosasurfer\ministruts\core\exception\RuntimeException;
 
-
 /**
  * DocoptFormatError
  *

@@ -1,15 +1,16 @@
 <?php
-declare(strict_types=1);
-
 /**
  * Helper functions and constants
  */
+declare(strict_types=1);
+
 namespace rosasurfer\ministruts;
 
 use ArrayAccess;
 use Closure;
 use ErrorException;
 use InvalidArgumentException;
+use SimpleXMLElement;
 use Traversable;
 
 use rosasurfer\ministruts\console\docopt\DocoptParser;
@@ -27,7 +28,7 @@ define('rosasurfer\ministruts\_MACOS',      strtoupper(PHP_OS) == 'DARWIN');
 define('rosasurfer\ministruts\_WINDOWS',    defined('\PHP_WINDOWS_VERSION_BUILD'));
 define('rosasurfer\ministruts\_NUL_DEVICE', _WINDOWS ? 'nul' : '/dev/null');
 
-/** @var bool - whether we run on a command line interface */       // constant declarations improve IDE auto-completion
+/** @var bool - whether we run on a command line interface */       // constant declarations improve IDE support
 const CLI = _CLI;
 /** @var bool - whether we run on MacOS */
 const MACOS = _MACOS;
@@ -70,9 +71,9 @@ const FRIDAY            = 5;
 const SATURDAY          = 6;
 
 // byte sizes
-const KB                = 1024;
-const MB                = 1024 << 10;
-const GB                = 1024 << 20;
+const KB                = 1_024;
+const MB                = 1_024 << 10;
+const GB                = 1_024 << 20;
 
 // array indexing types
 const ARRAY_ASSOC       = 1;
@@ -251,7 +252,8 @@ function docopt(string $doc, $args=null, array $options=[]): DocoptResult {
  *                                          FALSE, if the variable is to be dumped to the standard output device (default)
  * @param  bool  $flushBuffers [optional] - whether to flush output buffers on output (default: yes)
  *
- * @return ($return is true ? string : null)
+ * @return         ?string
+ * @phpstan-return ($return is true ? string : null)
  */
 function dump($var, bool $return = false, bool $flushBuffers = true): ?string {
     if ($return) ob_start();
@@ -471,7 +473,7 @@ function ini_get_int(string $option, bool $strict = true): ?int {
  * @return bool
  */
 function is_array_like($var): bool {
-    return \is_array($var) || $var instanceof \ArrayAccess;
+    return \is_array($var) || $var instanceof ArrayAccess;
 }
 
 
@@ -481,7 +483,7 @@ function is_array_like($var): bool {
  * @return bool
  */
 function isLittleEndian(): bool {
-    return (pack('S', 1) == "\x01\x00");
+    return pack('S', 1) == "\x01\x00";
 }
 
 
@@ -695,7 +697,6 @@ function php_byte_value($value): int {
     if (!preg_match('/^([+-]?[0-9]+)([KMG]?)$/i', $value, $match)) {
         throw new InvalidValueException('Invalid parameter $value: "'.$value.'" (not a PHP byte value)');
     }
-
     $iValue = (int)$match[1];
 
     switch (strtoupper($match[2])) {
@@ -725,28 +726,86 @@ function pluralize(int $count, string $singular='', string $plural='s'): string 
 
 
 /**
+ * Wrapper for preg_match() with better error handling.
+ *
+ * Perform a regular expression match. Searches subject for a match to the regular expression given in pattern.
+ *
+ * @param  string $pattern             - pattern to search for
+ * @param  string $subject             - input string
+ * @param  mixed  &$matches [optional] - array to be filled with the search results
+ * @param  int    $flags    [optional] - combination of: PREG_OFFSET_CAPTURE | PREG_UNMATCHED_AS_NULL
+ * @param  int    $offset   [optional] - offset from which to start the search (in bytes)
+ *
+ * @phpstan-param  int-mask-of<256|512|768> $flags
+ *
+ * @return int - 1 if the pattern matches given subject or 0 if it doesn't
+ *
+ * @throws InvalidArgumentException in case of errors
+ *
+ * @link   https://www.php.net/manual/en/function.preg-match.php
+ */
+function preg_match(string $pattern, string $subject, &$matches = null, int $flags = 0, int $offset = 0): int {
+    $result = \preg_match($pattern, $subject, $matches, $flags, $offset);
+
+    if (!is_int($result) || preg_last_error() != PREG_NO_ERROR) {
+        throw new InvalidArgumentException('preg_match() error');
+    }
+    return $result;
+}
+
+
+/**
+ * Wrapper for preg_match_all() with better error handling.
+ *
+ * Perform a global regular expression match. Searches subject for all matches to the regular expression given in pattern
+ * and puts them in matches in the order specified by flags.
+ *
+ * @param  string $pattern             - pattern to search for
+ * @param  string $subject             - input string
+ * @param  mixed  &$matches [optional] - array to be filled with the search results
+ * @param  int    $flags    [optional] - combination of: PREG_PATTERN_ORDER | PREG_SET_ORDER | PREG_OFFSET_CAPTURE | PREG_UNMATCHED_AS_NULL
+ * @param  int    $offset   [optional] - offset from which to start the search (in bytes)
+ *
+ * @return int - the number of full pattern matches (which might be zero)
+ *
+ * @throws InvalidArgumentException in case of errors
+ *
+ * @link   https://www.php.net/manual/en/function.preg-match-all.php
+ */
+function preg_match_all(string $pattern, string $subject, &$matches = null, int $flags = 0, int $offset = 0): int {
+    $result = \preg_match_all($pattern, $subject, $matches, $flags, $offset);
+
+    if (!is_int($result) || preg_last_error() != PREG_NO_ERROR) {
+        throw new InvalidArgumentException('preg_match_all() error');
+    }
+    return $result;
+}
+
+
+/**
  * Wrapper for preg_replace() with better error handling.
  *
- * Perform a regular expression search and replace
+ * Perform a regular expression search and replace.
  *
- * @param string|string[] $pattern          - pattern(s) to search for
- * @param string|string[] $replacement      - string or array with strings to replace
- * @param string|string[] $subject          - string or array with strings to search and replace
- * @param int             $limit [optional] - max replacements for each pattern (default: no limit)
- * @param ?int            $count [optional] - a variable to be filled with the number of replacements done
+ * @param     string|string[] $pattern          - pattern(s) to search for
+ * @param     string|string[] $replacement      - string or array with strings to replace
+ * @param     string|string[] $subject          - string or array with strings to search and replace
+ * @param     int             $limit [optional] - max replacements for each pattern (default: no limit)
+ * @param     mixed           $count [optional] - variable to be filled with the number of replacements done (int)
+ * @param-out int             $count
  *
  * @return         string|string[] - array if the subject is an array, or a string otherwise
  * @phpstan-return ($subject is array ? string[] : string)
  *
  * @throws InvalidArgumentException in case of errors
  *
- * @link http://www.php.net/manual/en/function.preg-replace.php
+ * @link   http://www.php.net/manual/en/function.preg-replace.php
  */
-function preg_replace($pattern, $replacement, $subject, int $limit = -1, ?int &$count = null) {
-    $result = \preg_replace(...func_get_args());
+function preg_replace($pattern, $replacement, $subject, int $limit = -1, &$count = null) {
+    $result = \preg_replace($pattern, $replacement, $subject, $limit, $count);
 
     if ($result === null || preg_last_error() != PREG_NO_ERROR) {
-        throw new InvalidArgumentException('preg_replace(): '.preg_last_error_msg());
+        throw new InvalidArgumentException('preg_replace() error');
     }
     return $result;
 }
@@ -767,13 +826,13 @@ function preg_replace($pattern, $replacement, $subject, int $limit = -1, ?int &$
  *
  * @throws InvalidArgumentException in case of errors
  *
- * @link http://www.php.net/manual/en/function.preg-split.php
+ * @link   http://www.php.net/manual/en/function.preg-split.php
  */
 function preg_split(string $pattern, string $subject, int $limit = -1, int $flags = 0): array {
     $result = \preg_split($pattern, $subject, $limit, $flags);
 
-    if ($result === false || preg_last_error() != PREG_NO_ERROR) {
-        throw new InvalidArgumentException('preg_split(): '.preg_last_error_msg());
+    if (!is_array($result) || preg_last_error() != PREG_NO_ERROR) {
+        throw new InvalidArgumentException('preg_split() error');
     }
     return $result;
 }
@@ -798,14 +857,14 @@ function prettyBytes($value, int $decimals = 1): string {
         $value = (int) round($value);
     }
 
-    if ($value < 1024) {
+    if ($value < 1_024) {
         return (string) $value;
     }
 
     $unit = '';
     foreach (['K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'] as $unit) {
-        $value /= 1024;
-        if ($value < 1024)
+        $value /= 1_024;
+        if ($value < 1_024)
             break;
     }
 
@@ -821,10 +880,11 @@ function prettyBytes($value, int $decimals = 1): string {
  *                                          FALSE, if the result is to be printed to the screen (default)
  * @param  bool  $flushBuffers [optional] - whether to flush output buffers on output (default: TRUE)
  *
- * @return ($return is true ? string : null)
+ * @return         ?string
+ * @phpstan-return ($return is true ? string : null)
  */
 function print_p($var, bool $return = false, bool $flushBuffers = true): ?string {
-    if (is_object($var) && method_exists($var, '__toString') && !$var instanceof \SimpleXMLElement) {
+    if (is_object($var) && method_exists($var, '__toString') && !$var instanceof SimpleXMLElement) {
         $str = (string) $var;
     }
     elseif (is_object($var) || is_array($var)) {
@@ -911,7 +971,7 @@ function route(string $name): Url {
 
     $path = $mapping->getPath();
     if ($path[0] == '/') {
-        $path = ($path=='/') ? '' : substr($path, 1);   // substr() returns FALSE on start==length
+        $path = $path == '/' ? '' : substr($path, 1);       // substr() returns FALSE on start==length
     }
     if ($query) $path .= $query;
     if ($hash)  $path .= $hash;
@@ -982,27 +1042,7 @@ function strCollapseWhiteSpace(string $string, bool $joinLines=true, string $sep
 
 
 /**
- * Functional replacement for ($a === $b).
- *
- * @param  ?string $a
- * @param  ?string $b
- * @param  bool    $ignoreCase [optional] - default: no
- *
- * @return bool
- */
-function strCompare(?string $a, ?string $b, bool $ignoreCase = false): bool {
-    if ($ignoreCase) {
-        if (isset($a, $b)) {
-            $a = strtolower($a);
-            $b = strtolower($b);
-        }
-    }
-    return ($a === $b);
-}
-
-
-/**
- * Functional replacement for ($a === $b) ignoring case differences.
+ * Functional replacement for case-insensitive ($a === $b).
  *
  * @param  ?string $a
  * @param  ?string $b
@@ -1010,86 +1050,130 @@ function strCompare(?string $a, ?string $b, bool $ignoreCase = false): bool {
  * @return bool
  */
 function strCompareI(?string $a, ?string $b): bool {
-    return strCompare($a, $b, true);
+    if (isset($a, $b)) {
+        $lenA = strlen($a);
+        $lenB = strlen($b);
+        return $lenA==$lenB && strncasecmp($a, $b, $lenA)===0;
+    }
+    return $a === $b;
 }
 
 
 /**
- * Whether a string contains a substring.
+ * Whether a string contains a case-sensitive substring.
+ * If multiple substrings are given, whether the string contains one of them.
  *
- * @param  string $haystack
- * @param  string $needle
- * @param  bool   $ignoreCase [optional] - default: no
+ * Note: This function follows common sense. Therefore an empty substring is *not* considered part of every string.
+ * That differs from math ideology of PHP developers. Use PHP8's str_contains() if you need math conformity.
+ *
+ * @link   https://externals.io/message/108562#108646
+ *
+ * @param  string    $haystack
+ * @param  string ...$needle - one or more substrings
  *
  * @return bool
  */
-function strContains(string $haystack, string $needle, bool $ignoreCase = false): bool {
-    if (!strlen($haystack) || !strlen($needle)) {
+function strContains(string $haystack, string ...$needle): bool {
+    if (!strlen($haystack)) {
         return false;
     }
-    if ($ignoreCase) {
-        return (stripos($haystack, $needle) !== false);
+    foreach ($needle as $n) {
+        if (strlen($n) && strpos($haystack, $n) !== false) {
+            return true;
+        }
     }
-    return (strpos($haystack, $needle) !== false);
+    return false;
 }
 
 
 /**
- * Whether a string contains a substring ignoring case differences.
+ * Whether a string contains a case-insensitive substring.
+ * If multiple substrings are given, whether the string contains one of them.
  *
- * @param  string $haystack
- * @param  string $needle
+ * Note: This function follows common sense. Therefore an empty substring is *not* considered part of every string.
+ * That differs from math ideology of PHP developers.
+ *
+ * @link   https://externals.io/message/108562#108646
+ *
+ * @param  string    $haystack
+ * @param  string ...$needle - one or more substrings
  *
  * @return bool
  */
-function strContainsI(string $haystack, string $needle): bool {
-    return strContains($haystack, $needle, true);
+function strContainsI(string $haystack, string ...$needle): bool {
+    if (!strlen($haystack)) {
+        return false;
+    }
+    foreach ($needle as $n) {
+        if (strlen($n) && stripos($haystack, $n) !== false) {
+            return true;
+        }
+    }
+    return false;
 }
 
 
 /**
- * Whether a string ends with a substring. If multiple suffixes are given, whether the string
- * ends with one of them.
+ * Whether a string ends with a case-sensitive substring.
+ * If multiple substrings are given, whether the string ends with one of them.
  *
- * @param  string          $string
- * @param  string|string[] $suffix                - one or more suffixes
- * @param  bool            $ignoreCase [optional] - default: no
+ * Note: This function follows common sense. Therefore *not* every string ends with an empty string.
+ * That differs from math ideology of PHP developers. Use PHP8's str_ends_with() if you need math conformity.
+ *
+ * @link   https://externals.io/message/108562#108646
+ *
+ * @param  string    $string
+ * @param  string ...$suffix - one or more suffixes
  *
  * @return bool
  */
-function strEndsWith(string $string, $suffix, bool $ignoreCase = false): bool {
-    if (is_array($suffix)) {
-        foreach ($suffix as $s) {
-            if (strEndsWith($string, $s, $ignoreCase)) {
+function strEndsWith(string $string, string ...$suffix): bool {
+    $lenString = strlen($string);
+    if (!$lenString) {
+        return false;
+    }
+    foreach ($suffix as $s) {
+        $lenSuffix = strlen($s);
+        if ($lenSuffix && $lenString >= $lenSuffix) {
+            $end = substr($string, -$lenSuffix);
+            if (strncmp($end, $s, $lenSuffix) === 0) {
                 return true;
             }
         }
-        return false;
     }
-    $stringLen = strlen($string);
-    $suffixLen = strlen($suffix);
-
-    if (!$stringLen || !$suffixLen) {
-        return false;
-    }
-    if ($ignoreCase) {
-        return (strripos($string, $suffix) === $stringLen-$suffixLen);
-    }
-    return (strrpos($string, $suffix) === $stringLen-$suffixLen);
+    return false;
 }
 
 
 /**
- * Whether a string ends with a substring ignoring case differences. If multiple suffixes
- * are given, whether the string ends with one of them.
+ * Whether a string ends with a case-insensitive substring.
+ * If multiple substrings are given, whether the string ends with one of them.
  *
- * @param  string          $string
- * @param  string|string[] $suffix - one or more suffixes
+ * Note: This function follows common sense. Therefore *not* every string ends with an empty string.
+ * That differs from math ideology of PHP developers.
+ *
+ * @link   https://externals.io/message/108562#108646
+ *
+ * @param  string    $string
+ * @param  string ...$suffix - one or more suffixes
  *
  * @return bool
  */
-function strEndsWithI(string $string, $suffix): bool {
-    return strEndsWith($string, $suffix, true);
+function strEndsWithI(string $string, string ...$suffix): bool {
+    $lenString = strlen($string);
+    if (!$lenString) {
+        return false;
+    }
+    foreach ($suffix as $s) {
+        $lenSuffix = strlen($s);
+        if ($lenSuffix && $lenString >= $lenSuffix) {
+            $end = substr($string, -$lenSuffix);
+            if (strncasecmp($end, $s, $lenSuffix) === 0) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 
@@ -1115,7 +1199,7 @@ function strIsDigits(string $string): bool {
 function strIsDoubleQuoted(string $string): bool {
     $len = strlen($string);
     if ($len > 1) {
-        return ($string[0]=='"' && $string[--$len]=='"');
+        return $string[0]=='"' && $string[--$len]=='"';
     }
     return false;
 }
@@ -1148,7 +1232,7 @@ function strIsNumeric(string $string): bool {
 function strIsQuoted(string $string): bool {
     $len = strlen($string);
     if ($len > 1) {
-        return (strIsSingleQuoted($string) || strIsDoubleQuoted($string));
+        return strIsSingleQuoted($string) || strIsDoubleQuoted($string);
     }
     return false;
 }
@@ -1164,7 +1248,7 @@ function strIsQuoted(string $string): bool {
 function strIsSingleQuoted(string $string): bool {
     $len = strlen($string);
     if ($len > 1) {
-        return ($string[0]=="'" && $string[--$len]=="'");
+        return $string[0]=="'" && $string[--$len]=="'";
     }
     return false;
 }
@@ -1321,7 +1405,7 @@ function strRightFrom(string $string, string $limiter, int $count=1, bool $inclu
             $count--;
         }
         $pos += strlen($limiter);
-        $result = ($pos >= strlen($string)) ? '' : substr($string, $pos);
+        $result = $pos >= strlen($string) ? '' : substr($string, $pos);
         if ($includeLimiter) {
             $result = $limiter.$result;
         }
@@ -1343,7 +1427,7 @@ function strRightFrom(string $string, string $limiter, int $count=1, bool $inclu
             $count++;
         }
         $pos += strlen($limiter);
-        $result = ($pos >= strlen($string)) ? '' : substr($string, $pos);
+        $result = $pos >= strlen($string) ? '' : substr($string, $pos);
         if ($includeLimiter) {
             $result = $limiter.$result;
         }
@@ -1356,45 +1440,58 @@ function strRightFrom(string $string, string $limiter, int $count=1, bool $inclu
 
 
 /**
- * Whether a string starts with a substring. If multiple prefixes are given, whether the string
- * starts with one of them.
+ * Whether a string starts with a case-sensitive substring.
+ * If multiple substrings are given, whether the string starts with one of them.
  *
- * @param  string          $string
- * @param  string|string[] $prefix                - one or more prefixes
- * @param  bool            $ignoreCase [optional] - default: no
+ * Note: This function follows common sense. Therefore *not* every string starts with an empty string.
+ * That differs from math ideology of PHP developers. Use PHP8's str_starts_with() if you need math conformity.
+ *
+ * @link   https://externals.io/message/108562#108646
+ *
+ * @param  string    $string
+ * @param  string ...$prefix - one or more prefixes
  *
  * @return bool
  */
-function strStartsWith(string $string, $prefix, bool $ignoreCase = false): bool {
-    if (is_array($prefix)) {
-        foreach ($prefix as $p) {
-            if (strStartsWith($string, $p, $ignoreCase)) {
-                return true;
-            }
+function strStartsWith(string $string, string ...$prefix): bool {
+    if (!strlen($string)) {
+        return false;
+    }
+    foreach ($prefix as $p) {
+        $lenPrefix = strlen($p);
+        if ($lenPrefix && strncmp($string, $p, $lenPrefix)===0) {
+            return true;
         }
-        return false;
     }
-    if (!strlen($string) || !strlen($prefix)) {
-        return false;
-    }
-    if ($ignoreCase) {
-        return (stripos($string, $prefix) === 0);
-    }
-    return (strpos($string, $prefix) === 0);
+    return false;
 }
 
 
 /**
- * Whether a string starts with a substring ignoring case differences. If multiple prefixes
- * are given, whether the string starts with one of them.
+ * Whether a string starts with a case-insensitive substring.
+ * If multiple substrings are given, whether the string starts with one of them.
  *
- * @param  string          $string
- * @param  string|string[] $prefix - one or more prefixes
+ * Note: This function follows common sense. Therefore *not* every string starts with an empty string.
+ * That differs from math ideology of PHP developers.
+ *
+ * @link   https://externals.io/message/108562#108646
+ *
+ * @param  string    $string
+ * @param  string ...$prefix - one or more prefixes
  *
  * @return bool
  */
-function strStartsWithI(string $string, $prefix): bool  {
-    return strStartsWith($string, $prefix, true);
+function strStartsWithI(string $string, string ...$prefix): bool  {
+    if (!strlen($string)) {
+        return false;
+    }
+    foreach ($prefix as $p) {
+        $lenPrefix = strlen($p);
+        if ($lenPrefix && strncasecmp($string, $p, $lenPrefix)===0) {
+            return true;
+        }
+    }
+    return false;
 }
 
 

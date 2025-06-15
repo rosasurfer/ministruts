@@ -16,8 +16,8 @@ use rosasurfer\ministruts\core\exception\IllegalStateException;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 
+use function rosasurfer\ministruts\preg_match;
 use function rosasurfer\ministruts\simpleClassName;
-
 
 /**
  * Command
@@ -27,8 +27,7 @@ use function rosasurfer\ministruts\simpleClassName;
  */
 class Command extends CObject {
 
-    /** @var string */
-    const DOCOPT = '';
+    public const DOCOPT = '';
 
     /** @var string */
     private string $name = '';
@@ -84,7 +83,7 @@ class Command extends CObject {
      * @return $this
      */
     protected function configure(): self {
-        if (strlen($docopt = static::DOCOPT)) {
+        if (strlen($docopt = $this::DOCOPT)) {
             $this->setDocoptDefinition($docopt);
         }
         return $this;
@@ -174,7 +173,7 @@ class Command extends CObject {
      * @return $this
      */
     public function setName(string $name): self {
-        if ($this->frozen) throw new RuntimeException('Configuration of "'.get_class($this).'" is frozen');
+        if ($this->frozen) throw new RuntimeException('Configuration of '.static::class.' is frozen');
 
         $this->validateName($name);
         $this->name = $name;
@@ -208,7 +207,7 @@ class Command extends CObject {
      * @return $this
      */
     public function setAliases(array $names): self {
-        if ($this->frozen)      throw new RuntimeException('Configuration of "'.get_class($this).'" is frozen');
+        if ($this->frozen)      throw new RuntimeException('Configuration of '.static::class.' is frozen');
         if ($this->name === '') throw new IllegalStateException('A default command (name="") cannot have aliases');
 
         foreach ($names as $alias) {
@@ -239,7 +238,7 @@ class Command extends CObject {
      * @link   https://docopt.org/
      */
     public function setDocoptDefinition(string $doc): self {
-        if ($this->frozen) throw new RuntimeException('Configuration of "'.get_class($this).'" is frozen');
+        if ($this->frozen) throw new RuntimeException('Configuration of '.static::class.' is frozen');
 
         $self = basename($_SERVER['PHP_SELF']);
         $doc = str_replace('{:cmd:}', $self, $doc);

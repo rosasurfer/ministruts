@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\console\docopt;
 
+use UnexpectedValueException;
+
 use rosasurfer\ministruts\core\CObject;
 
 use rosasurfer\ministruts\console\docopt\exception\DocoptFormatError;
@@ -19,12 +21,13 @@ use rosasurfer\ministruts\console\docopt\pattern\Required;
 
 use function rosasurfer\ministruts\array_filter;
 use function rosasurfer\ministruts\array_merge;
+use function rosasurfer\ministruts\preg_match;
+use function rosasurfer\ministruts\preg_match_all;
 use function rosasurfer\ministruts\preg_split;
 use function rosasurfer\ministruts\strEndsWith;
 use function rosasurfer\ministruts\strStartsWith;
 
 use const rosasurfer\ministruts\NL;
-
 
 /**
  * DocoptParser
@@ -32,7 +35,6 @@ use const rosasurfer\ministruts\NL;
  * A command line argument parser for the {@link https://docopt.org/#} language format.
  */
 class DocoptParser extends CObject {
-
 
     /** @var bool */
     protected bool $optionsFirst = false;
@@ -103,7 +105,7 @@ class DocoptParser extends CObject {
 
             $this->handleSpecials($this->help, $this->version, $args, $doc);
 
-            list($matched, $left, $collected) = $pattern->fix()->match($args);
+            [$matched, $left, $collected] = $pattern->fix()->match($args);
             if ($matched && !$left) {
                 $result = [];
                 foreach (array_merge($pattern->flat(), $collected) as $pattern) {
@@ -174,7 +176,7 @@ class DocoptParser extends CObject {
      * @return string
      */
     protected static function formalUsage(string $section): string {
-        list(, $section) = explode(':', $section, 2);       // drop "usage:"
+        [, $section] = explode(':', $section, 2);       // drop "usage:"
         $pu = preg_split('/\s+/', trim($section));
 
         $ret = [];
@@ -215,9 +217,7 @@ class DocoptParser extends CObject {
                 $parsed = array_merge($parsed, static::parseShort($tokens, $options));
             }
             elseif ($optionsFirst) {
-                return array_merge($parsed, array_map(function($value) {
-                    return new Argument(null, $value);
-                }, $tokens->left()));
+                return array_merge($parsed, array_map(static fn(string $value) => new Argument(null, $value), $tokens->left()));
             }
             else {
                 $parsed[] = new Argument(null, $tokens->move());
@@ -236,7 +236,7 @@ class DocoptParser extends CObject {
         $defaults = [];
         foreach (static::parseSection('options:', $doc) as $section) {
             # FIXME corner case "bla: options: --foo"
-            list (, $section) = explode(':', $section, 2);
+            [, $section] = explode(':', $section, 2);
 
             /** @var string[] $split */
             $split = preg_split("/\n[ \t]*(-\S+?)/", "\n".$section, 0, PREG_SPLIT_DELIM_CAPTURE);
@@ -244,7 +244,7 @@ class DocoptParser extends CObject {
 
             $split = [];
             for ($size=sizeof($splitTmp), $i=0; $i < $size; $i+=2) {
-                $split[] = $splitTmp[$i].(isset($splitTmp[$i+1]) ? $splitTmp[$i+1] : '');
+                $split[] = $splitTmp[$i].($splitTmp[$i+1] ?? '');
             }
             $options = [];
             foreach ($split as $value) {
@@ -334,7 +334,7 @@ class DocoptParser extends CObject {
     protected static function parseSequence(TokenIterator $tokens, OptionIterator $options): array {
         $result = [];
         $not = [null, '', ']', ')', '|'];
-        while (!in_array($tokens->current(), $not, true)) {
+        while (!\in_array($tokens->current(), $not, true)) {
             $atom = static::parseAtom($tokens, $options);
             if ($tokens->current() == '...') {
                 $atom = [new OneOrMore($atom)];
@@ -359,8 +359,8 @@ class DocoptParser extends CObject {
     protected static function parseShort(TokenIterator $tokens, OptionIterator $options): array {
         $token = $tokens->move();
 
-        if (!isset($token) || strpos($token, '-') !== 0 || strpos($token, '--') === 0) {
-            throw new \UnexpectedValueException("short token '$token' does not start with '-' or '--'");
+        if (!isset($token) || !strStartsWith($token, '-') || strStartsWith($token, '--')) {
+            throw new UnexpectedValueException("short token '$token' does not start with '-' or is '--'");
         }
 
         $left = ltrim($token, '-');
@@ -405,7 +405,7 @@ class DocoptParser extends CObject {
                     }
                 }
                 if ($tokens->getErrorClass() == DocoptUserNotification::class) {
-                    $o->value = isset($value) ? $value : true;
+                    $o->value = $value ?? true;
                 }
             }
             $parsed[] = $o;
@@ -424,8 +424,8 @@ class DocoptParser extends CObject {
      */
     protected static function parseLong(TokenIterator $tokens, OptionIterator $options): array {
         $tokenError = $tokens->getErrorClass();
-        $token      = (string) $tokens->move();
-        $exploded   = explode('=', $token, 2);
+        $token = (string) $tokens->move();
+        $exploded = explode('=', $token, 2);
 
         if (sizeof($exploded) == 2) {
             $long = $exploded[0];
@@ -438,16 +438,13 @@ class DocoptParser extends CObject {
             $value = null;
         }
 
-        if (strpos($long, '--') !== 0) {
-            throw new \UnexpectedValueException("Expected long option, found '$long'");
+        if (!strStartsWith($long, '--')) {
+            throw new UnexpectedValueException("Expected long option, found '$long'");
         }
-        $similar = array_values(array_filter($options, function($o) use ($long) {
-            return ($o->long && $o->long==$long);
-        }));
+        $similar = array_values(array_filter($options, static fn(Option $o): bool => $o->long && $o->long==$long));
+
         if ($tokenError==DocoptUserNotification::class && !$similar) {
-            $similar = array_values(array_filter($options, function($o) use ($long) {
-                return ($o->long && strpos($o->long, $long)===0);
-            }));
+            $similar = array_values(array_filter($options, static fn(Option $o): bool => $o->long && strStartsWith($o->long, $long)));
         }
         /** @var ?Option $o */
         $o = null;
@@ -462,9 +459,7 @@ class DocoptParser extends CObject {
         }
         elseif (sizeof($similar) > 1) {
             // might be simply specified ambiguously 2+ times?
-            throw new $tokenError("$long is not a unique prefix: ".join(', ', array_map(function($o) {
-                return $o->long;
-            }, $similar)));
+            throw new $tokenError("$long is not a unique prefix: ".join(', ', array_map(static fn(Option $o): ?string => $o->long, $similar)));
         }
         else {
             $o = new Option($similar[0]->short, $similar[0]->long, $similar[0]->argcount, $similar[0]->value);
@@ -506,7 +501,7 @@ class DocoptParser extends CObject {
                 '(' => [')', Required::class],
                 '[' => [']', Optional::class],
             ];
-            list($matching, $patternClass) = $index[$token];
+            [$matching, $patternClass] = $index[$token];
 
             $result = new $patternClass(static::parseExpression($tokens, $options));
             if ($tokens->move() != $matching) throw new $tokenError("Unmatched \"$token\"");
@@ -516,13 +511,13 @@ class DocoptParser extends CObject {
             $tokens->move();
             return [new OptionsShortcut()];
         }
-        elseif (strpos($token, '--')===0 && $token!='--') {
+        elseif (strStartsWith($token, '--') && $token != '--') {
             return static::parseLong($tokens, $options);
         }
-        elseif (strpos($token, '-')===0 && $token!='-' && $token!='--') {
+        elseif (strStartsWith($token, '-') && $token != '-' && $token != '--') {
             return static::parseShort($tokens, $options);
         }
-        elseif ((strpos($token, '<')===0 && strEndsWith($token, '>')) || static::isUpperCase($token)) {
+        elseif ((strStartsWith($token, '<') && strEndsWith($token, '>')) || static::isUpperCase($token)) {
             return [new Argument($tokens->move())];
         }
         else {

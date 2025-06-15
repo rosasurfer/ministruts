@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\struts;
 
-
 /**
  * EmptyActionForm
  *
@@ -13,13 +12,13 @@ namespace rosasurfer\ministruts\struts;
  */
 final class EmptyActionForm extends ActionForm {
 
-
     /**
      * {@inheritDoc}
      *
      * Intentionally this implementation does nothing.
      */
     protected function populate(): void {
+        // does nothing
     }
 
 

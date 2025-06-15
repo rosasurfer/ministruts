@@ -6,14 +6,12 @@ namespace rosasurfer\ministruts\db\orm\meta;
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\db\ConnectorInterface as Connector;
 
-
 /**
  * Type
  *
  * Defines custom conversion methods between a property's PHP and SQL representation.
  */
 abstract class Type extends CObject {
-
 
     /**
      * @param  mixed           $value     - result set representation of a property value as returned by the RDBMS

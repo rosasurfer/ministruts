@@ -7,14 +7,10 @@ use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\IOException;
 
-
 /**
  * Base class for concrete HTTP clients.
  */
 abstract class HttpClient extends CObject {
-
-
-    // default settings
 
     /** @var int */
     protected int $timeout = 30;

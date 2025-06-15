@@ -6,14 +6,12 @@ namespace rosasurfer\ministruts\util;
 use rosasurfer\ministruts\core\ObjectTrait;
 use rosasurfer\ministruts\core\di\DiAwareTrait;
 
-
 /**
  * Extended version of \DateTime.
  */
 class DateTime extends \DateTime {
 
     use ObjectTrait, DiAwareTrait;
-
 
     /**
      * {@inheritDoc}

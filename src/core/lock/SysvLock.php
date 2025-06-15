@@ -16,7 +16,6 @@ use function rosasurfer\ministruts\strStartsWith;
 use const rosasurfer\ministruts\L_DEBUG;
 use const rosasurfer\ministruts\NL;
 
-
 /**
  * SysvLock
  *
@@ -83,10 +82,10 @@ class SysvLock extends BaseLock {
                     "sem_acquire(): failed to acquire key 0x$hexId: Invalid argument",
                     "sem_acquire(): failed to acquire key 0x$hexId: Identifier removed",
                 ];
-                if (++$i < $trials && strStartsWith($message, $prefixes)) {
+                if (++$i < $trials && strStartsWith($message, ...$prefixes)) {
                     Logger::log("$message, trying again...", L_DEBUG);
                     $messages[] = $message;
-                    usleep(200000);                         // wait 200 msec
+                    usleep(200_000);                        // wait 200 msec = 200'000 µsec
                     continue;
                 }
 

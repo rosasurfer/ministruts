@@ -5,20 +5,20 @@ namespace rosasurfer\ministruts\console\docopt\pattern;
 
 use rosasurfer\ministruts\console\docopt\SingleMatch;
 
+use function rosasurfer\ministruts\preg_match_all;
 
 /**
  * Argument
  */
 class Argument extends LeafPattern {
 
-
     /**
      * {@inheritDoc}
      */
     public function singleMatch(array $left): SingleMatch {
         foreach ($left as $i => $pattern) {
-            if ($pattern instanceof Argument) {
-                return new SingleMatch($i, new Argument($this->name(), $pattern->value));
+            if ($pattern instanceof self) {
+                return new SingleMatch($i, new self($this->name(), $pattern->value));
             }
         }
         return new SingleMatch(null, null);

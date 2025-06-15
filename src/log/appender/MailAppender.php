@@ -10,12 +10,13 @@ use rosasurfer\ministruts\log\LogMessage;
 use rosasurfer\ministruts\log\detail\Request;
 
 use function rosasurfer\ministruts\normalizeEOL;
+use function rosasurfer\ministruts\preg_match;
 use function rosasurfer\ministruts\realpath;
 use function rosasurfer\ministruts\strContains;
 use function rosasurfer\ministruts\strEndsWith;
 use function rosasurfer\ministruts\strLeftTo;
 use function rosasurfer\ministruts\strRightFrom;
-use function rosasurfer\ministruts\strStartsWith;
+use function rosasurfer\ministruts\strStartsWithI;
 
 use const rosasurfer\ministruts\CLI;
 use const rosasurfer\ministruts\EOL_UNIX;
@@ -28,7 +29,6 @@ use const rosasurfer\ministruts\L_NOTICE;
 use const rosasurfer\ministruts\L_WARN;
 use const rosasurfer\ministruts\NL;
 use const rosasurfer\ministruts\WINDOWS;
-
 
 /**
  * MailAppender
@@ -282,7 +282,7 @@ class MailAppender extends BaseAppender {
             $name   = $match[1];
             $value  = $this->encodeNonAsciiChars(trim($match[2]));
             $header = "$name: $value";
-        };
+        }
         unset($header);
 
         $headers[] = 'X-Mailer: Microsoft Office Outlook 11';           // save us from Hotmail junk folder
@@ -417,7 +417,7 @@ class MailAppender extends BaseAppender {
         $result = null;
 
         foreach ($headers as $i => $header) {
-            if (strStartsWith($header, "$name:", true)) {
+            if (strStartsWithI($header, "$name:")) {
                 $result = trim(substr($header, strlen($name) + 1));
                 unset($headers[$i]);
             }

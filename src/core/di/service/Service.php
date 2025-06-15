@@ -7,7 +7,6 @@ use Closure;
 
 use rosasurfer\ministruts\core\exception\ClassNotFoundException;
 
-
 /**
  * Service
  *
@@ -19,7 +18,6 @@ use rosasurfer\ministruts\core\exception\ClassNotFoundException;
  * </pre>
  */
 class Service implements ServiceInterface {
-
 
     /** @var string */
     protected string $name;
@@ -75,7 +73,7 @@ class Service implements ServiceInterface {
      * {@inheritDoc}
      */
     public function addAlias(string $name): self {
-        if (!in_array($name, $this->aliases)) {
+        if (!\in_array($name, $this->aliases, true)) {
             $this->aliases[] = $name;
         }
         return $this;

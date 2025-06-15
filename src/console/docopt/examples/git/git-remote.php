@@ -9,9 +9,9 @@ if (!is_file($autoload = __DIR__.'/../../../../../vendor/autoload.php')) {
     echo "File \"$autoload\" not found".PHP_EOL;
     exit(1);
 }
-require($autoload);
+require $autoload;
 
-$doc = <<<DOCOPT
+$doc = <<<'DOCOPT'
 Usage: git remote [-v | --verbose]
        git remote add [-t <branch>] [-m <master>] [-f] [--mirror] <name> <url>
        git remote rename <old> <new>

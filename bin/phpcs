@@ -31,33 +31,55 @@ function stderr() {
 }
 
 #
-# Resolve the color setting to apply if no color-specific command line options are supplied.
+# Resolve and print the color status to apply in the current runtime environment.
 #
-# @param _InOut_ $1 - named reference to the default and resolved value
+# @param $1 - initial status, one of [on|off|auto]
 #
-function resolveColorSetting() {
+function resolveColorStatus() {
+  local result="$1"
+
+  if [[ "$1" == 'auto' ]]; then
+    local isTerminal=0 isPipe=0
+    [[ -t 1 ]] && isTerminal=1
+    [[ -p /proc/self/fd/1 ]] && isPipe=1
+    ((isTerminal || isPipe)) && result='on' || result='off'
+  fi
+
+  case "$result" in
+    on) # keep enabled as long as not explicitly disabled
+      [[ -n "${NO_COLOR:-}" ]] && result='off';;
+    off)
+      ;;
+    *)
+      fail "${FUNCNAME[0]}() invalid color status \"$1\"";;
+  esac
+
+  echo "$result"
+}
+
+#
+# Swap report ids "source" and "summary".
+#
+# @param _InOut_ $1 - named reference to the passed report id
+#
+function swapReportIds() {
   ((BASH_SUBSHELL)) && fail "${FUNCNAME[0]}() can't write to outer scope from subshell"
   local -n inout="$1"
+  local ids i
+  readarray -t ids < <(printf '%s\n' "${inout//,/$'\n'}")
 
-  case "$inout" in
-    on)   # enable color as long as not explicitly disabled
-      [[ -n "${NO_COLOR:-}" ]] && inout='off';;
+  for i in "${!ids[@]}"; do                     # swap ids
+    if [[ "${ids[i]}" == 'summary' ]]; then
+      ids[i]='source'
+    elif [[ "${ids[i]}" == 'source' ]]; then
+      ids[i]='summary'
+    elif [[ "${ids[i]}" == '' ]]; then
+      unset 'ids[i]'
+    fi
+  done
 
-    off)  # disable color as long as not explicitly enabled
-      [[ -z "${NO_COLOR:-}" && -n "${FORCE_COLOR:-}" && "$FORCE_COLOR" != '0' ]] && inout='on';;
-
-    auto) # determine setting depending on the runtime environment
-      local isTerminal=0 isPipe=0 localColor
-      [[ -t 1 ]] && isTerminal=1                    # inspect STDOUT
-      [[ -p /proc/self/fd/1 ]] && isPipe=1
-      ((isTerminal || isPipe)) && localColor='on' || localColor='off'
-      resolveColorSetting 'localColor'              # recurse to inspect environment (must not use the same var as in global)
-      inout="$localColor";;
-
-    *)
-      fail "${FUNCNAME[0]}() invalid color status \"$inout\"";;
-  esac
-  :                                                 # make sure the last command returns with success
+  inout=$(printf '%s,' "${ids[@]}")
+  inout="${inout%,}"                            # remove trailing comma
 }
 
 # --- end of functions ---------------------------------------------------------------------------------------------------------------------
@@ -82,67 +104,85 @@ phpcs="${phpcs#./}"
 [[ -f "$phpcs" ]] || fail "PHPCS executable not found"
 
 
-declare args=() arg showCmd=0
+declare args=() arg
+args+=('-d')                                                # always increase the memory limit
+args+=('memory_limit=-1')
+
 declare -A options
 options=()
+
 
 # parse arguments
 while (("$#")); do
   case "$1" in
+    --report|--report=*)
+      arg="${1#--report}"
+      arg="${arg:1}"
+      swapReportIds 'arg'
+      [[ -z "$arg" ]] && fail "missing value for option $1"
+      if [[ -z "${options['--report']:-}" ]]; then
+        options['--report']="--report=$arg"
+      else
+        options['--report']="${options['--report']},$arg"   # concatenate ids of multiple options
+      fi
+      shift
+      continue;;
+
     --standard|--standard=*)
-      arg="${1#--standard}"
       [[ -n "${options['--standard']:-}" ]] && fail 'multiple --standard options detected'
-      [[ -z "$arg" || "$arg" == '=' ]] && fail 'missing value for option --standard=<name-or-file>'
+      arg="${1#--standard}"
+      arg="${arg:1}"
+      [[ -z "$arg" ]] && fail 'missing value for option --standard=<name-or-file>'
       options['--standard']="--standard=$arg"
       shift
       continue;;
 
-    --color|--colors)
+    --color|--colors)                                       # standard and PHPCS syntax
       options['--color']='--colors'
       shift
       continue;;
 
-    --no-color|--no-colors)
+    --no-color|--no-colors)                                 # standard and PHPCS syntax
       options['--color']='--no-colors'
       shift
       continue;;
 
-    --show-cmd)
-      showCmd=1
+    -d)                                                     # a "php.ini" setting
+      args+=("$1")
       shift
-      continue;;
+      ((!"$#")) && fail 'missing value for option -d'
   esac
   args+=("$1")
   shift
 done
 
 
-# prepend the standard to use
+# define the rules to use
 if [[ -z "${options['--standard']:-}" ]]; then
-  defaultRules="$configDir/slevomat.xml"
-  [[ -f "$defaultRules" ]] || fail "file not found \"$defaultRules\""
-  options['--standard']="--standard=$defaultRules"
+  declare rulesFile="$configDir/slevomat.xml"
+  [[ -f "$rulesFile" ]] || fail "file not found \"$rulesFile\""
+  options['--standard']="--standard=$rulesFile"
 fi
-args=("${options['--standard']}" "${args[@]}")
 
 
-# prepend a color option
+# always provide a color option (PHP can't resolve it correctly)
 if [[ -z "${options['--color']:-}" ]]; then
-  declare color='auto'                          # resolve the current default
-  resolveColorSetting 'color'
+  declare color
+  color="$(resolveColorStatus auto)"                        # auto-resolve the current status
   [[ "$color" == 'on'  ]] && options['--color']='--colors'
   [[ "$color" == 'off' ]] && options['--color']='--no-colors'
 fi
-args=("${options['--color']}" "${args[@]}")
 
 
 # rebuild all arguments
+args=("${options[@]}" "${args[@]+"${args[@]}"}")
 set -- "${args[@]}"
 
 
-# show the final command
-if ((showCmd)); then
-  [[ "$php" == 'php' ]] && phpBin='' || phpBin="$php "
+# on DEBUG: show the final command
+if [[ "${DEBUG:-0}" != "0" ]]; then
+  declare phpBin=''
+  [[ "$php" != 'php' ]] && phpBin="$php "
   echo "CMD: ${phpBin}${phpcs} $*"
 fi
 

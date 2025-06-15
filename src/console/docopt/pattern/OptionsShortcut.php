@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\console\docopt\pattern;
 
-
 /**
  * OptionsShortcut
  *

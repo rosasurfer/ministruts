@@ -7,14 +7,14 @@ use InvalidArgumentException;
 
 use rosasurfer\ministruts\console\docopt\SingleMatch;
 
+use function rosasurfer\ministruts\preg_match;
 use function rosasurfer\ministruts\preg_split;
-
+use function rosasurfer\ministruts\strStartsWith;
 
 /**
  * Option
  */
 class Option extends LeafPattern {
-
 
     /** @var ?string */
     public ?string $short = null;
@@ -40,7 +40,7 @@ class Option extends LeafPattern {
         $this->long     = $long;
         $this->argcount = $argcount;
 
-        parent::__construct($this->name(), ($argcount && $value===false) ? null : $value);
+        parent::__construct($this->name(), $argcount && $value===false ? null : $value);
     }
 
 
@@ -49,7 +49,7 @@ class Option extends LeafPattern {
      *
      * @return Option
      */
-    public static function parse(string $optionDescription): Option {
+    public static function parse(string $optionDescription): self {
         $short    = null;
         $long     = null;
         $argcount = 0;
@@ -57,12 +57,12 @@ class Option extends LeafPattern {
 
         $exp = explode('  ', trim($optionDescription), 2);
         $options = $exp[0];
-        $description = isset($exp[1]) ? $exp[1] : '';
+        $description = $exp[1] ?? '';
 
         $options = str_replace(',', ' ', str_replace('=', ' ', $options));
 
         foreach (preg_split('/\s+/', $options) as $s) {
-            if (strpos($s, '--')===0) {
+            if (strStartsWith($s, '--')) {
                 $long = $s;
             }
             elseif ($s && $s[0] == '-') {

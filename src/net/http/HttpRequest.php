@@ -6,12 +6,12 @@ namespace rosasurfer\ministruts\net\http;
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 
+use function rosasurfer\ministruts\strContains;
 
 /**
  * HttpRequest
  */
 class HttpRequest extends CObject {
-
 
     /** @var string */
     protected string $url = '';
@@ -78,7 +78,7 @@ class HttpRequest extends CObject {
      */
     public function setUrl(string $url): self {
         // TODO: validate URL
-        if (strpos($url, ' ') !== false) throw new InvalidValueException('Invalid parameter $url: '.$url);
+        if (strContains($url, ' ')) throw new InvalidValueException("Invalid parameter \$url: $url");
         $this->url = $url;
         return $this;
     }

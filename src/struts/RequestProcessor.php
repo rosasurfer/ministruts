@@ -11,7 +11,6 @@ use rosasurfer\ministruts\net\http\HttpResponse;
 
 use function rosasurfer\ministruts\preg_replace;
 
-
 /**
  * RequestProcessor
  *
@@ -23,7 +22,6 @@ use function rosasurfer\ministruts\preg_replace;
  * A custom implementation can be configured for all {@link Module}s by re-defining the DI service named "requestProcessor".
  */
 class RequestProcessor extends CObject {
-
 
     /** @var Module - the Module the instance belongs to */
     protected Module $module;
@@ -163,17 +161,20 @@ class RequestProcessor extends CObject {
         }
         else {
             // otherwise generate one
-            echo <<<PROCESS_MAPPING_ERROR_SC_404
-<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
-<html><head>
+            echo <<<'HTML_SNIPPET'
+<!doctype html>
+<html lang="en">
+<head>
 <title>404 Not Found</title>
-</head><body>
+</head>
+<body>
 <h1>Not Found</h1>
 <p>The requested URL was not found on this server.</p>
 <hr>
 <address>...lamented the MiniStruts.</address>
-</body></html>
-PROCESS_MAPPING_ERROR_SC_404;
+</body>
+</html>
+HTML_SNIPPET;
         }
         return null;
     }
@@ -208,17 +209,20 @@ PROCESS_MAPPING_ERROR_SC_404;
         }
         else {
             // otherwise generate one
-            echo <<<PROCESS_METHOD_ERROR_SC_405
-<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
-<html><head>
+            echo <<<'HTML_SNIPPET'
+<!doctype html>
+<html lang="en">
+<head>
 <title>405 Method Not Allowed</title>
-</head><body>
+</head>
+<body>
 <h1>Method Not Allowed</h1>
 <p>The used HTTP method is not allowed for the requested URL.</p>
 <hr>
 <address>...lamented the MiniStruts.</address>
-</body></html>
-PROCESS_METHOD_ERROR_SC_405;
+</body>
+</html>
+HTML_SNIPPET;
         }
         return false;
     }
@@ -307,7 +311,7 @@ PROCESS_METHOD_ERROR_SC_405;
 
             if (!$forward) throw new RuntimeException(
                 '<mapping path="'.$mapping->getPath().'" form-validate-first="true": '
-               .'ActionForward "'.$key.'" not found (module validation error, should never happen)'
+               .'ActionForward "'.$key.'" not found (module validation error, should never happen)',
             );
         }
         $this->processActionForward($request, $response, $forward);

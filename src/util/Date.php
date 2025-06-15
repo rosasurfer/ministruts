@@ -12,12 +12,10 @@ use function rosasurfer\ministruts\strToTimestamp;
 use const rosasurfer\ministruts\DAYS;
 use const rosasurfer\ministruts\L_WARN;
 
-
 /**
  * Date
  */
 class Date extends StaticClass {
-
 
     /**
      * Calculate the number of days between two dates.

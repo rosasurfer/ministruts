@@ -5,7 +5,6 @@ namespace rosasurfer\ministruts\db\orm;
 
 use rosasurfer\ministruts\core\StaticClass;
 
-
 /**
  * A class holding ORM related helper functions and constants.
  */
@@ -13,17 +12,15 @@ final class ORM extends StaticClass {
 
     // Standard types for PHP properties and database columns.
 
-    /** @var string */
-    const BOOL = 'bool';
+    public const BOOL = 'bool';
 
-    /** @var string */
-    const INT = 'int';
+    public const INT = 'int';
 
-    /** @var string - synonym for db types "real", "double", "decimal" */
-    const FLOAT = 'float';
+    /** synonym for db types "real", "double", "decimal" */
+    public const FLOAT = 'float';
 
-    /** @var string - synonym for db type "text" */
-    const STRING = 'string';
+    /** synonym for db type "text" */
+    public const STRING = 'string';
 
 
     /**

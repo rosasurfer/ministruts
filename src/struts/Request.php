@@ -22,7 +22,6 @@ use function rosasurfer\ministruts\strStartsWith;
 use const rosasurfer\ministruts\DAY;
 use const rosasurfer\ministruts\NL;
 
-
 /**
  * Request
  *
@@ -30,7 +29,6 @@ use const rosasurfer\ministruts\NL;
  * additional variables context with the life-time of the request.
  */
 class Request extends CObject {
-
 
     /** @var string */
     protected string $method;
@@ -93,7 +91,7 @@ class Request extends CObject {
      * @return bool
      */
     public function isGet(): bool {
-        return ($this->method == 'GET');
+        return $this->method == 'GET';
     }
 
 
@@ -103,7 +101,7 @@ class Request extends CObject {
      * @return bool
      */
     public function isPost(): bool {
-        return ($this->method == 'POST');
+        return $this->method == 'POST';
     }
 
 
@@ -114,7 +112,7 @@ class Request extends CObject {
      */
     public function isAjax(): bool {
         static $isAjax;
-        !isset($isAjax) && $isAjax = strCompareI($this->getHeader('X-Requested-With'), 'XMLHttpRequest');
+        $isAjax ??= strCompareI($this->getHeader('X-Requested-With'), 'XMLHttpRequest');
         return $isAjax;
     }
 
@@ -173,11 +171,11 @@ class Request extends CObject {
     public function getFiles(): array {
         if (!isset($this->files)) {
             $normalizeLevel = null;
-            $normalizeLevel = function(array $file) use (&$normalizeLevel) {
+            $normalizeLevel = static function(array $file) use (&$normalizeLevel) {
                 if (isset($file['name']) && is_array($file['name'])) {
                     $properties = \array_keys($file);
                     $normalized = [];
-                    foreach ($file['name'] as $name => $v) {
+                    foreach ($file['name'] as $name => $_) {
                         foreach ($properties as $property) {
                             $normalized[$name][$property] = $file[$property][$name];
                         }
@@ -540,7 +538,7 @@ class Request extends CObject {
      * @return bool
      */
     public function isSession(): bool {
-        return (session_id() !== '');
+        return session_id() !== '';
     }
 
 
@@ -668,7 +666,7 @@ class Request extends CObject {
 
             if (!isset($headers['Authorization'])) {
                 if (isset($_SERVER['PHP_AUTH_USER'])) {
-                    $passwd = isset($_SERVER['PHP_AUTH_PW']) ? $_SERVER['PHP_AUTH_PW'] : '';
+                    $passwd = $_SERVER['PHP_AUTH_PW'] ?? '';
                     $headers['Authorization'] = 'Basic '. base64_encode($_SERVER['PHP_AUTH_USER'].':'.$passwd);
                 }
                 elseif (isset($_SERVER['PHP_AUTH_DIGEST'])) {
@@ -1036,7 +1034,7 @@ class Request extends CObject {
      * @return string[]
      */
     final public function __sleep(): array {
-        throw new IllegalStateException('You cannot serialize a '.get_class($this));
+        throw new IllegalStateException('You cannot serialize a '.static::class);
     }
 
 
@@ -1046,7 +1044,7 @@ class Request extends CObject {
      * @return void
      */
     final public function __wakeUp(): void {
-        throw new IllegalStateException('You cannot deserialize a '.get_class($this));
+        throw new IllegalStateException('You cannot deserialize a '.static::class);
     }
 
 
@@ -1071,7 +1069,7 @@ class Request extends CObject {
         // content (request body)
         $content = $this->getContent();
         if (strlen($content)) {
-            $string .= NL.substr($content, 0, 2048).NL;                     // limit the request body to 2048 bytes
+            $string .= NL.substr($content, 0, 2_048).NL;                    // limit the request body to 2048 bytes
         }
         return $string;
     }

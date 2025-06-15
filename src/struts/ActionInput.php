@@ -3,9 +3,11 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\struts;
 
+use ArrayAccess;
+use ReturnTypeWillChange;
+
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\exception\IllegalAccessException;
-
 
 /**
  * ActionInput
@@ -13,10 +15,9 @@ use rosasurfer\ministruts\core\exception\IllegalAccessException;
  * An object providing access to the current HTTP request's raw user input.
  * Use {@link ActionForm} to access the request's validated and interpreted input.
  *
- * @implements \ArrayAccess<string, string|array<string>>
+ * @implements ArrayAccess<string, string|array<string>>
  */
-class ActionInput extends CObject implements \ArrayAccess {
-
+class ActionInput extends CObject implements ArrayAccess {
 
     /** @var array<string, string|array<string|array<string>>> */
     protected array $parameters;
@@ -133,7 +134,7 @@ class ActionInput extends CObject implements \ArrayAccess {
      *
      * @return string|array<string|string[]>|null - parameter or NULL if no such input parameter exists
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function offsetGet($name) {
         if (\key_exists($name, $this->parameters)) {
             return $this->parameters[$name];

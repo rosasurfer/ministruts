@@ -3,17 +3,17 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\console\docopt\pattern;
 
+use Traversable;
+
 use rosasurfer\ministruts\console\docopt\SingleMatch;
 
 use function rosasurfer\ministruts\array_filter;
 use function rosasurfer\ministruts\array_merge;
 
-
 /**
  * LeafPattern
  */
 abstract class LeafPattern extends Pattern {
-
 
     /**
      * @param  ?string $name
@@ -37,7 +37,7 @@ abstract class LeafPattern extends Pattern {
      * {@inheritDoc}
      */
     public function flat(array $types = []): array {
-        if (!$types || in_array(get_class($this), $types)) {
+        if (!$types || \in_array(static::class, $types, true)) {
             return [$this];
         }
         return [];
@@ -48,7 +48,7 @@ abstract class LeafPattern extends Pattern {
      * {@inheritDoc}
      */
     public function match(array $left, array $collected = []): array {
-        list($pos, $match) = $this->singleMatch($left)->toArray();
+        [$pos, $match] = $this->singleMatch($left)->toArray();
         if (!$match) {
             return [false, $left, $collected];
         }
@@ -57,12 +57,9 @@ abstract class LeafPattern extends Pattern {
         unset($left_[$pos]);
         $left_ = array_values($left_);
 
-        $name = $this->name();
-        $sameName = array_values(array_filter($collected, function(Pattern $pattern) use ($name) {
-            return ($pattern->name() == $name);
-        }));
+        $sameName = array_values(array_filter($collected, fn(Pattern $pattern): bool => $pattern->name() == $this->name()));
 
-        if (is_int($this->value) || is_array($this->value) || $this->value instanceof \Traversable) {
+        if (is_int($this->value) || is_array($this->value) || $this->value instanceof Traversable) {
             if (is_int($this->value)) {
                 $increment = 1;
             }
@@ -74,7 +71,7 @@ abstract class LeafPattern extends Pattern {
                 $match->value = $increment;
                 return [true, $left_, array_merge($collected, [$match])];
             }
-            if (is_array($increment) || $increment instanceof \Traversable) {
+            if (is_array($increment) || $increment instanceof Traversable) {
                 $sameName[0]->value = array_merge($sameName[0]->value, $increment);
             }
             else {

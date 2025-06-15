@@ -12,7 +12,6 @@ use PHPStan\Type\DynamicMethodReturnTypeExtension;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
-use PHPStan\Type\TypeWithClassName;
 use PHPStan\Type\UnionType;
 use PHPStan\Type\VerbosityLevel;
 
@@ -22,7 +21,6 @@ use rosasurfer\ministruts\db\orm\PersistableObject;
 use function rosasurfer\ministruts\simpleClassName;
 use function rosasurfer\ministruts\strEndsWith;
 use function rosasurfer\ministruts\strLeft;
-
 
 /**
  * Overwrites the return types of {@link DAO::find()}, {@link DAO::findAll()}, {@link DAO::get()} and {@link DAO::getAll()}
@@ -117,7 +115,7 @@ class DaoReturnType extends Extension implements DynamicMethodReturnTypeExtensio
         // validate the supported return types
         $origTypeDescr = $origType->describe(VerbosityLevel::typeOnly());
         $expectedDescr = self::$supportedMethods[$methodName];
-        if (!in_array($origTypeDescr, self::$supportedMethods)) throw new ExtensionException("$call: unexpected return type $origTypeDescr (expected $expectedDescr)");
+        if (!\in_array($origTypeDescr, self::$supportedMethods, true)) throw new ExtensionException("$call: unexpected return type $origTypeDescr (expected $expectedDescr)");
 
         // branch according to the original return type
         $newType = null;

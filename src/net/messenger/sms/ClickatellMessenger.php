@@ -6,7 +6,6 @@ namespace rosasurfer\ministruts\net\messenger\sms;
 use rosasurfer\ministruts\core\exception\UnimplementedFeatureException;
 use rosasurfer\ministruts\net\messenger\Messenger;
 
-
 /**
  * ClickatellMessenger
  *
@@ -15,7 +14,6 @@ use rosasurfer\ministruts\net\messenger\Messenger;
  * @see  https://www.clickatell.com/developers/
  */
 class ClickatellMessenger extends Messenger {
-
 
     /**
      * {@inheritDoc}

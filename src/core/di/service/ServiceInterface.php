@@ -3,14 +3,12 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\core\di\service;
 
-
 /**
  * ServiceInterface
  *
  * An interface implemented by services to be registered in a dependency injection container.
  */
 interface ServiceInterface {
-
 
     /**
      * Constructor

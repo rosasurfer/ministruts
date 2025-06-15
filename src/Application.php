@@ -24,7 +24,7 @@ use rosasurfer\ministruts\util\PHP;
  */
 class Application extends CObject {
 
-    /** @var self - the application itself */
+    /** @var Application - the application itself */
     protected static self $instance;
 
     /** @var ?IConfig - the application's main configuration */
@@ -137,9 +137,15 @@ class Application extends CObject {
         Assert::string($mode, '$mode');
 
         switch ($mode) {
-            case 'ignore':    $iMode = ErrorHandler::MODE_IGNORE;    break;
-            case 'log':       $iMode = ErrorHandler::MODE_LOG;       break;
-            case 'exception': $iMode = ErrorHandler::MODE_EXCEPTION; break;
+            case 'ignore':
+                $iMode = ErrorHandler::MODE_IGNORE;
+                break;
+            case 'log':
+                $iMode = ErrorHandler::MODE_LOG;
+                break;
+            case 'exception':
+                $iMode = ErrorHandler::MODE_EXCEPTION;
+                break;
             default:
                 throw new InvalidValueException('Invalid parameter $mode: "'.$mode.'"');
         }
@@ -274,7 +280,7 @@ class Application extends CObject {
                     if (!$phpInfoTask) exit(0);
                 }
 
-                // execute "phpinfo" task if enabled
+                // execute "php-info" task if enabled
                 if ($phpInfoTask) {
                     PHP::phpinfo();
                     exit(0);
@@ -339,7 +345,6 @@ class Application extends CObject {
      * @return $this
      */
     protected function setConfig(IConfig $configuration): self {
-        $previous = self::$config;
         self::$config = $configuration;
 
         if (isset(self::$di)) {
@@ -357,8 +362,6 @@ class Application extends CObject {
      * @return $this
      */
     protected function setDi(Di $di): self {
-        $previous = self::$di;
-
         if (!$di->has('app')) {
             $di->set('app', $this);
         }
@@ -408,6 +411,6 @@ class Application extends CObject {
         }
         $list = \array_merge($whiteList ?? [], ['127.0.0.1', $_SERVER['SERVER_ADDR']]);
 
-        return \in_array($_SERVER['REMOTE_ADDR'], $list);
+        return \in_array($_SERVER['REMOTE_ADDR'], $list, true);
     }
 }

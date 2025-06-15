@@ -6,14 +6,12 @@ namespace rosasurfer\ministruts\net\http;
 use CurlHandle;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 
-
 /**
  * CurlHttpResponse
  *
  * Represents the HTTP response to an HTTP request made by cURL.
  */
 class CurlHttpResponse extends HttpResponse {
-
 
     /** @var HeaderParser */
     protected HeaderParser $headerParser;

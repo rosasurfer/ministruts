@@ -14,11 +14,11 @@ use rosasurfer\ministruts\core\exception\RuntimeException;
 use rosasurfer\ministruts\db\Connector;
 use rosasurfer\ministruts\db\DatabaseException;
 
+use function rosasurfer\ministruts\preg_match;
 use function rosasurfer\ministruts\strContains;
 use function rosasurfer\ministruts\strStartsWithI;
 
 use const rosasurfer\ministruts\NL;
-
 
 /**
  * PostgresConnector
@@ -54,7 +54,6 @@ use const rosasurfer\ministruts\NL;
  * @see  https://www.postgresql.org/docs/9.6/static/libpq-connect.html#LIBPQ-PARAMKEYWORDS)
  */
 class PostgresConnector extends Connector {
-
 
     /** @var string - DBMS type */
     protected string $type = 'pgsql';
@@ -266,7 +265,7 @@ class PostgresConnector extends Connector {
 
         try {
             error_clear_last();
-            $connection = pg_connect($connStr, PGSQL_CONNECT_FORCE_NEW);;
+            $connection = pg_connect($connStr, PGSQL_CONNECT_FORCE_NEW);
             if (!$connection) throw new DatabaseException(error_get_last()['message'] ?? '');
 
             $this->connection = $connection;
@@ -546,7 +545,7 @@ class PostgresConnector extends Connector {
      */
     public function isInTransaction(): bool {
         if ($this->isConnected()) {
-            return ($this->transactionLevel > 0);
+            return $this->transactionLevel > 0;
         }
         return false;
     }
@@ -563,7 +562,7 @@ class PostgresConnector extends Connector {
         if (!isset($this->lastInsertId)) {
             $version = $this->getVersionNumber();
 
-            if ($version < 8001000) {              // 8.1
+            if ($version < 8_001_000) {            // 8.1
                 $this->lastInsertId = -1;
             }
             else {
@@ -675,7 +674,7 @@ class PostgresConnector extends Connector {
             $minor   = (int) $match[2];
             $release = (int) $match[3];
 
-            $this->versionNumber = $major*1000000 + $minor*1000 + $release;
+            $this->versionNumber = $major*1_000_000 + $minor*1_000 + $release;
         }
         return $this->versionNumber;
     }

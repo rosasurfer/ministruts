@@ -7,9 +7,7 @@ use rosasurfer\ministruts\core\ObjectTrait;
 use rosasurfer\ministruts\core\di\DiAwareTrait;
 use rosasurfer\ministruts\log\Logger;
 
-use const rosasurfer\ministruts\L_ERROR;
 use const rosasurfer\ministruts\L_WARN;
-
 
 /**
  * ZipArchive
@@ -19,7 +17,6 @@ use const rosasurfer\ministruts\L_WARN;
 class ZipArchive extends \ZipArchive {
 
     use ObjectTrait, DiAwareTrait;
-
 
     /** @var string[][] */
     protected static array $errors = [

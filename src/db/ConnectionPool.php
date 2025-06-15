@@ -11,14 +11,12 @@ use rosasurfer\ministruts\db\ConnectorInterface as IConnector;
 use rosasurfer\ministruts\db\pgsql\PostgresConnector;
 use rosasurfer\ministruts\db\sqlite\SQLiteConnector;
 
-
 /**
  * ConnectionPool
  *
  * A pool for multiple database adapter instances. Each instance represents a connection.
  */
 final class ConnectionPool extends Singleton {
-
 
     /** @var IConnector[] - adapter pool */
     private array $pool = [];
@@ -39,11 +37,11 @@ final class ConnectionPool extends Singleton {
     /**
      * Return the Singleton instance of this class.
      *
-     * @return static
+     * @return ConnectionPool
      */
     public static function me(): self {
-        /** @var static $instance */
-        $instance = self::getInstance(static::class);
+        /** @var self $instance */
+        $instance = self::getInstance(self::class);
         return $instance;
     }
 
@@ -76,7 +74,7 @@ final class ConnectionPool extends Singleton {
             $className = self::$aliases[$lName] ?? $className;
 
             // instantiate connector and add it to the pool
-            $me->pool[$id] = $connector = Connector::create($className, $options);
+            $me->pool[$id] = Connector::create($className, $options);
         }
         return $me->pool[$id];
     }

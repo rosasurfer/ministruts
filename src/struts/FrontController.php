@@ -20,7 +20,6 @@ use function rosasurfer\ministruts\strStartsWith;
 
 use const rosasurfer\ministruts\CLI;
 
-
 /**
  * FrontController
  *
@@ -29,7 +28,6 @@ use const rosasurfer\ministruts\CLI;
  * variable runtime status.
  */
 class FrontController extends Singleton {
-
 
     /** @var Module[] - all registered Struts modules with the module prefix as index */
     private array $modules = [];
@@ -53,7 +51,7 @@ class FrontController extends Singleton {
             //                                                              //
             // $controller = $cache->get($class);                           // re-check after the lock is aquired
 
-            if (!$controller) {                                             // @phpstan-ignore booleanNot.alwaysTrue (TODO: fix cache)
+            if (!$controller) {                                             // @phpstan-ignore booleanNot.alwaysTrue (TODO: implement cache)
                 $controller = self::getInstance(static::class);
 
                 /** @var Config $config */
@@ -94,11 +92,11 @@ class FrontController extends Singleton {
         $configs    = \array_merge([$mainConfig], $subConfigs);
 
         // create and register a Module for each found configuration file
-        $file = $ex = null;
+        $file = null;
         try {
             foreach ($configs as $file) {
                 $basename = basename($file, '.xml');
-                $prefix = (strStartsWith($basename, 'struts-config-')) ? substr($basename, 14).'/' : '';
+                $prefix = strStartsWith($basename, 'struts-config-') ? substr($basename, 14).'/' : '';
 
                 $module = new Module($file, $prefix);
                 $module->freeze();
@@ -143,17 +141,20 @@ class FrontController extends Singleton {
             $response->setStatus(HttpResponse::SC_NOT_FOUND);
             header('HTTP/1.1 404 Not Found', true, HttpResponse::SC_NOT_FOUND);
 
-            echo <<<FRONTCONTROLLER_PROCESS_REQUEST_ERROR_SC_404
-<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
-<html><head>
+            echo <<<'HTML_SNIPPET'
+<!doctype html>
+<html lang="en">
+<head>
 <title>404 Not Found</title>
-</head><body>
+</head>
+<body>
 <h1>Not Found</h1>
 <p>The requested URL was not found on this server.</p>
 <hr>
 <address>...lamented the MiniStruts.</address>
-</body></html>
-FRONTCONTROLLER_PROCESS_REQUEST_ERROR_SC_404;
+</body>
+</html>
+HTML_SNIPPET;
         }
         return $response;
     }

@@ -7,9 +7,9 @@ use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\di\proxy\Request as RequestProxy;
 use rosasurfer\ministruts\core\exception\IllegalStateException;
 
+use function rosasurfer\ministruts\preg_match;
 use function rosasurfer\ministruts\strCompareI;
 use function rosasurfer\ministruts\strLeftTo;
-
 
 /**
  * ActionMapping
@@ -17,7 +17,6 @@ use function rosasurfer\ministruts\strLeftTo;
  * An ActionMapping encapsulates the processing instructions for a single route.
  */
 class ActionMapping extends CObject {
-
 
     /** @var bool - whether this component is fully configured */
     protected bool $configured = false;
@@ -434,7 +433,7 @@ class ActionMapping extends CObject {
             return $this->forward;
         }
         return $this->findForward($name) ?: Struts::configError(
-            "<mapping name=\"$this->name\"  path=\"$this->path\": ActionForward \"$name\" not found."
+            "<mapping name=\"$this->name\"  path=\"$this->path\": ActionForward \"$name\" not found.",
         );
     }
 }

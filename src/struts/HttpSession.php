@@ -6,9 +6,10 @@ namespace rosasurfer\ministruts\struts;
 use Throwable;
 
 use rosasurfer\ministruts\core\Singleton;
-use rosasurfer\ministruts\core\di\proxy\Request as Request;
+use rosasurfer\ministruts\core\di\proxy\Request as RequestProxy;
 use rosasurfer\ministruts\util\PHP;
 
+use function rosasurfer\ministruts\preg_match;
 
 /**
  * HttpSession
@@ -16,7 +17,6 @@ use rosasurfer\ministruts\util\PHP;
  * An object wrapping the current HTTP session.
  */
 class HttpSession extends Singleton {
-
 
     /** @var bool - Whether the session is considered "new". A session is new if the client doesn't yet know the session id. */
     protected bool $new;
@@ -52,7 +52,7 @@ class HttpSession extends Singleton {
         // limit session cookie to application path to support multiple projects per domain
         $params = session_get_cookie_params();
         session_set_cookie_params($params['lifetime'],
-                                  Request::getApplicationBaseUri(),
+                                  RequestProxy::getApplicationBaseUri(),
                                   $params['domain'  ],
                                   $params['secure'  ],
                                   $params['httponly']);
@@ -88,7 +88,7 @@ class HttpSession extends Singleton {
         if ($regenerateId) {
             session_regenerate_id(true);                                            // generate new id and delete the old file
         }
-        $request = Request::instance();
+        $request = RequestProxy::instance();
 
         $_SESSION = [];                                                             // empty the session
         $_SESSION['__SESSION_CREATED__'  ] = microtime(true);                       // initialize the session markers

@@ -9,9 +9,9 @@ if (!is_file($autoload = __DIR__.'/../../../../vendor/autoload.php')) {
     echo "File \"$autoload\" not found".PHP_EOL;
     exit(1);
 }
-require($autoload);
+require $autoload;
 
-$doc = <<<DOCOPT
+$doc = <<<'DOCOPT'
 Usage:
   {:cmd:}  tcp <host> <port> [--timeout=<seconds>]
   {:cmd:}  serial <port> [--baud=9600] [--timeout=<seconds>]

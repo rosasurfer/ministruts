@@ -10,12 +10,10 @@ use function rosasurfer\ministruts\normalizeEOL;
 use const rosasurfer\ministruts\NL;
 use const rosasurfer\ministruts\WINDOWS;
 
-
 /**
- * Helper for custom PHPStan extensions.
+ * Base class for custom PHPStan extensions.
  */
 abstract class Extension extends CObject {
-
 
     /**
      * Log a message to the system logger.

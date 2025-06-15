@@ -16,7 +16,6 @@ use const rosasurfer\ministruts\ERROR_LOG_SAPI;
 use const rosasurfer\ministruts\NL;
 use const rosasurfer\ministruts\WINDOWS;
 
-
 /**
  * ErrorLogAppender
  *
@@ -193,7 +192,7 @@ class ErrorLogAppender extends BaseAppender {
     protected function toSTDERR(): bool {
         if (CLI) {
             $iniSetting = !empty(ini_get('error_log'));
-            return (($this->destinationType == ERROR_LOG_DEFAULT && !$iniSetting) || $this->destinationType == ERROR_LOG_SAPI);
+            return ($this->destinationType == ERROR_LOG_DEFAULT && !$iniSetting) || $this->destinationType == ERROR_LOG_SAPI;
         }
         return false;
     }

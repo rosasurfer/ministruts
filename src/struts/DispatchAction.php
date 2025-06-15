@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\struts;
 
-
 /**
  * DispatchAction
  *
@@ -12,7 +11,6 @@ namespace rosasurfer\ministruts\struts;
  * the DispatchAction falls back to the standard Action behavior.
  */
 class DispatchAction extends Action {
-
 
     /**
      * Fall-back {@link Action} method called if no dispatch action key is submitted or a method matching the dispatch

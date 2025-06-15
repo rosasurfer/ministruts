@@ -5,12 +5,10 @@ namespace rosasurfer\ministruts\core\exception;
 
 use rosasurfer\ministruts\core\error\ErrorHandler;
 
-
 /**
  * A trait adding the behavior of a {@link RosasurferException} to any custom {@link \Throwable}.
  */
 trait RosasurferExceptionTrait {
-
 
     /**
      * Prepend a message to the exception's existing message. Used to enrich the exception with additional data.

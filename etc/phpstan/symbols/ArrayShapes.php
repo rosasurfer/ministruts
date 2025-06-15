@@ -3,15 +3,14 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\phpstan;
 
+use rosasurfer\ministruts\db\orm\PersistableObject;
 
 /**
  * Custom PHPStan type definitions and matching classes to enable IntelliSense and code completion.
  * Add this file to the project's library path and use the types in PHPStan annotations only.
  *
- * @phpstan-type  EntityClass = \rosasurfer\ministruts\db\orm\PersistableObject
- *
  * @phpstan-type  ORM_ENTITY = array{
- *     class       : class-string<EntityClass>,
+ *     class       : class-string<PersistableObject>,
  *     connection  : non-empty-string,
  *     table       : non-empty-string,
  *     properties  : array<string, ORM_PROPERTY>,
@@ -36,7 +35,7 @@ namespace rosasurfer\ministruts\phpstan;
  * @phpstan-type  ORM_RELATION = array{
  *     name          : non-empty-string,
  *     type          : 'one-to-one'|'one-to-many'|'many-to-one'|'many-to-many',
- *     class         : class-string<EntityClass>,
+ *     class         : class-string<PersistableObject>,
  *     key           : non-empty-string,
  *     column?       : non-empty-string,
  *     ref-column?   : non-empty-string,
@@ -56,13 +55,8 @@ namespace rosasurfer\ministruts\phpstan;
  *   __adjusted?: int,
  * }
  */
-final class CustomTypes {}
-
-
-/**
- * PHPStan alias for a {@link \rosasurfer\ministruts\db\orm\PersistableObject}.
- */
-final class EntityClass {}
+final class ArrayShapes {
+}
 
 
 /**
@@ -70,7 +64,7 @@ final class EntityClass {}
  *
  * <pre>
  * Array(
- *     class       : class-string&lt;EntityClass&gt;,
+ *     class       : class-string&lt;PersistableObject&gt;,
  *     connection  : non-empty-string,
  *     table       : non-empty-string,
  *     properties  : array&lt;string, ORM_PROPERTY&gt;,
@@ -83,11 +77,12 @@ final class EntityClass {}
  * )
  * </pre>
  *
- * @see \rosasurfer\ministruts\phpstan\EntityClass
+ * @see \rosasurfer\ministruts\phpstan\PersistableObject
  * @see \rosasurfer\ministruts\phpstan\ORM_PROPERTY
  * @see \rosasurfer\ministruts\phpstan\ORM_RELATION
  */
-final class ORM_ENTITY {}
+final class ORM_ENTITY {
+}
 
 
 /**
@@ -105,7 +100,8 @@ final class ORM_ENTITY {}
  * )
  * </pre>
  */
-final class ORM_PROPERTY {}
+final class ORM_PROPERTY {
+}
 
 
 /**
@@ -115,7 +111,7 @@ final class ORM_PROPERTY {}
  * Array(
  *     name          : non-empty-string,
  *     type          : 'one-to-one'|'one-to-many'|'many-to-one'|'many-to-many',
- *     class         : class-string&lt;EntityClass&gt;,
+ *     class         : class-string&lt;PersistableObject&gt;,
  *     key           : non-empty-string,
  *     column?       : non-empty-string,
  *     ref-column?   : non-empty-string,
@@ -125,9 +121,10 @@ final class ORM_PROPERTY {}
  * )
  * </pre>
  *
- * @see \rosasurfer\ministruts\phpstan\EntityClass
+ * @see \rosasurfer\ministruts\phpstan\PersistableObject
  */
-final class ORM_RELATION {}
+final class ORM_RELATION {
+}
 
 
 /**
@@ -146,4 +143,5 @@ final class ORM_RELATION {}
  * )
  * </pre>
  */
-final class STACKFRAME {}
+final class STACKFRAME {
+}

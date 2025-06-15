@@ -9,14 +9,12 @@ use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\error\ErrorHandler;
 use rosasurfer\ministruts\core\exception\InvalidTypeException;
 
-
 /**
  * Connector
  *
  * Abstract super class for concrete storage adapters.
  */
 abstract class Connector extends CObject implements ConnectorInterface {
-
 
     /**
      * Destructor

@@ -14,7 +14,6 @@ use function rosasurfer\ministruts\strLeftTo;
 use const rosasurfer\ministruts\CLI;
 use const rosasurfer\ministruts\NL;
 
-
 /**
  * Request
  *
@@ -37,7 +36,7 @@ class Request extends CObject {
     /** @var ?string - remote IP of the request */
     protected ?string $remoteIP = null;
 
-    /** @var self */
+    /** @var Request */
     protected static self $instance;
 
 
@@ -164,7 +163,7 @@ class Request extends CObject {
                 if (isset($file['name']) && is_array($file['name'])) {
                     $properties = array_keys($file);
                     $normalized = [];
-                    foreach ($file['name'] as $name => $v) {
+                    foreach ($file['name'] as $name => $_) {
                         foreach ($properties as $property) {
                             $normalized[$name][$property] = $file[$property][$name];
                         }
@@ -358,7 +357,7 @@ class Request extends CObject {
      * @return bool
      */
     public function isSecure(): bool {
-        return (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) != 'off');
+        return !empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) != 'off';
     }
 
 
@@ -408,7 +407,7 @@ class Request extends CObject {
         // content (request body)
         $content = $request->getContent($filter);
         if (strlen($content)) {
-            $result .= NL.trim(substr($content, 0, 2048)).NL;       // limit the request body to 2048 bytes
+            $result .= NL.trim(substr($content, 0, 2_048)).NL;      // limit the request body to 2048 bytes
         }
 
         return $result;
@@ -418,7 +417,7 @@ class Request extends CObject {
     /**
      * Return the object instance (there can be only one).
      *
-     * @return self
+     * @return Request
      */
     public static function instance(): self {
         self::$instance ??= new self();

@@ -9,9 +9,9 @@ if (!is_file($autoload = __DIR__.'/../../../../vendor/autoload.php')) {
     echo "File \"$autoload\" not found".PHP_EOL;
     exit(1);
 }
-require($autoload);
+require $autoload;
 
-$doc = <<<DOCOPT
+$doc = <<<'DOCOPT'
 Process FILE and optionally apply correction to either left-hand or right-hand side.
 
 Usage: {:cmd:}  [-vqrh] [FILE]...
