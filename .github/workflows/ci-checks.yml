@@ -14,8 +14,8 @@ permissions:
 jobs:
   integration-checks:
 
-    name:    PHP ${{ matrix.php }}
-    if:      ${{ !startsWith(github.ref, 'refs/tags/') }}   # skip the job if the push is just a tag
+    name: PHP ${{ matrix.php }}
+    if:   ${{ !startsWith(github.ref, 'refs/tags/') }}      # skip the job if the push is just a tag
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -92,7 +92,7 @@ jobs:
       - name: Run PHPUnit
         if:   env.SKIP_PHPUNIT == 'false'
         run: |
-          echo "Running PHPUnit tests..."
-          vendor/bin/phpunit tests --testdox --no-interaction --colors=always
+          echo "Running unit tests..."
+          vendor/bin/phpunit --configuration tests --testdox --no-interaction --colors=always
 
       # ------------------------------------------------------------------------------------------------------------------------------------
