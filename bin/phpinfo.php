@@ -6,12 +6,7 @@
  *
  * Checks the PHP runtime configuration and reports found issues.
  */
-if (!is_file($autoload = __DIR__.'/../vendor/autoload.php')) {
-    echo "File \"$autoload\" not found".PHP_EOL;
-    exit(1);
-}
-
-require($autoload);
+require __DIR__.'/../vendor/autoload.php';
 
 echo PHP_EOL;
 \rosasurfer\util\PHP::phpinfo();

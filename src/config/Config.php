@@ -505,8 +505,8 @@ class Config extends CObject implements ConfigInterface {
     /**
      * Dump the tree structure of a node into a flat format and return it.
      *
-     * @param  string[] $node         [in ]
-     * @param  array    $values       [in ]
+     * @param  string[] $node         [in]
+     * @param  array    $values       [in]
      * @param  int      $maxKeyLength [out]
      *
      * @return array

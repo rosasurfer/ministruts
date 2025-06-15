@@ -161,13 +161,15 @@ class PHP extends StaticClass {
     /**
      * Check PHP settings, print issues and call phpinfo().
      *
-     * PHP_INI_ALL    - entry can be set anywhere
-     * PHP_INI_USER   - entry can be set in scripts and in .user.ini
-     * PHP_INI_ONLY   - entry can be set in php.ini only
-     * PHP_INI_SYSTEM - entry can be set in php.ini and in httpd.conf
-     * PHP_INI_PERDIR - entry can be set in php.ini, httpd.conf, .htaccess and in .user.ini
-     *
      * @return void
+     *
+     * <pre>
+     *  PHP_INI_ALL    - entry can be set anywhere
+     *  PHP_INI_USER   - entry can be set via ini_set() and in .user.ini
+     *  PHP_INI_ONLY   - entry can be set in php.ini only
+     *  PHP_INI_SYSTEM - entry can be set in php.ini and in httpd.conf
+     *  PHP_INI_PERDIR - entry can be set in php.ini, httpd.conf, .htaccess and in .user.ini
+     * </pre>
      */
     public static function phpinfo() {
         /** @var Config|null $config */
@@ -399,7 +401,7 @@ class PHP extends StaticClass {
             </div>
             <?php
             echo NL;
-            @phpinfo();         // PHP might trigger warnings that are already checked and displayed (e.g. "date.timezone").
+            @phpinfo();         // phpinfo() might trigger warnings that are already checked and displayed (e.g. "date.timezone").
         }
     }
 
