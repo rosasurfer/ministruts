@@ -9,6 +9,8 @@ use rosasurfer\ministruts\core\Singleton;
 use rosasurfer\ministruts\core\di\proxy\Request as RequestProxy;
 use rosasurfer\ministruts\util\PHP;
 
+use function rosasurfer\ministruts\preg_match;
+
 /**
  * HttpSession
  *

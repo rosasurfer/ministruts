@@ -10,6 +10,7 @@ use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 
 use function rosasurfer\ministruts\isRelativePath;
+use function rosasurfer\ministruts\preg_match;
 use function rosasurfer\ministruts\realpath;
 use function rosasurfer\ministruts\stderr;
 use function rosasurfer\ministruts\strContains;
@@ -415,7 +416,6 @@ class Config extends CObject implements ConfigInterface {
                 // the last subkey: check for bracket notation
                 $match = null;
                 $result = preg_match('/(.+)\b *\[ *\]$/', $subkey, $match);
-                if ($result === false || preg_last_error() != PREG_NO_ERROR) throw new RuntimeException(preg_last_error_msg());
 
                 if ($result) {
                     // bracket notation

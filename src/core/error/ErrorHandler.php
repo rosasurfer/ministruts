@@ -17,6 +17,7 @@ use rosasurfer\ministruts\log\filter\ContentFilterInterface as ContentFilter;
 use rosasurfer\ministruts\phpstan\ArrayShapes;
 
 use function rosasurfer\ministruts\normalizeEOL;
+use function rosasurfer\ministruts\preg_match;
 use function rosasurfer\ministruts\strEndsWith;
 use function rosasurfer\ministruts\strLeftTo;
 use function rosasurfer\ministruts\strRightFrom;

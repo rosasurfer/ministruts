@@ -16,6 +16,7 @@ use rosasurfer\ministruts\core\exception\IllegalStateException;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 
+use function rosasurfer\ministruts\preg_match;
 use function rosasurfer\ministruts\simpleClassName;
 
 /**

@@ -14,6 +14,7 @@ use rosasurfer\ministruts\core\exception\RuntimeException;
 use rosasurfer\ministruts\db\Connector;
 use rosasurfer\ministruts\db\DatabaseException;
 
+use function rosasurfer\ministruts\preg_match;
 use function rosasurfer\ministruts\strContains;
 use function rosasurfer\ministruts\strStartsWithI;
 

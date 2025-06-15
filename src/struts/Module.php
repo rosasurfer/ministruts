@@ -11,6 +11,7 @@ use rosasurfer\ministruts\net\http\HttpResponse;
 
 use function rosasurfer\ministruts\first;
 use function rosasurfer\ministruts\isRelativePath;
+use function rosasurfer\ministruts\preg_match;
 use function rosasurfer\ministruts\realpath;
 use function rosasurfer\ministruts\simpleClassName;
 use function rosasurfer\ministruts\strCompareI;

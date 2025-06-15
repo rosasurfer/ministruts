@@ -5,6 +5,8 @@ namespace rosasurfer\ministruts\console\docopt\pattern;
 
 use rosasurfer\ministruts\console\docopt\SingleMatch;
 
+use function rosasurfer\ministruts\preg_match_all;
+
 /**
  * Argument
  */

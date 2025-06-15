@@ -21,6 +21,8 @@ use rosasurfer\ministruts\console\docopt\pattern\Required;
 
 use function rosasurfer\ministruts\array_filter;
 use function rosasurfer\ministruts\array_merge;
+use function rosasurfer\ministruts\preg_match;
+use function rosasurfer\ministruts\preg_match_all;
 use function rosasurfer\ministruts\preg_split;
 use function rosasurfer\ministruts\strEndsWith;
 use function rosasurfer\ministruts\strStartsWith;

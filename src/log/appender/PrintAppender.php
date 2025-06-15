@@ -7,6 +7,7 @@ use rosasurfer\ministruts\Application;
 use rosasurfer\ministruts\log\LogMessage;
 
 use function rosasurfer\ministruts\ini_get_bool;
+use function rosasurfer\ministruts\preg_match;
 use function rosasurfer\ministruts\stderr;
 use function rosasurfer\ministruts\stdout;
 

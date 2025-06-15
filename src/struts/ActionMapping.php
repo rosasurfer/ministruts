@@ -7,6 +7,7 @@ use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\di\proxy\Request as RequestProxy;
 use rosasurfer\ministruts\core\exception\IllegalStateException;
 
+use function rosasurfer\ministruts\preg_match;
 use function rosasurfer\ministruts\strCompareI;
 use function rosasurfer\ministruts\strLeftTo;
 

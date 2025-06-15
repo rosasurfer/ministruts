@@ -16,6 +16,7 @@ use function rosasurfer\ministruts\ini_get_bool;
 use function rosasurfer\ministruts\ini_get_bytes;
 use function rosasurfer\ministruts\ini_get_int;
 use function rosasurfer\ministruts\php_byte_value;
+use function rosasurfer\ministruts\preg_match;
 use function rosasurfer\ministruts\realpath;
 use function rosasurfer\ministruts\stderr;
 use function rosasurfer\ministruts\strContains;

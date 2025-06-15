@@ -10,6 +10,7 @@ use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 
 use function rosasurfer\ministruts\normalizeEOL;
+use function rosasurfer\ministruts\preg_match;
 use function rosasurfer\ministruts\strContains;
 use function rosasurfer\ministruts\strEndsWith;
 use function rosasurfer\ministruts\strLeft;

@@ -9,6 +9,7 @@ use rosasurfer\ministruts\db\ConnectorInterface as Connector;
 use rosasurfer\ministruts\db\MultipleRecordsException;
 use rosasurfer\ministruts\db\ResultInterface as IResult;
 
+use function rosasurfer\ministruts\preg_match_all;
 use function rosasurfer\ministruts\strLeftTo;
 
 use const rosasurfer\ministruts\ARRAY_ASSOC;
