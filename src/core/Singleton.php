@@ -61,8 +61,8 @@ abstract class Singleton extends CObject {
      *
      * @return never
      */
-    final protected function __clone(): void {
-        // since PHP8.0 private functions can't be final anymore
+    final protected function __clone() {
+        // protected because since PHP8.0 private functions can't be final anymore
         throw new IllegalStateException('You cannot clone me: '.static::class);
     }
 }
