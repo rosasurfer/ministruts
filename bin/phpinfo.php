@@ -4,19 +4,24 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts;
 
+use rosasurfer\ministruts\util\PHP;
+
 /**
  * CLI version of the framework's phpinfo() task.
  *
  * Checks the PHP runtime configuration and reports found issues.
  */
-if (!\is_file($autoload = __DIR__.'/../vendor/autoload.php')) {
-    echo "ERROR: file \"/vendor/autoload.php\" not found".PHP_EOL;
-    exit(1);
-}
+require __DIR__.'/../vendor/autoload.php';
 
-require($autoload);
+// initialize a new application
+PHP::ini_set('log_errors',         '1'                        );
+PHP::ini_set('log_errors_max_len', '0'                        );
+PHP::ini_set('error_log',          __DIR__.'/../php-error.log');
 
+new Application(['app.dir.root' => __DIR__.'/..']);
+
+// call phpInfo() task
 echo PHP_EOL;
-\rosasurfer\ministruts\util\PHP::phpinfo();
+PHP::phpinfo();
 $iniFile = \php_ini_loaded_file();
 echo PHP_EOL."loaded php.ini: \"$iniFile\"".PHP_EOL;
