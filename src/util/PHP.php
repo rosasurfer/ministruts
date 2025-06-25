@@ -213,7 +213,7 @@ class PHP extends StaticClass {
         // error handling
         // --------------
         /*PHP_INI_ALL   */ $current = ini_get_int('error_reporting');
-            $target = E_ALL & ~E_DEPRECATED;
+            $target = E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED;
             if ($notCovered=($target ^ $current) & $target)                                                          $issues[] = 'Warn:  error_reporting does not cover '.DebugHelper::errorLevelToStr($notCovered).'  [standards]';
         if (!WINDOWS) { /* Windows is always development */
             /*PHP_INI_ALL*/ if (ini_get_bool('display_errors'        )) /*bool|string:stderr*/                       $issues[] = 'Warn:  display_errors is not Off  [security]';
