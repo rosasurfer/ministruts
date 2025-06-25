@@ -47,6 +47,9 @@ class ErrorHandler extends StaticClass {
     const THROW_EXCEPTIONS = 2;
 
 
+    /** @var int - the configured error reporting level */
+    private static $reportingLevel = 0;
+
     /** @var int - the mode the error handler is configured for, can be either LOG_ERRORS or THROW_EXCEPTIONS */
     private static $errorMode;
 
@@ -69,7 +72,8 @@ class ErrorHandler extends StaticClass {
         elseif ($mode === self::THROW_EXCEPTIONS) self::$errorMode = self::THROW_EXCEPTIONS;
         else                                      return;
 
-        set_error_handler(__CLASS__.'::handleError', error_reporting());
+        self::$reportingLevel = error_reporting();
+        set_error_handler(__CLASS__.'::handleError', self::$reportingLevel);
         self::setupShutdownHandler();                           // handle fatal runtime errors during script shutdown
     }
 
@@ -131,12 +135,12 @@ class ErrorHandler extends StaticClass {
 
 
     /**
-     * Global handler for traditional PHP errors.
+     * Global handler for PHP errors.
      *
      * Errors are handled only if covered by the currently configured error reporting level. Errors of the levels
-     * E_DEPRECATED, E_USER_DEPRECATED, E_USER_NOTICE and E_USER_WARNING are always logged and script execution continues
-     * normally. All other errors are logged according to the configured error handling mode. Either they are logged and
-     * script exceution continues normally, or they are wrapped in a PHPError exception and thrown back.
+     * E_DEPRECATED, E_USER_DEPRECATED, E_USER_NOTICE and E_USER_WARNING are logged only and script execution continues
+     * normally. All other errors are handled according to the configured error handling mode. Either they are logged and
+     * script exceution continues normally, or they are converted to PHPError exceptions and thrown back.
      *
      * @param  int     $level              - PHP error severity level
      * @param  string  $message            - error message
@@ -154,8 +158,8 @@ class ErrorHandler extends StaticClass {
         //echoPre('ErrorHandler::handleError() '.DebugHelper::errorLevelToStr($level).': $message='.$message.', $file='.$file.', $line='.$line);
 
         // Ignore suppressed errors and errors not covered by the current reporting level.
-        $reportingLevel = error_reporting();                // since PHP8 some errors are not silenceable anymore
-        if (!$reportingLevel)            return false;      // the @ operator was specified
+        $reportingLevel = self::$reportingLevel;            // don't check against error_reporting() as userland code may modify it
+        if (!$reportingLevel)            return false;      // the @ operator was specified (since PHP8 some errors can't be silenced anymore)
         if (!($reportingLevel & $level)) return true;       // the error is not covered by current reporting level
 
         $message = strLeftTo($message, ' (this will throw an Error in a future version of PHP)', -1);
