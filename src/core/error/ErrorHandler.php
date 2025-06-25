@@ -52,6 +52,9 @@ class ErrorHandler extends StaticClass {
     public const MODE_EXCEPTION = 3;
 
 
+    /** @var int - the configured error reporting level */
+    protected static int $reportingLevel = 0;
+
     /** @var int - the configured error handling mode */
     protected static int $errorHandling = 0;
 
@@ -98,6 +101,7 @@ class ErrorHandler extends StaticClass {
                 self::$exceptionHandling = true;
                 self::$prevExceptionHandler = set_exception_handler(__CLASS__.'::handleException');
 
+                self::$reportingLevel = $level;
                 error_reporting($level);
                 break;
         }
@@ -126,7 +130,7 @@ class ErrorHandler extends StaticClass {
      * A handler for PHP errors. Errors are handled if covered by the active error reporting level. They are either
      * logged or converted to {@link PHPError} exceptions and thrown back.
      *
-     * Errors of level E_DEPRECATED, E_USER_DEPRECATED, E_USER_NOTICE or E_USER_WARNING are just logged and never thrown back.
+     * Errors of level E_DEPRECATED, E_USER_DEPRECATED, E_USER_NOTICE or E_USER_WARNING are only logged and never thrown back.
      *
      * @param  int     $level              - error severity level
      * @param  string  $message            - error message
@@ -153,8 +157,8 @@ class ErrorHandler extends StaticClass {
         };
 
         // ignore suppressed errors and errors not covered by the active reporting level
-        $reportingLevel = error_reporting();                                // since PHP8 some errors are not silenceable anymore
-        if (!$reportingLevel)            return $prevErrorHandler();        // the @ operator was specified
+        $reportingLevel = self::$reportingLevel;                            // don't check against error_reporting() as userland code may modify it
+        if (!$reportingLevel)            return $prevErrorHandler();        // the @ operator was specified (since PHP8 some errors can't be silenced anymore)
         if (!($reportingLevel & $level)) return $prevErrorHandler();        // the error is not covered by the active reporting level
 
         // convert error to a PHPError exception
