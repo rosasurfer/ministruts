@@ -394,8 +394,8 @@ class Application extends CObject {
      * <pre>
      *  configuration example:
      *  ----------------------
-     *  admin.ip-whitelist.a-name       = <ip-address>      // the 'name' field is an arbitrary value
-     *  admin.ip-whitelist.another-name = <ip-address>
+     *  admin.ip.a-name       = <ip-address>        // the 'name' field is an arbitrary value
+     *  admin.ip.another-name = <ip-address>
      * </pre>
      */
     public static function isAdminIP(): bool {
@@ -405,7 +405,7 @@ class Application extends CObject {
 
         static $whiteList = null;
         if (!$whiteList && self::$config) {
-            $values = self::$config->get('admin.ip-whitelist', []);
+            $values = self::$config->get('admin.ip', []);
             if (!\is_array($values)) $values = [$values];
             $whiteList = \array_values($values);
         }
