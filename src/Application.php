@@ -40,33 +40,33 @@ class Application extends CObject {
     /**
      * Create and initialize a new MiniStruts application.
      *
-     * @param  array<string, string> $options [optional] - array with any of the following options:
+     * @param  array<string, string> $options [optional] - array with explicit application config settings, specifically:
      *
-     *        "app.dir.root"       - string:  The project's root directory.
-     *                                        (default: the current directory)
+     *        "app.dir.root"            - string: The project's root directory.
+     *                                            (default: the current directory)
      *
-     *        "app.dir.config"     - string:  The project's configuration location (directory or file path).
-     *                                        (default: the current directory)
+     *        "app.dir.config"          - string: The project's configuration location (directory or file path).
+     *                                            (default: the current directory)
      *
-     *        "app.error.level"    - int:     Error reporting level, e.g. E_ALL & ~E_STRICT
-     *                                        (default: no change)
+     *        "app.error-handler.mode"  - string: Error handling mode, one of:
+     *                                            "ignore":    PHP errors and exceptions are ignored.
+     *                                            "log":       PHP errors and exceptions are logged but execution continues. Exceptions terminate
+     *                                                         the script.
+     *                                            "exception": PHP errors are converted to exceptions, both are logged and both terminate the
+     *                                                         script (default).
      *
-     *        "app.error.on-error" - string:  Error handling mode, one of:
-     *                                        "ignore":    PHP errors and exceptions are ignored.
-     *                                        "log":       PHP errors and exceptions are logged but execution continues. Exceptions terminate
-     *                                                     the script.
-     *                                        "exception": PHP errors are converted to exceptions, both are logged and both terminate the
-     *                                                     script (default).
+     *        "app.error-handler.level" - int:    Error reporting level. If set the level is fixed and userland code will not be able to modify
+     *                                            error reporting at runtime (default: the current runtime reporting level).
      *
-     * All further options are added to the application's configuration as regular config values.
+     * All passed settings are added to the regular application configuration.
      */
     public function __construct(array $options = []) {
         if (isset(self::$instance)) throw new IllegalStateException('Cannot create more than one Application instance');
         self::$instance = $this;
 
         // setup error handling
-        $errorLevel = $options['app.error.level'   ] ?? error_reporting();
-        $errorMode  = $options['app.error.on-error'] ?? 'exception';
+        $errorMode  = $options['app.error-handler.mode'] ?? 'exception';
+        $errorLevel = $options['app.error-handler.level'] ?? null;
         $this->initErrorHandling($errorLevel, $errorMode);
 
         $config = $this->initConfig($options);
@@ -133,7 +133,7 @@ class Application extends CObject {
             if (!strIsDigits($level)) throw new InvalidValueException("Invalid parameter \$level: \"$level\" (not numeric)");
             $level = (int)$level;
         }
-        Assert::int($level, '$level');
+        Assert::nullOrInt($level, '$level');
         Assert::string($mode, '$mode');
 
         switch ($mode) {

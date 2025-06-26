@@ -52,8 +52,8 @@ class ErrorHandler extends StaticClass {
     public const MODE_EXCEPTION = 3;
 
 
-    /** @var int - the configured error reporting level */
-    protected static int $reportingLevel = 0;
+    /** @var ?int - the configured error reporting level */
+    protected static ?int $reportingLevel = null;
 
     /** @var int - the configured error handling mode */
     protected static int $errorHandling = 0;
@@ -77,12 +77,12 @@ class ErrorHandler extends StaticClass {
     /**
      * Setup error handling.
      *
-     * @param  int $level - error reporting level
-     * @param  int $mode  - error handling mode, one of [MODE_IGNORE | MODE_LOG | MODE_EXCEPTION]
+     * @param  ?int $level - error reporting level
+     * @param  int  $mode  - error handling mode, one of [MODE_IGNORE | MODE_LOG | MODE_EXCEPTION]
      *
      * @return void
      */
-    public static function setupErrorHandling(int $level, int $mode): void {
+    public static function setupErrorHandling(?int $level, int $mode): void {
         if ($mode < self::MODE_IGNORE || $mode > self::MODE_EXCEPTION) {
             throw new InvalidValueException('Invalid parameter $mode: '.$mode);
         }
@@ -101,8 +101,10 @@ class ErrorHandler extends StaticClass {
                 self::$exceptionHandling = true;
                 self::$prevExceptionHandler = set_exception_handler(__CLASS__.'::handleException');
 
-                self::$reportingLevel = $level;
-                error_reporting($level);
+                if (isset($level)) {
+                    self::$reportingLevel = $level;
+                    error_reporting($level);
+                }
                 break;
         }
         self::setupShutdownHandler();                               // always setup a shutdown hook
@@ -157,7 +159,7 @@ class ErrorHandler extends StaticClass {
         };
 
         // ignore suppressed errors and errors not covered by the active reporting level
-        $reportingLevel = self::$reportingLevel;                            // don't check against error_reporting() as userland code may modify it
+        $reportingLevel = self::$reportingLevel ?? error_reporting();
         if (!$reportingLevel)            return $prevErrorHandler();        // the @ operator was specified (since PHP8 some errors can't be silenced anymore)
         if (!($reportingLevel & $level)) return $prevErrorHandler();        // the error is not covered by the active reporting level
 
