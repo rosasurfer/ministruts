@@ -243,42 +243,58 @@ class DebugHelper extends StaticClass {
 
 
     /**
-     * Return a human-readable form of the specified error reporting level.
+     * Return a string representation of the passed error reporting levels.
      *
-     * @param  int $level - error reporting level
+     * @param  int  $flags              - error reporting levels
+     * @param  bool $combine [optional] - whether to combine or list multiple levels (default: list)
      *
      * @return string
      */
-    public static function errorLevelToStr($level) {
-        Assert::int($level);
+    public static function errorLevelToStr($flags, $combine = false) {
+        Assert::int($flags);
 
-        $levels = [
-            E_ERROR             => 'E_ERROR',                   //     1
-            E_WARNING           => 'E_WARNING',                 //     2
+        // ordered by real-world priorities
+        $allLevels = [
             E_PARSE             => 'E_PARSE',                   //     4
-            E_NOTICE            => 'E_NOTICE',                  //     8
-            E_CORE_ERROR        => 'E_CORE_ERROR',              //    16
-            E_CORE_WARNING      => 'E_CORE_WARNING',            //    32
             E_COMPILE_ERROR     => 'E_COMPILE_ERROR',           //    64
             E_COMPILE_WARNING   => 'E_COMPILE_WARNING',         //   128
+            E_CORE_ERROR        => 'E_CORE_ERROR',              //    16
+            E_CORE_WARNING      => 'E_CORE_WARNING',            //    32
+            E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',       //  4096
+            E_ERROR             => 'E_ERROR',                   //     1
+            E_WARNING           => 'E_WARNING',                 //     2
+            E_NOTICE            => 'E_NOTICE',                  //     8
+            E_STRICT            => 'E_STRICT',                  //  2048
+            E_DEPRECATED        => 'E_DEPRECATED',              //  8192
             E_USER_ERROR        => 'E_USER_ERROR',              //   256
             E_USER_WARNING      => 'E_USER_WARNING',            //   512
             E_USER_NOTICE       => 'E_USER_NOTICE',             //  1024
-            E_STRICT            => 'E_STRICT',                  //  2048
-            E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',       //  4096
-            E_DEPRECATED        => 'E_DEPRECATED',              //  8192
             E_USER_DEPRECATED   => 'E_USER_DEPRECATED',         // 16384
         ];
 
-        if      (!$level)                                                       $levels = ['0'];                        //     0
-        else if (($level &  E_ALL)                  ==  E_ALL)                  $levels = ['E_ALL'];                    // 32767
-        else if (($level & (E_ALL & ~E_DEPRECATED)) == (E_ALL & ~E_DEPRECATED)) $levels = ['E_ALL & ~E_DEPRECATED'];    // 24575
-        else {
-            foreach ($levels as $key => $v) {
-                if ($level & $key) continue;
-                unset($levels[$key]);
+        $set = $notset = [];
+
+        foreach ($allLevels as $level => $description) {
+            if ($flags & $level) {
+                $set[] = $description;
+            }
+            else {
+                $notset[] = $description;
             }
         }
-        return join('|', $levels);
+
+        if ($combine) {
+            if (sizeof($set) < sizeof($notset)) {
+                $result = $set ? join(' | ', $set) : '0';
+            }
+            else {
+                array_unshift($notset, 'E_ALL');
+                $result = join(' & ~', $notset);
+            }
+        }
+        else {
+            $result = $set ? join(', ', $set) : '0';
+        }
+        return $result;
     }
 }
