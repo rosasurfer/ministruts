@@ -1,0 +1,95 @@
+#!/bin/bash
+#
+# Conveniant wrapper of PHPUnit to set default values. Supports switching between multiple PHP and/or PHPUnit versions.
+#
+# A custom PHP interpreter can be used by setting the environment variable PHP='<php-binary>'.
+# A custom PHPUnit executable can be used by setting the environment variable PHPUNIT='<phpunit-binary>'.
+#
+set -eEuo pipefail
+
+# --- functions ----------------------------------------------------------------------------------------------------------------------------
+
+#
+# Print a message to STDERR and exit the script/subshell.
+#
+# @param $@ - any number of arguments
+#
+function fail() {
+  stderr "ERROR: $*"
+  exit 127
+}
+
+#
+# Print a message to STDERR but don't exit the script/subshell.
+#
+# @param $@ - any number of arguments
+#
+function stderr() {
+  echo "$@" >&2
+}
+
+# --- end of functions ---------------------------------------------------------------------------------------------------------------------
+
+
+# determine the PHP interpreter to use
+declare php="${PHP:-php}"
+
+
+# resolve the project root
+declare isWindowsPhp projectDir
+isWindowsPhp="$("$php" -r "echo (int)(PHP_OS_FAMILY == 'Windows');")"
+projectDir="$(realpath --relative-to=. "$(dirname "$(realpath "$(type -p "$0")")")"/..)"
+[[ "$projectDir" == /* ]] && ((isWindowsPhp)) && projectDir="$(cygpath -m "$projectDir")"
+
+
+# source an existing environment
+declare files=('.env.dist' '.env') file
+for file in "${files[@]}"; do
+  [[ -f "$projectDir/$file" ]] && . "$projectDir/$file"
+done
+
+
+# resolve the vendor directory
+declare vendorDir="$projectDir/${PHP_COMPOSER_VENDOR_DIR:-vendor}"
+vendorDir="${vendorDir#./}"
+
+
+# determine the PHPUnit executable to use
+declare PHPUNIT="${PHPUNIT:-}" phpunit phpunitCmd isExternalPhpunit=0
+
+if [[ -n "$PHPUNIT" ]]; then                                    # a user-specified command
+  phpunitCmd="$PHPUNIT"
+  phpunit="$(type -p "$PHPUNIT")" || fail "PHPUnit executable not found: $PHPUNIT"
+  isExternalPhpunit=1
+else
+  phpunitCmd='vendor/bin/phpunit'
+  phpunit="$vendorDir/bin/phpunit"                              # search vendor directory
+  phpunit="${phpunit#./}"
+  if [[ ! -f "$phpunit" ]]; then
+    phpunitCmd='phpunit' && phpunit="$(type -p phpunit)" || {   # search PATH for: phpunit, phpunit.phar
+      phpunitCmd='phpunit.phar' && phpunit="$(type -p phpunit.phar)" || fail "PHPUnit executable not found"
+    }
+    isExternalPhpunit=1
+  fi
+fi
+((isWindowsPhp)) && phpunit="$(cygpath -m "$phpunit")"          # normalize path if running a Windows PHP version
+
+
+# parse command line arguments
+declare args=() arg cmd=''                                      # symfony/console (and thus PHPStan) supports:
+declare -A options                                              # -s[ ]VALUE             - short option value with optional white space separator
+options=()                                                      # --long-option[= ]VALUE - long option value with mandatory equal or space separator
+
+
+# on DEBUG: show the final command
+if [[ "${DEBUG:-0}" != "0" ]]; then
+  declare phpBin=''
+  [[ "$php" != 'php' ]] && phpBin="$php "
+  echo "CMD: ${phpBin}${phpunit} $*"
+fi
+
+
+# call PHPUnit
+"$php" "$phpunit" --configuration="$projectDir/tests" --colors=always "$@"
+
+exit $?
