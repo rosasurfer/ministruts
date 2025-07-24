@@ -69,17 +69,17 @@ jobs:
         if:   env.SKIP_PHPSTAN == 'false' || env.SKIP_PHPCS == 'false' || env.SKIP_PHPUNIT == 'false'
         run: |
           echo "Validating \"composer.json\"..."
-          composer validate --strict
+          composer validate --strict --ansi
 
           echo "Installing dependencies..."
-          composer install --no-progress
+          composer install --no-progress --ansi
 
       # ------------------------------------------------------------------------------------------------------------------------------------
       - name: Run PHPStan
         if:   env.SKIP_PHPSTAN == 'false'
         run: |
           echo "Generating PHPStan report..."
-          bin/phpstan --no-progress -vvv
+          DEBUG=1 bin/phpstan --no-progress -vvv
 
       # ------------------------------------------------------------------------------------------------------------------------------------
       - name: Run PHPCodeSniffer
@@ -92,7 +92,7 @@ jobs:
       - name: Run PHPUnit
         if:   env.SKIP_PHPUNIT == 'false'
         run: |
-          echo "Running unit tests..."
-          vendor/bin/phpunit --configuration tests --testdox --no-interaction --colors=always
+          echo "Running PHPUnit tests..."
+          DEBUG=1 bin/phpunit --testdox
 
       # ------------------------------------------------------------------------------------------------------------------------------------
