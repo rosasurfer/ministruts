@@ -504,6 +504,39 @@ function isRelativePath(string $path): bool {
 
 
 /**
+ * Encode a value as a JSON string. Wrapper for the built-in function <tt>json_encode()</tt> with enabled error exceptions.
+ *
+ * @param  mixed        $value
+ * @param  int          $flags [optional] - default: none
+ * @param  positive-int $depth [optional] - default: 512
+ *
+ * @return string - encoded value
+ *
+ * @link https://www.php.net/manual/en/function.json-encode.php
+ */
+function json_encode($value, int $flags=0, int $depth=512): string {
+    return \json_encode($value, $flags|JSON_THROW_ON_ERROR, $depth);
+}
+
+
+/**
+ * Decode a JSON value. Wrapper for the built-in function <tt>json_decode()</tt> with enabled error exceptions.
+ *
+ * @param  string       $value
+ * @param  ?bool        $associative [optional] - default: depending on parameter $flags
+ * @param  positive-int $depth       [optional] - default: 512
+ * @param  int          $flags       [optional] - default: none
+ *
+ * @return mixed - decoded value
+ *
+ * @link https://www.php.net/manual/en/function.json-decode.php
+ */
+function json_decode(string $value, ?bool $associative=null, int $depth=512, int $flags=0) {
+    return \json_decode($value, $associative, $depth, $flags|JSON_THROW_ON_ERROR);
+}
+
+
+/**
  * Whether the given index exists in an array-like variable.
  *
  * Complement of PHP's <tt>key_exists()</tt> function adding support for {@link \ArrayAccess} arguments.

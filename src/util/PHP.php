@@ -15,6 +15,7 @@ use function rosasurfer\ministruts\echof;
 use function rosasurfer\ministruts\ini_get_bool;
 use function rosasurfer\ministruts\ini_get_bytes;
 use function rosasurfer\ministruts\ini_get_int;
+use function rosasurfer\ministruts\json_decode;
 use function rosasurfer\ministruts\php_byte_value;
 use function rosasurfer\ministruts\realpath;
 use function rosasurfer\ministruts\stderr;
@@ -322,8 +323,8 @@ class PHP extends StaticClass {
         // check Composer defined dependencies
         $appRoot = $config['app.dir.root'];
         if (is_file($file=$appRoot.'/composer.json') && extension_loaded('json')) {
-            $composer = json_decode(file_get_contents($file), true, 512, JSON_THROW_ON_ERROR);
-            if (isset($composer['require']) && is_array($composer['require'])) {
+            $composer = json_decode(file_get_contents($file), true);
+            if (is_array($composer['require'] ?? false)) {
                 foreach ($composer['require'] as $name => $v) {
                     $name = trim(strtolower($name));
                     if (in_array($name, ['php', 'php-64bit', 'hhvm']) || strContains($name, '/')) continue;
