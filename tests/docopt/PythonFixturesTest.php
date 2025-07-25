@@ -7,6 +7,7 @@ use Exception;
 use PHPUnit\Framework\TestCase;
 
 use function rosasurfer\ministruts\docopt;
+use function rosasurfer\ministruts\json_decode;
 use function rosasurfer\ministruts\preg_replace;
 
 use const rosasurfer\ministruts\NL;
@@ -70,7 +71,7 @@ class PythonFixturesTest extends TestCase {
             foreach (array_slice(explode('$', $body), 1) as $testCase) {
                 $testCase = trim($testCase);
                 [$argv, $expected] = explode(NL, $testCase, 2);
-                $expected = json_decode($expected, true, 512, JSON_THROW_ON_ERROR);
+                $expected = json_decode($expected, true);
 
                 $name = "$i: $argv";
                 $args = explode(' ', $argv, 2);
