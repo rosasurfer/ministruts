@@ -64,7 +64,7 @@ class SQLiteResult extends Result {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param  int $mode [optional] - Controls how the returned array is indexed. Can take one of the following values:
      *                                ARRAY_ASSOC, ARRAY_NUM, or ARRAY_BOTH (default).
@@ -125,7 +125,7 @@ class SQLiteResult extends Result {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function numRows(): int {
         if ($this->numRows < 0) {
@@ -150,7 +150,7 @@ class SQLiteResult extends Result {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function release(): void {
         if ($this->result) {

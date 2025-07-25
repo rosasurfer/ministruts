@@ -57,7 +57,7 @@ final class FileSystemCache extends CachePeer {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isCached(string $key): bool {
         // The actual working horse. This method does not only check the key's existence, it also retrieves the value and
@@ -114,7 +114,7 @@ final class FileSystemCache extends CachePeer {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function get(string $key, $default = null) {
         if ($this->isCached($key))
@@ -124,7 +124,7 @@ final class FileSystemCache extends CachePeer {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function drop(string $key): bool {
         $fileName = $this->getFilePath($key);
@@ -142,7 +142,7 @@ final class FileSystemCache extends CachePeer {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function set(string $key, $value, int $expires = Cache::EXPIRES_NEVER, ?Dependency $dependency = null): bool {
         // stored data: [created, expires, value, dependency]

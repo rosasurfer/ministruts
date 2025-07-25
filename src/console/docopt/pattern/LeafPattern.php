@@ -34,7 +34,7 @@ abstract class LeafPattern extends Pattern {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function flat(array $types = []) {
         if (!$types || in_array(get_class($this), $types)) {
@@ -45,7 +45,7 @@ abstract class LeafPattern extends Pattern {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function match(array $left, array $collected = []) {
         list($pos, $match) = $this->singleMatch($left)->toArray();

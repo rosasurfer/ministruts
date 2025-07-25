@@ -62,7 +62,7 @@ class ZipArchive extends \ZipArchive {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param  string $filename
      * @param  int    $flags [optional]

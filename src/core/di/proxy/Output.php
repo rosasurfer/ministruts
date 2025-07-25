@@ -19,7 +19,7 @@ class Output extends Proxy {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @return string
      */

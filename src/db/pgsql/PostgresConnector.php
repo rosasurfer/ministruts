@@ -260,7 +260,7 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function connect(): self {
         $connStr = $this->getConnectionString();
@@ -303,7 +303,7 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function disconnect(): self {
         if ($this->isConnected()) {
@@ -321,7 +321,7 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isConnected(): bool {
         return isset($this->connection);
@@ -329,7 +329,7 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function escapeIdentifier(string $name): string {
         if (!$this->isConnected()) {
@@ -353,7 +353,7 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function escapeLiteral($value): string {
         // bug or feature: pg_escape_literal(null) => '' quoted empty string instead of 'null'
@@ -375,7 +375,7 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function escapeString(?string $value): ?string {
         // bug or feature: pg_escape_string(null) => empty string instead of NULL
@@ -413,7 +413,7 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @return PostgresResult
      */
@@ -424,7 +424,7 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function execute(string $sql): self {
         $result = $this->executeRaw($sql);
@@ -435,7 +435,7 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @return resource|PgSqlResult - result
      * @phpstan-return PgSqlResultId
@@ -494,7 +494,7 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function commit(): self {
         if ($this->transactionLevel < 0) throw new RuntimeException("Negative transaction nesting level detected: $this->transactionLevel");
@@ -543,7 +543,7 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isInTransaction(): bool {
         if ($this->isConnected()) {
@@ -604,7 +604,7 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function supportsInsertReturn(): bool {
         return true;
@@ -629,7 +629,7 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getType(): string {
         return $this->type;
@@ -637,7 +637,7 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @return string - e.g. "9.1.23-rc"
      */
@@ -660,7 +660,7 @@ class PostgresConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @return int - e.g. 9001023 for version string "9.1.23-rc"
      */

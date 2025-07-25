@@ -95,7 +95,7 @@ class Di extends CObject implements DiInterface {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param  string $name - service identifier
      *
@@ -107,7 +107,7 @@ class Di extends CObject implements DiInterface {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param  string   $name
      * @param  mixed ...$args - instantiation arguments
@@ -126,7 +126,7 @@ class Di extends CObject implements DiInterface {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param  string $name
      *
@@ -144,7 +144,7 @@ class Di extends CObject implements DiInterface {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param  string        $name               - service identifier
      * @param  string|object $definition         - a class name, an instance or a \Closure acting as an instance factory
@@ -164,7 +164,7 @@ class Di extends CObject implements DiInterface {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param  string $name - service identifier
      *

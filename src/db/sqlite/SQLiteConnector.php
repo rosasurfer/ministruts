@@ -139,7 +139,7 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function connect(): self {
         /** @var int $flags */
@@ -190,7 +190,7 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function disconnect(): self {
         if ($this->isConnected()) {
@@ -204,7 +204,7 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isConnected(): bool {
         return ($this->sqlite !== null);
@@ -212,7 +212,7 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function escapeIdentifier(string $name): string {
         return '"'.str_replace('"', '""', $name).'"';
@@ -220,7 +220,7 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function escapeLiteral($value): string {
         // bug or feature: SQLite3::escapeString(null) => empty string instead of NULL
@@ -235,7 +235,7 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function escapeString(?string $value): ?string {
         // bug or feature: SQLite3::escapeString(null) => empty string instead of NULL
@@ -253,7 +253,7 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function query($sql): SQLiteResult {
         try {
@@ -293,7 +293,7 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @return SQLite3Result|bool
      */
@@ -345,7 +345,7 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function commit(): self {
         if ($this->transactionLevel < 0) throw new RuntimeException('Negative transaction nesting level detected: '.$this->transactionLevel);
@@ -384,7 +384,7 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isInTransaction(): bool {
         if ($this->isConnected()) {
@@ -417,7 +417,7 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function supportsInsertReturn(): bool {
         return false;
@@ -440,7 +440,7 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getType(): string {
         return $this->type;
@@ -448,7 +448,7 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @return string - e.g. "3.5.9-rc"
      */
@@ -466,7 +466,7 @@ class SQLiteConnector extends Connector {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @return int - e.g. 3005009 for version string "3.5.9-rc"
      */

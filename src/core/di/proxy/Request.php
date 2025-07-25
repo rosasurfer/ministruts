@@ -69,7 +69,7 @@ class Request extends Proxy {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @return string
      */

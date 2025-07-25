@@ -11,7 +11,7 @@ class Optional extends BranchPattern {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function match(array $left, array $collected = []) {
         foreach ($this->children as $pattern) {

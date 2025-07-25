@@ -244,7 +244,7 @@ class Config extends CObject implements ConfigInterface {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function get(string $key, $default = null) {
         $notFound = false;
@@ -259,7 +259,7 @@ class Config extends CObject implements ConfigInterface {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getBool(string $key, bool $strict=false, bool $default=false): bool {
         $notFound = false;
@@ -290,7 +290,7 @@ class Config extends CObject implements ConfigInterface {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getString(string $key, string $default = ''): string {
         $notFound = false;
@@ -313,7 +313,7 @@ class Config extends CObject implements ConfigInterface {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function set(string $key, $value): self {
         $this->setProperty($key, $value);
@@ -495,7 +495,7 @@ class Config extends CObject implements ConfigInterface {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function dump(array $options = []): string {
         $lines = [];
@@ -583,7 +583,7 @@ class Config extends CObject implements ConfigInterface {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function export(array $options = []): array {
         $maxKeyLength = 0;

@@ -13,7 +13,7 @@ class Argument extends LeafPattern {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function singleMatch(array $left) {
         foreach ($left as $i => $pattern) {

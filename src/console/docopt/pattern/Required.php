@@ -11,7 +11,7 @@ class Required extends BranchPattern {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function match(array $left, array $collected = []) {
         $l = $left;

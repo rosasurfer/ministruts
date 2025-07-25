@@ -1073,7 +1073,7 @@ class Request extends CObject {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function __toString(): string {
         // request

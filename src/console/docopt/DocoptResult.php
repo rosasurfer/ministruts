@@ -105,7 +105,7 @@ class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function offsetExists($offset): bool {
         return key_exists($offset, $this->args);
@@ -113,7 +113,7 @@ class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @return bool|int|string[]|null
      */
@@ -124,7 +124,7 @@ class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function offsetSet($offset, $value): void {
         throw new IllegalAccessException('Modification of CLI parse results denied');
@@ -132,7 +132,7 @@ class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function offsetUnset($offset): void {
         throw new IllegalAccessException('Modification of CLI parse results denied');
@@ -140,7 +140,7 @@ class DocoptResult extends CObject implements \ArrayAccess, \IteratorAggregate {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @return ArrayIterator<string, bool|int|string[]|null>
      */

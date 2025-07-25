@@ -37,7 +37,7 @@ class CurlHttpResponse extends HttpResponse {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getStatus(): int {
         return $this->status;
@@ -59,7 +59,7 @@ class CurlHttpResponse extends HttpResponse {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @return array<string, string[]> - associative array of all received headers
      */
@@ -69,7 +69,7 @@ class CurlHttpResponse extends HttpResponse {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param  string $name - header name
      *
@@ -81,7 +81,7 @@ class CurlHttpResponse extends HttpResponse {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param  string $name - header name
      *
@@ -127,7 +127,7 @@ class CurlHttpResponse extends HttpResponse {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getContent(): string {
         return $this->content;

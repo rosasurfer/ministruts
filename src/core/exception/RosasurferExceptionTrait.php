@@ -59,7 +59,7 @@ trait RosasurferExceptionTrait {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function __toString(): string {
         return ErrorHandler::getVerboseMessage($this);

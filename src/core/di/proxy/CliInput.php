@@ -29,7 +29,7 @@ class CliInput extends Proxy {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @return string
      */

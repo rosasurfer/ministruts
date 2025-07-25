@@ -48,7 +48,7 @@ class Service implements ServiceInterface {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @return string
      */
@@ -58,7 +58,7 @@ class Service implements ServiceInterface {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @return string|object $definition - a class name, an instance or a Closure acting as an instance factory
      */
@@ -68,7 +68,7 @@ class Service implements ServiceInterface {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @return string[] - list of aliases (including the original name)
      */
@@ -78,7 +78,7 @@ class Service implements ServiceInterface {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param  string $name - alias name
      *
@@ -92,7 +92,7 @@ class Service implements ServiceInterface {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param  bool    $factory [optional] - whether to return a new instance (default: no)
      * @param  mixed[] $args [optional]    - additional instantiation arguments of a factory call (default: none)

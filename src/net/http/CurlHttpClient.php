@@ -167,7 +167,7 @@ class CurlHttpClient extends HttpClient {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param  HttpRequest $request
      *
