@@ -49,8 +49,11 @@ class ZipArchive extends \ZipArchive {
 
 
     /**
+     * {@inheritDoc}
+     *
      * @return int - Returns always an error status and not a mixed value. On success it returns ER_OK.
      */
+    #[\ReturnTypeWillChange]
     public function open($filename, $flags = null) {
         $result = parent::open($filename, $flags);
 

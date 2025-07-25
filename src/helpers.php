@@ -746,8 +746,8 @@ function isRelativePath($path) {
  * @see  https://github.com/alexeyshockov/php-json-wrapper
  */
 function json_encode($value, $options=0, $depth=512) {
-    $result = \json_encode(...func_get_args());
-    if ($result === false || json_last_error()) {
+    $result = \json_encode($value, $options|JSON_THROW_ON_ERROR, $depth);
+    if ($result === false) {
         throw new InvalidArgumentException('Cannot convert $value ('.gettype($value).') to JSON ('.json_last_error_msg().')', json_last_error());
     }
     return $result;
@@ -770,8 +770,10 @@ function json_encode($value, $options=0, $depth=512) {
  */
 function json_decode($value, $assoc=false, $depth=512, $options=0) {
     Assert::string($value);
-    $result = \json_decode(...func_get_args());
-    if (json_last_error()) throw new InvalidArgumentException('Invalid JSON value in "'.$value.'" ('.json_last_error_msg().')', json_last_error());
+    $result = \json_decode($value, $assoc, $depth, $options|JSON_THROW_ON_ERROR);
+    if (json_last_error()) {
+        throw new InvalidArgumentException('Invalid JSON value in "'.$value.'" ('.json_last_error_msg().')', json_last_error());
+    }
     return $result;
 }
 
