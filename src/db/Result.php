@@ -42,7 +42,7 @@ abstract class Result extends CObject implements ResultInterface {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function fetchColumn($column=0, $row=null, $onNull=null, $onNoMoreRows=null) {
         if (!is_int($column) && !is_string($column)) {                                  // @phpstan-ignore booleanAnd.alwaysFalse (types come from PHPDoc)

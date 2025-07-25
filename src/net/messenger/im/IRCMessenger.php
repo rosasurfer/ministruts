@@ -14,7 +14,7 @@ class IRCMessenger extends Messenger {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param  scalar[] $options
      */

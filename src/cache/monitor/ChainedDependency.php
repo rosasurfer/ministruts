@@ -41,7 +41,7 @@ class ChainedDependency extends Dependency {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @return self
      */
@@ -61,7 +61,7 @@ class ChainedDependency extends Dependency {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @return self
      */
@@ -81,7 +81,7 @@ class ChainedDependency extends Dependency {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isValid() {
         if ($this->type == 'AND') {

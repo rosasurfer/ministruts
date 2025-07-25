@@ -68,7 +68,7 @@ class SQLiteResult extends Result {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * The types of the values of the returned array are mapped from SQLite3 types as follows:                  <br>
      *  - Integers are mapped to int if they fit into the range PHP_INT_MIN...PHP_INT_MAX, otherwise to string. <br>

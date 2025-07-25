@@ -87,7 +87,7 @@ class FileDependency extends Dependency {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isValid() {
         // TODO: reset stat cache on repeated call, @see clearstatcache()

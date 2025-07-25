@@ -35,7 +35,7 @@ class CurlHttpResponse extends HttpResponse {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @return int
      */
@@ -61,7 +61,7 @@ class CurlHttpResponse extends HttpResponse {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @return array<string, string[]> - associative array of all received headers
      */
@@ -71,7 +71,7 @@ class CurlHttpResponse extends HttpResponse {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param  string $name - header name
      *
@@ -83,7 +83,7 @@ class CurlHttpResponse extends HttpResponse {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param  string $name - header name
      *
@@ -127,7 +127,7 @@ class CurlHttpResponse extends HttpResponse {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @return string - content
      */

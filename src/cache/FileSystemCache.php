@@ -58,7 +58,7 @@ final class FileSystemCache extends CachePeer {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param  string $key
      *
@@ -119,7 +119,7 @@ final class FileSystemCache extends CachePeer {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param  string $key
      * @param  mixed  $default [optional]
@@ -134,7 +134,7 @@ final class FileSystemCache extends CachePeer {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param  string $key
      *
@@ -156,7 +156,7 @@ final class FileSystemCache extends CachePeer {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param  string      $key
      * @param  mixed       $value

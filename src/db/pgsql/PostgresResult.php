@@ -96,7 +96,7 @@ class PostgresResult extends Result {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param  int $mode [optional]
      *
@@ -164,7 +164,7 @@ class PostgresResult extends Result {
 
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @return void
      */

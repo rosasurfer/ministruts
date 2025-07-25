@@ -733,7 +733,7 @@ function isRelativePath($path) {
 
 
 /**
- * Decode a JSON value. Wrapper for the built-in method <tt>json_encode()</tt> with improved error handling.
+ * Encode a value as a JSON string. Wrapper for the built-in function <tt>json_encode()</tt> with improved default error handling.
  *
  * @param  mixed $value
  * @param  int   $options [optional] - default: 0
@@ -747,13 +747,15 @@ function isRelativePath($path) {
  */
 function json_encode($value, $options=0, $depth=512) {
     $result = \json_encode(...func_get_args());
-    if (json_last_error()) throw new InvalidArgumentException('Cannot convert value "'.$value.'" to JSON ('.json_last_error_msg().')', json_last_error());
+    if ($result === false || json_last_error()) {
+        throw new InvalidArgumentException('Cannot convert $value ('.gettype($value).') to JSON ('.json_last_error_msg().')', json_last_error());
+    }
     return $result;
 }
 
 
 /**
- * Decode a JSON value. Wrapper for the built-in method <tt>json_decode()</tt> with improved error handling.
+ * Decode a JSON value. Wrapper for the built-in function <tt>json_decode()</tt> with improved default error handling.
  *
  * @param  string $value
  * @param  bool   $assoc   [optional] - default: FALSE
