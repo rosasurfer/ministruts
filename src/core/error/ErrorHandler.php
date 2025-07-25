@@ -132,7 +132,7 @@ class ErrorHandler extends StaticClass {
      * A handler for PHP errors. Errors are handled if covered by the active error reporting level. They are either
      * logged or converted to {@link PHPError} exceptions and thrown back.
      *
-     * Errors of level E_DEPRECATED, E_USER_DEPRECATED, E_USER_NOTICE or E_USER_WARNING are only logged and never thrown back.
+     * Errors of level E_DEPRECATED, E_USER_DEPRECATED, E_USER_NOTICE or E_USER_WARNING are logged only.
      *
      * @param  int     $level              - error severity level
      * @param  string  $message            - error message
