@@ -1,11 +1,19 @@
 #!/bin/bash
 #
-# Conveniant wrapper of PHPUnit to set default values. Supports switching between multiple PHP and/or PHPUnit versions.
+# Conveniant wrapper of PHPUnit. Sets default values and allows switching between multiple PHP and/or PHPUnit versions.
 #
 # A custom PHP interpreter can be used by setting the environment variable PHP='<php-binary>'.
 # A custom PHPUnit executable can be used by setting the environment variable PHPUNIT='<phpunit-binary>'.
 #
+# Short option name/argument separator are zero or more spaces:   e.g. "-cphpunit.xml" or "-c phpunit.xml"
+# Long option name/argument separator is the "=" equal character: e.g. "--configuration=directory"
+#
+# @version 2025.07.26 21:25
+#
 set -eEuo pipefail
+
+exec 3>&1                                                       # duplicate original STDOUT
+
 
 # --- functions ----------------------------------------------------------------------------------------------------------------------------
 
@@ -28,6 +36,25 @@ function stderr() {
   echo "$@" >&2
 }
 
+#
+# Whether to colorize the output in the current context.
+#
+function useColors() {
+  local color isTerminal=0 isPipe=0
+
+  case "${FORCE_COLOR:-}" in
+    always|yes|true|1) color=1;;
+    never|no|false|0)  color=0;;
+    *)                                                          # lowest priority: auto-detection
+      [[ -t 3 && "${TERM:-}" != 'dumb' ]] && isTerminal=1       # whether STDOUT is an interactive and color-capable terminal
+      [[ -p /proc/self/fd/3 ]] && isPipe=1                      # whether STDOUT is a pipe
+      color=$((isTerminal || isPipe));;
+  esac
+  [[ -n "${NO_COLOR:-}" ]] && color=0                           # highest priority
+
+  return $((!color))
+}
+
 # --- end of functions ---------------------------------------------------------------------------------------------------------------------
 
 
@@ -35,14 +62,14 @@ function stderr() {
 declare php="${PHP:-php}"
 
 
-# resolve the project root
+# resolve the project root directory
 declare isWindowsPhp projectDir
 isWindowsPhp="$("$php" -r "echo (int)(PHP_OS_FAMILY == 'Windows');")"
 projectDir="$(realpath --relative-to=. "$(dirname "$(realpath "$(type -p "$0")")")"/..)"
 [[ "$projectDir" == /* ]] && ((isWindowsPhp)) && projectDir="$(cygpath -m "$projectDir")"
 
 
-# source an existing environment
+# source an existing env configuration
 declare files=('.env.dist' '.env') file
 for file in "${files[@]}"; do
   [[ -f "$projectDir/$file" ]] && . "$projectDir/$file"
@@ -72,13 +99,53 @@ else
     isExternalPhpunit=1
   fi
 fi
-((isWindowsPhp)) && phpunit="$(cygpath -m "$phpunit")"          # normalize path if running a Windows PHP version
+((isWindowsPhp)) && phpunit="$(cygpath -m "$phpunit")"
 
 
 # parse command line arguments
-declare args=() arg cmd=''                                      # symfony/console (and thus PHPStan) supports:
-declare -A options                                              # -s[ ]VALUE             - short option value with optional white space separator
-options=()                                                      # --long-option[= ]VALUE - long option value with mandatory equal or space separator
+declare args=() arg
+declare -A options
+options=()
+
+
+# extract options for default settings
+while (("$#")); do
+  case "$1" in
+    --)                                                         # stop parsing at argument delimiter
+      break;;
+  esac
+  (("$#")) && args+=("$1")
+  shift
+done
+args+=("$@")
+
+
+# set default options
+# --configuration
+if [[ -v options['--configuration'] ]]; then
+  file="${options[--configuration]}"
+  [[ -z "$file" ]] && fail "option --configuration requires a value"
+  [[ -e "$file" ]] || fail "configuration file/directory \"$file\" not found"
+  [[ "$file" == /* ]] && ((isWindowsPhp)) && file="$(cygpath -m "$file")"
+  options['--configuration']="$file"
+else
+  declare dir="$projectDir/tests"
+  dir="${dir#./}"
+  [[ -d "$dir" ]] || fail "directory \"$dir\" not found"
+  options['--configuration']="--configuration=$dir"
+fi
+
+# --printer klas\\tests\\helper\\CliTestDoxNoSummaryPrinter
+
+# --color (PHP can't resolve it correctly)
+if [[ -z "${options['--color']:-}" ]]; then
+  useColors && options['--color']='--colors=always' || options['--color']='--colors=never'
+fi
+
+
+# rebuild all arguments
+args=("${options[@]}" "${args[@]+"${args[@]}"}")
+set -- "${args[@]}"
 
 
 # on DEBUG: show the final command
@@ -90,6 +157,6 @@ fi
 
 
 # call PHPUnit
-"$php" "$phpunit" --configuration="$projectDir/tests" --colors=always "$@"
+"$php" "$phpunit" "$@"
 
 exit $?

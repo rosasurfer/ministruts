@@ -5,9 +5,13 @@
 # PHPCS can be executed using a custom PHP interpreter by setting the environment variable PHP='<php-cmd>'.
 #
 # Examples:
-#  PHP=php81 phpcs                          # Use a different PHP version instead of the standard `php`.
+#  PHP=php81 phpcs                    Use a different PHP version instead of the standard `php`.
+#
+# @version 2025.07.26 21:24
 #
 set -eEuo pipefail
+
+exec 3>&1                                                       # duplicate original STDOUT
 
 # --- functions ----------------------------------------------------------------------------------------------------------------------------
 
@@ -31,30 +35,22 @@ function stderr() {
 }
 
 #
-# Resolve and print the color status to apply in the current runtime environment.
+# Whether to colorize the output in the current context.
 #
-# @param $1 - initial status, one of [on|off|auto]
-#
-function resolveColorStatus() {
-  local result="$1"
+function useColors() {
+  local color isTerminal=0 isPipe=0
 
-  if [[ "$1" == 'auto' ]]; then
-    local isTerminal=0 isPipe=0
-    [[ -t 1 ]] && isTerminal=1
-    [[ -p /proc/self/fd/1 ]] && isPipe=1
-    ((isTerminal || isPipe)) && result='on' || result='off'
-  fi
-
-  case "$result" in
-    on) # keep enabled as long as not explicitly disabled
-      [[ -n "${NO_COLOR:-}" ]] && result='off';;
-    off)
-      ;;
-    *)
-      fail "${FUNCNAME[0]}() invalid color status \"$1\"";;
+  case "${FORCE_COLOR:-}" in
+    always|yes|true|1) color=1;;
+    never|no|false|0)  color=0;;
+    *)                                                          # lowest priority: auto-detection
+      [[ -t 3 && "${TERM:-}" != 'dumb' ]] && isTerminal=1       # whether STDOUT is an interactive and color-capable terminal
+      [[ -p /proc/self/fd/3 ]] && isPipe=1                      # whether STDOUT is a pipe
+      color=$((isTerminal || isPipe));;
   esac
+  [[ -n "${NO_COLOR:-}" ]] && color=0                           # highest priority
 
-  echo "$result"
+  return $((!color))
 }
 
 #
@@ -68,7 +64,7 @@ function swapReportIds() {
   local ids i
   readarray -t ids < <(printf '%s\n' "${inout//,/$'\n'}")
 
-  for i in "${!ids[@]}"; do                     # swap ids
+  for i in "${!ids[@]}"; do                                     # swap ids
     if [[ "${ids[i]}" == 'summary' ]]; then
       ids[i]='source'
     elif [[ "${ids[i]}" == 'source' ]]; then
@@ -79,7 +75,7 @@ function swapReportIds() {
   done
 
   inout=$(printf '%s,' "${ids[@]}")
-  inout="${inout%,}"                            # remove trailing comma
+  inout="${inout%,}"                                            # remove trailing comma
 }
 
 # --- end of functions ---------------------------------------------------------------------------------------------------------------------
@@ -105,7 +101,7 @@ phpcs="${phpcs#./}"
 
 
 declare args=() arg
-args+=('-d')                                                # always increase the memory limit
+args+=('-d')                                                    # always increase the memory limit
 args+=('memory_limit=-1')
 
 declare -A options
@@ -123,7 +119,7 @@ while (("$#")); do
       if [[ -z "${options['--report']:-}" ]]; then
         options['--report']="--report=$arg"
       else
-        options['--report']="${options['--report']},$arg"   # concatenate ids of multiple options
+        options['--report']="${options['--report']},$arg"       # concatenate ids of multiple options
       fi
       shift
       continue;;
@@ -137,17 +133,17 @@ while (("$#")); do
       shift
       continue;;
 
-    --color|--colors)                                       # standard and PHPCS syntax
+    --color|--colors)                                           # standard and PHPCS syntax
       options['--color']='--colors'
       shift
       continue;;
 
-    --no-color|--no-colors)                                 # standard and PHPCS syntax
+    --no-color|--no-colors)                                     # standard and PHPCS syntax
       options['--color']='--no-colors'
       shift
       continue;;
 
-    -d)                                                     # a "php.ini" setting
+    -d)                                                         # a "php.ini" setting
       args+=("$1")
       shift
       ((!"$#")) && fail 'missing value for option -d'
@@ -167,10 +163,7 @@ fi
 
 # always provide a color option (PHP can't resolve it correctly)
 if [[ -z "${options['--color']:-}" ]]; then
-  declare color
-  color="$(resolveColorStatus auto)"                        # auto-resolve the current status
-  [[ "$color" == 'on'  ]] && options['--color']='--colors'
-  [[ "$color" == 'off' ]] && options['--color']='--no-colors'
+  useColors && options['--color']='--colors' || options['--color']='--no-colors'
 fi
 
 
