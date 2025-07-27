@@ -2,17 +2,31 @@
 #
 # Conveniant wrapper of PHPUnit. Sets default values and allows switching between multiple PHP and/or PHPUnit versions.
 #
+# Usage:                 All arguments are optional.
+#   phpunit [options] [--] [DIRECTORY|SingleTest.php]
+#
+# Options:               All PHPUnit options are supported, plus the following:
+#   --default-format     Reset a preconfigured report format.
+#   --default-printer    Reset a preconfigured report format printer.
+#   --full-diff          Display the full diff of failing comparisons (requires a TestCase extension).
+#   --color, --no-color  Enforce or disable colored output (default: auto).
+#   -h                   Original PHPUnit help.
+#
+# Short option name/argument separator are zero or more spaces:   e.g. "-cphpunit.xml" or "-c phpunit.xml"
+# Long option name/argument separator are space or "=" equal character: e.g. "--configuration directory" or "--configuration=directory"
+#
 # A custom PHP interpreter can be used by setting the environment variable PHP='<php-binary>'.
 # A custom PHPUnit executable can be used by setting the environment variable PHPUNIT='<phpunit-binary>'.
 #
-# Short option name/argument separator are zero or more spaces:   e.g. "-cphpunit.xml" or "-c phpunit.xml"
-# Long option name/argument separator is the "=" equal character: e.g. "--configuration=directory"
 #
-# @version 2025.07.26 21:25
+# TODO:
+#  - use a configurable custom printer, reset with --default-printer    --printer klas\\tests\\helper\\CliTestDoxPrinter
+#
+# @version 2025.07.28 22:37
 #
 set -eEuo pipefail
 
-exec 3>&1                                                       # duplicate original STDOUT
+exec 3>&1                                                       # duplicate the original STDOUT
 
 
 # --- functions ----------------------------------------------------------------------------------------------------------------------------
@@ -34,6 +48,32 @@ function fail() {
 #
 function stderr() {
   echo "$@" >&2
+}
+
+#
+# Read configuration files in isolation and extract the requested variables.
+#
+# @param _InOut_ $1 - named reference to an associative array holding the resulting configuration
+# @param _In_    $2 - named reference to an array holding the configuration files to read
+# @param _In_    $@ - any number of config variables to read
+#
+function readConfig() {
+  local -n _config_="$1"                                        # these two names must not appear in outer scopes
+  local -n _files_="$2"
+  shift 2
+  unset "$@"
+  local key value
+
+  while IFS='=' read -r key value; do
+    _config_["$key"]="$value"
+  done < <(
+    for file in "${_files_[@]}"; do
+      [[ -f "$file" ]] && . "$file" &> /dev/null
+    done
+    for var in "$@"; do
+      [[ -v "$var" ]] && echo "$var=${!var}"
+    done
+  )
 }
 
 #
@@ -69,11 +109,14 @@ projectDir="$(realpath --relative-to=. "$(dirname "$(realpath "$(type -p "$0")")
 [[ "$projectDir" == /* ]] && ((isWindowsPhp)) && projectDir="$(cygpath -m "$projectDir")"
 
 
-# source an existing env configuration
-declare files=('.env.dist' '.env') file
-for file in "${files[@]}"; do
-  [[ -f "$projectDir/$file" ]] && . "$projectDir/$file"
-done
+# read the configuration
+declare -A config; config=()
+declare files=("$projectDir/.env.dist" "$projectDir/.env")
+readConfig 'config' 'files' PHP_COMPOSER_VENDOR_DIR  PHPUNIT_REPORT_FORMAT  PHPUNIT_TESTDOX_PRINTER
+
+[[ -v PHP_COMPOSER_VENDOR_DIR ]] || PHP_COMPOSER_VENDOR_DIR="${config[PHP_COMPOSER_VENDOR_DIR]:-}"
+[[ -v PHPUNIT_REPORT_FORMAT   ]] || PHPUNIT_REPORT_FORMAT="${config[PHPUNIT_REPORT_FORMAT]:-}"
+[[ -v PHPUNIT_TESTDOX_PRINTER ]] || PHPUNIT_TESTDOX_PRINTER="${config[PHPUNIT_TESTDOX_PRINTER]:-}"
 
 
 # resolve the vendor directory
@@ -113,6 +156,60 @@ while (("$#")); do
   case "$1" in
     --)                                                         # stop parsing at argument delimiter
       break;;
+
+    --teamcity|--testdox)
+      [[ -v options['--report-format'] ]] && fail 'multiple report format options detected'
+      options['--report-format']="$1"
+      shift
+      continue;;
+
+    --default-format)
+      [[ -v options['--report-format'] ]] && fail 'multiple report format options detected'
+      options['--report-format']=''
+      shift
+      continue;;
+
+    --full-diff)
+      [[ -v options['--full-diff'] ]] && fail 'multiple --full-diff options detected'
+      options['--full-diff']='1'
+      shift
+      continue;;
+
+    --color)                                                    # standard syntax
+      [[ -v options['--color'] ]] && fail 'multiple color options detected'
+      options['--color']='--colors=always'
+      shift
+      continue;;
+
+    --no-color)                                                 # standard syntax
+      [[ -v options['--color'] ]] && fail 'multiple color options detected'
+      options['--color']='--colors=never'
+      shift
+      continue;;
+
+    --colors)                                                   # PHPUnit syntax
+      [[ -v options['--color'] ]] && fail 'multiple color options detected'
+      shift
+      if ((!"$#")) || [[ "$1" == -* ]]; then
+        options['--color']=''                                   # same as auto
+        continue
+      fi
+      arg="$1"
+      shift
+      set -- "--colors=$arg" "$@"
+      continue;;
+
+    --colors=*)                                                 # PHPUnit syntax
+      [[ -v options['--color'] ]] && fail 'multiple color options detected'
+      arg="${1#--colors=}"
+      case "$arg" in
+        never|always) options['--color']="--colors=$arg";;
+        auto)         options['--color']='';;
+        '')           fail "option --colors requires a value";;
+        *)            fail 'invalid --colors argument (must be one of "never", "always" or "auto")';;
+      esac
+      shift
+      continue;;
   esac
   (("$#")) && args+=("$1")
   shift
@@ -135,7 +232,21 @@ else
   options['--configuration']="--configuration=$dir"
 fi
 
-# --printer klas\\tests\\helper\\CliTestDoxNoSummaryPrinter
+# --report-format
+if [[ ! -v options['--report-format'] ]]; then
+  declare format="${PHPUNIT_REPORT_FORMAT:-}"
+  case "$format" in
+    teamcity|testdox) options['--report-format']="--$format";;
+    '')               ;;
+    *)                fail 'invalid env variable PHPUNIT_REPORT_FORMAT (must be one of "teamcity" or "testdox")';;
+  esac
+fi
+
+# --full-diff
+if [[ -v options['--full-diff'] ]]; then
+  export PHPUNIT_FULL_DIFF='1'
+  unset 'options[--full-diff]'
+fi
 
 # --color (PHP can't resolve it correctly)
 if [[ -z "${options['--color']:-}" ]]; then

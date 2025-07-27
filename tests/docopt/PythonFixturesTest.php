@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace rosasurfer\ministruts\tests\docopt;
 
 use Exception;
-use PHPUnit\Framework\TestCase;
+use rosasurfer\ministruts\tests\helper\TestCase;
 
 use function rosasurfer\ministruts\docopt;
 use function rosasurfer\ministruts\json_decode;

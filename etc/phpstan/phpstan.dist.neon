@@ -51,3 +51,5 @@ parameters:
     maximumNumberOfProcesses: 4
   tmpDir:       ../tmp/phpstan
   tipsOfTheDay: false
+  tips:
+    discoveringSymbols: false

@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\tests\docopt;
 
-use PHPUnit\Framework\TestCase;
-
 use rosasurfer\ministruts\console\docopt\DocoptResult;
 use rosasurfer\ministruts\console\docopt\OptionIterator;
 use rosasurfer\ministruts\console\docopt\TokenIterator;
@@ -17,6 +15,7 @@ use rosasurfer\ministruts\console\docopt\pattern\Option;
 use rosasurfer\ministruts\console\docopt\pattern\Optional;
 use rosasurfer\ministruts\console\docopt\pattern\OptionsShortcut;
 use rosasurfer\ministruts\console\docopt\pattern\Required;
+use rosasurfer\ministruts\tests\helper\TestCase;
 
 use function rosasurfer\ministruts\docopt;
 
