@@ -19,6 +19,7 @@ use function rosasurfer\ministruts\strLeftTo;
 use function rosasurfer\ministruts\strStartsWith;
 
 use const rosasurfer\ministruts\CLI;
+use const rosasurfer\ministruts\NL;
 
 /**
  * FrontController
@@ -107,7 +108,7 @@ class FrontController extends Singleton {
         }
         catch (Throwable $ex) {
             if (!$ex instanceof IRosasurferException) $ex = new StrutsException($ex->getMessage(), $ex->getCode(), $ex);
-            throw $ex->appendMessage("Error instantiating Struts module from file \"$file\"");
+            throw $ex->appendMessage(NL."Error instantiating Struts module from file \"$file\"");
         }
     }
 

@@ -174,7 +174,6 @@ class ErrorHandler extends StaticClass {
 
         if ($neverThrow || self::$errorHandling == self::MODE_LOG) {
             // only log the error
-            $exception->prependMessage('PHP '.self::errorLevelDescr($level).': ');
             switch ($level) {
                 case E_NOTICE           : $logLevel = L_NOTICE; break;
                 case E_WARNING          : $logLevel = L_WARN;   break;

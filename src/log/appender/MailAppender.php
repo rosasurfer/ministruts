@@ -12,6 +12,7 @@ use rosasurfer\ministruts\log\detail\Request;
 use function rosasurfer\ministruts\normalizeEOL;
 use function rosasurfer\ministruts\preg_match;
 use function rosasurfer\ministruts\realpath;
+use function rosasurfer\ministruts\simpleClassName;
 use function rosasurfer\ministruts\strContains;
 use function rosasurfer\ministruts\strEndsWith;
 use function rosasurfer\ministruts\strLeftTo;
@@ -22,11 +23,9 @@ use const rosasurfer\ministruts\CLI;
 use const rosasurfer\ministruts\EOL_UNIX;
 use const rosasurfer\ministruts\EOL_WINDOWS;
 use const rosasurfer\ministruts\L_DEBUG;
-use const rosasurfer\ministruts\L_ERROR;
 use const rosasurfer\ministruts\L_FATAL;
 use const rosasurfer\ministruts\L_INFO;
 use const rosasurfer\ministruts\L_NOTICE;
-use const rosasurfer\ministruts\L_WARN;
 use const rosasurfer\ministruts\NL;
 use const rosasurfer\ministruts\WINDOWS;
 
@@ -184,49 +183,49 @@ class MailAppender extends BaseAppender {
     /**
      * Process the passed log messages.
      *
-     * @param  LogMessage[] $messages
+     * @param  LogMessage[] $logMessages
      *
      * @return bool - Whether logging should continue with the next registered appender. Returning FALSE interrupts the chain.
      */
-    protected function processMessages(array $messages): bool {
-        if (!$messages) return true;
+    protected function processMessages(array $logMessages): bool {
+        if (!$logMessages) return true;
         $location = $subject = $msg = '';
 
-        foreach ($messages as $i => $message) {
+        foreach ($logMessages as $i => $logMessage) {
             if ($i == 0) {
-                $logLevel = $message->getLogLevel();
-                $type = 'Exception';
+                $exception = $logMessage->getException();
+                $logLevel  = $logMessage->getLogLevel();
 
-                if ($message->isSentByErrorHandler() || !$message->getException()) {
-                    switch ($logLevel) {
-                        case L_DEBUG:
-                        case L_INFO:
-                        case L_NOTICE:
-                        case L_WARN:  $type = 'message'; break;
-                        case L_ERROR: $type = 'error';   break;
-                        case L_FATAL:
-                            $type = $message->isSentByErrorHandler() ? 'Unhandled exception' : 'error';
-                            break;
+                if ($exception) {
+                    $subjectMsg = simpleClassName($exception);
+                    if ($logMessage->isSentByErrorHandler()) {
+                        $subjectMsg = $logLevel == L_FATAL ? "Unhandled $subjectMsg" : (string)strtok($exception->getMessage(), NL);
                     }
+                    $location = CLI ? 'in '.realpath($_SERVER['PHP_SELF']) : 'at '.strLeftTo(Request::getUrl($this->filter), '?');
                 }
-                $location = CLI ? realpath($_SERVER['PHP_SELF']) : strLeftTo(Request::getUrl($this->filter), '?');
-                $subject  = 'PHP ['.strtoupper(Logger::logLevelDescription($logLevel))."] $type".(CLI ? ' in':' at')." $location";
+                else {
+                    $subjectMsg = (string)strtok($logMessage->getMessage(), NL);
+                    $location = CLI ? 'in '.realpath($_SERVER['PHP_SELF']) : '';
+                }
+
+                $logLevelDescr = strtoupper(Logger::logLevelDescription($logLevel));
+                $subject       = "PHP [$logLevelDescr] $subjectMsg $location";
             }
             else {
                 $msg .= NL.NL.' followed by'.NL;
             }
-            $msg .= $message->getMessageDetails(false, $this->filter);
-            if ($this->traceDetails && $detail = $message->getTraceDetails(false, $this->filter)) {
+            $msg .= $logMessage->getMessageDetails(false, $this->filter);
+            if ($this->traceDetails && $detail = $logMessage->getTraceDetails(false, $this->filter)) {
                 $msg .= NL.$detail;
             }
         }
-        if (sizeof($messages) > 1) $msg .= NL;
+        if (sizeof($logMessages) > 1) $msg .= NL;
 
-        if ($this->requestDetails && $detail = $message->getRequestDetails(false, $this->filter)) $msg .= NL.$detail;
-        if ($this->sessionDetails && $detail = $message->getSessionDetails(false, $this->filter)) $msg .= NL.$detail;
-        if ($this->serverDetails  && $detail = $message->getServerDetails (false, $this->filter)) $msg .= NL.$detail;
+        if ($this->requestDetails && $detail = $logMessage->getRequestDetails(false, $this->filter)) $msg .= NL.$detail;
+        if ($this->sessionDetails && $detail = $logMessage->getSessionDetails(false, $this->filter)) $msg .= NL.$detail;
+        if ($this->serverDetails  && $detail = $logMessage->getServerDetails (false, $this->filter)) $msg .= NL.$detail;
 
-        $msg .= NL.$message->getCallDetails(false);
+        $msg .= NL.$logMessage->getCallDetails(false);
         $msg = trim($msg);
 
         foreach ($this->receivers as $receiver) {
