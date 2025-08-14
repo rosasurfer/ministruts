@@ -209,7 +209,7 @@ class MailAppender extends BaseAppender {
                         case L_DEBUG:
                         case L_INFO:
                         case L_NOTICE:
-                            $where = 'from';
+                            $where = ', url: ';
                             break;
                     }
                 }
