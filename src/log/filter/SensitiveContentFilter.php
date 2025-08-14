@@ -12,10 +12,6 @@ use rosasurfer\ministruts\core\CObject;
  */
 class SensitiveContentFilter extends CObject implements ContentFilterInterface {
 
-    /** replacement value for sensitive strings */
-    private const SUBSTITUTE = '******';
-
-
     /**
      * @var string[] - sensitive name patterns (case-insensitive partial matching)
      *

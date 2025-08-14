@@ -9,7 +9,9 @@ use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\exception\IllegalStateException;
 use rosasurfer\ministruts\log\filter\ContentFilterInterface as ContentFilter;
 
+use function rosasurfer\ministruts\preg_replace;
 use function rosasurfer\ministruts\strLeftTo;
+use function rosasurfer\ministruts\strStartsWith;
 
 use const rosasurfer\ministruts\CLI;
 use const rosasurfer\ministruts\NL;
@@ -393,6 +395,18 @@ class Request extends CObject {
                     }
                 }
                 $headers['Cookie'] = join('; ', $cookies);
+            }
+            if (isset($headers['Authorization'])) {
+                $authHeader = $headers['Authorization'];
+                $redacted = ContentFilter::SUBSTITUTE;
+
+                if (strStartsWith($authHeader, 'Basic')) {
+                    $authHeader = "Basic $redacted:$redacted";
+                }
+                elseif (strStartsWith($authHeader, 'Digest')) {
+                    $authHeader = preg_replace('/(c?nonce|response)="[^"]*"/', "\$1=\"$redacted\"", $authHeader);
+                }
+                $headers['Authorization'] = $authHeader;
             }
         }
 

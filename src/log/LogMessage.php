@@ -268,7 +268,7 @@ class LogMessage extends CObject {
 
         if (!CLI) {
             $indent = ' ';
-            $detail = 'Request:'.NL .'--------'.NL .trim(Request::stringify());
+            $detail = 'Request:'.NL .'--------'.NL .trim(Request::stringify($filter));
             $detail = $indent.str_replace(NL, NL.$indent, normalizeEOL($detail)).NL;
             if ($html) {
                 $detail = '<br style="clear:both"/><br/>'.print_p($detail, true, false).NL;
