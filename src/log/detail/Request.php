@@ -404,7 +404,7 @@ class Request extends CObject {
                     $authHeader = "Basic $redacted:$redacted";
                 }
                 elseif (strStartsWith($authHeader, 'Digest')) {
-                    $authHeader = preg_replace('/(cnonce|response)="[^"]*"/', "\$1=\"$redacted\"", $authHeader);
+                    $authHeader = preg_replace('/(c?nonce|response)="[^"]*"/', "\$1=\"$redacted\"", $authHeader);
                 }
                 $headers['Authorization'] = $authHeader;
             }
