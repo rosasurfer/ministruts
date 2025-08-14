@@ -63,8 +63,8 @@ class Request extends CObject {
                 'CONTENT_MD5'    => 'Content-MD5',
             ];
 
-            // headers with commonly used names (not a RFC requirement)
-            $fixNames = [
+            // headers with commonly used non-standard spelling (not a RFC requirement)
+            $fixHeaderNames = [
                 'CDN'     => 'CDN',
                 'DNT'     => 'DNT',
                 'SEC_GPC' => 'Sec-GPC',
@@ -83,29 +83,30 @@ class Request extends CObject {
                     $name = substr($name, 5);
                     // skip content headers
                     if (!isset($contentNames[$name])) {
-                        $name = $fixNames[$name] ?? str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower($name))));
+                        $name = $fixHeaderNames[$name] ?? str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower($name))));
                         $headers[$name] = $value;
                     }
                 }
             }
 
-            // collect all content headers together at the end
-            foreach ($contentNames as $name => $value) {
-                if (isset($_SERVER[$name])) {
-                    $headers[$contentNames[$name]] = $_SERVER[$name];
+            // reconstruct an existing 'Authorization' header
+            if (!isset($headers['Authorization']) && isset($_SERVER['AUTH_TYPE'])) {
+                $authType = $_SERVER['AUTH_TYPE'];
+                if ($authType == 'Basic') {
+                    $user = $_SERVER['PHP_AUTH_USER'] ?? '';
+                    $pass = $_SERVER['PHP_AUTH_PW'] ?? '';
+                    $headers['Authorization'] = 'Basic '.base64_encode("$user:$pass");
+                }
+                if ($authType == 'Digest') {
+                    $digest = $_SERVER['PHP_AUTH_DIGEST'] ?? '';
+                    $headers['Authorization'] = "Digest $digest";
                 }
             }
 
-            if (!isset($headers['Authorization'])) {
-                if (isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
-                    $headers['Authorization'] = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
-                }
-                elseif (isset($_SERVER['PHP_AUTH_USER'])) {
-                    $passwd = $_SERVER['PHP_AUTH_PW'] ?? '';
-                    $headers['Authorization'] = 'Basic '.base64_encode($_SERVER['PHP_AUTH_USER'].':'.$passwd);
-                }
-                elseif (isset($_SERVER['PHP_AUTH_DIGEST'])) {
-                    $headers['Authorization'] = $_SERVER['PHP_AUTH_DIGEST'];
+            // finally group all content related headers at the end
+            foreach ($contentNames as $name => $value) {
+                if (isset($_SERVER[$name])) {
+                    $headers[$contentNames[$name]] = $_SERVER[$name];
                 }
             }
             $this->headers = $headers;

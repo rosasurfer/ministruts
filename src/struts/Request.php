@@ -642,35 +642,60 @@ class Request extends CObject {
      */
     public function getHeaders(string ...$names): array {
         static $headers = null;
-        static $fixHeaderNames = [
-            'CDN'     => 'CDN',
-            'DNT'     => 'DNT',
-            'SEC_GPC' => 'Sec-GPC',
-            'X_CDN'   => 'X-CDN',
-        ];
 
         // read headers only once
         if ($headers === null) {
+            // content related headers
+            static $contentNames = [
+                'CONTENT_TYPE'   => 'Content-Type',
+                'CONTENT_LENGTH' => 'Content-Length',
+                'CONTENT_MD5'    => 'Content-MD5',
+            ];
+
+            // headers with commonly used non-standard spelling (not a RFC requirement)
+            static $fixHeaderNames = [
+                'CDN'     => 'CDN',
+                'DNT'     => 'DNT',
+                'SEC_GPC' => 'Sec-GPC',
+                'X_CDN'   => 'X-CDN',
+            ];
             $headers = [];
+
             foreach ($_SERVER as $name => $value) {
                 while (substr($name, 0, 9) == 'REDIRECT_') {
                     $name = substr($name, 9);
-                    if (isset($_SERVER[$name])) continue 2;
+                    if (isset($_SERVER[$name])) {
+                        continue 2;
+                    }
                 }
                 if (substr($name, 0, 5) == 'HTTP_') {
                     $name = substr($name, 5);
-                    $name = $fixHeaderNames[$name] ?? str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower($name))));
-                    $headers[$name] = $value;
+                    // skip content headers
+                    if (!isset($contentNames[$name])) {
+                        $name = $fixHeaderNames[$name] ?? str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower($name))));
+                        $headers[$name] = $value;
+                    }
                 }
             }
 
-            if (!isset($headers['Authorization'])) {
-                if (isset($_SERVER['PHP_AUTH_USER'])) {
-                    $passwd = $_SERVER['PHP_AUTH_PW'] ?? '';
-                    $headers['Authorization'] = 'Basic '. base64_encode($_SERVER['PHP_AUTH_USER'].':'.$passwd);
+            // reconstruct an existing 'Authorization' header
+            if (!isset($headers['Authorization']) && isset($_SERVER['AUTH_TYPE'])) {
+                $authType = $_SERVER['AUTH_TYPE'];
+                if ($authType == 'Basic') {
+                    $user = $_SERVER['PHP_AUTH_USER'] ?? '';
+                    $pass = $_SERVER['PHP_AUTH_PW'] ?? '';
+                    $headers['Authorization'] = 'Basic '.base64_encode("$user:$pass");
                 }
-                elseif (isset($_SERVER['PHP_AUTH_DIGEST'])) {
-                    $headers['Authorization'] = $_SERVER['PHP_AUTH_DIGEST'];
+                if ($authType == 'Digest') {
+                    $digest = $_SERVER['PHP_AUTH_DIGEST'] ?? '';
+                    $headers['Authorization'] = "Digest $digest";
+                }
+            }
+
+            // finally group all content related headers at the end
+            foreach ($contentNames as $name => $value) {
+                if (isset($_SERVER[$name])) {
+                    $headers[$contentNames[$name]] = $_SERVER[$name];
                 }
             }
         }
