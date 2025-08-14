@@ -195,28 +195,21 @@ class MailAppender extends BaseAppender {
             if ($i == 0) {
                 $exception = $logMessage->getException();
                 $logLevel  = $logMessage->getLogLevel();
-                $where     = 'at';
 
                 if ($exception) {
                     $subjectMsg = simpleClassName($exception);
                     if ($logMessage->isSentByErrorHandler()) {
                         $subjectMsg = $logLevel == L_FATAL ? "Unhandled $subjectMsg" : (string)strtok($exception->getMessage(), NL);
                     }
+                    $location = CLI ? 'in '.realpath($_SERVER['PHP_SELF']) : 'at '.strLeftTo(Request::getUrl($this->filter), '?');
                 }
                 else {
                     $subjectMsg = (string)strtok($logMessage->getMessage(), NL);
-                    switch ($logLevel) {
-                        case L_DEBUG:
-                        case L_INFO:
-                        case L_NOTICE:
-                            $where = ', url: ';
-                            break;
-                    }
+                    $location = CLI ? 'in '.realpath($_SERVER['PHP_SELF']) : '';
                 }
 
                 $logLevelDescr = strtoupper(Logger::logLevelDescription($logLevel));
-                $location      = CLI ? realpath($_SERVER['PHP_SELF']) : strLeftTo(Request::getUrl($this->filter), '?');
-                $subject       = "PHP [$logLevelDescr] $subjectMsg ".(CLI ? 'in' : $where)." $location";
+                $subject       = "PHP [$logLevelDescr] $subjectMsg $location";
             }
             else {
                 $msg .= NL.NL.' followed by'.NL;
