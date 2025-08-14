@@ -22,10 +22,7 @@ use function rosasurfer\ministruts\strStartsWithI;
 use const rosasurfer\ministruts\CLI;
 use const rosasurfer\ministruts\EOL_UNIX;
 use const rosasurfer\ministruts\EOL_WINDOWS;
-use const rosasurfer\ministruts\L_DEBUG;
 use const rosasurfer\ministruts\L_FATAL;
-use const rosasurfer\ministruts\L_INFO;
-use const rosasurfer\ministruts\L_NOTICE;
 use const rosasurfer\ministruts\NL;
 use const rosasurfer\ministruts\WINDOWS;
 
