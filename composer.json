@@ -37,8 +37,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "rosasurfer\\ministruts\\tests\\":   "tests/",
-            "rosasurfer\\ministruts\\phpstan\\": "etc/phpstan/extension/"
+            "rosasurfer\\ministruts\\phpstan\\": "etc/phpstan/extension/",
+            "rosasurfer\\ministruts\\tests\\":   "tests/"
         },
         "classmap": [
             "etc/phpstan/symbols/"

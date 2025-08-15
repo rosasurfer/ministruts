@@ -28,11 +28,12 @@ class TestCase extends PHPUnitTestCase {
             if (!self::isFullDiffMode()) {
                 throw $ex;
             }
-            parent::fail(sprintf(
+            $message = sprintf(
                 "Failed asserting that two variables are equal.\n\nExpected:\n%s\n\nActual:\n%s",
                 var_export($expected, true),
                 var_export($actual, true),
-            ));
+            );
+            parent::fail($message);
         }
     }
 
@@ -54,11 +55,12 @@ class TestCase extends PHPUnitTestCase {
             if (!self::isFullDiffMode()) {
                 throw $ex;
             }
-            parent::fail(sprintf(
+            $message = sprintf(
                 "Failed asserting that two variables are equal (canonicalizing).\n\nExpected:\n%s\n\nActual:\n%s",
                 var_export($expected, true),
                 var_export($actual, true),
-            ));
+            );
+            parent::fail($message);
         }
     }
 
@@ -80,11 +82,12 @@ class TestCase extends PHPUnitTestCase {
             if (!self::isFullDiffMode()) {
                 throw $ex;
             }
-            parent::fail(sprintf(
+            $message = sprintf(
                 "Failed asserting that two variables are identical.\n\nExpected:\n%s\n\nActual:\n%s",
                 var_export($expected, true),
                 var_export($actual, true),
-            ));
+            );
+            parent::fail($message);
         }
     }
 
@@ -95,7 +98,7 @@ class TestCase extends PHPUnitTestCase {
      *
      * @return bool
      */
-    private static function isFullDiffMode(): bool {
+    protected static function isFullDiffMode(): bool {
         static $fullDiff;
         $fullDiff ??= !empty(getenv('PHPUNIT_FULL_DIFF'));
         return $fullDiff;
