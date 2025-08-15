@@ -5,11 +5,13 @@ namespace rosasurfer\ministruts\log\appender;
 
 use rosasurfer\ministruts\Application;
 use rosasurfer\ministruts\log\LogMessage;
+use rosasurfer\ministruts\log\detail\Request;
 
 use function rosasurfer\ministruts\ini_get_bool;
 use function rosasurfer\ministruts\preg_match;
 use function rosasurfer\ministruts\stderr;
 use function rosasurfer\ministruts\stdout;
+use function rosasurfer\ministruts\strCompareI;
 
 use const rosasurfer\ministruts\CLI;
 use const rosasurfer\ministruts\NL;
@@ -60,28 +62,38 @@ class PrintAppender extends BaseAppender {
             return true;
         }
 
-        // detect "headers already sent" errors triggered by a previous message and cancel further processing
-        if ($message->isSentByErrorHandler() && $this->msgCounterHtml > 0) {
+        // detect "headers already sent" errors triggered by the PrintAppender itself and terminate processing of the error
+        if ($message->isSentByErrorHandler() && $this->msgCounter > 0) {
             if (preg_match('/- headers already sent (by )?\(output started at /', $message->getMessage())) {
                 return false;
             }
         }
 
-        $msg = $message->getMessageDetails(!CLI, $this->filter);
-        if ($this->traceDetails   && $detail = $message->getTraceDetails  (!CLI, $this->filter)) $msg .= NL.$detail;
-        if ($this->requestDetails && $detail = $message->getRequestDetails(!CLI, $this->filter)) $msg .= NL.$detail;
-        if ($this->sessionDetails && $detail = $message->getSessionDetails(!CLI, $this->filter)) $msg .= NL.$detail;
-        if ($this->serverDetails  && $detail = $message->getServerDetails (!CLI, $this->filter)) $msg .= NL.$detail;
-        $msg .= NL.$message->getCallDetails(!CLI, false);
+        if (CLI) {
+            $html = false;
+        }
+        else {
+            $ui = Request::instance()->getHeaderValue('x-ministruts-ui') ?? 'web';
+            $html = !strCompareI($ui, 'cli');
+        }
+
+        $msg = $message->getMessageDetails($html, $this->filter);
+        if ($this->traceDetails   && $detail = $message->getTraceDetails  ($html, $this->filter)) $msg .= NL.$detail;
+        if ($this->requestDetails && $detail = $message->getRequestDetails($html, $this->filter)) $msg .= NL.$detail;
+        if ($this->sessionDetails && $detail = $message->getSessionDetails($html, $this->filter)) $msg .= NL.$detail;
+        if ($this->serverDetails  && $detail = $message->getServerDetails ($html, $this->filter)) $msg .= NL.$detail;
+        $msg .= NL.$message->getCallDetails($html, false);
         $msg = trim($msg);
 
-        if (CLI) {
+        if (!$html) {
             if ($this->msgCounter > 0) {
                 $msg = str_repeat('-', 120).NL.$msg;
             }
             $msg .= NL.NL;                                                  // EOL + one empty line
-            if ($message->isSentByErrorHandler()) stderr($msg);
-            else                                  stdout($msg);
+
+            if (!CLI)                                 echo $msg;            // web UI with forced plain text format
+            elseif ($message->isSentByErrorHandler()) stderr($msg);
+            else                                      stdout($msg);
         }
         else {
             // break out of unfortunate HTML tags
@@ -91,9 +103,8 @@ class PrintAppender extends BaseAppender {
             // the id of each message DIV is unique
             $divId = md5('ministruts').'-'.++$this->msgCounterHtml;
 
-            echo <<<HTML_SNIPPET
-            <div id="$divId"
-                 align="left"
+            echo <<<HTML
+            <div id="$divId" align="left" 
                  style="display:initial; visibility:initial; clear:both;
                  position:relative; top:initial; left:initial; z-index:4294967295;
                  float:left; width:initial; height:initial
@@ -102,10 +113,10 @@ class PrintAppender extends BaseAppender {
                  color:black; background-color:lightgray">
                $msg
             </div>
-            HTML_SNIPPET;
+            HTML;
 
             // some JavaScript to move messages to the top of the page (if JS is not available messages show up inline)
-            echo <<<JAVASCRIPT_SNIPPET
+            echo <<<JAVASCRIPT
             <script>
                 var container = window.ministrutsContainer;
                 if (!container) {
@@ -134,7 +145,7 @@ class PrintAppender extends BaseAppender {
                     if (logMsg) container.appendChild(logMsg);
                 }
             </script>
-            JAVASCRIPT_SNIPPET;
+            JAVASCRIPT;
         }
         $this->msgCounter++;
 

@@ -15,10 +15,11 @@ use Traversable;
 
 use rosasurfer\ministruts\console\docopt\DocoptParser;
 use rosasurfer\ministruts\console\docopt\DocoptResult;
-use rosasurfer\ministruts\core\di\proxy\Request;
+use rosasurfer\ministruts\core\di\proxy\Request as RequestProxy;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 use rosasurfer\ministruts\core\lock\Lock;
+use rosasurfer\ministruts\log\detail\Request;
 use rosasurfer\ministruts\struts\url\Url;
 use rosasurfer\ministruts\struts\url\VersionedUrl;
 
@@ -933,16 +934,24 @@ function print_p($var, bool $return = false, bool $flushBuffers = true): ?string
         $str = (string) $var;
     }
 
-    if (!CLI) {
+    if (CLI) {
+        $html = false;
+    }
+    else {
+        $ui = Request::instance()->getHeaderValue('x-ministruts-ui') ?? 'web';
+        $html = !strCompareI($ui, 'cli');
+    }
+
+    if ($html) {
         $str = '<div align="left"
                      style="display:initial; visibility:initial; clear:both;
                      position:relative; top:initial; left:initial; z-index:4294967295;
                      float:left; width:initial; height:initial;
                      margin:0; padding:0; border-width:0;
                      color:inherit; background-color:inherit">
-                   <pre style="width:initial; height:initial; margin:0; padding:0; border-width:0;
-                        color:inherit; background-color:inherit; white-space:pre; line-height:12px;
-                        font:normal normal 12px/normal \'Courier New\',courier,serif">'.hsc($str).'</pre>
+                  <pre style="width:initial; height:initial; margin:0; padding:0; border-width:0;
+                       color:inherit; background-color:inherit; white-space:pre; line-height:12px;
+                       font:normal normal 12px/normal \'Courier New\',courier,serif">'.hsc($str).'</pre>
                 </div>';
     }
     if (!strEndsWith($str, NL)) {
@@ -996,8 +1005,8 @@ function route(string $name): Url {
         $name  = substr($name, 0, $pos);
     }
 
-    $module = Request::getModule();
-    if (!$module) throw new RuntimeException("Request module not found");
+    $module = RequestProxy::getModule();
+    if (!$module) throw new RuntimeException('Request module not found');
 
     $mapping = $module->getMapping($name);
     if (!$mapping) throw new RuntimeException("Route \"$name\" not found");

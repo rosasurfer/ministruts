@@ -137,7 +137,7 @@ class LogMessage extends CObject {
     /**
      * Return a string representation of the message details.
      *
-     * @param  bool           $html              - whether to get an HTML (true) or a CLI (false) representation
+     * @param  bool           $html              - whether to get an HTML (true) or a plain text (false) representation
      * @param  ?ContentFilter $filter [optional] - the content filter to apply (default: none)
      *
      * @return string - message details (ending with a line break) or an empty string if not applicable
@@ -188,7 +188,7 @@ class LogMessage extends CObject {
     /**
      * Return a string representation of the stacktrace.
      *
-     * @param  bool           $html              - whether to get an HTML (true) or a CLI (false) representation
+     * @param  bool           $html              - whether to get an HTML (true) or a plain text (false) representation
      * @param  ?ContentFilter $filter [optional] - the content filter to apply (default: none)
      *
      * @return string - stacktrace details (ending with a line break) or an empty string if not applicable
@@ -250,7 +250,7 @@ class LogMessage extends CObject {
     /**
      * Return a string representation of the current HTTP request.
      *
-     * @param  bool           $html              - whether to get an HTML (true) or a CLI (false) representation
+     * @param  bool           $html              - whether to get an HTML (true) or a plain text (false) representation
      * @param  ?ContentFilter $filter [optional] - the content filter to apply (default: none)
      *
      * @return string - request details (ending with a line break) or an empty string if not applicable
@@ -281,7 +281,7 @@ class LogMessage extends CObject {
     /**
      * Return a string representation of the current HTTP session.
      *
-     * @param  bool           $html              - whether to get an HTML (true) or a CLI (false) representation
+     * @param  bool           $html              - whether to get an HTML (true) or a plain text (false) representation
      * @param  ?ContentFilter $filter [optional] - the content filter to apply (default: none)
      *
      * @return string - session details (ending with a line break) or an empty string if not applicable
@@ -316,7 +316,7 @@ class LogMessage extends CObject {
     /**
      * Return a string representation of the current $_SERVER environment.
      *
-     * @param  bool           $html              - whether to get an HTML (true) or a CLI (false) representation
+     * @param  bool           $html              - whether to get an HTML (true) or a plain text (false) representation
      * @param  ?ContentFilter $filter [optional] - the content filter to apply (default: none)
      *
      * @return string - server details (ending with a line break) or an empty string if not applicable
@@ -346,7 +346,7 @@ class LogMessage extends CObject {
     /**
      * Return a string representation of the interface calling context.
      *
-     * @param  bool $html                   - whether to get an HTML (true) or a CLI (false) representation
+     * @param  bool $html                   - whether to get an HTML (true) or a plain text (false) representation
      * @param  bool $requestTime [optional] - whether to add an additional request timestamp (default: yes)
      *
      * @return string - calling context details (ending with a line break) or an empty string if not applicable
