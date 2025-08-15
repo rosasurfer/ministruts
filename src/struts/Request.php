@@ -652,12 +652,13 @@ class Request extends CObject {
                 'CONTENT_MD5'    => 'Content-MD5',
             ];
 
-            // headers with commonly used non-standard spelling (not a RFC requirement)
+            // headers with non-standard casing (not a RFC requirement)
             static $fixHeaderNames = [
-                'CDN'     => 'CDN',
-                'DNT'     => 'DNT',
-                'SEC_GPC' => 'Sec-GPC',
-                'X_CDN'   => 'X-CDN',
+                'CDN'             => 'CDN',
+                'DNT'             => 'DNT',
+                'SEC_GPC'         => 'Sec-GPC',
+                'X_CDN'           => 'X-CDN',
+                'X_MINISTRUTS_UI' => 'X-Ministruts-UI',
             ];
             $headers = [];
 
