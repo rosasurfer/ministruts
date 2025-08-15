@@ -199,6 +199,10 @@ class Request extends CObject {
         if (!isset($this->content)) {
             $content = '';
 
+            if ($_GET) {
+                $get = $filter ? $filter->filterValues($_GET) : $_GET;
+                $content .= '$_GET => '.trim(print_r($get, true)).NL;
+            }
             if ($_POST) {
                 $post = $filter ? $filter->filterValues($_POST) : $_POST;
                 $content .= '$_POST => '.trim(print_r($post, true)).NL;
@@ -214,7 +218,7 @@ class Request extends CObject {
                                 $input = json_encode($values, JSON_THROW_ON_ERROR);
                             }
                         }
-                        catch (Throwable $th) {}            // intentionally eat it
+                        catch (Throwable $ex) {}            // intentionally eat it
                     }
                     $content .= trim($input).NL;
                 }
@@ -379,7 +383,7 @@ class Request extends CObject {
         $method   = $_SERVER['REQUEST_METHOD' ] ?? '';
         $protocol = $_SERVER['SERVER_PROTOCOL'] ?? '';
         $uri      = $request->getUri($filter);
-        $result = "$method $uri $protocol".NL;
+        $result   = "$method $uri $protocol".NL;
 
         // headers
         $headers = $request->getHeaders();
