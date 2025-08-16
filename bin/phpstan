@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Conveniant wrapper of PHPStan. Sets default values and adds command-line support for using baseline files
+# Conveniant wrapper for PHPStan. Sets default values and adds command-line support for using baseline files
 # (a feature PHPStan lacks). Also supports switching between multiple PHP and/or PHPStan versions.
 #
 # Usage:                                    All arguments are optional.
@@ -38,14 +38,13 @@
 # TODO:
 #  - include baseline via dynamic PHP include           @see https://phpstan.org/config-reference#multiple-files
 #
-# @version 2025.07.26 21:25
-#
 set -eEuo pipefail
 
-exec 3>&1                                                       # duplicate original STDOUT
+exec 3>&1                                               # duplicate original STDOUT
 
 
 # --- functions ----------------------------------------------------------------------------------------------------------------------------
+
 
 #
 # Print a message to STDERR and exit the script/subshell.
@@ -57,6 +56,7 @@ function fail() {
   exit 127
 }
 
+
 #
 # Print a message to STDERR but don't exit the script/subshell.
 #
@@ -65,6 +65,62 @@ function fail() {
 function stderr() {
   echo "$@" >&2
 }
+
+
+#
+# Read configuration files in isolation and extract the requested variables.
+#
+# @param $1     - name of an indexed array with config files to read
+# @param $2     - name of an associative array with the resulting configuration
+# @param ${@:3} - any number of variable names to read from the config files
+#
+function readConfig() {
+  local _files_="$1[@]" name value
+  (("$#" < 3)) && fail "${FUNCNAME[0]}() missing arguments (min. 3)"
+  [[ "$1" == '_files_' ]] && fail "${FUNCNAME[0]}() invalid argument \$1: illegal name '$1'"
+  eval "((!\${#$_files_}))" && fail "${FUNCNAME[0]}() invalid argument \$1: empty"
+  for name in "${@:3}"; do
+    [[ "$name" == '_file_' || "$name" == '_name_' ]] && fail "${FUNCNAME[0]}() illegal argument name '$name'"
+  done
+
+  while IFS='=' read -r name value; do
+    eval "$2[$name]='$value'"
+  done < <(
+    shift 2
+    unset "$@"
+    for _file_ in "${!_files_}"; do
+      [[ -f "$_file_" ]] && source "$_file_" &> /dev/null
+    done
+    for _name_ in "$@"; do
+      [[ -v "$_name_" ]] && echo "$_name_=${!_name_}"
+    done
+  )
+}
+
+
+#
+# Finds a specified command in the PATH and makes sure it's not this script itself. Prints the found command.
+#
+# @param $1 - command
+#
+function findCommand() {
+  local lines line path
+  readarray -t lines < <(type -a "$1" 2>/dev/null || :)
+
+  for line in "${lines[@]+"${lines[@]}"}"; do
+    case "$line" in
+      *' is a'*) ;;
+      *)
+        path="${line#* is }"
+        [[ "$(realpath "$path")" == "$self" ]] && continue
+        [[ "$(stat -c '%d:%i' "$path")" == "$(stat -c '%d:%i' "$self")" ]] && continue
+        echo "$path"
+        return 0;;
+    esac
+  done
+  return 1
+}
+
 
 #
 # Whether to colorize the output in the current context.
@@ -85,48 +141,52 @@ function useColors() {
   return $((!color))
 }
 
+
 # --- end of functions ---------------------------------------------------------------------------------------------------------------------
 
 
-# determine the PHP interpreter to use
-declare php="${PHP:-php}"
-
-
 # resolve the project root directory
-declare isWindowsPhp projectDir
+declare self projectDir
+self="$(realpath "$(type -p "$0")")"
+projectDir="$(realpath --relative-to=. "$(dirname "$self")"/..)"
+
+
+# read the configuration
+declare -a files=("$projectDir/.env.dist" "$projectDir/.env")
+declare -A config=()
+readConfig 'files' 'config' PHP PHP_COMPOSER_VENDOR_DIR PHPSTAN
+
+[[ -v PHP                     ]] || PHP="${config[PHP]:-}"
+[[ -v PHP_COMPOSER_VENDOR_DIR ]] || PHP_COMPOSER_VENDOR_DIR="${config[PHP_COMPOSER_VENDOR_DIR]:-}"
+[[ -v PHPSTAN                 ]] || PHPSTAN="${config[PHPSTAN]:-}"
+
+
+# determine the PHP interpreter to use
+declare php="${PHP:-php}" isWindowsPhp
 isWindowsPhp="$("$php" -r "echo (int)(PHP_OS_FAMILY == 'Windows');")"
-projectDir="$(realpath --relative-to=. "$(dirname "$(realpath "$(type -p "$0")")")"/..)"
 [[ "$projectDir" == /* ]] && ((isWindowsPhp)) && projectDir="$(cygpath -m "$projectDir")"
 
 
-# source an existing env configuration
-declare files=('.env.dist' '.env') file
-for file in "${files[@]}"; do
-  [[ -f "$projectDir/$file" ]] && . "$projectDir/$file"
-done
-
-
-# resolve config and vendor directory
-declare configDir="$projectDir/etc/phpstan" configFile=''
-configDir="${configDir#./}"
-declare vendorDir="$projectDir/${PHP_COMPOSER_VENDOR_DIR:-vendor}"
+# resolve vendor and config directory
+declare vendorDir="$projectDir/${PHP_COMPOSER_VENDOR_DIR:-vendor}" configDir="$projectDir/etc/phpstan" configFile=''
 vendorDir="${vendorDir#./}"
+configDir="${configDir#./}"
 
 
 # determine the PHPStan executable to use
-declare PHPSTAN="${PHPSTAN:-}" phpstan phpstanCmd isExternalPhpstan=0
+declare phpstan phpstanCmd isExternalPhpstan=0
 
 if [[ -n "$PHPSTAN" ]]; then                                    # a user-specified command
   phpstanCmd="$PHPSTAN"
-  phpstan="$(type -p "$PHPSTAN")" || fail "PHPStan executable not found: $PHPSTAN"
-  isExternalPhpstan=1
+  phpstan="$(findCommand "$PHPSTAN")" || fail "PHPStan executable not found: $PHPSTAN"
+  isExternalPhpstan=1                                           # TODO: make sure phpstan is not this script itself
 else
   phpstanCmd='vendor/bin/phpstan'
   phpstan="$vendorDir/bin/phpstan"                              # search vendor directory
   phpstan="${phpstan#./}"
-  if [[ ! -f "$phpstan" ]]; then
-    phpstanCmd='phpstan' && phpstan="$(type -p phpstan)" || {   # search PATH for: phpstan, phpstan.phar
-      phpstanCmd='phpstan.phar' && phpstan="$(type -p phpstan.phar)" || fail "PHPStan executable not found"
+  if [[ ! -f "$phpstan" ]]; then                                # TODO: make sure phpstan is not this script itself
+    phpstanCmd='phpstan' && phpstan="$(findCommand phpstan)" || {
+      phpstanCmd='phpstan.phar' && phpstan="$(findCommand phpstan.phar)" || fail "PHPStan executable not found"
     }
     isExternalPhpstan=1
   fi
@@ -134,10 +194,9 @@ fi
 ((isWindowsPhp)) && phpstan="$(cygpath -m "$phpstan")"
 
 
-# parse command line arguments
-declare args=() arg cmd=''                                      # symfony/console (and thus PHPStan) supports:
-declare -A options                                              # -s[ ]VALUE             - optional space separator
-options=()                                                      # --long-option[= ]VALUE - mandatory equal or space separator
+# parse command line arguments                                  # symfony/console (and thus PHPStan) supports:
+declare -A options=()                                           # -s[ ]VALUE             - optional space separator
+declare args=() arg cmd=''                                      # --long-option[= ]VALUE - mandatory equal or space separator
 
 
 # extract and set the PHPStan command
@@ -227,25 +286,24 @@ args+=("$@")
 
 # set default options
 # --autoload-file
-if [[ -v options['--autoload-file'] ]]; then
+if [[ -n "${options[--autoload-file]+x}" ]]; then
   file="${options[--autoload-file]}"
   [[ -z "$file" ]] && fail "option --autoload-file requires a value"
   [[ -f "$file" ]] || fail "autoload file \"$file\" not found"
   [[ "$file" == /* ]] && ((isWindowsPhp)) && file="$(cygpath -m "$file")"
-  options['--autoload-file']="$file"
+  options['--autoload-file']="--autoload-file=$file"
 elif ((isExternalPhpstan)); then                                # an external PHPStan needs an explicit auto-load option
   arg="$vendorDir/autoload.php"
   arg="${arg#./}"
   [[ -f "$arg" ]] || fail "$vendorDir/autoload.php not found"
-  options['--autoload-file']="$arg"
+  options['--autoload-file']="--autoload-file=$arg"
 fi
-[[ -v options['--autoload-file'] ]] && options['--autoload-file']="--autoload-file=${options[--autoload-file]}"
 
 # --configuration
 if [[ "$cmd" == 'completion' || "$cmd" == 'list' ]]; then
   unset 'options[--configuration]'
 else
-  if [[ -v options['--configuration'] ]]; then
+  if [[ -n "${options[--configuration]+x}" ]]; then
     file="${options[--configuration]}"
     [[ -z "$file" ]] && fail "option --configuration requires a value"
     [[ -f "$file" ]] || fail "configuration file \"$file\" not found"
@@ -266,7 +324,7 @@ fi
 if [[ "$cmd" == 'list' ]]; then
   unset 'options[--memory-limit]'
 else
-  if [[ -v options['--memory-limit'] ]]; then
+  if [[ -n "${options[--memory-limit]+x}" ]]; then
     [[ -z "${options[--memory-limit]}" ]] && fail "option --memory-limit requires a value"
   else
     options['--memory-limit']='-1'
@@ -274,18 +332,18 @@ else
   options['--memory-limit']="--memory-limit=${options[--memory-limit]}"
 fi
 
-# --color (PHP can't resolve it correctly)
+# --color: PHP can't resolve it correctly
 if [[ -z "${options['--color']:-}" ]]; then
   useColors && options['--color']='--ansi' || options['--color']='--no-ansi'
 fi
 
 # --use-baseline
 if [[ "$cmd" == 'analyse' ]]; then
-  if [[ -v options['--use-baseline'] ]]; then
+  if [[ -n "${options[--use-baseline]+x}" ]]; then
     file="${options[--use-baseline]}"
     [[ -z "$file" ]] && fail "option --use-baseline requires a value"
     [[ -f "$file" ]] || fail "baseline file \"$file\" not found"
-    [[ "$file" == /* ]] && ((isWindowsPhp)) && file="$(cygpath -m "$file")"
+    [[ "$file" == /* ]] && ((isWindowsPhp)) && options['--use-baseline']="$(cygpath -m "$file")"
   fi
 else
   unset 'options[--use-baseline]'
@@ -293,19 +351,19 @@ fi
 
 
 # include a specified user baseline
-if [[ -v options['--use-baseline'] ]]; then
+if [[ -n "${options[--use-baseline]+x}" ]]; then
   declare configWrapper                                         # create tmp file and register it for auto-deletion
   configWrapper="$(mktemp --suffix .neon .config-wrapper.XXX)"
   [[ "$configWrapper" == /* ]] && ((isWindowsPhp)) && configWrapper="$(cygpath -m "$configWrapper")"
   trap "rm -f '$configWrapper'" EXIT
 
-  echo "includes:"                        > "$configWrapper"
+  echo 'includes:'                        > "$configWrapper"
   echo "  - ${options[--configuration]}" >> "$configWrapper"    # include user or default config
   echo "  - ${options[--use-baseline]}"  >> "$configWrapper"    # include user baseline
   options['--configuration']="$configWrapper"
   unset 'options[--use-baseline]'
 fi
-[[ -v options['--configuration'] ]] && options['--configuration']="--configuration=${options[--configuration]}"
+[[ -n "${options[--configuration]+x}" ]] && options['--configuration']="--configuration=${options[--configuration]}"
 
 
 # rebuild all arguments

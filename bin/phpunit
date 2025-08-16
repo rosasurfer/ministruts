@@ -21,7 +21,7 @@
 # A custom PHPUnit executable can be used by setting the environment variable PHPUNIT=<phpunit-binary>.
 #
 #
-# @version 2025.08.15 18:18
+# @version 2025.08.16 17:37
 #
 set -eEuo pipefail
 
@@ -115,7 +115,7 @@ projectDir="$(realpath --relative-to=. "$(dirname "$(realpath "$(type -p "$0")")
 
 
 # read the configuration
-declare -A config; config=()
+declare -A config=()
 declare files=("$projectDir/.env.dist" "$projectDir/.env") exportVars=()
 readConfig 'config' 'files'  PHP  PHP_COMPOSER_VENDOR_DIR  PHPUNIT  PHPUNIT_STOP_ON_FAILURE  PHPUNIT_REPORT_FORMAT  PHPUNIT_REPORT_PRINTER  PHPUNIT_TEAMCITY_PRINTER  PHPUNIT_TESTDOX_PRINTER  PHPUNIT_EXPORT_VARS
 
@@ -170,7 +170,7 @@ fi
 
 
 # parse command line arguments
-declare -A options; options=()
+declare -A options=()
 declare args=() arg
 
 
