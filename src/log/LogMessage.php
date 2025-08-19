@@ -166,7 +166,7 @@ class LogMessage extends CObject {
         }
         else {
             $msg = $filter ? $filter->filterString($this->message) : $this->message;
-            $msg = str_replace(NL, NL.$indent, normalizeEOL(trim($msg)));
+            $msg = str_replace(NL, NL.$indent, normalizeEOL(rtrim($msg)));
         }
         $sLogLevel = Logger::logLevelDescription($this->logLevel);
 
@@ -371,7 +371,7 @@ class LogMessage extends CObject {
                 $values['Request id:'] = $_SERVER['UNIQUE_ID'];
             }
 
-            $ip   = Request::getRemoteIP();
+            $ip = Request::getRemoteIP();
             $host = Request::getRemoteHost();
             $values['IP:'] = $ip . ($host ? " ($host)" : '');
 

@@ -158,7 +158,7 @@ class ErrorLogAppender extends BaseAppender {
         if ($this->serverDetails  && $detail = $message->getServerDetails (false, $this->filter)) $msg .= NL.$detail;
 
         $msg .= NL.$message->getCallDetails(false, false);
-        $msg = trim($msg).NL;
+        $msg = rtrim($msg).NL;
 
         if (!$this->toSTDERR()) {
             $msg  = (CLI ? 'CLI' : Request::getRemoteIP()).' '.$msg;

@@ -201,7 +201,7 @@ class MailAppender extends BaseAppender {
                     $location = CLI ? 'in '.realpath($_SERVER['PHP_SELF']) : 'at '.strLeftTo(Request::getUrl($this->filter), '?');
                 }
                 else {
-                    $subjectMsg = (string)strtok($logMessage->getMessage(), NL);
+                    $subjectMsg = (string)strtok(ltrim($logMessage->getMessage()), NL);
                     $location = CLI ? 'in '.realpath($_SERVER['PHP_SELF']) : '';
                 }
 

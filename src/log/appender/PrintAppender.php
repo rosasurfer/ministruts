@@ -83,7 +83,7 @@ class PrintAppender extends BaseAppender {
         if ($this->sessionDetails && $detail = $message->getSessionDetails($html, $this->filter)) $msg .= NL.$detail;
         if ($this->serverDetails  && $detail = $message->getServerDetails ($html, $this->filter)) $msg .= NL.$detail;
         $msg .= NL.$message->getCallDetails($html, false);
-        $msg = trim($msg);
+        $msg = rtrim($msg);
 
         if (!$html) {
             if ($this->msgCounter > 0) {
