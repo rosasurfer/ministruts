@@ -12,7 +12,7 @@ use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\error\ErrorHandler;
 use rosasurfer\ministruts\log\detail\Request;
 use rosasurfer\ministruts\log\filter\ContentFilterInterface as ContentFilter;
-use rosasurfer\ministruts\phpstan\ArrayShapes;
+use rosasurfer\ministruts\phpstan\UserTypes as PHPStanUserTypes;
 
 use function rosasurfer\ministruts\hsc;
 use function rosasurfer\ministruts\normalizeEOL;
@@ -25,7 +25,7 @@ use const rosasurfer\ministruts\NL;
 /**
  * LogMessage
  *
- * @phpstan-import-type STACKFRAME from ArrayShapes
+ * @phpstan-import-type STACKFRAME from PHPStanUserTypes
  */
 class LogMessage extends CObject {
 

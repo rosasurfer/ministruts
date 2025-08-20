@@ -11,7 +11,7 @@ use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 use rosasurfer\ministruts\db\ConnectorInterface as Connector;
 use rosasurfer\ministruts\db\orm\meta\PropertyMapping;
-use rosasurfer\ministruts\phpstan\ArrayShapes;
+use rosasurfer\ministruts\phpstan\UserTypes as PHPStanUserTypes;
 
 use function rosasurfer\ministruts\strEndsWith;
 use function rosasurfer\ministruts\strLeft;
@@ -21,8 +21,8 @@ use function rosasurfer\ministruts\strLeft;
  *
  * Abstract base class for stored objects.
  *
- * @phpstan-import-type ORM_PROPERTY from ArrayShapes
- * @phpstan-import-type ORM_RELATION from ArrayShapes
+ * @phpstan-import-type ORM_PROPERTY from PHPStanUserTypes
+ * @phpstan-import-type ORM_RELATION from PHPStanUserTypes
  */
 abstract class PersistableObject extends CObject {
 

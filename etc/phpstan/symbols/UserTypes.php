@@ -6,10 +6,10 @@ namespace rosasurfer\ministruts\phpstan;
 use rosasurfer\ministruts\db\orm\PersistableObject;
 
 /**
- * Custom PHPStan type definitions and matching classes to enable IntelliSense and code completion.
+ * Custom PHPStan type definitions and matching classes to enable IDE support.
  * Add this file to the project's library path and use the types in PHPStan annotations only.
  *
- * @phpstan-type  ORM_ENTITY = array{
+ * @phpstan-type ORM_ENTITY = array{
  *     class       : class-string<PersistableObject>,
  *     connection  : non-empty-string,
  *     table       : non-empty-string,
@@ -22,7 +22,7 @@ use rosasurfer\ministruts\db\orm\PersistableObject;
  *     soft-delete?: ORM_PROPERTY,
  * }
  *
- * @phpstan-type  ORM_PROPERTY = array{
+ * @phpstan-type ORM_PROPERTY = array{
  *     name        : non-empty-string,
  *     type        : non-empty-string,
  *     column      : non-empty-string,
@@ -32,7 +32,7 @@ use rosasurfer\ministruts\db\orm\PersistableObject;
  *     soft-delete?: true,
  * }
  *
- * @phpstan-type  ORM_RELATION = array{
+ * @phpstan-type ORM_RELATION = array{
  *     name          : non-empty-string,
  *     type          : 'one-to-one'|'one-to-many'|'many-to-one'|'many-to-many',
  *     class         : class-string<PersistableObject>,
@@ -44,7 +44,7 @@ use rosasurfer\ministruts\db\orm\PersistableObject;
  *     foreign-key?  : non-empty-string,
  * }
  *
- * @phpstan-type  STACKFRAME = array{
+ * @phpstan-type STACKFRAME = array{
  *     file?    : string,
  *     line?    : int,
  *     class?   : string,
@@ -55,38 +55,34 @@ use rosasurfer\ministruts\db\orm\PersistableObject;
  *   __adjusted?: int,
  * }
  */
-final class ArrayShapes {
+final class UserTypes {
 }
 
 
 /**
- * Custom PHPStan type for an array holding the mapping of an ORM entity.
+ * Array holding the mapping of an ORM entity.
  *
  * <pre>
  * Array(
- *     class       : class-string&lt;PersistableObject&gt;,
+ *     class       : class-string&lt;{@link PersistableObject}&gt;,
  *     connection  : non-empty-string,
  *     table       : non-empty-string,
- *     properties  : array&lt;string, ORM_PROPERTY&gt;,
- *     relations   : array&lt;string, ORM_RELATION&gt;,
- *     columns     : array&lt;string, ORM_PROPERTY|ORM_RELATION&gt;,
- *     getters     : array&lt;string, ORM_PROPERTY|ORM_RELATION&gt;,
- *     identity    : ORM_PROPERTY,
- *     version?    : ORM_PROPERTY,
- *     soft-delete?: ORM_PROPERTY,
+ *     properties  : array&lt;string, {@link ORM_PROPERTY}&gt;,
+ *     relations   : array&lt;string, {@link ORM_RELATION}&gt;,
+ *     columns     : array&lt;string, {@link ORM_PROPERTY}|{@link ORM_RELATION}&gt;,
+ *     getters     : array&lt;string, {@link ORM_PROPERTY}|{@link ORM_RELATION}&gt;,
+ *     identity    : {@link ORM_PROPERTY},
+ *     version?    : {@link ORM_PROPERTY},
+ *     soft-delete?: {@link ORM_PROPERTY},
  * )
  * </pre>
- *
- * @see \rosasurfer\ministruts\phpstan\PersistableObject
- * @see \rosasurfer\ministruts\phpstan\ORM_PROPERTY
- * @see \rosasurfer\ministruts\phpstan\ORM_RELATION
  */
 final class ORM_ENTITY {
 }
 
 
 /**
- * Custom PHPStan type for an array holding the mapping of an ORM property.
+ * Array holding the mapping of an ORM property.
  *
  * <pre>
  * Array(
@@ -105,13 +101,13 @@ final class ORM_PROPERTY {
 
 
 /**
- * Custom PHPStan type for an array holding the mapping of an ORM relation.
+ * Array holding the mapping of an ORM relation.
  *
  * <pre>
  * Array(
  *     name          : non-empty-string,
  *     type          : 'one-to-one'|'one-to-many'|'many-to-one'|'many-to-many',
- *     class         : class-string&lt;PersistableObject&gt;,
+ *     class         : class-string&lt;{@link PersistableObject}&gt;,
  *     key           : non-empty-string,
  *     column?       : non-empty-string,
  *     ref-column?   : non-empty-string,
@@ -120,16 +116,13 @@ final class ORM_PROPERTY {
  *     foreign-key?  : non-empty-string,
  * )
  * </pre>
- *
- * @see \rosasurfer\ministruts\phpstan\PersistableObject
  */
 final class ORM_RELATION {
 }
 
 
 /**
- * Custom PHPStan type for an array holding a single frame of a stacktrace.
- * All fields are optional and may not exist
+ * Array holding a single frame of a stacktrace. All fields are optional/may not exist.
  *
  * <pre>
  * Array(

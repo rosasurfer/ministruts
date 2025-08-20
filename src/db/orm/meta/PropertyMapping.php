@@ -6,12 +6,12 @@ namespace rosasurfer\ministruts\db\orm\meta;
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\db\ConnectorInterface as Connector;
-use rosasurfer\ministruts\phpstan\ArrayShapes;
+use rosasurfer\ministruts\phpstan\UserTypes as PHPStanUserTypes;
 
 /**
  * A PropertyMapping is an object encapsulating meta information about how to map a PHP class property to a database column.
  *
- * @phpstan-import-type ORM_PROPERTY from ArrayShapes
+ * @phpstan-import-type ORM_PROPERTY from PHPStanUserTypes
  */
 class PropertyMapping extends CObject {
 

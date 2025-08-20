@@ -14,12 +14,12 @@ use rosasurfer\ministruts\db\MultipleRecordsException;
 use rosasurfer\ministruts\db\NoSuchRecordException;
 use rosasurfer\ministruts\db\ResultInterface as IResult;
 use rosasurfer\ministruts\db\orm\meta\EntityMapping;
-use rosasurfer\ministruts\phpstan\ArrayShapes;
+use rosasurfer\ministruts\phpstan\UserTypes as PHPStanUserTypes;
 
 /**
  * Abstract DAO base class.
  *
- * @phpstan-import-type ORM_ENTITY from ArrayShapes
+ * @phpstan-import-type ORM_ENTITY from PHPStanUserTypes
  */
 abstract class DAO extends Singleton {
 
