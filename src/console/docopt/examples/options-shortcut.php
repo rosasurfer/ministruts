@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use function rosasurfer\ministruts\docopt;
 use function rosasurfer\ministruts\echof;
-use function rosasurfer\ministruts\json_encode;
+use function rosasurfer\ministruts\json_encode_or_throw;
 
 if (!is_file($autoload = __DIR__.'/../../../../vendor/autoload.php')) {
     echo "File \"$autoload\" not found".PHP_EOL;
@@ -30,5 +30,5 @@ DOCOPT;
 $result = docopt($doc, null, ['version'=>'1.0.0rc2']);
 
 foreach ($result as $key => $value) {
-    echof($key.': '.json_encode($value).(($type=gettype($value))=='NULL' ? '':" ($type)"));
+    echof($key.': '.json_encode_or_throw($value).(($type=gettype($value))=='NULL' ? '':" ($type)"));
 }

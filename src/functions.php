@@ -547,7 +547,7 @@ function isRelativePath(string $path): bool {
 
 
 /**
- * Encode a value as a JSON string. Wrapper for the built-in function <tt>json_encode()</tt> with enabled error exceptions.
+ * Encode a value as a JSON string or throw an exception in case of errors.
  *
  * @param  mixed        $value
  * @param  int          $flags [optional] - default: none
@@ -557,13 +557,13 @@ function isRelativePath(string $path): bool {
  *
  * @link https://www.php.net/manual/en/function.json-encode.php
  */
-function json_encode($value, int $flags=0, int $depth=512): string {
-    return \json_encode($value, $flags|JSON_THROW_ON_ERROR, $depth);
+function json_encode_or_throw($value, int $flags=0, int $depth=512): string {
+    return json_encode($value, $flags|JSON_THROW_ON_ERROR, $depth);
 }
 
 
 /**
- * Decode a JSON value. Wrapper for the built-in function <tt>json_decode()</tt> with enabled error exceptions.
+ * Decode a JSON value or throw an exception in case of errors.
  *
  * @param  string       $value
  * @param  ?bool        $associative [optional] - default: depending on parameter $flags
@@ -574,8 +574,8 @@ function json_encode($value, int $flags=0, int $depth=512): string {
  *
  * @link https://www.php.net/manual/en/function.json-decode.php
  */
-function json_decode(string $value, ?bool $associative=null, int $depth=512, int $flags=0) {
-    return \json_decode($value, $associative, $depth, $flags|JSON_THROW_ON_ERROR);
+function json_decode_or_throw(string $value, ?bool $associative=null, int $depth=512, int $flags=0) {
+    return json_decode($value, $associative, $depth, $flags|JSON_THROW_ON_ERROR);
 }
 
 

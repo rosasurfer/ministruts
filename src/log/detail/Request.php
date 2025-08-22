@@ -9,6 +9,8 @@ use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\exception\IllegalStateException;
 use rosasurfer\ministruts\log\filter\ContentFilterInterface as ContentFilter;
 
+use function rosasurfer\ministruts\json_decode_or_throw;
+use function rosasurfer\ministruts\json_encode_or_throw;
 use function rosasurfer\ministruts\preg_replace;
 use function rosasurfer\ministruts\strLeftTo;
 use function rosasurfer\ministruts\strStartsWith;
@@ -212,10 +214,10 @@ class Request extends CObject {
                 if (strlen($input)) {
                     if ($filter && $this->getContentType()=='application/json') {
                         try {
-                            $values = json_decode($input, true, 512, JSON_BIGINT_AS_STRING | JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR);
+                            $values = json_decode_or_throw($input, true, 512, JSON_BIGINT_AS_STRING | JSON_INVALID_UTF8_SUBSTITUTE);
                             if (is_array($values)) {
                                 $values = $filter->filterValues($values);
-                                $input = json_encode($values, JSON_THROW_ON_ERROR);
+                                $input = json_encode_or_throw($values);
                             }
                         }
                         catch (Throwable $ex) {}            // intentionally eat it
