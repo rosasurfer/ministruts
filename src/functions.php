@@ -19,6 +19,7 @@ use rosasurfer\ministruts\core\di\proxy\Request as RequestProxy;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 use rosasurfer\ministruts\core\lock\Lock;
+use rosasurfer\ministruts\file\FileSystem;
 use rosasurfer\ministruts\log\detail\Request;
 use rosasurfer\ministruts\struts\url\Url;
 use rosasurfer\ministruts\struts\url\VersionedUrl;
@@ -246,7 +247,7 @@ function docopt(string $doc, $args=null, array $options=[]): DocoptResult {
 
 
 /**
- * Dumps a variable to the standard output device or into a string.
+ * Dumps a variable to STDOUT or into a string.
  *
  * @param  mixed $var                     - variable
  * @param  bool  $return       [optional] - TRUE,  if the variable is to be dumped into a string <br>
@@ -262,6 +263,45 @@ function dump($var, bool $return = false, bool $flushBuffers = true): ?string {
     if ($return) return ob_get_clean();
 
     $flushBuffers && ob_get_level() && ob_flush();
+    return null;
+}
+
+
+/**
+ * Helper for dump-driven development. Appends a message to a dump file. If the file doesn't exist it is created.
+ *
+ * @param  string $msg
+ * @param  bool   $reset    [optional] - whether to reset the dump file (default: no)
+ * @param  string $filename [optional] - custom dump filename, remembered (default: dirname(ini_get('error_log')).'/ddd.log')
+ *
+ * @return mixed - any value to make the call an expression
+ */
+function ddd(string $msg, bool $reset = false, string $filename = '') {
+    static $dumplog;
+
+    if (!isset($dumplog)) {
+        if (!strlen($filename)) {
+            $errorLog = (string) ini_get('error_log');
+            $dir = strlen($errorLog) ? dirname($errorLog) : (string)getcwd();
+            $filename = $dir.'/ddd.log';
+        }
+        $dumplog = $filename;
+    }
+
+    if (!is_file($dumplog)) {
+        FileSystem::mkDir(dirname($dumplog));
+    }
+    elseif ($reset) {
+        $hFile = fopen($dumplog, 'r+');
+        ftruncate($hFile, 0);
+        fclose($hFile);
+    }
+
+    if (!strEndsWith($msg, NL)) {
+        $msg .= NL;
+    }
+
+    file_put_contents($dumplog, $msg, FILE_APPEND|LOCK_EX);
     return null;
 }
 
