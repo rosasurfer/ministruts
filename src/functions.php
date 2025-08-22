@@ -88,12 +88,15 @@ const ACCESS_PROTECTED  = 2;
 const ACCESS_PRIVATE    = 4;
 const ACCESS_ALL        = ACCESS_PUBLIC | ACCESS_PROTECTED | ACCESS_PRIVATE;
 
-// miscellaneous
+// EOL separators
 const NL                = "\n";                                     // - ctrl --- hex --- dec ----
 const EOL_MAC           = "\r";                                     //   CR       0D      13
 const EOL_NETSCAPE      = "\r\r\n";                                 //   CRCRLF   0D0D0A  13,13,10
 const EOL_UNIX          = "\n";                                     //   LF       0A      10
 const EOL_WINDOWS       = "\r\n";                                   //   CRLF     0D0A    13,10
+
+// miscellaneous
+const JSON_PRETTY_ALL   = JSON_PRETTY_PRINT|JSON_UNESCAPED_LINE_TERMINATORS|JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE|JSON_PRESERVE_ZERO_FRACTION;
 
 
 /**
@@ -969,6 +972,15 @@ function print_p($var, bool $return = false, bool $flushBuffers = true): ?string
     }
     elseif (is_bool($var)) {
         $str = ($var ? 'true':'false').' (bool)';
+    }
+    elseif (is_string($var)) {
+        $str = ltrim($var);
+        if (strStartsWith($str, '{')) {
+            $data = json_decode($str);
+            if (json_last_error() || !is_string($str = json_encode($data, JSON_PRETTY_ALL))) {
+                $str = $var;
+            }
+        }
     }
     else {
         $str = (string) $var;
