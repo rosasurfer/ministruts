@@ -271,15 +271,15 @@ function dump($var, bool $return = false, bool $flushBuffers = true): ?string {
 
 
 /**
- * Helper for dump-driven development. Appends a message to a dump file. If the file doesn't exist it is created.
+ * Helper for dump-driven development. Appends a stringified variable to a dump file. If the file doesn't exist it is created.
  *
- * @param  string $msg
+ * @param  mixed  $var
  * @param  bool   $reset    [optional] - whether to reset the dump file (default: no)
  * @param  string $filename [optional] - custom dump filename, remembered (default: dirname(ini_get('error_log')).'/ddd.log')
  *
  * @return mixed - any value to make the call an expression
  */
-function ddd(string $msg, bool $reset = false, string $filename = '') {
+function ddd($var, bool $reset = false, string $filename = '') {
     static $dumplog;
 
     if (!isset($dumplog)) {
@@ -300,11 +300,35 @@ function ddd(string $msg, bool $reset = false, string $filename = '') {
         fclose($hFile);
     }
 
-    if (!strEndsWith($msg, NL)) {
-        $msg .= NL;
+    if (is_object($var) && method_exists($var, '__toString') && !$var instanceof SimpleXMLElement) {
+        $str = (string) $var;
+    }
+    elseif (is_object($var) || is_array($var)) {
+        $str = print_r($var, true);
+    }
+    elseif ($var === null) {
+        $str = '(null)';
+    }
+    elseif (is_bool($var)) {
+        $str = ($var ? 'true':'false').' (bool)';
+    }
+    elseif (is_string($var)) {
+        $str = ltrim($var);
+        if (strStartsWith($str, '{')) {
+            $data = json_decode($str);
+            if (json_last_error() || !is_string($str = json_encode($data, JSON_PRETTY_ALL))) {
+                $str = $var;
+            }
+        }
+    }
+    else {
+        $str = (string) $var;
     }
 
-    file_put_contents($dumplog, $msg, FILE_APPEND|LOCK_EX);
+    if (!strEndsWith($str, NL)) {
+        $str .= NL;
+    }
+    file_put_contents($dumplog, $str, FILE_APPEND|LOCK_EX);
     return null;
 }
 
@@ -968,7 +992,7 @@ function print_p($var, bool $return = false, bool $flushBuffers = true): ?string
         $str = print_r($var, true);
     }
     elseif ($var === null) {
-        $str = '(null)';                            // analogous to typeof(null) = 'NULL'
+        $str = '(null)';
     }
     elseif (is_bool($var)) {
         $str = ($var ? 'true':'false').' (bool)';
