@@ -2,30 +2,28 @@
 #
 # Conveniant wrapper for PHPUnit 9. Sets default values and allows switching between multiple PHP and/or PHPUnit versions.
 #
-# Usage:                 All arguments are optional.
+# Usage:                  All arguments are optional.
 #
 #   phpunit [options] [--] [DIRECTORY|SingleTest.php]
 #
-# Options:               All PHPUnit options are supported, plus the following:
-#   --default-format     Use the built-in report format instead of a preconfigured value.
-#   --default-printer    Use the built-in report printer instead of a preconfigured value.
-#   --full-diff          Display the full diff of failing compare assertions.
-#   --stop-on-failure=0  Accepts an additional argument 0 to override a preconfigured value.
-#   --color, --no-color  Enforce or disable colored output (default: auto).
-#   -h                   Original PHPUnit help.
+# Options:                All PHPUnit options are supported, plus the following:
+#   --default-format      Use the built-in report format instead of a preconfigured value.
+#   --default-printer     Use the built-in report printer instead of a preconfigured value.
+#   --full-diff           Display the full diff of failing compare assertions.
+#   --no-stop-on-failure  Override a preconfigured --stop-on-failure option.
+#   --color, --no-color   Enforce or disable colored output (default: auto).
+#   -h                    Original PHPUnit help.
 #
-# Short option name/argument separator are zero or more spaces:   e.g. "-cphpunit.xml" or "-c phpunit.xml"
+# Short option name/argument separator are zero or more spaces:         e.g. "-cphpunit.xml" or "-c phpunit.xml"
 # Long option name/argument separator are space or "=" equal character: e.g. "--configuration directory" or "--configuration=directory"
 #
-# A custom PHP interpreter can be used by setting the environment variable PHP=<php-binary>.
-# A custom PHPUnit executable can be used by setting the environment variable PHPUNIT=<phpunit-binary>.
+# A custom PHP interpreter can be used by setting the env variable PHP=<php-binary>.
+# A custom PHPUnit executable can be used by setting the env variable PHPUNIT=<phpunit-binary>.
 #
-#
-# @version 2025.08.16 17:37
-#
+shopt -s inherit_errexit 2>/dev/null || :
 set -eEuo pipefail
 
-exec 3>&1                                                       # duplicate the original STDOUT
+exec 3>&1                                               # duplicate original STDOUT
 
 
 # --- functions ----------------------------------------------------------------------------------------------------------------------------
@@ -53,32 +51,76 @@ function stderr() {
 
 
 #
+# Error handler. Shows the location of the last error if env variable TRACE is set to a non-zero value.
+#
+function onError() {
+  local exitStatus=$? size=${#FUNCNAME[@]} i func file line
+
+  if [[ "${TRACE:-0}" != "0" ]]; then
+    stderr "ERROR: execution failed with status $exitStatus"
+    for ((i=1; i < size; ++i)); do
+      func="${FUNCNAME[i]}()                        "
+      file="${BASH_SOURCE[i]}"
+      line="${BASH_LINENO[i-1]}"
+      ((i==1 && line==1)) && {
+        [[ "$func" == 'fail()'* ]] && continue
+        line='?'
+      }
+      stderr " in ${func:0:24} file: $file, line $line"
+    done
+  fi
+  return "$exitStatus"
+}
+trap onError ERR
+
+
+#
 # Read configuration files in isolation and extract the requested variables.
 #
-# @param _InOut_ $1 - named reference to an associative array holding the resulting configuration
-# @param _In_    $2 - named reference to an array holding the configuration files to read
-# @param _In_    $@ - any number of variable names to extract from the configuration
+# @param $1     - name of an indexed array with config files to read
+# @param $2     - name of an associative array with the resulting configuration
+# @param ${@:3} - any number of variable names to read from the config files
 #
 function readConfig() {
-  ((BASH_SUBSHELL)) && fail "${FUNCNAME[0]}() can't write to outer scope from subshell"
-  local -n _config="$1"
-  local -n _files="$2"
-  ((!${#_files[@]})) && fail "${FUNCNAME[0]}() invalid argument '$2' (empty array)"
-  shift 2
-  ((!"$#")) && fail "${FUNCNAME[0]}() missing variable names (empty)"
-  local key value
+  local _files_="$1[@]" name value
+  (("$#" < 3)) && fail "${FUNCNAME[0]}() missing arguments (min. 3)"
+  [[ "$1" == '_files_' ]] && fail "${FUNCNAME[0]}() invalid argument \$1: illegal name '$1'"
+  eval "((!\${#$_files_}))" && fail "${FUNCNAME[0]}() invalid argument \$1: empty"
+  for name in "${@:3}"; do
+    [[ "$name" == '_file_' || "$name" == '_name_' ]] && fail "${FUNCNAME[0]}() illegal argument name '$name'"
+  done
 
-  while IFS='=' read -r key value; do
-    _config["$key"]="$value"
+  while IFS='=' read -r name value; do
+    eval "$2[$name]='$value'"
   done < <(
+    shift 2
     unset "$@"
-    for file in "${_files[@]}"; do
-      [[ -f "$file" ]] && source "$file" &> /dev/null
+    for _file_ in "${!_files_}"; do
+      [[ -f "$_file_" ]] && source "$_file_" &> /dev/null
     done
-    for var in "$@"; do
-      [[ -v "$var" ]] && echo "$var=${!var}"
+    for _name_ in "$@"; do
+      [[ -v "$_name_" ]] && echo "$_name_=${!_name_}"
     done
   )
+}
+
+
+#
+# Finds a specified command in the PATH and makes sure it's not this script itself. Prints the found command.
+#
+# @param $1 - command
+#
+function findCommand() {
+  local lines path
+  readarray -t lines < <(type -ap "$1" 2>/dev/null || :)
+
+  for path in "${lines[@]+"${lines[@]}"}"; do
+    [[ "$(realpath "$path")" == "$self" ]] && continue
+    [[ "$(stat -c '%d:%i' "$path")" == "$(stat -c '%d:%i' "$self")" ]] && continue
+    echo "$path"
+    return 0
+  done
+  return 1
 }
 
 
@@ -105,19 +147,20 @@ function useColors() {
 # --- end of functions ---------------------------------------------------------------------------------------------------------------------
 
 
-# ensure we run Bash v4.3+
-((BASH_VERSINFO[0] < 4 || (BASH_VERSINFO[0] == 4 && BASH_VERSINFO[1] < 3))) && fail "this script requires Bash version 4.3+"
+# ensure we run Bash v4.2+
+((BASH_VERSINFO[0] < 4 || (BASH_VERSINFO[0] == 4 && BASH_VERSINFO[1] < 2))) && fail "this script requires Bash version 4.2+"
 
 
 # resolve the project root directory
-declare projectDir
-projectDir="$(realpath --relative-to=. "$(dirname "$(realpath "$(type -p "$0")")")"/..)"
+declare self projectDir
+self="$(realpath "$(type -p "$0")")"
+projectDir="$(realpath --relative-to=. "$(dirname "$self")"/..)"
 
 
 # read the configuration
+declare files=("$projectDir/.env.dist" "$projectDir/.env") exportVars=() var
 declare -A config=()
-declare files=("$projectDir/.env.dist" "$projectDir/.env") exportVars=()
-readConfig 'config' 'files'  PHP  PHP_COMPOSER_VENDOR_DIR  PHPUNIT  PHPUNIT_STOP_ON_FAILURE  PHPUNIT_REPORT_FORMAT  PHPUNIT_REPORT_PRINTER  PHPUNIT_TEAMCITY_PRINTER  PHPUNIT_TESTDOX_PRINTER  PHPUNIT_EXPORT_VARS
+readConfig 'files' 'config' PHP PHP_COMPOSER_VENDOR_DIR PHPUNIT PHPUNIT_STOP_ON_FAILURE PHPUNIT_REPORT_FORMAT PHPUNIT_REPORT_PRINTER PHPUNIT_TEAMCITY_PRINTER PHPUNIT_TESTDOX_PRINTER PHPUNIT_EXPORT_VARS
 
 [[ -v PHP                      ]] || PHP="${config[PHP]:-}"
 [[ -v PHP_COMPOSER_VENDOR_DIR  ]] || PHP_COMPOSER_VENDOR_DIR="${config[PHP_COMPOSER_VENDOR_DIR]:-}"
@@ -130,7 +173,7 @@ readConfig 'config' 'files'  PHP  PHP_COMPOSER_VENDOR_DIR  PHPUNIT  PHPUNIT_STOP
 
 IFS=$' \t' read -ra exportVars <<< "${config[PHPUNIT_EXPORT_VARS]:-}"
 ((${#exportVars[@]})) && {
-  readConfig 'config' 'files' "${exportVars[@]}"
+  readConfig 'files' 'config' "${exportVars[@]}"
   for var in "${exportVars[@]}"; do
     [[ -v "$var" ]] || declare "$var"="${config[$var]:-}"
   done
@@ -153,15 +196,15 @@ declare phpunit phpunitCmd isExternalPhpunit=0
 
 if [[ -n "$PHPUNIT" ]]; then                                    # a user-specified command
   phpunitCmd="$PHPUNIT"
-  phpunit="$(type -p "$PHPUNIT")" || fail "PHPUnit executable not found: $PHPUNIT"
+  phpunit="$(findCommand "$PHPUNIT")" || fail "PHPUnit executable not found: $PHPUNIT"
   isExternalPhpunit=1
 else
   phpunitCmd='vendor/bin/phpunit'
   phpunit="$vendorDir/bin/phpunit"                              # search vendor directory
   phpunit="${phpunit#./}"
   if [[ ! -f "$phpunit" ]]; then
-    phpunitCmd='phpunit' && phpunit="$(type -p phpunit)" || {   # search PATH for: phpunit, phpunit.phar
-      phpunitCmd='phpunit.phar' && phpunit="$(type -p phpunit.phar)" || fail "PHPUnit executable not found"
+    phpunitCmd='phpunit' && phpunit="$(findCommand phpunit)" || {   # search PATH for: phpunit, phpunit.phar
+      phpunitCmd='phpunit.phar' && phpunit="$(findCommand phpunit.phar)" || fail "PHPUnit executable not found"
     }
     isExternalPhpunit=1
   fi
@@ -181,19 +224,11 @@ while (("$#")); do
       break;;
 
     --default-format|--teamcity|--testdox)
-      [[ -v 'options[--format]' ]] && fail 'multiple report format options detected'
       options[--format]="${1#--default-format}"
       shift
       continue;;
 
-    --default-printer)
-      [[ -v 'options[--printer]' ]] && fail 'multiple printer options detected'
-      options[--printer]=''
-      shift
-      continue;;
-
     --printer|--printer=*)
-      [[ -v 'options[--printer]' ]] && fail 'multiple --printer options detected'
       if [[ "$1" == '--printer' ]]; then
         shift
         [[ "$#" -eq 0 || "$1" == -* ]] && fail 'option --printer requires a value'
@@ -206,36 +241,35 @@ while (("$#")); do
       shift
       continue;;
 
-    --full-diff)
-      [[ -v 'options[--full-diff]' ]] && fail 'multiple --full-diff options detected'
-      options[--full-diff]='1'
+    --default-printer)
+      options[--printer]=''
       shift
       continue;;
 
-    --stop-on-failure|--stop-on-failure=*)
-      [[ -v 'options[--stop-on-failure]' ]] && fail 'multiple --stop-on-failure options detected'
-      [[ "$1" == '--stop-on-failure' ]] && arg=1 || arg="${1#--stop-on-failure=}"
-      [[ "$arg" != [01] ]] && fail 'invalid --stop-on-failure argument (must be 0 or 1)'
-      ((arg)) && options[--stop-on-failure]='--stop-on-failure' || options[--stop-on-failure]=''
+    --full-diff)
+      options[--full-diff]=1
+      shift
+      continue;;
+
+    --stop-on-failure|--no-stop-on-failure)
+      [[ "$1" == '--stop-on-failure' ]] && arg='--stop-on-failure' || arg=''
+      options[--stop-on-failure]="$arg"
       shift
       continue;;
 
     --color)                                                    # standard syntax
-      [[ -v 'options[--color]' ]] && fail 'multiple color options detected'
       options[--color]='--colors=always'
       shift
       continue;;
 
     --no-color)                                                 # standard syntax
-      [[ -v 'options[--color]' ]] && fail 'multiple color options detected'
       options[--color]='--colors=never'
       shift
       continue;;
 
     --colors)                                                   # PHPUnit syntax
-      [[ -v 'options[--color]' ]] && fail 'multiple color options detected'
       shift
-      if ((!"$#")) || [[ "$1" == -* ]]; then
+      if [[ "$#" -eq 0 || "$1" == -* ]]; then
         options[--color]=''                                     # same as auto
         continue
       fi
@@ -245,7 +279,6 @@ while (("$#")); do
       continue;;
 
     --colors=*)                                                 # PHPUnit syntax
-      [[ -v 'options[--color]' ]] && fail 'multiple color options detected'
       arg="${1#--colors=}"
       case "$arg" in
         never|always) options[--color]="--colors=$arg";;
@@ -264,7 +297,7 @@ args+=("$@")
 
 # set default options
 # --configuration
-if [[ -v 'options[--configuration]' ]]; then
+if [[ -n "${options[--configuration]+x}" ]]; then
   file="${options[--configuration]}"
   [[ -z "$file" ]] && fail "option --configuration requires a value"
   [[ -e "$file" ]] || fail "configuration file/directory \"$file\" not found"
@@ -278,18 +311,18 @@ else
 fi
 
 # --format
-if [[ ! -v 'options[--format]' ]]; then
+if [[ -z "${options[--format]+x}" ]]; then
   case "$PHPUNIT_REPORT_FORMAT" in
     teamcity|testdox) options[--format]="--$PHPUNIT_REPORT_FORMAT";;
     '')               options[--format]='';;
     *)                fail 'invalid env variable PHPUNIT_REPORT_FORMAT (must be one of "teamcity" or "testdox")';;
   esac
-fi                                        # PHPUnit 9.* bug:
+fi                                        # PHPUnit 9 bug:
 declare format="${options[--format]:-}"   # The --printer option must not be positioned before the report format option. Associative Bash
 unset 'options[--format]'                 # arrays do not preserve insertion order. So we extract both options and position them manually.
 
 # --printer
-if [[ ! -v 'options[--printer]' ]]; then
+if [[ -z "${options[--printer]+x}" ]]; then
   case "$format" in
     '')         [[ -n "$PHPUNIT_REPORT_PRINTER"   ]] && options[--printer]="--printer=$PHPUNIT_REPORT_PRINTER";;
     --teamcity) [[ -n "$PHPUNIT_TEAMCITY_PRINTER" ]] && options[--printer]="--printer=$PHPUNIT_TEAMCITY_PRINTER";;
@@ -300,14 +333,14 @@ declare printer="${options[--printer]:-}"
 unset 'options[--printer]'
 
 # --full-diff
-if [[ -v 'options[--full-diff]' ]]; then
-  export PHPUNIT_FULL_DIFF='1'
+if [[ "${options[--full-diff]:-0}" != '0' ]]; then
+  export PHPUNIT_FULL_DIFF=1
   unset 'options[--full-diff]'
 fi
 
 # --stop-on-failure
-if [[ ! -v 'options[--stop-on-failure]' ]]; then
-  [[ "${PHPUNIT_STOP_ON_FAILURE:-0}" != "0" ]] && options[--stop-on-failure]='--stop-on-failure'
+if [[ -z "${options[--stop-on-failure]+x}" ]]; then
+  [[ "${PHPUNIT_STOP_ON_FAILURE:-0}" != '0' ]] && options[--stop-on-failure]='--stop-on-failure'
 fi
 
 # --color: PHP can't resolve it correctly
@@ -326,7 +359,7 @@ set -- "${args[@]}"
 
 
 # on DEBUG: show the final command
-if [[ "${DEBUG:-0}" != "0" ]]; then
+if [[ "${DEBUG:-0}" != '0' ]]; then
   declare phpBin=''
   [[ "$php" != 'php' ]] && phpBin="$php "
   echo "CMD: ${phpBin}${phpunit} $*"
@@ -334,6 +367,6 @@ fi
 
 
 # call PHPUnit
-"$php" "$phpunit" "$@"
+"$php" "$phpunit" "$@" || exit $?
 
-exit $?
+exit 0
