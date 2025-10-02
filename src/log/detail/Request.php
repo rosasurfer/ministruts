@@ -53,22 +53,15 @@ class Request extends CObject {
 
 
     /**
-     * Return all headers as an associative array of header values. Source is the $_SERVER array,
-     * any raw multi-field headers are already combined into a single header line by PHP.
+     * Return all headers as an associative array of header values. Source is the $_SERVER[] array,
+     * any raw multi-field headers are already collapsed into a single header line by PHP.
      *
      * @return array<string, string> - associative array of header values
      */
     protected function getNormalizedHeaders(): array {
         if (!isset($this->headers)) {
-            // content related headers
-            $contentNames = [
-                'CONTENT_TYPE'   => 'Content-Type',
-                'CONTENT_LENGTH' => 'Content-Length',
-                'CONTENT_MD5'    => 'Content-MD5',
-            ];
-
-            // headers with non-standard casing (not a RFC requirement)
-            $fixHeaderNames = [
+            // headers with a non-standard name representation (names are case-insensitive)
+            $specialHeaders = [
                 'CDN'             => 'CDN',
                 'DNT'             => 'DNT',
                 'SEC_GPC'         => 'Sec-GPC',
@@ -86,11 +79,8 @@ class Request extends CObject {
                 }
                 if (substr($name, 0, 5) == 'HTTP_') {
                     $name = substr($name, 5);
-                    // skip content headers
-                    if (!isset($contentNames[$name])) {
-                        $name = $fixHeaderNames[$name] ?? str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower($name))));
-                        $headers[$name] = $value;
-                    }
+                    $name = $specialHeaders[$name] ?? str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower($name))));
+                    $headers[$name] = $value;
                 }
             }
 
@@ -108,12 +98,16 @@ class Request extends CObject {
                 }
             }
 
-            // finally group all content related headers at the end
-            foreach ($contentNames as $name => $value) {
-                if (isset($_SERVER[$name])) {
-                    $headers[$contentNames[$name]] = $_SERVER[$name];
-                }
+            // sort headers
+            uksort($headers, 'strnatcasecmp');
+
+            // move "Host" header to the beginning
+            $value = $headers[$name='Host'] ?? null;
+            if (isset($value)) {
+                unset($headers[$name]);
+                $headers = [$name => $value] + $headers;
             }
+
             $this->headers = $headers;
         }
         return $this->headers;
@@ -133,9 +127,7 @@ class Request extends CObject {
         if (!$names) {
             return $allHeaders;
         }
-        /** @phpstan-var callable-string $func*/
-        $func = 'strcasecmp';
-        return array_intersect_ukey($allHeaders, array_flip($names), $func);
+        return array_intersect_ukey($allHeaders, array_flip($names), 'strcasecmp');
     }
 
 
