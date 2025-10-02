@@ -117,7 +117,7 @@ class Config extends CObject implements ConfigInterface {
         elseif (is_dir($location)) {
             $configDir = realpath($location);
         }
-        else throw new InvalidValueException('Location not found: "'.$location.'"');
+        else throw new InvalidValueException("Location not found: \"$location\"");
 
         // versioned/distributable config file
         $files = [];
@@ -250,7 +250,7 @@ class Config extends CObject implements ConfigInterface {
         $value = $this->getProperty($key, $notFound);
 
         if ($notFound) {
-            if (func_num_args() == 1) throw new RuntimeException("Config key '$key' not found (no default value specified)");
+            if (func_num_args() == 1) throw new RuntimeException("Config key \"$key\" not found (no default value specified)");
             return $default;
         }
         return $value;
@@ -269,20 +269,20 @@ class Config extends CObject implements ConfigInterface {
             if (func_num_args() > 2) {
                 return $default;
             }
-            throw new RuntimeException("Config key '$key' not found (no default value specified)");
+            throw new RuntimeException("Config key \"$key\" not found (no default value specified)");
         }
 
         // key found: validate it as a boolean
         $flags = 0;
         if ($strict) {
             if ($value===null || $value==='') {     // filter_var() considers NULL and an empty string '' as valid strict booleans
-                throw new RuntimeException("Invalid type of config key '$key': ".gettype($value).' (boolean expected)');
+                throw new RuntimeException("Invalid value of config key \"$key\": ".(isset($value) ? 'empty' : 'NULL').' (boolean representation expected)');
             }
             $flags = FILTER_NULL_ON_FAILURE;
         }
         $result = filter_var($value, FILTER_VALIDATE_BOOLEAN, $flags);
         if ($result === null) {                     // @phpstan-ignore identical.alwaysFalse (PHPStan doesn't see flag FILTER_NULL_ON_FAILURE)
-            throw new RuntimeException("Invalid type of config key '$key': ".gettype($value).' (boolean expected)');
+            throw new RuntimeException("Invalid value of config key \"$key\": ".(is_scalar($value) ? $value : gettype($value)).' (boolean representation expected)');
         }
         return $result;
     }
@@ -300,14 +300,14 @@ class Config extends CObject implements ConfigInterface {
             if (func_num_args() > 1) {
                 return $default;
             }
-            throw new RuntimeException("Config key '$key' not found (no default value specified)");
+            throw new RuntimeException("Config key \"$key\" not found (no default value specified)");
         }
 
         // key found
         if (is_scalar($value)) {
             return (string) $value;
         }
-        throw new RuntimeException("Invalid type of config key '$key': ".gettype($value).' (scalar expected)');
+        throw new RuntimeException("Invalid type of config key \"$key\": ".gettype($value).' (scalar expected)');
     }
 
 
