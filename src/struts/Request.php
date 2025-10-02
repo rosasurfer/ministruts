@@ -645,13 +645,14 @@ class Request extends CObject {
 
         // read headers only once
         if ($headers === null) {
-            // headers with a non-standard name representation (names are case-insensitive)
+            // headers with custom name representation (names are case-insensitive)
             $specialHeaders = [
                 'CDN'             => 'CDN',
                 'DNT'             => 'DNT',
                 'SEC_GPC'         => 'Sec-GPC',
                 'X_CDN'           => 'X-CDN',
                 'X_MINISTRUTS_UI' => 'X-Ministruts-UI',
+                'X_REAL_IP'       => 'X-Real-IP',
             ];
             $headers = [];
 
