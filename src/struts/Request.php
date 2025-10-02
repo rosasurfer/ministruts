@@ -445,7 +445,18 @@ class Request extends CObject {
      * @return string - IP address
      */
     public function getRemoteAddress(): string {
-        return $_SERVER['REMOTE_ADDR'] ?? '';
+        static $remoteAddr = null;
+        if (!isset($remoteAddr)) {
+            $addr = $_SERVER['HTTP_X_REAL_IP']              // nginx and others
+                 ?? $_SERVER['HTTP_TRUE_CLIENT_IP']         // Akamai, Cloudflare Enterprise
+                 ?? $_SERVER['HTTP_CF_CONNECTING_IP']       // Cloudflare
+                 ?? $_SERVER['HTTP_X_FORWARDED_FOR']        // de facto standard
+                 ?? $_SERVER['HTTP_X_UP_FORWARDED_FOR']     // legacy mobile
+                 ?? $_SERVER['HTTP_CLIENT_IP']              // legacy proxies
+                 ?? $_SERVER['REMOTE_ADDR'] ?? '';
+            $remoteAddr = trim(explode(',', $addr, 2)[0]);
+        }
+        return $remoteAddr;
     }
 
 
@@ -461,16 +472,6 @@ class Request extends CObject {
             $hostname = getHostByAddress($this->getRemoteAddress());
         }
         return $hostname;
-    }
-
-
-    /**
-     * Return the value of a transmitted "X-Forwarded-For" header.
-     *
-     * @return ?string - header value (one or more ip addresses or hostnames) or NULL if the header was not transmitted
-     */
-    public function getForwardedRemoteAddress(): ?string {
-        return $this->getHeaderValue('X-Forwarded-For', 'X-UP-Forwarded-For');
     }
 
 
@@ -646,13 +647,17 @@ class Request extends CObject {
         // read headers only once
         if ($headers === null) {
             // headers with custom name representation (names are case-insensitive)
-            $specialHeaders = [
-                'CDN'             => 'CDN',
-                'DNT'             => 'DNT',
-                'SEC_GPC'         => 'Sec-GPC',
-                'X_CDN'           => 'X-CDN',
-                'X_MINISTRUTS_UI' => 'X-Ministruts-UI',
-                'X_REAL_IP'       => 'X-Real-IP',
+            $customHeaders = [
+                'CDN'                => 'CDN',
+                'CF_CONNECTING_IP'   => 'CF-Connecting-IP',
+                'CLIENT_IP'          => 'Client-IP',
+                'DNT'                => 'DNT',
+                'SEC_GPC'            => 'Sec-GPC',
+                'TRUE_CLIENT_IP'     => 'True-Client-IP',
+                'X_CDN'              => 'X-CDN',
+                'X_MINISTRUTS_UI'    => 'X-Ministruts-UI',
+                'X_REAL_IP'          => 'X-Real-IP',
+                'X_UP_FORWARDED_FOR' => 'X-UP-Forwarded-For',
             ];
             $headers = [];
 
@@ -665,7 +670,7 @@ class Request extends CObject {
                 }
                 if (substr($name, 0, 5) == 'HTTP_') {
                     $name = substr($name, 5);
-                    $name = $specialHeaders[$name] ?? str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower($name))));
+                    $name = $customHeaders[$name] ?? str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower($name))));
                     $headers[$name] = $value;
                 }
             }

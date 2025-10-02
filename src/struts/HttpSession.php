@@ -86,13 +86,13 @@ class HttpSession extends Singleton {
      */
     public function reset(bool $regenerateId): void {
         if ($regenerateId) {
-            session_regenerate_id(true);                                            // generate new id and delete the old file
+            session_regenerate_id(true);                            // generate new id and delete the old file
         }
         $request = RequestProxy::instance();
 
-        $_SESSION = [];                                                             // empty the session
-        $_SESSION['__SESSION_CREATED__'  ] = microtime(true);                       // initialize the session markers
-        $_SESSION['__SESSION_IP__'       ] = $request->getRemoteAddress();          // TODO: resolve/store forwarded IP
+        $_SESSION = [];                                             // empty the session
+        $_SESSION['__SESSION_CREATED__'  ] = microtime(true);       // initialize the session markers
+        $_SESSION['__SESSION_IP__'       ] = $request->getRemoteAddress();
         $_SESSION['__SESSION_USERAGENT__'] = $request->getHeaderValue('User-Agent');
 
         $this->new = true;

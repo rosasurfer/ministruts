@@ -38,7 +38,6 @@ use rosasurfer\ministruts\struts\Request as StrutsRequest;
  * @method static string         getQueryString()                                                          Return the query string of the request's URL.
  * @method static string         getRemoteAddress()                                                        Return the IP address the request was made from.
  * @method static string         getRemoteHostname()                                                       Return the name of the host the request was made from.
- * @method static ?string        getForwardedRemoteAddress()                                               Return the value of a transmitted "X-Forwarded-For" header.
  * @method static string         getContent()                                                              Return the content of the request (the body). For file uploads the method doesn't return the real binary content. Instead it returns available metadata.
  * @method static ?string        getContentType()                                                          Return the "Content-Type" header of the request. If multiple "Content-Type" headers have been transmitted the first one is returned.
  * @method static HttpSession    getSession()                                                              Return the current HTTP session object. If a session object does not yet exist, one is created.

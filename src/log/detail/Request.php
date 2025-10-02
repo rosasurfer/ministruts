@@ -61,13 +61,17 @@ class Request extends CObject {
     protected function getNormalizedHeaders(): array {
         if (!isset($this->headers)) {
             // headers with custom name representation (names are case-insensitive)
-            $specialHeaders = [
-                'CDN'             => 'CDN',
-                'DNT'             => 'DNT',
-                'SEC_GPC'         => 'Sec-GPC',
-                'X_CDN'           => 'X-CDN',
-                'X_MINISTRUTS_UI' => 'X-Ministruts-UI',
-                'X_REAL_IP'       => 'X-Real-IP',
+            $customHeaders = [
+                'CDN'                => 'CDN',
+                'CF_CONNECTING_IP'   => 'CF-Connecting-IP',
+                'CLIENT_IP'          => 'Client-IP',
+                'DNT'                => 'DNT',
+                'SEC_GPC'            => 'Sec-GPC',
+                'TRUE_CLIENT_IP'     => 'True-Client-IP',
+                'X_CDN'              => 'X-CDN',
+                'X_MINISTRUTS_UI'    => 'X-Ministruts-UI',
+                'X_REAL_IP'          => 'X-Real-IP',
+                'X_UP_FORWARDED_FOR' => 'X-UP-Forwarded-For',
             ];
             $headers = [];
 
@@ -80,7 +84,7 @@ class Request extends CObject {
                 }
                 if (substr($name, 0, 5) == 'HTTP_') {
                     $name = substr($name, 5);
-                    $name = $specialHeaders[$name] ?? str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower($name))));
+                    $name = $customHeaders[$name] ?? str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower($name))));
                     $headers[$name] = $value;
                 }
             }
@@ -257,8 +261,13 @@ class Request extends CObject {
         $request = self::instance();
 
         if (!isset($request->remoteIP)) {
-                              // nginx proxy                // apache proxy                     // no proxy
-            $addr = $_SERVER['HTTP_X_REAL_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '';
+            $addr = $_SERVER['HTTP_X_REAL_IP']              // nginx and others
+                 ?? $_SERVER['HTTP_TRUE_CLIENT_IP']         // Akamai, Cloudflare Enterprise
+                 ?? $_SERVER['HTTP_CF_CONNECTING_IP']       // Cloudflare
+                 ?? $_SERVER['HTTP_X_FORWARDED_FOR']        // de facto standard
+                 ?? $_SERVER['HTTP_X_UP_FORWARDED_FOR']     // legacy mobile
+                 ?? $_SERVER['HTTP_CLIENT_IP']              // legacy proxies
+                 ?? $_SERVER['REMOTE_ADDR'] ?? '';
             $request->remoteIP = trim(explode(',', $addr, 2)[0]);
         }
         return $request->remoteIP;

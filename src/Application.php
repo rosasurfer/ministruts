@@ -411,8 +411,13 @@ class Application extends CObject {
         }                                               // add always white-listed IPs (default)
         $list = ($whiteList ?? []) + ['127.0.0.1'=>'localhost', $_SERVER['SERVER_ADDR']=>'serverIP'];
 
-                          // nginx proxy                // apache proxy                     // no proxy
-        $addr = $_SERVER['HTTP_X_REAL_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'];
+        $addr = $_SERVER['HTTP_X_REAL_IP']              // nginx and others
+             ?? $_SERVER['HTTP_TRUE_CLIENT_IP']         // Akamai, Cloudflare Enterprise
+             ?? $_SERVER['HTTP_CF_CONNECTING_IP']       // Cloudflare
+             ?? $_SERVER['HTTP_X_FORWARDED_FOR']        // de facto standard
+             ?? $_SERVER['HTTP_X_UP_FORWARDED_FOR']     // legacy mobile
+             ?? $_SERVER['HTTP_CLIENT_IP']              // legacy proxies
+             ?? $_SERVER['REMOTE_ADDR'];
         $remoteIP = trim(explode(',', $addr, 2)[0]);
 
         return isset($list[$remoteIP]);
