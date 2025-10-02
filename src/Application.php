@@ -394,7 +394,7 @@ class Application extends CObject {
      * <pre>
      *  configuration example:
      *  ----------------------
-     *  admin.ip.a-name       = <ip-address>        // the 'name' field is an arbitrary value
+     *  admin.ip.a-name       = <ip-address>            // the 'name' field is arbitrary
      *  admin.ip.another-name = <ip-address>
      * </pre>
      */
@@ -407,10 +407,14 @@ class Application extends CObject {
         if (!$whiteList && self::$config) {
             $values = self::$config->get('admin.ip', []);
             if (!\is_array($values)) $values = [$values];
-            $whiteList = \array_values($values);
-        }
-        $list = \array_merge($whiteList ?? [], ['127.0.0.1', $_SERVER['SERVER_ADDR']]);
+            $whiteList = array_flip($values);
+        }                                               // add always white-listed IPs (default)
+        $list = ($whiteList ?? []) + ['127.0.0.1'=>'localhost', $_SERVER['SERVER_ADDR']=>'serverIP'];
 
-        return \in_array($_SERVER['REMOTE_ADDR'], $list, true);
+                          // nginx proxy                // apache proxy                     // no proxy
+        $addr = $_SERVER['HTTP_X_REAL_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'];
+        $remoteIP = trim(explode(',', $addr, 2)[0]);
+
+        return isset($list[$remoteIP]);
     }
 }

@@ -21,7 +21,7 @@ use const rosasurfer\ministruts\NL;
 /**
  * Request
  *
- * An object to stringify details of the current HTTP request.
+ * An object to access details of the current HTTP request.
  */
 class Request extends CObject {
 
