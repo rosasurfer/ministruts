@@ -313,8 +313,8 @@ function ddd($var, bool $reset = false, string $filename = '') {
         $str = ($var ? 'true':'false').' (bool)';
     }
     elseif (is_string($var)) {
-        $str = ltrim($var);
-        if (strStartsWith($str, '{')) {
+        $str = $var;
+        if (strStartsWith(ltrim($str), '{')) {
             $data = json_decode($str);
             if (json_last_error() || !is_string($str = json_encode($data, JSON_PRETTY_ALL))) {
                 $str = $var;
@@ -998,8 +998,8 @@ function print_p($var, bool $return = false, bool $flushBuffers = true): ?string
         $str = ($var ? 'true':'false').' (bool)';
     }
     elseif (is_string($var)) {
-        $str = ltrim($var);
-        if (strStartsWith($str, '{')) {
+        $str = $var;
+        if (strStartsWith(ltrim($str), '{')) {
             $data = json_decode($str);
             if (json_last_error() || !is_string($str = json_encode($data, JSON_PRETTY_ALL))) {
                 $str = $var;

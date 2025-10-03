@@ -29,22 +29,25 @@ use const rosasurfer\ministruts\NL;
  */
 class LogMessage extends CObject {
 
-    /** @var string - a logged string message */
+    /** @var string - a logged message */
     protected string $message = '';
 
-    /** @var Throwable|null - a logged exception, if any */
+    /** @var ?Throwable - a logged exception */
     protected ?Throwable $exception = null;
 
     /** @var int - loglevel */
     protected int $logLevel;
 
-    /** @var string - filename of the log statement causing this message */
+    /** @var string - filename of the location causing this log message */
     protected string $file;
 
-    /** @var int - file position of the log statement causing this message */
+    /** @var int - file position of the location causing this log message */
     protected int $line;
 
-    /** @var array<string, mixed> - logging context */
+    /** @phpstan-var array{file:string, line:int, trace:STACKFRAME[]} - internal call location infos */
+    protected array $internalLocation;
+
+    /** @var array<string, mixed> - logging context with additional infos (if any) */
     protected array $context;
 
 
@@ -53,7 +56,7 @@ class LogMessage extends CObject {
      *
      * @param  string|object        $loggable - a string or an object implementing <tt>__toString()</tt>
      * @param  int                  $level    - loglevel
-     * @param  array<string, mixed> $context  - logging context with additional data
+     * @param  array<string, mixed> $context  - logging context with additional infos
      */
     public function __construct($loggable, int $level, array $context) {
         if (!is_string($loggable)) {
@@ -69,18 +72,19 @@ class LogMessage extends CObject {
 
         $this->logLevel = $level;
         $this->context = $context;
-
-        $this->resolveCallLocation();
+        $this->internalLocation = $this->getInternalLocation();
+        $this->file = $this->getFile();
+        $this->line = $this->getLine();
     }
 
 
     /**
-     * Whether the message is marked as sent by the registered error handler.
+     * Whether the message was sent by the framework's error handler.
      *
      * @return bool
      */
-    public function isSentByErrorHandler(): bool {
-        return \key_exists('error-handler', $this->context);
+    public function fromErrorHandler(): bool {
+        return isset($this->context['error-handler']);
     }
 
 
@@ -95,7 +99,7 @@ class LogMessage extends CObject {
 
 
     /**
-     * Get the exception of the instance (if any).
+     * Get the logged exception of the instance (if any).
      *
      * @return ?Throwable
      */
@@ -115,22 +119,107 @@ class LogMessage extends CObject {
 
 
     /**
-     * Return the filename of the log statement causing this message.
+     * Return the filename of the location causing this log message.
      *
      * @return string
      */
     public function getFile(): string {
+        if (!isset($this->file)) {
+            if ($this->fromErrorHandler()) {                        // use location infos from the error handler
+                /** @var Throwable $exception */
+                $exception = $this->exception;
+                $this->file = $exception->getFile();
+            }
+            elseif (isset($this->context['file'])) {                // use custom location infos
+                $this->file = $this->context['file'];
+            }
+            else {                                                  // no external location infos
+                ['file' => $file] = $this->getInternalLocation();
+                $this->file = $file;
+            }
+        }
         return $this->file;
     }
 
 
     /**
-     * Return the file position of the log statement causing this message.
+     * Return the file position of the location causing this log message.
      *
      * @return int
      */
     public function getLine(): int {
+        if (!isset($this->line)) {
+            if ($this->fromErrorHandler()) {                        // use location infos from the error handler
+                /** @var Throwable $exception */
+                $exception = $this->exception;
+                $this->line = $exception->getLine();
+            }
+            elseif (isset($this->context['line'])) {                // use custom location infos
+                $this->line = $this->context['line'];
+            }
+            else {                                                  // no external location infos
+                ['line' => $line] = $this->getInternalLocation();
+                $this->line = $line;
+            }
+        }
         return $this->line;
+    }
+
+
+    /**
+     * Internally resolves the location infos causing this log message.
+     *
+     * @return         mixed[] - file, line and stacktrace of the causing statement
+     * @phpstan-return array{file:string, line:int, trace:STACKFRAME[]}
+     *
+     * @see \rosasurfer\ministruts\phpstan\STACKFRAME
+     */
+    protected function getInternalLocation(): array {
+        if (!isset($this->internalLocation)) {
+            /** @phpstan-var STACKFRAME[] $fullTrace */
+            $fullTrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+            $partialTrace = null;
+            $file = '(unknown)';
+            $line = 0;
+
+            if (isset($this->context['file'], $this->context['line'])) {
+                // custom location: look-up a call at file + line
+                $file = $this->context['file'];
+                $line = $this->context['line'];
+
+                foreach ($fullTrace as $i => $frame) {
+                    if (isset($frame['file'], $frame['line'])) {
+                        if ($frame['file']==$file && $frame['line']==$line) {
+                            $partialTrace = array_slice($fullTrace, $i+1);
+                            break;
+                        }
+                    }
+                }
+            }
+            else {
+                // default: look-up a call to Logger::log()
+                $logMethod = strtolower(Logger::class.'::log');
+
+                foreach ($fullTrace as $i => $frame) {
+                    if (isset($frame['class'], $frame['function'])) {
+                        $method = "$frame[class]::$frame[function]";
+                        if (strtolower($method) == $logMethod) {
+                            $file = $frame['file'] ?? '(unknown)';
+                            $line = $frame['line'] ?? 0;
+                            $partialTrace = array_slice($fullTrace, $i+1);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            $this->internalLocation = [
+                'file'  => $file,
+                'line'  => $line,
+                'trace' => $partialTrace ?? $fullTrace,
+            ];
+        }
+        return $this->internalLocation;
     }
 
 
@@ -143,7 +232,7 @@ class LogMessage extends CObject {
      * @return string - message details (ending with a line break) or an empty string if not applicable
      */
     public function getMessageDetails(bool $html, ?ContentFilter $filter = null): string {
-        $key = 'messageDetails.'.($html ? 'web':'cli') . ($filter ? get_class($filter) : '');
+        $key = 'messageDetails.'.($html ? 'web':'cli').($filter ? get_class($filter) : '');
 
         if (isset($this->context[$key])) {
             /** @var string $msg */
@@ -157,7 +246,7 @@ class LogMessage extends CObject {
 
         if ($this->exception) {
             $msg = trim(ErrorHandler::getVerboseMessage($this->exception, $indent, $filter));
-            if ($this->isSentByErrorHandler() && $this->logLevel==L_FATAL) {
+            if ($this->fromErrorHandler() && $this->logLevel==L_FATAL) {
                 if (!$this->exception instanceof ErrorException ||
                     !($this->exception->getSeverity() & (E_ERROR | E_PARSE | E_CORE_ERROR | E_CORE_WARNING | E_COMPILE_ERROR | E_COMPILE_WARNING))) {
                     $msg = "Unhandled $msg";
@@ -194,53 +283,47 @@ class LogMessage extends CObject {
      * @return string - stacktrace details (ending with a line break) or an empty string if not applicable
      */
     public function getTraceDetails(bool $html, ?ContentFilter $filter = null): string {
-        $key = 'traceDetails.'.($html ? 'web':'cli') . ($filter ? get_class($filter) : '');
+        $key = 'traceDetails.'.($html ? 'web':'cli').($filter ? get_class($filter) : '');
 
         if (isset($this->context[$key])) {
             /** @var string $detail */
             $detail = $this->context[$key];
             return $detail;
         }
-
         $indent = ' ';
 
         if ($this->exception) {
-            // process the exception's stacktrace
+            // use stacktrace from an explicitly passed exception (will include any nested exceptions)
             $detail  = $indent.'Stacktrace:'.NL .$indent.'-----------'.NL;
             $detail .= ErrorHandler::getAdjustedStackTraceAsString($this->exception, $indent, $filter);
             if ($html) {
                 $detail = '<br style="clear:both"/><br/>'.print_p($detail, true, false).NL;
             }
         }
-        else {
-            // process an existing context exception
-            if (isset($this->context['exception'])) {
-                /** @var Throwable $exception */
-                $exception = $this->context['exception'];
-                $msg = $indent.trim(ErrorHandler::getVerboseMessage($exception, $indent, $filter)).NL.NL;
-                if ($html) {
-                    $msg = '<br/>'.nl2br(hsc($msg));
-                }
-
-                $detail  = $indent.'Stacktrace:'.NL .$indent.'-----------'.NL;
-                $detail .= ErrorHandler::getAdjustedStackTraceAsString($exception, $indent, $filter);
-                if ($html) {
-                    $detail = '<br style="clear:both"/><br/>'.print_p($detail, true, false).NL;
-                }
-                $detail = $msg.$detail;
+        elseif (isset($this->context['exception'])) {
+            // use stacktrace from a context exception (will include any nested exceptions)
+            /** @var Throwable $exception */
+            $exception = $this->context['exception'];
+            $msg = $indent.trim(ErrorHandler::getVerboseMessage($exception, $indent, $filter)).NL.NL;
+            if ($html) {
+                $msg = '<br/>'.nl2br(hsc($msg));
             }
-            else {
-                // otherwise process the internal stacktrace
-                if (!isset($this->context['stacktrace'])) {
-                    $this->generateStackTrace();
-                }
-                /** @phpstan-var STACKFRAME[] $stacktrace */
-                $stacktrace = $this->context['stacktrace'];
-                $detail  = $indent.'Stacktrace:'.NL .$indent.'-----------'.NL;
-                $detail .= ErrorHandler::formatStackTrace($stacktrace, $indent, $filter);
-                if ($html) {
-                    $detail = '<br style="clear:both"/><br/>'.print_p($detail, true, false).NL;
-                }
+
+            $detail  = $indent.'Stacktrace:'.NL .$indent.'-----------'.NL;
+            $detail .= ErrorHandler::getAdjustedStackTraceAsString($exception, $indent, $filter);
+            if ($html) {
+                $detail = '<br style="clear:both"/><br/>'.print_p($detail, true, false).NL;
+            }
+            $detail = $msg.$detail;
+        }
+        else {
+            // use our own stacktrace (points to the causing log statement)
+            $detail = $indent.'Stacktrace:'.NL .$indent.'-----------'.NL;
+            ['trace' => $trace] = $this->getInternalLocation();
+            $stacktrace = ErrorHandler::convertToJavaStackTrace($trace, $this->getFile(), $this->getLine());
+            $detail .= ErrorHandler::formatStackTrace($stacktrace, $indent, $filter);
+            if ($html) {
+                $detail = '<br style="clear:both"/><br/>'.print_p($detail, true, false).NL;
             }
         }
         return $this->context[$key] = $detail;
@@ -256,7 +339,7 @@ class LogMessage extends CObject {
      * @return string - request details (ending with a line break) or an empty string if not applicable
      */
     public function getRequestDetails(bool $html, ?ContentFilter $filter = null): string {
-        $key = 'requestDetails.'.($html ? 'web':'cli') . ($filter ? get_class($filter) : '');
+        $key = 'requestDetails.'.($html ? 'web':'cli').($filter ? get_class($filter) : '');
 
         if (isset($this->context[$key])) {
             /** @var string $detail */
@@ -287,7 +370,7 @@ class LogMessage extends CObject {
      * @return string - session details (ending with a line break) or an empty string if not applicable
      */
     public function getSessionDetails(bool $html, ?ContentFilter $filter = null): string {
-        $key = 'sessionDetails.'.($html ? 'web':'cli') . ($filter ? get_class($filter) : '');
+        $key = 'sessionDetails.'.($html ? 'web':'cli').($filter ? get_class($filter) : '');
 
         if (isset($this->context[$key])) {
             /** @var string $detail */
@@ -322,7 +405,7 @@ class LogMessage extends CObject {
      * @return string - server details (ending with a line break) or an empty string if not applicable
      */
     public function getServerDetails(bool $html, ?ContentFilter $filter = null): string {
-        $key = 'serverDetails.'.($html ? 'web':'cli') . ($filter ? get_class($filter) : '');
+        $key = 'serverDetails.'.($html ? 'web':'cli').($filter ? get_class($filter) : '');
 
         if (isset($this->context[$key])) {
             /** @var string $detail */
@@ -394,63 +477,5 @@ class LogMessage extends CObject {
             $detail = '<br style="clear:both"/><br/>'.print_p($detail, true, false).NL;
         }
         return $this->context[$key] = $detail;
-    }
-
-
-    /**
-     * Resolve the file location the log statement was triggered or made from.
-     *
-     * @return void
-     */
-    protected function resolveCallLocation(): void {
-        if ($this->exception) {
-            $this->file = $this->exception->getFile();
-            $this->line = $this->exception->getLine();
-            return;
-        }
-
-        if (!isset($this->context['stacktrace'])) {
-            $this->generateStackTrace();
-        }
-        /** @phpstan-var STACKFRAME[] $stacktrace */
-        $stacktrace = $this->context['stacktrace'];
-
-        foreach ($stacktrace as $frame) {
-            // find the first frame with 'file' (skips internal PHP functions)
-            if (isset($frame['file'])) {
-                $this->file = $frame['file'];
-                $this->line = $frame['line'] ?? 0;
-                return;
-            }
-        }
-
-        $this->file = 'Unknown';
-        $this->line = 0;
-    }
-
-
-    /**
-     * Generate a stacktrace pointing to the log statement and store it under $context['stacktrace'].
-     *
-     * @return void
-     */
-    protected function generateStackTrace(): void {
-        if (isset($this->context['stacktrace'])) {
-            return;
-        }
-
-        $result = $stacktrace = ErrorHandler::adjustStackTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), __FILE__, __LINE__);
-        $logMethod = strtolower(Logger::class.'::log');
-
-        foreach ($stacktrace as $i => $frame) {
-            if (isset($frame['class'])) {
-                $method = strtolower($frame['class'].'::'.($frame['function'] ?? ''));
-                if ($method == $logMethod) {
-                    $result = array_slice($stacktrace, $i + 1);
-                    break;
-                }
-            }
-        }
-        $this->context['stacktrace'] = $result;
     }
 }

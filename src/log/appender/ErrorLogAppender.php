@@ -113,7 +113,7 @@ class ErrorLogAppender extends BaseAppender {
         }
 
         // prevent duplicated output on STDERR if the print appender is active
-        if ($this->toSTDERR()) {
+        if ($this->logsToSTDERR()) {
             if ($this->options['print.enabled'] ?? false) {
                 return true;
             }
@@ -158,14 +158,14 @@ class ErrorLogAppender extends BaseAppender {
         if ($this->serverDetails  && $detail = $message->getServerDetails (false, $this->filter)) $msg .= NL.$detail;
 
         $msg .= NL.$message->getCallDetails(false, false);
-        $msg = rtrim($msg).NL;
+        $msg = trim($msg).NL;
 
-        if (!$this->toSTDERR()) {
+        if (!$this->logsToSTDERR()) {
             $msg  = (CLI ? 'CLI' : Request::getRemoteIP()).' '.$msg;
             $msg .= NL.str_repeat('-', 150);
         }
 
-        $msg = str_replace(chr(0), '\0', $msg);                 // replace NUL bytes which mess up the logfile
+        $msg = str_replace(chr(0), '\0', $msg);                 // replace NUL bytes which would mess up the logfile
         if (WINDOWS) $msg = str_replace(NL, PHP_EOL, $msg);     // prevent a mixed EOL file format on Windows
 
         if ($this->destinationType == ERROR_LOG_DEFAULT) {
@@ -185,11 +185,12 @@ class ErrorLogAppender extends BaseAppender {
 
 
     /**
-     * Whether the appender logs to STDERR. Used to prevent duplicate screen output from both this and the display appender.
+     * Whether the ErrorLogAppender in fact logs to STDERR. Used to prevent duplicate screen output from both this
+     * and the {@link PrintAppender}.
      *
      * @return bool
      */
-    protected function toSTDERR(): bool {
+    protected function logsToSTDERR(): bool {
         if (CLI) {
             $iniSetting = !empty(ini_get('error_log'));
             return ($this->destinationType == ERROR_LOG_DEFAULT && !$iniSetting) || $this->destinationType == ERROR_LOG_SAPI;

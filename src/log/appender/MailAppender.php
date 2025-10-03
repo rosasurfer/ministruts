@@ -195,7 +195,7 @@ class MailAppender extends BaseAppender {
 
                 if ($exception) {
                     $subjectMsg = simpleClassName($exception);
-                    if ($logMessage->isSentByErrorHandler()) {
+                    if ($logMessage->fromErrorHandler()) {
                         $subjectMsg = $logLevel == L_FATAL ? "Unhandled $subjectMsg" : (string)strtok($exception->getMessage(), NL);
                     }
                     $location = CLI ? 'in '.realpath($_SERVER['PHP_SELF']) : 'at '.strLeftTo(Request::getUrl($this->filter), '?');

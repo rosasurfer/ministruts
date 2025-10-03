@@ -44,7 +44,7 @@ use const rosasurfer\ministruts\L_WARN;
  * </pre>
  *
  *
- * @TODO: implement \Psr\Log\LoggerInterface and remove static crap
+ * @todo: implement \Psr\Log\LoggerInterface and remove static crap
  */
 class Logger extends StaticClass {
 
@@ -70,7 +70,7 @@ class Logger extends StaticClass {
 
 
     /**
-     * Initialize the Logger.
+     * Initialize the Logger and instantiate enabled appenders.
      *
      * @return void
      */
@@ -149,6 +149,7 @@ class Logger extends StaticClass {
 
         // filter messages below the active loglevel
         if ($level >= self::$appLogLevel) {
+            $context = array_intersect_key($context, array_flip(['error-handler', 'exception', 'file', 'line']));
             $message = new LogMessage($loggable, $level, $context);
 
             foreach (self::$logAppenders as $appender) {

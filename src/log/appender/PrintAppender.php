@@ -63,7 +63,7 @@ class PrintAppender extends BaseAppender {
         }
 
         // detect "headers already sent" errors triggered by the PrintAppender itself and terminate processing of the error
-        if ($message->isSentByErrorHandler() && $this->msgCounter > 0) {
+        if ($message->fromErrorHandler() && $this->msgCounter > 0) {
             if (preg_match('/- headers already sent (by )?\(output started at /', $message->getMessage())) {
                 return false;
             }
@@ -83,7 +83,7 @@ class PrintAppender extends BaseAppender {
         if ($this->sessionDetails && $detail = $message->getSessionDetails($html, $this->filter)) $msg .= NL.$detail;
         if ($this->serverDetails  && $detail = $message->getServerDetails ($html, $this->filter)) $msg .= NL.$detail;
         $msg .= NL.$message->getCallDetails($html, false);
-        $msg = rtrim($msg);
+        $msg = trim($msg);
 
         if (!$html) {
             if ($this->msgCounter > 0) {
@@ -91,9 +91,9 @@ class PrintAppender extends BaseAppender {
             }
             $msg .= NL.NL;                                                  // EOL + one empty line
 
-            if (!CLI)                                 echo $msg;            // web UI with forced plain text format
-            elseif ($message->isSentByErrorHandler()) stderr($msg);
-            else                                      stdout($msg);
+            if (!CLI)                             echo $msg;                // web UI with forced plain text format
+            elseif ($message->fromErrorHandler()) stderr($msg);
+            else                                  stdout($msg);
         }
         else {
             // break out of unfortunate HTML tags

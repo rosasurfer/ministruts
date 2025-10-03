@@ -194,18 +194,14 @@ class ErrorHandler extends StaticClass {
                 default: $logLevel = L_ERROR;
             }
 
-            // catch exceptions thrown by logger or chained error handler
+            // catch recursive exceptions
             try {
-                Logger::log($exception, $logLevel, [
-                    'file'          => $file,
-                    'line'          => $line,
-                    'error-handler' => true,
-                ]);
+                Logger::log($exception, $logLevel, ['error-handler' => true]);
                 // chain a previously active handler
                 return $prevErrorHandler();
             }
-            catch (Throwable $second) {
-                self::handle2ndException($exception, $second);
+            catch (Throwable $next) {
+                self::handleRecursiveException($exception, $next);
             }
             return false;
         }
@@ -246,37 +242,33 @@ class ErrorHandler extends StaticClass {
 
         // catch exceptions thrown by logger or chained exception handler
         try {
-            Logger::log($exception, L_FATAL, [
-                'file'          => $exception->getFile(),
-                'line'          => $exception->getLine(),
-                'error-handler' => true,
-            ]);
+            Logger::log($exception, L_FATAL, ['error-handler' => true]);
 
             // chain a previously active handler
             if (self::$prevExceptionHandler) {
                 (self::$prevExceptionHandler)($exception);
             }
         }
-        catch (Throwable $second) {
-            self::handle2ndException($exception, $second);
+        catch (Throwable $next) {
+            self::handleRecursiveException($exception, $next);
         }
     }
 
 
     /**
-     * Process exceptions thrown inside the exception handler. Called if {@link Logger} or other chained exception handlers fail
-     * and throw exceptions by themself. In such a case both exceptions are logged to the default log with only limited details.
+     * Process recursive exceptions. Called if {@link Logger} or chained exception handlers throw exceptions by themself.
+     * In such a case both exceptions are logged to the default log with only limited details.
      *
-     * Note: If this method is reached something in the previous error handling went seriously wrong. Therefore this method should
-     *       not use excessive external dependencies.
+     * Note: If this method is reached something in the error handling went seriously wrong. Therefore this method should
+     *       use only minimal external dependencies.
      *
-     * @param  Throwable $first  - primary exception
-     * @param  Throwable $second - secondary exception
+     * @param  Throwable $first - primary exception
+     * @param  Throwable $next  - next exception
      *
      * @return void
      */
-    private static function handle2ndException(Throwable $first, Throwable $second): void {
-        //\rosasurfer\ministruts\echof('ErrorHandler::handle2ndException(inShutdown='.(int)self::$inShutdown.') '.$second->getMessage());
+    private static function handleRecursiveException(Throwable $first, Throwable $next): void {
+        //\rosasurfer\ministruts\echof('ErrorHandler::handleRecursiveException(inShutdown='.(int)self::$inShutdown.') '.$next->getMessage());
         try {
             $indent = ' ';
             $msg  = trim(self::getVerboseMessage($first, $indent));
@@ -289,16 +281,16 @@ class ErrorHandler extends StaticClass {
             $msg .= NL;
             $msg .= NL;
             $msg .= $indent.'followed by'.NL;
-            $msg .= $indent.trim(self::getVerboseMessage($second, $indent)).NL;
-            $msg .= $indent.'in '.$second->getFile().' on line '.$second->getLine().NL;
+            $msg .= $indent.trim(self::getVerboseMessage($next, $indent)).NL;
+            $msg .= $indent.'in '.$next->getFile().' on line '.$next->getLine().NL;
             $msg .= NL;
             $msg .= $indent.'Stacktrace:'.NL;
             $msg .= $indent.'-----------'.NL;
-            $msg .= self::getAdjustedStackTraceAsString($second, $indent);
+            $msg .= self::getAdjustedStackTraceAsString($next, $indent);
             $msg .= NL;
 
             // log everything to the system logger (never throws an error)
-            $msg = str_replace(chr(0), '\0', $msg);         // replace NUL bytes which mess up the logfile
+            $msg = str_replace(chr(0), '\0', $msg);         // replace NUL bytes which would mess up the logfile
             if (WINDOWS) {
                 $msg = str_replace(NL, PHP_EOL, $msg);
             }
@@ -526,10 +518,10 @@ class ErrorHandler extends StaticClass {
             if ($throwable instanceof ErrorException) {     // a PHP error not created by this ErrorHandler
                 $class .= '('.self::errorLevelDescr($throwable->getSeverity()).')';
             }
-            $message = $class.(strlen($message) ? ': ':'').$message;
+            $message = $class.($message=='' ? '' : ": $message");
         }
 
-        if (strlen($indent)) {
+        if ($indent != '') {
             $message = str_replace(NL, NL.$indent, normalizeEOL($message));
         }
         return $indent.$message;
@@ -537,21 +529,22 @@ class ErrorHandler extends StaticClass {
 
 
     /**
-     * Takes a regular PHP stacktrace and adjusts it to be more readable.
+     * Convert a PHP stacktrace to the more intuitive Java-style.
      *
      * @param  array[] $trace           - regular PHP stacktrace
-     * @param  string  $file [optional] - name of the file where the stacktrace was generated
-     * @param  int     $line [optional] - line of the file where the stacktrace was generated
+     * @param  string  $file [optional] - name of the file where the stacktrace was created (missing in PHP traces)
+     * @param  int     $line [optional] - line of the file where the stacktrace was created (missing in PHP traces)
      *
-     * @return mixed[] - adjusted stacktrace
+     * @return mixed[] - Java-style stacktrace
      *
      * @phpstan-param  STACKFRAME[] $trace
      * @phpstan-return STACKFRAME[]
      *
      * @see \rosasurfer\ministruts\phpstan\STACKFRAME
      *
-     * @example
-     * before: The location in the frame points to the called statement.
+     * Notes
+     * -----
+     * PHP style shows WHAT was called. Each frame shows the function/method that was called.
      * <pre>
      *  require_once()  # line 5,  file: /var/www/phalcon/vokuro/vendor/autoload.php
      *  include_once()  # line 21, file: /var/www/phalcon/vokuro/app/config/loader.php
@@ -559,22 +552,52 @@ class ErrorHandler extends StaticClass {
      *  {main}
      * </pre>
      *
-     * after: The location in the frame points to the calling statement.
+     * Java style shows WHERE a call was made. Each frame points to the location that made the call.
      * <pre>
      *  require_once()             [php]
      *  include_once()  # line 5,  file: /var/www/phalcon/vokuro/vendor/autoload.php
      *  include()       # line 21, file: /var/www/phalcon/vokuro/app/config/loader.php
      *  {main}          # line 26, file: /var/www/phalcon/vokuro/public/index.php
      * </pre>
+     *
+     *
+     * PHP style (what was called)
+     * ---------------------------
+     * Pros:
+     *  - Makes the call chain very explicit. You can clearly see "X called Y called Z".
+     *  - Useful when function/method names are more important than exact line numbers.
+     *  - The function name tells you what's being invoked at each step.
+     * Cons:
+     *  - The "shift" between function name and line number is confusing.
+     *  - Less intuitive. You have to look at one line to see what was called and another line to see where it failed.
+     *  - Requires more mental parsing to locate the actual problem.
+     *
+     *
+     * Java style (where a call was made)
+     * ----------------------------------
+     * Pros:
+     *  - More intuitive for debugging. Each line shows exactly what code executed at that location.
+     *  - The top line immediately shows the exact line where the error occurred.
+     *  - No mental "shift" needed, line number and context match directly.
+     *  - Better for step-by-step reasoning: "this line ran, then this line ran, then this line failed".
+     * Cons:
+     *  - Can be slightly less clear about the call chain.
+     *
+     *
+     * Consensus
+     * ---------
+     * Most developers and language designers prefer Java's style. Languages like Python, JavaScript, C#, Rust, and Go all
+     * follow Java's pattern. The directness of "this is the line that executed and caused the problem" is generally considered
+     * more developer-friendly and requires less cognitive overhead during debugging.
      */
-    public static function adjustStackTrace(array $trace, string $file = 'unknown', int $line = 0): array {
-        // check if the stacktrace is already adjusted
-        if (isset($trace[0]['__adjusted'])) {
+    public static function convertToJavaStackTrace(array $trace, string $file = '(unknown)', int $line = 0): array {
+        // check if the stacktrace is already Java-style
+        if (isset($trace[0]['_javastyle'])) {
             return $trace;
         }
 
         // fix a zero $line[0] if $file matches (e.g. with \SimpleXMLElement)
-        if ($file != 'unknown' && $line) {
+        if ($file != '(unknown)' && $line) {
             if (($trace[0]['file'] ?? null)===$file && ($trace[0]['line'] ?? 0)===0) {
                 $trace[0]['line'] = $line;
             }
@@ -591,7 +614,7 @@ class ErrorHandler extends StaticClass {
             if (isset($trace[$i-1]['line'])) $trace[$i]['line'] = $trace[$i-1]['line'];
             else                       unset($trace[$i]['line']);
 
-            $trace[$i]['__adjusted'] = 1;
+            $trace[$i]['_javastyle'] = 1;
         }
 
         // add location from parameters to first frame if it differs from the old one (now in second frame)
@@ -600,7 +623,7 @@ class ErrorHandler extends StaticClass {
             $trace[0]['line'] = $line;                          // SQLite3::enableExceptions(true|false);
         }                                                       // SQLite3::exec($invalid_sql);
         else {
-            unset($trace[0]['file'], $trace[0]['line']);        // otherwise delete location (a call from PHP core)
+            unset($trace[0]['file'], $trace[0]['line']);        // otherwise delete location (a call from the PHP core)
         }
 
         // remove the last frame again if it has no location (no main script, call from PHP core)
@@ -629,7 +652,7 @@ class ErrorHandler extends StaticClass {
      * @return string - string representation ending with an EOL marker
      */
     public static function getAdjustedStackTraceAsString(Throwable $throwable, string $indent = '', ?ContentFilter $filter = null): string {
-        $trace = self::adjustStackTrace($throwable->getTrace(), $throwable->getFile(), $throwable->getLine());
+        $trace = self::convertToJavaStackTrace($throwable->getTrace(), $throwable->getFile(), $throwable->getLine());
         $result = self::formatStackTrace($trace, $indent, $filter);
 
         if ($cause = $throwable->getPrevious()) {
@@ -643,7 +666,7 @@ class ErrorHandler extends StaticClass {
 
 
     /**
-     * Return a formatted and more readable version of a stacktrace.
+     * Return a formatted version of a stacktrace.
      *
      * @param  array[]        $trace             - stacktrace
      * @param  string         $indent [optional] - indent formatted lines by this value (default: no indenting)
@@ -788,7 +811,7 @@ class ErrorHandler extends StaticClass {
             if (isset($trace[0]['function'])) {
                 if (strtolower($trace[0]['function']) == $method) {
                     $frame = array_shift($trace);
-                    $file = $frame['file'] ?? 'Unknown';
+                    $file = $frame['file'] ?? '(unknown)';
                     $line = $frame['line'] ?? 0;
                     $size--;
                     $count++;

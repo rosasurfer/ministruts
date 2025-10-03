@@ -45,14 +45,14 @@ use rosasurfer\ministruts\db\orm\PersistableObject;
  * }
  *
  * @phpstan-type STACKFRAME = array{
- *     file?    : string,
- *     line?    : int,
- *     class?   : string,
- *     type?    : '->'|'::',
- *     function?: string,
- *     object?  : object,
- *     args?    : mixed[],
- *   __adjusted?: int,
+ *     file?     : string,
+ *     line?     : int,
+ *     class?    : string,
+ *     type?     : '->'|'::',
+ *     function? : string,
+ *     object?   : object,
+ *     args?     : mixed[],
+ *    _javastyle?: int,
  * }
  */
 final class UserTypes {
