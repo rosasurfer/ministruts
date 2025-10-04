@@ -42,8 +42,10 @@ parameters:
 
   checkUninitializedProperties: true
 
-  ignoreErrors:                                     # silence opinionated checks
-    - '#^Unsafe usage of new static\(\)\.$#'
+  ignoreErrors:
+    - identifier: isset.initializedProperty
+    - '#^Unsafe usage of new static\(\)\.$#'        # opinionated
+
 
   reportUnmatchedIgnoredErrors: false
 

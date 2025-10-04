@@ -537,8 +537,8 @@ class ErrorHandler extends StaticClass {
      *
      * @return mixed[] - Java-style stacktrace
      *
-     * @phpstan-param  STACKFRAME[] $trace
-     * @phpstan-return STACKFRAME[]
+     * @phpstan-param  list<STACKFRAME> $trace
+     * @phpstan-return list<STACKFRAME>
      *
      * @see \rosasurfer\ministruts\phpstan\STACKFRAME
      *
@@ -631,7 +631,7 @@ class ErrorHandler extends StaticClass {
         if (!isset($trace[$size-1]['file'])) {
             array_pop($trace);
         }
-        return $trace;
+        return $trace;                                          // @phpstan-ignore return.type (false positive: Array might not have offset 'function')
 
         // TODO: fix stack traces originating from require()/require_once() errors
         // TODO: fix wrong stack frames originating from calls to virtual static functions
@@ -674,7 +674,7 @@ class ErrorHandler extends StaticClass {
      *
      * @return string - string representation ending with an EOL marker
      *
-     * @phpstan-param STACKFRAME[] $trace
+     * @phpstan-param list<STACKFRAME> $trace
      *
      * @see \rosasurfer\ministruts\phpstan\STACKFRAME
      */
@@ -735,28 +735,25 @@ class ErrorHandler extends StaticClass {
      * @param  array $frame                - stack frame
      * @param  bool  $nsToLower [optional] - whether to return the namespace part in lower case (default: unmodified)
      *
-     * @return string - method name without trailing parentheses
+     * @return string - method name (without parentheses)
      *
      * @phpstan-param  STACKFRAME $frame
      *
      * @see \rosasurfer\ministruts\phpstan\STACKFRAME
      */
     public static function getStackFrameMethod(array $frame, bool $nsToLower = false): string {
-        $class = $function = '';
+        $class = '';
+        $function = $frame['function'];
 
-        if (isset($frame['function'])) {
-            $function = $frame['function'];
-
-            if (isset($frame['class'])) {
-                $class = $frame['class'];
-                if ($nsToLower && is_int($pos = strrpos($class, '\\'))) {
-                    $class = strtolower(substr($class, 0, $pos)).substr($class, $pos);
-                }
-                $class = $class.($frame['type'] ?? '');
+        if (isset($frame['class'])) {
+            $class = $frame['class'];
+            if ($nsToLower && is_int($pos = strrpos($class, '\\'))) {
+                $class = strtolower(substr($class, 0, $pos)).substr($class, $pos);
             }
-            elseif ($nsToLower && is_int($pos = strrpos($function, '\\'))) {
-                $function = strtolower(substr($function, 0, $pos)).substr($function, $pos);
-            }
+            $class .= ($frame['type'] ?? '');
+        }
+        elseif ($nsToLower && is_int($pos = strrpos($function, '\\'))) {
+            $function = strtolower(substr($function, 0, $pos)).substr($function, $pos);
         }
         return $class.$function;
     }
@@ -772,8 +769,8 @@ class ErrorHandler extends StaticClass {
      *
      * @return mixed[] - modified stacktrace
      *
-     * @phpstan-param  STACKFRAME[] $trace
-     * @phpstan-return STACKFRAME[]
+     * @phpstan-param  list<STACKFRAME> $trace
+     * @phpstan-return list<STACKFRAME>
      *
      * @see \rosasurfer\ministruts\phpstan\STACKFRAME
      */
@@ -836,7 +833,7 @@ class ErrorHandler extends StaticClass {
      *
      * @return void
      *
-     * @phpstan-param STACKFRAME[] $trace
+     * @phpstan-param list<STACKFRAME> $trace
      *
      * @see \rosasurfer\ministruts\phpstan\STACKFRAME
      */

@@ -44,7 +44,7 @@ class LogMessage extends CObject {
     /** @var int - file position of the location causing this log message */
     protected int $line;
 
-    /** @phpstan-var array{file:string, line:int, trace:STACKFRAME[]} - internal call location infos */
+    /** @phpstan-var array{file:string, line:int, trace:list<STACKFRAME>} - internal call location infos */
     protected array $internalLocation;
 
     /** @var array<string, mixed> - logging context with additional infos (if any) */
@@ -170,13 +170,12 @@ class LogMessage extends CObject {
      * Internally resolves the location infos causing this log message.
      *
      * @return         mixed[] - file, line and stacktrace of the causing statement
-     * @phpstan-return array{file:string, line:int, trace:STACKFRAME[]}
+     * @phpstan-return array{file:string, line:int, trace:list<STACKFRAME>}
      *
      * @see \rosasurfer\ministruts\phpstan\STACKFRAME
      */
     protected function getInternalLocation(): array {
         if (!isset($this->internalLocation)) {
-            /** @phpstan-var STACKFRAME[] $fullTrace */
             $fullTrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
             $partialTrace = null;
             $file = '(unknown)';
@@ -201,7 +200,7 @@ class LogMessage extends CObject {
                 $logMethod = strtolower(Logger::class.'::log');
 
                 foreach ($fullTrace as $i => $frame) {
-                    if (isset($frame['class'], $frame['function'])) {
+                    if (isset($frame['class'])) {
                         $method = "$frame[class]::$frame[function]";
                         if (strtolower($method) == $logMethod) {
                             $file = $frame['file'] ?? '(unknown)';

@@ -45,14 +45,14 @@ use rosasurfer\ministruts\db\orm\PersistableObject;
  * }
  *
  * @phpstan-type STACKFRAME = array{
- *     file?     : string,
- *     line?     : int,
- *     class?    : string,
- *     type?     : '->'|'::',
- *     function? : string,
- *     object?   : object,
- *     args?     : mixed[],
- *    _javastyle?: int,
+ *     file?:       string,
+ *     line?:       int,
+ *     class?:      class-string,
+ *     type?:       '->'|'::',
+ *     function:    string,
+ *     args?:       list<mixed>,
+ *     object?:     object,
+ *     _javastyle?: int,
  * }
  */
 final class UserTypes {
@@ -122,17 +122,17 @@ final class ORM_RELATION {
 
 
 /**
- * Array holding a single frame of a stacktrace. All fields are optional/may not exist.
+ * Array holding a single frame of a stacktrace.
  *
  * <pre>
  * Array(
- *     file?    : non-empty-string,
- *     line?    : int,
- *     class?   : class-string,
- *     type?    : '->'|'::',
- *     function?: non-empty-string,
- *     object?  : object,
- *     args?    : mixed[],
+ *     file?   : string,
+ *     line?   : int,
+ *     class?  : class-string,
+ *     type?   : '->'|'::',
+ *     function: string,
+ *     args?   : list<mixed>,
+ *     object? : object,
  * )
  * </pre>
  */
