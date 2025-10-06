@@ -300,30 +300,7 @@ function ddd($var, bool $reset = false, string $filename = '') {
         fclose($hFile);
     }
 
-    if (is_object($var) && method_exists($var, '__toString') && !$var instanceof SimpleXMLElement) {
-        $str = (string) $var;
-    }
-    elseif (is_object($var) || is_array($var)) {
-        $str = print_r($var, true);
-    }
-    elseif ($var === null) {
-        $str = '(null)';
-    }
-    elseif (is_bool($var)) {
-        $str = ($var ? 'true':'false').' (bool)';
-    }
-    elseif (is_string($var)) {
-        $str = $var;
-        if (strStartsWith(ltrim($str), '{')) {
-            $data = json_decode($str);
-            if (json_last_error() || !is_string($str = json_encode($data, JSON_PRETTY_ALL))) {
-                $str = $var;
-            }
-        }
-    }
-    else {
-        $str = (string) $var;
-    }
+    $str = toString($var);
 
     if (!strEndsWith($str, NL)) {
         $str .= NL;
@@ -334,17 +311,14 @@ function ddd($var, bool $reset = false, string $filename = '') {
 
 
 /**
- * Alias of print_p($var, false, $flushBuffers)
- *
- * Outputs a variable in a formatted and pretty way. Output always ends with a EOL marker.
+ * Prints a variable in a formatted and pretty way. Alias of <tt>print_p($var, false)</tt>.
  *
  * @param  mixed $var
- * @param  bool  $flushBuffers [optional] - whether to flush output buffers (default: yes)
  *
  * @return void
  */
-function echof($var, bool $flushBuffers = true): void {
-    print_p($var, false, $flushBuffers);
+function echof($var): void {
+    print_p($var);
 }
 
 
@@ -985,30 +959,7 @@ function prettyBytes($value, int $decimals = 1): string {
  * @phpstan-return ($return is true ? string : null)
  */
 function print_p($var, bool $return = false, bool $flushBuffers = true): ?string {
-    if (is_object($var) && method_exists($var, '__toString') && !$var instanceof SimpleXMLElement) {
-        $str = (string) $var;
-    }
-    elseif (is_object($var) || is_array($var)) {
-        $str = print_r($var, true);
-    }
-    elseif ($var === null) {
-        $str = '(null)';
-    }
-    elseif (is_bool($var)) {
-        $str = ($var ? 'true':'false').' (bool)';
-    }
-    elseif (is_string($var)) {
-        $str = $var;
-        if (strStartsWith(ltrim($str), '{')) {
-            $data = json_decode($str);
-            if (json_last_error() || !is_string($str = json_encode($data, JSON_PRETTY_ALL))) {
-                $str = $var;
-            }
-        }
-    }
-    else {
-        $str = (string) $var;
-    }
+    $str = toString($var);
 
     if (CLI) {
         $html = false;
@@ -1814,6 +1765,42 @@ function synchronized(Closure $task, ?string $mutex = null): void {
     finally {
         $lock->release();
     }
+}
+
+
+/**
+ * Convert any variable to a nicely formatted string. Can also be used to format JSON strings.
+ *
+ * @param  mixed $var
+ *
+ * @return string
+ */
+function toString($var): string {
+    if (is_object($var) && method_exists($var, '__toString') && !$var instanceof SimpleXMLElement) {
+        $str = (string) $var;
+    }
+    elseif (is_object($var) || is_array($var)) {
+        $str = print_r($var, true);
+    }
+    elseif ($var === null) {
+        $str = 'NULL';
+    }
+    elseif (is_bool($var)) {
+        $str = ($var ? 'true':'false').' (bool)';
+    }
+    elseif (is_string($var)) {
+        $str = $var;
+        if (strStartsWith(ltrim($str), '{')) {
+            $data = json_decode($str);
+            if (json_last_error() || !is_string($str = json_encode($data, JSON_PRETTY_ALL))) {
+                $str = $var;
+            }
+        }
+    }
+    else {
+        $str = (string) $var;
+    }
+    return $str;
 }
 
 

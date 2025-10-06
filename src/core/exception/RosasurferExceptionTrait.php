@@ -18,9 +18,7 @@ trait RosasurferExceptionTrait {
      * @return $this
      */
     public function prependMessage(string $message): self {
-        if (strlen($message)) {
-            $this->message = trim($message.$this->message);
-        }
+        $this->message = $message.$this->message;
         return $this;
     }
 
@@ -33,9 +31,7 @@ trait RosasurferExceptionTrait {
      * @return $this
      */
     public function appendMessage(string $message): self {
-        if (strlen($message)) {
-            $this->message = trim($this->message.$message);
-        }
+        $this->message .= $message;
         return $this;
     }
 
