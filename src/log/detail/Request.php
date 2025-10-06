@@ -13,7 +13,6 @@ use function rosasurfer\ministruts\json_decode_or_throw;
 use function rosasurfer\ministruts\json_encode_or_throw;
 use function rosasurfer\ministruts\preg_replace;
 use function rosasurfer\ministruts\strLeftTo;
-use function rosasurfer\ministruts\strStartsWith;
 
 use const rosasurfer\ministruts\CLI;
 use const rosasurfer\ministruts\NL;
@@ -406,15 +405,8 @@ class Request extends CObject {
                 $headers['Cookie'] = join('; ', $cookies);
             }
             if (isset($headers['Authorization'])) {
-                $authHeader = $headers['Authorization'];
                 $redacted = ContentFilter::SUBSTITUTE;
-
-                if (strStartsWith($authHeader, 'Basic')) {
-                    $authHeader = "Basic $redacted:$redacted";
-                }
-                elseif (strStartsWith($authHeader, 'Digest')) {
-                    $authHeader = preg_replace('/(c?nonce|response)="[^"]*"/', "\$1=\"$redacted\"", $authHeader);
-                }
+                $authHeader = preg_replace('/^(Basic|Bearer|Digest)\s/i', "\$1 $redacted", $headers['Authorization']);
                 $headers['Authorization'] = $authHeader;
             }
         }

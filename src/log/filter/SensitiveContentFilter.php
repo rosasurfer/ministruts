@@ -21,6 +21,7 @@ class SensitiveContentFilter extends CObject implements ContentFilterInterface {
         'api_key',
         'apikey',
         'auth',
+        'bearer',
         'credential',
         'mysql_pwd',
         'pass',
