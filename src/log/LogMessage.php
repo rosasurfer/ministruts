@@ -13,6 +13,7 @@ use rosasurfer\ministruts\core\error\ErrorHandler;
 use rosasurfer\ministruts\log\detail\Request;
 use rosasurfer\ministruts\log\filter\ContentFilterInterface as ContentFilter;
 use rosasurfer\ministruts\phpstan\UserTypes as PHPStanUserTypes;
+use rosasurfer\ministruts\util\Trace;
 
 use function rosasurfer\ministruts\hsc;
 use function rosasurfer\ministruts\normalizeEOL;
@@ -294,9 +295,9 @@ class LogMessage extends CObject {
         if ($this->exception) {
             // use stacktrace from an explicitly passed exception (will include any nested exceptions)
             $detail  = $indent.'Stacktrace:'.NL .$indent.'-----------'.NL;
-            $detail .= ErrorHandler::getAdjustedStackTraceAsString($this->exception, $indent, $filter);
+            $detail .= Trace::convertStackTraceToString($this->exception, $indent, $filter);
             if ($html) {
-                $detail = '<br style="clear:both"/><br/>'.print_p($detail, true, false).NL;
+                $detail = '<br style="clear:both"/><br/>'.print_p($detail, true).NL;
             }
         }
         elseif (isset($this->context['exception'])) {
@@ -309,9 +310,9 @@ class LogMessage extends CObject {
             }
 
             $detail  = $indent.'Stacktrace:'.NL .$indent.'-----------'.NL;
-            $detail .= ErrorHandler::getAdjustedStackTraceAsString($exception, $indent, $filter);
+            $detail .= Trace::convertStackTraceToString($exception, $indent, $filter);
             if ($html) {
-                $detail = '<br style="clear:both"/><br/>'.print_p($detail, true, false).NL;
+                $detail = '<br style="clear:both"/><br/>'.print_p($detail, true).NL;
             }
             $detail = $msg.$detail;
         }
@@ -319,10 +320,10 @@ class LogMessage extends CObject {
             // use our own stacktrace (points to the causing log statement)
             $detail = $indent.'Stacktrace:'.NL .$indent.'-----------'.NL;
             ['trace' => $trace] = $this->getInternalLocation();
-            $stacktrace = ErrorHandler::convertToJavaStackTrace($trace, $this->getFile(), $this->getLine());
-            $detail .= ErrorHandler::formatStackTrace($stacktrace, $indent, $filter);
+            $stacktrace = Trace::convertStackTrace($trace, $this->getFile(), $this->getLine());
+            $detail .= Trace::formatStackTrace($stacktrace, $indent);
             if ($html) {
-                $detail = '<br style="clear:both"/><br/>'.print_p($detail, true, false).NL;
+                $detail = '<br style="clear:both"/><br/>'.print_p($detail, true).NL;
             }
         }
         return $this->context[$key] = $detail;
@@ -353,7 +354,7 @@ class LogMessage extends CObject {
             $detail = 'Request:'.NL .'--------'.NL .trim(Request::stringify($filter));
             $detail = $indent.str_replace(NL, NL.$indent, normalizeEOL($detail)).NL;
             if ($html) {
-                $detail = '<br style="clear:both"/><br/>'.print_p($detail, true, false).NL;
+                $detail = '<br style="clear:both"/><br/>'.print_p($detail, true).NL;
             }
         }
         return $this->context[$key] = $detail;
@@ -388,7 +389,7 @@ class LogMessage extends CObject {
             $header = 'Session:'.NL . '--------'.NL;
             $detail = $indent.str_replace(NL, NL.$indent, normalizeEOL($header.$detail)).NL;
             if ($html) {
-                $detail = '<br style="clear:both"/><br/>'.print_p($detail, true, false).NL;
+                $detail = '<br style="clear:both"/><br/>'.print_p($detail, true).NL;
             }
         }
         return $this->context[$key] = $detail;
@@ -419,7 +420,7 @@ class LogMessage extends CObject {
         $detail = 'Server:'.NL .'-------'.NL .print_r($values, true);
         $detail = $indent.str_replace(NL, NL.$indent, normalizeEOL(trim($detail))).NL;
         if ($html) {
-            $detail = '<br style="clear:both"/><br/>'.print_p($detail, true, false).NL;
+            $detail = '<br style="clear:both"/><br/>'.print_p($detail, true).NL;
         }
         return $this->context[$key] = $detail;
     }
@@ -473,7 +474,7 @@ class LogMessage extends CObject {
         $detail = $indent.str_replace(NL, NL.$indent, normalizeEOL(trim($detail))).NL;
 
         if ($html) {
-            $detail = '<br style="clear:both"/><br/>'.print_p($detail, true, false).NL;
+            $detail = '<br style="clear:both"/><br/>'.print_p($detail, true).NL;
         }
         return $this->context[$key] = $detail;
     }

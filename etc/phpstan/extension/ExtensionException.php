@@ -7,6 +7,7 @@ use Throwable;
 
 use rosasurfer\ministruts\core\error\ErrorHandler;
 use rosasurfer\ministruts\core\exception\RosasurferException;
+use rosasurfer\ministruts\util\Trace;
 
 use const rosasurfer\ministruts\NL;
 
@@ -34,7 +35,7 @@ class ExtensionException extends RosasurferException {
         $msg .= NL;
         $msg .= $indent.'Stacktrace:'.NL;
         $msg .= $indent.'-----------'.NL;
-        $msg .= ErrorHandler::getAdjustedStackTraceAsString($this, $indent);
+        $msg .= Trace::convertStackTraceToString($this, $indent);
 
         Extension::log($msg);
     }
