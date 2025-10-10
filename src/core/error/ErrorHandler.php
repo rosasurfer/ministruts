@@ -156,7 +156,7 @@ class ErrorHandler extends StaticClass {
         // convert error to a PHPError exception
         $message = strLeftTo($message, ' (this will throw an Error in a future version of PHP)', -1);
         $exception = new PHPError($message, 0, $level, $file, $line);
-        $trace = Trace::unwindStackToLocation($exception->getTrace(), $file, $line);
+        $trace = Trace::unwindTraceToLocation($exception->getTrace(), $file, $line);
         Exception::modifyException($exception, $trace);           // let the stacktrace point to the trigger statement
 
         // handle the error accordingly
@@ -267,7 +267,7 @@ class ErrorHandler extends StaticClass {
             $msg .= NL;
             $msg .= $indent.'Stacktrace:'.NL;
             $msg .= $indent.'-----------'.NL;
-            $msg .= Trace::convertStackTraceToString($first, $indent);
+            $msg .= Trace::convertTraceToString($first, $indent);
             $msg .= NL;
             $msg .= NL;
             $msg .= $indent.'followed by'.NL;
@@ -276,7 +276,7 @@ class ErrorHandler extends StaticClass {
             $msg .= NL;
             $msg .= $indent.'Stacktrace:'.NL;
             $msg .= $indent.'-----------'.NL;
-            $msg .= Trace::convertStackTraceToString($next, $indent);
+            $msg .= Trace::convertTraceToString($next, $indent);
             $msg .= NL;
 
             // log everything to the system logger (never throws an error)

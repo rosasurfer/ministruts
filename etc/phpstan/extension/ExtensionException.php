@@ -34,7 +34,7 @@ class ExtensionException extends RosasurferException {
         $msg .= NL;
         $msg .= $indent.'Stacktrace:'.NL;
         $msg .= $indent.'-----------'.NL;
-        $msg .= Trace::convertStackTraceToString($this, $indent);
+        $msg .= Trace::convertTraceToString($this, $indent);
 
         Extension::log($msg);
     }

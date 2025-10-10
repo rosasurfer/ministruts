@@ -20,7 +20,7 @@ trait ObjectTrait {
      */
     public function __get(string $property) {
         $ex = new RuntimeException('Read access to undefined property '.static::class.'::$'.$property);
-        Trace::unwindStackToMethod($ex, __FUNCTION__);
+        Trace::unwindTraceToMethod($ex, __FUNCTION__);
         throw $ex;
     }
 
@@ -35,7 +35,7 @@ trait ObjectTrait {
      */
     public function __set(string $property, $value): void {
         $ex = new RuntimeException('Write access to undefined property '.static::class.'::$'.$property);
-        Trace::unwindStackToMethod($ex, __FUNCTION__);
+        Trace::unwindTraceToMethod($ex, __FUNCTION__);
         throw $ex;
     }
 
@@ -50,7 +50,7 @@ trait ObjectTrait {
      */
     public function __call(string $method, array $args) {
         $ex = new RuntimeException('Call of undefined or inaccessible method '.static::class.'->'.$method.'()');
-        Trace::unwindStackToMethod($ex, __FUNCTION__);
+        Trace::unwindTraceToMethod($ex, __FUNCTION__);
         throw $ex;
     }
 
@@ -65,7 +65,7 @@ trait ObjectTrait {
      */
     public static function __callStatic(string $method, array $args) {
         $ex = new RuntimeException('Call of undefined or inaccessible method '.static::class.'::'.$method.'()');
-        Trace::unwindStackToMethod($ex, __FUNCTION__);
+        Trace::unwindTraceToMethod($ex, __FUNCTION__);
         throw $ex;
     }
 }

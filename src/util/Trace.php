@@ -87,7 +87,7 @@ class Trace extends StaticClass {
      * follow Java's pattern. The directness of "this is the line that executed and caused the problem" is generally considered
      * more developer-friendly and requires less cognitive overhead during debugging.
      */
-    public static function convertStackTrace(array $trace, string $file = '(unknown)', int $line = 0): array {
+    public static function convertTrace(array $trace, string $file = '(unknown)', int $line = 0): array {
         // check if the stacktrace is already Java-style
         if (isset($trace[0]['_javastyle'])) {
             return $trace;
@@ -149,15 +149,15 @@ class Trace extends StaticClass {
      *
      * @return string - string representation ending with EOL
      */
-    public static function convertStackTraceToString(Throwable $throwable, string $indent = '', ?ContentFilter $filter = null): string {
-        $trace = self::convertStackTrace($throwable->getTrace(), $throwable->getFile(), $throwable->getLine());
-        $result = self::formatStackTrace($trace, $indent);
+    public static function convertTraceToString(Throwable $throwable, string $indent = '', ?ContentFilter $filter = null): string {
+        $trace = self::convertTrace($throwable->getTrace(), $throwable->getFile(), $throwable->getLine());
+        $result = self::formatTrace($trace, $indent);
 
         // recursively add stacktraces of nested exceptions
         if ($cause = $throwable->getPrevious()) {
             $message = trim(Exception::getVerboseMessage($cause, $indent, $filter));
             $result .= NL.$indent.'caused by'.NL.$indent.$message.NL.NL;
-            $result .= self::convertStackTraceToString($cause, $indent, $filter);
+            $result .= self::convertTraceToString($cause, $indent, $filter);
         }
         return $result;
     }
@@ -175,7 +175,7 @@ class Trace extends StaticClass {
      *
      * @see \rosasurfer\ministruts\phpstan\STACKFRAME
      */
-    public static function getStackFrameMethod(array $frame, bool $nsToLower = false): string {
+    public static function getFrameMethod(array $frame, bool $nsToLower = false): string {
         $class = '';
         $function = $frame['function'];
 
@@ -205,7 +205,7 @@ class Trace extends StaticClass {
      *
      * @see \rosasurfer\ministruts\phpstan\STACKFRAME
      */
-    public static function formatStackTrace(array $trace, string $indent = ''): string {
+    public static function formatTrace(array $trace, string $indent = ''): string {
         $appRoot = '';
         $di = Application::getDi();
         if ($di && $di->has('config')) {
@@ -220,7 +220,7 @@ class Trace extends StaticClass {
         for ($i=0; $i < $size; $i++) {              // align FILE and LINE
             $frame = &$trace[$i];
 
-            $call = self::getStackFrameMethod($frame, true);
+            $call = self::getFrameMethod($frame, true);
             if ($call != '{main}' && !strEndsWith($call, '{closure}')) {
                 $call .= '()';
             }
@@ -271,7 +271,7 @@ class Trace extends StaticClass {
      *
      * @see \rosasurfer\ministruts\phpstan\STACKFRAME
      */
-    public static function unwindStackToLocation(array $trace, string $file, int $line): array {
+    public static function unwindTraceToLocation(array $trace, string $file, int $line): array {
         $result = $trace;
         $size = sizeof($trace);
 
@@ -293,7 +293,7 @@ class Trace extends StaticClass {
      *
      * @return int - number of removed frames
      */
-    public static function unwindStackToMethod(Throwable $exception, string $method): int {
+    public static function unwindTraceToMethod(Throwable $exception, string $method): int {
         $trace  = $exception->getTrace();
         $size   = sizeof($trace);
         $file   = $exception->getFile();
