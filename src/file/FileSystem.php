@@ -6,7 +6,7 @@ namespace rosasurfer\ministruts\file;
 use Throwable;
 
 use rosasurfer\ministruts\core\StaticClass;
-use rosasurfer\ministruts\core\exception\RosasurferExceptionInterface as IRosasurferException;
+use rosasurfer\ministruts\core\exception\ExceptionInterface as RosasurferException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 
 /**
@@ -43,7 +43,7 @@ class FileSystem extends StaticClass {
                 return \mkdir(...$args);                // unpack arguments as mkdir() will not accept $context = null
             }
             catch (Throwable $ex) {
-                if (!$ex instanceof IRosasurferException) {
+                if (!$ex instanceof RosasurferException) {
                     $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex);
                 }
                 throw $ex->appendMessage("Cannot create directory \"$path\"");

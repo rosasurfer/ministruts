@@ -7,7 +7,7 @@ use SysvSemaphore;
 use Throwable;
 
 use rosasurfer\ministruts\core\error\ErrorHandler;
-use rosasurfer\ministruts\core\exception\RosasurferExceptionInterface as IRosasurferException;
+use rosasurfer\ministruts\core\exception\ExceptionInterface as RosasurferException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 use rosasurfer\ministruts\log\Logger;
 
@@ -90,7 +90,7 @@ class SysvLock extends BaseLock {
                 }
 
                 // prevent infinite loop
-                if (!$ex instanceof IRosasurferException) {
+                if (!$ex instanceof RosasurferException) {
                     $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex);
                 }
                 throw $ex->appendMessage("Giving up to get lock for key \"$key\" after $i trials".($messages ? ', previous errors:'.NL.join(NL, $messages) : ''));

@@ -9,7 +9,7 @@ use Throwable;
 
 use rosasurfer\ministruts\config\ConfigInterface as Config;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
-use rosasurfer\ministruts\core\exception\RosasurferExceptionInterface as IRosasurferException;
+use rosasurfer\ministruts\core\exception\ExceptionInterface as RosasurferException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 use rosasurfer\ministruts\db\Connector;
 use rosasurfer\ministruts\db\DatabaseException;
@@ -146,7 +146,7 @@ class SQLiteConnector extends Connector {
             $this->sqlite = new SQLite3($this->file, $flags);                   // 2: SQLITE3_OPEN_READWRITE
         }                                                                       // 4: SQLITE3_OPEN_CREATE
         catch (Throwable $ex) {
-            if (!$ex instanceof IRosasurferException) {
+            if (!$ex instanceof RosasurferException) {
                 $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex);
             }
             $file = $this->file;
@@ -310,7 +310,7 @@ class SQLiteConnector extends Connector {
             if (!$result) throw new DatabaseException('Error '.$sqlite->lastErrorCode().', '.$sqlite->lastErrorMsg());
         }
         catch (Throwable $ex) {
-            if (!$ex instanceof IRosasurferException) {
+            if (!$ex instanceof RosasurferException) {
                 $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex);
             }
             throw $ex->appendMessage("Database: $this->file".NL."SQL: \"$sql\"");

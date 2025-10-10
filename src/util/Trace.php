@@ -8,8 +8,7 @@ use Throwable;
 use rosasurfer\ministruts\Application;
 use rosasurfer\ministruts\config\ConfigInterface as Config;
 use rosasurfer\ministruts\core\StaticClass;
-use rosasurfer\ministruts\core\error\ErrorHandler;
-use rosasurfer\ministruts\core\exception\RosasurferException;
+use rosasurfer\ministruts\core\exception\Exception;
 use rosasurfer\ministruts\log\filter\ContentFilterInterface as ContentFilter;
 use rosasurfer\ministruts\phpstan\UserTypes as PHPStanUserTypes;
 
@@ -156,7 +155,7 @@ class Trace extends StaticClass {
 
         // recursively add stacktraces of nested exceptions
         if ($cause = $throwable->getPrevious()) {
-            $message = trim(ErrorHandler::getVerboseMessage($cause, $indent, $filter));
+            $message = trim(Exception::getVerboseMessage($cause, $indent, $filter));
             $result .= NL.$indent.'caused by'.NL.$indent.$message.NL.NL;
             $result .= self::convertStackTraceToString($cause, $indent, $filter);
         }
@@ -316,7 +315,7 @@ class Trace extends StaticClass {
             break;
         }
 
-        RosasurferException::modifyException($exception, $trace, $file, $line);
+        Exception::modifyException($exception, $trace, $file, $line);
         return $count;
     }
 }

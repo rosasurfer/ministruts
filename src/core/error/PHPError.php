@@ -7,13 +7,13 @@ use ErrorException;
 
 use rosasurfer\ministruts\core\ObjectTrait;
 use rosasurfer\ministruts\core\di\DiAwareTrait;
-use rosasurfer\ministruts\core\exception\RosasurferExceptionInterface as IRosasurferException;
-use rosasurfer\ministruts\core\exception\RosasurferExceptionTrait;
+use rosasurfer\ministruts\core\exception\ExceptionInterface as RosasurferException;
+use rosasurfer\ministruts\core\exception\ExceptionTrait as RosasurferExceptionTrait;
 
 /**
- * An exception representing a PHP error. Provides some additional convenient helpers.
+ * An exception representing a PHP error. Provides some convenient helpers.
  */
-class PHPError extends ErrorException implements IRosasurferException {
+class PHPError extends ErrorException implements RosasurferException {
 
     use RosasurferExceptionTrait, ObjectTrait, DiAwareTrait;
 

@@ -7,7 +7,7 @@ use Throwable;
 
 use rosasurfer\ministruts\core\ObjectTrait;
 use rosasurfer\ministruts\core\di\DiAwareTrait;
-use rosasurfer\ministruts\core\exception\RosasurferExceptionInterface as IRosasurferException;
+use rosasurfer\ministruts\core\exception\ExceptionInterface as RosasurferException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 
 use function rosasurfer\ministruts\strRightFrom;
@@ -50,7 +50,7 @@ class SimpleXMLElement extends \SimpleXMLElement {
             $xml = new static(...func_get_args());
         }
         catch (Throwable $ex) {
-            if (!$ex instanceof IRosasurferException) {
+            if (!$ex instanceof RosasurferException) {
                 $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex);
             }
         }

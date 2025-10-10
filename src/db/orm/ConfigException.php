@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\db\orm;
 
-use rosasurfer\ministruts\core\exception\RosasurferException;
+use rosasurfer\ministruts\core\exception\Exception as RosasurferException;
 
 /**
  * ConfigException

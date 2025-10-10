@@ -7,9 +7,9 @@ use ErrorException;
 use Throwable;
 
 use rosasurfer\ministruts\core\CObject;
+use rosasurfer\ministruts\core\exception\Exception;
 use rosasurfer\ministruts\core\exception\InvalidTypeException;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
-use rosasurfer\ministruts\core\error\ErrorHandler;
 use rosasurfer\ministruts\log\detail\Request;
 use rosasurfer\ministruts\log\filter\ContentFilterInterface as ContentFilter;
 use rosasurfer\ministruts\phpstan\UserTypes as PHPStanUserTypes;
@@ -245,7 +245,7 @@ class LogMessage extends CObject {
         $indent = ' ';
 
         if ($this->exception) {
-            $msg = trim(ErrorHandler::getVerboseMessage($this->exception, $indent, $filter));
+            $msg = trim(Exception::getVerboseMessage($this->exception, $indent, $filter));
             if ($this->fromErrorHandler() && $this->logLevel==L_FATAL) {
                 if (!$this->exception instanceof ErrorException ||
                     !($this->exception->getSeverity() & (E_ERROR | E_PARSE | E_CORE_ERROR | E_CORE_WARNING | E_COMPILE_ERROR | E_COMPILE_WARNING))) {
@@ -304,7 +304,7 @@ class LogMessage extends CObject {
             // use stacktrace from a context exception (will include any nested exceptions)
             /** @var Throwable $exception */
             $exception = $this->context['exception'];
-            $msg = $indent.trim(ErrorHandler::getVerboseMessage($exception, $indent, $filter)).NL.NL;
+            $msg = $indent.trim(Exception::getVerboseMessage($exception, $indent, $filter)).NL.NL;
             if ($html) {
                 $msg = '<br/>'.nl2br(hsc($msg));
             }

@@ -3,18 +3,15 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\core\error;
 
-use ErrorException;
 use LibXMLError;
 use Throwable;
 
 use rosasurfer\ministruts\core\StaticClass;
+use rosasurfer\ministruts\core\exception\Exception;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
-use rosasurfer\ministruts\core\exception\RosasurferException;
 use rosasurfer\ministruts\log\Logger;
-use rosasurfer\ministruts\log\filter\ContentFilterInterface as ContentFilter;
 use rosasurfer\ministruts\util\Trace;
 
-use function rosasurfer\ministruts\normalizeEOL;
 use function rosasurfer\ministruts\preg_match;
 use function rosasurfer\ministruts\strLeftTo;
 
@@ -160,7 +157,7 @@ class ErrorHandler extends StaticClass {
         $message = strLeftTo($message, ' (this will throw an Error in a future version of PHP)', -1);
         $exception = new PHPError($message, 0, $level, $file, $line);
         $trace = Trace::unwindStackToLocation($exception->getTrace(), $file, $line);
-        RosasurferException::modifyException($exception, $trace);           // let the stacktrace point to the trigger statement
+        Exception::modifyException($exception, $trace);           // let the stacktrace point to the trigger statement
 
         // handle the error accordingly
         $neverThrow = (bool)($level & (E_DEPRECATED | E_USER_DEPRECATED | E_USER_NOTICE | E_USER_WARNING));
@@ -264,7 +261,7 @@ class ErrorHandler extends StaticClass {
         //\rosasurfer\ministruts\echof('ErrorHandler::handleRecursiveException(inShutdown='.(int)self::$inShutdown.') '.$next->getMessage());
         try {
             $indent = ' ';
-            $msg  = trim(self::getVerboseMessage($first, $indent));
+            $msg  = trim(Exception::getVerboseMessage($first, $indent));
             $msg  = $indent.($first instanceof PHPError ? '':'[FATAL] Unhandled ').$msg.NL;
             $msg .= $indent.'in '.$first->getFile().' on line '.$first->getLine().NL;
             $msg .= NL;
@@ -274,7 +271,7 @@ class ErrorHandler extends StaticClass {
             $msg .= NL;
             $msg .= NL;
             $msg .= $indent.'followed by'.NL;
-            $msg .= $indent.trim(self::getVerboseMessage($next, $indent)).NL;
+            $msg .= $indent.trim(Exception::getVerboseMessage($next, $indent)).NL;
             $msg .= $indent.'in '.$next->getFile().' on line '.$next->getLine().NL;
             $msg .= NL;
             $msg .= $indent.'Stacktrace:'.NL;
@@ -487,36 +484,5 @@ class ErrorHandler extends StaticClass {
         }
 
         return trim($msg);
-    }
-
-
-    /**
-     * Return a more verbose version of a {@link Throwable}'s message. The resulting message has the classname of the throwable
-     * and in case of {@link \ErrorException}s also the severity level of the error prepended to the original message.
-     *
-     * @param  Throwable      $throwable         - throwable
-     * @param  string         $indent [optional] - indent all lines by the specified value (default: no indentation)
-     * @param  ?ContentFilter $filter [optional] - the content filter to apply (default: none)
-     *
-     * @return string - message
-     */
-    public static function getVerboseMessage(Throwable $throwable, string $indent = '', ?ContentFilter $filter = null): string {
-        $message = trim($throwable->getMessage());
-        if ($filter) {
-            $message = $filter->filterString($message);
-        }
-
-        if (!$throwable instanceof PHPError) {              // PHP errors are verbose enough
-            $class = get_class($throwable);
-            if ($throwable instanceof ErrorException) {     // a PHP error not created by this ErrorHandler
-                $class .= '('.self::errorLevelDescr($throwable->getSeverity()).')';
-            }
-            $message = $class.($message=='' ? '' : ": $message");
-        }
-
-        if ($indent != '') {
-            $message = str_replace(NL, NL.$indent, normalizeEOL($message));
-        }
-        return $indent.$message;
     }
 }

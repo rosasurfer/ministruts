@@ -8,7 +8,7 @@ use Throwable;
 use rosasurfer\ministruts\config\ConfigInterface as Config;
 use rosasurfer\ministruts\core\StaticClass;
 use rosasurfer\ministruts\core\error\ErrorHandler;
-use rosasurfer\ministruts\core\exception\RosasurferExceptionInterface as IRosasurferException;
+use rosasurfer\ministruts\core\exception\ExceptionInterface as RosasurferException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 
 use function rosasurfer\ministruts\echof;
@@ -100,8 +100,9 @@ class PHP extends StaticClass {
             $hProc = proc_open($cmd, $descriptors, $pipes, $dir, $env, ['bypass_shell'=>true]);
         }
         catch (Throwable $ex) {
-            if (!$ex instanceof IRosasurferException) $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex);
-
+            if (!$ex instanceof RosasurferException) {
+                $ex = new RuntimeException($ex->getMessage(), $ex->getCode(), $ex);
+            }
             $match = null;
             if (WINDOWS && preg_match('/proc_open\(\): CreateProcess failed, error code - ([0-9]+)/i', $ex->getMessage(), $match)) {
                 $error = Windows::errorToString((int) $match[1]);

@@ -5,14 +5,13 @@ namespace rosasurfer\ministruts\phpstan;
 
 use Throwable;
 
-use rosasurfer\ministruts\core\error\ErrorHandler;
-use rosasurfer\ministruts\core\exception\RosasurferException;
+use rosasurfer\ministruts\core\exception\Exception as RosasurferException;
 use rosasurfer\ministruts\util\Trace;
 
 use const rosasurfer\ministruts\NL;
 
 /**
- * An exception to enforce meaningful output during a PHPStan analysis.
+ * An exception to provide more meaningful output during a PHPStan analysis.
  */
 class ExtensionException extends RosasurferException {
 
@@ -29,7 +28,7 @@ class ExtensionException extends RosasurferException {
 
         // also log the exception to the phpstan.log
         $indent = ' ';
-        $msg  = trim(ErrorHandler::getVerboseMessage($this, $indent));
+        $msg  = trim(self::getVerboseMessage($this, $indent));
         $msg  = $indent.'[FATAL] Unhandled '.$msg.NL;
         $msg .= $indent.'in '.$this->getFile().' on line '.$this->getLine().NL;
         $msg .= NL;

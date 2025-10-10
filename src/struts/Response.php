@@ -6,7 +6,7 @@ namespace rosasurfer\ministruts\struts;
 use rosasurfer\ministruts\core\Singleton;
 use rosasurfer\ministruts\core\di\proxy\Request as RequestProxy;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
-use rosasurfer\ministruts\core\exception\RosasurferExceptionInterface as IRosasurferException;
+use rosasurfer\ministruts\core\exception\ExceptionInterface as RosasurferException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 use rosasurfer\ministruts\net\http\HttpResponse;
 
@@ -181,7 +181,7 @@ class Response extends Singleton {
             // resulting absolute URL
             return $scheme.'://'.$user.$pass.$at.$host.$port.$path;
         }
-        catch (IRosasurferException $ex) {
+        catch (RosasurferException $ex) {
             throw $ex->appendMessage('Illegal parameter $base: "'.$base.'"');
         }
     }

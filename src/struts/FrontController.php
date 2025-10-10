@@ -11,7 +11,7 @@ use rosasurfer\ministruts\config\ConfigInterface as Config;
 use rosasurfer\ministruts\core\Singleton;
 use rosasurfer\ministruts\core\di\proxy\Request as RequestProxy;
 use rosasurfer\ministruts\core\exception\IllegalStateException;
-use rosasurfer\ministruts\core\exception\RosasurferExceptionInterface as IRosasurferException;
+use rosasurfer\ministruts\core\exception\ExceptionInterface as RosasurferException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 use rosasurfer\ministruts\net\http\HttpResponse;
 
@@ -107,7 +107,7 @@ class FrontController extends Singleton {
             }
         }
         catch (Throwable $ex) {
-            if (!$ex instanceof IRosasurferException) $ex = new StrutsException($ex->getMessage(), $ex->getCode(), $ex);
+            if (!$ex instanceof RosasurferException) $ex = new StrutsException($ex->getMessage(), $ex->getCode(), $ex);
             throw $ex->appendMessage(NL."Error instantiating Struts module from file \"$file\"");
         }
     }

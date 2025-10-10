@@ -6,12 +6,12 @@ namespace rosasurfer\ministruts\core\exception;
 use Throwable;
 
 /**
- * An interface defining common functionality for all "rosasurfer" exceptions.
+ * An interface defining common functionality for all "rosasurfer/ministruts" exceptions.
  */
-interface RosasurferExceptionInterface extends Throwable {
+interface ExceptionInterface extends Throwable {
 
     /**
-     * Prepend a message to the exception's existing message. Used to enrich the exception with additional data.
+     * Prepend a message to the exception's existing message.
      *
      * @param  string $message
      *
@@ -21,7 +21,7 @@ interface RosasurferExceptionInterface extends Throwable {
 
 
     /**
-     * Append a message to the exception's existing message. Used to enrich the exception with additional data.
+     * Append a message to the exception's existing message.
      *
      * @param  string $message
      *
@@ -31,8 +31,7 @@ interface RosasurferExceptionInterface extends Throwable {
 
 
     /**
-     * Set the error code of an exception. Used to enrich the exception with additional data.
-     * Ignored if the error code is already set.
+     * Set the error code of an exception. Ignored if the error code is already set.
      *
      * @param  int $code
      *

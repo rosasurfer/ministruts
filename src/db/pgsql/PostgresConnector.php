@@ -9,7 +9,7 @@ use PgSql\Connection as PgSqlConnection;
 use PgSql\Result as PgSqlResult;
 
 use rosasurfer\ministruts\core\assert\Assert;
-use rosasurfer\ministruts\core\exception\RosasurferExceptionInterface as IRosasurferException;
+use rosasurfer\ministruts\core\exception\ExceptionInterface as RosasurferException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 use rosasurfer\ministruts\db\Connector;
 use rosasurfer\ministruts\db\DatabaseException;
@@ -271,7 +271,7 @@ class PostgresConnector extends Connector {
             $this->connection = $connection;
         }
         catch (Throwable $ex) {
-            if (!$ex instanceof IRosasurferException) {
+            if (!$ex instanceof RosasurferException) {
                 $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex);
             }
             throw $ex->appendMessage("Cannot connect to PostgreSQL server with connection string: \"$connStr\"");
@@ -452,7 +452,7 @@ class PostgresConnector extends Connector {
             if (!$result) throw new DatabaseException(pg_last_error($connection));
         }
         catch (Throwable $ex) {
-            if (!$ex instanceof IRosasurferException) {
+            if (!$ex instanceof RosasurferException) {
                 $ex = new DatabaseException($ex->getMessage(), $ex->getCode(), $ex);
             }
             throw $ex->appendMessage('Database: '.$this->getConnectionDescription().NL."SQL: \"$sql\"");
