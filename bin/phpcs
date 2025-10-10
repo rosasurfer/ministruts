@@ -5,7 +5,8 @@
 # PHPCS can be executed using a custom PHP interpreter by setting the environment variable PHP='<php-cmd>'.
 #
 # Examples:
-#  PHP=php81 phpcs                    Use a different PHP version instead of the standard `php`.
+#  phpcs --report=full      Show error details only (no summaries).
+#  PHP=php81 phpcs          Use a different PHP version instead of the standard `php`.
 #
 # @version 2025.07.26 21:24
 #
