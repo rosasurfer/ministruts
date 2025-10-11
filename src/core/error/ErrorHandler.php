@@ -6,7 +6,7 @@ namespace rosasurfer\ministruts\core\error;
 use LibXMLError;
 use Throwable;
 
-use rosasurfer\ministruts\core\StaticClass;
+use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\exception\Exception;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\log\Logger;
@@ -30,7 +30,7 @@ use const rosasurfer\ministruts\WINDOWS;
 /**
  * A handler for unhandled PHP errors and exceptions.
  */
-class ErrorHandler extends StaticClass {
+class ErrorHandler extends CObject {
 
     /** ignore PHP errors and exceptions */
     public const MODE_IGNORE = 1;
