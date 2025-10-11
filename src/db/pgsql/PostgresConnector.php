@@ -425,9 +425,7 @@ class PostgresConnector extends Connector {
      * {@inheritDoc}
      */
     public function execute(string $sql): self {
-        $result = $this->executeRaw($sql);
-        if (is_resource($result))
-            pg_free_result($result);
+        $this->executeRaw($sql);        // the result is immediately garbage collected
         return $this;
     }
 

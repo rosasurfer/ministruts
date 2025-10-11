@@ -85,8 +85,8 @@ interface ConnectorInterface {
 
 
     /**
-     * Execute a SQL statement and skip potential result set processing. This method should be used for SQL statements not
-     * returning rows. If the database driver does not support it the statement is forwarded to {@link ConnectorInterface::query()}.
+     * Execute a SQL statement and discard potential result sets. This method should be used for SQL statements not returning
+     * rows. If the database driver doesn't support it the statement is forwarded to {@link ConnectorInterface::query()}.
      *
      * @param  string $sql - SQL statement
      *
