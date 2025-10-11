@@ -11,14 +11,14 @@ use rosasurfer\ministruts\core\exception\ExceptionInterface as RosasurferExcepti
 use rosasurfer\ministruts\core\exception\ExceptionTrait as RosasurferExceptionTrait;
 
 /**
- * An exception representing a PHP error. Provides some convenient helpers.
+ * An exception representing a PHP error.
  */
 class PHPError extends ErrorException implements RosasurferException {
 
     use RosasurferExceptionTrait, ObjectTrait, DiAwareTrait;
 
     /**
-     * Create a new instance. Parameters are identical to the built-in PHP {@link \ErrorException} but stronger typed.
+     * Create a new instance. A PHP error is a top-level issue, it can't have nested errors/exceptions.
      *
      * @param  string $message  - error description
      * @param  int    $code     - error identifier, usually an application id

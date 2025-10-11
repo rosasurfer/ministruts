@@ -7,10 +7,10 @@ use ErrorException;
 use ReflectionProperty;
 use Throwable;
 
-use rosasurfer\ministruts\core\error\ErrorHandler;
 use rosasurfer\ministruts\core\error\PHPError;
 use rosasurfer\ministruts\log\filter\ContentFilterInterface as ContentFilter;
 use rosasurfer\ministruts\phpstan\UserTypes as PHPStanUserTypes;
+use rosasurfer\ministruts\util\PHP;
 
 use function rosasurfer\ministruts\normalizeEOL;
 
@@ -92,7 +92,7 @@ trait ExceptionTrait {
         if (!$throwable instanceof PHPError) {              // PHP errors are verbose enough
             $class = get_class($throwable);
             if ($throwable instanceof ErrorException) {     // a PHP error not created by this ErrorHandler
-                $class .= '('.ErrorHandler::errorLevelDescr($throwable->getSeverity()).')';
+                $class .= '('.PHP::errorLevelDescr($throwable->getSeverity()).')';
             }
             $message = $class.($message=='' ? '' : ": $message");
         }

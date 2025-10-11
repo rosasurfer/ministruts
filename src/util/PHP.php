@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\util;
 
+use LibXMLError;
 use Throwable;
 
 use rosasurfer\ministruts\config\ConfigInterface as Config;
 use rosasurfer\ministruts\core\StaticClass;
-use rosasurfer\ministruts\core\error\ErrorHandler;
 use rosasurfer\ministruts\core\exception\ExceptionInterface as RosasurferException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 
@@ -46,6 +46,132 @@ class PHP extends StaticClass {
         gc_collect_cycles();
 
         !$wasEnabled && gc_disable();
+    }
+
+
+    /**
+     * Return a description of the passed error reporting level.
+     *
+     * @param  int $level - single error reporting constant
+     *
+     * @return string
+     */
+    public static function errorLevelDescr(int $level): string {
+        static $levels = [
+            E_ERROR             => 'Error',                     //     1
+            E_WARNING           => 'Warning',                   //     2
+            E_PARSE             => 'Parse Error',               //     4
+            E_NOTICE            => 'Notice',                    //     8
+            E_CORE_ERROR        => 'Core Error',                //    16
+            E_CORE_WARNING      => 'Core Warning',              //    32
+            E_COMPILE_ERROR     => 'Compile Error',             //    64
+            E_COMPILE_WARNING   => 'Compile Warning',           //   128
+            E_USER_ERROR        => 'User Error',                //   256
+            E_USER_WARNING      => 'User Warning',              //   512
+            E_USER_NOTICE       => 'User Notice',               //  1024
+            E_STRICT            => 'Strict',                    //  2048
+            E_RECOVERABLE_ERROR => 'Recoverable Error',         //  4096
+            E_DEPRECATED        => 'Deprecated',                //  8192
+            E_USER_DEPRECATED   => 'User Deprecated',           // 16384
+        ];
+        return $levels[$level] ?? '(unknown)';
+    }
+
+
+    /**
+     * Return a textual representation of one/many error reporting levels (a combined flag).
+     *
+     * @param  int  $flag               - combination of error reporting constants
+     * @param  bool $combine [optional] - whether to combine or list multiple levels (default: list)
+     *
+     * @return string
+     */
+    public static function errorLevelToStr(int $flag, bool $combine = false): string {
+        // ordered by real-world priorities
+        $allLevels = [
+            E_PARSE             => 'E_PARSE',                   //     4
+            E_COMPILE_ERROR     => 'E_COMPILE_ERROR',           //    64
+            E_COMPILE_WARNING   => 'E_COMPILE_WARNING',         //   128
+            E_CORE_ERROR        => 'E_CORE_ERROR',              //    16
+            E_CORE_WARNING      => 'E_CORE_WARNING',            //    32
+            E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',       //  4096
+            E_ERROR             => 'E_ERROR',                   //     1
+            E_WARNING           => 'E_WARNING',                 //     2
+            E_NOTICE            => 'E_NOTICE',                  //     8
+            E_STRICT            => 'E_STRICT',                  //  2048
+            E_DEPRECATED        => 'E_DEPRECATED',              //  8192
+            E_USER_ERROR        => 'E_USER_ERROR',              //   256
+            E_USER_WARNING      => 'E_USER_WARNING',            //   512
+            E_USER_NOTICE       => 'E_USER_NOTICE',             //  1024
+            E_USER_DEPRECATED   => 'E_USER_DEPRECATED',         // 16384
+        ];
+
+        $set = $notset = [];
+
+        foreach ($allLevels as $level => $description) {
+            if ($flag & $level) {
+                $set[] = $description;
+            }
+            else {
+                $notset[] = $description;
+            }
+        }
+
+        if ($combine) {
+            if (sizeof($set) < sizeof($notset)) {
+                $result = $set ? join(' | ', $set) : '0';
+            }
+            else {
+                $result = join(' & ~', ['E_ALL', ...$notset]);
+            }
+        }
+        else {
+            $result = $set ? join(', ', $set) : '0';
+        }
+        return $result;
+    }
+
+
+    /**
+     * Return a readable representation of the specified LibXML errors.
+     *
+     * @param  LibXMLError[] $errors - array of LibXML errors, e.g. as returned by <tt>libxml_get_errors()</tt>
+     * @param  string[]      $lines  - the XML causing the errors split by line
+     *
+     * @return string - readable error representation or an empty string if parameter $errors is empty
+     */
+    public static function libXmlErrorsToStr(array $errors, array $lines): string {
+        $msg = '';
+
+        foreach ($errors as $error) {
+            $msg .= 'line '.$error->line.': ';
+
+            switch ($error->level) {
+                case LIBXML_ERR_NONE:
+                    break;
+                case LIBXML_ERR_WARNING:
+                    $msg .= 'parser warning';
+                    break;
+                case LIBXML_ERR_ERROR:
+                    // @see  https://gnome.pages.gitlab.gnome.org/libxml2/devhelp/libxml2-xmlerror.html#xmlParserErrors
+                    switch ($error->code) {
+                        case 201:
+                        case 202:
+                        case 203:
+                        case 204:
+                        case 205:
+                            $msg .= 'namespace error';
+                            break 2;
+                    }
+                default:
+                    $msg .= 'parser error';
+            }
+            $msg .= ': '.trim($error->message)             .NL;
+            $msg .= ($lines[$error->line - 1] ?? '')       .NL;
+            $msg .= str_repeat(' ', $error->column - 1).'^'.NL.NL;
+        }
+
+        return trim($msg);
     }
 
 
@@ -218,7 +344,7 @@ class PHP extends StaticClass {
         // --------------
         /*PHP_INI_ALL   */ $current = ini_get_int('error_reporting');
             $target = E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED;
-            if ($notCovered = ($target ^ $current) & $target)                                                      $issues[] = 'Warn:  error_reporting does not cover '.ErrorHandler::errorLevelToStr($notCovered).' [standards]';
+            if ($notCovered = ($target ^ $current) & $target)                                                      $issues[] = 'Warn:  error_reporting does not cover '.self::errorLevelToStr($notCovered).' [standards]';
         if (!WINDOWS) { /* Windows is always development */
             /*PHP_INI_ALL*/ if (ini_get_bool('display_errors'        )) /*bool|string:stderr*/                     $issues[] = 'Warn:  display_errors is not off [security]';
             /*PHP_INI_ALL*/ if (ini_get_bool('display_startup_errors'))                                            $issues[] = 'Warn:  display_startup_errors is not off [security]';

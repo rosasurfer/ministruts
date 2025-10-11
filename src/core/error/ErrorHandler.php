@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\core\error;
 
-use LibXMLError;
 use Throwable;
 
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\exception\Exception;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\log\Logger;
+use rosasurfer\ministruts\util\PHP;
 use rosasurfer\ministruts\util\Trace;
 
 use function rosasurfer\ministruts\preg_match;
@@ -205,7 +205,7 @@ class ErrorHandler extends CObject {
         // Solution: Call the exception handler manually.
         $cantThrow = (bool)($level & (E_ERROR | E_PARSE | E_CORE_ERROR | E_CORE_WARNING | E_COMPILE_ERROR | E_COMPILE_WARNING));
         if ($cantThrow) {
-            $exception->prependMessage('PHP '.self::errorLevelDescr($level).': ');
+            $exception->prependMessage('PHP '.PHP::errorLevelDescr($level).': ');
             $currentHandler = set_exception_handler(null);
             restore_exception_handler();
             if ($currentHandler) {
@@ -358,131 +358,5 @@ class ErrorHandler extends CObject {
                 ($currentHandler)(...array_values($error));
             }
         }
-    }
-
-
-    /**
-     * Return the description of a single error reporting level.
-     *
-     * @param  int $level - single error reporting level
-     *
-     * @return string
-     */
-    public static function errorLevelDescr(int $level): string {
-        static $levels = [
-            E_ERROR             => 'Error',                     //     1
-            E_WARNING           => 'Warning',                   //     2
-            E_PARSE             => 'Parse Error',               //     4
-            E_NOTICE            => 'Notice',                    //     8
-            E_CORE_ERROR        => 'Core Error',                //    16
-            E_CORE_WARNING      => 'Core Warning',              //    32
-            E_COMPILE_ERROR     => 'Compile Error',             //    64
-            E_COMPILE_WARNING   => 'Compile Warning',           //   128
-            E_USER_ERROR        => 'User Error',                //   256
-            E_USER_WARNING      => 'User Warning',              //   512
-            E_USER_NOTICE       => 'User Notice',               //  1024
-            E_STRICT            => 'Strict',                    //  2048
-            E_RECOVERABLE_ERROR => 'Recoverable Error',         //  4096
-            E_DEPRECATED        => 'Deprecated',                //  8192
-            E_USER_DEPRECATED   => 'User Deprecated',           // 16384
-        ];
-        return $levels[$level] ?? '(unknown)';
-    }
-
-
-    /**
-     * Return a string representation of the passed error reporting levels.
-     *
-     * @param  int  $flags              - error reporting levels
-     * @param  bool $combine [optional] - whether to combine or list multiple levels (default: list)
-     *
-     * @return string
-     */
-    public static function errorLevelToStr(int $flags, bool $combine = false): string {
-        // ordered by real-world priorities
-        $allLevels = [
-            E_PARSE             => 'E_PARSE',                   //     4
-            E_COMPILE_ERROR     => 'E_COMPILE_ERROR',           //    64
-            E_COMPILE_WARNING   => 'E_COMPILE_WARNING',         //   128
-            E_CORE_ERROR        => 'E_CORE_ERROR',              //    16
-            E_CORE_WARNING      => 'E_CORE_WARNING',            //    32
-            E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',       //  4096
-            E_ERROR             => 'E_ERROR',                   //     1
-            E_WARNING           => 'E_WARNING',                 //     2
-            E_NOTICE            => 'E_NOTICE',                  //     8
-            E_STRICT            => 'E_STRICT',                  //  2048
-            E_DEPRECATED        => 'E_DEPRECATED',              //  8192
-            E_USER_ERROR        => 'E_USER_ERROR',              //   256
-            E_USER_WARNING      => 'E_USER_WARNING',            //   512
-            E_USER_NOTICE       => 'E_USER_NOTICE',             //  1024
-            E_USER_DEPRECATED   => 'E_USER_DEPRECATED',         // 16384
-        ];
-
-        $set = $notset = [];
-
-        foreach ($allLevels as $level => $description) {
-            if ($flags & $level) {
-                $set[] = $description;
-            }
-            else {
-                $notset[] = $description;
-            }
-        }
-
-        if ($combine) {
-            if (sizeof($set) < sizeof($notset)) {
-                $result = $set ? join(' | ', $set) : '0';
-            }
-            else {
-                $result = join(' & ~', ['E_ALL', ...$notset]);
-            }
-        }
-        else {
-            $result = $set ? join(', ', $set) : '0';
-        }
-        return $result;
-    }
-
-
-    /**
-     * Return a readable representation of the specified LibXML errors.
-     *
-     * @param  LibXMLError[] $errors - array of LibXML errors, e.g. as returned by <tt>libxml_get_errors()</tt>
-     * @param  string[]      $lines  - the XML causing the errors split by line
-     *
-     * @return string - readable error representation or an empty string if parameter $errors is empty
-     */
-    public static function libxmlErrorsToStr(array $errors, array $lines): string {
-        $msg = '';
-
-        foreach ($errors as $error) {
-            $msg .= 'line '.$error->line.': ';
-
-            switch ($error->level) {
-                case LIBXML_ERR_NONE:
-                    break;
-                case LIBXML_ERR_WARNING:
-                    $msg .= 'parser warning';
-                    break;
-                case LIBXML_ERR_ERROR:
-                    // @see  https://gnome.pages.gitlab.gnome.org/libxml2/devhelp/libxml2-xmlerror.html#xmlParserErrors
-                    switch ($error->code) {
-                        case 201:
-                        case 202:
-                        case 203:
-                        case 204:
-                        case 205:
-                            $msg .= 'namespace error';
-                            break 2;
-                    }
-                default:
-                    $msg .= 'parser error';
-            }
-            $msg .= ': '.trim($error->message)             .NL;
-            $msg .= ($lines[$error->line - 1] ?? '')       .NL;
-            $msg .= str_repeat(' ', $error->column - 1).'^'.NL.NL;
-        }
-
-        return trim($msg);
     }
 }
