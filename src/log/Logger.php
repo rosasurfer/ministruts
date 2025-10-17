@@ -54,12 +54,12 @@ class Logger extends StaticClass {
 
     /** @var string[] - loglevels and their string representations */
     private static array $logLevels = [
-        L_DEBUG  => 'Debug' ,
-        L_INFO   => 'Info'  ,
+        L_DEBUG  => 'Debug',
+        L_INFO   => 'Info',
         L_NOTICE => 'Notice',
-        L_WARN   => 'Warn'  ,
-        L_ERROR  => 'Error' ,
-        L_FATAL  => 'Fatal' ,
+        L_WARN   => 'Warn',
+        L_ERROR  => 'Error',
+        L_FATAL  => 'Fatal',
     ];
 
     /** @var int - the application's default loglevel */
@@ -149,7 +149,9 @@ class Logger extends StaticClass {
 
         // filter messages below the active loglevel
         if ($level >= self::$appLogLevel) {
-            $context = array_intersect_key($context, array_flip(['error-handler', 'exception', 'file', 'line']));
+            static $supportedKeys = ['error-handler'=>1, 'exception'=>1, 'file'=>1, 'line'=>1];
+            $context = array_intersect_key($context, $supportedKeys);
+
             $message = new LogMessage($loggable, $level, $context);
 
             foreach (self::$logAppenders as $appender) {
