@@ -1120,9 +1120,7 @@ function strCollapseWhiteSpace(string $string, bool $joinLines=true, string $sep
  */
 function strCompareI(?string $a, ?string $b): bool {
     if (isset($a, $b)) {
-        $lenA = strlen($a);
-        $lenB = strlen($b);
-        return $lenA==$lenB && strncasecmp($a, $b, $lenA)===0;
+        return !strcasecmp($a, $b);
     }
     return $a === $b;
 }
@@ -1132,10 +1130,10 @@ function strCompareI(?string $a, ?string $b): bool {
  * Whether a string contains a case-sensitive substring.
  * If multiple substrings are given, whether the string contains one of them.
  *
- * Note: This function follows common sense. Therefore an empty substring is *not* considered part of every string.
- * That differs from math ideology of PHP developers. Use PHP8's str_contains() if you need math conformity.
+ * Note: This function simplifies typical use cases and follows common sense. Therefore an empty substring is *not* considered
+ * part of every string. That differs from math ideology of PHP creators. Use PHP8's str_contains() if you want math conformity.
  *
- * @link   https://externals.io/message/108562#108646
+ * @see    https://externals.io/message/108562#108646
  *
  * @param  string    $haystack
  * @param  string ...$needle - one or more substrings
@@ -1159,10 +1157,10 @@ function strContains(string $haystack, string ...$needle): bool {
  * Whether a string contains a case-insensitive substring.
  * If multiple substrings are given, whether the string contains one of them.
  *
- * Note: This function follows common sense. Therefore an empty substring is *not* considered part of every string.
- * That differs from math ideology of PHP developers.
+ * Note: This function simplifies typical use cases and follows common sense. Therefore an empty substring is *not* considered
+ * part of every string. That differs from math ideology of PHP creators.
  *
- * @link   https://externals.io/message/108562#108646
+ * @see    https://externals.io/message/108562#108646
  *
  * @param  string    $haystack
  * @param  string ...$needle - one or more substrings
@@ -1189,7 +1187,7 @@ function strContainsI(string $haystack, string ...$needle): bool {
  * Note: This function follows common sense. Therefore *not* every string ends with an empty string.
  * That differs from math ideology of PHP developers. Use PHP8's str_ends_with() if you need math conformity.
  *
- * @link   https://externals.io/message/108562#108646
+ * @see    https://externals.io/message/108562#108646
  *
  * @param  string    $string
  * @param  string ...$suffix - one or more suffixes
@@ -1221,7 +1219,7 @@ function strEndsWith(string $string, string ...$suffix): bool {
  * Note: This function follows common sense. Therefore *not* every string ends with an empty string.
  * That differs from math ideology of PHP developers.
  *
- * @link   https://externals.io/message/108562#108646
+ * @see    https://externals.io/message/108562#108646
  *
  * @param  string    $string
  * @param  string ...$suffix - one or more suffixes
