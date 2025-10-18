@@ -801,6 +801,36 @@ function pluralize(int $count, string $singular='', string $plural='s'): string 
 
 
 /**
+ * Wrapper for preg_filter() with better error handling.
+ *
+ * Perform a regular expression search and replace. Identical to `preg_replace()` except it only returns the (possibly transformed)
+ * subjects where there was a match.
+ *
+ * @param     string|string[] $pattern          - pattern(s) to search for
+ * @param     string|string[] $replacement      - string or array with strings to replace
+ * @param     string|string[] $subject          - string or array with strings to search and replace
+ * @param     int             $limit [optional] - max replacements for each pattern (default: no limit)
+ * @param     mixed           $count [optional] - variable to be filled with the number of replacements done (int)
+ * @param-out int             $count
+ *
+ * @return         string|string[]|null - array if $subject is an array, a string or NULL otherwise
+ * @phpstan-return ($subject is array ? string[] : ?string)
+ *
+ * @throws InvalidArgumentException in case of errors
+ *
+ * @link   https://www.php.net/manual/en/function.preg-filter.php
+ */
+function preg_filter($pattern, $replacement, $subject, int $limit = -1, &$count = null) {
+    $result = \preg_filter($pattern, $replacement, $subject, $limit, $count);
+
+    if (preg_last_error()) {
+        throw new InvalidArgumentException('preg_filter() error: '.preg_last_error());
+    }
+    return $result;
+}
+
+
+/**
  * Wrapper for preg_match() with better error handling.
  *
  * Perform a regular expression match. Searches subject for a match to the regular expression given in pattern.
@@ -822,8 +852,8 @@ function pluralize(int $count, string $singular='', string $plural='s'): string 
 function preg_match(string $pattern, string $subject, &$matches = null, int $flags = 0, int $offset = 0): int {
     $result = \preg_match($pattern, $subject, $matches, $flags, $offset);
 
-    if (!is_int($result) || preg_last_error() != PREG_NO_ERROR) {
-        throw new InvalidArgumentException('preg_match() error');
+    if (!is_int($result) || preg_last_error()) {
+        throw new InvalidArgumentException('preg_match() error: '.preg_last_error());
     }
     return $result;
 }
@@ -850,8 +880,8 @@ function preg_match(string $pattern, string $subject, &$matches = null, int $fla
 function preg_match_all(string $pattern, string $subject, &$matches = null, int $flags = 0, int $offset = 0): int {
     $result = \preg_match_all($pattern, $subject, $matches, $flags, $offset);
 
-    if (!is_int($result) || preg_last_error() != PREG_NO_ERROR) {
-        throw new InvalidArgumentException('preg_match_all() error');
+    if (!is_int($result) || preg_last_error()) {
+        throw new InvalidArgumentException('preg_match_all() error: '.preg_last_error());
     }
     return $result;
 }
@@ -869,7 +899,7 @@ function preg_match_all(string $pattern, string $subject, &$matches = null, int 
  * @param     mixed           $count [optional] - variable to be filled with the number of replacements done (int)
  * @param-out int             $count
  *
- * @return         string|string[] - array if the subject is an array, or a string otherwise
+ * @return         string|string[] - array if $subject is an array, or a string otherwise
  * @phpstan-return ($subject is array ? string[] : string)
  *
  * @throws InvalidArgumentException in case of errors
@@ -879,8 +909,8 @@ function preg_match_all(string $pattern, string $subject, &$matches = null, int 
 function preg_replace($pattern, $replacement, $subject, int $limit = -1, &$count = null) {
     $result = \preg_replace($pattern, $replacement, $subject, $limit, $count);
 
-    if ($result === null || preg_last_error() != PREG_NO_ERROR) {
-        throw new InvalidArgumentException('preg_replace() error');
+    if ($result === null || preg_last_error()) {
+        throw new InvalidArgumentException('preg_replace() error: '.preg_last_error());
     }
     return $result;
 }
@@ -906,8 +936,8 @@ function preg_replace($pattern, $replacement, $subject, int $limit = -1, &$count
 function preg_split(string $pattern, string $subject, int $limit = -1, int $flags = 0): array {
     $result = \preg_split($pattern, $subject, $limit, $flags);
 
-    if (!is_array($result) || preg_last_error() != PREG_NO_ERROR) {
-        throw new InvalidArgumentException('preg_split() error');
+    if (!is_array($result) || preg_last_error()) {
+        throw new InvalidArgumentException('preg_split() error: '.preg_last_error());
     }
     return $result;
 }
