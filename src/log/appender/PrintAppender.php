@@ -9,7 +9,6 @@ use rosasurfer\ministruts\log\detail\Request;
 
 use function rosasurfer\ministruts\ini_get_bool;
 use function rosasurfer\ministruts\preg_filter;
-use function rosasurfer\ministruts\preg_match;
 use function rosasurfer\ministruts\stderr;
 use function rosasurfer\ministruts\stdout;
 use function rosasurfer\ministruts\strCompareI;

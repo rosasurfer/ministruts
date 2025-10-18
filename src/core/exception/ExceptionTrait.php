@@ -74,25 +74,38 @@ trait ExceptionTrait {
 
 
     /**
-     * Return a more verbose version of a {@link Throwable}'s message. The resulting message has the classname of the throwable
+     * Return a more verbose version of an exception's message. The resulting message has the classname of the exception
      * and in case of {@link \ErrorException}s also the severity level of the error prepended to the original message.
      *
-     * @param  Throwable      $throwable         - throwable
+     * @param  Throwable      $exception         - exception
      * @param  string         $indent [optional] - indent all lines by the specified value (default: no indentation)
      * @param  ?ContentFilter $filter [optional] - the content filter to apply (default: none)
      *
      * @return string - message
      */
-    public static function getVerboseMessage(Throwable $throwable, string $indent = '', ?ContentFilter $filter = null): string {
-        $message = trim($throwable->getMessage());
+    public static function getVerboseMessage(Throwable $exception, string $indent = '', ?ContentFilter $filter = null): string {
+        $message = trim($exception->getMessage());
         if ($filter) {
             $message = $filter->filterString($message);
         }
 
-        if (!$throwable instanceof PHPError) {              // PHP errors are verbose enough
-            $class = get_class($throwable);
-            if ($throwable instanceof ErrorException) {     // a PHP error not created by this ErrorHandler
-                $class .= '('.PHP::errorLevelDescr($throwable->getSeverity()).')';
+        if ($exception instanceof PHPError) {
+            switch ($exception->getSeverity()) {
+                case E_USER_NOTICE:
+                case E_USER_WARNING:
+                case E_USER_ERROR:
+                case E_USER_DEPRECATED:
+                case E_DEPRECATED:
+                case E_STRICT:
+                    $prefix = PHP::errorLevelDescr($exception->getSeverity());
+                    $message = $prefix.($message=='' ? '' : ": $message");
+                    break;
+            }
+        }
+        else {
+            $class = get_class($exception);
+            if ($exception instanceof ErrorException) {     // a PHP error not created by our ErrorHandler
+                $class .= '('.PHP::errorLevelDescr($exception->getSeverity()).')';
             }
             $message = $class.($message=='' ? '' : ": $message");
         }

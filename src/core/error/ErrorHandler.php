@@ -20,7 +20,6 @@ use const rosasurfer\ministruts\ERROR_LOG_DEFAULT;
 use const rosasurfer\ministruts\KB;
 use const rosasurfer\ministruts\L_ERROR;
 use const rosasurfer\ministruts\L_FATAL;
-use const rosasurfer\ministruts\L_INFO;
 use const rosasurfer\ministruts\L_NOTICE;
 use const rosasurfer\ministruts\L_WARN;
 use const rosasurfer\ministruts\MB;
@@ -177,8 +176,8 @@ class ErrorHandler extends CObject {
                 case E_USER_NOTICE      : $logLevel = L_NOTICE; break;
                 case E_USER_WARNING     : $logLevel = L_WARN;   break;
                 case E_USER_ERROR       : $logLevel = L_ERROR;  break;
-                case E_USER_DEPRECATED  : $logLevel = L_INFO;   break;
-                case E_DEPRECATED       : $logLevel = L_INFO;   break;
+                case E_USER_DEPRECATED  : $logLevel = L_NOTICE; break;
+                case E_DEPRECATED       : $logLevel = L_NOTICE; break;
                 case E_STRICT           : $logLevel = L_NOTICE; break;
 
                 default: $logLevel = L_ERROR;
@@ -258,11 +257,11 @@ class ErrorHandler extends CObject {
      * @return void
      */
     private static function handleRecursiveException(Throwable $first, Throwable $next): void {
-        //\rosasurfer\ministruts\echof('ErrorHandler::handleRecursiveException(inShutdown='.(int)self::$inShutdown.') '.$next->getMessage());
+        //\rosasurfer\ministruts\ddd('ErrorHandler::handleRecursiveException(inShutdown='.(int)self::$inShutdown.') '.$next->getMessage());
         try {
             $indent = ' ';
             $msg  = trim(Exception::getVerboseMessage($first, $indent));
-            $msg  = $indent.($first instanceof PHPError ? '':'[FATAL] Unhandled ').$msg.NL;
+            $msg  = $indent.($first instanceof PHPError ? '' : '[FATAL] Unhandled ').$msg.NL;
             $msg .= $indent.'in '.$first->getFile().' on line '.$first->getLine().NL;
             $msg .= NL;
             $msg .= $indent.'Stacktrace:'.NL;
