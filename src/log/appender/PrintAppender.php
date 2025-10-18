@@ -8,6 +8,7 @@ use rosasurfer\ministruts\log\LogMessage;
 use rosasurfer\ministruts\log\detail\Request;
 
 use function rosasurfer\ministruts\ini_get_bool;
+use function rosasurfer\ministruts\preg_filter;
 use function rosasurfer\ministruts\preg_match;
 use function rosasurfer\ministruts\stderr;
 use function rosasurfer\ministruts\stdout;
@@ -64,7 +65,11 @@ class PrintAppender extends BaseAppender {
 
         // detect "headers already sent" errors triggered by the PrintAppender itself and terminate processing of the error
         if ($message->fromErrorHandler() && $this->msgCounter > 0) {
-            if (preg_match('/- headers already sent (by )?\(output started at /', $message->getMessage())) {
+            $patterns = [
+                '/- headers already sent (by )?\(output started at /',
+                '/cookie parameters cannot be changed after headers have already been sent/',
+            ];
+            if (preg_filter($patterns, '', $message->getMessage()) !== null) {
                 return false;
             }
         }
