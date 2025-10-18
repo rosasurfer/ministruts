@@ -136,7 +136,7 @@ class ErrorHandler extends CObject {
      * @throws PHPError
      */
     public static function handleError(int $level, string $message, string $file, int $line, array $symbols = []): bool {
-        //\rosasurfer\ministruts\ddd('ErrorHandler::handleError(inShutdown='.(int)self::$inShutdown.') '.PHP::errorLevelToStr($level).': '.$message.', in '.$file.', line '.$line);
+        //\rosasurfer\ministruts\ddd('ErrorHandler::handleError() '.(self::$inShutdown ? 'shutdown ':'').PHP::errorLevelToStr($level).': '.$message.', in '.$file.', line '.$line);
         if (!self::$errorHandling) return false;
 
         // anonymous function to chain a previously active handler
@@ -227,7 +227,7 @@ class ErrorHandler extends CObject {
      * @return void
      */
     public static function handleException(Throwable $exception): void {
-        //\rosasurfer\ministruts\ddd('ErrorHandler::handleException(inShutdown='.(int)self::$inShutdown.') '.$exception->getMessage());
+        //\rosasurfer\ministruts\ddd('ErrorHandler::handleException() '.(self::$inShutdown ? 'shutdown ':'').$exception->getMessage());
         if (!self::$exceptionHandling) return;
 
         // catch exceptions thrown by logger or chained exception handler
