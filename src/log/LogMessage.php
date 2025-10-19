@@ -7,6 +7,7 @@ use ErrorException;
 use Throwable;
 
 use rosasurfer\ministruts\core\CObject;
+use rosasurfer\ministruts\core\error\PHPError;
 use rosasurfer\ministruts\core\exception\Exception;
 use rosasurfer\ministruts\core\exception\InvalidTypeException;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
@@ -85,7 +86,7 @@ class LogMessage extends CObject {
      * @return bool
      */
     public function fromErrorHandler(): bool {
-        return isset($this->context['error-handler']);
+        return $this->exception instanceof PHPError || isset($this->context['error-handler']);
     }
 
 

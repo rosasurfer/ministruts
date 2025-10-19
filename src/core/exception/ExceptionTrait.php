@@ -89,22 +89,9 @@ trait ExceptionTrait {
             $message = $filter->filterString($message);
         }
 
-        if ($exception instanceof PHPError) {
-            switch ($exception->getSeverity()) {
-                case E_USER_NOTICE:
-                case E_USER_WARNING:
-                case E_USER_ERROR:
-                case E_USER_DEPRECATED:
-                case E_DEPRECATED:
-                case E_STRICT:
-                    $prefix = PHP::errorLevelDescr($exception->getSeverity());
-                    $message = $prefix.($message=='' ? '' : ": $message");
-                    break;
-            }
-        }
-        else {
+        if (!$exception instanceof PHPError) {
             $class = get_class($exception);
-            if ($exception instanceof ErrorException) {     // a PHP error not created by our ErrorHandler
+            if ($exception instanceof ErrorException) {     // a built-in PHP error not created by our ErrorHandler
                 $class .= '('.PHP::errorLevelDescr($exception->getSeverity()).')';
             }
             $message = $class.($message=='' ? '' : ": $message");

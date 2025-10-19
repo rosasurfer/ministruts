@@ -149,7 +149,7 @@ class ErrorHandler extends CObject {
 
         // ignore suppressed errors and errors not covered by the active reporting level
         $reportingLevel = self::$reportingLevel ?? error_reporting();
-        if (!$reportingLevel)            return $prevErrorHandler();        // the @ operator was specified (since PHP8 some errors can't be silenced anymore)
+        if (!$reportingLevel)            return $prevErrorHandler();        // the @ operator was specified (since PHP8 some errors can't be silenced anymore using @)
         if (!($reportingLevel & $level)) return $prevErrorHandler();        // the error is not covered by the active reporting level
 
         // convert error to a PHPError exception

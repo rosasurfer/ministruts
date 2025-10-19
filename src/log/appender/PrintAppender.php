@@ -63,8 +63,8 @@ class PrintAppender extends BaseAppender {
         }
 
         // detect "headers already sent" errors triggered by the PrintAppender itself and terminate processing of the error
-        if ($message->fromErrorHandler() && $this->msgCounter > 0) {
-            $patterns = [
+        if ($message->fromErrorHandler() && $this->msgCounter) {
+            static $patterns = [
                 '/- headers already sent (by )?\(output started at /',
                 '/cookie parameters cannot be changed after headers have already been sent/',
             ];
@@ -90,7 +90,7 @@ class PrintAppender extends BaseAppender {
         $msg = trim($msg);
 
         if (!$html) {
-            if ($this->msgCounter > 0) {
+            if ($this->msgCounter) {
                 $msg = str_repeat('-', 120).NL.$msg;
             }
             $msg .= NL.NL;                                                  // EOL + one empty line
