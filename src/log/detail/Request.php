@@ -406,7 +406,7 @@ class Request extends CObject {
             }
             if (isset($headers['Authorization'])) {
                 $redacted = ContentFilter::SUBSTITUTE;
-                $authHeader = preg_replace('/^(Basic|Bearer|Digest)\s/i', "\$1 $redacted", $headers['Authorization']);
+                $authHeader = preg_replace('/^(\S+)\s/', "\$1 $redacted", $headers['Authorization']);
                 $headers['Authorization'] = $authHeader;
             }
         }
