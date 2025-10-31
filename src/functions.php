@@ -11,11 +11,13 @@ use Closure;
 use ErrorException;
 use InvalidArgumentException;
 use SimpleXMLElement;
+use Throwable;
 use Traversable;
 
 use rosasurfer\ministruts\console\docopt\DocoptParser;
 use rosasurfer\ministruts\console\docopt\DocoptResult;
 use rosasurfer\ministruts\core\di\proxy\Request as RequestProxy;
+use rosasurfer\ministruts\core\exception\Exception;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 use rosasurfer\ministruts\core\lock\Lock;
@@ -23,6 +25,7 @@ use rosasurfer\ministruts\file\FileSystem;
 use rosasurfer\ministruts\log\detail\Request;
 use rosasurfer\ministruts\struts\url\Url;
 use rosasurfer\ministruts\struts\url\VersionedUrl;
+use rosasurfer\ministruts\util\Trace;
 
 // Whether we run on a command line interface, on localhost and/or on Windows.
 define('rosasurfer\ministruts\_CLI',        defined('\STDIN') && is_resource(\STDIN));
@@ -1804,7 +1807,15 @@ function synchronized(Closure $task, ?string $mutex = null): void {
  * @return string
  */
 function toString($var): string {
-    if (is_object($var) && method_exists($var, '__toString') && !$var instanceof SimpleXMLElement) {
+    if ($var instanceof Throwable) {
+        $str  = trim(Exception::getVerboseMessage($var, $indent = ' ')).NL;
+        $str .= $indent.'in '.$var->getFile().' on line '.$var->getLine().NL;
+        $str .= NL;
+        $str .= $indent.'Stacktrace:'.NL;
+        $str .= $indent.'-----------'.NL;
+        $str .= Trace::convertTraceToString($var, $indent);
+    }
+    elseif (is_object($var) && method_exists($var, '__toString') && !$var instanceof SimpleXMLElement) {
         $str = (string) $var;
     }
     elseif (is_object($var) || is_array($var)) {
