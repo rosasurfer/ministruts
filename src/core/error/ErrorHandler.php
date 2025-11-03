@@ -144,19 +144,19 @@ class ErrorHandler extends CObject {
             if (self::$prevErrorHandler) {
                 (self::$prevErrorHandler)(...$args);
             }
-            return true;                                                    // tell PHP to call error_clear_last()
+            return true;                                                // tell PHP to call error_clear_last()
         };
 
         // ignore suppressed errors and errors not covered by the active reporting level
         $reportingLevel = self::$reportingLevel ?? error_reporting();
-        if (!$reportingLevel)            return $prevErrorHandler();        // the @ operator was specified (since PHP8 some errors can't be silenced anymore using @)
-        if (!($reportingLevel & $level)) return $prevErrorHandler();        // the error is not covered by the active reporting level
+        if (!$reportingLevel)            return $prevErrorHandler();    // the @ operator was specified (since PHP8 some errors can't be silenced anymore using @)
+        if (!($reportingLevel & $level)) return $prevErrorHandler();    // the error is not covered by the active reporting level
 
         // convert error to a PHPError exception
         $message = strLeftTo($message, ' (this will throw an Error in a future version of PHP)', -1);
         $exception = new PHPError($message, 0, $level, $file, $line);
         $trace = Trace::unwindTraceToLocation($exception->getTrace(), $file, $line);
-        Exception::modifyException($exception, $trace);           // let the stacktrace point to the trigger statement
+        Exception::patchStackTrace($exception, $trace);                 // let the stacktrace point to the trigger statement
 
         // handle the error accordingly
         $neverThrow = (bool)($level & (E_DEPRECATED | E_USER_DEPRECATED | E_USER_NOTICE | E_USER_WARNING));
@@ -260,8 +260,8 @@ class ErrorHandler extends CObject {
         //\rosasurfer\ministruts\ddd('ErrorHandler::handleRecursiveException(inShutdown='.(int)self::$inShutdown.') '.$next->getMessage());
         try {
             $indent = ' ';
-            $msg  = trim(Exception::getVerboseMessage($first, $indent));
-            $msg  = $indent.($first instanceof PHPError ? '' : '[FATAL] Unhandled ').$msg.NL;
+            $msg  = ltrim(Exception::getVerboseMessage($first, $indent));
+            $msg  = $indent.($first instanceof PHPError ? '' : '[FATAL] Unhandled ').$msg;
             $msg .= $indent.'in '.$first->getFile().' on line '.$first->getLine().NL;
             $msg .= NL;
             $msg .= $indent.'Stacktrace:'.NL;
@@ -270,7 +270,7 @@ class ErrorHandler extends CObject {
             $msg .= NL;
             $msg .= NL;
             $msg .= $indent.'followed by'.NL;
-            $msg .= $indent.trim(Exception::getVerboseMessage($next, $indent)).NL;
+            $msg .= Exception::getVerboseMessage($next, $indent);
             $msg .= $indent.'in '.$next->getFile().' on line '.$next->getLine().NL;
             $msg .= NL;
             $msg .= $indent.'Stacktrace:'.NL;

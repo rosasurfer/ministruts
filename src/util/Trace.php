@@ -26,7 +26,7 @@ use const rosasurfer\ministruts\NL;
 class Trace extends StaticClass {
 
     /**
-     * Convert a PHP stacktrace to the more intuitive Java-style.
+     * Convert a PHP-style stacktrace to the more intuitive Java-style.
      *
      * @param  array[] $trace           - regular PHP-style stacktrace
      * @param  string  $file [optional] - name of the file where the stacktrace was created (missing in PHP traces)
@@ -140,21 +140,21 @@ class Trace extends StaticClass {
 
 
     /**
-     * Convert a PHP stacktrace to the more intuitive Java-style and return a string representation.
+     * Convert an exception's PHP-style stacktrace to the more intuitive Java-style and return its string representation.
      * Contains infos about nested exceptions.
      *
-     * @param  Throwable      $throwable         - any throwable
+     * @param  Throwable      $exception         - any exception
      * @param  string         $indent [optional] - indent the resulting lines by the specified value (default: no indentation)
      * @param  ?ContentFilter $filter [optional] - the content filter to apply (default: none)
      *
      * @return string - string representation ending with EOL
      */
-    public static function convertTraceToString(Throwable $throwable, string $indent = '', ?ContentFilter $filter = null): string {
-        $trace = self::convertTrace($throwable->getTrace(), $throwable->getFile(), $throwable->getLine());
-        $result = self::formatTrace($trace, $indent);
+    public static function convertTraceToString(Throwable $exception, string $indent = '', ?ContentFilter $filter = null): string {
+        $stacktrace = self::convertTrace($exception->getTrace(), $exception->getFile(), $exception->getLine());
+        $result = self::toString($stacktrace, $indent);
 
         // recursively add stacktraces of nested exceptions
-        if ($cause = $throwable->getPrevious()) {
+        if ($cause = $exception->getPrevious()) {
             $message = trim(Exception::getVerboseMessage($cause, $indent, $filter));
             $result .= NL.$indent.'caused by'.NL.$indent.$message.NL.NL;
             $result .= self::convertTraceToString($cause, $indent, $filter);
@@ -194,18 +194,18 @@ class Trace extends StaticClass {
 
 
     /**
-     * Return a formatted version of a stacktrace.
+     * Return a formatted string representation of a stacktrace.
      *
      * @param  array[] $trace             - stacktrace
      * @param  string  $indent [optional] - indent formatted lines by this value (default: no indenting)
      *
-     * @return string - string representation ending with an EOL marker
+     * @return string - string representation ending with EOL
      *
      * @phpstan-param list<STACKFRAME> $trace
      *
      * @see \rosasurfer\ministruts\phpstan\STACKFRAME
      */
-    public static function formatTrace(array $trace, string $indent = ''): string {
+    public static function toString(array $trace, string $indent = ''): string {
         $appRoot = '';
         $di = Application::getDi();
         if ($di && $di->has('config')) {
@@ -315,7 +315,7 @@ class Trace extends StaticClass {
             break;
         }
 
-        Exception::modifyException($exception, $trace, $file, $line);
+        Exception::patchStackTrace($exception, $trace, $file, $line);
         return $count;
     }
 }

@@ -294,7 +294,7 @@ class LogMessage extends CObject {
         $indent = ' ';
 
         if ($this->exception) {
-            // use stacktrace from an explicitly passed exception (will include any nested exceptions)
+            // use stacktrace from an explicitly passed exception (will include nested exceptions)
             $detail  = $indent.'Stacktrace:'.NL .$indent.'-----------'.NL;
             $detail .= Trace::convertTraceToString($this->exception, $indent, $filter);
             if ($html) {
@@ -302,10 +302,10 @@ class LogMessage extends CObject {
             }
         }
         elseif (isset($this->context['exception'])) {
-            // use stacktrace from a context exception (will include any nested exceptions)
+            // use stacktrace from a context exception (will include nested exceptions)
             /** @var Throwable $exception */
             $exception = $this->context['exception'];
-            $msg = $indent.trim(Exception::getVerboseMessage($exception, $indent, $filter)).NL.NL;
+            $msg = Exception::getVerboseMessage($exception, $indent, $filter).NL.NL;
             if ($html) {
                 $msg = '<br/>'.nl2br(hsc($msg));
             }
@@ -320,9 +320,9 @@ class LogMessage extends CObject {
         else {
             // use our own stacktrace (points to the causing log statement)
             $detail = $indent.'Stacktrace:'.NL .$indent.'-----------'.NL;
-            ['trace' => $trace] = $this->getInternalLocation();
-            $stacktrace = Trace::convertTrace($trace, $this->getFile(), $this->getLine());
-            $detail .= Trace::formatTrace($stacktrace, $indent);
+            ['trace' => $stacktrace] = $this->getInternalLocation();
+            $stacktrace = Trace::convertTrace($stacktrace, $this->getFile(), $this->getLine());
+            $detail .= Trace::toString($stacktrace, $indent);
             if ($html) {
                 $detail = '<br style="clear:both"/><br/>'.print_p($detail, true).NL;
             }

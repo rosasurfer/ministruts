@@ -69,13 +69,13 @@ trait ExceptionTrait {
      * {@inheritDoc}
      */
     public function __toString(): string {
-        return Exception::getVerboseMessage($this);
+        return static::getVerboseMessage($this);
     }
 
 
     /**
-     * Return a more verbose version of an exception's message. The resulting message has the classname of the exception
-     * and in case of {@link \ErrorException}s also the severity level of the error prepended to the original message.
+     * Return a more verbose version of a {@link Throwable}'s message. The resulting message has either the severity level of
+     * an {@link \ErrorException} or the {@link \Exception}'s classname prepended.
      *
      * @param  Throwable      $exception         - exception
      * @param  string         $indent [optional] - indent all lines by the specified value (default: no indentation)
@@ -89,7 +89,7 @@ trait ExceptionTrait {
             $message = $filter->filterString($message);
         }
 
-        if (!$exception instanceof PHPError) {
+        if (!$exception instanceof PHPError) {              //  PHPError::getMessage() already returns the verbose message
             $class = get_class($exception);
             if ($exception instanceof ErrorException) {     // a built-in PHP error not created by our ErrorHandler
                 $class .= '('.PHP::errorLevelDescr($exception->getSeverity()).')';
@@ -105,12 +105,13 @@ trait ExceptionTrait {
 
 
     /**
-     * Modify the location related properties of a {@link Throwable}.
+     * Patch stacktrace and error location of a {@link Throwable}. Used for removing frames from an exeption's stacktrace, so the
+     * location properties point to the user-land code which triggered the exception.
      *
-     * @param  Throwable $exception       - exception to modify
-     * @param  array[]   $trace           - stacktrace
-     * @param  string    $file [optional] - filename of the error location (default: unchanged)
-     * @param  int       $line [optional] - line number of the error location (default: unchanged)
+     * @param  Throwable $exception       - the exception to modify
+     * @param  array[]   $trace           - new stacktrace
+     * @param  string    $file [optional] - new filename of the error location (default: unchanged)
+     * @param  int       $line [optional] - new line number of the error location (default: unchanged)
      *
      * @return void
      *
@@ -118,7 +119,7 @@ trait ExceptionTrait {
      *
      * @see \rosasurfer\ministruts\phpstan\STACKFRAME
      */
-    public static function modifyException(Throwable $exception, array $trace, string $file = '', int $line = 0): void {
+    public static function patchStackTrace(Throwable $exception, array $trace, string $file = '', int $line = 0): void {
         // Throwable is either Error or Exception
         $className = get_class($exception);
         while ($parent = get_parent_class($className)) {
