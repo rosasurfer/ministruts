@@ -257,25 +257,16 @@ class ErrorHandler extends CObject {
      * @return void
      */
     private static function handleRecursiveException(Throwable $first, Throwable $next): void {
-        //\rosasurfer\ministruts\ddd('ErrorHandler::handleRecursiveException(inShutdown='.(int)self::$inShutdown.') '.$next->getMessage());
+        //\rosasurfer\ministruts\ddd('ErrorHandler::handleRecursiveException() '.(self::$inShutdown ? 'shutdown ':'').$next->getMessage());
         try {
             $indent = ' ';
-            $msg  = ltrim(Exception::getVerboseMessage($first, $indent));
-            $msg  = $indent.($first instanceof PHPError ? '' : '[FATAL] Unhandled ').$msg;
-            $msg .= $indent.'in '.$first->getFile().' on line '.$first->getLine().NL;
-            $msg .= NL;
-            $msg .= $indent.'Stacktrace:'.NL;
-            $msg .= $indent.'-----------'.NL;
-            $msg .= Trace::convertTraceToString($first, $indent);
+            $prefix = $indent.($first instanceof PHPError ? '' : '[FATAL] Unhandled ');
+
+            $msg = $prefix.ltrim(Exception::toString($first, $indent));
             $msg .= NL;
             $msg .= NL;
             $msg .= $indent.'followed by'.NL;
-            $msg .= Exception::getVerboseMessage($next, $indent);
-            $msg .= $indent.'in '.$next->getFile().' on line '.$next->getLine().NL;
-            $msg .= NL;
-            $msg .= $indent.'Stacktrace:'.NL;
-            $msg .= $indent.'-----------'.NL;
-            $msg .= Trace::convertTraceToString($next, $indent);
+            $msg .= Exception::toString($next, $indent);
             $msg .= NL;
 
             // log everything to the system logger (never throws an error)

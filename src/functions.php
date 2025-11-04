@@ -1808,12 +1808,7 @@ function synchronized(Closure $task, ?string $mutex = null): void {
  */
 function toString($var): string {
     if ($var instanceof Throwable) {
-        $str  = trim(Exception::getVerboseMessage($var, $indent = ' ')).NL;
-        $str .= $indent.'in '.$var->getFile().' on line '.$var->getLine().NL;
-        $str .= NL;
-        $str .= $indent.'Stacktrace:'.NL;
-        $str .= $indent.'-----------'.NL;
-        $str .= Trace::convertTraceToString($var, $indent);
+        $str = Exception::toString($var);
     }
     elseif (is_object($var) && method_exists($var, '__toString') && !$var instanceof SimpleXMLElement) {
         $str = (string) $var;

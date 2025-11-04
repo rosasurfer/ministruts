@@ -11,6 +11,7 @@ use rosasurfer\ministruts\core\error\PHPError;
 use rosasurfer\ministruts\log\filter\ContentFilterInterface as ContentFilter;
 use rosasurfer\ministruts\phpstan\UserTypes as PHPStanUserTypes;
 use rosasurfer\ministruts\util\PHP;
+use rosasurfer\ministruts\util\Trace;
 
 use function rosasurfer\ministruts\normalizeEOL;
 
@@ -69,7 +70,27 @@ trait ExceptionTrait {
      * {@inheritDoc}
      */
     public function __toString(): string {
-        return static::getVerboseMessage($this);
+        return static::toString($this);
+    }
+
+
+    /**
+     * Return a formatted and more verbose version of an exceptions's string representation. Contains infos about nested exceptions.
+     *
+     * @param  Throwable      $exception         - exception
+     * @param  string         $indent [optional] - indent all lines by the specified value (default: no indentation)
+     * @param  ?ContentFilter $filter [optional] - the content filter to apply (default: none)
+     *
+     * @return string - string representation ending with EOL
+     */
+    public static function toString(Throwable $exception, string $indent = '', ?ContentFilter $filter = null): string {
+        $str  = static::getVerboseMessage($exception, $indent).NL;
+        $str .= $indent.'in '.$exception->getFile().' on line '.$exception->getLine().NL;
+        $str .= NL;
+        $str .= $indent.'Stacktrace:'.NL;
+        $str .= $indent.'-----------'.NL;
+        $str .= Trace::convertTraceToString($exception, $indent);
+        return $str;
     }
 
 
@@ -81,7 +102,7 @@ trait ExceptionTrait {
      * @param  string         $indent [optional] - indent all lines by the specified value (default: no indentation)
      * @param  ?ContentFilter $filter [optional] - the content filter to apply (default: none)
      *
-     * @return string - message
+     * @return string - message not ending with EOL
      */
     public static function getVerboseMessage(Throwable $exception, string $indent = '', ?ContentFilter $filter = null): string {
         $message = trim($exception->getMessage());
@@ -94,7 +115,7 @@ trait ExceptionTrait {
             if ($exception instanceof ErrorException) {     // a built-in PHP error not created by our ErrorHandler
                 $class .= '('.PHP::errorLevelDescr($exception->getSeverity()).')';
             }
-            $message = $class.($message=='' ? '' : ": $message");
+            $message = $class.($message=='' ? '' : ': ').$message;
         }
 
         if ($indent != '') {

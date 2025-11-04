@@ -141,7 +141,7 @@ class Trace extends StaticClass {
 
     /**
      * Convert an exception's PHP-style stacktrace to the more intuitive Java-style and return its string representation.
-     * Contains infos about nested exceptions.
+     * Contains nested exceptions.
      *
      * @param  Throwable      $exception         - any exception
      * @param  string         $indent [optional] - indent the resulting lines by the specified value (default: no indentation)
@@ -153,11 +153,11 @@ class Trace extends StaticClass {
         $stacktrace = self::convertTrace($exception->getTrace(), $exception->getFile(), $exception->getLine());
         $result = self::toString($stacktrace, $indent);
 
-        // recursively add stacktraces of nested exceptions
+        // recursively add details of nested exceptions
         if ($cause = $exception->getPrevious()) {
-            $message = trim(Exception::getVerboseMessage($cause, $indent, $filter));
-            $result .= NL.$indent.'caused by'.NL.$indent.$message.NL.NL;
-            $result .= self::convertTraceToString($cause, $indent, $filter);
+            $result .= NL;
+            $result .= $indent.'caused by'.NL;
+            $result .= Exception::toString($cause, "$indent  ", $filter);   // increase indentation
         }
         return $result;
     }
