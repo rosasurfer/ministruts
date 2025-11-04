@@ -38,6 +38,6 @@ are beautiful syntax definitions even for more complex tools (no more ugly Symfo
 Examples are [here](src/console/docopt/examples/git), or you can try out the online parser [here](http://try.docopt.org/#).
 
 ---
-Mini-Struts reference: [struts-config.dtd](src/struts/dtd/struts-config.dtd)
+MiniStruts reference: [struts-config.dtd](src/struts/dtd/struts-config.dtd)
 
 ORM mapping reference: [README.md](src/db/orm/README.md)
