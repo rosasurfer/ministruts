@@ -25,7 +25,6 @@ use rosasurfer\ministruts\file\FileSystem;
 use rosasurfer\ministruts\log\detail\Request;
 use rosasurfer\ministruts\struts\url\Url;
 use rosasurfer\ministruts\struts\url\VersionedUrl;
-use rosasurfer\ministruts\util\Trace;
 
 // Whether we run on a command line interface, on localhost and/or on Windows.
 define('rosasurfer\ministruts\_CLI',        defined('\STDIN') && is_resource(\STDIN));
