@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\log;
 
+use Throwable;
+
 use rosasurfer\ministruts\config\ConfigInterface as Config;
 use rosasurfer\ministruts\core\StaticClass;
 use rosasurfer\ministruts\log\appender\AppenderInterface as LogAppender;
@@ -141,7 +143,10 @@ class Logger extends StaticClass {
     public static function log($loggable, int $level, array $context = []): bool {
         // prevent recursive calls
         static $recursion = false;
-        if ($recursion) throw new IllegalStateException('Recursive call detected, aborting...');
+        if ($recursion) {
+            $previous = $loggable instanceof Throwable ? $loggable : null;
+            throw new IllegalStateException('Recursive call detected, aborting...', 0, $previous);
+        }
         $recursion = true;
 
         self::init();

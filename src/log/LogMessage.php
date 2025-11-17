@@ -5,6 +5,7 @@ namespace rosasurfer\ministruts\log;
 
 use ErrorException;
 use Throwable;
+use Traversable;
 
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\error\PHPError;
@@ -382,7 +383,12 @@ class LogMessage extends CObject {
         $detail = '';
 
         if (isset($_SESSION)) {
-            $session = $filter ? $filter->filterValues($_SESSION) : $_SESSION;
+            /** @var iterable<mixed> $session */
+            $session = $_SESSION;
+            if ($session instanceof Traversable) {
+                $session = iterator_to_array($session, true);
+            }
+            $session = $filter ? $filter->filterValues($session) : $session;
             ksort($session);
             $detail = trim(print_r($session, true));
 

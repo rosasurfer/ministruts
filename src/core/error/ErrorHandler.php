@@ -305,7 +305,7 @@ class ErrorHandler extends CObject {
      */
     public static function handleDestructorException(Throwable $exception): Throwable {
         if (self::$inShutdown) {
-            $currentHandler = set_exception_handler(static function(): void {});
+            $currentHandler = set_exception_handler(null);
             restore_exception_handler();
 
             if ($currentHandler) {
@@ -325,9 +325,9 @@ class ErrorHandler extends CObject {
     public static function onShutdown(): void {
         self::$inShutdown = true;
 
-        // Errors showing up here haven't been passed to an installed custom error handler. That's compile time
-        // errors (E_ERROR, E_PARSE, E_CORE_ERROR, E_CORE_WARNING, E_COMPILE_ERROR, E_COMPILE_WARNING) or fatal
-        // runtime errors (e.g. "out-of-memory").
+        // Errors showing up here haven't been passed to an installed custom error handler. That's compile time errors
+        // (E_ERROR, E_PARSE, E_CORE_ERROR, E_CORE_WARNING, E_COMPILE_ERROR, E_COMPILE_WARNING), fatal runtime errors
+        // (e.g. "out-of-memory") or runtime errors during execution of custom shutdown functions.
         //
         // @see  https://www.php.net/manual/en/function.set-error-handler.php
 
