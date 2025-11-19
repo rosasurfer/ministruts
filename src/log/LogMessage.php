@@ -384,12 +384,14 @@ class LogMessage extends CObject {
 
         if (isset($_SESSION)) {
             /** @var iterable<mixed> $session */
-            $session = $_SESSION;
+            $session = $_SESSION ?? [];
             if ($session instanceof Traversable) {
                 $session = iterator_to_array($session, true);
             }
-            $session = $filter ? $filter->filterValues($session) : $session;
-            ksort($session);
+            if (is_array($session)) {                           // @phpstan-ignore function.alreadyNarrowedType ($_SESSION can be anything)
+                $session = $filter ? $filter->filterValues($session) : $session;
+                ksort($session);
+            }
             $detail = trim(print_r($session, true));
 
             $indent = ' ';
