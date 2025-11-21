@@ -379,7 +379,7 @@ class Request extends CObject {
      *
      * @return string
      */
-    public static function stringify(?ContentFilter $filter = null): string {
+    public static function toString(?ContentFilter $filter = null): string {
         $request = self::instance();
 
         // request

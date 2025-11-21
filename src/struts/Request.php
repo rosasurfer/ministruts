@@ -606,7 +606,9 @@ class Request extends CObject {
     public function destroySession(): void {
         if (session_status() == PHP_SESSION_ACTIVE) {
             // unset all session variables
-            $_SESSION = [];
+            foreach ($_SESSION as $key => $_) {         // empty the session, don't use: $_SESSION = [];
+                unset($_SESSION[$key]);                 // as $_SESSION may be an instance of Traversable
+            }
 
             // delete the session cookie
             if (ini_get_bool('session.use_cookies')) {
@@ -616,7 +618,7 @@ class Request extends CObject {
                                                             $params['secure'  ],
                                                             $params['httponly']);
             }
-            session_destroy();          // TODO: check if SID is reset
+            session_destroy();                          // TODO: check if SID is reset
         }
     }
 

@@ -353,7 +353,7 @@ class LogMessage extends CObject {
 
         if (!CLI) {
             $indent = ' ';
-            $detail = 'Request:'.NL .'--------'.NL .trim(Request::stringify($filter));
+            $detail = 'Request:'.NL .'--------'.NL .trim(Request::toString($filter));
             $detail = $indent.str_replace(NL, NL.$indent, normalizeEOL($detail)).NL;
             if ($html) {
                 $detail = '<br style="clear:both"/><br/>'.print_p($detail, true).NL;
@@ -384,14 +384,12 @@ class LogMessage extends CObject {
 
         if (isset($_SESSION)) {
             /** @var iterable<mixed> $session */
-            $session = $_SESSION ?? [];
+            $session = $_SESSION;
             if ($session instanceof Traversable) {
                 $session = iterator_to_array($session, true);
             }
-            if (is_array($session)) {                           // @phpstan-ignore function.alreadyNarrowedType ($_SESSION can be anything)
-                $session = $filter ? $filter->filterValues($session) : $session;
-                ksort($session);
-            }
+            $session = $filter ? $filter->filterValues($session) : $session;
+            ksort($session);
             $detail = trim(print_r($session, true));
 
             $indent = ' ';
@@ -422,7 +420,12 @@ class LogMessage extends CObject {
             return $detail;
         }
 
-        $values = $filter ? $filter->filterValues($_SERVER) : $_SERVER;
+        /** @var iterable<mixed> $server */
+        $server = $_SERVER;
+        if ($server instanceof Traversable) {
+            $server = iterator_to_array($server, true);
+        }
+        $values = $filter ? $filter->filterValues($server) : $server;
         ksort($values);
 
         $indent = ' ';

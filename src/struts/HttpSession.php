@@ -90,7 +90,9 @@ class HttpSession extends Singleton {
         }
         $request = RequestProxy::instance();
 
-        $_SESSION = [];                                             // empty the session
+        foreach ($_SESSION as $key => $_) {                         // empty the session, don't use: $_SESSION = [];
+            unset($_SESSION[$key]);                                 // as $_SESSION may be an instance of Traversable
+        }
         $_SESSION['__SESSION_CREATED__'  ] = microtime(true);       // initialize the session markers
         $_SESSION['__SESSION_IP__'       ] = $request->getRemoteAddress();
         $_SESSION['__SESSION_USERAGENT__'] = $request->getHeaderValue('User-Agent');
