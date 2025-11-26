@@ -3,16 +3,13 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\log\detail;
 
-use Throwable;
-
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\exception\IllegalStateException;
 use rosasurfer\ministruts\log\filter\ContentFilterInterface as ContentFilter;
 
-use function rosasurfer\ministruts\json_decode_or_throw;
-use function rosasurfer\ministruts\json_encode_or_throw;
 use function rosasurfer\ministruts\preg_replace;
 use function rosasurfer\ministruts\strLeftTo;
+use function rosasurfer\ministruts\toString;
 
 use const rosasurfer\ministruts\CLI;
 use const rosasurfer\ministruts\NL;
@@ -186,10 +183,9 @@ class Request extends CObject {
 
 
     /**
-     * Return the content of the request (the body). For file uploads the method doesn't return the uploaded content.
-     * Instead it returns available metadata.
+     * Return the content of the request (the body). For file uploads the method available metadata.
      *
-     * @param  ?ContentFilter $filter [optional] - the content filter to apply (default: none)
+     * @param  ?ContentFilter $filter [optional] - a content filter to apply (default: none)
      *
      * @return string - request body or metadata
      */
@@ -206,17 +202,21 @@ class Request extends CObject {
                 $content .= '$_POST => '.trim(print_r($post, true)).NL;
             }
             else {
-                $input = file_get_contents('php://input');  // not available with content type 'multipart/form-data'
+                $input = file_get_contents('php://input');      // not available with content type 'multipart/form-data'
                 if (strlen($input)) {
-                    if ($filter && $this->getContentType()=='application/json') {
-                        try {
-                            $values = json_decode_or_throw($input, true, 512, JSON_BIGINT_AS_STRING | JSON_INVALID_UTF8_SUBSTITUTE);
-                            if (is_array($values)) {
-                                $values = $filter->filterValues($values);
-                                $input = json_encode_or_throw($values);
-                            }
-                        }
-                        catch (Throwable $ex) {}            // intentionally eat it
+                    $contentType = $this->getContentType() ?? 'application/json';
+                    if ($contentType == 'application/json') {
+                        //if ($filter) {                        // filter a possible JSON content
+                        //    try {
+                        //        $values = json_decode_or_throw($input, true, 512, JSON_BIGINT_AS_STRING | JSON_INVALID_UTF8_SUBSTITUTE);
+                        //        if (is_array($values)) {
+                        //            $values = $filter->filterValues($values);
+                        //            $input = json_encode_or_throw($values);
+                        //        }
+                        //    }
+                        //    catch (Throwable $ex) {}
+                        //}
+                        $input = toString($input);              // format a possible JSON content
                     }
                     $content .= trim($input).NL;
                 }
@@ -422,8 +422,8 @@ class Request extends CObject {
 
         // content (request body)
         $content = $request->getContent($filter);
-        if (strlen($content)) {
-            $result .= NL.trim(substr($content, 0, 2_048)).NL;      // limit the request body to 2048 bytes
+        if ($content != '') {
+            $result .= NL.trim(substr($content, 0, 2_048)).NL;      // limit the request body to 2KB
         }
 
         return $result;
