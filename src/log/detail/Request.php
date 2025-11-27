@@ -21,7 +21,7 @@ use const rosasurfer\ministruts\NL;
  */
 class Request extends CObject {
 
-    /** @var ?array<string, string> - all request headers (no multi-field headers) */
+    /** @var ?array<string, string> - all received request headers */
     protected ?array $headers = null;
 
     /** @var ?array<string, string[]> - normalized metadata of uploaded files */
@@ -49,14 +49,14 @@ class Request extends CObject {
 
 
     /**
-     * Return all headers as an associative array of header values. Source is the $_SERVER[] array,
-     * any raw multi-field headers are already collapsed into a single header line by PHP.
+     * Return all received headers as an associative array of header names/values. Source is the $_SERVER[] array.
+     * Multiple headers of the same name are already collapsed into a single header by PHP.
      *
      * @return array<string, string> - associative array of header values
      */
     protected function getNormalizedHeaders(): array {
         if (!isset($this->headers)) {
-            // headers with custom name representation (names are case-insensitive)
+            // headers with custom name representation
             $customHeaders = [
                 'CDN'                => 'CDN',
                 'CF_CONNECTING_IP'   => 'CF-Connecting-IP',
@@ -116,12 +116,12 @@ class Request extends CObject {
 
 
     /**
-     * Return the received headers with the specified names as an associative array of header values.
-     * Any received multi-field headers are combined into a single header line.
+     * Return the headers with the specified names as an associative array of header names/values.
+     * Multiple headers of the same name are already collapsed into a single header by PHP.
      *
-     * @param  string ...$names [optional] - zero or more header names (default: return all received headers)
+     * @param  string ...$names [optional] - one or more header names (default: all headers)
      *
-     * @return array<string, string> - associative array of header values
+     * @return array<string, string> - header names/values
      */
     public function getHeaders(string ...$names): array {
         $allHeaders = $this->getNormalizedHeaders();
@@ -133,19 +133,15 @@ class Request extends CObject {
 
 
     /**
-     * Return the received value of the header with the specified name.
+     * Return the value of the header with the specified name.
      *
      * @param  string $name - header name
      *
-     * @return ?string - received header value, or NULL if no such header was received
+     * @return ?string - header value or NULL if no such header was received
      */
     public function getHeaderValue(string $name): ?string {
         $header = $this->getHeaders($name);
-
-        foreach ($header as $value) {
-            return $value;
-        }
-        return null;
+        return $header ? reset($header) : null;
     }
 
 

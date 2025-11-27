@@ -46,10 +46,8 @@ use rosasurfer\ministruts\struts\Request as StrutsRequest;
  * @method static string         getSessionId()                                                            Return the session id transmitted with the request (not the id sent with the response, which may differ).
  * @method static bool           hasSessionId()                                                            Whether a valid session id was transmitted with the request. An invalid id is a URL based session id when the php.ini setting "session.use_only_cookies" is enabled.
  * @method static void           destroySession()                                                          Destroy the current session and it's data.
- * @method static ?string        getHeader(string $name)                                                   Return the first transmitted header with the specified name.
- * @method static string[]       getHeaders(string ...$names)                                              Return all headers with the specified name as an associative array of header values (in transmitted order).
- * @method static ?string        getHeaderValue(string ...$names)                                          Return a single value of all specified header(s). If multiple headers are specified or multiple headers have been transmitted, return all values as one comma-separated value (in transmission order).
- * @method static string[]       getHeaderValues(string ...$names)                                         Return the values of all specified header(s) as an array (in transmission order).
+ * @method static string[]       getHeaders(string ...$names)                                              Return the headers with the specified names as an associative array of header names/values.
+ * @method static ?string        getHeaderValue(string $name)                                              Return the value of the header with the specified name.
  * @method static mixed          getAttribute(string $name)                                                Return a value stored in the request's variables context under the specified name.
  * @method static mixed[]        getAttributes()                                                           Return all values stored in the request's variables context.
  * @method static void           setAttribute(string $name, mixed $value)                                  Store a value in the request's variables context. May be used to transfer data from controllers or {@link \rosasurfer\ministruts\struts\Action}s * to views.

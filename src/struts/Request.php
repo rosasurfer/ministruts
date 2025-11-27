@@ -60,6 +60,9 @@ class Request extends CObject {
     /** @var ?scalar[][] - normalized array of files uploaded with the request */
     protected ?array $files = null;
 
+    /** @var ?array<string, string> - all received request headers */
+    protected ?array $headers = null;
+
     /** @var mixed[] - additional variables context */
     protected array $attributes = [];
 
@@ -112,7 +115,7 @@ class Request extends CObject {
      */
     public function isAjax(): bool {
         static $isAjax;
-        $isAjax ??= strCompareI($this->getHeader('X-Requested-With'), 'XMLHttpRequest');
+        $isAjax ??= strCompareI($this->getHeaderValue('X-Requested-With'), 'XMLHttpRequest');
         return $isAjax;
     }
 
@@ -624,31 +627,16 @@ class Request extends CObject {
 
 
     /**
-     * Return the first transmitted header with the specified name.
-     *
-     * @param  string $name - header name
-     *
-     * @return ?string - header value or NULL if no such header was transmitted
-     */
-    public function getHeader(string $name): ?string {
-        $headers = $this->getHeaders($name);
-        return \array_shift($headers);
-    }
-
-
-    /**
-     * Return all headers with the specified name as an associative array of header values (in transmitted order).
+     * Return the headers with the specified names as an associative array of header names/values.
+     * Multiple headers of the same name are already collapsed into a single header by PHP.
      *
      * @param  string ...$names [optional] - one or more header names (default: all headers)
      *
-     * @return string[] - associative array of header values
+     * @return array<string, string> - header names/values
      */
     public function getHeaders(string ...$names): array {
-        static $headers = null;
-
-        // read headers only once
-        if ($headers === null) {
-            // headers with custom name representation (names are case-insensitive)
+        if (!isset($this->headers)) {
+            // headers with custom name representation
             $customHeaders = [
                 'CDN'                => 'CDN',
                 'CF_CONNECTING_IP'   => 'CF-Connecting-IP',
@@ -700,42 +688,28 @@ class Request extends CObject {
                 unset($headers[$name]);
                 $headers = [$name => $value] + $headers;
             }
+
+            $this->headers = $headers;
         }
 
         // return all or just the specified headers
         if (!$names) {
-            return $headers;
+            return $this->headers;
         }
-        return \array_intersect_ukey($headers, \array_flip($names), 'strcasecmp');
+        return \array_intersect_ukey($this->headers, \array_flip($names), 'strcasecmp');
     }
 
 
     /**
-     * Return a single value of the specified header/s. If multiple headers are specified or multiple headers have been
-     * transmitted, return all values as one comma-separated value (in transmission order).
+     * Return the value of the header with the specified name.
      *
-     * @param  string ...$names - one or multiple header names
+     * @param  string $name - header name
      *
-     * @return ?string - value or NULL if no such headers have been transmitted
+     * @return ?string - header value or NULL if no such header was received
      */
-    public function getHeaderValue(string ...$names): ?string {
-        $headers = $this->getHeaders(...$names);
-        return $headers ? join(',', $headers) : null;
-    }
-
-
-    /**
-     * Return the values of all specified header(s) as an array (in transmission order).
-     *
-     * @param  string ...$names - one or multiple header names
-     *
-     * @return string[] - values or an empty array if no such headers have been transmitted
-     */
-    public function getHeaderValues(string ...$names): array {
-        $headers = $this->getHeaders(...$names);
-        if (!$headers) return [];
-
-        return \array_map('trim', explode(',', join(',', $headers)));
+    public function getHeaderValue(string $name): ?string {
+        $header = $this->getHeaders($name);
+        return $header ? reset($header) : null;
     }
 
 
