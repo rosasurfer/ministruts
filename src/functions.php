@@ -1165,7 +1165,7 @@ function strCompareI(?string $a, ?string $b): bool {
  * Note: This function simplifies typical use cases and follows common sense. Therefore an empty substring is *not* considered
  * part of every string. That differs from math ideology of PHP creators. Use PHP8's str_contains() if you want math conformity.
  *
- * @see    https://externals.io/message/108562#108646
+ * @link https://externals.io/message/108562#108646
  *
  * @param  string    $haystack
  * @param  string ...$needle - one or more substrings
@@ -1192,7 +1192,7 @@ function strContains(string $haystack, string ...$needle): bool {
  * Note: This function simplifies typical use cases and follows common sense. Therefore an empty substring is *not* considered
  * part of every string. That differs from math ideology of PHP creators.
  *
- * @see    https://externals.io/message/108562#108646
+ * @link https://externals.io/message/108562#108646
  *
  * @param  string    $haystack
  * @param  string ...$needle - one or more substrings
@@ -1219,7 +1219,7 @@ function strContainsI(string $haystack, string ...$needle): bool {
  * Note: This function follows common sense. Therefore *not* every string ends with an empty string.
  * That differs from math ideology of PHP developers. Use PHP8's str_ends_with() if you need math conformity.
  *
- * @see    https://externals.io/message/108562#108646
+ * @link https://externals.io/message/108562#108646
  *
  * @param  string    $string
  * @param  string ...$suffix - one or more suffixes
@@ -1251,7 +1251,7 @@ function strEndsWith(string $string, string ...$suffix): bool {
  * Note: This function follows common sense. Therefore *not* every string ends with an empty string.
  * That differs from math ideology of PHP developers.
  *
- * @see    https://externals.io/message/108562#108646
+ * @link https://externals.io/message/108562#108646
  *
  * @param  string    $string
  * @param  string ...$suffix - one or more suffixes

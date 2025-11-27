@@ -48,7 +48,7 @@ use const rosasurfer\ministruts\NL;
  * empty result before calling <tt>fetchArray()</tt>. There is <b>no</b> workaround to prevent multiple executions of SELECT
  * queries except using a different SQLite adapter, e.g. the PDO SQLite3 adapter.
  *
- * @see  https://bugs.php.net/bug.php?id=64531
+ * @link  https://bugs.php.net/bug.php?id=64531
  */
 class SQLiteConnector extends Connector {
 

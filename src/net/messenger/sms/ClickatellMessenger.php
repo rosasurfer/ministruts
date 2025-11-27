@@ -11,7 +11,7 @@ use rosasurfer\ministruts\net\messenger\Messenger;
  *
  * A {@link rosasurfer\ministruts\net\messenger\Messenger} sending text messages via Clickatell.
  *
- * @see  https://www.clickatell.com/developers/
+ * @link https://www.clickatell.com/developers/
  */
 class ClickatellMessenger extends Messenger {
 

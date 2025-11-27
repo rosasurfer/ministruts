@@ -51,7 +51,7 @@ use const rosasurfer\ministruts\NL;
  * User-defined options can be specified as nested suboptions and are sent to the database as system variables in the
  * scope of the active session.
  *
- * @see  https://www.postgresql.org/docs/9.6/static/libpq-connect.html#LIBPQ-PARAMKEYWORDS)
+ * @link https://www.postgresql.org/docs/9.6/static/libpq-connect.html#LIBPQ-PARAMKEYWORDS)
  */
 class PostgresConnector extends Connector {
 
@@ -399,7 +399,7 @@ class PostgresConnector extends Connector {
      *
      * @return string - UTF-8 encoded value
      *
-     * @see https://www.drupal.org/node/434802
+     * @link https://www.drupal.org/node/434802
      */
     private function fixUtf8Encoding(string $value): string {
         $encoding = mb_detect_encoding($value, null, true);

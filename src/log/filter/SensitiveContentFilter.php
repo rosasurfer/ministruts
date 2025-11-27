@@ -15,7 +15,7 @@ class SensitiveContentFilter extends CObject implements ContentFilterInterface {
     /**
      * @var string[] - sensitive name patterns (case-insensitive partial matching)
      *
-     * @see https://docs.sentry.io/product/data-management-settings/scrubbing/server-side-scrubbing/
+     * @link https://docs.sentry.io/product/data-management-settings/scrubbing/server-side-scrubbing/
      */
     protected array $patterns = [
         'api_key',

@@ -317,7 +317,7 @@ class MailAppender extends BaseAppender {
      *
      * @return string - encoded value
      *
-     * @see    https://tools.ietf.org/html/rfc1522
+     * @link https://tools.ietf.org/html/rfc1522
      */
     protected function encodeNonAsciiChars(string $value): string {
         if (preg_match('/[\x80-\xFF]/', $value)) {
@@ -353,7 +353,7 @@ class MailAppender extends BaseAppender {
      *
      * @return string
      *
-     * @see    https://www.rfc-editor.org/rfc/rfc2822#section-2.1.1
+     * @link https://www.rfc-editor.org/rfc/rfc2822#section-2.1.1
      */
     protected function normalizeLines(string $value): string {
         $limit = 980;                                               // per RFC max 998 chars but e.g. FastMail only accepts 990

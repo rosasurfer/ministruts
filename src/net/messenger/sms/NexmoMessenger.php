@@ -11,7 +11,7 @@ use rosasurfer\ministruts\net\messenger\Messenger;
  *
  * A {@link rosasurfer\ministruts\net\messenger\Messenger} sending text messages via Nexmo.
  *
- * @see  https://docs.nexmo.com/messaging/sms-api
+ * @link https://docs.nexmo.com/messaging/sms-api
  */
 class NexmoMessenger extends Messenger {
 

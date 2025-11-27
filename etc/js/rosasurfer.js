@@ -125,7 +125,7 @@ if ('ab'.substr(-1) != 'b') {
      *
      * @return number - adjusted value
      *
-     * @see    https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/round#Example:_Decimal_rounding
+     * @link   https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/round#Example:_Decimal_rounding
      */
     function decimalAdjust(type, value, exp) {
         // if the exp is undefined or zero...

@@ -119,7 +119,7 @@ class HttpRequest extends CObject {
      *
      * @return $this
      *
-     * @see    https://stackoverflow.com/questions/3241326/set-more-than-one-http-header-with-the-same-name
+     * @link https://stackoverflow.com/questions/3241326/set-more-than-one-http-header-with-the-same-name
      */
     public function addHeader(string $name, string $value): self {
         if (!strlen($name))  throw new InvalidValueException('Invalid parameter $name: '.$name);
