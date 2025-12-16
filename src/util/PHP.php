@@ -357,7 +357,7 @@ class PHP extends StaticClass {
             if     ($bytes <  0) /* 'log_errors' and 'log_errors_max_len' do not affect */                         $issues[] = 'Error: log_errors_max_len is invalid: '.ini_get('log_errors_max_len');
             elseif ($bytes != 0) /* explicit calls to the function error_log()          */                         $issues[] = 'Warn:  log_errors_max_len is not 0: '.ini_get('log_errors_max_len').' [functionality]';
         /*PHP_INI_ALL   */ $errorLog = ini_get('error_log');
-            if (!empty($errorLog) && $errorLog!='syslog') {
+            if (!empty($errorLog) && $errorLog != 'syslog') {
                 if (is_file($errorLog)) {
                     $hFile = @fopen($errorLog, 'ab');         // try to open
                     if (is_resource($hFile)) fclose($hFile);
@@ -404,7 +404,7 @@ class PHP extends StaticClass {
         /*PHP_INI_PERDIR*/ if (ini_get_bytes('upload_max_filesize') >= $postMaxSize)                               $issues[] = 'Error: post_max_size "'.ini_get('post_max_size').'" is not larger than upload_max_filesize "'.ini_get('upload_max_filesize').'" [request handling]';
         /*PHP_INI_SYSTEM*/ $dir = ini_get($name = 'upload_tmp_dir') ?: '';
             $file = null;
-            if (!strlen(trim($dir))) {                                                                             $issues[] = 'Info:  '.$name.' is not set [setup]';
+            if (trim($dir) == '') {                                                                                $issues[] = 'Info:  '.$name.' is not set [setup]';
                 $dir = sys_get_temp_dir();
                 $name = 'sys_get_temp_dir()';
             }
@@ -424,8 +424,15 @@ class PHP extends StaticClass {
 
         // session related settings
         // ------------------------
-        /*PHP_INI_ALL   */ if (ini_get('session.save_handler') != 'files')                                         $issues[] = 'Info:  session.save_handler is not "files": "'.ini_get('session.save_handler').'"';
-        // TODO: check "session.save_path"
+        /*PHP_INI_ALL   */ $handler = ini_get('session.save_handler') ?: '';
+        /*PHP_INI_ALL   */ $dir     = ini_get('session.save_path') ?: '';
+            if ($handler == 'files') {
+                $file = null;
+                if (!is_dir($dir))                                                                                 $issues[] = 'Error: session.save_path "'.$dir.'" is not a valid directory [setup]';
+                elseif (!($file = @tempnam($dir, 'php')) || !strStartsWith(realpath($file), realpath($dir)))       $issues[] = 'Error: session.save_path "'.$dir.'" directory is not writable [setup]';
+                $file && is_file($file) && @unlink($file);
+            }
+            else                                                                                                   $issues[] = 'Info:  session.save_handler is not "files": "'.$handler.'" [setup]';
         /*PHP_INI_ALL   */ if (ini_get('session.serialize_handler') != 'php')                                      $issues[] = 'Info:  session.serialize_handler is not "php": "'.ini_get('session.serialize_handler').'"';
         /*PHP_INI_PERDIR*/ if (ini_get_bool('session.auto_start'))                                                 $issues[] = 'Info:  session.auto_start is not off [performance]';
         /*
