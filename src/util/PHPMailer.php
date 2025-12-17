@@ -17,6 +17,7 @@ use function rosasurfer\ministruts\strLeftTo;
 use function rosasurfer\ministruts\strRightFrom;
 use function rosasurfer\ministruts\strStartsWithI;
 
+use const rosasurfer\ministruts\EOL_UNIX;
 use const rosasurfer\ministruts\EOL_WINDOWS;
 use const rosasurfer\ministruts\WINDOWS;
 
@@ -111,7 +112,7 @@ class PHPMailer extends CObject {
         $rcpt = self::parseAddress($receiver);
         if (!$rcpt) throw new InvalidValueException("Invalid parameter $receiver: $receiver");
         $forced = $config->getString('mail.forced-receiver', '');
-        if (strlen($forced)) {
+        if ($forced != '') {
             $rcpt = self::parseAddress($forced);
             if (!$rcpt) throw new InvalidValueException("Invalid config value \"mail.forced-receiver\": $forced");
         }
@@ -129,41 +130,47 @@ class PHPMailer extends CObject {
         // Subject:
         $subject = $this->encodeNonAsciiChars(trim($subject));
 
-        // encode remaining headers (must be ASCII chars only)
-        foreach ($headers as $i => &$header) {
+        // encode remaining headers to ASCII
+        foreach ($headers as $i => $header) {
             $pattern = '/^([a-z]+(?:-[a-z]+)*): *(.*)/i';
             $match = null;
             if (!preg_match($pattern, $header, $match)) throw new InvalidValueException("Invalid parameter \$headers[$i]: \"$header\"");
             $name   = $match[1];
             $value  = $this->encodeNonAsciiChars(trim($match[2]));
-            $header = $name.': '.$value;
+            $headers[$i] = "$name: $value";
         }
-        unset($header);
 
         // add needed headers
-        $headers[] = 'Content-Type: text/plain; charset=utf-8';
+        $headers[] = 'Content-Type: text/plain; charset=utf-8';             // ASCII is a subset of UTF-8
         $headers[] = 'Content-Transfer-Encoding: quoted-printable';
         $headers[] = 'From: '.trim("$from[name] <$from[address]>");
-        if ($rcpt != $to) {                                                 // on Linux mail() always adds another "To" header (same as RCPT),
+        if ($to != $rcpt) {                                                 // on Linux mail() always adds another "To" header (same as RCPT),
             $headers[] = 'To: '.trim("$to[name] <$to[address]>");           // on Windows it does so only if $headers is missing "To"
         }
+        $headers = join(EOL_WINDOWS, $headers);
 
         // mail body
         $message = str_replace(chr(0), '\0', $message);                     // replace NUL bytes which destroy the mail
-        $message = normalizeEOL($message, EOL_WINDOWS);                     // multiple lines must be separated by CRLF
+        $message = $this->normalizeLines($message);
         $message = quoted_printable_encode($message);
 
-        // TODO: wrap long lines into several shorter ones                  // max 998 chars per RFC but e.g. FastMail only accepts 990
-                                                                            // @see https://tools.ietf.org/html/rfc2822 see 2.1 General description
         $receiver = trim("$rcpt[name] <$rcpt[address]>");
-        $oldSendmail_from = ini_get('sendmail_from');
-        WINDOWS && PHP::ini_set('sendmail_from', $returnPath['address']);
 
-        error_clear_last();
-        $accepted = mail($receiver, $subject, $message, join(EOL_WINDOWS, $headers), "-f $returnPath[address]");
-        if (!$accepted) throw new RuntimeException(error_get_last()['message'] ?? __METHOD__.'(): email was not accepted for delivery');
-
-        WINDOWS && PHP::ini_set('sendmail_from', $oldSendmail_from);
+        // send mail
+        if (WINDOWS) {
+            $prevSendmailFrom = ini_get('sendmail_from') ?: '';
+            PHP::ini_set('sendmail_from', $returnPath['address']);
+        }
+        try {
+            error_clear_last();
+            $success = mail($receiver, $subject, $message, $headers, "-f $returnPath[address]");
+            if (!$success) throw new RuntimeException(error_get_last()['message'] ?? __METHOD__.'(): email was not accepted for delivery');
+        }
+        finally {
+            if (WINDOWS) {
+                PHP::ini_set('sendmail_from', $prevSendmailFrom);
+            }
+        }
         return true;
     }
 
@@ -197,13 +204,39 @@ class PHPMailer extends CObject {
 
 
     /**
+     * Wrap long lines and ensure RFC-compliant line endings.
+     *
+     * @param  string $value
+     *
+     * @return string
+     *
+     * @link https://www.rfc-editor.org/rfc/rfc2822#section-2.1.1
+     */
+    protected function normalizeLines(string $value): string {
+        $limit = 980;                                               // per RFC max 998 chars but e.g. FastMail only accepts 990
+        $lines = explode(EOL_UNIX, normalizeEOL($value, EOL_UNIX));
+
+        $results = [];
+        foreach ($lines as $line) {
+            if (strlen($line) > $limit) {
+                $results = array_merge($results, str_split($line, $limit));
+            }
+            else {
+                $results[] = $line;
+            }
+        }
+        return join(EOL_WINDOWS, $results);
+    }
+
+
+    /**
      * Parse a full email address "FirstName LastName <user@domain.tld>" into name and address part.
      *
      * @param  string $value
      *
      * @return string[] - name and address part or an empty array if the specified address is invalid
      */
-    public function parseAddress(string $value): array {
+    protected function parseAddress(string $value): array {
         $value = trim($value);
 
         if (strEndsWith($value, '>')) {

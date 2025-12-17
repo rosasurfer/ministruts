@@ -5,9 +5,11 @@ namespace rosasurfer\ministruts\log\appender;
 
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\InvalidTypeException;
+use rosasurfer\ministruts\core\exception\RuntimeException;
 use rosasurfer\ministruts\log\Logger;
 use rosasurfer\ministruts\log\LogMessage;
 use rosasurfer\ministruts\log\detail\Request;
+use rosasurfer\ministruts\util\PHP;
 
 use function rosasurfer\ministruts\normalizeEOL;
 use function rosasurfer\ministruts\preg_match;
@@ -48,9 +50,12 @@ use const rosasurfer\ministruts\WINDOWS;
  *  'details.server'     = (bool)           // whether server details are attached to log messages from the CLI interface (default: no)
  *  'filter'             = {classname}      // content filter to apply to the resulting output (default: none)
  *  'aggregate-messages' = (bool)           // whether to group messages per HTTP request/CLI call (default: see self::getDefaultAggregation())
- *  'sender'             = {email-address}  // sender address of log messages (default: php.ini setting "sendmail_from")
+ *  'sender'             = {email-address}  // sender address of log messages (default: "php.ini" setting "sendmail_from")
  *  'receiver'           = {email-address}  // required: one or more receiver addresses separated by comma ","
  *  'headers'            = string[]         // zero or more additional MIME headers, e.g. "CC: user@domain.tld" (default: none)
+ *  'options'            = []               // mail delivery options (default: use configuration of "php.ini")
+ *  'options.smtp'       = {hostname|ip}    // host name or IP address of the SMTP server to be used for mail delivery (default: "php.ini" setting "SMTP")
+ *  'options.smtp_port'  = (int)            // SMTP server port to be used for mail delivery (default: "php.ini" setting "smtp_port")
  * </pre>
  */
 class MailAppender extends BaseAppender {
@@ -61,10 +66,10 @@ class MailAppender extends BaseAppender {
     /** @var string[] - one or more mail receivers */
     protected array $receivers = [];
 
-    /** @var string[] - additional mail headers, if any */
+    /** @var string[] - additional mail headers (if any) */
     protected array $headers = [];
 
-    /** @var bool - whether to aggregate multiple messages per request or process */
+    /** @var bool - whether to aggregate multiple messages per request/process */
     protected bool $aggregateMessages;
 
     /** @var LogMessage[] - collected messages */
@@ -87,7 +92,7 @@ class MailAppender extends BaseAppender {
             $sender = $this->parseAddress($sender);
             if (!$sender) throw new InvalidValueException("Invalid parameter \$options[sender]: \"$sender\"");
         }
-        elseif (!is_null($sender)) {
+        elseif (isset($sender)) {
             throw new InvalidTypeException('Invalid type of parameter $options[sender]: ('.gettype($sender).')');
         }
         else {
@@ -247,7 +252,7 @@ class MailAppender extends BaseAppender {
         // Return-Path: (invisible sender)
         $returnPath = $this->sender;
         $value = $this->removeHeader($headers, 'Return-Path');
-        if (is_string($value)) {
+        if (isset($value)) {
             $returnPath = $this->parseAddress($value);
             if (!$returnPath) throw new InvalidValueException("Invalid header \"Return-Path: $value\"");
         }
@@ -255,7 +260,7 @@ class MailAppender extends BaseAppender {
         // From: (visible sender)
         $from = $this->sender;
         $value = $this->removeHeader($headers, 'From');
-        if (is_string($value)) {
+        if (isset($value)) {
             $from = $this->parseAddress($value);
             if (!$from) throw new InvalidValueException("Invalid header \"From: $value\"");
         }
@@ -270,41 +275,43 @@ class MailAppender extends BaseAppender {
         // Subject:
         $subject = $this->encodeNonAsciiChars(trim($subject));
 
-        // remaining headers
-        foreach ($headers as &$header) {
+        // encode remaining headers to ASCII
+        foreach ($headers as $i => $header) {
             $pattern = '/^([a-z]+(?:-[a-z]+)*): *(.*)/i';
             $match = null;
-            if (!preg_match($pattern, $header, $match)) throw new InvalidValueException("Invalid header \"$header\"");
-            $name   = $match[1];
-            $value  = $this->encodeNonAsciiChars(trim($match[2]));
-            $header = "$name: $value";
+            if (!preg_match($pattern, $header, $match)) throw new InvalidValueException("Invalid parameter \$headers[$i]: \"$header\"");
+            $name  = $match[1];
+            $value = $this->encodeNonAsciiChars(trim($match[2]));
+            $headers[$i] = "$name: $value";
         }
-        unset($header);
 
-        $headers[] = 'X-Mailer: Microsoft Office Outlook 11';           // save us from Hotmail junk folder
-        $headers[] = 'X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2900.2180';
+        // add needed headers
         $headers[] = 'Content-Type: text/plain; charset=utf-8';         // ASCII is a subset of UTF-8
+        $headers[] = 'Content-Transfer-Encoding: quoted-printable';
         $headers[] = "From: <$from>";
-        if ($to != $rcpt) {                                             // Linux-PHP always sets the "To:" header (to RCPT) and doesn't check for a custom header
-            $headers[] = "To: <$to>";                                   // Windows-PHP sets the "To:" header (to RCPT) only if no custom header is given
+        if ($to != $rcpt) {                                             // on Linux mail() always adds another "To" header (same as RCPT),
+            $headers[] = "To: <$to>";                                   // on Windows it does so only if $headers is missing "To"
         }
         $headers = join(EOL_WINDOWS, $headers);
 
         // mail body
         $message = str_replace(chr(0), '\0', $message);                 // replace NUL bytes which destroy the mail
         $message = $this->normalizeLines($message);
+        $message = quoted_printable_encode($message);
 
         // send mail
         if (WINDOWS) {
             $prevSendmailFrom = ini_get('sendmail_from') ?: '';
-            ini_set('sendmail_from', $returnPath);
+            PHP::ini_set('sendmail_from', $returnPath);
         }
         try {
-            mail("<$receiver>", $subject, $message, $headers, "-f $returnPath");
+            error_clear_last();
+            $success = mail("<$receiver>", $subject, $message, $headers, "-f $returnPath");
+            if (!$success) throw new RuntimeException(error_get_last()['message'] ?? __METHOD__.'(): email was not accepted for delivery');
         }
         finally {
             if (WINDOWS) {
-                ini_set('sendmail_from', $prevSendmailFrom);
+                PHP::ini_set('sendmail_from', $prevSendmailFrom);
             }
         }
     }
