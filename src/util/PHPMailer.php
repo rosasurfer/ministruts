@@ -5,7 +5,6 @@ namespace rosasurfer\ministruts\util;
 
 use rosasurfer\ministruts\config\ConfigInterface as Config;
 use rosasurfer\ministruts\core\CObject;
-use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 
@@ -77,7 +76,7 @@ class PHPMailer extends CObject {
         // first validate the additional headers
         foreach ($headers as $i => $header) {
             if (!preg_match('/^[a-z]+(-[a-z]+)*:/i', $header)) {
-                throw new InvalidValueException('Invalid parameter $headers['.$i.']: "'.$header.'"');
+                throw new InvalidValueException("Invalid parameter \$headers[$i]: \"$header\"");
             }
         }
 
@@ -91,40 +90,39 @@ class PHPMailer extends CObject {
 
         // Return-Path: (invisible sender)
         $returnPath = self::parseAddress($sender);
-        if (!$returnPath)                  throw new InvalidValueException('Invalid parameter $sender: '.$sender);
+        if (!$returnPath) throw new InvalidValueException("Invalid parameter \$sender: $sender");
         $value = $this->removeHeader($headers, 'Return-Path');
         if (isset($value)) {
             $returnPath = self::parseAddress($value);
-            if (!$returnPath)              throw new InvalidValueException('Invalid header "Return-Path: '.$value.'"');
+            if (!$returnPath) throw new InvalidValueException("Invalid header \"Return-Path: $value\"");
         }
 
         // From: (visible sender)
         $from = self::parseAddress($sender);
-        if (!$from)                        throw new InvalidValueException('Invalid parameter $sender: '.$sender);
+        if (!$from) throw new InvalidValueException("Invalid parameter \$sender: $sender");
         $value = $this->removeHeader($headers, 'From');
         if (isset($value)) {
             $from = self::parseAddress($value);
-            if (!$from)                    throw new InvalidValueException('Invalid header "From: '.$value.'"');
+            if (!$from) throw new InvalidValueException("Invalid header \"From: $value\"");
         }
         $from = $this->encodeNonAsciiChars($from);
 
         // RCPT: (receiving mailbox)
         $rcpt = self::parseAddress($receiver);
-        if (!$rcpt)                        throw new InvalidValueException('Invalid parameter $receiver: '.$receiver);
-        $forced = $config->get('mail.forced-receiver', '');
-        Assert::string($forced, 'config value "mail.forced-receiver"');
+        if (!$rcpt) throw new InvalidValueException("Invalid parameter $receiver: $receiver");
+        $forced = $config->getString('mail.forced-receiver', '');
         if (strlen($forced)) {
             $rcpt = self::parseAddress($forced);
-            if (!$rcpt)                    throw new InvalidValueException('Invalid config value "mail.forced-receiver": '.$forced);
+            if (!$rcpt) throw new InvalidValueException("Invalid config value \"mail.forced-receiver\": $forced");
         }
 
         // To: (visible receiver)
         $to = self::parseAddress($receiver);
-        if (!$to)                          throw new InvalidValueException('Invalid parameter $receiver: '.$receiver);
+        if (!$to) throw new InvalidValueException("Invalid parameter \$receiver: $receiver");
         $value = $this->removeHeader($headers, 'To');
         if (isset($value)) {
             $to = self::parseAddress($value);
-            if (!$to)                      throw new InvalidValueException('Invalid header "To: '.$value.'"');
+            if (!$to) throw new InvalidValueException("Invalid header \"To: $value\"");
         }
         $to = $this->encodeNonAsciiChars($to);
 
@@ -135,21 +133,19 @@ class PHPMailer extends CObject {
         foreach ($headers as $i => &$header) {
             $pattern = '/^([a-z]+(?:-[a-z]+)*): *(.*)/i';
             $match = null;
-            if (!preg_match($pattern, $header, $match)) throw new InvalidValueException('Invalid parameter $headers['.$i.']: "'.$header.'"');
+            if (!preg_match($pattern, $header, $match)) throw new InvalidValueException("Invalid parameter \$headers[$i]: \"$header\"");
             $name   = $match[1];
             $value  = $this->encodeNonAsciiChars(trim($match[2]));
             $header = $name.': '.$value;
         }
         unset($header);
 
-        // add more needed headers
-        $headers[] = 'X-Mailer: Microsoft Office Outlook 11';               // save us from Hotmail junk folder
-        $headers[] = 'X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2900.2180';
+        // add needed headers
         $headers[] = 'Content-Type: text/plain; charset=utf-8';
         $headers[] = 'Content-Transfer-Encoding: quoted-printable';
-        $headers[] = 'From: '.trim($from['name'].' <'.$from['address'].'>');
-        if ($rcpt != $to) {                                                 // on Linux mail() always adds another "To:" header (same as RCPT),
-            $headers[] = 'To: '.trim($to['name'].' <'.$to['address'].'>');  // on Windows only if $headers is missing one
+        $headers[] = 'From: '.trim("$from[name] <$from[address]>");
+        if ($rcpt != $to) {                                                 // on Linux mail() always adds another "To" header (same as RCPT),
+            $headers[] = 'To: '.trim("$to[name] <$to[address]>");           // on Windows it does so only if $headers is missing "To"
         }
 
         // mail body
@@ -159,12 +155,12 @@ class PHPMailer extends CObject {
 
         // TODO: wrap long lines into several shorter ones                  // max 998 chars per RFC but e.g. FastMail only accepts 990
                                                                             // @see https://tools.ietf.org/html/rfc2822 see 2.1 General description
+        $receiver = trim("$rcpt[name] <$rcpt[address]>");
         $oldSendmail_from = ini_get('sendmail_from');
         WINDOWS && PHP::ini_set('sendmail_from', $returnPath['address']);
-        $receiver = trim($rcpt['name'].' <'.$rcpt['address'].'>');
 
         error_clear_last();
-        $accepted = mail($receiver, $subject, $message, join(EOL_WINDOWS, $headers), '-f '.$returnPath['address']);
+        $accepted = mail($receiver, $subject, $message, join(EOL_WINDOWS, $headers), "-f $returnPath[address]");
         if (!$accepted) throw new RuntimeException(error_get_last()['message'] ?? __METHOD__.'(): email was not accepted for delivery');
 
         WINDOWS && PHP::ini_set('sendmail_from', $oldSendmail_from);
