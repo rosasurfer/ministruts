@@ -287,7 +287,7 @@ class MailAppender extends BaseAppender {
 
         // add needed headers
         $headers[] = 'Content-Type: text/plain; charset=utf-8';         // ASCII is a subset of UTF-8
-        $headers[] = 'Content-Transfer-Encoding: quoted-printable';
+        $headers[] = 'Content-Transfer-Encoding: 8bit';
         $headers[] = "From: <$from>";
         if ($to != $rcpt) {                                             // on Linux mail() always adds another "To" header (same as RCPT),
             $headers[] = "To: <$to>";                                   // on Windows it does so only if $headers is missing "To"
@@ -297,7 +297,6 @@ class MailAppender extends BaseAppender {
         // mail body
         $message = str_replace(chr(0), '\0', $message);                 // replace NUL bytes which destroy the mail
         $message = $this->normalizeLines($message);
-        $message = quoted_printable_encode($message);
 
         // send mail
         if (WINDOWS) {
