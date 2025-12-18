@@ -19,13 +19,16 @@ class SensitiveContentFilter extends CObject implements ContentFilterInterface {
      */
     protected array $patterns = [
         'api_key',
+        'api-key',
         'apikey',
         'auth',
         'bearer',
         'credential',
         'mysql_pwd',
+        'mysql-pwd',
         'pass',
         'private_key',
+        'private-key',
         'privatekey',
         'secret',
         'token',
