@@ -45,17 +45,20 @@ use const rosasurfer\ministruts\WINDOWS;
  *  'enabled'            = (bool)           // whether the appender is enabled (default: no)
  *  'loglevel'           = (int|string)     // appender loglevel (default: application loglevel)
  *  'details.trace'      = (bool)           // whether a stacktrace is attached to log messages (default: yes)
- *  'details.request'    = (bool)           // whether HTTP request details are attached to log messages from the web interface (default: yes)
- *  'details.session'    = (bool)           // whether HTTP session details are attached to log messages from the web interface (default: yes)
- *  'details.server'     = (bool)           // whether server details are attached to log messages from the CLI interface (default: no)
+ *  'details.request'    = (bool)           // whether HTTP request details are attached to log messages (default: yes)
+ *  'details.session'    = (bool)           // whether HTTP session details are attached to log messages (default: yes)
+ *  'details.server'     = (bool)           // whether server details are attached to log messages (default: no)
  *  'filter'             = {classname}      // content filter to apply to the resulting output (default: none)
  *  'aggregate-messages' = (bool)           // whether to group messages per HTTP request/CLI call (default: see self::getDefaultAggregation())
- *  'sender'             = {email-address}  // sender address of log messages (default: "php.ini" setting "sendmail_from")
+ *  'sender'             = {email-address}  // sender address (default: "php.ini" setting "sendmail_from")
  *  'receiver'           = {email-address}  // required: one or more receiver addresses separated by comma ","
- *  'headers'            = string[]         // zero or more additional MIME headers, e.g. "CC: user@domain.tld" (default: none)
- *  'options'            = []               // mail delivery options (default: use configuration of "php.ini")
- *  'options.smtp'       = {hostname|ip}    // host name or IP address of the SMTP server to be used for mail delivery (default: "php.ini" setting "SMTP")
- *  'options.smtp_port'  = (int)            // SMTP server port to be used for mail delivery (default: "php.ini" setting "smtp_port")
+ *  'headers'            = string[]         // array of additional MIME headers, e.g. "CC: user@domain.tld" (default: none)
+ *
+ *  'smtp.hostname'      = {hostname|ip}    // host name or IP address of the SMTP server to be used for mail delivery (default: "php.ini" setting "SMTP")
+ *  'smtp.port'          = (int)            // port of the SMTP server to be used for mail delivery (default: "php.ini" setting "smtp_port")
+ *  'smtp.auth'          = (string)         // SMTP authentication type
+ *  'smtp.user'          = (string)         // SMTP authentication username
+ *  'smtp.pass'          = (string)         // SMTP authentication password
  * </pre>
  */
 class MailAppender extends BaseAppender {
