@@ -36,6 +36,26 @@ class Assert extends StaticClass {
 
 
     /**
+     * Ensure that the passed value is not NULL.
+     *
+     * @param  mixed    $value
+     * @param  string   $message [optional] - value identifier or description
+     * @param  mixed ...$args    [optional] - additional message arguments
+     *
+     * @return bool
+     *
+     * @phpstan-return ($value is null ? false : true)
+     * @phpstan-assert !null $value
+     */
+    public static function notNull($value, string $message = '', ...$args): bool {
+        if (!isset($value)) {
+            throw new InvalidValueException("NULL: $message");
+        }
+        return true;
+    }
+
+
+    /**
      * Ensure that the passed value is considered "empty".
      *
      * @param  mixed    $value
@@ -567,8 +587,7 @@ class Assert extends StaticClass {
      * @return string - generated error message
      */
     protected static function illegalTypeMessage($value, string $expectedType, string $message, array $args): string {
-        $message = (string) $message;
-        if (strlen($message)) {
+        if ($message != '') {
             if (strContains($message, '%')) {
                 $message = sprintf($message, ...$args);
             }

@@ -11,11 +11,17 @@ namespace rosasurfer\ministruts\net\mail;
 class SmtpMailer extends Mailer {
 
     /**
-     * Constructor
-     *
-     * @param  mixed[] $options [optional] - mailer configuration
+     * {@inheritDoc}
      */
     public function __construct(array $options = []) {
         parent::__construct($options);
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    public function sendMail(?string $sender, string $receiver, string $subject, string $message, array $headers = []): bool {
+        return false;
     }
 }
