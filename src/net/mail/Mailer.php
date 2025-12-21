@@ -63,7 +63,7 @@ abstract class Mailer extends CObject {
 
         // use SMTP mailer for direct MTA delivery
         $smtp = $options['smtp'] ?? null;
-        if (false && isset($smtp) && Assert::isArray($smtp, '$options[smtp]')) {
+        if (false && isset($smtp) && Assert::isArray($smtp, '$options[smtp]')) {    // @phpstan-ignore-line
             return new SmtpMailer($options);
         }
 

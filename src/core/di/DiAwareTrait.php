@@ -25,7 +25,7 @@ trait DiAwareTrait {
      */
     protected static function di(?string $name = null): object {
         $di = Application::getDi();
-        if (!$di) throw new RuntimeException('Application not initialized');
+        if (!$di) throw new RuntimeException('Application not initialized, $di = NULL');
 
         if (isset($name)) {
             return $di->get($name);
