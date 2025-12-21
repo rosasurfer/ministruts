@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace rosasurfer\ministruts\util;
+namespace rosasurfer\ministruts\net\mail;
 
 use rosasurfer\ministruts\config\ConfigInterface as Config;
-use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
+use rosasurfer\ministruts\util\PHP;
 
 use function rosasurfer\ministruts\normalizeEOL;
 use function rosasurfer\ministruts\preg_match;
@@ -24,16 +24,9 @@ use const rosasurfer\ministruts\WINDOWS;
 /**
  * PHPMailer
  *
- * A mailer sending email using the built-in PHP function mail().
+ * A mailer sending email using the built-in function mail().
  */
-class PHPMailer extends CObject {
-
-    /** @var scalar[] */
-    protected array $options;
-
-    /** @var string */
-    protected string $hostName;
-
+class PHPMailer extends Mailer {
 
     /**
      * Constructor
@@ -41,25 +34,19 @@ class PHPMailer extends CObject {
      * @param  mixed[] $options [optional] - mailer configuration
      */
     public function __construct(array $options = []) {
-        $this->options = $options;
-
-        // get our hostname
-        $hostName = php_uname('n');
-        if (!$hostName)
-            $hostName  = 'localhost';
-        if (!strContains($hostName, '.'))
-            $hostName .= '.localdomain';            // hostname must contain more than one part (see RFC 2821)
-        $this->hostName = strtolower($hostName);
+        parent::__construct($options);
     }
 
-
     /**
-     * Send an email. Sender and receiver addresses can be specified in simple or full format. The simple format
-     * can be specified with or without angle brackets. If an empty sender is specified the mail is sent from the
-     * current user.
+     * Sends an email. Sender and receiver addresses can be specified in simple or full format. The simple format
+     * can be specified with or without angle brackets.
      *
-     * @param  ?string  $sender             - mail sender (From:), full format: "FirstName LastName <user@domain.tld>"
-     * @param  string   $receiver           - mail receiver (To:), full format: "FirstName LastName <user@domain.tld>"
+     *  - full address format:                          "Name part <user@domain.tld>"
+     *  - simple address format with angel brackets:    "<user@domain.tld>"
+     *  - simple address format without angel brackets: "user@domain.tld"
+     *
+     * @param  ?string  $sender             - mail sender (From:), if empty the mail is sent from the current user
+     * @param  string   $receiver           - mail receiver (To:)
      * @param  string   $subject            - mail subject
      * @param  string   $message            - mail body
      * @param  string[] $headers [optional] - additional MIME headers (default: none)
@@ -81,11 +68,18 @@ class PHPMailer extends CObject {
             }
         }
 
-        // auto-complete sender if not specified
-        if (!isset($sender)) {
+        // auto-complete an empty sender
+        if (($sender ?? '') == '') {
             $sender = $config->get('mail.from', ini_get('sendmail_from') ?: '');
-            if (!strlen($sender)) {
-                $sender = strtolower(get_current_user().'@'.$this->hostName);
+            if ($sender == '') {
+                $hostName = php_uname('n');
+                if (!$hostName) {
+                    $hostName  = 'localhost';
+                }
+                if (!strContains($hostName, '.')) {
+                    $hostName .= '.localdomain';                // hostname must contain more than one part (see RFC 2821)
+                }
+                $sender = strtolower(get_current_user()."@$hostName");
             }
         }
 
@@ -141,8 +135,8 @@ class PHPMailer extends CObject {
         }
 
         // add needed headers
-        $headers[] = 'Content-Type: text/plain; charset=utf-8';             // ASCII is a subset of UTF-8
         $headers[] = 'Content-Transfer-Encoding: 8bit';
+        $headers[] = 'Content-Type: text/plain; charset=utf-8';             // ASCII is a subset of UTF-8
         $headers[] = 'From: '.trim("$from[name] <$from[address]>");
         if ($to != $rcpt) {                                                 // on Linux mail() always adds another "To" header (same as RCPT),
             $headers[] = 'To: '.trim("$to[name] <$to[address]>");           // on Windows it does so only if $headers is missing "To"
@@ -227,13 +221,13 @@ class PHPMailer extends CObject {
         return join(EOL_WINDOWS, $results);
     }
 
-
     /**
      * Parse a full email address "FirstName LastName <user@domain.tld>" into name and address part.
      *
      * @param  string $value
      *
-     * @return string[] - name and address part or an empty array if the specified address is invalid
+     * @return string[] - name and address part or an empty array if the passed address is invalid
+     * @phpstan-return array{name:string, address:string}|array{}
      */
     protected function parseAddress(string $value): array {
         $value = trim($value);
@@ -258,7 +252,6 @@ class PHPMailer extends CObject {
         }
         return [];
     }
-
 
     /**
      * Search for a given header and return its value. If the array contains multiple headers of that name the last such
@@ -333,7 +326,7 @@ class PHPMailer extends CObject {
 
         // TODO: see https://tools.ietf.org/html/rfc1522
         //
-        // An encoded-word may not be more than 75 characters long, including charset,
+        // An encoded-word must not be more than 75 characters long, including charset,
         // encoding, encoded-text, and delimiters.  If it is desirable to encode more
         // text than will fit in an encoded-word of 75 characters, multiple encoded-words
         // (separated by SPACE or newline) may be used.  Message header lines that contain
