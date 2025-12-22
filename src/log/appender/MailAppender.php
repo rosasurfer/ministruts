@@ -42,7 +42,7 @@ use const rosasurfer\ministruts\NL;
  *  'filter'                = {classname}       // content filter to apply to the resulting output (default: none)
  *  'aggregate-messages'    = (bool)            // whether to group messages per HTTP request/CLI call (default: see self::getDefaultAggregation())
  *  'sender'                = {email-address}   // sender address (default: .ini setting "sendmail_from")
- *  'receivers'             = {email-address}   // one or more receiver addresses separated by comma "," (required)
+ *  'receiver'              = {email-address}   // one or more receiver addresses separated by comma "," (required)
  *  'headers'               = string[]          // optional array of additional MIME headers, e.g. "Cc: user@domain.tld" (default: none)
  *  'options'               = []                // optional mailer options, see {@link \rosasurfer\ministruts\net\mail\Mailer::create()}
  * </pre>
@@ -80,20 +80,20 @@ class MailAppender extends BaseAppender {
         Assert::nullOrString($sender, '$options[sender]');
         $this->sender = $sender;
 
-        // receivers (required)
-        $receivers = $options['receivers'] ?? null;
-        Assert::notNull($receivers, 'Missing parameter $options[receivers]: (empty)');
+        // receiver (required)
+        $receivers = $options['receiver'] ?? null;
+        Assert::notNull($receivers, 'Missing parameter $options[receiver]: (empty)');
         if (is_string($receivers)) {
             $receivers = explode(',', $receivers);
         }
-        Assert::isArray($receivers, 'Invalid type of parameter \$options[receivers]: ('.gettype($options['receivers']).')');
+        Assert::isArray($receivers, 'Invalid type of parameter \$options[receiver]: ('.gettype($options['receiver']).')');
         foreach ($receivers as $i => $receiver) {
             $receiver = trim($receiver);
             if ($receiver == '') {
                 unset($receivers[$i]);
             }
         }
-        if (!$receivers) throw new InvalidValueException('Invalid parameter $options[receivers]: (empty)');
+        if (!$receivers) throw new InvalidValueException('Invalid parameter $options[receiver]: (empty)');
         $this->receivers = $receivers;
 
         // additional headers (optional)
@@ -196,7 +196,7 @@ class MailAppender extends BaseAppender {
         Assert::isArray($options, 'config "log.appender.mail.options"');
         $mailer ??= Mailer::create($options);
 
-        // send a separate email to each receiver (use header "Cc: receiver2, receiver3..." to send a single mail to all receivers
+        // send a separate email to each receiver (use "Cc:" or "Bcc:" to send a single mail to all receivers
         foreach ($this->receivers as $receiver) {
             $mailer->sendMail($this->sender, $receiver, $subject, $msg, $this->headers);
         }

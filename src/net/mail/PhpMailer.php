@@ -9,21 +9,19 @@ use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 use rosasurfer\ministruts\util\PHP;
 
-use function rosasurfer\ministruts\normalizeEOL;
 use function rosasurfer\ministruts\preg_match;
 use function rosasurfer\ministruts\strContains;
 use function rosasurfer\ministruts\strStartsWithI;
 
-use const rosasurfer\ministruts\EOL_UNIX;
 use const rosasurfer\ministruts\EOL_WINDOWS;
 use const rosasurfer\ministruts\WINDOWS;
 
 /**
- * PHPMailer
+ * PhpMailer
  *
  * A mailer sending email using the built-in function mail().
  */
-class PHPMailer extends Mailer {
+class PhpMailer extends Mailer {
 
     /**
      * {@inheritDoc}
@@ -45,9 +43,9 @@ class PHPMailer extends Mailer {
         /** @var Config $config */
         $config = $this->di('config');
 
-        // validate and decode additional headers               // @todo fix algorithm
+        // validate additional headers                          // @todo fix algorithm
         foreach ($headers as $i => $header) {
-            Assert::string($header, "\$headers[$i]");           // @phpstan-ignore staticMethod.alreadyNarrowedType
+            Assert::string($header, "\$headers[$i]");           // @phpstan-ignore staticMethod.alreadyNarrowedType (derived from annotation)
             if (!preg_match('/^[a-z]+(-[a-z]+)*:/i', $header)) {
                 throw new InvalidValueException("Invalid parameter \$headers[$i]: \"$header\"");
             }
@@ -114,7 +112,7 @@ class PHPMailer extends Mailer {
             $headers[$i] = "$name: $value";
         }
 
-        // add needed headers                                   // @todo remove existing headers
+        // add more headers                                     // @todo remove existing headers
         $headers[] = 'Content-Transfer-Encoding: 8bit';
         $headers[] = 'Content-Type: text/plain; charset=utf-8';             // ASCII is a subset of UTF-8
         $headers[] = 'From: '.trim("$from[name] <$from[address]>");
@@ -173,32 +171,6 @@ class PHPMailer extends Mailer {
         //       and keep the mail script sending in background with "output_buffering" enabled. As the output buffer is
         //       never full from just a redirect header PHP is waiting for the shutdown function to finish as it might
         //       push more content into the buffer. Maybe "output_buffering" can be disabled when entering shutdown?
-    }
-
-
-    /**
-     * Wrap long lines and ensure RFC-compliant line endings.
-     *
-     * @param  string $value
-     *
-     * @return string
-     *
-     * @link https://www.rfc-editor.org/rfc/rfc2822#section-2.1.1
-     */
-    protected function normalizeLines(string $value): string {
-        $limit = 980;                                               // per RFC max 998 chars but e.g. FastMail only accepts 990
-        $lines = explode(EOL_UNIX, normalizeEOL($value, EOL_UNIX));
-
-        $results = [];
-        foreach ($lines as $line) {
-            if (strlen($line) > $limit) {
-                $results = array_merge($results, str_split($line, $limit));
-            }
-            else {
-                $results[] = $line;
-            }
-        }
-        return join(EOL_WINDOWS, $results);
     }
 
 

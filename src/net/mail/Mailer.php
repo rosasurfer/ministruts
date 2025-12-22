@@ -7,10 +7,14 @@ use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 
+use function rosasurfer\ministruts\normalizeEOL;
 use function rosasurfer\ministruts\strEndsWith;
 use function rosasurfer\ministruts\strLeft;
 use function rosasurfer\ministruts\strLeftTo;
 use function rosasurfer\ministruts\strRightFrom;
+
+use const rosasurfer\ministruts\EOL_UNIX;
+use const rosasurfer\ministruts\EOL_WINDOWS;
 
 /**
  * Mailer
@@ -62,7 +66,7 @@ abstract class Mailer extends CObject {
         }
 
         // use SMTP mailer for direct MTA delivery
-        $smtp = $options['smtp_'] ?? null;                                  // temporarily disable
+        $smtp = $options['smtp'] ?? null;
         if (isset($smtp) && Assert::isArray($smtp, '$options[smtp]')) {
             return new SmtpMailer($options);
         }
@@ -70,7 +74,7 @@ abstract class Mailer extends CObject {
         // @todo CliMailer
 
         // all other cases: use the built-in mailer
-        return new PHPMailer($options);
+        return new PhpMailer($options);
     }
 
 
@@ -81,11 +85,9 @@ abstract class Mailer extends CObject {
      *
      * @return string[] - name and address part or an empty array if the passed address is invalid
      * @phpstan-return array{name:string, address:string}|array{}
-     *
-     * @todo  The algorithm must account for trailing comments.
      */
     public static function parseAddress(string $value): array {
-        $value = trim($value);
+        $value = trim($value);                                  // @todo The algorithm must account for trailing comments.
 
         if (strEndsWith($value, '>')) {
             // closing angle bracket found, check for a matching opening bracket
@@ -110,18 +112,44 @@ abstract class Mailer extends CObject {
 
 
     /**
-     * Send an email. Sender and receiver addresses can be specified in simple or full format. Simple format can be specified
-     * with or without angle brackets.
+     * Wrap long lines and ensure RFC-compliant line endings.
      *
-     *  - full format:                          "display name <user@domain.tld>"
-     *  - simple format with angel brackets:    "<user@domain.tld>"
-     *  - simple format without angel brackets: "user@domain.tld"
+     * @param  string $value
+     *
+     * @return string
+     *
+     * @link https://www.rfc-editor.org/rfc/rfc2822#section-2.1.1
+     */
+    protected function normalizeLines(string $value): string {
+        $limit = 980;                                               // per RFC max 998 chars but e.g. FastMail only accepts 990
+        $lines = explode(EOL_UNIX, normalizeEOL($value, EOL_UNIX));
+
+        $results = [];
+        foreach ($lines as $line) {
+            if (strlen($line) > $limit) {
+                $results = array_merge($results, str_split($line, $limit));
+            }
+            else {
+                $results[] = $line;
+            }
+        }
+        return join(EOL_WINDOWS, $results);
+    }
+
+
+    /**
+     * Send an email. Sender and receiver addresses may be specified in simple or full format. Simple format may be specified with
+     * or without angle brackets.
+     *
+     *  - full format:                          "display name <user@domain.tld>" </br>
+     *  - simple format with angel brackets:    "<user@domain.tld>"              </br>
+     *  - simple format without angel brackets: "user@domain.tld"                </br>
      *
      * @param  ?string  $sender             - mail sender, if empty the mail is sent from .ini setting "sendmail_from" or the current user
      * @param  string   $receiver           - mail receiver
      * @param  string   $subject            - mail subject
      * @param  string   $message            - mail body
-     * @param  string[] $headers [optional] - additional MIME headers, encoded or unencoded (default: none)
+     * @param  string[] $headers [optional] - additional headers, plain text or MIME encoded (default: none)
      *
      * @return bool - whether the email was accepted for delivery (not whether it was indeed sent)
      */
