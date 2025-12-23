@@ -61,9 +61,17 @@ class Request extends CObject {
                 'CDN'                => 'CDN',
                 'CF_CONNECTING_IP'   => 'CF-Connecting-IP',
                 'CLIENT_IP'          => 'Client-IP',
+                'CONTENT_ID'         => 'Content-ID',
+                'CONTENT_MD5'        => 'Content-MD5',
+                'DASL'               => 'DASL',
+                'DAV'                => 'DAV',
                 'DNT'                => 'DNT',
+                'ETAG'               => 'ETag',
+                'MIME_VERSION'       => 'MIME-Version',
                 'SEC_GPC'            => 'Sec-GPC',
+                'TE'                 => 'TE',
                 'TRUE_CLIENT_IP'     => 'True-Client-IP',
+                'WWW_AUTHENTICATE'   => 'WWW-Authenticate',
                 'X_CDN'              => 'X-CDN',
                 'X_MINISTRUTS_UI'    => 'X-Ministruts-UI',
                 'X_REAL_IP'          => 'X-Real-IP',
@@ -78,7 +86,11 @@ class Request extends CObject {
                         continue 2;
                     }
                 }
-                if (substr($name, 0, 5) == 'HTTP_') {
+                if (substr($name, 0, 8) == 'CONTENT_') {
+                    $name = $customHeaders[$name] ?? str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower($name))));
+                    $headers[$name] = $value;
+                }
+                elseif (substr($name, 0, 5) == 'HTTP_') {
                     $name = substr($name, 5);
                     $name = $customHeaders[$name] ?? str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower($name))));
                     $headers[$name] = $value;
