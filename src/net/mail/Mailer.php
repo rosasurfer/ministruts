@@ -65,7 +65,7 @@ abstract class Mailer extends CObject {
             return new $class($options);
         }
 
-        // use SMTP mailer for direct MTA delivery
+        // use SMTP mailer for direct SMTP communication
         $smtp = $options['smtp'] ?? null;
         if (isset($smtp) && Assert::isArray($smtp, '$options[smtp]')) {
             return new SmtpMailer($options);

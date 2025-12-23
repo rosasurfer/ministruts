@@ -8,7 +8,6 @@ use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\util\PHP;
 
-use PHPMailer\PHPMailer\PHPMailer as ClassicPHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 
 use function rosasurfer\ministruts\strContains;
@@ -19,7 +18,7 @@ use const rosasurfer\ministruts\WINDOWS;
 /**
  * SmtpMailer
  *
- * A mailer using package "phpmailer/phpmailer" to send email directly to an SMTP server.
+ * A mailer sending email directly to a mail server via SMTP.
  */
 class SmtpMailer extends Mailer {
 
@@ -87,7 +86,8 @@ class SmtpMailer extends Mailer {
      */
     public function sendMail(?string $sender, string $receiver, string $subject, string $message, array $headers = []): bool {
         // on Windows without authentication: pass-through to PhpMailer which uses the built-in mail() function
-        if (false && WINDOWS && !isset($this->auth) && !isset($this->pass)) {                       // @phpstan-ignore-line (development)
+
+        if (false && WINDOWS && !isset($this->auth) && !isset($this->pass)) {           // @phpstan-ignore-line (development)
             return $this->pass2PhpMailer($sender, $receiver, $subject, $message);
         }
 
@@ -128,18 +128,18 @@ class SmtpMailer extends Mailer {
         $message = $this->normalizeLines($message);
 
         // compose the mail
-        $mail = new ClassicPHPMailer(true);                     // enable exceptions
-        $mail->XMailer = null;                                  // don't add "X-Mailer:" header
+        $mail = new ClassicMailer(true);                        // enable exceptions
+        $mail->XMailer = null;                                  // don't add marketing header "X-Mailer:"
         $mail->AllowEmpty = true;                               // don't try to be smart
 
         $mail->isSMTP();                                        // use SMTP
         $mail->SMTPDebug = SMTP::DEBUG_OFF;                     // DEBUG_OFF|DEBUG_CLIENT|DEBUG_SERVER|DEBUG_CONNECTION|DEBUG_LOWLEVEL
         $mail->Debugoutput = 'error_log';
-        $mail->Host = $this->host;                              // MTA hostname
-        $mail->Port = $this->port;                              // MTA port
+        $mail->Host = $this->host;                              // SMTP hostname
+        $mail->Port = $this->port;                              // SMTP port
 
         $mail->setFrom($from['address'], $from['name']);        // "MAIL FROM" and "From:" header
-        $mail->addAddress($rcpt['address'], $rcpt['name']);     // RCPT TO
+        $mail->addAddress($rcpt['address'], $rcpt['name']);     // "RCPT TO"
 
         $mail->Subject = $subject;
 
