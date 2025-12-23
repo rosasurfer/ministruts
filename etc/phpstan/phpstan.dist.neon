@@ -1,7 +1,4 @@
 #
-# Usage:
-#  See the PHPStan wrapper "bin/phpstan".
-#
 # File format:
 #  @see  https://phpstan.org/config-reference
 #
@@ -43,8 +40,8 @@ parameters:
   checkUninitializedProperties: true
 
   ignoreErrors:
-    - identifier: isset.initializedProperty
-    - '#^Unsafe usage of new static\(\)\.$#'        # opinionated
+   #- identifier: isset.initializedProperty
+    - identifier: new.static                        # opinionated
 
 
   reportUnmatchedIgnoredErrors: false

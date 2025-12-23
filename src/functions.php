@@ -1025,7 +1025,7 @@ function print_p($var, bool $return = false, bool $flushBuffers = true): ?string
 
 
 /**
- * Same as the builtin function but throws an exception in case of errors.
+ * Same as the built-in function but throws an exception in case of errors.
  *
  * @param  string $path
  *

@@ -1,98 +1,72 @@
 <?php
 declare(strict_types=1);
 
-namespace rosasurfer\ministruts\util;
+namespace rosasurfer\ministruts\net\mail;
 
 use rosasurfer\ministruts\config\ConfigInterface as Config;
-use rosasurfer\ministruts\core\CObject;
+use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
+use rosasurfer\ministruts\util\PHP;
 
-use function rosasurfer\ministruts\normalizeEOL;
 use function rosasurfer\ministruts\preg_match;
 use function rosasurfer\ministruts\strContains;
-use function rosasurfer\ministruts\strEndsWith;
-use function rosasurfer\ministruts\strLeft;
-use function rosasurfer\ministruts\strLeftTo;
-use function rosasurfer\ministruts\strRightFrom;
 use function rosasurfer\ministruts\strStartsWithI;
 
-use const rosasurfer\ministruts\EOL_UNIX;
 use const rosasurfer\ministruts\EOL_WINDOWS;
 use const rosasurfer\ministruts\WINDOWS;
 
 /**
- * PHPMailer
+ * PhpMailer
  *
- * A mailer sending email using the built-in PHP function mail().
+ * A mailer sending email using the built-in function mail().
  */
-class PHPMailer extends CObject {
-
-    /** @var scalar[] */
-    protected array $options;
-
-    /** @var string */
-    protected string $hostName;
-
+class PhpMailer extends Mailer {
 
     /**
-     * Constructor
-     *
-     * @param  mixed[] $options [optional] - mailer configuration
+     * {@inheritDoc}
      */
     public function __construct(array $options = []) {
-        $this->options = $options;
-
-        // get our hostname
-        $hostName = php_uname('n');
-        if (!$hostName)
-            $hostName  = 'localhost';
-        if (!strContains($hostName, '.'))
-            $hostName .= '.localdomain';            // hostname must contain more than one part (see RFC 2821)
-        $this->hostName = strtolower($hostName);
+        parent::__construct($options);
     }
 
 
     /**
-     * Send an email. Sender and receiver addresses can be specified in simple or full format. The simple format
-     * can be specified with or without angle brackets. If an empty sender is specified the mail is sent from the
-     * current user.
-     *
-     * @param  ?string  $sender             - mail sender (From:), full format: "FirstName LastName <user@domain.tld>"
-     * @param  string   $receiver           - mail receiver (To:), full format: "FirstName LastName <user@domain.tld>"
-     * @param  string   $subject            - mail subject
-     * @param  string   $message            - mail body
-     * @param  string[] $headers [optional] - additional MIME headers (default: none)
-     *
-     * @return bool - whether the email was accepted for delivery (not whether it was indeed sent)
+     * {@inheritDoc}
      */
     public function sendMail(?string $sender, string $receiver, string $subject, string $message, array $headers = []): bool {
-        // delay sending to the script's shutdown if configured (e.g. as not to block other tasks)
-        if (!empty($this->options['send-later'])) {
-            return $this->sendLater($sender, $receiver, $subject, $message, $headers);
-        }
+        //// delay sending to the script's shutdown if configured (e.g. as not to block other tasks)
+        //if (!empty($this->options['send-later'])) {
+        //    return $this->sendLater($sender, $receiver, $subject, $message, $headers);
+        //}
+
         /** @var Config $config */
         $config = $this->di('config');
 
-        // first validate the additional headers
+        // validate additional headers                          // @todo fix algorithm
         foreach ($headers as $i => $header) {
+            Assert::string($header, "\$headers[$i]");           // @phpstan-ignore staticMethod.alreadyNarrowedType (derived from annotation)
             if (!preg_match('/^[a-z]+(-[a-z]+)*:/i', $header)) {
                 throw new InvalidValueException("Invalid parameter \$headers[$i]: \"$header\"");
             }
         }
 
-        // auto-complete sender if not specified
+        // auto-complete an empty sender
         if (!isset($sender)) {
-            $sender = $config->get('mail.from', ini_get('sendmail_from') ?: '');
-            if (!strlen($sender)) {
-                $sender = strtolower(get_current_user().'@'.$this->hostName);
+            $sender = $config->getString('mail.from', ini_get('sendmail_from') ?: '');
+            if ($sender == '') {
+                $hostName = php_uname('n') ?: 'localhost';
+                if (!strContains($hostName, '.')) {
+                    $hostName .= '.localdomain';                // hostname must contain more than one part (see RFC 2821)
+                }
+                $sender = strtolower(get_current_user()."@$hostName");
             }
         }
 
         // Return-Path: (invisible sender)
         $returnPath = self::parseAddress($sender);
         if (!$returnPath) throw new InvalidValueException("Invalid parameter \$sender: $sender");
-        $value = $this->removeHeader($headers, 'Return-Path');
+        $value = $this->extractHeader($headers, 'Return-Path');
         if (isset($value)) {
             $returnPath = self::parseAddress($value);
             if (!$returnPath) throw new InvalidValueException("Invalid header \"Return-Path: $value\"");
@@ -101,16 +75,15 @@ class PHPMailer extends CObject {
         // From: (visible sender)
         $from = self::parseAddress($sender);
         if (!$from) throw new InvalidValueException("Invalid parameter \$sender: $sender");
-        $value = $this->removeHeader($headers, 'From');
-        if (isset($value)) {
+        $value = $this->extractHeader($headers, 'From');
+        if (isset($value)) {                                    // @todo merge header value and explicit sender
             $from = self::parseAddress($value);
             if (!$from) throw new InvalidValueException("Invalid header \"From: $value\"");
         }
-        $from = $this->encodeNonAsciiChars($from);
 
         // RCPT: (receiving mailbox)
         $rcpt = self::parseAddress($receiver);
-        if (!$rcpt) throw new InvalidValueException("Invalid parameter $receiver: $receiver");
+        if (!$rcpt) throw new InvalidValueException("Invalid parameter \$receiver: $receiver");
         $forced = $config->getString('mail.forced-receiver', '');
         if ($forced != '') {
             $rcpt = self::parseAddress($forced);
@@ -120,29 +93,28 @@ class PHPMailer extends CObject {
         // To: (visible receiver)
         $to = self::parseAddress($receiver);
         if (!$to) throw new InvalidValueException("Invalid parameter \$receiver: $receiver");
-        $value = $this->removeHeader($headers, 'To');
-        if (isset($value)) {
+        $value = $this->extractHeader($headers, 'To');
+        if (isset($value)) {                                    // @todo merge header value and explicit receiver
             $to = self::parseAddress($value);
             if (!$to) throw new InvalidValueException("Invalid header \"To: $value\"");
         }
-        $to = $this->encodeNonAsciiChars($to);
 
         // Subject:
-        $subject = $this->encodeNonAsciiChars(trim($subject));
+        $subject = $this->encodeHeader(trim($subject));         // @todo merge header value and explicit subject
 
         // encode remaining headers to ASCII
         foreach ($headers as $i => $header) {
-            $pattern = '/^([a-z]+(?:-[a-z]+)*): *(.*)/i';
+            $pattern = '/^([a-z]+(?:-[a-z]+)*): *(.*)/i';       // @todo fix algorithm
             $match = null;
             if (!preg_match($pattern, $header, $match)) throw new InvalidValueException("Invalid parameter \$headers[$i]: \"$header\"");
             $name   = $match[1];
-            $value  = $this->encodeNonAsciiChars(trim($match[2]));
+            $value  = $this->encodeHeader(trim($match[2]));
             $headers[$i] = "$name: $value";
         }
 
-        // add needed headers
-        $headers[] = 'Content-Type: text/plain; charset=utf-8';             // ASCII is a subset of UTF-8
+        // add more headers                                     // @todo remove existing headers
         $headers[] = 'Content-Transfer-Encoding: 8bit';
+        $headers[] = 'Content-Type: text/plain; charset=utf-8';             // ASCII is a subset of UTF-8
         $headers[] = 'From: '.trim("$from[name] <$from[address]>");
         if ($to != $rcpt) {                                                 // on Linux mail() always adds another "To" header (same as RCPT),
             $headers[] = 'To: '.trim("$to[name] <$to[address]>");           // on Windows it does so only if $headers is missing "To"
@@ -203,64 +175,6 @@ class PHPMailer extends CObject {
 
 
     /**
-     * Wrap long lines and ensure RFC-compliant line endings.
-     *
-     * @param  string $value
-     *
-     * @return string
-     *
-     * @link https://www.rfc-editor.org/rfc/rfc2822#section-2.1.1
-     */
-    protected function normalizeLines(string $value): string {
-        $limit = 980;                                               // per RFC max 998 chars but e.g. FastMail only accepts 990
-        $lines = explode(EOL_UNIX, normalizeEOL($value, EOL_UNIX));
-
-        $results = [];
-        foreach ($lines as $line) {
-            if (strlen($line) > $limit) {
-                $results = array_merge($results, str_split($line, $limit));
-            }
-            else {
-                $results[] = $line;
-            }
-        }
-        return join(EOL_WINDOWS, $results);
-    }
-
-
-    /**
-     * Parse a full email address "FirstName LastName <user@domain.tld>" into name and address part.
-     *
-     * @param  string $value
-     *
-     * @return string[] - name and address part or an empty array if the specified address is invalid
-     */
-    protected function parseAddress(string $value): array {
-        $value = trim($value);
-
-        if (strEndsWith($value, '>')) {
-            // closing angle bracket found, check for a matching opening bracket
-            $name    = trim(strLeftTo($value, '<', -1));
-            $address = strRightFrom($value, '<', -1);           // omits the opening bracket
-            $address = trim(strLeft($address, -1));             // omit the closing bracket
-        }
-        else {
-            // no closing angle bracket found, it must be a simple address
-            $name  = '';
-            $address = $value;
-        }
-
-        if (strlen($address) && filter_var($address, FILTER_VALIDATE_EMAIL)) {
-            return [
-                'name'    => $name,
-                'address' => $address,
-            ];
-        }
-        return [];
-    }
-
-
-    /**
      * Search for a given header and return its value. If the array contains multiple headers of that name the last such
      * header is returned.
      *
@@ -291,16 +205,15 @@ class PHPMailer extends CObject {
      * @param  string[] $headers - reference to an array of headers
      * @param  string   $name    - header to remove
      *
-     * @return ?string - value of the last removed header or NULL if the header was not found
+     * @return ?string - value of the extracted header or NULL if the header was not found
      */
-    protected function removeHeader(array &$headers, string $name): ?string {
+    protected function extractHeader(array &$headers, string $name): ?string {
         if (!preg_match('/^[a-z]+(-[a-z]+)*$/i', $name)) throw new InvalidValueException("Invalid parameter $name: \"$name\"");
-
         $result = null;
 
         foreach ($headers as $i => $header) {
-            if (strStartsWithI($header, $name.':')) {
-                $result = trim(substr($header, strlen($name)+1));
+            if (strStartsWithI($header, "$name:")) {
+                $result = trim(substr($header, strlen($name) + 1));
                 unset($headers[$i]);
             }
         }
@@ -316,24 +229,28 @@ class PHPMailer extends CObject {
      * @return         string|string[] - the encoded value/s
      * @phpstan-return ($value is string ? string : string[])
      */
-    protected function encodeNonAsciiChars($value) {
+    protected function encodeHeader($value) {
         if (is_array($value)) {
             /** @var string[] $result */
             $result = [];
             foreach ($value as $k => $v) {
-                $result[$k] = $this->encodeNonAsciiChars($v);
+                $result[$k] = $this->encodeHeader($v);
             }
             return $result;
         }
 
         if (preg_match('/[\x80-\xFF]/', $value)) {
-            return '=?utf-8?B?'.base64_encode($value).'?=';
+            $words = str_split($value, 45);
+            foreach ($words as $i => $word) {
+                $words[$i] = '=?utf-8?B?'.base64_encode($word).'?=';
+            }
+            $value = join(EOL_WINDOWS.' ', $words);
         }
         return $value;
 
         // TODO: see https://tools.ietf.org/html/rfc1522
         //
-        // An encoded-word may not be more than 75 characters long, including charset,
+        // An encoded-word must not be more than 75 characters long, including charset,
         // encoding, encoded-text, and delimiters.  If it is desirable to encode more
         // text than will fit in an encoded-word of 75 characters, multiple encoded-words
         // (separated by SPACE or newline) may be used.  Message header lines that contain
@@ -342,5 +259,18 @@ class PHPMailer extends CObject {
         // While there is no limit to the length of a multiple-line header
         // field, each line of a header field that contains one or more
         // encoded-words is limited to 76 characters.
+
+
+        // Constraints per RFC2047:
+        // ------------------------
+        // - each encoded-word is limited to 75 chars
+        // - encoded-words must be separated from each other by whitespace (ignored during decoding)
+        // - each header line that contains encoded-words is limited to 76 chars
+        // - no limit to the total length of a multi-line header value
+
+        // max-len(encoded-word)=75  =>  max-len(base64-part)=63
+        // base64 multiple of 4:     max(base64)=60
+        // original value:           max 45 chars
+        // split $value into chunks of 45 chars
     }
 }

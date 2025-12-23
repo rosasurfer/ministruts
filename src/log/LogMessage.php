@@ -41,14 +41,14 @@ class LogMessage extends CObject {
     /** @var int - loglevel */
     protected int $logLevel;
 
-    /** @var string - filename of the location causing this log message */
-    protected string $file;
+    /** @var ?string - filename of the location causing this log message */
+    protected ?string $file = null;
 
-    /** @var int - file position of the location causing this log message */
-    protected int $line;
+    /** @var ?int - file position of the location causing this log message */
+    protected ?int $line = null;
 
-    /** @phpstan-var array{file:string, line:int, trace:list<STACKFRAME>} - internal call location infos */
-    protected array $internalLocation;
+    /** @phpstan-var ?array{file:string, line:int, trace:list<STACKFRAME>} - internal call location infos */
+    protected ?array $internalLocation = null;
 
     /** @var array<string, mixed> - logging context with additional infos (if any) */
     protected array $context;

@@ -6,7 +6,7 @@ namespace rosasurfer\ministruts\core;
 use rosasurfer\ministruts\core\di\DiAwareTrait;
 
 /**
- * Base class of all "rosasurfer" classes. Other classes may use {@link \rosasurfer\ministruts\core\ObjectTrait}
+ * Base class of all "rosasurfer/ministruts" classes. Other classes may use {@link \rosasurfer\ministruts\core\ObjectTrait}
  * and/or {@link \rosasurfer\ministruts\core\di\DiAwareTrait} to provide the same functionality.
  */
 class CObject {
