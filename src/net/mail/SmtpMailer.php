@@ -86,8 +86,7 @@ class SmtpMailer extends Mailer {
      */
     public function sendMail(?string $sender, string $receiver, string $subject, string $message, array $headers = []): bool {
         // on Windows without authentication: pass-through to PhpMailer which uses the built-in mail() function
-
-        if (false && WINDOWS && !isset($this->auth) && !isset($this->pass)) {           // @phpstan-ignore-line (development)
+        if (WINDOWS && !isset($this->auth) && !isset($this->pass)) {
             return $this->pass2PhpMailer($sender, $receiver, $subject, $message);
         }
 
