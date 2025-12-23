@@ -659,35 +659,40 @@ class Request extends CObject {
             ];
             $headers = [];
 
-            foreach ($_SERVER as $name => $value) {
-                while (substr($name, 0, 9) == 'REDIRECT_') {
-                    $name = substr($name, 9);
-                    if (isset($_SERVER[$name])) {
-                        continue 2;
+            if (function_exists('getallheaders')) {
+                $headers = getallheaders();
+            }
+            else {
+                foreach ($_SERVER as $name => $value) {
+                    while (substr($name, 0, 9) == 'REDIRECT_') {
+                        $name = substr($name, 9);
+                        if (isset($_SERVER[$name])) {
+                            continue 2;
+                        }
+                    }
+                    if (substr($name, 0, 8) == 'CONTENT_') {
+                        $name = $customHeaders[$name] ?? str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower($name))));
+                        $headers[$name] = $value;
+                    }
+                    elseif (substr($name, 0, 5) == 'HTTP_') {
+                        $name = substr($name, 5);
+                        $name = $customHeaders[$name] ?? str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower($name))));
+                        $headers[$name] = $value;
                     }
                 }
-                if (substr($name, 0, 8) == 'CONTENT_') {
-                    $name = $customHeaders[$name] ?? str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower($name))));
-                    $headers[$name] = $value;
-                }
-                elseif (substr($name, 0, 5) == 'HTTP_') {
-                    $name = substr($name, 5);
-                    $name = $customHeaders[$name] ?? str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower($name))));
-                    $headers[$name] = $value;
-                }
-            }
 
-            // reconstruct an existing 'Authorization' header
-            if (!isset($headers['Authorization']) && isset($_SERVER['AUTH_TYPE'])) {
-                $authType = $_SERVER['AUTH_TYPE'];
-                if ($authType == 'Basic') {
-                    $user = $_SERVER['PHP_AUTH_USER'] ?? '';
-                    $pass = $_SERVER['PHP_AUTH_PW'] ?? '';
-                    $headers['Authorization'] = 'Basic '.base64_encode("$user:$pass");
-                }
-                if ($authType == 'Digest') {
-                    $digest = $_SERVER['PHP_AUTH_DIGEST'] ?? '';
-                    $headers['Authorization'] = "Digest $digest";
+                // reconstruct an existing 'Authorization' header
+                if (!isset($headers['Authorization']) && isset($_SERVER['AUTH_TYPE'])) {
+                    $authType = $_SERVER['AUTH_TYPE'];
+                    if ($authType == 'Basic') {
+                        $user = $_SERVER['PHP_AUTH_USER'] ?? '';
+                        $pass = $_SERVER['PHP_AUTH_PW'] ?? '';
+                        $headers['Authorization'] = 'Basic '.base64_encode("$user:$pass");
+                    }
+                    if ($authType == 'Digest') {
+                        $digest = $_SERVER['PHP_AUTH_DIGEST'] ?? '';
+                        $headers['Authorization'] = "Digest $digest";
+                    }
                 }
             }
 
