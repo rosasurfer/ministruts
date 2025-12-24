@@ -35,11 +35,12 @@ interface ContentFilterInterface {
     /**
      * Filter an array of named values.
      *
-     * @param  mixed[] $values - input values
+     * @param  mixed[]     $values          - input values
+     * @param  array-key[] $skip [optional] - elements to skip (default: none)
      *
      * @return mixed[] - filtered values
      */
-    public function filterValues(array $values): array;
+    public function filterValues(array $values, array $skip = []): array;
 
 
     /**

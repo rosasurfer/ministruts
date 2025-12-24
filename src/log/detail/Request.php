@@ -405,29 +405,29 @@ class Request extends CObject {
         // headers
         $headers = $request->getHeaders();
         if ($filter) {
-            if (isset($headers['Referer'])) {
-                $headers['Referer'] = $filter->filterUri($headers['Referer']);
+            $skip = [];
+            if (isset($headers[$name = 'Referer'])) {
+                $headers[$name] = $filter->filterUri($headers[$name]);
+                $skip[] = $name;
             }
-            if (isset($headers['Cookie'])) {
-                $cookies = explode('; ', $headers['Cookie']);
+            if (isset($headers[$name = 'Cookie'])) {
+                $cookies = explode('; ', $headers[$name]);
                 foreach ($cookies as $i => $cookie) {
                     $args = explode('=', $cookie, 2);
                     if (sizeof($args) > 1) {
                         $cookies[$i] = $args[0].'='.$filter->filterValue($args[0], $args[1]);
                     }
                 }
-                $headers['Cookie'] = join('; ', $cookies);
+                $headers[$name] = join('; ', $cookies);
+                $skip[] = $name;
             }
-            $authHeader = null;
-            if (isset($headers['Authorization'])) {
+            if (isset($headers[$name = 'Authorization'])) {
                 $redacted = ContentFilter::SUBSTITUTE;
-                $authHeader = preg_replace('/^(\S+).*/', "\$1 $redacted", $headers['Authorization']);
-                $headers['Authorization'] = $authHeader;
+                $authHeader = preg_replace('/^(\S+).*/', "\$1 $redacted", $headers[$name]);
+                $headers[$name] = $authHeader;
+                $skip[] = $name;
             }
-            $headers = $filter->filterValues($headers);
-            if (isset($authHeader)) {
-                $headers['Authorization'] = $authHeader;
-            }
+            $headers = $filter->filterValues($headers, $skip);
         }
 
         $maxLen = 0;

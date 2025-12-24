@@ -38,9 +38,7 @@ class SensitiveContentFilter extends CObject implements ContentFilterInterface {
     /**
      * A plain string does not constitute a named value and will pass through this filter unmodified.
      *
-     * @param  string $input
-     *
-     * @return string
+     * {@inheritDoc}
      *
      * @example
      * <pre>
@@ -55,12 +53,7 @@ class SensitiveContentFilter extends CObject implements ContentFilterInterface {
 
 
     /**
-     * Filter a single named value.
-     *
-     * @param  string $name
-     * @param  mixed  $value
-     *
-     * @return mixed - filtered value
+     * {@inheritDoc}
      *
      * @example
      * <pre>
@@ -79,11 +72,7 @@ class SensitiveContentFilter extends CObject implements ContentFilterInterface {
 
 
     /**
-     * Filter an array of named values.
-     *
-     * @param  mixed[] $values - input values
-     *
-     * @return mixed[] - filtered values
+     * {@inheritDoc}
      *
      * @example
      * <pre>
@@ -92,8 +81,13 @@ class SensitiveContentFilter extends CObject implements ContentFilterInterface {
      *  print_r($array);            // output: Array([password] => ******)
      * </pre>
      */
-    public function filterValues(array $values): array {
+    public function filterValues(array $values, array $skip = []): array {
+        $skip = array_flip($skip);
+
         foreach ($values as $key => $value) {
+            if (isset($skip[$key])) {
+                continue;
+            }
             if (is_array($value)) {
                 $values[$key] = $this->filterValues($value);
             }
@@ -109,11 +103,7 @@ class SensitiveContentFilter extends CObject implements ContentFilterInterface {
 
 
     /**
-     * Filter the string representation of an URI.
-     *
-     * @param  string $uri - filter input
-     *
-     * @return string - filtered URI
+     * {@inheritDoc}
      *
      * @example
      * <pre>
@@ -179,7 +169,7 @@ class SensitiveContentFilter extends CObject implements ContentFilterInterface {
      * @return bool
      */
     protected function isSensitive(string $input): bool {
-        if (!strlen($input)) {
+        if ($input == '') {
             return false;
         }
 
