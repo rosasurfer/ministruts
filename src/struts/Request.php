@@ -659,8 +659,8 @@ class Request extends CObject {
             ];
             $headers = [];
 
-            if (function_exists('getallheaders')) {
-                $headers = getallheaders();
+            if (function_exists('apache_request_headers')) {
+                $headers = apache_request_headers();
             }
             else {
                 foreach ($_SERVER as $name => $value) {

@@ -34,28 +34,30 @@ class CoreFunctionReturnType extends Extension implements DynamicFunctionReturnT
         $null = new NullType();
 
         $this->interceptedFunctions = [
-            // function            type to remove       original return type
-            // -------------------------------------------------------------------------
-            'curl_init'            => $bool,            // resource|CurlHandle|false        @see  https://www.php.net/manual/en/function.curl-init.php
-            'file'                 => $bool,            // array|false
-            'file_get_contents'    => $bool,            // string|false                     @see  https://www.php.net/manual/en/function.file-get-contents.php
-            'filemtime'            => $bool,            // int|false                        @see  https://www.php.net/manual/en/function.filemtime.php
-            'filter_var'           => null,      // (2) // mixed (NULL is wrongly removed)  @see  https://www.php.net/manual/en/function.filter-var.php
-            'fopen'                => $bool,            // resource|false
-            'getcwd'               => $bool,            // string|false
-            'ini_get_all'          => $bool,            // array|false                      @see  https://www.php.net/manual/en/function.ini-get-all.php
-            'ob_get_clean'         => $bool,            // string|false
-            'opendir'              => $bool,            // resource|false
-            'pg_escape_identifier' => $bool,     // (1) // string                           @see  https://www.php.net/manual/en/function.pg-escape-identifier.php
-            'pg_escape_literal'    => $bool,     // (1) // string                           @see  https://www.php.net/manual/en/function.pg-escape-literal.php
-            'proc_open'            => $bool,            // resource|false                   @see  https://www.php.net/manual/en/function.proc-open.php
-            'session_id'           => $bool,            // string|false                     @see  https://www.php.net/manual/en/function.session-id.php
-            'session_name'         => $bool,            // string|false                     @see  https://www.php.net/manual/en/function.session-name.php
-            'shell_exec'           => $bool,            // string|false|null                @see  https://www.php.net/manual/en/function.shell-exec.php
-            'stream_get_contents'  => $bool,            // string|false                     @see  https://www.php.net/manual/en/function.stream-get-contents.php
+            // function              type to remove       original return type
+            // ---------------------------------------------------------------------------
+            'apache_request_headers' => $bool,     // (1) // array|false                      @see  https://www.php.net/manual/en/function.apache-request-headers.php
+            'curl_init'              => $bool,            // resource|CurlHandle|false        @see  https://www.php.net/manual/en/function.curl-init.php
+            'file'                   => $bool,            // array|false
+            'file_get_contents'      => $bool,            // string|false                     @see  https://www.php.net/manual/en/function.file-get-contents.php
+            'filemtime'              => $bool,            // int|false                        @see  https://www.php.net/manual/en/function.filemtime.php
+            'filter_var'             => null,      // (2) // mixed (NULL is wrongly removed)  @see  https://www.php.net/manual/en/function.filter-var.php
+            'fopen'                  => $bool,            // resource|false
+            'getcwd'                 => $bool,            // string|false
+            'ini_get_all'            => $bool,            // array|false                      @see  https://www.php.net/manual/en/function.ini-get-all.php
+            'ob_get_clean'           => $bool,            // string|false
+            'opendir'                => $bool,            // resource|false
+            'pg_escape_identifier'   => $bool,     // (3) // string                           @see  https://www.php.net/manual/en/function.pg-escape-identifier.php
+            'pg_escape_literal'      => $bool,     // (3) // string                           @see  https://www.php.net/manual/en/function.pg-escape-literal.php
+            'proc_open'              => $bool,            // resource|false                   @see  https://www.php.net/manual/en/function.proc-open.php
+            'session_id'             => $bool,            // string|false                     @see  https://www.php.net/manual/en/function.session-id.php
+            'session_name'           => $bool,            // string|false                     @see  https://www.php.net/manual/en/function.session-name.php
+            'shell_exec'             => $bool,            // string|false|null                @see  https://www.php.net/manual/en/function.shell-exec.php
+            'stream_get_contents'    => $bool,            // string|false                     @see  https://www.php.net/manual/en/function.stream-get-contents.php
 
-            // (1) either PHPStan or the PHP documentation are wrong
+            // (1) needed under PHP7.4 only
             // (2) the extension is not called by PHPStan
+            // (3) either PHPStan or the PHP documentation are wrong
         ];
     }
 
