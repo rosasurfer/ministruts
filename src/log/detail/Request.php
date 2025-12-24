@@ -81,6 +81,7 @@ class Request extends CObject {
 
             if (function_exists('apache_request_headers')) {
                 $headers = apache_request_headers();
+                // @todo name capitalization is not normalized
             }
             else {
                 foreach ($_SERVER as $name => $value) {
@@ -109,7 +110,7 @@ class Request extends CObject {
                         $pass = $_SERVER['PHP_AUTH_PW'] ?? '';
                         $headers['Authorization'] = 'Basic '.base64_encode("$user:$pass");
                     }
-                    if ($authType == 'Digest') {
+                    elseif ($authType == 'Digest') {
                         $digest = $_SERVER['PHP_AUTH_DIGEST'] ?? '';
                         $headers['Authorization'] = "Digest $digest";
                     }
@@ -417,9 +418,14 @@ class Request extends CObject {
                 }
                 $headers['Cookie'] = join('; ', $cookies);
             }
+            $authHeader = null;
             if (isset($headers['Authorization'])) {
                 $redacted = ContentFilter::SUBSTITUTE;
-                $authHeader = preg_replace('/^(\S+)\s/', "\$1 $redacted", $headers['Authorization']);
+                $authHeader = preg_replace('/^(\S+).*/', "\$1 $redacted", $headers['Authorization']);
+                $headers['Authorization'] = $authHeader;
+            }
+            $headers = $filter->filterValues($headers);
+            if (isset($authHeader)) {
                 $headers['Authorization'] = $authHeader;
             }
         }

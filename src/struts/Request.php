@@ -661,6 +661,7 @@ class Request extends CObject {
 
             if (function_exists('apache_request_headers')) {
                 $headers = apache_request_headers();
+                // @todo name capitalization is not normalized
             }
             else {
                 foreach ($_SERVER as $name => $value) {
@@ -689,7 +690,7 @@ class Request extends CObject {
                         $pass = $_SERVER['PHP_AUTH_PW'] ?? '';
                         $headers['Authorization'] = 'Basic '.base64_encode("$user:$pass");
                     }
-                    if ($authType == 'Digest') {
+                    elseif ($authType == 'Digest') {
                         $digest = $_SERVER['PHP_AUTH_DIGEST'] ?? '';
                         $headers['Authorization'] = "Digest $digest";
                     }
