@@ -36,7 +36,7 @@ class Request extends CObject {
     /** @var ?string - remote IP of the request */
     protected ?string $remoteIP = null;
 
-    /** @var Request */
+    /** @var self */
     protected static self $instance;
 
 

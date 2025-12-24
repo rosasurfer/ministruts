@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
-
+<!-- 
+ File format:
+  @see  https://github.com/PHPCSStandards/PHP_CodeSniffer/wiki/Annotated-Ruleset
+-->
 <ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="https://github.com/PHPCSStandards/PHP_CodeSniffer/raw/refs/heads/master/phpcs.xsd"
          name="rosasurfer/ministruts/slevomat">
@@ -9,6 +12,10 @@
     <file>../../etc/phpstan</file>
     <file>../../src</file>
     <file>../../tests</file>
+    
+    <!-- file patterns to exclude (not files) -->
+    <exclude-pattern>*/etc/phpstan/symbols/*</exclude-pattern>
+    
     <arg name="extensions" value="php"/>
 
     <!-- PHP version to test against -->
