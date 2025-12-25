@@ -31,8 +31,8 @@ use const rosasurfer\ministruts\WINDOWS;
  */
 class ErrorHandler extends CObject {
 
-    /** ignore PHP errors and exceptions */
-    public const MODE_IGNORE = 1;
+    /** no error handling */
+    public const MODE_OFF = 1;
 
     /** log PHP errors and exceptions */
     public const MODE_LOG = 2;
@@ -67,20 +67,20 @@ class ErrorHandler extends CObject {
      * Setup error handling.
      *
      * @param  ?int $level - error reporting level
-     * @param  int  $mode  - error handling mode, one of [MODE_IGNORE | MODE_LOG | MODE_EXCEPTION]
+     * @param  int  $mode  - error handling mode: MODE_OFF | MODE_LOG | MODE_EXCEPTION
      *
      * @return void
      */
     public static function setupErrorHandling(?int $level, int $mode): void {
-        if ($mode < self::MODE_IGNORE || $mode > self::MODE_EXCEPTION) {
-            throw new InvalidValueException('Invalid parameter $mode: '.$mode);
+        if ($mode < self::MODE_OFF || $mode > self::MODE_EXCEPTION) {
+            throw new InvalidValueException("Invalid parameter \$mode: $mode");
         }
 
         switch ($mode) {
-            case self::MODE_IGNORE:
+            case self::MODE_OFF:
                 self::$errorHandling = 0;
                 self::$exceptionHandling = false;
-                break;
+                return;
 
             case self::MODE_LOG:
             case self::MODE_EXCEPTION:

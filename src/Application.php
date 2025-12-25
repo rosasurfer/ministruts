@@ -49,7 +49,7 @@ class Application extends CObject {
      *                                            (default: the current directory)
      *
      *        "app.error-handler.mode"  - string: Error handling mode, one of:
-     *                                            "ignore":    PHP errors and exceptions are ignored.
+     *                                            "off":       No error handling.
      *                                            "log":       PHP errors and exceptions are logged but execution continues. Exceptions terminate
      *                                                         the script.
      *                                            "exception": PHP errors are converted to exceptions, both are logged and both terminate the
@@ -124,7 +124,7 @@ class Application extends CObject {
      * Initialize error handling.
      *
      * @param  mixed $level - error reporting level
-     * @param  mixed $mode  - error handling: "ignore | log | exception"
+     * @param  mixed $mode  - error handling mode: "off | log | exception"
      *
      * @return void
      */
@@ -137,9 +137,8 @@ class Application extends CObject {
         Assert::string($mode, '$mode');
 
         switch ($mode) {
-            case 'ignore':
-                $iMode = ErrorHandler::MODE_IGNORE;
-                break;
+            case 'off':
+                return;
             case 'log':
                 $iMode = ErrorHandler::MODE_LOG;
                 break;
@@ -147,7 +146,7 @@ class Application extends CObject {
                 $iMode = ErrorHandler::MODE_EXCEPTION;
                 break;
             default:
-                throw new InvalidValueException('Invalid parameter $mode: "'.$mode.'"');
+                throw new InvalidValueException("Invalid parameter \$mode: \"$mode\"");
         }
         ErrorHandler::setupErrorHandling($level, $iMode);
     }
