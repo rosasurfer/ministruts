@@ -34,8 +34,8 @@ solidity, and to adapt it to current web standards. [Long live Struts](https://w
 The project includes a special feature for command line interfaces that is worth mentioning: a syntax parser for the [DocOpt](http://docopt.org/#)
 standard, which is well known in the Linux/Python world, but little known in the PHP universe. The DocOpt standard uses the syntax description
 of the tool itself to define call options. At runtime, the syntax description is parsed and validated against the current call. The result
-are beautiful syntax definitions even for more complex tools (no more ugly Symfony error messages).
-Examples are [here](src/console/docopt/examples/git), or you can try out the online parser [here](http://try.docopt.org/#).
+are beautiful syntax definitions even for more complex tools (no more ugly Symfony error messages). Examples are 
+[here](src/console/docopt/examples/git), or you can try out the online parser [here](https://web.archive.org/web/20221006200023/http://try.docopt.org/#).
 
 ---
 MiniStruts reference: [struts-config.dtd](src/struts/dtd/struts-config.dtd)
