@@ -197,7 +197,7 @@ class Request extends CObject {
 
 
     /**
-     * Return the content of the request (the body). For file uploads the method available metadata.
+     * Return the content of the request (the body). For file uploads the method returns available metadata.
      *
      * @param  ?ContentFilter $filter [optional] - a content filter to apply (default: none)
      *
@@ -207,20 +207,12 @@ class Request extends CObject {
         if (!isset($this->content)) {
             $content = '';
 
-            if ($_GET) {
-                $get = $filter ? $filter->filterValues($_GET) : $_GET;
-                $content .= '$_GET => '.trim(print_r($get, true)).NL;
-            }
-            if ($_POST) {
-                $post = $filter ? $filter->filterValues($_POST) : $_POST;
-                $content .= '$_POST => '.trim(print_r($post, true)).NL;
-            }
-            else {
-                $input = file_get_contents('php://input');      // not available with content type 'multipart/form-data'
-                if (strlen($input)) {
+            if (!$_POST) {
+                $input = (string)file_get_contents('php://input');  // not available with content type 'multipart/form-data'
+                if ($input != '') {
                     $contentType = $this->getContentType() ?? 'application/json';
                     if ($contentType == 'application/json') {
-                        //if ($filter) {                        // filter a possible JSON content
+                        //if ($filter) {                            // filter a possible JSON content
                         //    try {
                         //        $values = json_decode_or_throw($input, true, 512, JSON_BIGINT_AS_STRING | JSON_INVALID_UTF8_SUBSTITUTE);
                         //        if (is_array($values)) {
@@ -230,12 +222,22 @@ class Request extends CObject {
                         //    }
                         //    catch (Throwable $ex) {}
                         //}
-                        $input = toString($input);              // format a possible JSON content
+                        $input = toString($input);                  // format a possible JSON content
                     }
-                    $content .= trim($input).NL;
+                    else {
+                        $input = substr($input, 0, 2_048);          // limit the content to 2KB
+                    }
+                    $content .= rtrim($input).NL.NL;
                 }
             }
-
+            if ($_GET) {
+                $get = $filter ? $filter->filterValues($_GET) : $_GET;
+                $content .= '$_GET => '.trim(print_r($get, true)).NL;
+            }
+            if ($_POST) {
+                $post = $filter ? $filter->filterValues($_POST) : $_POST;
+                $content .= '$_POST => '.trim(print_r($post, true)).NL;
+            }
             if ($_FILES) {
                 $content .= '$_FILES => '.trim(print_r($this->getFiles(), true)).NL;
             }
@@ -442,9 +444,8 @@ class Request extends CObject {
         // content (request body)
         $content = $request->getContent($filter);
         if ($content != '') {
-            $result .= NL.trim(substr($content, 0, 2_048)).NL;      // limit the request body to 2KB
+            $result .= NL.rtrim($content).NL;
         }
-
         return $result;
     }
 
