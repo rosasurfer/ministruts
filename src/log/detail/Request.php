@@ -13,7 +13,6 @@ use function rosasurfer\ministruts\toString;
 
 use const rosasurfer\ministruts\CLI;
 use const rosasurfer\ministruts\NL;
-use function rosasurfer\ministruts\strContains;
 
 /**
  * Request
