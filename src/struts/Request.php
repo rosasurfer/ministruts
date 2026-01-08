@@ -628,7 +628,7 @@ class Request extends CObject {
 
     /**
      * Return the headers with the specified names as an associative array of header names/values.
-     * Multiple headers of the same name are already collapsed into a single header by PHP.
+     * Multiple headers of the same name are collapsed into a single header with comma-separated values.
      *
      * @param  string ...$names [optional] - one or more header names (default: all headers)
      *
@@ -638,30 +638,46 @@ class Request extends CObject {
         if (!isset($this->headers)) {
             // headers with custom name representation
             $customHeaders = [
+                'AUTHORIZATION'      => 'Authorization',
                 'CDN'                => 'CDN',
+                'CF-CONNECTING-IP'   => 'CF-Connecting-IP',
                 'CF_CONNECTING_IP'   => 'CF-Connecting-IP',
+                'CLIENT-IP'          => 'Client-IP',
                 'CLIENT_IP'          => 'Client-IP',
+                'CONTENT-ID'         => 'Content-ID',
                 'CONTENT_ID'         => 'Content-ID',
+                'CONTENT-MD5'        => 'Content-MD5',
                 'CONTENT_MD5'        => 'Content-MD5',
                 'DASL'               => 'DASL',
                 'DAV'                => 'DAV',
                 'DNT'                => 'DNT',
                 'ETAG'               => 'ETag',
+                'MIME-VERSION'       => 'MIME-Version',
                 'MIME_VERSION'       => 'MIME-Version',
+                'SEC-GPC'            => 'Sec-GPC',
                 'SEC_GPC'            => 'Sec-GPC',
-                'TE'                 => 'TE',
+                'TRUE-CLIENT-IP'     => 'True-Client-IP',
                 'TRUE_CLIENT_IP'     => 'True-Client-IP',
+                'WWW-AUTHENTICATE'   => 'WWW-Authenticate',
                 'WWW_AUTHENTICATE'   => 'WWW-Authenticate',
+                'X-CDN'              => 'X-CDN',
                 'X_CDN'              => 'X-CDN',
-                'X_MINISTRUTS_UI'    => 'X-Ministruts-UI',
+                'X-OPENAI-HOST-HASH' => 'X-OpenAI-Host-Hash',
+                'X_OPENAI_HOST_HASH' => 'X-OpenAI-Host-Hash',
+                'X-REAL-IP'          => 'X-Real-IP',
                 'X_REAL_IP'          => 'X-Real-IP',
+                'X-UP-FORWARDED-FOR' => 'X-UP-Forwarded-For',
                 'X_UP_FORWARDED_FOR' => 'X-UP-Forwarded-For',
             ];
             $headers = [];
 
-            if (function_exists('apache_request_headers')) {
-                $headers = apache_request_headers();
-                // @todo name capitalization is not normalized
+            if (function_exists('getallheaders')) {
+                foreach (getallheaders() as $name => $value) {
+                    $name = str_replace(' ', '-', ucwords(str_replace('-', ' ', $name)));
+                    $name = str_replace(' ', '_', ucwords(str_replace('_', ' ', $name)));
+                    $name = $customHeaders[strtoupper($name)] ?? $name;
+                    $headers[$name] = $value;
+                }
             }
             else {
                 foreach ($_SERVER as $name => $value) {
