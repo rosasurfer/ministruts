@@ -716,6 +716,18 @@ class Request extends CObject {
             // sort headers
             uksort($headers, 'strnatcasecmp');
 
+            // split "Content-*" and non-content headers
+            $contentHeaders = array_filter(
+                $headers,
+                static fn($name): bool => strpos($name, 'Content-') === 0,
+                ARRAY_FILTER_USE_KEY,
+            );
+            $headers = array_filter(
+                $headers,
+                static fn($name): bool => strpos($name, 'Content-') !== 0,
+                ARRAY_FILTER_USE_KEY,
+            );
+
             // move "Host" header to the beginning
             $value = $headers[$name='Host'] ?? null;
             if (isset($value)) {
@@ -723,7 +735,17 @@ class Request extends CObject {
                 $headers = [$name => $value] + $headers;
             }
 
-            $this->headers = $headers;
+            // move "Content-Type", "Content-Encoding" and "Content-Length" headers to the end
+            foreach(['Content-Type', 'Content-Encoding', 'Content-Length'] as $name) {
+                $value = $contentHeaders[$name] ?? null;
+                if (isset($value)) {
+                    unset($contentHeaders[$name]);
+                    $contentHeaders += [$name => $value];
+                }
+            }
+
+            // append "Content-*" headers to non-content headers
+            $this->headers = $headers + $contentHeaders;
         }
 
         // return all or just the specified headers
