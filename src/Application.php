@@ -160,15 +160,13 @@ class Application extends CObject {
      * @return IConfig
      */
     protected function initConfig(array $options): IConfig {
-        $location = $options['app.dir.config'] ?? getcwd();
-        Assert::stringNotEmpty($location, '$options[app.dir.config]');
+        $location = (string)($options['app.dir.config'] ?? getcwd());
         $config = Config::createFrom($location);
         $this->setConfig($config);
         unset($options['app.dir.config']);
 
         // set root directory
-        $rootDir = $options['app.dir.root'] ?? getcwd();
-        Assert::stringNotEmpty($rootDir, '$options[app.dir.root]');
+        $rootDir = (string)($options['app.dir.root'] ?? getcwd());
         $config->set('app.dir.root', $rootDir);
         unset($options['app.dir.root']);
 
