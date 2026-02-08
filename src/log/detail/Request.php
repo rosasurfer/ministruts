@@ -96,7 +96,7 @@ class Request extends CObject {
                     $name = str_replace(' ', '-', ucwords(str_replace('-', ' ', $name)));
                     $name = str_replace(' ', '_', ucwords(str_replace('_', ' ', $name)));
                     $name = $customHeaders[strtoupper($name)] ?? $name;
-                    $headers[$name] = $value;
+                    $headers[$name] = trim($value);
                 }
             }
             else {
@@ -109,12 +109,12 @@ class Request extends CObject {
                     }
                     if (substr($name, 0, 8) == 'CONTENT_') {
                         $name = $customHeaders[$name] ?? str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower($name))));
-                        $headers[$name] = $value;
+                        $headers[$name] = trim($value);
                     }
                     elseif (substr($name, 0, 5) == 'HTTP_') {
                         $name = substr($name, 5);
                         $name = $customHeaders[$name] ?? str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower($name))));
-                        $headers[$name] = $value;
+                        $headers[$name] = trim($value);
                     }
                 }
 
