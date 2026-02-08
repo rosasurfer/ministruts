@@ -40,7 +40,7 @@ class Application extends CObject {
     /**
      * Create and initialize a new MiniStruts application.
      *
-     * @param  array<string, string> $options [optional] - array with explicit application config settings, specifically:
+     * @param  array<string, ?scalar> $options [optional] - array with explicit application config settings, specifically:
      *
      *        "app.dir.root"            - string: The project's root directory.
      *                                            (default: the current directory)
@@ -155,17 +155,20 @@ class Application extends CObject {
     /**
      * Load and initialize the main configuration.
      *
-     * @param  array<string, string> $options - configuration options as passed to the framework loader
+     * @param  array<string, ?scalar> $options - configuration options as passed to the framework loader
      *
      * @return IConfig
      */
     protected function initConfig(array $options): IConfig {
-        $config = Config::createFrom($options['app.dir.config'] ?? getcwd());
+        $location = $options['app.dir.config'] ?? getcwd();
+        Assert::stringNotEmpty($location, '$options[app.dir.config]');
+        $config = Config::createFrom($location);
         $this->setConfig($config);
         unset($options['app.dir.config']);
 
         // set root directory
         $rootDir = $options['app.dir.root'] ?? getcwd();
+        Assert::stringNotEmpty($rootDir, '$options[app.dir.root]');
         $config->set('app.dir.root', $rootDir);
         unset($options['app.dir.root']);
 
