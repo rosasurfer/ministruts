@@ -22,7 +22,7 @@ use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 use rosasurfer\ministruts\core\lock\Lock;
 use rosasurfer\ministruts\file\FileSystem;
-use rosasurfer\ministruts\log\detail\Request;
+//use rosasurfer\ministruts\log\detail\Request;
 use rosasurfer\ministruts\struts\url\Url;
 use rosasurfer\ministruts\struts\url\VersionedUrl;
 
@@ -993,13 +993,7 @@ function prettyBytes($value, int $decimals = 1): string {
 function print_p($var, bool $return = false, bool $flushBuffers = true): ?string {
     $str = toString($var);
 
-    if (CLI) {
-        $html = false;
-    }
-    else {
-        $ui = Request::instance()->getHeaderValue('x-ministruts-ui') ?? 'web';
-        $html = !strCompareI($ui, 'cli');
-    }
+    $html = !CLI && strContains($_SERVER['HTTP_ACCEPT'] ?? '', 'text/html', 'application/xhtml+xml');
 
     if ($html) {
         $str = '<div align="left"

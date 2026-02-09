@@ -5,13 +5,12 @@ namespace rosasurfer\ministruts\log\appender;
 
 use rosasurfer\ministruts\Application;
 use rosasurfer\ministruts\log\LogMessage;
-use rosasurfer\ministruts\log\detail\Request;
 
 use function rosasurfer\ministruts\ini_get_bool;
 use function rosasurfer\ministruts\preg_filter;
 use function rosasurfer\ministruts\stderr;
 use function rosasurfer\ministruts\stdout;
-use function rosasurfer\ministruts\strCompareI;
+use function rosasurfer\ministruts\strContains;
 
 use const rosasurfer\ministruts\CLI;
 use const rosasurfer\ministruts\NL;
@@ -72,14 +71,7 @@ class PrintAppender extends BaseAppender {
                 return false;
             }
         }
-
-        if (CLI) {
-            $html = false;
-        }
-        else {
-            $ui = Request::instance()->getHeaderValue('x-ministruts-ui') ?? 'web';
-            $html = !strCompareI($ui, 'cli');
-        }
+        $html = !CLI && strContains($_SERVER['HTTP_ACCEPT'] ?? '', 'text/html', 'application/xhtml+xml');
 
         $msg = $message->getMessageDetails($html, $this->filter);
         if ($this->traceDetails   && $detail = $message->getTraceDetails  ($html, $this->filter)) $msg .= NL.$detail;
