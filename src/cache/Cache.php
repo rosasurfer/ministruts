@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\cache;
 
+use rosasurfer\ministruts\Application;
 use rosasurfer\ministruts\config\ConfigInterface as Config;
 use rosasurfer\ministruts\core\StaticClass;
 use rosasurfer\ministruts\core\exception\RuntimeException;
@@ -57,7 +58,7 @@ final class Cache extends StaticClass {
         // specific cache
         if (!isset(self::$caches[$label])) {
             /** @var Config $config */
-            $config = self::di('config');
+            $config = Application::service('config');
 
             // get cache configuration and create new instance
             $class   = $config->get('cache.'.$label.'.class');

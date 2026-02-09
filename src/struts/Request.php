@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\struts;
 
+use rosasurfer\ministruts\Application;
 use rosasurfer\ministruts\config\ConfigInterface as Config;
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\exception\IllegalStateException;
@@ -385,7 +386,7 @@ class Request extends CObject {
 
             if (!isset($baseUri)) {
                 /** @var Config $config */
-                $config  = $this->di('config');
+                $config  = Application::service('config');
                 /** @var ?string $baseUri */
                 $baseUri = $config->get('app.base-uri', null);
                 if (!$baseUri) throw new RuntimeException('Unknown application base URI, either $_SERVER["APP_BASE_URI"] or $config["app.base-uri"] needs to be configured.');

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\net\mail;
 
+use rosasurfer\ministruts\Application;
 use rosasurfer\ministruts\config\ConfigInterface as Config;
 use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
@@ -41,7 +42,7 @@ class PhpMailer extends Mailer {
         //}
 
         /** @var Config $config */
-        $config = $this->di('config');
+        $config = Application::service('config');
 
         // validate additional headers                          // @todo fix algorithm
         foreach ($headers as $i => $header) {

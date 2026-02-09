@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\log\appender;
 
+use rosasurfer\ministruts\Application;
 use rosasurfer\ministruts\config\ConfigInterface as Config;
 use rosasurfer\ministruts\log\LogMessage;
 use rosasurfer\ministruts\log\detail\Request;
@@ -78,7 +79,7 @@ class ErrorLogAppender extends BaseAppender {
             if (isRelativePath($filepath)) {
                 // convert to absolute path as the current PHP working directory is not fix
                 /** @var Config $config */
-                $config = $this->di('config');
+                $config = Application::service('config');
                 $filepath = $config['app.dir.root']."/$filepath";
             }
             $this->destinationFile = $filepath;

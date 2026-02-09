@@ -279,7 +279,7 @@ class Tile extends CObject {
         $tileHint = false;
         if (Application::isAdminIP()) {
             /** @var Config $config */
-            $config = $this->di('config');
+            $config = Application::service('config');
             $rootDir  = $config->getString('app.dir.root');
             $file     = $this->fileName;
             $file     = strRightFrom($file, $rootDir.DIRECTORY_SEPARATOR, 1, false, $file);

@@ -5,6 +5,7 @@ namespace rosasurfer\ministruts\log;
 
 use Throwable;
 
+use rosasurfer\ministruts\Application;
 use rosasurfer\ministruts\config\ConfigInterface as Config;
 use rosasurfer\ministruts\core\StaticClass;
 use rosasurfer\ministruts\log\appender\AppenderInterface as LogAppender;
@@ -81,7 +82,7 @@ class Logger extends StaticClass {
         if (!$initialized) {
             // read the configured application loglevel
             /** @var Config $config */
-            $config = self::di('config');
+            $config = Application::service('config');
             $value = $config['log.level.default'] ?? '';
             $logLevel = 0;
 
@@ -119,7 +120,7 @@ class Logger extends StaticClass {
         static $config = null;
         if (!$config) {
             /** @var Config $config */
-            $config = self::di('config');
+            $config = Application::service('config');
         }
 
         switch ($id) {

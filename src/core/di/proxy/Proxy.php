@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\core\di\proxy;
 
+use rosasurfer\ministruts\Application;
 use rosasurfer\ministruts\core\StaticClass;
 use rosasurfer\ministruts\core\exception\IllegalAccessException;
 use rosasurfer\ministruts\core\exception\UnimplementedFeatureException;
@@ -31,17 +32,17 @@ abstract class Proxy extends StaticClass {
 
     /**
      * Get the object instance behind the proxy. The standard implementation looks-up the instance in the application's
-     * default service container. Override this method to change that behavior.
+     * dependency container. Override this method to change that behavior.
      *
      * @return object
      */
     public static function instance(): object {
         $key = static::getServiceName();
 
-        if (isset(static::$resolvedInstances[$key]))
+        if (isset(static::$resolvedInstances[$key])) {
             return static::$resolvedInstances[$key];
-
-        return static::$resolvedInstances[$key] = self::di()->get($key);
+        }
+        return static::$resolvedInstances[$key] = Application::service($key);
     }
 
 

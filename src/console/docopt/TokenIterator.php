@@ -9,7 +9,6 @@ use Throwable;
 use rosasurfer\ministruts\console\docopt\exception\DocoptFormatError;
 use rosasurfer\ministruts\console\docopt\exception\DocoptUserNotification;
 use rosasurfer\ministruts\core\ObjectTrait;
-use rosasurfer\ministruts\core\di\DiAwareTrait;
 
 use function rosasurfer\ministruts\preg_split;
 use function rosasurfer\ministruts\preg_replace;
@@ -21,7 +20,7 @@ use function rosasurfer\ministruts\preg_replace;
  */
 class TokenIterator extends ArrayIterator {
 
-    use ObjectTrait, DiAwareTrait;
+    use ObjectTrait;
 
     /** @var class-string<Throwable> */
     protected string $errorClass;

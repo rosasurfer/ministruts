@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\cache;
 
+use rosasurfer\ministruts\Application;
 use rosasurfer\ministruts\cache\monitor\Dependency;
 use rosasurfer\ministruts\config\ConfigInterface as Config;
 use rosasurfer\ministruts\core\exception\RuntimeException;
@@ -36,7 +37,7 @@ final class FileSystemCache extends CachePeer {
         $this->options   = $options;
 
         /** @var Config $config */
-        $config = $this->di('config');
+        $config = Application::service('config');
 
         // determine the cache directory to use
         /** @var ?string $directory */

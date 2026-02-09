@@ -6,7 +6,6 @@ namespace rosasurfer\ministruts\file\xml;
 use Throwable;
 
 use rosasurfer\ministruts\core\ObjectTrait;
-use rosasurfer\ministruts\core\di\DiAwareTrait;
 use rosasurfer\ministruts\core\exception\ExceptionInterface as RosasurferException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 
@@ -21,7 +20,7 @@ use const rosasurfer\ministruts\NL;
  */
 class SimpleXMLElement extends \SimpleXMLElement {
 
-    use ObjectTrait, DiAwareTrait;
+    use ObjectTrait;
 
     /**
      * Create a new SimpleXMLElement instance.

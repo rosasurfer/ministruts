@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\struts\url;
 
+use rosasurfer\ministruts\Application;
 use rosasurfer\ministruts\config\ConfigInterface as Config;
 
 /**
@@ -23,7 +24,7 @@ class VersionedUrl extends Url {
         else                $name = substr($relativeUri, 0, $pos);
 
         /** @var Config $config */
-        $config = $this->di('config');
+        $config = Application::service('config');
         $webDir = $config->getString('app.dir.web', '');
 
         if ($webDir && file_exists($fileName = $webDir.'/'.$name)) {

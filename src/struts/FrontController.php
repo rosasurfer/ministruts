@@ -5,6 +5,7 @@ namespace rosasurfer\ministruts\struts;
 
 use Throwable;
 
+use rosasurfer\ministruts\Application;
 use rosasurfer\ministruts\cache\Cache;
 use rosasurfer\ministruts\cache\monitor\FileDependency;
 use rosasurfer\ministruts\config\ConfigInterface as Config;
@@ -56,7 +57,7 @@ class FrontController extends Singleton {
                 $controller = self::getInstance(static::class);
 
                 /** @var Config $config */
-                $config = self::di('config');
+                $config = Application::service('config');
                 $configDir = $config['app.dir.config'];
                 $configFile = str_replace('\\', '/', $configDir.'/struts-config.xml');
 
@@ -80,7 +81,7 @@ class FrontController extends Singleton {
         parent::__construct();
 
         /** @var Config $config */
-        $config = $this->di('config');
+        $config = Application::service('config');
 
         // lookup Struts configuration files
         $configDir = $config->get('app.dir.struts', null);

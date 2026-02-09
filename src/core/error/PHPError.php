@@ -7,7 +7,6 @@ use BadMethodCallException;
 use ErrorException;
 
 use rosasurfer\ministruts\core\ObjectTrait;
-use rosasurfer\ministruts\core\di\DiAwareTrait;
 use rosasurfer\ministruts\core\exception\ExceptionInterface as RosasurferException;
 use rosasurfer\ministruts\core\exception\ExceptionTrait as RosasurferExceptionTrait;
 use rosasurfer\ministruts\util\PHP;
@@ -17,7 +16,7 @@ use rosasurfer\ministruts\util\PHP;
  */
 class PHPError extends ErrorException implements RosasurferException {
 
-    use RosasurferExceptionTrait, ObjectTrait, DiAwareTrait;
+    use RosasurferExceptionTrait, ObjectTrait;
 
     /**
      * Create a new instance. A PHP error can't have nested errors/exceptions.

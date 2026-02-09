@@ -3,7 +3,8 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\struts;
 
-use rosasurfer\ministruts\config\ConfigInterface;
+use rosasurfer\ministruts\Application;
+use rosasurfer\ministruts\config\ConfigInterface as Config;
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\exception\IllegalStateException;
 use rosasurfer\ministruts\file\xml\SimpleXMLElement;
@@ -238,8 +239,8 @@ class Module extends CObject {
     protected function setResourceBase(SimpleXMLElement $xml): self {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
-        /** @var ConfigInterface $config */
-        $config = $this->di('config');
+        /** @var Config $config */
+        $config = Application::service('config');
 
         if (!isset($xml['file-base'])) {
             // not specified, apply global configuration

@@ -5,7 +5,8 @@ namespace rosasurfer\ministruts\core\lock;
 
 use Throwable;
 
-use rosasurfer\ministruts\config\ConfigInterface;
+use rosasurfer\ministruts\Application;
+use rosasurfer\ministruts\config\ConfigInterface as Config;
 use rosasurfer\ministruts\core\error\ErrorHandler;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 
@@ -41,8 +42,8 @@ class Lock extends BaseLock {
             $this->impl = new SysvLock($key);
         }
         else {
-            /** @var ConfigInterface $config */
-            $config = $this->di('config');
+            /** @var Config $config */
+            $config = Application::service('config');
 
             // fall-back to FileLock...
             $directory = $config->get('app.dir.tmp', null);

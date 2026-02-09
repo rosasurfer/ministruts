@@ -6,6 +6,7 @@ namespace rosasurfer\ministruts\util;
 use LibXMLError;
 use Throwable;
 
+use rosasurfer\ministruts\Application;
 use rosasurfer\ministruts\config\ConfigInterface as Config;
 use rosasurfer\ministruts\core\StaticClass;
 use rosasurfer\ministruts\core\exception\ExceptionInterface as RosasurferException;
@@ -309,7 +310,7 @@ class PHP extends StaticClass {
      */
     public static function phpinfo(): void {
         /** @var Config $config */
-        $config = self::di('config');
+        $config = Application::service('config');
         $issues = [];
 
         // core configuration

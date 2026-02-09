@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\cache;
 
+use rosasurfer\ministruts\Application;
 use rosasurfer\ministruts\cache\monitor\Dependency;
 use rosasurfer\ministruts\config\ConfigInterface as Config;
 
@@ -21,7 +22,7 @@ class ApcCache extends CachePeer {
      */
     public function __construct(?string $label = null, array $options = []) {
         /** @var Config $config */
-        $config = $this->di('config');
+        $config = Application::service('config');
 
         $label ??= '';
         $this->label     = $label;
