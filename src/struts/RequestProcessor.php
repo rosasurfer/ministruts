@@ -466,7 +466,7 @@ HTML_SNIPPET;
 
     /**
      * Move an old {@link ActionForm} stored in the session to the current {@link Request}. The form will be available via
-     * {@link \rosasurfer\ministruts\core\container\facade\Forms} and {@link \rosasurfer\ministruts\core\di\facade\Form::old()},
+     * {@link \rosasurfer\ministruts\core\container\facade\Forms} and {@link \rosasurfer\ministruts\core\facade\Form::old()},
      * giving access to the input of the previous request.
      *
      * @param  Request $request

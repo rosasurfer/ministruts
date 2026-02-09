@@ -9,11 +9,11 @@ with service definitions in the form ```$name => $definition```.
   anonymous function (interpreted as a service factory) or another ```object``` instance (interpreted as a service itself).
 
 A definition does not define whether a service can be used in a dependency injection or in a service location context. The
-usage pattern is determined at runtime depending on the used DI accessor method:
+usage pattern is determined at runtime depending on the used container accessor:
 
-- ```Di::get($name)```: Uses the dependency in a service location context and returns always the same instance. This method
+- ```Container::service($name)```: Uses the dependency in a service location context and returns always the same instance. This method
   does not support additional instantiation parameters. All required parameters must be specified in the service definition.
-- ```Di::create($name, ...$params)```: Uses the dependency in a factory context and returns always a new instance.
+- ```Container::factory($name, ...$params)```: Uses the dependency in a factory context and returns always a new instance.
   This method supports additional instantiation parameters for each new instance.
 
 Dependencies are lazy-loaded, i.e. they are instantiated on first use.
@@ -42,22 +42,21 @@ return [
 
 Dependencies can be defined at runtime:
 ```php
-$di = $this->di();                         // getting the default container in a class context
-$di = Application::getDi();                // getting the default container in a non-class context
+// get the application container
+$container = Application::container();        
 
-// defining a parameterless dependency
-$di->set('warrior', \rosasurfer\model\Hobbit::class);
+// define a parameterless dependency
+$container->set('warrior', \rosasurfer\model\Hobbit::class);
 ```
 A parameterless definition can be used in a parameterized factory context. The opposite - using a definition which requires
 parameters in a parameterless context (i.e. service location) - is not possible:
 ```php
-$di = Application::getDi();
-$options = ['status'=>'not-afraid'];
-$warrior = $di->create('warrior', $options);
+$options = ['status' => 'not-afraid'];
+$warrior = $container->factory('warrior', $options);
 ```
 
-On dependency instantiation closures/anonymous functions are invoked in the class context of the DI container. In the function
-body they have access to all registered application services:
+On dependency instantiation closures/anonymous functions are invoked in the class context of the container.
+They have access to all registered dependencies:
 ```php
 <?php
 // services.php
