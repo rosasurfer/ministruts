@@ -16,11 +16,11 @@ use Traversable;
 
 use rosasurfer\ministruts\console\docopt\DocoptParser;
 use rosasurfer\ministruts\console\docopt\DocoptResult;
-use rosasurfer\ministruts\core\di\proxy\Request as RequestProxy;
 use rosasurfer\ministruts\core\exception\Exception;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 use rosasurfer\ministruts\core\lock\Lock;
+use rosasurfer\ministruts\core\proxy\Request as RequestProxy;
 use rosasurfer\ministruts\file\FileSystem;
 //use rosasurfer\ministruts\log\detail\Request;
 use rosasurfer\ministruts\struts\url\Url;

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\core\facade;
 
-use rosasurfer\ministruts\core\di\proxy\Request;
+use rosasurfer\ministruts\core\proxy\Request;
 use rosasurfer\ministruts\struts\ActionForm;
 use rosasurfer\ministruts\struts\EmptyActionForm;
 use rosasurfer\ministruts\struts\Struts;

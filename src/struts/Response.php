@@ -4,10 +4,10 @@ declare(strict_types=1);
 namespace rosasurfer\ministruts\struts;
 
 use rosasurfer\ministruts\core\Singleton;
-use rosasurfer\ministruts\core\di\proxy\Request as RequestProxy;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\ExceptionInterface as RosasurferException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
+use rosasurfer\ministruts\core\proxy\Request as RequestProxy;
 use rosasurfer\ministruts\net\http\HttpResponse;
 
 use function rosasurfer\ministruts\strLeft;

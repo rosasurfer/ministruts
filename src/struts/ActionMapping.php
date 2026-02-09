@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace rosasurfer\ministruts\struts;
 
 use rosasurfer\ministruts\core\CObject;
-use rosasurfer\ministruts\core\di\proxy\Request as RequestProxy;
 use rosasurfer\ministruts\core\exception\IllegalStateException;
+use rosasurfer\ministruts\core\proxy\Request as RequestProxy;
 
 use function rosasurfer\ministruts\preg_match;
 use function rosasurfer\ministruts\strCompareI;

@@ -5,7 +5,7 @@ namespace rosasurfer\ministruts\core\facade;
 
 use ReflectionClass;
 
-use rosasurfer\ministruts\core\di\proxy\Request as RequestProxy;
+use rosasurfer\ministruts\core\proxy\Request as RequestProxy;
 use rosasurfer\ministruts\struts\ActionInput;
 use rosasurfer\ministruts\struts\Struts;
 

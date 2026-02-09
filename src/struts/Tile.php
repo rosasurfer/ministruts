@@ -8,8 +8,8 @@ use Closure;
 use rosasurfer\ministruts\Application;
 use rosasurfer\ministruts\config\ConfigInterface as Config;
 use rosasurfer\ministruts\core\CObject;
-use rosasurfer\ministruts\core\di\proxy\Request as RequestProxy;
 use rosasurfer\ministruts\core\exception\IllegalStateException;
+use rosasurfer\ministruts\core\proxy\Request as RequestProxy;
 
 use function rosasurfer\ministruts\strLeft;
 use function rosasurfer\ministruts\strRightFrom;

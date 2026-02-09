@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace rosasurfer\ministruts\core\di\proxy;
+namespace rosasurfer\ministruts\core\proxy;
 
 use rosasurfer\ministruts\struts\ActionInput;
 use rosasurfer\ministruts\struts\ActionMapping;

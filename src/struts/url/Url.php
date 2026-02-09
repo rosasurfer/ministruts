@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace rosasurfer\ministruts\struts\url;
 
 use rosasurfer\ministruts\core\CObject;
-use rosasurfer\ministruts\core\di\proxy\Request;
 use rosasurfer\ministruts\core\exception\RuntimeException;
+use rosasurfer\ministruts\core\proxy\Request;
 
 /**
  * URL generation helper

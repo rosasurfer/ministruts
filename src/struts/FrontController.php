@@ -10,10 +10,10 @@ use rosasurfer\ministruts\cache\Cache;
 use rosasurfer\ministruts\cache\monitor\FileDependency;
 use rosasurfer\ministruts\config\ConfigInterface as Config;
 use rosasurfer\ministruts\core\Singleton;
-use rosasurfer\ministruts\core\di\proxy\Request as RequestProxy;
 use rosasurfer\ministruts\core\exception\IllegalStateException;
 use rosasurfer\ministruts\core\exception\ExceptionInterface as RosasurferException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
+use rosasurfer\ministruts\core\proxy\Request as RequestProxy;
 use rosasurfer\ministruts\net\http\HttpResponse;
 
 use function rosasurfer\ministruts\strLeftTo;

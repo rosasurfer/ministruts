@@ -10,11 +10,11 @@ use rosasurfer\ministruts\console\docopt\DocoptResult;
 use rosasurfer\ministruts\console\io\Input;
 use rosasurfer\ministruts\console\io\Output;
 use rosasurfer\ministruts\core\CObject;
-use rosasurfer\ministruts\core\di\proxy\CliInput as InputProxy;
-use rosasurfer\ministruts\core\di\proxy\Output as OutputProxy;
 use rosasurfer\ministruts\core\exception\IllegalStateException;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
+use rosasurfer\ministruts\core\proxy\CliInput as InputProxy;
+use rosasurfer\ministruts\core\proxy\Output as OutputProxy;
 
 use function rosasurfer\ministruts\preg_match;
 use function rosasurfer\ministruts\simpleClassName;
