@@ -9,7 +9,7 @@ use rosasurfer\ministruts\console\docopt\DocoptResult;
 /**
  * CliInput
  *
- * A {@link Proxy} for the CLI "input" {@link \rosasurfer\ministruts\core\di\service\Service} which is registered in the service container.
+ * A {@link Proxy} for the CLI "input" {@link \rosasurfer\ministruts\core\container\service\Service} which is registered in the service container.
  *
  * Default implementation: {@link \rosasurfer\ministruts\console\io\Input}
  *

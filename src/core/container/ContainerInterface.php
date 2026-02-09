@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace rosasurfer\ministruts\core\di;
+namespace rosasurfer\ministruts\core\container;
 
 use ArrayAccess;
 
-use rosasurfer\ministruts\core\di\service\ServiceInterface as IService;
-use rosasurfer\ministruts\core\di\service\ServiceNotFoundException;
+use rosasurfer\ministruts\core\container\service\ServiceInterface as IService;
+use rosasurfer\ministruts\core\container\service\ServiceNotFoundException;
 
 use Psr\Container\ContainerInterface as PsrContainer;
 

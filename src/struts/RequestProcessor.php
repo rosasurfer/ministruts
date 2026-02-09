@@ -449,8 +449,8 @@ HTML_SNIPPET;
 
     /**
      * Copy the {@link ActionForm} configured for the current {@link ActionMapping} from the {@link Request} to the {@link HttpSession}.
-     * On the next request the form will be available via {@link \rosasurfer\ministruts\core\di\facade\Form::old()}, giving access to
-     * the input of the previous request. An {@link EmptyActionForm} can't be configured for a mapping, and will not be copied.
+     * On the next request the form will be available via {@link \rosasurfer\ministruts\core\container\facade\Form::old()}, giving access
+     * to the input of the previous request. An {@link EmptyActionForm} can't be configured for a mapping, and will not be copied.
      *
      * @param  Request $request
      *
@@ -466,8 +466,8 @@ HTML_SNIPPET;
 
     /**
      * Move an old {@link ActionForm} stored in the session to the current {@link Request}. The form will be available via
-     * {@link \rosasurfer\ministruts\core\di\facade\Forms} and {@link \rosasurfer\ministruts\core\di\facade\Form::old()}, giving access
-     * to the input of the previous request.
+     * {@link \rosasurfer\ministruts\core\container\facade\Forms} and {@link \rosasurfer\ministruts\core\di\facade\Form::old()},
+     * giving access to the input of the previous request.
      *
      * @param  Request $request
      *

@@ -8,7 +8,7 @@ use rosasurfer\ministruts\console\io\Output as ConsoleOutput;
 /**
  * Output
  *
- * A {@link Proxy} for the "output" {@link \rosasurfer\ministruts\core\di\service\Service} currently registered in the service container.
+ * A {@link Proxy} for the "output" {@link \rosasurfer\ministruts\core\container\service\Service} currently registered in the service container.
  *
  * Default implementation: {@link \rosasurfer\ministruts\console\io\Output}
  *

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace rosasurfer\ministruts\core\di;
+namespace rosasurfer\ministruts\core\container;
 
 use rosasurfer\ministruts\core\exception\RuntimeException;
 

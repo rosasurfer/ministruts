@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace rosasurfer\ministruts\core\di;
+namespace rosasurfer\ministruts\core\container;
 
 use rosasurfer\ministruts\console\io\Output;
-use rosasurfer\ministruts\core\di\service\Service;
+use rosasurfer\ministruts\core\container\service\Service;
 use rosasurfer\ministruts\struts\Request;
 
 /**

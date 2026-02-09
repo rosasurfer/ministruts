@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace rosasurfer\ministruts\core\di;
+namespace rosasurfer\ministruts\core\container;
 
 use Throwable;
 
 use rosasurfer\ministruts\core\CObject;
-use rosasurfer\ministruts\core\di\service\Service;
-use rosasurfer\ministruts\core\di\service\ServiceInterface as IService;
-use rosasurfer\ministruts\core\di\service\ServiceNotFoundException;
+use rosasurfer\ministruts\core\container\service\Service;
+use rosasurfer\ministruts\core\container\service\ServiceInterface as IService;
+use rosasurfer\ministruts\core\container\service\ServiceNotFoundException;
 
 /**
  * A class for managing application dependencies.
