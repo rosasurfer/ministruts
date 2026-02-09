@@ -9,9 +9,9 @@ use rosasurfer\ministruts\console\Command;
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\di\ContainerException;
-use rosasurfer\ministruts\core\di\DiInterface as Di;
-use rosasurfer\ministruts\core\di\auto\CliServiceContainer;
-use rosasurfer\ministruts\core\di\auto\WebServiceContainer;
+use rosasurfer\ministruts\core\di\ContainerInterface as Container;
+use rosasurfer\ministruts\core\di\DefaultCliContainer;
+use rosasurfer\ministruts\core\di\DefaultWebContainer;
 use rosasurfer\ministruts\core\di\service\ServiceNotFoundException;
 use rosasurfer\ministruts\core\error\ErrorHandler;
 use rosasurfer\ministruts\core\exception\IllegalStateException;
@@ -33,8 +33,8 @@ class Application extends CObject {
     /** @var ConfigInterface - the main configuration */
     protected ConfigInterface $config;
 
-    /** @var Di - the dependency container */
-    protected Di $container;
+    /** @var Container - the dependency container */
+    protected Container $container;
 
     /** @var Command[] - registered CLI commands */
     protected array $commands = [];
@@ -191,10 +191,10 @@ class Application extends CObject {
      *
      * @param  string $directory - directory with service configurations
      *
-     * @return Di
+     * @return Container
      */
-    protected function initContainer(string $directory): Di {
-        $class = CLI ? CliServiceContainer::class : WebServiceContainer::class;
+    protected function initContainer(string $directory): Container {
+        $class = CLI ? DefaultCliContainer::class : DefaultWebContainer::class;
         return new $class($directory);
     }
 
@@ -354,13 +354,13 @@ class Application extends CObject {
 
 
     /**
-     * Set the {@link Application}s dependency container.
+     * Set the {@link Application}'s dependency container.
      *
-     * @param  Di $container
+     * @param  Container $container
      *
      * @return $this
      */
-    public function setContainer(Di $container): self {
+    public function setContainer(Container $container): self {
         if (!$container->has('app')) {
             $container->set('app', $this);
         }
@@ -375,9 +375,9 @@ class Application extends CObject {
     /**
      * Return the {@link Application}'s dependency container.
      *
-     * @return ?Di
+     * @return ?Container
      */
-    public static function container(): ?Di {
+    public static function container(): ?Container {
         $app = self::$instance;
         return $app ? $app->container : null;
     }
@@ -387,7 +387,7 @@ class Application extends CObject {
      * Service locator
      *
      * Resolve an application service and return its implementation. This method always returns the same instance.
-     * Alias of {@link Di::get()}.
+     * Alias of {@link Container::get()}.
      *
      * @param  string $name
      *

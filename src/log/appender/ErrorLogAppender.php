@@ -25,7 +25,7 @@ use const rosasurfer\ministruts\WINDOWS;
  *
  * @example
  * <pre>
- *  $config = $this->di('config');
+ *  $config = Application::service('config');
  *  $options = $config['log.appender.errorlog'];
  *  $appender = new ErrorLogAppender($options);
  *

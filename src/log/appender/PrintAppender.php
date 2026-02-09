@@ -24,7 +24,7 @@ use const rosasurfer\ministruts\NL;
  *
  * @example
  * <pre>
- *  $config = $this->di('config');
+ *  $config = Application::service('config');
  *  $options = $config['log.appender.print'];
  *  $appender = new PrintAppender($options);
  *

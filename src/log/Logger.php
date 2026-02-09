@@ -40,7 +40,7 @@ use const rosasurfer\ministruts\L_WARN;
  *
  * @example
  * <pre>
- *  $config = $this->di('config');
+ *  $config = Application::service('config');
  *  $config['log.level.default']              = L_WARN;         // set the application's default loglevel to L_WARN
  *  $config['log.level.class.ClassA']         = L_DEBUG;        // set the loglevel for class "ClassA" to L_DEBUG
  *  $config['log.level.class.foo\bar\ClassB'] = L_ERROR;        // set the loglevel for class "foo\bar\ClassB" to L_ERROR

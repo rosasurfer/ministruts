@@ -11,15 +11,13 @@ use rosasurfer\ministruts\core\di\service\ServiceInterface as IService;
 use rosasurfer\ministruts\core\di\service\ServiceNotFoundException;
 
 /**
- * Di
- *
- * A class that implements management of dependencies.
+ * A class for managing application dependencies.
  *
  * The definition of a dependency does not specify its intended runtime usage (i.e. service locator vs factory pattern).
  * The applied usage is determined at runtime from the called resolver method.
  *
  * <pre>
- *  $container = new Di();                                  // create a new container
+ *  $container = new Container();                           // create a new container
  *  $container = Application::container();                  // get the application container
  *
  *  // define a parameterless service using a string
@@ -35,7 +33,7 @@ use rosasurfer\ministruts\core\di\service\ServiceNotFoundException;
  *  $tile    = $container->factory('tile', ...$args);       // resolve a new instance using the factory pattern
  * </pre>
  */
-class Di extends CObject implements DiInterface {
+class Container extends CObject implements ContainerInterface {
 
     /** @var IService[] - list of registered services */
     protected array $services = [];

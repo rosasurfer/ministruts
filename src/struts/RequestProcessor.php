@@ -19,7 +19,7 @@ use function rosasurfer\ministruts\preg_replace;
  * A custom implementation can be configured for a single {@link Module} by defining the module's Struts config attribute
  * <tt>/struts-config/controller[@request-processor="%ClassName"]</tt>.
  *
- * A custom implementation can be configured for all {@link Module}s by re-defining the DI service named "requestProcessor".
+ * A custom implementation can be configured for all {@link Module}s by re-defining the application dependency "requestProcessor".
  */
 class RequestProcessor extends CObject {
 

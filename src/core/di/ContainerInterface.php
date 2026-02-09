@@ -8,16 +8,14 @@ use ArrayAccess;
 use rosasurfer\ministruts\core\di\service\ServiceInterface as IService;
 use rosasurfer\ministruts\core\di\service\ServiceNotFoundException;
 
-use Psr\Container\ContainerInterface;
+use Psr\Container\ContainerInterface as PsrContainer;
 
 /**
- * DiInterface
- *
  * Interface to be implemented by dependency containers.
  *
  * @extends ArrayAccess<string, object>
  */
-interface DiInterface extends ArrayAccess, ContainerInterface {
+interface ContainerInterface extends ArrayAccess, PsrContainer {
 
     /**
      * Whether a dependency with the specified name is registered in the container.
