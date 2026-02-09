@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace rosasurfer\ministruts\core\di\facade;
+namespace rosasurfer\ministruts\core\facade;
 
 /**
  * Forms
