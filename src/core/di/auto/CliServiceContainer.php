@@ -9,17 +9,17 @@ use rosasurfer\ministruts\core\di\Di;
 use rosasurfer\ministruts\core\di\service\Service;
 
 /**
- * Default dependency injector automatically created for command-line applications.
+ * Default dependency container automatically created for command-line applications.
  *
- * A variant of the standard dependency injector {@link Di} suitable for CLI applications. Registers CLI related
- * services provided by the framework and user-defined services loaded from the file "{app.dir.config}/services.php".
+ * A variant of {@link Di} suitable for CLI applications. Registers CLI related dependencies provided by the framework
+ * and user-defined dependencies loaded from file "{app.dir.config}/services.php".
  */
 class CliServiceContainer extends Di {
 
     /**
      * Constructor
      *
-     * @param  string $configDir - directory to load custom service definitions from
+     * @param  string $configDir - directory to load custom dependency definitions from
      */
     public function __construct(string $configDir) {
         $services = [

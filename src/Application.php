@@ -4,16 +4,19 @@ declare(strict_types=1);
 namespace rosasurfer\ministruts;
 
 use rosasurfer\ministruts\config\Config;
-use rosasurfer\ministruts\config\ConfigInterface as IConfig;
+use rosasurfer\ministruts\config\ConfigInterface;
 use rosasurfer\ministruts\console\Command;
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\assert\Assert;
+use rosasurfer\ministruts\core\di\ContainerException;
 use rosasurfer\ministruts\core\di\DiInterface as Di;
 use rosasurfer\ministruts\core\di\auto\CliServiceContainer;
 use rosasurfer\ministruts\core\di\auto\WebServiceContainer;
+use rosasurfer\ministruts\core\di\service\ServiceNotFoundException;
 use rosasurfer\ministruts\core\error\ErrorHandler;
 use rosasurfer\ministruts\core\exception\IllegalStateException;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
+use rosasurfer\ministruts\core\exception\RuntimeException;
 use rosasurfer\ministruts\log\Logger;
 use rosasurfer\ministruts\struts\FrontController;
 use rosasurfer\ministruts\struts\Response;
@@ -24,17 +27,17 @@ use rosasurfer\ministruts\util\PHP;
  */
 class Application extends CObject {
 
-    /** @var Application - the application itself */
-    protected static self $instance;
+    /** @var ?Application - the application instance */
+    protected static ?self $instance;
 
-    /** @var ?IConfig - the application's main configuration */
-    protected static ?IConfig $config = null;
+    /** @var ConfigInterface - the main configuration */
+    protected ConfigInterface $config;
 
-    /** @var Di|null - the application's service container */
-    protected static ?Di $di = null;
+    /** @var Di - the dependency container */
+    protected Di $container;
 
     /** @var Command[] - registered CLI commands */
-    private array $commands = [];
+    protected array $commands = [];
 
 
     /**
@@ -69,11 +72,14 @@ class Application extends CObject {
         $errorLevel = $options['app.error-handler.level'] ?? null;
         $this->initErrorHandling($errorLevel, $errorMode);
 
-        $config = $this->initConfig($options);
-        $configDir = $config->getString('app.dir.config');
-        $di = $this->initDi($configDir);
-        $di->set('app', $this);
-        $di->set('config', $config);
+        // initialize the configuration
+        $this->config = $this->initConfig($options);
+        $configDir = $this->config->getString('app.dir.config');
+
+        // initialize the container
+        $this->container = $this->initContainer($configDir)
+                                ->set('app', $this)
+                                ->set('config', $this->config);
 
         // adjust runtime behavior
         $this->configure();
@@ -153,19 +159,18 @@ class Application extends CObject {
 
 
     /**
-     * Load and initialize the main configuration.
+     * Create and initialize the main configuration.
      *
      * @param  array<string, ?scalar> $options - configuration options as passed to the framework loader
      *
-     * @return IConfig
+     * @return ConfigInterface
      */
-    protected function initConfig(array $options): IConfig {
+    protected function initConfig(array $options): ConfigInterface {
         $location = (string)($options['app.dir.config'] ?? getcwd());
         $config = Config::createFrom($location);
-        $this->setConfig($config);
         unset($options['app.dir.config']);
 
-        // set root directory
+        // set application root directory
         $rootDir = (string)($options['app.dir.root'] ?? getcwd());
         $config->set('app.dir.root', $rootDir);
         unset($options['app.dir.root']);
@@ -182,17 +187,15 @@ class Application extends CObject {
 
 
     /**
-     * Load and initialize the dependency/service container.
+     * Create and initialize a new dependency container.
      *
      * @param  string $directory - directory with service configurations
      *
      * @return Di
      */
-    protected function initDi(string $directory): Di {
+    protected function initContainer(string $directory): Di {
         $class = CLI ? CliServiceContainer::class : WebServiceContainer::class;
-        $di = new $class($directory);
-        $this->setDi($di);
-        return $di;
+        return new $class($directory);
     }
 
 
@@ -202,8 +205,7 @@ class Application extends CObject {
      * @return void
      */
     protected function configure(): void {
-        $config = self::$config;
-        if (!$config) return;
+        $config = $this->config;
 
         // ensure that we have an "app.id"
         $appId = $config->get('app.id', null);
@@ -222,9 +224,10 @@ class Application extends CObject {
 
         // log excessive memory consumption
         register_shutdown_function(static function(): void {
-            if (!self::$config) return;
+            /** @var self $app */
+            $app = self::$instance;
 
-            $warnLimit = php_byte_value(self::$config->get('log.warn.memory_limit', PHP_INT_MAX));
+            $warnLimit = php_byte_value($app->config->get('log.warn.memory_limit', PHP_INT_MAX));
             $usedBytes = memory_get_peak_usage(true);
             if ($usedBytes > $warnLimit) {
                 Logger::log('Memory consumption exceeded '.prettyBytes($warnLimit).' (peak usage: '.prettyBytes($usedBytes).')', L_WARN, ['class' => self::class]);
@@ -248,11 +251,10 @@ class Application extends CObject {
         $configInfoTask = isset($_GET['__config__' ]) && !$cacheInfoTask;
 
         if ($configInfoTask || $phpInfoTask || $cacheInfoTask) {
-            $config = self::$config;
-            if ($config && self::isAdminIP()) {
+            if (self::isAdminIP()) {
                 // execute "config-info" task if enabled
                 if ($configInfoTask) {
-                    $configFiles = $config->getConfigFiles();
+                    $configFiles = $this->config->getConfigFiles();
                     $files = [];
                     foreach ($configFiles as $file => $exists) {
                         $files[] = ($exists ? 'OK':'? ').'   '.str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $file);
@@ -272,7 +274,7 @@ class Application extends CObject {
                                                               .NL
                            .'Application configuration:'      .NL
                            .'--------------------------'      .NL
-                           .print_r($config->dump(['sort'=>SORT_ASC]), true)
+                           .print_r($this->config->dump(['sort'=>SORT_ASC]), true)
                            ?>
                         </pre>
                     </div>
@@ -340,47 +342,86 @@ class Application extends CObject {
     /**
      * Set the {@link Application}'s main configuration.
      *
-     * @param  IConfig $configuration
+     * @param  ConfigInterface $configuration
      *
      * @return $this
      */
-    protected function setConfig(IConfig $configuration): self {
-        self::$config = $configuration;
-
-        if (isset(self::$di)) {
-            self::$di->set('config', $configuration);
-        }
+    public function setConfig(ConfigInterface $configuration): self {
+        $this->config = $configuration;
+        $this->container->set('config', $configuration);
         return $this;
     }
 
 
     /**
-     * Set the {@link Application}s dependency/service container.
+     * Set the {@link Application}s dependency container.
      *
-     * @param  Di $di
+     * @param  Di $container
      *
      * @return $this
      */
-    protected function setDi(Di $di): self {
-        if (!$di->has('app')) {
-            $di->set('app', $this);
+    public function setContainer(Di $container): self {
+        if (!$container->has('app')) {
+            $container->set('app', $this);
         }
-        if (!$di->has('config') && self::$config) {
-            $di->set('config', self::$config);
+        if (!$container->has('config')) {
+            $container->set('config', $this->config);
         }
-        self::$di = $di;
+        $this->container = $container;
         return $this;
     }
 
 
     /**
-     * Return the {@link Application}'s dependency container. This method should be used to access
-     * the container from a non-class context (i.e. from procedural code).
+     * Return the {@link Application}'s dependency container.
      *
      * @return ?Di
      */
-    public static function getDi(): ?Di {
-        return self::$di;
+    public static function container(): ?Di {
+        $app = self::$instance;
+        return $app ? $app->container : null;
+    }
+
+
+    /**
+     * Service locator
+     *
+     * Resolve an application service and return its implementation. This method always returns the same instance.
+     * Alias of {@link Di::get()}.
+     *
+     * @param  string $name
+     *
+     * @return object
+     *
+     * @throws ServiceNotFoundException if the service was not found
+     * @throws ContainerException       if the dependency could not be resolved
+     */
+    public static function service(string $name): object {
+        if ($container = self::container()) {
+            return $container->get($name);
+        }
+        throw new RuntimeException('Application not initialized');
+    }
+
+
+    /**
+     * Factory pattern
+     *
+     * Resolve a named dependency and return a new instance of the wrapped object.
+     *
+     * @param  string   $name
+     * @param  mixed ...$args - instantiation arguments
+     *
+     * @return object
+     *
+     * @throws ServiceNotFoundException if the service was not found
+     * @throws ContainerException       if the dependency could not be resolved
+     */
+    public static function factory(string $name, ...$args): object {
+        if ($container = self::container()) {
+            return $container->factory($name, ...$args);
+        }
+        throw new RuntimeException('Application not initialized');
     }
 
 
@@ -404,12 +445,12 @@ class Application extends CObject {
         }
 
         static $whiteList = null;
-        if (!$whiteList && self::$config) {
-            $values = self::$config->get('admin.ip', []);
+        if (!$whiteList && self::$instance) {
+            $values = self::$instance->config->get('admin.ip', []);
             if (!\is_array($values)) $values = [$values];
             $whiteList = array_flip($values);
         }                                               // add always white-listed IPs (default)
-        $list = ($whiteList ?? []) + ['127.0.0.1'=>'localhost', $_SERVER['SERVER_ADDR']=>'serverIP'];
+        $list = $whiteList + ['127.0.0.1'=>'localhost', $_SERVER['SERVER_ADDR']=>'serverIP'];
 
         $addr = $_SERVER['HTTP_X_REAL_IP']              // nginx and others
              ?? $_SERVER['HTTP_TRUE_CLIENT_IP']         // Akamai, Cloudflare Enterprise

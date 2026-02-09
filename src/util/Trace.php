@@ -207,10 +207,10 @@ class Trace extends StaticClass {
      */
     public static function toString(array $trace, string $indent = ''): string {
         $appRoot = '';
-        $di = Application::getDi();
-        if ($di && $di->has('config')) {
+        $container = Application::container();
+        if ($container && $container->has('config')) {
             /** @var Config $config */
-            $config = $di['config'];
+            $config = $container['config'];
             $appRoot = $config->getString('app.dir.root');
         }
         $result = '';
