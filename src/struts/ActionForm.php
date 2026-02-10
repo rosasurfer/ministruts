@@ -145,31 +145,6 @@ abstract class ActionForm extends CObject implements ArrayAccess {
 
 
     /**
-     * Return the form property with the specified name. If a getter for the property exists the getter is called.
-     * Otherwise the property is returned.
-     *
-     * @param  string $name               - property name
-     * @param  mixed  $default [optional] - default value to return if the specified property was not found (default: NULL)
-     *
-     * @return mixed
-     */
-    public function get(string $name, $default = null) {
-        switch ($name) {
-            case 'request':
-            case 'fileUploadErrors':
-                return $default;
-        }
-        if (method_exists($this, $method='get'.$name)) {
-            return $this->$method();
-        }
-        if (property_exists($this, $name)) {
-            return $this->$name;
-        }
-        return $default;
-    }
-
-
-    /**
      * Whether a form property with the specified name exists.
      *
      * {@inheritDoc}
@@ -180,7 +155,7 @@ abstract class ActionForm extends CObject implements ArrayAccess {
             case 'fileUploadErrors':
                 return false;
         }
-        return property_exists($this, $name) || method_exists($this, 'get'.$name);
+        return property_exists($this, $name);
     }
 
 
@@ -192,7 +167,7 @@ abstract class ActionForm extends CObject implements ArrayAccess {
      */
     #[ReturnTypeWillChange]
     public function offsetGet($name) {
-        return $this->get($name);
+        return $this->__get($name);
     }
 
 
@@ -213,6 +188,55 @@ abstract class ActionForm extends CObject implements ArrayAccess {
      */
     final public function offsetUnset($name): void {
         throw new IllegalAccessException('Cannot set/modify ActionForm properties');
+    }
+
+
+    /**
+     * Return the form property with the specified name. If a getter for the property exists the getter is called.
+     * Otherwise the property is returned.
+     *
+     * @param  string $name               - property name
+     * @param  mixed  $default [optional] - default value to return if the specified property was not found (default: NULL)
+     *
+     * @return mixed
+     */
+    public function get(string $name, $default = null) {
+        switch ($name) {
+            case 'request':
+            case 'fileUploadErrors':
+                return $default;
+        }
+        if (property_exists($this, $name)) {
+            if (method_exists($this, $method = "get{$name}")) {
+                return $this->$method();
+            }
+            return $this->$name;
+        }
+        return $default;
+    }
+
+
+    /**
+     * Return the form property with the specified name. If a getter for the property exists the getter is called.
+     * Otherwise the property is returned.
+     *
+     * @param  string $name - property name
+     *
+     * @return mixed
+     */
+    public function __get(string $name) {
+        switch ($name) {
+            case 'request':
+            case 'fileUploadErrors':
+                return parent::__get($name);
+        }
+        if (property_exists($this, $name)) {
+            if (method_exists($this, $method = "get{$name}")) {
+                return $this->$method();
+            }
+            return $this->$name;
+        }
+        return parent::__get($name);
     }
 
 
