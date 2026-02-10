@@ -19,7 +19,7 @@ Used @link elements reference PHP classes in namespace \rosasurfer\ministruts\st
 -->
 
 
-<!-- ====== Type Definitions ============================================================================================ -->
+<!-- ====== Type Definitions =========================================================================================================== -->
 
 
 <!--
@@ -41,8 +41,7 @@ Used @link elements reference PHP classes in namespace \rosasurfer\ministruts\st
 
 
 <!--
-    A "RequestPath" is a module-relative URI path beginning with a slash "/" that identifies a mapped resource within the
-    web application.
+    A "RequestPath" is a module-relative URI path beginning with a slash "/" that identifies a mapped resource within the web application.
 -->
 <!ENTITY % RequestPath "CDATA">
 
@@ -54,21 +53,19 @@ Used @link elements reference PHP classes in namespace \rosasurfer\ministruts\st
 
 
 
-<!-- ====== Element Definitions ========================================================================================= -->
+<!-- ====== Element Definitions ======================================================================================================== -->
 
 
 <!--
-    The "struts-config" element is the root of the configuration file and contains nested elements for all of the other
-    configuration settings.
+    The "struts-config" element is the root of the configuration file and contains nested elements for all of the other config settings.
 
-    namespace  The default PHP namespace used for loading classes referenced by unqualified class names. Valid namespace
-               separators are the slash "/" and the backslash "\". Additional namespaces may be specified in the "imports"
-               element of the configuration.
+    namespace  The default PHP namespace used for loading classes referenced by unqualified class names. Valid namespace separators are the
+               slash "/" and the backslash "\". Additional namespaces may be specified in the "imports" element of the configuration.
                [default: the global namespace]
 
-    file-base  Comma-delimited list of paths to lookup referenced files or file system locations (templates, layouts, page
-               fragments etc). Values may be absolute or relative to the directory "app.dir.root". Each Struts {@link Module}
-               can have its own list of "file-base" locations.
+    file-base  Comma-delimited list of paths to lookup referenced files or file system locations (templates, layouts, page fragments etc).
+               Values may be absolute or relative to the directory "app.dir.root". Each Struts {@link Module} can have its own list of
+               "file-base" locations.
                [default: the application-wide configured view directory "app.dir.view"]
 -->
 <!ELEMENT struts-config (imports?, global-forwards?, action-mappings, tiles?, controller?)>
@@ -79,19 +76,19 @@ Used @link elements reference PHP classes in namespace \rosasurfer\ministruts\st
 
 
 <!--
-    The "imports" element describes a set of additional PHP names used for loading classes referenced by unqualified class
-    names. The individual names are configured through nested "import" elements.
+    The "imports" element describes a set of additional PHP names used for loading classes referenced by unqualified class names. The
+    individual names are configured through nested "import" elements.
 -->
 <!ELEMENT imports (import*)>
 <!ATTLIST import>
 
 
 <!--
-    The "import" element describes an additional name used for loading classes if a referenced unqualified class name can not
-    be resolved in the {@link Module}'s default namespace. The element's value may describe a single PHP class or an entire
-    PHP namespace. A single class is specified by its fully qualified class name. A namespace is specified by its name
-    followed by a wildcard "*" character, e.g. "foo/*". When resolving names fully qualified names are preferred over names
-    imported via namespace wildcards. Valid namespace separators are the slash "/" and the backslash "\".
+    The "import" element describes an additional name used for loading classes if a referenced unqualified class name can not be resolved
+    in the {@link Module}'s default namespace. The element's value may describe a single PHP class or an entire PHP namespace. A single
+    class is specified by its fully qualified class name. A namespace is specified by its name followed by a wildcard "*" character, e.g.
+    "foo/*". When resolving names fully qualified names are preferred over names imported via namespace wildcards. Valid namespace
+    separators are the slash "/" and the backslash "\".
 
     value  The name describing a single PHP class or all classes of a PHP namespace.
 -->
@@ -102,41 +99,39 @@ Used @link elements reference PHP classes in namespace \rosasurfer\ministruts\st
 
 
 <!--
-    The "global-forwards" element describes a set of {@link ActionForward} instances that are available to all {@link Action}
-    objects as a return value. The individual forwards are configured through nested "forward" elements. A "mapping" element
-    may override a globally defined forward by defining a local (i.e. nested) "forward" element of the same name.
+    The "global-forwards" element describes a set of {@link ActionForward} instances that are available to all {@link Action} objects as a
+    return value. The individual forwards are configured through nested "forward" elements. A "mapping" element may override a globally
+    defined forward by defining a local (i.e. nested) "forward" element of the same name.
 -->
 <!ELEMENT global-forwards (forward*)>
 <!ATTLIST global-forwards>
 
 
 <!--
-    The "forward" element describes an {@link ActionForward}. An ActionForward has a logical name and describes a resource to
-    forward a request to after it was processed. The resource can be an {@link ActionMapping}, a URI, a tile definition or a
-    file. The "forward" element can be used in both a global and a local context. Global forwards are defined in the
-    "global-forwards" element and are available to all ActionMappings of the {@link Module}. Local forwards are defined in a
-    "mapping" element and are available only in the context of that ActionMapping.
+    The "forward" element describes an {@link ActionForward}. An ActionForward has a logical name and describes a resource to forward a
+    request to after it was processed. The resource can be an {@link ActionMapping}, a URI, a tile definition or a file. The "forward"
+    element can be used in both a global and a local context. Global forwards are defined in the "global-forwards" element and are available
+    to all ActionMappings of the {@link Module}. Local forwards are defined in a "mapping" element and are available only in the context of
+    that ActionMapping.
 
     name           The unique identifier of the forward. Used to select the resource to complete the request/response.
 
-    include        The name of a {@link Tile} definition or a file to include. Tile definition names must start with a dot
-                   ".", file names must not start with a dot ".". Exactly one of "include", "mapping", "redirect" or
-                   "forward" must be specified.
+    include        The name of a {@link Tile} definition or a file to include. Tile definition names must start with a dot ".", file names
+                   must not start with a dot ".". Exactly one of "include", "mapping", "redirect" or "forward" must be specified.
 
-    mapping        The name of an {@link ActionMapping} to which a redirect instruction should be issued. Exactly one of
-                   "include", "mapping", "redirect" or "forward" must be specified.
-
-    redirect       The {@link Module}-relative URI to which a redirect instruction should be issued. Exactly one of "include",
+    mapping        The name of an {@link ActionMapping} to which a redirect instruction should be issued. Exactly one of "include",
                    "mapping", "redirect" or "forward" must be specified.
 
-    redirect-type  The type of redirect to be issued ("temporary" or "permanent"). Optional if the "redirect" attribute is
-                   specified, else not valid.
+    redirect       The {@link Module}-relative URI to which a redirect instruction should be issued. Exactly one of "include", "mapping",
+                   "redirect" or "forward" must be specified.
+
+    redirect-type  The type of redirect to be issued ("temporary" or "permanent"). Optional if the "redirect" attribute is specified, else
+                   not valid.
                    [default: "temporary"]
 
-    forward        The name of another "forward" element to use instead of the current one. Locally defined forwards are
-                   preferred over globally defined ones. Supports the reserved value "self" to define a forward to the
-                   currently used {@link ActionMapping} itself. Exactly one of "include", "mapping", "redirect" or "forward"
-                   must be specified.
+    forward        The name of another "forward" element to use instead of the current one. Locally defined forwards are preferred over
+                   globally defined ones. Supports the reserved value "self" to define a forward to the currently used {@link ActionMapping}
+                   itself. Exactly one of "include", "mapping", "redirect" or "forward" must be specified.
 -->
 <!ELEMENT forward (set*)>
 <!ATTLIST forward
@@ -150,69 +145,65 @@ Used @link elements reference PHP classes in namespace \rosasurfer\ministruts\st
 
 
 <!--
-    The "action-mappings" element describes a set of {@link ActionMapping} objects that are available to process requests
-    matching the given URI pattern. Individual ActionMappings are configured through nested "mapping" elements.
+    The "action-mappings" element describes a set of {@link ActionMapping} objects that are available to process requests matching the given
+    URI pattern. Individual ActionMappings are configured through nested "mapping" elements.
 -->
 <!ELEMENT action-mappings (mapping+)>
 <!ATTLIST action-mappings>
 
 
 <!--
-    The "mapping" element describes an {@link ActionMapping} object to be used to process a request for a specific
-    module-relative URI. The following attributes are defined:
+    The "mapping" element describes an {@link ActionMapping} object to be used to process a request for a specific module-relative URI. The
+    following attributes are defined:
 
-    name                 The unique identifier of the ActionMapping. Used to build mapping selectors to get mappings URIs by
-                         name. Names must not contain the colon character ":" as it is the {@link Module} separator in a
-                         selector expression.
+    name                 The unique identifier of the ActionMapping. Used to build mapping selectors to get mappings URIs by name. Names
+                         must not contain the colon character ":" as it is the {@link Module} separator in a selector expression.
                          [default: none]
 
     path                 The {@link Module}-relative path of the request, starting with a slash "/" character.
 
   //match                TODO: Not yet implemented
-  //                     The path attribute's matching type. Can be one of "literal" or "variable". If the value is "literal"
-  //                     the path attribute is matched as-is. If the value is "variable" the path attribute can contain
-  //                     parameter placeholders of the form "/path/{:param1:}/{:param2:}" matching variable path segments.
-  //                     Parameter separator is the slash "/" character. If the last parameter placeholder is not followed by
-  //                     a slash the parameter matches everything up to the end of the request path.
+  //                     The path attribute's matching type. Can be one of "literal" or "variable". If the value is "literal" the path
+  //                     attribute is matched as-is. If the value is "variable" the path attribute can contain parameter placeholders of
+  //                     the form "/path/{:param1:}/{:param2:}" matching variable path segments. Parameter separator is the slash "/"
+  //                     character. If the last parameter placeholder is not followed by a slash the parameter matches everything up to the
+  //                     end of the request path.
   //                     [default: "literal"]
 
-    action               Class name of an {@link Action} subclass that will process requests for this ActionMapping. Only one
-                         of "action", "include", "redirect" or "forward" can be specified.
+    action               Class name of an {@link Action} subclass that will process requests for this ActionMapping. Only one of "action",
+                         "include", "redirect" or "forward" can be specified.
 
-    include              The name of a {@link Tile} definition or a file to include, instead of passing the request to an
-                         {@link Action}. Tile definition names must start with a dot ".", file names must not start with a
-                         dot. Only one of "action", "include", "redirect" or "forward" can be specified.
+    include              The name of a {@link Tile} definition or a file to include, instead of passing the request to an {@link Action}.
+                         Tile definition names must start with a dot ".", file names must not start with a dot. Only one of "action",
+                         "include", "redirect" or "forward" can be specified.
 
-    redirect             The {@link Module}-relative path of the location to which a redirect instruction should be issued,
-                         instead of passing the request to an {@link Action}. Only one of "action", "include", "redirect" or
-                         "forward" can be specified.
+    redirect             The {@link Module}-relative path of the location to which a redirect instruction should be issued, instead of
+                         passing the request to an {@link Action}. Only one of "action", "include", "redirect" or "forward" can be specified.
 
-    redirect-type        The type of redirect to be issued ("temporary" or "permanent"). Optional if the "redirect" attribute
-                         is specified, else not valid.
+    redirect-type        The type of redirect to be issued ("temporary" or "permanent"). Optional if the "redirect" attribute is specified,
+                         else not valid.
                          [default: "temporary"]
 
-    forward              The name of a global "forward" element to forward control to, instead of passing the request to an
-                         {@link Action}. Not to be confused with a nested, locally defined ActionForward. Only one of
-                         "action", "include", "redirect" or "forward" can be specified.
+    forward              The name of a global "forward" element to forward control to, instead of passing the request to an {@link Action}.
+                         Not to be confused with a nested, locally defined ActionForward. Only one of "action", "include", "redirect" or
+                         "forward" can be specified.
 
   //alias                TODO: Not yet implemented
-  //                     The name of another "mapping" element to use for request processing instead of the current one.
-  //                     Allows the definition of multiple request paths using the same mapping definition. Can not be used
-  //                     in combination with "action", "include", "redirect" or "forward".
+  //                     The name of another "mapping" element to use for request processing instead of the current one. Allows the
+  //                     definition of multiple request paths using the same mapping definition. Can not be used in combination with
+  //                     "action", "include", "redirect" or "forward".
 
     form                 Class name of an {@link ActionForm} subclass, that is associated with the mapping. Optional.
 
-    form-validate-first  Set to "true" if the {@link ActionForm} should be validated automatically by the framework before
-                         calling the {@link Action}. Set to "false" if validation is performed by the configured Action.
-                         Optional if the "form" attribute is specified, else not valid.
+    form-validate-first  Set to "true" if the {@link ActionForm} should be validated automatically by the framework before calling the
+                         {@link Action}. Set to "false" if validation is performed by the configured Action. Optional if the "form"
+                         attribute is specified, else not valid.
 
-                         The default behaviour is "false" if an Action or {@link ActionForward} is configured, and "true"
-                         if no Action and no ActionForward are configured. Framework validation requires the configuration of
-                         two nested "forward" elements named "success" and "error".
+                         The default behaviour is "false" if an Action or {@link ActionForward} is configured, and "true" otherwise.
+                         Framework validation requires the configuration of two nested "forward" elements named "success" and "error".
 
-                         In other words:
-                         If an Action is configured, per default the Action is responsible for input validation. If neither
-                         an Action nor an ActionForward are configured the framework will perform input validation.
+                         In other words: If an Action is configured, per default the Action is responsible for input validation. If neither
+                         Action nor ActionForward are configured the framework will perform input validation.
 
     methods              Comma-delimited list of HTTP method verbs the action mapping supports.
                          [default: "get"]
@@ -220,9 +211,9 @@ Used @link elements reference PHP classes in namespace \rosasurfer\ministruts\st
     roles                Comma-delimited list of required roles to access the action mapping.
                          [default: none]
 
-    default              Set to "true" if the mapping should be configured as the default action mapping of the {@link Module}.
-                         If a request does not match any other action mapping, it will be passed to the mapping with the
-                         "default" attribute set to "true". Only one mapping within a module can be marked as "default".
+    default              Set to "true" if the mapping should be configured as the default action mapping of the {@link Module}. If a request
+                         does not match any other action mapping, it will be passed to the mapping with the "default" attribute set to
+                         "true". Only one mapping within a module can be marked as "default".
                          [default: "false"]
 -->
 <!ELEMENT mapping ((forward*, set*)*)>
@@ -243,14 +234,13 @@ Used @link elements reference PHP classes in namespace \rosasurfer\ministruts\st
 
 
 <!--
-    The "tiles" element describes the set of available {@link Tile} objects. Individual tiles are configured through nested
-    "tile" elements.
+    The "tiles" element describes the set of available {@link Tile} objects. Individual tiles are configured through nested "tile" elements.
 
     class      Class name of a {@link Tile} subclass used as the {@link Module}'s default tile implementation.
                [default: rosasurfer\ministruts\struts\Tile]
 
-    namespace  The PHP namespace used by view templates and tiles. The namespace will be populated with the configured view
-               helpers (constants and helper functions). Valid namespace separators are the slash "/" and the backslash "\".
+    namespace  The PHP namespace used by view templates and tiles. The namespace will be populated with the configured view helpers
+               (constants and helper functions). Valid namespace separators are the slash "/" and the backslash "\".
                [default: the global namespace]
 -->
 <!ELEMENT tiles (tile*)>
@@ -265,22 +255,20 @@ Used @link elements reference PHP classes in namespace \rosasurfer\ministruts\st
 
     name     The unique identifier for this {@link Tile}. Tile names must start with a dot ".".
 
-    file     The path of the file to insert relative to the "file-base" location of the {@link Module}. Exactly one of "file",
-             "extends" or "alias" must be specified.
+    file     The path of the file to insert relative to the "file-base" location of the {@link Module}. Exactly one of "file", "extends" or
+             "alias" must be specified.
 
-    extends  Name of another {@link Tile} that is used as an ancestor of this tile. Tile names must start with a dot ".".
-             All attributes from the ancestor are available to the new tile. Any attribute inherited from the ancestor can
-             be overwritten by providing a new value. Exactly one of "file", "extends" or "alias" must be specified.
+    extends  Name of another {@link Tile} that is used as an ancestor of this tile. Tile names must start with a dot ".". All attributes
+             from the ancestor are available to the new tile. Any attribute inherited from the ancestor can be overwritten by providing a
+             new value. Exactly one of "file", "extends" or "alias" must be specified.
 
-    alias    Name of another {@link Tile} to use instead of the current one. Tile names must start with a dot ".". If this
-             attribute is set the tile can not have child elements. Exactly one of "file", "extends" or "alias" must be
-             specified.
+    alias    Name of another {@link Tile} to use instead of the current one. Tile names must start with a dot ".". If this attribute is set
+             the tile can not have child elements. Exactly one of "file", "extends" or "alias" must be specified.
 
-    push     Whether data exchange between controller and view supports the MVC push model. Cannot be used in combination
-             with the "alias" attribute.
-             If this value is set to "true" all variables in the {@link Page} context are made available to the view as
-             regular PHP variables (MVC push model). If the value is set to "false" the push model is not supported. The MVC
-             pull model is always supported, regardless of this setting.
+    push     Whether data exchange between controller and view supports the MVC push model. Cannot be used in combination with the "alias"
+             attribute. If this value is set to "true" all variables in the {@link Page} context are made available to the view as regular
+             PHP variables (MVC push model). If the value is set to "false" the push model is not supported. The MVC pull model is always
+             supported, regardless of this setting.
              [default: "false"]
 -->
 <!ELEMENT tile ((include*, set*)*)>
@@ -298,13 +286,12 @@ Used @link elements reference PHP classes in namespace \rosasurfer\ministruts\st
 
     name   Name of the variable under which the resource is made available in the view.
 
-    value  The name of a tiles definition or a file to include. Tile names must start with a dot ".", file names must not
-           start with a dot. All properties from the surrounding tile are also available to the inserted element. Any
-           property inherited from the surrounding tile can be overwritten by providing a new value. However, this will not
-           modify the original value in the surrounding tile.
-           If this attribute is omitted the surrounding tile is marked as a template and cannot be rendered independently.
-           If a template is extended by another tile the extending tile can assign and override attributes of the extended
-           tile. If all "include" elements of a tile have an assigned value the tile can be rendered.
+    value  The name of a tiles definition or a file to include. Tile names must start with a dot ".", file names must not start with a dot.
+           All properties from the surrounding tile are also available to the inserted element. Any property inherited from the surrounding
+           tile can be overwritten by providing a new value. However, this will not modify the original value in the surrounding tile.
+           If this attribute is omitted the surrounding tile is marked as a template and cannot be rendered independently. If a template is
+           extended by another tile the extending tile can assign and override attributes of the extended tile. If all "include" elements of
+           a tile have an assigned value the tile can be rendered.
 -->
 <!ELEMENT include EMPTY>
 <!ATTLIST include
@@ -314,20 +301,20 @@ Used @link elements reference PHP classes in namespace \rosasurfer\ministruts\st
 
 
 <!--
-    The "set" element describes an additional variable or class property. It can be used in "tile", "forward" and "mapping"
-    elements. The value of this element can be specified as an XML attribute or in the body of the element.
+    The "set" element describes an additional variable or class property. It can be used in "tile", "forward" and "mapping" elements. The
+    value of this element can be specified as an XML attribute or in the body of the element.
 
-    If the "set" element is used in a {@link Tile} the value is made available in the resulting view as a regular PHP variable.
-    If the "set" element is used in a "forward" or "mapping" element, after the object representing the element is instantiated,
-    the setter for the property is called and passed the specified value.
+    If the "set" element is used in a {@link Tile} the value is made available in the resulting view as a regular PHP variable. If the "set"
+    element is used in a "forward" or "mapping" element, after the object representing the element is instantiated, the setter for the
+    property is called and passed the specified value.
 
     name   Name of the variable or class property.
 
     type   The type of the created or passed value. Can be "bool", "int", "float" or "string".
            [default: "string"]
 
-    value  String representation of the variable or property value. The value can be specified as an XML attribute or in the
-           body of the element.
+    value  String representation of the variable or property value. The value can be specified as an XML attribute or in the body of the
+           element.
 -->
 <!ELEMENT set (#PCDATA)>
 <!ATTLIST set
