@@ -380,7 +380,9 @@ HTML_SNIPPET;
                 $forward = $action->execute($request, $response);
             }
         }
-        catch (Throwable $ex) {}               // keep exception for later use
+        catch (Throwable $ex) {
+            header('HTTP/1.1 500 Internal Server Error', true, HttpResponse::SC_INTERNAL_SERVER_ERROR);
+        }
 
         // convert a returned string identifier to an actual ActionForward
         if (is_string($forward)) {
