@@ -39,6 +39,9 @@ parameters:
 
   checkUninitializedProperties: true
 
+  additionalConstructors:
+    - rosasurfer\ministruts\struts\ActionForm::populate
+
   ignoreErrors:
    #- identifier: isset.initializedProperty
     - identifier: new.static                        # opinionated
