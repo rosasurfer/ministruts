@@ -5,9 +5,12 @@ namespace rosasurfer\ministruts\console\io;
 
 use rosasurfer\ministruts\core\CObject;
 
-use function rosasurfer\ministruts\print_p;
 use function rosasurfer\ministruts\stderr;
 use function rosasurfer\ministruts\stdout;
+use function rosasurfer\ministruts\strEndsWith;
+use function rosasurfer\ministruts\toString;
+
+use const rosasurfer\ministruts\NL;
 
 /**
  * Output
@@ -22,7 +25,11 @@ class Output extends CObject {
      * @return void
      */
     public function out($message): void {
-        stdout(print_p($message, true));
+        $str = is_string($message) ? $message : toString($message);
+        if (!strEndsWith($str, NL)) {
+            $str .= NL;
+        }
+        stdout($str);
     }
 
 
@@ -34,6 +41,10 @@ class Output extends CObject {
      * @return void
      */
     public function error($message): void {
-        stderr(print_p($message, true));
+        $str = is_string($message) ? $message : toString($message);
+        if (!strEndsWith($str, NL)) {
+            $str .= NL;
+        }
+        stderr($str);
     }
 }
