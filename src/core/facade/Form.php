@@ -21,7 +21,8 @@ use rosasurfer\ministruts\struts\Struts;
 class Form extends Facade {
 
     /**
-     * Return the current HTTP request's {@link ActionForm} property with the specified name.
+     * Convenient view helper for fetching form properties when the type of the instance is not known.
+     * Returns the current HTTP request's {@link ActionForm} property with the specified name.
      *
      * @param  string $name               - property name
      * @param  mixed  $default [optional] - default value to return if the specified property was not found (default: none)

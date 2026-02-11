@@ -3,21 +3,15 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\struts;
 
-use ArrayAccess;
-use ReturnTypeWillChange;
-
 use rosasurfer\ministruts\core\CObject;
-use rosasurfer\ministruts\core\exception\IllegalAccessException;
 
 /**
  * ActionForm
  *
  * An ActionForm encapsulates and represents interpreted user input. It provides an interface for {@link Action}s
  * and business layer to access and validate this input. Use {@link ActionInput} to access the raw input parameters.
- *
- * @implements ArrayAccess<string, mixed>
  */
-abstract class ActionForm extends CObject implements ArrayAccess {
+abstract class ActionForm extends CObject {
 
     /** @var Request [transient] - the request the form belongs to */
     protected Request $request;
@@ -145,54 +139,8 @@ abstract class ActionForm extends CObject implements ArrayAccess {
 
 
     /**
-     * Whether a form property with the specified name exists.
-     *
-     * {@inheritDoc}
-     */
-    public function offsetExists($name): bool {
-        switch ($name) {
-            case 'request':
-            case 'fileUploadErrors':
-                return false;
-        }
-        return property_exists($this, $name);
-    }
-
-
-    /**
-     * Return the property with the specified name. If a getter for the property exists the getter is called.
-     * Otherwise the property is returned.
-     *
-     * {@inheritDoc}
-     */
-    #[ReturnTypeWillChange]
-    public function offsetGet($name) {
-        return $this->__get($name);
-    }
-
-
-    /**
-     * Prevent modification of form properties.
-     *
-     * {@inheritDoc}
-     */
-    final public function offsetSet($name, $value): void {
-        throw new IllegalAccessException('Cannot set/modify ActionForm properties');
-    }
-
-
-    /**
-     * Unsetting form properties is not allowed.
-     *
-     * {@inheritDoc}
-     */
-    final public function offsetUnset($name): void {
-        throw new IllegalAccessException('Cannot set/modify ActionForm properties');
-    }
-
-
-    /**
-     * Return the form property with the specified name. If a getter for the property exists the getter is called.
+     * Convenient view helper for fetching form properties when the type of the instance is not known.
+     * Returns the form property with the specified name. If a getter for the property exists the getter is called.
      * Otherwise the property is returned.
      *
      * @param  string $name               - property name

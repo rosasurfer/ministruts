@@ -30,7 +30,7 @@ class Inputs extends Facade {
      * or the passed default value if no such input parameter was transmitted. If multiple parameters with that name have
      * been transmitted the last one is returned. If the parameter exists in both requests the current value is returned.
      * If an array of parameters with that name has been transmitted it is ignored. Use {@link Inputs::getArray()} to access
-     * an array of raw input parameters.
+     * arrays of input parameters.
      *
      * @param  string  $name               - parameter name
      * @param  ?string $default [optional] - value to return if the specified parameter was not transmitted (default: none)
@@ -46,7 +46,7 @@ class Inputs extends Facade {
      * Return an array of raw input parameter with the specified name from any of the current or the previous HTTP request,
      * or the passed default values if no such input parameter array was transmitted. If the array parameter exists in both
      * requests the current value is returned. If a single parameter with that name has been transmitted it is ignored.
-     * Use {@link Inputs::get()} to access a single raw parameter.
+     * Use {@link Inputs::get()} to access single parameters.
      *
      * @param  string   $name               - parameter name
      * @param  string[] $default [optional] - values to return if the specified parameter array was not transmitted
@@ -61,7 +61,7 @@ class Inputs extends Facade {
     /**
      * Whether a single raw input parameter with the specified name has been transmitted in any of the current or the
      * previous HTTP request. A transmitted array of parameters with that name is ignored. Use {@link Inputs::hasArray()}
-     * to test for an array of parameters.
+     * to test for arrays of parameters.
      *
      * @param  string $name - parameter name
      *
@@ -75,7 +75,7 @@ class Inputs extends Facade {
     /**
      * Whether an array of raw input parameter with the specified name has been transmitted in any of the current or the
      * previous HTTP request. A transmitted single parameter with that name is ignored. Use {@link Inputs::has()} to test
-     * for a single parameter.
+     * for single parameters.
      *
      * @param  string $name - parameter name
      *
