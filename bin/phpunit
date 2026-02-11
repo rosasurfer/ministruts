@@ -367,6 +367,4 @@ fi
 
 
 # call PHPUnit
-"$php" "$phpunit" "$@" || exit $?
-
-exit 0
+"$php" "$phpunit" "$@"

@@ -1,14 +1,14 @@
 #!/bin/bash
 #
-# Conveniant wrapper of PHPCodeSniffer. Simplifies switching between PHP/PHPCS versions and configurations.
+# Conveniant wrapper for PHPCodeSniffer. Simplifies switching between multiple PHP/PHPCS versions.
 #
 # PHPCS can be executed using a custom PHP interpreter by setting the environment variable PHP='<php-cmd>'.
 #
 # Examples:
-#  phpcs --report=full      Show error details only (no summaries).
-#  PHP=php81 phpcs          Use a different PHP version instead of the standard `php`.
+#  PHP=php81 phpcs                    Use a different PHP version instead of the standard `php`.
 #
-# @version 2025.07.26 21:24
+#
+# @version 2025.08.16 17:35
 #
 set -eEuo pipefail
 
@@ -105,8 +105,7 @@ declare args=() arg
 args+=('-d')                                                    # always increase the memory limit
 args+=('memory_limit=-1')
 
-declare -A options
-options=()
+declare -A options=()
 
 
 # parse arguments
