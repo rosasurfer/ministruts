@@ -3,11 +3,10 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\cache;
 
-use rosasurfer\ministruts\Application;
 use rosasurfer\ministruts\cache\monitor\Dependency;
-use rosasurfer\ministruts\config\Config;
 use rosasurfer\ministruts\core\exception\RuntimeException;
-use rosasurfer\ministruts\file\FileSystem as FS;
+use rosasurfer\ministruts\core\proxy\Config;
+use rosasurfer\ministruts\file\FileSystem;
 
 use function rosasurfer\ministruts\isRelativePath;
 use function rosasurfer\ministruts\realpath;
@@ -36,20 +35,17 @@ final class FileSystemCache extends CachePeer {
         $this->namespace = $label;
         $this->options   = $options;
 
-        /** @var Config $config */
-        $config = Application::service('config');
-
         // determine the cache directory to use
         /** @var ?string $directory */
-        $directory = $options['directory'] ?? $config['app.dir.cache'] ?? null;
+        $directory = $options['directory'] ?? Config::get('app.dir.cache', null);
         if (!isset($directory)) throw new RuntimeException('Missing cache instantiation option "directory"');
 
         if (isRelativePath($directory)) {
-            $directory = $config->getString('app.dir.root').'/'.$directory;
+            $directory = Config::getString('app.dir.root').'/'.$directory;
         }
 
         // make sure the directory exists
-        FS::mkDir($directory);
+        FileSystem::mkDir($directory);
 
         $this->directory = realpath($directory).DIRECTORY_SEPARATOR;
     }
@@ -191,7 +187,7 @@ final class FileSystemCache extends CachePeer {
      * @return bool - success status
      */
     private function writeFile(string $fileName, $value, int $expires): bool {
-        FS::mkDir(dirname($fileName));
+        FileSystem::mkDir(dirname($fileName));
         file_put_contents($fileName, serialize($value));
 
         // TODO: https://phpdevblog.niknovo.com/2009/11/serialize-vs-var-export-vs-json-encode.html

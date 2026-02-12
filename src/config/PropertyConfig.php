@@ -32,28 +32,29 @@ use const rosasurfer\ministruts\CLI;
  *
  * @example
  * <pre>
- *  db.connector = mysql                         # named key notation creates associative property branches
+ *  db.connector = mysql                        # named key notation creates associative property branches
  *  db.host      = localhost:3306
  *  db.database  = dbname
  *
- *  db.options[] = value at index 0              # bracket notation creates indexed property branches
+ *  db.options[] = value at index 0             # bracket notation creates indexed property branches
  *  db.options[] = value at index 1
  *  db.options[] = value at index 2
  *
  *  # a comment on its own line
- *  log.level.Action          = warn             # a trailing comment
- *  log.level.foo\bar\MyClass = notice           # subkeys may contain any character except the dot "."
+ *  log.level.Action          = warn            # a trailing comment
+ *  log.level.foo\bar\MyClass = notice          # subkeys may contain any character except the dot "."
  *
- *  key.subkey with spaces    = value            # subkeys may contain spaces...
- *  key.   indented.subkey    = value            # ...but enclosing white space is ignored
- *  key."a.subkey.with.dots"  = value            # quoted subkeys can contain otherwise illegal key characters (i.e. dots)
- *  key                       = value            # the root value of an array is accessed via an empty subkey: key.""
+ *  key.subkey with spaces    = value           # subkeys may contain spaces...
+ *  key.   indented.subkey    = value           # ...but enclosing white space is ignored
+ *  key."a.subkey.with.dots"  = value           # quoted subkeys can contain otherwise illegal key characters (i.e. dots)
+ *  key                       = value           # the root value of an array is accessed via an empty subkey: key.""
  *
  *  &lt;?php
- *  $config = Application::getConfig();
- *  $config->get('db.connector')                 # return a single value
- *  $config->get('db')                           # return an associative array of values ['connector'=>..., 'host'=>...]
- *  $config->get('db.options')                   # return a numerical indexed array of values [0=>..., 1=>..., 2=>...]
+ *  $file = ['config.properties'];
+ *  $config = new PropertyConfig($file);
+ *  $config->get('db.connector')                # return a single value
+ *  $config->get('db')                          # return an associative array of values ['connector'=>..., 'host'=>...]
+ *  $config->get('db.options')                  # return a numerical indexed array of values [0=>..., 1=>..., 2=>...]
  * </pre>
  */
 class PropertyConfig extends CObject implements Config {

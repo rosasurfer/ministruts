@@ -3,10 +3,9 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\net\mail;
 
-use rosasurfer\ministruts\Application;
-use rosasurfer\ministruts\config\Config;
 use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
+use rosasurfer\ministruts\core\proxy\Config;
 use rosasurfer\ministruts\util\PHP;
 
 use PHPMailer\PHPMailer\SMTP;
@@ -91,12 +90,9 @@ class SmtpMailer extends Mailer {
             return $this->pass2PhpMailer($sender, $receiver, $subject, $message);
         }
 
-        /** @var Config $config */
-        $config = Application::service('config');
-
         // auto-complete an empty sender
         if (!isset($sender)) {
-            $sender = $config->getString('mail.from', ini_get('sendmail_from') ?: '');
+            $sender = Config::getString('mail.from', ini_get('sendmail_from') ?: '');
             if ($sender == '') {
                 $hostName = php_uname('n') ?: 'localhost';
                 if (!strContains($hostName, '.')) {
@@ -113,7 +109,7 @@ class SmtpMailer extends Mailer {
         // RCPT: (receiving mailbox)
         $rcpt = self::parseAddress($receiver);
         if (!$rcpt) throw new InvalidValueException("Invalid parameter \$receiver: $receiver");
-        $forced = $config->getString('mail.forced-receiver', '');
+        $forced = Config::getString('mail.forced-receiver', '');
         if ($forced != '') {
             $rcpt = self::parseAddress($forced);
             if (!$rcpt) throw new InvalidValueException("Invalid config value \"mail.forced-receiver\": $forced");

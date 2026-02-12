@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\struts;
 
-use rosasurfer\ministruts\Application;
 use rosasurfer\ministruts\config\Config;
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\exception\IllegalStateException;
+use rosasurfer\ministruts\core\proxy\Config as ConfigProxy;
 use rosasurfer\ministruts\file\xml\SimpleXMLElement;
 use rosasurfer\ministruts\net\http\HttpResponse;
 
@@ -240,7 +240,7 @@ class Module extends CObject {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
 
         /** @var Config $config */
-        $config = Application::service('config');
+        $config = ConfigProxy::instance();
 
         if (!isset($xml['file-base'])) {
             // not specified, apply global configuration

@@ -3,10 +3,9 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\cache;
 
-use rosasurfer\ministruts\Application;
-use rosasurfer\ministruts\config\Config;
 use rosasurfer\ministruts\core\StaticClass;
 use rosasurfer\ministruts\core\exception\RuntimeException;
+use rosasurfer\ministruts\core\proxy\Config;
 
 use function rosasurfer\ministruts\ini_get_bool;
 
@@ -57,12 +56,9 @@ final class Cache extends StaticClass {
 
         // specific cache
         if (!isset(self::$caches[$label])) {
-            /** @var Config $config */
-            $config = Application::service('config');
-
             // get cache configuration and create new instance
-            $class   = $config->get('cache.'.$label.'.class');
-            $options = $config->get('cache.'.$label.'.options', []);
+            $class   = Config::get('cache.'.$label.'.class');
+            $options = Config::get('cache.'.$label.'.options', []);
 
             if (!is_subclass_of($class, CachePeer::class)) {
                 throw new RuntimeException('Not a subclass of '.CachePeer::class.": $class");

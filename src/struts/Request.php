@@ -3,22 +3,19 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\struts;
 
-use rosasurfer\ministruts\Application;
-use rosasurfer\ministruts\config\Config;
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\exception\IllegalStateException;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
+use rosasurfer\ministruts\core\proxy\Config;
 
 use function rosasurfer\ministruts\first;
 use function rosasurfer\ministruts\getHostByAddress;
 use function rosasurfer\ministruts\ini_get_bool;
 use function rosasurfer\ministruts\strCompareI;
-use function rosasurfer\ministruts\strEndsWith;
 use function rosasurfer\ministruts\strLeft;
 use function rosasurfer\ministruts\strLeftTo;
 use function rosasurfer\ministruts\strRightFrom;
-use function rosasurfer\ministruts\strStartsWith;
 
 use const rosasurfer\ministruts\DAY;
 use const rosasurfer\ministruts\NL;
@@ -382,17 +379,16 @@ class Request extends CObject {
         // TODO: Move to application as this is not a property of the request.
         static $baseUri;
         if (!isset($baseUri)) {
-            $baseUri = $this->resolveBaseUriVar();
-
-            if (!isset($baseUri)) {
-                /** @var Config $config */
-                $config  = Application::service('config');
-                /** @var ?string $baseUri */
-                $baseUri = $config->get('app.base-uri', null);
-                if (!$baseUri) throw new RuntimeException('Unknown application base URI, either $_SERVER["APP_BASE_URI"] or $config["app.base-uri"] needs to be configured.');
+            $baseUri = $this->resolveBaseUriVar() ?? Config::getString('app.base-uri', '');
+            if (!$baseUri) {
+                throw new RuntimeException('Unknown application base URI, either $_SERVER["APP_BASE_URI"] or $config["app.base-uri"] needs to be configured.');
             }
-            !strStartsWith($baseUri, '/') && $baseUri  = '/'.$baseUri;
-            !strEndsWith  ($baseUri, '/') && $baseUri .= '/';
+            if ($baseUri[0] != '/') {
+                $baseUri = "/$baseUri";
+            }
+            if ($baseUri[-1] != '/') {
+                $baseUri = "$baseUri/";
+            }
         }
         return $baseUri;
     }

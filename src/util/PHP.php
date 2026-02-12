@@ -6,11 +6,10 @@ namespace rosasurfer\ministruts\util;
 use LibXMLError;
 use Throwable;
 
-use rosasurfer\ministruts\Application;
-use rosasurfer\ministruts\config\Config;
 use rosasurfer\ministruts\core\StaticClass;
 use rosasurfer\ministruts\core\exception\ExceptionInterface as RosasurferException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
+use rosasurfer\ministruts\core\proxy\Config;
 
 use function rosasurfer\ministruts\echof;
 use function rosasurfer\ministruts\ini_get_bool;
@@ -309,8 +308,6 @@ class PHP extends StaticClass {
      * </pre>
      */
     public static function phpinfo(): void {
-        /** @var Config $config */
-        $config = Application::service('config');
         $issues = [];
 
         // core configuration
@@ -326,7 +323,7 @@ class PHP extends StaticClass {
             elseif ($memoryLimit <  32*MB)                                                                         $issues[] = 'Warn:  memory_limit is very low: '.ini_get('memory_limit').' [resources]';
             elseif ($memoryLimit > 128*MB)                                                                         $issues[] = 'Info:  memory_limit is very high: '.ini_get('memory_limit').' [resources]';
 
-            $sWarnLimit = $config->get('log.warn.memory_limit', '');
+            $sWarnLimit = Config::getString('log.warn.memory_limit', '');
             $warnLimit = php_byte_value($sWarnLimit);
             if ($warnLimit) {
                 if     ($warnLimit <             0)                                                                $issues[] = 'Error: log.warn.memory_limit is invalid: '.$sWarnLimit.' [configuration]';
@@ -464,8 +461,8 @@ class PHP extends StaticClass {
         if (!extension_loaded('sysvsem') && !WINDOWS)                                                              $issues[] = 'Info:  System-V Semaphore extension is not loaded [functionality]';
 
         // check Composer defined dependencies
-        $appRoot = $config['app.dir.root'];
-        if (is_file($file=$appRoot.'/composer.json') && extension_loaded('json')) {
+        $appRoot = Config::getString('app.dir.root');
+        if (is_file($file = $appRoot.'/composer.json') && extension_loaded('json')) {
             $composer = json_decode_or_throw(file_get_contents($file), true);
             if (is_array($composer['require'] ?? false)) {
                 foreach ($composer['require'] as $name => $_) {

@@ -5,10 +5,9 @@ namespace rosasurfer\ministruts\core\lock;
 
 use Throwable;
 
-use rosasurfer\ministruts\Application;
-use rosasurfer\ministruts\config\Config;
 use rosasurfer\ministruts\core\error\ErrorHandler;
 use rosasurfer\ministruts\core\exception\RuntimeException;
+use rosasurfer\ministruts\core\proxy\Config;
 
 /**
  * Lock
@@ -42,11 +41,8 @@ class Lock extends BaseLock {
             $this->impl = new SysvLock($key);
         }
         else {
-            /** @var Config $config */
-            $config = Application::service('config');
-
             // fall-back to FileLock...
-            $directory = $config->get('app.dir.tmp', null);
+            $directory = Config::get('app.dir.tmp', null);
             if (!$directory) $directory = ini_get('sys_temp_dir');
             if (!$directory) $directory = sys_get_temp_dir();
 

@@ -3,9 +3,8 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\cache;
 
-use rosasurfer\ministruts\Application;
 use rosasurfer\ministruts\cache\monitor\Dependency;
-use rosasurfer\ministruts\config\Config;
+use rosasurfer\ministruts\core\proxy\Config;
 
 /**
  * ApcCache
@@ -21,12 +20,9 @@ class ApcCache extends CachePeer {
      * @param  mixed[] $options [optional] - additional instantiation options (default: none)
      */
     public function __construct(?string $label = null, array $options = []) {
-        /** @var Config $config */
-        $config = Application::service('config');
-
         $label ??= '';
         $this->label     = $label;
-        $this->namespace = strlen($label) ? $label : md5($config->getString('app.dir.root'));
+        $this->namespace = strlen($label) ? $label : md5(Config::getString('app.dir.root'));
         $this->options   = $options;
     }
 

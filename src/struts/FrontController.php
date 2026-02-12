@@ -5,14 +5,13 @@ namespace rosasurfer\ministruts\struts;
 
 use Throwable;
 
-use rosasurfer\ministruts\Application;
 use rosasurfer\ministruts\cache\Cache;
 use rosasurfer\ministruts\cache\monitor\FileDependency;
-use rosasurfer\ministruts\config\Config;
 use rosasurfer\ministruts\core\Singleton;
 use rosasurfer\ministruts\core\exception\IllegalStateException;
 use rosasurfer\ministruts\core\exception\ExceptionInterface as RosasurferException;
 use rosasurfer\ministruts\core\exception\RuntimeException;
+use rosasurfer\ministruts\core\proxy\Config;
 use rosasurfer\ministruts\core\proxy\Request as RequestProxy;
 use rosasurfer\ministruts\net\http\HttpResponse;
 
@@ -56,9 +55,7 @@ class FrontController extends Singleton {
             if (!$controller) {                                             // @phpstan-ignore booleanNot.alwaysTrue (TODO: implement cache)
                 $controller = self::getInstance(static::class);
 
-                /** @var Config $config */
-                $config = Application::service('config');
-                $configDir = $config['app.dir.config'];
+                $configDir = Config::get('app.dir.config');
                 $configFile = str_replace('\\', '/', $configDir.'/struts-config.xml');
 
                 // ...and cache it with a FileDependency
@@ -80,12 +77,9 @@ class FrontController extends Singleton {
     protected function __construct() {
         parent::__construct();
 
-        /** @var Config $config */
-        $config = Application::service('config');
-
         // lookup Struts configuration files
-        $configDir = $config->get('app.dir.struts', null);
-        !$configDir && $configDir=$config['app.dir.config'];                        // fall-back to standard config directory
+        $configDir = Config::get('app.dir.struts', null);
+        $configDir ??= Config::get('app.dir.config');                               // fall-back to standard config directory
 
         $mainConfig = str_replace('\\', '/', $configDir.'/struts-config.xml');      // main module config
         if (!is_file($mainConfig)) Struts::configError('Struts configuration file not found: "'.$mainConfig.'"');

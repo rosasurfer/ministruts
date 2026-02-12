@@ -3,8 +3,7 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\struts\url;
 
-use rosasurfer\ministruts\Application;
-use rosasurfer\ministruts\config\Config;
+use rosasurfer\ministruts\core\proxy\Config;
 
 /**
  * Version-aware URL generation helper. Appends a hash of size and last modification time of a
@@ -23,9 +22,7 @@ class VersionedUrl extends Url {
         if ($pos === false) $name = $relativeUri;
         else                $name = substr($relativeUri, 0, $pos);
 
-        /** @var Config $config */
-        $config = Application::service('config');
-        $webDir = $config->getString('app.dir.web', '');
+        $webDir = Config::getString('app.dir.web', '');
 
         if ($webDir && file_exists($fileName = $webDir.'/'.$name)) {
             if ($pos === false) $uri .= '?';
