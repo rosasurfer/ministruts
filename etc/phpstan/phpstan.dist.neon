@@ -34,18 +34,13 @@ parameters:
     - rosasurfer\ministruts\WINDOWS
     - rosasurfer\ministruts\NUL_DEVICE
 
-  universalObjectCratesClasses:
-    - rosasurfer\ministruts\struts\ActionForm
-
-  checkUninitializedProperties: true
-
   additionalConstructors:
     - rosasurfer\ministruts\struts\ActionForm::populate
 
-  ignoreErrors:
-   #- identifier: isset.initializedProperty
-    - identifier: new.static                        # opinionated
+  checkUninitializedProperties: true
 
+  ignoreErrors:
+    - identifier: new.static                        # opinionated
 
   reportUnmatchedIgnoredErrors: false
 
@@ -54,4 +49,5 @@ parameters:
   tmpDir:       ../tmp/phpstan
   tipsOfTheDay: false
   tips:
-    discoveringSymbols: false
+    discoveringSymbols:        false
+    treatPhpDocTypesAsCertain: false
