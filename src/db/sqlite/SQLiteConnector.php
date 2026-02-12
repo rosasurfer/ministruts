@@ -35,7 +35,7 @@ use const rosasurfer\ministruts\NL;
  *  | db.{name}.options.recursive_triggers | [on|off]    | on                         |
  *  +--------------------------------------+-------------+----------------------------+
  * </pre>
- *  (1) - A relative file path is interpreted relative to <tt>Config["app.dir.root"]</tt>.                                  <br>
+ *  (1) - A relative file path is interpreted relative to <tt>Config::string('app.dir.root')</tt>.                          <br>
  *  (2) - Available flags: SQLITE3_OPEN_CREATE | SQLITE3_OPEN_READONLY | SQLITE3_OPEN_READWRITE                             <br>
  *
  * Additional SQLite pragma options can be specified under the "options" key.

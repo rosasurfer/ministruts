@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts;
 
-use rosasurfer\ministruts\config\Config;
 use rosasurfer\ministruts\config\ConfigInterface;
+use rosasurfer\ministruts\config\PropertyConfig;
 use rosasurfer\ministruts\console\Command;
 use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\assert\Assert;
@@ -167,7 +167,7 @@ class Application extends CObject {
      */
     protected function initConfig(array $options): ConfigInterface {
         $location = (string)($options['app.dir.config'] ?? getcwd());
-        $config = Config::createFrom($location);
+        $config = PropertyConfig::createFrom($location);
         unset($options['app.dir.config']);
 
         // set application root directory
@@ -300,12 +300,12 @@ class Application extends CObject {
     /**
      * Expand relative "app.dir.*" values by the specified root directory.
      *
-     * @param  Config $config  - application configuration
-     * @param  string $rootDir - application root directory
+     * @param  ConfigInterface $config  - application configuration
+     * @param  string          $rootDir - application root directory
      *
      * @return void
      */
-    protected function expandAppDirs(Config $config, string $rootDir): void {
+    protected function expandAppDirs(ConfigInterface $config, string $rootDir): void {
         if (!strlen($rootDir) || isRelativePath($rootDir)) throw new InvalidValueException("Invalid config option \"app.dir.root\" = \"$rootDir\" (not an absolute path)");
 
         $rootDir = rtrim(str_replace('\\', '/', $rootDir), '/');

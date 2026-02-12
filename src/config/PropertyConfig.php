@@ -27,8 +27,8 @@ use const rosasurfer\ministruts\CLI;
  *
  * File format: <br>
  * Settings are defined as "key = value" pairs. Enclosing white space and empty lines are ignored. Subkeys can be used to
- * create structures which can be queried as a whole (array) or as single values. Keys are case-insensitive. Config instances
- * can be accessed like arrays.
+ * create structures which can be queried as a whole (array) or as single values. Keys are case-insensitive. Configuration
+ * instances can be accessed like arrays.
  *
  * @example
  * <pre>
@@ -56,7 +56,7 @@ use const rosasurfer\ministruts\CLI;
  *  $config->get('db.options')                   # return a numerical indexed array of values [0=>..., 1=>..., 2=>...]
  * </pre>
  */
-class Config extends CObject implements ConfigInterface {
+class PropertyConfig extends CObject implements ConfigInterface {
 
     /** @var array<string, bool> - config file names and their existence status */
     protected array $files = [];
