@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace rosasurfer\ministruts\log\appender;
 
 use rosasurfer\ministruts\Application;
-use rosasurfer\ministruts\config\ConfigInterface as Config;
+use rosasurfer\ministruts\config\Config;
 use rosasurfer\ministruts\log\LogMessage;
 use rosasurfer\ministruts\log\detail\Request;
 

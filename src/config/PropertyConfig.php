@@ -56,7 +56,7 @@ use const rosasurfer\ministruts\CLI;
  *  $config->get('db.options')                   # return a numerical indexed array of values [0=>..., 1=>..., 2=>...]
  * </pre>
  */
-class PropertyConfig extends CObject implements ConfigInterface {
+class PropertyConfig extends CObject implements Config {
 
     /** @var array<string, bool> - config file names and their existence status */
     protected array $files = [];

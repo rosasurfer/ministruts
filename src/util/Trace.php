@@ -6,7 +6,7 @@ namespace rosasurfer\ministruts\util;
 use Throwable;
 
 use rosasurfer\ministruts\Application;
-use rosasurfer\ministruts\config\ConfigInterface as Config;
+use rosasurfer\ministruts\config\Config;
 use rosasurfer\ministruts\core\StaticClass;
 use rosasurfer\ministruts\core\exception\Exception;
 use rosasurfer\ministruts\log\filter\ContentFilterInterface as ContentFilter;

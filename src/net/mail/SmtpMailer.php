@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace rosasurfer\ministruts\net\mail;
 
 use rosasurfer\ministruts\Application;
-use rosasurfer\ministruts\config\ConfigInterface as Config;
+use rosasurfer\ministruts\config\Config;
 use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\exception\InvalidValueException;
 use rosasurfer\ministruts\util\PHP;

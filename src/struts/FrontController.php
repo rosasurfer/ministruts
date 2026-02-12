@@ -8,7 +8,7 @@ use Throwable;
 use rosasurfer\ministruts\Application;
 use rosasurfer\ministruts\cache\Cache;
 use rosasurfer\ministruts\cache\monitor\FileDependency;
-use rosasurfer\ministruts\config\ConfigInterface as Config;
+use rosasurfer\ministruts\config\Config;
 use rosasurfer\ministruts\core\Singleton;
 use rosasurfer\ministruts\core\exception\IllegalStateException;
 use rosasurfer\ministruts\core\exception\ExceptionInterface as RosasurferException;

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts;
 
-use rosasurfer\ministruts\config\ConfigInterface;
+use rosasurfer\ministruts\config\Config;
 use rosasurfer\ministruts\config\PropertyConfig;
 use rosasurfer\ministruts\console\Command;
 use rosasurfer\ministruts\core\CObject;
@@ -30,8 +30,8 @@ class Application extends CObject {
     /** @var ?Application - the application instance */
     protected static ?self $instance;
 
-    /** @var ConfigInterface - the main configuration */
-    protected ConfigInterface $config;
+    /** @var Config - the main configuration */
+    protected Config $config;
 
     /** @var Container - the dependency container */
     protected Container $container;
@@ -163,9 +163,9 @@ class Application extends CObject {
      *
      * @param  array<string, ?scalar> $options - configuration options as passed to the framework loader
      *
-     * @return ConfigInterface
+     * @return Config
      */
-    protected function initConfig(array $options): ConfigInterface {
+    protected function initConfig(array $options): Config {
         $location = (string)($options['app.dir.config'] ?? getcwd());
         $config = PropertyConfig::createFrom($location);
         unset($options['app.dir.config']);
@@ -300,12 +300,12 @@ class Application extends CObject {
     /**
      * Expand relative "app.dir.*" values by the specified root directory.
      *
-     * @param  ConfigInterface $config  - application configuration
-     * @param  string          $rootDir - application root directory
+     * @param  Config $config  - application configuration
+     * @param  string $rootDir - application root directory
      *
      * @return void
      */
-    protected function expandAppDirs(ConfigInterface $config, string $rootDir): void {
+    protected function expandAppDirs(Config $config, string $rootDir): void {
         if (!strlen($rootDir) || isRelativePath($rootDir)) throw new InvalidValueException("Invalid config option \"app.dir.root\" = \"$rootDir\" (not an absolute path)");
 
         $rootDir = rtrim(str_replace('\\', '/', $rootDir), '/');
@@ -342,11 +342,11 @@ class Application extends CObject {
     /**
      * Set the {@link Application}'s main configuration.
      *
-     * @param  ConfigInterface $configuration
+     * @param  Config $configuration
      *
      * @return $this
      */
-    public function setConfig(ConfigInterface $configuration): self {
+    public function setConfig(Config $configuration): self {
         $this->config = $configuration;
         $this->container->set('config', $configuration);
         return $this;

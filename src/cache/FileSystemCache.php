@@ -5,7 +5,7 @@ namespace rosasurfer\ministruts\cache;
 
 use rosasurfer\ministruts\Application;
 use rosasurfer\ministruts\cache\monitor\Dependency;
-use rosasurfer\ministruts\config\ConfigInterface as Config;
+use rosasurfer\ministruts\config\Config;
 use rosasurfer\ministruts\core\exception\RuntimeException;
 use rosasurfer\ministruts\file\FileSystem as FS;
 

@@ -6,7 +6,7 @@ namespace rosasurfer\ministruts\log;
 use Throwable;
 
 use rosasurfer\ministruts\Application;
-use rosasurfer\ministruts\config\ConfigInterface as Config;
+use rosasurfer\ministruts\config\Config;
 use rosasurfer\ministruts\core\StaticClass;
 use rosasurfer\ministruts\log\appender\AppenderInterface as LogAppender;
 use rosasurfer\ministruts\log\appender\ErrorLogAppender;

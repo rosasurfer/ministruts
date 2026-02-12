@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace rosasurfer\ministruts\struts\url;
 
 use rosasurfer\ministruts\Application;
-use rosasurfer\ministruts\config\ConfigInterface as Config;
+use rosasurfer\ministruts\config\Config;
 
 /**
  * Version-aware URL generation helper. Appends a hash of size and last modification time of a
