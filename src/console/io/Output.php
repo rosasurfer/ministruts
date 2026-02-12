@@ -25,11 +25,13 @@ class Output extends CObject {
      * @return void
      */
     public function out($message): void {
-        $str = is_string($message) ? $message : toString($message);
-        if (!strEndsWith($str, NL)) {
-            $str .= NL;
+        if (!is_string($message)) {
+            $message = toString($message);
         }
-        stdout($str);
+        if (!strEndsWith($message, NL)) {
+            $message .= NL;
+        }
+        stdout($message);
     }
 
 
@@ -41,10 +43,12 @@ class Output extends CObject {
      * @return void
      */
     public function error($message): void {
-        $str = is_string($message) ? $message : toString($message);
-        if (!strEndsWith($str, NL)) {
-            $str .= NL;
+        if (!is_string($message)) {
+            $message = toString($message);
         }
-        stderr($str);
+        if (!strEndsWith($message, NL)) {
+            $message .= NL;
+        }
+        stderr($message);
     }
 }

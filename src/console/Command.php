@@ -93,7 +93,7 @@ class Command extends CObject {
     /**
      * Trigger execution of the command.
      *
-     * @return int - execution status (0 for success)
+     * @return int - execution/exit status (0 for success)
      */
     public function run(): int {
         $input = $this->input;
@@ -147,7 +147,7 @@ class Command extends CObject {
      * @param  Input  $input
      * @param  Output $output
      *
-     * @return int - execution status (0 for success)
+     * @return int - execution/exit status (0 for success)
      */
     protected function execute(Input $input, Output $output): int {
         return 0;
