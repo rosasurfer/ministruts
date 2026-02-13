@@ -29,35 +29,55 @@ interface Config extends ArrayAccess, Countable {
 
 
     /**
-     * Return the config setting with the specified key as a boolean. Accepted strict boolean representations are "1" and "0",
-     * "true" and "false", "on" and "off", "yes" and "no" (case-insensitive).
+     * Return the config setting with the specified key as an integer.
      *
-     * @param  string $key                - case-insensitive key
-     * @param  bool   $strict  [optional] - whether to apply strict interpretation rules:
-     *                                      FALSE - returns TRUE only for "1", "true", "on" and "yes", and FALSE otherwise (default)
-     *                                      TRUE  - as above but FALSE is returned only for "0", "false", "off" and "no",
-     *                                              otherwise an exception is thrown
-     * @param  bool   $default [optional] - value to return if the config setting does not exist (default: exception)
+     * @param  string $key             - case-insensitive key
+     * @param  int    $default         - value to return if the config setting does not exist (default: exception)
      *
-     * @return bool - config setting or the specified default value
+     * @return int - config setting or the specified default value
      *
-     * @throws RuntimeException if the setting is not found or is not strict boolean
+     * @throws RuntimeException if the setting is not found or is not an integer
      */
-    public function getBool(string $key, bool $strict=false, bool $default=false): bool;
+    public function int(string $key, int $default = 0): int;
 
 
     /**
-     * Return the config setting with the specified key as a string. Scalar setting values are casted to string. Not existing and
-     * non-scalar settings trigger an exception.
+     * Return the config setting with the specified key as a floating point number.
+     *
+     * @param  string $key             - case-insensitive key
+     * @param  float  $default         - value to return if the config setting does not exist (default: exception)
+     *
+     * @return float - config setting or the specified default value
+     *
+     * @throws RuntimeException if the setting is not found or is not a float
+     */
+    public function float(string $key, float $default = 0.0): float;
+
+
+    /**
+     * Return the config setting with the specified key as a boolean.
+     *
+     * @param  string $key             - case-insensitive key
+     * @param  bool   $default         - value to return if the config setting does not exist (default: exception)
+     *
+     * @return bool - config setting or the specified default value
+     *
+     * @throws RuntimeException if the setting is not found or is not a boolean
+     */
+    public function bool(string $key, bool $default = false): bool;
+
+
+    /**
+     * Return the config setting with the specified key as a string.
      *
      * @param  string $key                - case-insensitive key
      * @param  string $default [optional] - value to return if the config setting does not exist (default: exception)
      *
      * @return string - config setting or the specified default value
      *
-     * @throws RuntimeException if the setting is not found or is non-scalar
+     * @throws RuntimeException if the setting is not found or is not a string
      */
-    public function getString(string $key, string $default = ''): string;
+    public function string(string $key, string $default = ''): string;
 
 
     /**

@@ -41,7 +41,7 @@ final class FileSystemCache extends CachePeer {
         if (!isset($directory)) throw new RuntimeException('Missing cache instantiation option "directory"');
 
         if (isRelativePath($directory)) {
-            $directory = Config::getString('app.dir.root').'/'.$directory;
+            $directory = Config::string('app.dir.root').'/'.$directory;
         }
 
         // make sure the directory exists

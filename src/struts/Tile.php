@@ -278,7 +278,7 @@ class Tile extends CObject {
 
         $tileHint = false;
         if (Application::isAdminIP()) {
-            $rootDir  = Config::getString('app.dir.root');
+            $rootDir  = Config::string('app.dir.root');
             $file     = $this->fileName;
             $file     = strRightFrom($file, $rootDir.DIRECTORY_SEPARATOR, 1, false, $file);
             $file     = 'file="'.str_replace('\\', '/', $file).'"';

@@ -22,7 +22,7 @@ class VersionedUrl extends Url {
         if ($pos === false) $name = $relativeUri;
         else                $name = substr($relativeUri, 0, $pos);
 
-        $webDir = Config::getString('app.dir.web', '');
+        $webDir = Config::string('app.dir.web', '');
 
         if ($webDir && file_exists($fileName = $webDir.'/'.$name)) {
             if ($pos === false) $uri .= '?';

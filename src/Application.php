@@ -74,7 +74,7 @@ class Application extends CObject {
 
         // initialize the configuration
         $this->config = $this->initConfig($options);
-        $configDir = $this->config->getString('app.dir.config');
+        $configDir = $this->config->string('app.dir.config');
 
         // initialize the container
         $this->container = $this->initContainer($configDir)
@@ -209,7 +209,7 @@ class Application extends CObject {
 
         // ensure that we have an "app.id"
         $appId = $config->get('app.id', null);
-        if (!$appId) $config->set('app.id', substr(md5($config->getString('app.dir.root')), 0, 16));
+        if (!$appId) $config->set('app.id', substr(md5($config->string('app.dir.root')), 0, 16));
 
         // enforce mission-critical PHP requirements
         if (!php_ini_loaded_file()) {

@@ -263,7 +263,7 @@ class Module extends CObject {
             $location = trim($location);
             if (!strlen($location)) continue;
             if (isRelativePath($location)) {
-                $appRoot ??= $config->getString('app.dir.root');
+                $appRoot ??= $config->string('app.dir.root');
                 $location = $appRoot.DIRECTORY_SEPARATOR.$location;
             }
             if (!is_dir($location)) Struts::configError("<struts-config file-base=\"$locations[$i]\": Resource location not found");
