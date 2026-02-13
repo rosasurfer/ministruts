@@ -176,24 +176,18 @@ class PHP extends StaticClass {
 
 
     /**
-     * Execute a process and return STDOUT.
-     *
-     * Replacement for shell_exec() wich suffers from a Windows bug where a DOS EOF character (0x1A = ASCII 26)
-     * in the STDOUT stream causes further reading to stop.
-     *
-     * - popen() suffers from the same bug
-     * - passthru() does not capture STDERR
+     * Execute a process and optionally capture exit status, STDOUT and STDERR separately. Optionally pass-through all content.
      *
      * @param  string        $cmd                 - external command to execute
-     * @param  ?string       $stderr   [optional] - if present a variable the contents of STDERR will be written to
-     * @param  ?int          $exitCode [optional] - if present a variable the commands's exit code will be written to
-     * @param  ?string       $dir      [optional] - if present the initial working directory for the command
-     * @param  string[]|null $env      [optional] - if present the environment to *replace* the current one
-     * @param  bool[]        $options  [optional] - additional options controlling runtime behavior:                      <br>
-     *                  key "stdout-passthrough":   Whether to additionally pass-through (print) the contents of STDOUT.  <br>
-     *                                              This option will not affect the return value (default: no)            <br>
-     *                  key "stderr-passthrough":   Whether to additionally pass-through (print) the contents of STDERR.  <br>
-     *                                              This option will not affect the return value (default: no)            <br>
+     * @param  ?string       $stderr   [optional] - variable the content of STDERR will be written to
+     * @param  ?int          $exitCode [optional] - variable the exit status will be written to
+     * @param  ?string       $dir      [optional] - initial working directory for the command
+     * @param  string[]|null $env      [optional] - environment to *replace* the current one
+     * @param  bool[]        $options  [optional] - additional options controlling runtime behavior:                    <br>
+     *                  key "stdout-passthrough":   Whether to additionally pass-through (print) STDOUT (default: no).  <br>
+     *                                              Setting this option will not affect the return value.               <br>
+     *                  key "stderr-passthrough":   Whether to additionally pass-through (print) STDERR (default: no).  <br>
+     *                                              Setting this option will not affect parameter $stderr               <br>
      *
      * @return ?string - content of STDOUT or NULL if the process didn't produce any output
      */
@@ -203,12 +197,26 @@ class PHP extends StaticClass {
                                       ?string $dir = null,
                                       ?array  $env = null,
                                        array  $options = []): ?string {
+        //
+        // - Both exec() and shell_exec() execute the command via a shell which supports redirection and piping.
+        // - Neither exec() nor shell_exec() can provide all three exit status, STDOUT and STDERR independently.
+        // - shell_exec() suffers from a Windows bug where a DOS EOF character (0x1A = ASCII 26) in the STDOUT stream causes
+        //   further reading of STDOUT to stop prematurely. This will corrupt the output and can cause shell_exec() to hang.
+        // - passthru() supports STDOUT only.
+        //
+        // On Windows, shell_exec() reads STDOUT through a text-mode pipe. In text mode, the Microsoft CRT treats CTRL+Z / 0x1A as
+        // end-of-file, so output will get truncated at the first 0x1A byte. The PHP manual now warns that on Windows the underlying
+        // pipe may fail. popen() in text-mode behaves the same.
+        //
+        // @link  https://bugs.php.net/bug.php?id=78699
+        //
+
         // check whether the process needs to be watched asynchronously
-        $argc         = func_num_args();
-        $needStderr   = ($argc > 1);
-        $needExitCode = ($argc > 2);
-        $stdoutPassthrough = isset($options['stdout-passthrough']) && $options['stdout-passthrough'];
-        $stderrPassthrough = isset($options['stderr-passthrough']) && $options['stderr-passthrough'];
+        $argc              = func_num_args();
+        $needStderr        = ($argc > 1);
+        $needExitCode      = ($argc > 2);
+        $stdoutPassthrough = (bool) ($options['stdout-passthrough'] ?? false);
+        $stderrPassthrough = (bool) ($options['stderr-passthrough'] ?? false);
 
         if (!$needStderr && !$needExitCode && !WINDOWS) {
             return shell_exec($cmd);                                    // the process doesn't need watching and we can go with shell_exec()
@@ -216,9 +224,9 @@ class PHP extends StaticClass {
 
         // we must use proc_open()/proc_close()
         $descriptors = [                                                // "pipes" or "files":
-            ($STDIN =0) => ['pipe', 'rb'],                              // ['file', '/dev/tty', 'rb'],
-            ($STDOUT=1) => ['pipe', 'wb'],                              // ['file', '/dev/tty', 'wb'],
-            ($STDERR=2) => ['pipe', 'wb'],                              // ['file', '/dev/tty', 'wb'],
+            ($STDIN  = 0) => ['pipe', 'rb'],                            // ['file', '/dev/tty', 'rb'],
+            ($STDOUT = 1) => ['pipe', 'wb'],                            // ['file', '/dev/tty', 'wb'],
+            ($STDERR = 2) => ['pipe', 'wb'],                            // ['file', '/dev/tty', 'wb'],
         ];
         $pipes = [];
 
@@ -273,9 +281,9 @@ class PHP extends StaticClass {
         $null = null;
         do {
             $readable = $observed;
-            stream_select($readable, $null, $null, 0, 200_000);         // timeout = 0.2 sec = 200'000 µsec
+            stream_select($readable, $null, $null, 0, 200_000);         // timeout: 0.2 sec = 200'000 µsec
             foreach ($readable as $stream) {
-                if (($line=fgets($stream)) === false) {                 // this covers fEof() too
+                if (($line = fgets($stream)) === false) {               // this covers fEof() too
                     fclose($stream);
                     unset($observed[(int)$stream]);                     // close and remove from observed streams
                     continue;
