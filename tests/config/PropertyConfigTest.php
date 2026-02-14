@@ -99,4 +99,21 @@ class PropertyConfigTest extends TestCase {
         $this->expectException();
         $config->string('missing.key');
     }
+
+
+    public function testGetArray(): void {
+        $config = new PropertyConfig([$this->configFile]);
+
+        $expected = [
+            'a' => '42',
+            'b' => '-7',
+        ];
+        $this->assertSame($expected, $config->array('int'));
+        $this->assertSame($expected, $config->array('missing.key', $expected));
+
+        $this->expectException();
+        $config->array('text');
+        $this->expectException();
+        $config->array('missing.key');
+    }
 }

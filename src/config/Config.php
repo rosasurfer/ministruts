@@ -101,6 +101,19 @@ interface Config extends ArrayAccess, Countable {
 
 
     /**
+     * Return the config settings with the specified key as an array. Not existing settings and non-array values trigger an exception.
+     *
+     * @param  string  $key                - case-insensitive key
+     * @param  mixed[] $default [optional] - value to return if the config setting does not exist (default: exception)
+     *
+     * @return mixed[] - config settings or the specified default value
+     *
+     * @throws RuntimeException if the setting is not found or is not an array
+     */
+    public function array(string $key, array $default = []): array;
+
+
+    /**
      * Return a plain text dump of the instance's preferences.
      *
      * @param  array<string, int|string> $options [optional] - array with dump options, may be any of:                   <br>
