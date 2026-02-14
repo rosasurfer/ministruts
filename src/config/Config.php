@@ -16,6 +16,17 @@ use rosasurfer\ministruts\core\exception\RuntimeException;
 interface Config extends ArrayAccess, Countable {
 
     /**
+     * Set/modify the config setting with the specified key.
+     *
+     * @param  int|string $key   - case-insensitive key
+     * @param  mixed      $value - new value
+     *
+     * @return $this
+     */
+    public function set($key, $value): self;
+
+
+    /**
      * Return the config setting with the specified key or the default value if no such setting is found.
      *
      * @param  string $key                - case-insensitive key
@@ -29,46 +40,110 @@ interface Config extends ArrayAccess, Countable {
 
 
     /**
-     * Return the config setting with the specified key as a boolean. Accepted strict boolean representations are "1" and "0",
-     * "true" and "false", "on" and "off", "yes" and "no" (case-insensitive).
+     * Return the config setting with the specified key interpreted as a boolean. Accepted strict boolean representations are "1" and "0",
+     * "true" and "false", "on" and "off", "yes" and "no" (case-insensitive), as well as native booleans. Not existing settings and
+     * non-boolean values trigger an exception.
      *
      * @param  string $key                - case-insensitive key
-     * @param  bool   $strict  [optional] - whether to apply strict interpretation rules:
-     *                                      FALSE - returns TRUE only for "1", "true", "on" and "yes", and FALSE otherwise (default)
-     *                                      TRUE  - as above but FALSE is returned only for "0", "false", "off" and "no",
-     *                                              otherwise an exception is thrown
+     * @param  bool   $strict  [optional] - whether to apply strict interpretation rules:                                   <br>
+     *                                       FALSE: returns TRUE for "1", "true", "on" and "yes", otherwise FALSE (default) <br>
+     *                                       TRUE:  as above but FALSE is returned only for "0", "false", "off" and "no"    <br>
      * @param  bool   $default [optional] - value to return if the config setting does not exist (default: exception)
      *
-     * @return bool - config setting or the specified default value
+     * @return bool - interpreted config setting or the specified default value
      *
-     * @throws RuntimeException if the setting is not found or is not strict boolean
+     * @throws RuntimeException if the setting is not found or cannot be interpreted as a boolean
      */
-    public function getBool(string $key, bool $strict=false, bool $default=false): bool;
+    public function bool(string $key, bool $strict = false, bool $default = false): bool;
 
 
     /**
-     * Return the config setting with the specified key as a string. Scalar setting values are casted to string. Not existing and
-     * non-scalar settings trigger an exception.
+     * Return the config setting with the specified key interpreted as an integer. Accepted integer representations are integer values
+     * and strings matching integer notation (e.g. "0", "42", "-7"). Not existing settings and non-integer values trigger an exception.
+     *
+     * @param  string $key                - case-insensitive key
+     * @param  int    $default [optional] - value to return if the config setting does not exist (default: exception)
+     *
+     * @return int - interpreted config setting or the specified default value
+     *
+     * @throws RuntimeException if the setting is not found or cannot be interpreted as an integer
+     */
+    public function int(string $key, int $default = 0): int;
+
+
+    /**
+     * Return the config setting with the specified key interpreted as a floating point number. Accepted float representations are
+     * integer/float values and strings in numeric notation (e.g. "1", "3.14", "-2.5e3"). Not existing settings and non-integer values
+     * trigger an exception.
+     *
+     * @param  string $key                - case-insensitive key
+     * @param  float  $default [optional] - value to return if the config setting does not exist (default: exception)
+     *
+     * @return float - interpreted config setting or the specified default value
+     *
+     * @throws RuntimeException if the setting is not found or cannot be interpreted as a float
+     */
+    public function float(string $key, float $default = 0.0): float;
+
+
+    /**
+     * Return the config setting with the specified key interpreted as a string. Scalar values are casted to string. Not existing settings
+     * and non-scalar values trigger an exception.
      *
      * @param  string $key                - case-insensitive key
      * @param  string $default [optional] - value to return if the config setting does not exist (default: exception)
      *
-     * @return string - config setting or the specified default value
+     * @return string - interpreted config setting or the specified default value
      *
      * @throws RuntimeException if the setting is not found or is non-scalar
      */
-    public function getString(string $key, string $default = ''): string;
+    public function string(string $key, string $default = ''): string;
 
 
     /**
-     * Set/modify the config setting with the specified key.
+     * Return the config setting with the specified key as an array. Not existing settings and non-array values trigger an exception.
      *
-     * @param  int|string $key   - case-insensitive key
-     * @param  mixed      $value - new value
+     * @param  string  $key                - case-insensitive key
+     * @param  mixed[] $default [optional] - value to return if the config setting does not exist (default: exception)
      *
-     * @return $this
+     * @return mixed[] - config settings or the specified default value
+     *
+     * @throws RuntimeException if the setting is not found or is not an array
      */
-    public function set($key, $value): self;
+    public function array(string $key, array $default = []): array;
+
+
+    /**
+     * Return the config setting with the specified key as an object. Not existing settings and non-object values trigger an exception.
+     *
+     * @param  string $key                - case-insensitive key
+     * @param  object $default [optional] - value to return if the config setting does not exist (default: exception)
+     *
+     * @return object - config setting or the specified default value
+     *
+     * @throws RuntimeException if the setting is not found or is not an object
+     */
+    public function object(string $key, ?object $default = null): object;
+
+
+    /**
+     * Return the config setting with the specified key as a typed instance. Not existing settings and non-matching instance values
+     * trigger an exception.
+     *
+     * @param  string $key                - case-insensitive key
+     * @param  string $classname          - expected class of the instance to return
+     * @param  object $default [optional] - instance to return if the config setting does not exist (default: exception)
+     *
+     * @return object - config setting or the specified default value
+     *
+     * @template       T of object
+     * @phpstan-param  class-string<T> $classname
+     * @phpstan-param  T|null          $default
+     * @phpstan-return T
+     *
+     * @throws RuntimeException if the setting is not found or is not of the specified type
+     */
+    public function instance(string $key, string $classname, ?object $default = null): object;
 
 
     /**

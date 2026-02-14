@@ -27,8 +27,7 @@ use const rosasurfer\ministruts\NL;
  *
  * @example
  * <pre>
- *  $config = Application::service('config');
- *  $options = $config['log.appender.mail'];
+ *  $options  = Config::array('log.appender.mail');
  *  $appender = new MailAppender($options);
  *
  *  Option fields:

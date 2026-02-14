@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace rosasurfer\ministruts\db;
 
 use rosasurfer\ministruts\core\Singleton;
-use rosasurfer\ministruts\core\assert\Assert;
 use rosasurfer\ministruts\core\exception\IllegalStateException;
 use rosasurfer\ministruts\core\proxy\Config;
 use rosasurfer\ministruts\db\ConnectorInterface as IConnector;
@@ -57,8 +56,7 @@ final class ConnectionPool extends Singleton {
         $me = self::me();
 
         if (!isset($me->pool[$id])) {
-            $options = Config::get("db.$id", []);
-            Assert::isArray($options, "config value \"db.$id\"");
+            $options = Config::array("db.$id", []);
             if (!$options) throw new IllegalStateException("No configuration found for database alias \"$id\"");
 
             // resolve the class name of the connector

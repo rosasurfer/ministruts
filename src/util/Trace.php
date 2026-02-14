@@ -211,7 +211,7 @@ class Trace extends StaticClass {
         if ($container && $container->has('config')) {
             /** @var Config $config */
             $config = $container['config'];
-            $appRoot = $config->getString('app.dir.root', '');
+            $appRoot = $config->string('app.dir.root', '');
         }
         $result = '';
         $size = sizeof($trace);

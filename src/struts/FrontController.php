@@ -55,8 +55,8 @@ class FrontController extends Singleton {
             if (!$controller) {                                             // @phpstan-ignore booleanNot.alwaysTrue (TODO: implement cache)
                 $controller = self::getInstance(static::class);
 
-                $configDir = Config::get('app.dir.config');
-                $configFile = str_replace('\\', '/', $configDir.'/struts-config.xml');
+                $configDir = Config::string('app.dir.config');
+                $configFile = str_replace('\\', '/', "$configDir/struts-config.xml");
 
                 // ...and cache it with a FileDependency
                 $dependency = FileDependency::create([$configFile]);
@@ -78,13 +78,15 @@ class FrontController extends Singleton {
         parent::__construct();
 
         // lookup Struts configuration files
-        $configDir = Config::get('app.dir.struts', null);
-        $configDir ??= Config::get('app.dir.config');                               // fall-back to standard config directory
+        $configDir = Config::string('app.dir.struts', '');
+        if ($configDir == '') {
+            $configDir = Config::string('app.dir.config');                          // fall-back to standard config directory
+        }
 
-        $mainConfig = str_replace('\\', '/', $configDir.'/struts-config.xml');      // main module config
+        $mainConfig = str_replace('\\', '/', "$configDir/struts-config.xml");       // main module config
         if (!is_file($mainConfig)) Struts::configError('Struts configuration file not found: "'.$mainConfig.'"');
 
-        $subConfigs = glob($configDir.'/struts-config-*.xml', GLOB_ERR) ?: [];      // scan for submodule configs
+        $subConfigs = glob("$configDir/struts-config-*.xml", GLOB_ERR) ?: [];       // scan for submodule configs
         $configs    = \array_merge([$mainConfig], $subConfigs);
 
         // create and register a Module for each found configuration file

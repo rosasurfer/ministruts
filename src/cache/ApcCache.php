@@ -20,10 +20,12 @@ class ApcCache extends CachePeer {
      * @param  mixed[] $options [optional] - additional instantiation options (default: none)
      */
     public function __construct(?string $label = null, array $options = []) {
-        $label ??= '';
-        $this->label     = $label;
-        $this->namespace = strlen($label) ? $label : md5(Config::getString('app.dir.root'));
-        $this->options   = $options;
+        parent::__construct($label, $options);
+
+        $this->namespace = $this->label;
+        if ($this->namespace == '') {
+            $this->namespace = md5(Config::string('app.dir.root'));
+        }
     }
 
 

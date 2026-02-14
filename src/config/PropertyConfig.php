@@ -52,9 +52,9 @@ use const rosasurfer\ministruts\CLI;
  *  &lt;?php
  *  $file = ['config.properties'];
  *  $config = new PropertyConfig($file);
- *  $config->get('db.connector')                # return a single value
- *  $config->get('db')                          # return an associative array of values ['connector'=>..., 'host'=>...]
- *  $config->get('db.options')                  # return a numerical indexed array of values [0=>..., 1=>..., 2=>...]
+ *  $config->string('db.connector')             # return a single value
+ *  $config->array('db')                        # return an associative array of values ['connector'=>..., 'host'=>...]
+ *  $config->array('db.options')                # return a numerical indexed array of values [0=>..., 1=>..., 2=>...]
  * </pre>
  */
 class PropertyConfig extends CObject implements Config {
@@ -245,6 +245,17 @@ class PropertyConfig extends CObject implements Config {
 
     /**
      * {@inheritDoc}
+     *
+     * @param  int|string $key - case-insensitive key
+     */
+    public function set($key, $value): self {
+        $this->setProperty($key, $value);
+        return $this;
+    }
+
+
+    /**
+     * {@inheritDoc}
      */
     public function get(string $key, $default = null) {
         $notFound = false;
@@ -261,22 +272,20 @@ class PropertyConfig extends CObject implements Config {
     /**
      * {@inheritDoc}
      */
-    public function getBool(string $key, bool $strict=false, bool $default=false): bool {
+    public function bool(string $key, bool $strict = false, bool $default = false): bool {
         $notFound = false;
         $value = $this->getProperty($key, $notFound);
 
         if ($notFound) {
-            // key not found: return a passed default value
             if (func_num_args() > 2) {
                 return $default;
             }
             throw new RuntimeException("Config key \"$key\" not found (no default value specified)");
         }
 
-        // key found: validate it as a boolean
         $flags = 0;
         if ($strict) {
-            if ($value===null || $value==='') {     // filter_var() considers NULL and an empty string '' as valid strict booleans
+            if (($value ?? '') === '') {             // filter_var() considers NULL and empty strings as valid booleans
                 throw new RuntimeException("Invalid value of config key \"$key\": ".(isset($value) ? 'empty' : 'NULL').' (boolean representation expected)');
             }
             $flags = FILTER_NULL_ON_FAILURE;
@@ -292,19 +301,59 @@ class PropertyConfig extends CObject implements Config {
     /**
      * {@inheritDoc}
      */
-    public function getString(string $key, string $default = ''): string {
+    public function int(string $key, int $default = 0): int {
         $notFound = false;
         $value = $this->getProperty($key, $notFound);
 
         if ($notFound) {
-            // key not found: return a passed default value
             if (func_num_args() > 1) {
                 return $default;
             }
             throw new RuntimeException("Config key \"$key\" not found (no default value specified)");
         }
 
-        // key found
+        if (is_int($value) || (is_string($value) && preg_match('/^[+-]?\d+$/', $value))) {
+            return (int) $value;
+        }
+        throw new RuntimeException("Invalid value of config key \"$key\": ".(is_scalar($value) ? $value : gettype($value)).' (integer representation expected)');
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    public function float(string $key, float $default = 0.0): float {
+        $notFound = false;
+        $value = $this->getProperty($key, $notFound);
+
+        if ($notFound) {
+            if (func_num_args() > 1) {
+                return $default;
+            }
+            throw new RuntimeException("Config key \"$key\" not found (no default value specified)");
+        }
+
+        if (is_int($value) || is_float($value) || (is_string($value) && is_numeric($value))) {
+            return (float) $value;
+        }
+        throw new RuntimeException("Invalid value of config key \"$key\": ".(is_scalar($value) ? $value : gettype($value)).' (float representation expected)');
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    public function string(string $key, string $default = ''): string {
+        $notFound = false;
+        $value = $this->getProperty($key, $notFound);
+
+        if ($notFound) {
+            if (func_num_args() > 1) {
+                return $default;
+            }
+            throw new RuntimeException("Config key \"$key\" not found (no default value specified)");
+        }
+
         if (is_scalar($value)) {
             return (string) $value;
         }
@@ -314,12 +363,69 @@ class PropertyConfig extends CObject implements Config {
 
     /**
      * {@inheritDoc}
-     *
-     * @param  int|string $key - case-insensitive key
      */
-    public function set($key, $value): self {
-        $this->setProperty($key, $value);
-        return $this;
+    public function array(string $key, array $default = []): array {
+        $notFound = false;
+        $value = $this->getProperty($key, $notFound);
+
+        if ($notFound) {
+            if (func_num_args() > 1) {
+                return $default;
+            }
+            throw new RuntimeException("Config key \"$key\" not found (no default value specified)");
+        }
+
+        if (is_array($value)) {
+            return $value;
+        }
+        throw new RuntimeException("Invalid type of config key \"$key\": ".gettype($value).' (array expected)');
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    public function object(string $key, ?object $default = null): object {
+        $notFound = false;
+        $value = $this->getProperty($key, $notFound);
+
+        if ($notFound) {
+            if ($default) {
+                return $default;
+            }
+            throw new RuntimeException("Config key \"$key\" not found (no default value specified)");
+        }
+
+        if (is_object($value)) {
+            return $value;
+        }
+        throw new RuntimeException("Invalid type of config key \"$key\": ".gettype($value).' (object expected)');
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    public function instance(string $key, string $classname, ?object $default = null): object {
+        if ($default && !$default instanceof $classname) {
+            throw new InvalidValueException('Invalid type of parameter $default: '.get_class($default)." (instance of $classname expected)");
+        }
+
+        $notFound = false;
+        $value = $this->getProperty($key, $notFound);
+
+        if ($notFound) {
+            if ($default) {
+                return $default;
+            }
+            throw new RuntimeException("Config key \"$key\" not found (no default value specified)");
+        }
+
+        if ($value instanceof $classname) {
+            return $value;
+        }
+        $type = is_object($value) ? get_class($value) : gettype($value);
+        throw new RuntimeException("Invalid type of config key \"$key\": $type (instance of $classname expected)");
     }
 
 

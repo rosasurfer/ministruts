@@ -31,17 +31,17 @@ final class FileSystemCache extends CachePeer {
      * @param  mixed[] $options [optional] - additional instantiation options (default: none)
      */
     public function __construct(string $label, array $options = []) {
-        $this->label     = $label;
+        parent::__construct($label, $options);
+
         $this->namespace = $label;
-        $this->options   = $options;
 
         // determine the cache directory to use
-        /** @var ?string $directory */
-        $directory = $options['directory'] ?? Config::get('app.dir.cache', null);
-        if (!isset($directory)) throw new RuntimeException('Missing cache instantiation option "directory"');
+        /** @var string $directory */
+        $directory = $options['directory'] ?? Config::string('app.dir.cache', '');
+        if ($directory == '') throw new RuntimeException('Missing cache instantiation option["directory"]');
 
         if (isRelativePath($directory)) {
-            $directory = Config::getString('app.dir.root').'/'.$directory;
+            $directory = Config::string('app.dir.root')."/$directory";
         }
 
         // make sure the directory exists

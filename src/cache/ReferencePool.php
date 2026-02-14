@@ -19,18 +19,6 @@ final class ReferencePool extends CachePeer {
 
 
     /**
-     * Constructor.
-     *
-     * @param  ?string $label   [optional] - cache identifier (namespace, ignored for in-memory instances)
-     * @param  mixed[] $options [optional] - additional instantiation options (default: none)
-     */
-    public function __construct(?string $label = null, array $options = []) {
-        $this->label = $label ?? '';
-        $this->options = $options;
-    }
-
-
-    /**
      * {@inheritDoc}
      */
     protected function getReferencePool(): self {

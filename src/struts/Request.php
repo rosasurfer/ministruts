@@ -379,9 +379,9 @@ class Request extends CObject {
         // TODO: Move to application as this is not a property of the request.
         static $baseUri;
         if (!isset($baseUri)) {
-            $baseUri = $this->resolveBaseUriVar() ?? Config::getString('app.base-uri', '');
+            $baseUri = $this->resolveBaseUriVar() ?? Config::string('app.base-uri', '');
             if (!$baseUri) {
-                throw new RuntimeException('Unknown application base URI, either $_SERVER["APP_BASE_URI"] or $config["app.base-uri"] needs to be configured.');
+                throw new RuntimeException('Unknown application base URI, either $_SERVER[APP_BASE_URI] or $config[app.base-uri] need to be configured.');
             }
             if ($baseUri[0] != '/') {
                 $baseUri = "/$baseUri";

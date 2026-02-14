@@ -328,7 +328,7 @@ class PHP extends StaticClass {
             elseif ($memoryLimit <  32*MB)                                                                         $issues[] = 'Warn:  memory_limit is very low: '.ini_get('memory_limit').' [resources]';
             elseif ($memoryLimit > 128*MB)                                                                         $issues[] = 'Info:  memory_limit is very high: '.ini_get('memory_limit').' [resources]';
 
-            $sWarnLimit = Config::getString('log.warn.memory_limit', '');
+            $sWarnLimit = Config::string('log.warn.memory_limit', '');
             $warnLimit = php_byte_value($sWarnLimit);
             if ($warnLimit) {
                 if     ($warnLimit <             0)                                                                $issues[] = 'Error: log.warn.memory_limit is invalid: '.$sWarnLimit.' [configuration]';
@@ -466,7 +466,7 @@ class PHP extends StaticClass {
         if (!extension_loaded('sysvsem') && !WINDOWS)                                                              $issues[] = 'Info:  System-V Semaphore extension is not loaded [functionality]';
 
         // check Composer defined dependencies
-        $appRoot = Config::getString('app.dir.root');
+        $appRoot = Config::string('app.dir.root');
         if (is_file($file = $appRoot.'/composer.json') && extension_loaded('json')) {
             $composer = json_decode_or_throw(file_get_contents($file), true);
             if (is_array($composer['require'] ?? false)) {

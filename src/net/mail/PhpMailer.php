@@ -50,7 +50,7 @@ class PhpMailer extends Mailer {
 
         // auto-complete an empty sender
         if (!isset($sender)) {
-            $sender = Config::getString('mail.from', ini_get('sendmail_from') ?: '');
+            $sender = Config::string('mail.from', ini_get('sendmail_from') ?: '');
             if ($sender == '') {
                 $hostName = php_uname('n') ?: 'localhost';
                 if (!strContains($hostName, '.')) {
@@ -81,7 +81,7 @@ class PhpMailer extends Mailer {
         // RCPT: (receiving mailbox)
         $rcpt = self::parseAddress($receiver);
         if (!$rcpt) throw new InvalidValueException("Invalid parameter \$receiver: $receiver");
-        $forced = Config::getString('mail.forced-receiver', '');
+        $forced = Config::string('mail.forced-receiver', '');
         if ($forced != '') {
             $rcpt = self::parseAddress($forced);
             if (!$rcpt) throw new InvalidValueException("Invalid config value \"mail.forced-receiver\": $forced");

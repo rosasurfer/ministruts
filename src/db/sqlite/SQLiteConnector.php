@@ -114,7 +114,7 @@ class SQLiteConnector extends Connector {
             $this->file = $file;
         }
         else {
-            $rootDir = Config::get('app.dir.root');
+            $rootDir = Config::string('app.dir.root');
             $this->file = str_replace('\\', '/', $rootDir.'/'.$file);
         }
         return $this;

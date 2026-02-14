@@ -24,8 +24,7 @@ use const rosasurfer\ministruts\WINDOWS;
  *
  * @example
  * <pre>
- *  $config = Application::service('config');
- *  $options = $config['log.appender.errorlog'];
+ *  $options  = Config::array('log.appender.errorlog');
  *  $appender = new ErrorLogAppender($options);
  *
  *  Option fields:
@@ -76,8 +75,8 @@ class ErrorLogAppender extends BaseAppender {
         else {
             $this->destinationType = ERROR_LOG_FILE;
             if (isRelativePath($filepath)) {
-                // convert to absolute path as the current PHP working directory is not fix
-                $filepath = Config::get('app.dir.root')."/$filepath";
+                // convert to absolute path
+                $filepath = Config::string('app.dir.root')."/$filepath";
             }
             $this->destinationFile = $filepath;
         }

@@ -36,6 +36,18 @@ abstract class CachePeer extends CObject {
 
 
     /**
+     * Constructor.
+     *
+     * @param  ?string $label   [optional] - cache identifier (default: none)
+     * @param  mixed[] $options [optional] - additional instantiation options (default: none)
+     */
+    public function __construct(?string $label = null, array $options = []) {
+        $this->label   = $label ?? '';
+        $this->options = $options;
+    }
+
+
+    /**
      * Return the {@link ReferencePool} instance of the cache (the identity manager).
      *
      * @return ReferencePool

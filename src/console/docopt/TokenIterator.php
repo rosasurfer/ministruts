@@ -37,7 +37,7 @@ class TokenIterator extends ArrayIterator {
         if (!is_array($source)) {
             $source = trim($source);
 
-            if (strlen($source)) {
+            if ($source != '') {
                 $source = preg_split('/\s+/', $source);
             }
             else {

@@ -91,12 +91,15 @@
       <exclude name="SlevomatCodingStandard.Namespaces.UseSpacing.IncorrectLinesCountBetweenSameTypeOfUse"/>
       <exclude name="SlevomatCodingStandard.Numbers.DisallowNumericLiteralSeparator.DisallowedNumericLiteralSeparator"/>
       <exclude name="SlevomatCodingStandard.PHP.DisallowReference.DisallowedInheritingVariableByReference"/>
+      <exclude name="SlevomatCodingStandard.TypeHints.ClassConstantTypeHint.UselessDocComment"/>
       <exclude name="SlevomatCodingStandard.TypeHints.DisallowArrayTypeHintSyntax.DisallowedArrayTypeHintSyntax"/>
       <exclude name="SlevomatCodingStandard.TypeHints.ParameterTypeHint.UselessAnnotation"/>
       <exclude name="SlevomatCodingStandard.TypeHints.ParameterTypeHintSpacing.MultipleSpacesBetweenTypeHintAndParameter"/>
       <exclude name="SlevomatCodingStandard.TypeHints.PropertyTypeHint.UselessAnnotation"/>
       <exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHint.UselessAnnotation"/>
+      <exclude name="SlevomatCodingStandard.TypeHints.UselessConstantTypeHint.UselessDocComment"/>
       <exclude name="SlevomatCodingStandard.Whitespaces.DuplicateSpaces.DuplicateSpaces"/>
+
 
       <!-- broken -->
       <exclude name="SlevomatCodingStandard.ControlStructures.EarlyExit"/>
@@ -240,9 +243,5 @@
         <property name="linesCountBeforeDeclare" value="0"/>
         <property name="spacesCountAroundEqualsSign" value="0"/>
       </properties>
-    </rule>
-
-    <rule ref="SlevomatCodingStandard.TypeHints.UselessConstantTypeHint.UselessDocComment">
-      <exclude-pattern>*/src/functions.php</exclude-pattern> <!-- allow for const redeclarations -->
     </rule>
 </ruleset>
