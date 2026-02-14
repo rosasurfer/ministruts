@@ -35,6 +35,7 @@ parameters:
     - rosasurfer\ministruts\NUL_DEVICE
 
   additionalConstructors:
+    - PHPUnit\Framework\TestCase::setUp
     - rosasurfer\ministruts\struts\ActionForm::populate
 
   checkUninitializedProperties: true
