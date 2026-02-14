@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\tests\config;
 
+use stdClass;
+
 use rosasurfer\ministruts\config\PropertyConfig;
 use rosasurfer\ministruts\core\proxy\Config;
 use rosasurfer\ministruts\tests\helper\TestCase;
@@ -104,16 +106,32 @@ class PropertyConfigTest extends TestCase {
     public function testGetArray(): void {
         $config = new PropertyConfig([$this->configFile]);
 
-        $expected = [
+        $array = [
             'a' => '42',
             'b' => '-7',
         ];
-        $this->assertSame($expected, $config->array('int'));
-        $this->assertSame($expected, $config->array('missing.key', $expected));
+        $this->assertSame($array, $config->array('int'));
+        $this->assertSame($array, $config->array('missing.key', $array));
 
         $this->expectException();
         $config->array('text');
         $this->expectException();
         $config->array('missing.key');
+    }
+
+
+    public function testGetObject(): void {
+        $config = new PropertyConfig([$this->configFile]);
+
+        $obj = new stdClass();
+        $config->set('object', $obj);
+
+        $this->assertSame($obj, $config->object('object'));
+        $this->assertSame($obj, $config->object('missing.key', $obj));
+
+        $this->expectException();
+        $config->object('text');
+        $this->expectException();
+        $config->object('missing.key');
     }
 }

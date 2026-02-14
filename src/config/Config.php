@@ -114,6 +114,19 @@ interface Config extends ArrayAccess, Countable {
 
 
     /**
+     * Return the config setting with the specified key as an object. Not existing settings and non-object values trigger an exception.
+     *
+     * @param  string $key                - case-insensitive key
+     * @param  object $default [optional] - value to return if the config setting does not exist (default: exception)
+     *
+     * @return object - config setting or the specified default value
+     *
+     * @throws RuntimeException if the setting is not found or is not an object
+     */
+    public function object(string $key, ?object $default = null): object;
+
+
+    /**
      * Return a plain text dump of the instance's preferences.
      *
      * @param  array<string, int|string> $options [optional] - array with dump options, may be any of:                   <br>
