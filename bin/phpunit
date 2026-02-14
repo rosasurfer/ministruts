@@ -7,8 +7,9 @@
 #   phpunit [options] [--] [DIRECTORY|SingleTest.php]
 #
 # Options:                All PHPUnit options are supported, plus the following:
-#   --default-format      Use the built-in report format instead of a preconfigured value.
-#   --default-printer     Use the built-in report printer instead of a preconfigured value.
+#   --testdox             Use the "testdox" report format instead of a preconfigured value.
+#   --default-format      Use the built-in default report format instead of a preconfigured value.
+#   --default-printer     Use the built-in default report printer instead of a preconfigured value.
 #   --full-diff           Display the full diff of failing compare assertions.
 #   --no-stop-on-failure  Override a preconfigured --stop-on-failure option.
 #   --color, --no-color   Enforce or disable colored output (default: auto).

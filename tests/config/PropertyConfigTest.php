@@ -62,7 +62,7 @@ class PropertyConfigTest extends TestCase {
 
         $this->assertTrue($config->bool('bool.true'));
         $this->assertFalse($config->bool('bool.false'));
-        $this->assertTrue($config->bool('missing.key', true));
+        $this->assertTrue($config->bool('missing.key', false, true));
     }
 
 
