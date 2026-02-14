@@ -29,53 +29,64 @@ interface Config extends ArrayAccess, Countable {
 
 
     /**
-     * Return the config setting with the specified key as an integer.
+     * Return the config setting with the specified key interpreted as an integer.
+     *
+     * Accepted integer representations are integer values and strings matching integer notation
+     * (e.g. "0", "42", "-7").
      *
      * @param  string $key             - case-insensitive key
      * @param  int    $default         - value to return if the config setting does not exist (default: exception)
      *
-     * @return int - config setting or the specified default value
+     * @return int - interpreted config setting or the specified default value
      *
-     * @throws RuntimeException if the setting is not found or is not an integer
+     * @throws RuntimeException if the setting is not found or cannot be interpreted as an integer
      */
     public function int(string $key, int $default = 0): int;
 
 
     /**
-     * Return the config setting with the specified key as a floating point number.
+     * Return the config setting with the specified key interpreted as a floating point number.
+     *
+     * Accepted float representations are integer/float values and strings in numeric notation
+     * (e.g. "1", "3.14", "-2.5e3").
      *
      * @param  string $key             - case-insensitive key
      * @param  float  $default         - value to return if the config setting does not exist (default: exception)
      *
-     * @return float - config setting or the specified default value
+     * @return float - interpreted config setting or the specified default value
      *
-     * @throws RuntimeException if the setting is not found or is not a float
+     * @throws RuntimeException if the setting is not found or cannot be interpreted as a float
      */
     public function float(string $key, float $default = 0.0): float;
 
 
     /**
-     * Return the config setting with the specified key as a boolean.
+     * Return the config setting with the specified key interpreted as a boolean.
+     *
+     * Accepted boolean representations are "1" and "0", "true" and "false", "on" and "off",
+     * "yes" and "no" (case-insensitive), as well as native boolean values.
      *
      * @param  string $key             - case-insensitive key
      * @param  bool   $default         - value to return if the config setting does not exist (default: exception)
      *
-     * @return bool - config setting or the specified default value
+     * @return bool - interpreted config setting or the specified default value
      *
-     * @throws RuntimeException if the setting is not found or is not a boolean
+     * @throws RuntimeException if the setting is not found or cannot be interpreted as a boolean
      */
     public function bool(string $key, bool $default = false): bool;
 
 
     /**
-     * Return the config setting with the specified key as a string.
+     * Return the config setting with the specified key interpreted as a string.
+     *
+     * Scalar setting values are casted to string. Not existing and non-scalar settings trigger an exception.
      *
      * @param  string $key                - case-insensitive key
      * @param  string $default [optional] - value to return if the config setting does not exist (default: exception)
      *
-     * @return string - config setting or the specified default value
+     * @return string - interpreted config setting or the specified default value
      *
-     * @throws RuntimeException if the setting is not found or is not a string
+     * @throws RuntimeException if the setting is not found or is non-scalar
      */
     public function string(string $key, string $default = ''): string;
 
