@@ -176,7 +176,7 @@ class PHP extends StaticClass {
 
 
     /**
-     * Execute a process and optionally capture exit status, STDOUT and STDERR separately. Optionally pass-through all content.
+     * Execute a process and independently capture exit status, STDOUT and STDERR. Optionally pass-through all content.
      *
      * @param  string        $cmd                 - external command to execute
      * @param  ?string       $stderr   [optional] - variable the content of STDERR will be written to
@@ -198,15 +198,11 @@ class PHP extends StaticClass {
                                       ?array  $env = null,
                                        array  $options = []): ?string {
         //
-        // - Both exec() and shell_exec() execute the command via a shell which supports redirection and piping.
-        // - Neither exec() nor shell_exec() can provide all three exit status, STDOUT and STDERR independently.
-        // - shell_exec() suffers from a Windows bug where a DOS EOF character (0x1A = ASCII 26) in the STDOUT stream causes
-        //   further reading of STDOUT to stop prematurely. This will corrupt the output and can cause shell_exec() to hang.
-        // - passthru() supports STDOUT only.
-        //
-        // On Windows, shell_exec() reads STDOUT through a text-mode pipe. In text mode, the Microsoft CRT treats CTRL+Z / 0x1A as
-        // end-of-file, so output will get truncated at the first 0x1A byte. The PHP manual now warns that on Windows the underlying
-        // pipe may fail. popen() in text-mode behaves the same.
+        // - Both exec() and shell_exec() execute the command via the shell which supports redirection and piping.
+        // - proc_open() is the only function which can access STDERR independently.
+        // - On Windows, shell_exec() can't be used. It reads STDOUT through a text-mode pipe. In text mode, the Microsoft CRT treats
+        //   CTRL+Z / 0x1A as DOS EOF character (ASCII 26). On the first 0x1A byte reading of STDOUT will stop and output will get
+        //   truncated. In between the PHP manual warns that on Windows the underlying pipe may fail.
         //
         // @link  https://bugs.php.net/bug.php?id=78699
         //
@@ -231,7 +227,7 @@ class PHP extends StaticClass {
         $pipes = [];
 
         try {
-            $hProc = proc_open($cmd, $descriptors, $pipes, $dir, $env, ['bypass_shell'=>true]);
+            $hProc = proc_open($cmd, $descriptors, $pipes, $dir, $env, ['bypass_shell' => true]);
         }
         catch (Throwable $ex) {
             if (!$ex instanceof RosasurferException) {
@@ -249,7 +245,8 @@ class PHP extends StaticClass {
 
         // if the process doesn't need asynchronous watching
         if (!$stdoutPassthrough && !$stderrPassthrough) {
-            $stdout = stream_get_contents($pipes[$STDOUT]);
+            $stdout = $stderr = null;
+            $stdout = stream_get_contents($pipes[$STDOUT]);             // Windows: if pushed to background reading STDOUT blocks even with >NUL
             $stderr = stream_get_contents($pipes[$STDERR]);
             fclose($pipes[$STDIN ]);                                    // $pipes[0] => writeable handle connected to the child's STDIN
             fclose($pipes[$STDOUT]);                                    // $pipes[1] => readable handle connected to the child's STDOUT
