@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace rosasurfer\ministruts\tests\config;
 
 use rosasurfer\ministruts\config\PropertyConfig;
-use rosasurfer\ministruts\core\exception\RuntimeException;
 use rosasurfer\ministruts\core\proxy\Config;
 use rosasurfer\ministruts\tests\helper\TestCase;
 
@@ -29,6 +28,7 @@ class PropertyConfigTest extends TestCase {
             'float.b = -2.5e3',
             'bool.true = yes',
             'bool.false = off',
+            'bool.falsy = -1',
             'text = abc',
         ]));
     }
@@ -47,7 +47,16 @@ class PropertyConfigTest extends TestCase {
 
         $this->assertTrue($config->bool('bool.true'));
         $this->assertFalse($config->bool('bool.false'));
+        $this->assertFalse($config->bool('bool.falsy'));
         $this->assertTrue($config->bool('missing.key', false, true));
+
+        $this->expectException();
+        $config->bool('text');
+        $config->bool('bool.falsy', true);
+        $this->expectException();
+        $config->bool('text');
+        $this->expectException();
+        $config->bool('missing.key');
     }
 
 
@@ -58,8 +67,12 @@ class PropertyConfigTest extends TestCase {
         $this->assertSame(-7, $config->int('int.b'));
         $this->assertSame(5, $config->int('missing.key', 5));
 
-        $this->expectException(RuntimeException::class);
+        $this->expectException();
+        $config->int('float.a');
+        $this->expectException();
         $config->int('text');
+        $this->expectException();
+        $config->int('missing.key');
     }
 
 
@@ -68,7 +81,13 @@ class PropertyConfigTest extends TestCase {
 
         $this->assertSame(3.14, $config->float('float.a'));
         $this->assertSame(-2_500.0, $config->float('float.b'));
+        $this->assertSame(42.0, $config->float('int.a'));
         $this->assertSame(1.25, $config->float('missing.key', 1.25));
+
+        $this->expectException();
+        $config->float('text');
+        $this->expectException();
+        $config->float('missing.key');
     }
 
 
@@ -76,5 +95,8 @@ class PropertyConfigTest extends TestCase {
         $config = new PropertyConfig([$this->configFile]);
 
         $this->assertSame('abc', $config->string('text'));
+
+        $this->expectException();
+        $config->string('missing.key');
     }
 }

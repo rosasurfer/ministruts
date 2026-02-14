@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\tests\helper;
 
+use Throwable;
+
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 
@@ -14,9 +16,9 @@ class TestCase extends PHPUnitTestCase {
     /**
      * Asserts that two variables are equal. Adds optional verbose output of the diff.
      *
-     * @param mixed  $expected
-     * @param mixed  $actual
-     * @param string $message [optional]
+     * @param  mixed  $expected
+     * @param  mixed  $actual
+     * @param  string $message [optional]
      *
      * @return void
      */
@@ -41,9 +43,9 @@ class TestCase extends PHPUnitTestCase {
     /**
      * Asserts that two variables are equal (canonicalizing). Adds optional verbose output of the diff.
      *
-     * @param mixed  $expected
-     * @param mixed  $actual
-     * @param string $message [optional]
+     * @param  mixed  $expected
+     * @param  mixed  $actual
+     * @param  string $message [optional]
      *
      * @return void
      */
@@ -68,9 +70,9 @@ class TestCase extends PHPUnitTestCase {
     /**
      * Asserts that two variables are identical. Adds optional verbose output of the diff.
      *
-     * @param mixed  $expected
-     * @param mixed  $actual
-     * @param string $message [optional]
+     * @param  mixed  $expected
+     * @param  mixed  $actual
+     * @param  string $message [optional]
      *
      * @return void
      */
@@ -89,6 +91,19 @@ class TestCase extends PHPUnitTestCase {
             );
             parent::fail($message);
         }
+    }
+
+
+    /**
+     * Sets up an expectation for an exception to be raised by the code under test.
+     *
+     * @param  class-string<Throwable> $classname [optional] - exception class (default: any exception)
+     *
+     * @return void
+     */
+    public function expectException(string $classname = Throwable::class): void
+    {
+        parent::expectException($classname);
     }
 
 

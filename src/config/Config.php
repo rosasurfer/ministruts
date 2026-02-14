@@ -45,9 +45,9 @@ interface Config extends ArrayAccess, Countable {
      * non-boolean values trigger an exception.
      *
      * @param  string $key                - case-insensitive key
-     * @param  bool   $strict  [optional] - whether to apply strict interpretation rules:
-     *                                      FALSE - returns TRUE for "1", "true", "on" and "yes", otherwise FALSE (default)
-     *                                      TRUE  - as above but FALSE is returned only for "0", "false", "off" and "no", otherwise exception
+     * @param  bool   $strict  [optional] - whether to apply strict interpretation rules:                                   <br>
+     *                                       FALSE: returns TRUE for "1", "true", "on" and "yes", otherwise FALSE (default) <br>
+     *                                       TRUE:  as above but FALSE is returned only for "0", "false", "off" and "no"    <br>
      * @param  bool   $default [optional] - value to return if the config setting does not exist (default: exception)
      *
      * @return bool - interpreted config setting or the specified default value
