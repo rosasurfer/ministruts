@@ -15,11 +15,6 @@ connected and customized. The configuration is done in pure PHP (no annotations 
 The ORM is inspired by [Hibernate](https://hibernate.org/#).
 
 
-**V** - The view component is realized by a layout engine which is inspired by the Struts [Tiles plugin](https://struts.apache.org/plugins/tiles/#).
-Pages can be composed using re-usable layouts and HTML fragments. Both can be configured and extended as needed.
-Template language is pure PHP (no pre-compiling of HTML necessary).
-
-
 **V** - The view component is realized by a layout engine inspired by the [Struts Tiles](https://struts.apache.org/plugins/tiles/#) plugin.
 Pages can be assembled from reusable layouts and HTML fragments. Both can be configured and extended as needed.
 The template language is pure PHP (no pre-compilation of HTML necessary).

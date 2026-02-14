@@ -454,7 +454,7 @@ class Module extends CObject {
                 else {
                     if ($tag['form-validate-first']=='false') Struts::configError('<mapping'.$sName.' path="'.$path.'": An "action", "include", "redirect" or "forward" attribute must be defined if "form-validate-first" is set to "false"');
                     $formValidateFirst = true;
-                    // checking existence of "success" und "error" takes place in ActionMapping:freeze()
+                    // checking existence of "success" and "error" takes place in ActionMapping:freeze()
                 }
             }
             elseif ($tag['form-validate-first'] == 'true') {

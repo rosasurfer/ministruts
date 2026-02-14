@@ -285,7 +285,7 @@ function ddd($var, bool $reset = false, string $filename = '') {
     static $dumplog;
 
     if (!isset($dumplog)) {
-        if (!strlen($filename)) {
+        if ($filename == '') {
             $errorLog = (string) ini_get('error_log');
             $dir = strlen($errorLog) ? dirname($errorLog) : (string)getcwd();
             $filename = $dir.'/ddd.log';
