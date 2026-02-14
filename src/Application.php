@@ -208,8 +208,9 @@ class Application extends CObject {
         $config = $this->config;
 
         // ensure that we have an "app.id"
-        $appId = $config->get('app.id', null);
-        if (!$appId) $config->set('app.id', substr(md5($config->string('app.dir.root')), 0, 16));
+        if (!$config->string('app.id', '')) {
+            $config->set('app.id', substr(md5($config->string('app.dir.root')), 0, 16));
+        }
 
         // enforce mission-critical PHP requirements
         if (!php_ini_loaded_file()) {
@@ -227,7 +228,7 @@ class Application extends CObject {
             /** @var self $app */
             $app = self::$instance;
 
-            $warnLimit = php_byte_value($app->config->get('log.warn.memory_limit', PHP_INT_MAX));
+            $warnLimit = php_byte_value($app->config->string('log.warn.memory_limit', (string)PHP_INT_MAX));
             $usedBytes = memory_get_peak_usage(true);
             if ($usedBytes > $warnLimit) {
                 Logger::log('Memory consumption exceeded '.prettyBytes($warnLimit).' (peak usage: '.prettyBytes($usedBytes).')', L_WARN, ['class' => self::class]);
@@ -306,10 +307,10 @@ class Application extends CObject {
      * @return void
      */
     protected function expandAppDirs(Config $config, string $rootDir): void {
-        if (!strlen($rootDir) || isRelativePath($rootDir)) throw new InvalidValueException("Invalid config option \"app.dir.root\" = \"$rootDir\" (not an absolute path)");
+        if ($rootDir=='' || isRelativePath($rootDir)) throw new InvalidValueException("Invalid config option \"app.dir.root\" = \"$rootDir\" (not an absolute path)");
 
         $rootDir = rtrim(str_replace('\\', '/', $rootDir), '/');
-        $dirs = $config->get('app.dir', []);
+        $dirs = $config->array('app.dir', []);
         $this->expandDirsRecursive($dirs, $rootDir);
 
         $config->set('app.dir', $dirs);                     // store everything back
@@ -446,8 +447,7 @@ class Application extends CObject {
 
         static $whiteList = null;
         if (!$whiteList && self::$instance) {
-            $values = self::$instance->config->get('admin.ip', []);
-            if (!\is_array($values)) $values = [$values];
+            $values = (array) self::$instance->config->get('admin.ip', []);
             $whiteList = array_flip($values);
         }                                               // add always white-listed IPs (default)
         $list = $whiteList + ['127.0.0.1'=>'localhost', $_SERVER['SERVER_ADDR']=>'serverIP'];

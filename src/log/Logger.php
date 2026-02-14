@@ -39,7 +39,7 @@ use const rosasurfer\ministruts\L_WARN;
  *
  * @example
  * <pre>
- *  $config = Application::service('config');
+ *  $config = Config::instance();
  *  $config['log.level.default']              = L_WARN;         // set the application's default loglevel to L_WARN
  *  $config['log.level.class.ClassA']         = L_DEBUG;        // set the loglevel for class "ClassA" to L_DEBUG
  *  $config['log.level.class.foo\bar\ClassB'] = L_ERROR;        // set the loglevel for class "foo\bar\ClassB" to L_ERROR
@@ -91,16 +91,16 @@ class Logger extends StaticClass {
 
             // initialize log appenders
             if (self::isAppenderEnabled($id = 'print')) {
-                self::$logAppenders[$id] = new PrintAppender($config["log.appender.$id"] ?? []);
+                self::$logAppenders[$id] = new PrintAppender($config->array("log.appender.$id", []));
             }
             if (self::isAppenderEnabled($id = 'errorlog')) {
                 // the ErrorLogAppender needs to know the status of the PrintAppender
-                $options = $config["log.appender.$id"] ?? [];
+                $options = $config->array("log.appender.$id", []);
                 $options += ['print.enabled' => isset(self::$logAppenders['print'])];
                 self::$logAppenders[$id] = new ErrorLogAppender($options);
             }
             if (self::isAppenderEnabled($id = 'mail')) {
-                self::$logAppenders[$id] = new MailAppender($config["log.appender.$id"] ?? []);
+                self::$logAppenders[$id] = new MailAppender($config->array("log.appender.$id", []));
             }
         }
         $initialized = true;

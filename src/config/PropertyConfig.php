@@ -52,9 +52,9 @@ use const rosasurfer\ministruts\CLI;
  *  &lt;?php
  *  $file = ['config.properties'];
  *  $config = new PropertyConfig($file);
- *  $config->get('db.connector')                # return a single value
- *  $config->get('db')                          # return an associative array of values ['connector'=>..., 'host'=>...]
- *  $config->get('db.options')                  # return a numerical indexed array of values [0=>..., 1=>..., 2=>...]
+ *  $config->string('db.connector')             # return a single value
+ *  $config->array('db')                        # return an associative array of values ['connector'=>..., 'host'=>...]
+ *  $config->array('db.options')                # return a numerical indexed array of values [0=>..., 1=>..., 2=>...]
  * </pre>
  */
 class PropertyConfig extends CObject implements Config {

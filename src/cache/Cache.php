@@ -57,8 +57,8 @@ final class Cache extends StaticClass {
         // specific cache
         if (!isset(self::$caches[$label])) {
             // get cache configuration and create new instance
-            $class   = Config::get('cache.'.$label.'.class');
-            $options = Config::get('cache.'.$label.'.options', []);
+            $class   = Config::string("cache.$label.class");
+            $options = Config::array("cache.$label.options", []);
 
             if (!is_subclass_of($class, CachePeer::class)) {
                 throw new RuntimeException('Not a subclass of '.CachePeer::class.": $class");

@@ -42,10 +42,7 @@ class Lock extends BaseLock {
         }
         else {
             // fall-back to FileLock...
-            $directory = Config::get('app.dir.tmp', null);
-            if (!$directory) $directory = ini_get('sys_temp_dir');
-            if (!$directory) $directory = sys_get_temp_dir();
-
+            $directory = Config::string('app.dir.tmp', sys_get_temp_dir());
             $this->impl = new FileLock($directory.'/lock_'.md5($key));
         }
     }

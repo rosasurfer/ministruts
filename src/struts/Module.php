@@ -244,13 +244,12 @@ class Module extends CObject {
 
         if (!isset($xml['file-base'])) {
             // not specified, apply global configuration
-            /** @var string $viewDir */
-            $viewDir = $config->get('app.dir.view', null) ?? Struts::configError(
+            $viewDir = $config->string('app.dir.view', '') ?: Struts::configError(
                 'Missing view directory configuration: Neither $config[app.dir.view] nor <struts-config file-base="{base-directory}" are specified'.NL
                 .'config: '.NL
                 .$config->dump(),
             );
-            if (!is_dir($viewDir)) Struts::configError("View directory \$config[app.dir.view]=\"$viewDir\" not found");
+            if (!is_dir($viewDir)) Struts::configError("View directory \$config[app.dir.view] not found: \"$viewDir\"");
 
             $this->resourceLocations[] = $viewDir;
             return $this;
