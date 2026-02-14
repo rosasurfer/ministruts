@@ -29,13 +29,11 @@ interface Config extends ArrayAccess, Countable {
 
 
     /**
-     * Return the config setting with the specified key interpreted as an integer.
+     * Return the config setting with the specified key interpreted as an integer. Accepted integer representations are integer values
+     * and strings matching integer notation (e.g. "0", "42", "-7"). Not existing settings and non-integer values trigger an exception.
      *
-     * Accepted integer representations are integer values and strings matching integer notation
-     * (e.g. "0", "42", "-7").
-     *
-     * @param  string $key             - case-insensitive key
-     * @param  int    $default         - value to return if the config setting does not exist (default: exception)
+     * @param  string $key                - case-insensitive key
+     * @param  int    $default [optional] - value to return if the config setting does not exist (default: exception)
      *
      * @return int - interpreted config setting or the specified default value
      *
@@ -62,7 +60,8 @@ interface Config extends ArrayAccess, Countable {
 
     /**
      * Return the config setting with the specified key interpreted as a boolean. Accepted strict boolean representations are "1" and "0",
-     * "true" and "false", "on" and "off", "yes" and "no" (case-insensitive), as well as native boolean values.
+     * "true" and "false", "on" and "off", "yes" and "no" (case-insensitive), as well as native booleans. Not existing settings and
+     * non-boolean values trigger an exception.
      *
      * @param  string $key                - case-insensitive key
      * @param  bool   $strict  [optional] - whether to apply strict interpretation rules:
@@ -70,7 +69,7 @@ interface Config extends ArrayAccess, Countable {
      *                                      TRUE  - as above but FALSE is returned only for "0", "false", "off" and "no", otherwise exception
      * @param  bool   $default [optional] - value to return if the config setting does not exist (default: exception)
      *
-     * @return bool - config setting or the specified default value
+     * @return bool - interpreted config setting or the specified default value
      *
      * @throws RuntimeException if the setting is not found or cannot be interpreted as a boolean
      */
@@ -84,7 +83,7 @@ interface Config extends ArrayAccess, Countable {
      * @param  string $key                - case-insensitive key
      * @param  string $default [optional] - value to return if the config setting does not exist (default: exception)
      *
-     * @return string - config setting or the specified default value
+     * @return string - interpreted config setting or the specified default value
      *
      * @throws RuntimeException if the setting is not found or is non-scalar
      */

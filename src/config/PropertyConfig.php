@@ -308,14 +308,12 @@ class PropertyConfig extends CObject implements Config {
         $value = $this->getProperty($key, $notFound);
 
         if ($notFound) {
-            // key not found: return a passed default value
             if (func_num_args() > 2) {
                 return $default;
             }
             throw new RuntimeException("Config key \"$key\" not found (no default value specified)");
         }
 
-        // key found: validate it as a boolean
         $flags = 0;
         if ($strict) {
             if (($value ?? '') === '') {             // filter_var() considers NULL and empty strings as valid booleans
@@ -339,7 +337,6 @@ class PropertyConfig extends CObject implements Config {
         $value = $this->getProperty($key, $notFound);
 
         if ($notFound) {
-            // key not found: return a passed default value
             if (func_num_args() > 1) {
                 return $default;
             }
