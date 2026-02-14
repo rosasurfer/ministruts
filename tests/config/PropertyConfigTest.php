@@ -42,27 +42,27 @@ class PropertyConfigTest extends TestCase {
     public function testIntInterpretsStringRepresentations(): void {
         $config = new PropertyConfig([$this->configFile]);
 
-        self::assertSame(42, $config->int('int.a'));
-        self::assertSame(-7, $config->int('int.b'));
-        self::assertSame(5, $config->int('missing.key', 5));
+        $this->assertSame(42, $config->int('int.a'));
+        $this->assertSame(-7, $config->int('int.b'));
+        $this->assertSame(5, $config->int('missing.key', 5));
     }
 
 
     public function testFloatInterpretsStringRepresentations(): void {
         $config = new PropertyConfig([$this->configFile]);
 
-        self::assertSame(3.14, $config->float('float.a'));
-        self::assertSame(-2500.0, $config->float('float.b'));
-        self::assertSame(1.25, $config->float('missing.key', 1.25));
+        $this->assertSame(3.14, $config->float('float.a'));
+        $this->assertSame(-2500.0, $config->float('float.b'));
+        $this->assertSame(1.25, $config->float('missing.key', 1.25));
     }
 
 
     public function testBoolInterpretsStringRepresentations(): void {
         $config = new PropertyConfig([$this->configFile]);
 
-        self::assertTrue($config->bool('bool.true'));
-        self::assertFalse($config->bool('bool.false'));
-        self::assertTrue($config->bool('missing.key', true));
+        $this->assertTrue($config->bool('bool.true'));
+        $this->assertFalse($config->bool('bool.false'));
+        $this->assertTrue($config->bool('missing.key', true));
     }
 
 
