@@ -101,7 +101,7 @@ interface Config extends ArrayAccess, Countable {
 
 
     /**
-     * Return the config settings with the specified key as an array. Not existing settings and non-array values trigger an exception.
+     * Return the config setting with the specified key as an array. Not existing settings and non-array values trigger an exception.
      *
      * @param  string  $key                - case-insensitive key
      * @param  mixed[] $default [optional] - value to return if the config setting does not exist (default: exception)
@@ -124,6 +124,26 @@ interface Config extends ArrayAccess, Countable {
      * @throws RuntimeException if the setting is not found or is not an object
      */
     public function object(string $key, ?object $default = null): object;
+
+
+    /**
+     * Return the config setting with the specified key as a typed instance. Not existing settings and non-matching instance values
+     * trigger an exception.
+     *
+     * @param  string $key                - case-insensitive key
+     * @param  string $classname          - expected class of the instance to return
+     * @param  object $default [optional] - instance to return if the config setting does not exist (default: exception)
+     *
+     * @return object - config setting or the specified default value
+     *
+     * @template       T of object
+     * @phpstan-param  class-string<T> $classname
+     * @phpstan-param  T|null          $default
+     * @phpstan-return T
+     *
+     * @throws RuntimeException if the setting is not found or is not of the specified type
+     */
+    public function instance(string $key, string $classname, ?object $default = null): object;
 
 
     /**

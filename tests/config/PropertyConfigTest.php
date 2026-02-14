@@ -6,6 +6,7 @@ namespace rosasurfer\ministruts\tests\config;
 use stdClass;
 
 use rosasurfer\ministruts\config\PropertyConfig;
+use rosasurfer\ministruts\core\CObject;
 use rosasurfer\ministruts\core\proxy\Config;
 use rosasurfer\ministruts\tests\helper\TestCase;
 
@@ -133,5 +134,28 @@ class PropertyConfigTest extends TestCase {
         $config->object('text');
         $this->expectException();
         $config->object('missing.key');
+    }
+
+
+    public function testGetInstance(): void {
+        $config = new PropertyConfig([$this->configFile]);
+
+        $obj1 = new stdClass();
+        $config->set('object.1', $obj1);
+
+        $obj2 = new CObject();
+        $config->set('object.2', $obj2);
+
+        $this->assertSame($obj1, $config->instance('object.1', stdClass::class));
+        $this->assertSame($obj1, $config->instance('missing.key', stdClass::class, $obj1));
+
+        $this->expectException();
+        $config->$config->instance('object.2', stdClass::class);
+        $this->expectException();
+        $config->$config->instance('object.2', stdClass::class, $obj2);
+        $this->expectException();
+        $config->instance('text', stdClass::class);
+        $this->expectException();
+        $config->instance('missing.key', stdClass::class);
     }
 }

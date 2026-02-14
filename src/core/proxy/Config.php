@@ -17,7 +17,7 @@ use rosasurfer\ministruts\config\Config as ConfigInterface;
  * @method static int             int(string $key, int $default = 0)                             Return the config setting with the specified key interpreted as an integer. Accepted integer representations are integer values and strings matching integer notation (e.g. "0", "42", "-7"). Not existing settings and non-integer values trigger an exception.
  * @method static float           float(string $key, float $default = 0.0)                       Return the config setting with the specified key interpreted as a floating point number. Accepted float representations are integer/float values and strings in numeric notation (e.g. "1", "3.14", "-2.5e3"). Not existing settings and non-integer values trigger an exception.
  * @method static string          string(string $key, string $default = '')                      Return the config setting with the specified key interpreted as a string. Scalar values are casted to string. Not existing settings and non-scalar values trigger an exception.
- * @method static mixed[]         array(string $key, mixed[] $default = [])                      Return the config settings with the specified key as an array. Not existing settings and non-array values trigger an exception.
+ * @method static mixed[]         array(string $key, mixed[] $default = [])                      Return the config setting with the specified key as an array. Not existing settings and non-array values trigger an exception.
  * @method static object          object(string $key, ?object $default = null)                   Return the config setting with the specified key as an object. Not existing settings and non-object values trigger an exception.
  */
 class Config extends Proxy {

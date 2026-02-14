@@ -5,6 +5,8 @@ namespace rosasurfer\ministruts\tests\helper;
 
 use Throwable;
 
+use rosasurfer\ministruts\core\ObjectTrait;
+
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 
@@ -12,6 +14,8 @@ use PHPUnit\Framework\TestCase as PHPUnitTestCase;
  *
  */
 class TestCase extends PHPUnitTestCase {
+
+    use ObjectTrait;
 
     /**
      * Asserts that two variables are equal. Adds optional verbose output of the diff.

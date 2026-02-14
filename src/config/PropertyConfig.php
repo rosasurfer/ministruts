@@ -404,6 +404,32 @@ class PropertyConfig extends CObject implements Config {
 
 
     /**
+     * {@inheritDoc}
+     */
+    public function instance(string $key, string $classname, ?object $default = null): object {
+        if ($default && !$default instanceof $classname) {
+            throw new InvalidValueException('Invalid type of parameter $default: '.get_class($default)." (instance of $classname expected)");
+        }
+
+        $notFound = false;
+        $value = $this->getProperty($key, $notFound);
+
+        if ($notFound) {
+            if ($default) {
+                return $default;
+            }
+            throw new RuntimeException("Config key \"$key\" not found (no default value specified)");
+        }
+
+        if ($value instanceof $classname) {
+            return $value;
+        }
+        $type = is_object($value) ? get_class($value) : gettype($value);
+        throw new RuntimeException("Invalid type of config key \"$key\": $type (instance of $classname expected)");
+    }
+
+
+    /**
      * Look-up a property and return its value.
      *
      * @param  string $key      - property key
