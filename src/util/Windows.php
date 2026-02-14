@@ -10,7 +10,7 @@ use rosasurfer\ministruts\core\StaticClass;
  */
 class Windows extends StaticClass {
 
-    /** for example the maximum path on drive D is "D:\some-256-character-path-string<NUL>" */
+    /** @var int - the maximum path on a drive is "D:\some-256-character-path-string<NUL>" */
     public const MAX_PATH = 260;
 
     /** @var array<string[]> - Win32 errors and descriptions */

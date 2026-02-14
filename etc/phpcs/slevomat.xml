@@ -23,7 +23,7 @@
 
 
     <!-- runtime options -->
-    <arg name="report" value="full,source"/>            <!-- full display + summary                      -->
+    <arg name="report" value="full"/>                   <!-- full display per issue                      -->
     <arg name="basepath" value="../.."/>                <!-- base path to strip from reported file names -->
     <arg name="cache" value="../tmp/phpcs-cache.json"/> <!-- use result cache                            -->
     <arg value="p"/>                                    <!-- show progress                               -->
