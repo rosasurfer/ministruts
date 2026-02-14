@@ -119,9 +119,9 @@ class Logger extends StaticClass {
         $config ??= Config::instance();
 
         switch ($id) {
-            case 'print':    return $config->bool("log.appender.$id.enabled", PrintAppender::getDefaultEnabled());
-            case 'errorlog': return $config->bool("log.appender.$id.enabled", ErrorLogAppender::getDefaultEnabled());
-            case 'mail':     return $config->bool("log.appender.$id.enabled", MailAppender::getDefaultEnabled());
+            case 'print':    return $config->bool("log.appender.$id.enabled", true, PrintAppender::getDefaultEnabled());
+            case 'errorlog': return $config->bool("log.appender.$id.enabled", true, ErrorLogAppender::getDefaultEnabled());
+            case 'mail':     return $config->bool("log.appender.$id.enabled", true, MailAppender::getDefaultEnabled());
         }
         return $config->bool("log.appender.$id.enabled", true);
     }

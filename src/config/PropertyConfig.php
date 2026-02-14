@@ -303,24 +303,28 @@ class PropertyConfig extends CObject implements Config {
     /**
      * {@inheritDoc}
      */
-    public function bool(string $key, bool $default=false): bool {
+    public function bool(string $key, bool $strict = false, bool $default = false): bool {
         $notFound = false;
         $value = $this->getProperty($key, $notFound);
 
         if ($notFound) {
             // key not found: return a passed default value
-            if (func_num_args() > 1) {
+            if (func_num_args() > 2) {
                 return $default;
             }
             throw new RuntimeException("Config key \"$key\" not found (no default value specified)");
         }
 
-        if ($value===null || $value==='') {          // filter_var() considers NULL and an empty string '' as valid booleans
-            throw new RuntimeException("Invalid value of config key \"$key\": ".(isset($value) ? 'empty' : 'NULL').' (boolean representation expected)');
+        // key found: validate it as a boolean
+        $flags = 0;
+        if ($strict) {
+            if (($value ?? '') === '') {             // filter_var() considers NULL and empty strings as valid booleans
+                throw new RuntimeException("Invalid value of config key \"$key\": ".(isset($value) ? 'empty' : 'NULL').' (boolean representation expected)');
+            }
+            $flags = FILTER_NULL_ON_FAILURE;
         }
-
-        $result = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-        if ($result === null) {                      // @phpstan-ignore identical.alwaysFalse (PHPStan doesn't see FILTER_NULL_ON_FAILURE)
+        $result = filter_var($value, FILTER_VALIDATE_BOOLEAN, $flags);
+        if ($result === null) {                     // @phpstan-ignore identical.alwaysFalse (PHPStan doesn't see flag FILTER_NULL_ON_FAILURE)
             throw new RuntimeException("Invalid value of config key \"$key\": ".(is_scalar($value) ? $value : gettype($value)).' (boolean representation expected)');
         }
         return $result;
