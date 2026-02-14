@@ -43,13 +43,12 @@ interface Config extends ArrayAccess, Countable {
 
 
     /**
-     * Return the config setting with the specified key interpreted as a floating point number.
+     * Return the config setting with the specified key interpreted as a floating point number. Accepted float representations are
+     * integer/float values and strings in numeric notation (e.g. "1", "3.14", "-2.5e3"). Not existing settings and non-integer values
+     * trigger an exception.
      *
-     * Accepted float representations are integer/float values and strings in numeric notation
-     * (e.g. "1", "3.14", "-2.5e3").
-     *
-     * @param  string $key             - case-insensitive key
-     * @param  float  $default         - value to return if the config setting does not exist (default: exception)
+     * @param  string $key                - case-insensitive key
+     * @param  float  $default [optional] - value to return if the config setting does not exist (default: exception)
      *
      * @return float - interpreted config setting or the specified default value
      *
