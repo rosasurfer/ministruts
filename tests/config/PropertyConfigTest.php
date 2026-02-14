@@ -52,7 +52,7 @@ class PropertyConfigTest extends TestCase {
         $config = new PropertyConfig([$this->configFile]);
 
         $this->assertSame(3.14, $config->float('float.a'));
-        $this->assertSame(-2500.0, $config->float('float.b'));
+        $this->assertSame(-2_500.0, $config->float('float.b'));
         $this->assertSame(1.25, $config->float('missing.key', 1.25));
     }
 
