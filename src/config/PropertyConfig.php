@@ -245,6 +245,17 @@ class PropertyConfig extends CObject implements Config {
 
     /**
      * {@inheritDoc}
+     *
+     * @param  int|string $key - case-insensitive key
+     */
+    public function set($key, $value): self {
+        $this->setProperty($key, $value);
+        return $this;
+    }
+
+
+    /**
+     * {@inheritDoc}
      */
     public function get(string $key, $default = null) {
         $notFound = false;
@@ -255,6 +266,35 @@ class PropertyConfig extends CObject implements Config {
             return $default;
         }
         return $value;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    public function bool(string $key, bool $strict = false, bool $default = false): bool {
+        $notFound = false;
+        $value = $this->getProperty($key, $notFound);
+
+        if ($notFound) {
+            if (func_num_args() > 2) {
+                return $default;
+            }
+            throw new RuntimeException("Config key \"$key\" not found (no default value specified)");
+        }
+
+        $flags = 0;
+        if ($strict) {
+            if (($value ?? '') === '') {             // filter_var() considers NULL and empty strings as valid booleans
+                throw new RuntimeException("Invalid value of config key \"$key\": ".(isset($value) ? 'empty' : 'NULL').' (boolean representation expected)');
+            }
+            $flags = FILTER_NULL_ON_FAILURE;
+        }
+        $result = filter_var($value, FILTER_VALIDATE_BOOLEAN, $flags);
+        if ($result === null) {                     // @phpstan-ignore identical.alwaysFalse (PHPStan doesn't see flag FILTER_NULL_ON_FAILURE)
+            throw new RuntimeException("Invalid value of config key \"$key\": ".(is_scalar($value) ? $value : gettype($value)).' (boolean representation expected)');
+        }
+        return $result;
     }
 
 
@@ -303,35 +343,6 @@ class PropertyConfig extends CObject implements Config {
     /**
      * {@inheritDoc}
      */
-    public function bool(string $key, bool $strict = false, bool $default = false): bool {
-        $notFound = false;
-        $value = $this->getProperty($key, $notFound);
-
-        if ($notFound) {
-            if (func_num_args() > 2) {
-                return $default;
-            }
-            throw new RuntimeException("Config key \"$key\" not found (no default value specified)");
-        }
-
-        $flags = 0;
-        if ($strict) {
-            if (($value ?? '') === '') {             // filter_var() considers NULL and empty strings as valid booleans
-                throw new RuntimeException("Invalid value of config key \"$key\": ".(isset($value) ? 'empty' : 'NULL').' (boolean representation expected)');
-            }
-            $flags = FILTER_NULL_ON_FAILURE;
-        }
-        $result = filter_var($value, FILTER_VALIDATE_BOOLEAN, $flags);
-        if ($result === null) {                     // @phpstan-ignore identical.alwaysFalse (PHPStan doesn't see flag FILTER_NULL_ON_FAILURE)
-            throw new RuntimeException("Invalid value of config key \"$key\": ".(is_scalar($value) ? $value : gettype($value)).' (boolean representation expected)');
-        }
-        return $result;
-    }
-
-
-    /**
-     * {@inheritDoc}
-     */
     public function string(string $key, string $default = ''): string {
         $notFound = false;
         $value = $this->getProperty($key, $notFound);
@@ -347,17 +358,6 @@ class PropertyConfig extends CObject implements Config {
             return (string) $value;
         }
         throw new RuntimeException("Invalid type of config key \"$key\": ".gettype($value).' (scalar expected)');
-    }
-
-
-    /**
-     * {@inheritDoc}
-     *
-     * @param  int|string $key - case-insensitive key
-     */
-    public function set($key, $value): self {
-        $this->setProperty($key, $value);
-        return $this;
     }
 
 

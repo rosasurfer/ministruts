@@ -16,6 +16,17 @@ use rosasurfer\ministruts\core\exception\RuntimeException;
 interface Config extends ArrayAccess, Countable {
 
     /**
+     * Set/modify the config setting with the specified key.
+     *
+     * @param  int|string $key   - case-insensitive key
+     * @param  mixed      $value - new value
+     *
+     * @return $this
+     */
+    public function set($key, $value): self;
+
+
+    /**
      * Return the config setting with the specified key or the default value if no such setting is found.
      *
      * @param  string $key                - case-insensitive key
@@ -26,6 +37,24 @@ interface Config extends ArrayAccess, Countable {
      * @throws RuntimeException if the setting is not found and no default value was specified
      */
     public function get(string $key, $default = null);
+
+
+    /**
+     * Return the config setting with the specified key interpreted as a boolean. Accepted strict boolean representations are "1" and "0",
+     * "true" and "false", "on" and "off", "yes" and "no" (case-insensitive), as well as native booleans. Not existing settings and
+     * non-boolean values trigger an exception.
+     *
+     * @param  string $key                - case-insensitive key
+     * @param  bool   $strict  [optional] - whether to apply strict interpretation rules:
+     *                                      FALSE - returns TRUE for "1", "true", "on" and "yes", otherwise FALSE (default)
+     *                                      TRUE  - as above but FALSE is returned only for "0", "false", "off" and "no", otherwise exception
+     * @param  bool   $default [optional] - value to return if the config setting does not exist (default: exception)
+     *
+     * @return bool - interpreted config setting or the specified default value
+     *
+     * @throws RuntimeException if the setting is not found or cannot be interpreted as a boolean
+     */
+    public function bool(string $key, bool $strict = false, bool $default = false): bool;
 
 
     /**
@@ -58,24 +87,6 @@ interface Config extends ArrayAccess, Countable {
 
 
     /**
-     * Return the config setting with the specified key interpreted as a boolean. Accepted strict boolean representations are "1" and "0",
-     * "true" and "false", "on" and "off", "yes" and "no" (case-insensitive), as well as native booleans. Not existing settings and
-     * non-boolean values trigger an exception.
-     *
-     * @param  string $key                - case-insensitive key
-     * @param  bool   $strict  [optional] - whether to apply strict interpretation rules:
-     *                                      FALSE - returns TRUE for "1", "true", "on" and "yes", otherwise FALSE (default)
-     *                                      TRUE  - as above but FALSE is returned only for "0", "false", "off" and "no", otherwise exception
-     * @param  bool   $default [optional] - value to return if the config setting does not exist (default: exception)
-     *
-     * @return bool - interpreted config setting or the specified default value
-     *
-     * @throws RuntimeException if the setting is not found or cannot be interpreted as a boolean
-     */
-    public function bool(string $key, bool $strict = false, bool $default = false): bool;
-
-
-    /**
      * Return the config setting with the specified key interpreted as a string. Scalar values are casted to string. Not existing settings
      * and non-scalar values trigger an exception.
      *
@@ -87,17 +98,6 @@ interface Config extends ArrayAccess, Countable {
      * @throws RuntimeException if the setting is not found or is non-scalar
      */
     public function string(string $key, string $default = ''): string;
-
-
-    /**
-     * Set/modify the config setting with the specified key.
-     *
-     * @param  int|string $key   - case-insensitive key
-     * @param  mixed      $value - new value
-     *
-     * @return $this
-     */
-    public function set($key, $value): self;
 
 
     /**
