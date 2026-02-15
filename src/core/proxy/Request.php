@@ -64,8 +64,8 @@ use rosasurfer\ministruts\struts\Request as StrutsRequest;
  * @method static bool           isActionError(string ...$keys)                                            Whether an ActionError exists for one of the specified keys, or for any key if no key was given.
  * @method static void           setActionError(string $key, string $message)                              Store an ActionError for the specified key.
  * @method static string[]       removeActionErrors(string ...$keys)                                       Remove the ActionError(s) with the specified key(s).
- * @method static ?ActionMapping getMapping()                                                              Return the MiniStruts {@link \rosasurfer\ministruts\struts\ActionMapping} responsible for processing the current request.
- * @method static ?Module        getModule()                                                               Return the MiniStruts {@link \\rosasurfer\ministruts\struts\Module} the current request is assigned to.
+ * @method static ?ActionMapping getMapping()                                                              Return the {@link \rosasurfer\ministruts\struts\ActionMapping} responsible for processing the current request.
+ * @method static ?Module        getModule()                                                               Return the {@link \\rosasurfer\ministruts\struts\Module} the current request is assigned to.
  */
 class Request extends Proxy {
 

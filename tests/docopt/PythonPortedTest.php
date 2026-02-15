@@ -1088,24 +1088,24 @@ class PythonPortedTest extends TestCase {
         $this->assertEquals(TestParser::parseSection('usage:', "usage: -x\n -y"), array("usage: -x\n -y"));
 
         $usage = <<<PARSE_SECTION
-usage: this
-
-usage:hai
-usage: this that
-
-usage: foo
-       bar
-
-PROGRAM USAGE:
- foo
- bar
-usage:
-\ttoo
-\ttar
-Usage: eggs spam
-BAZZ
-usage: pit stop
-PARSE_SECTION;
+        usage: this
+        
+        usage:hai
+        usage: this that
+        
+        usage: foo
+               bar
+        
+        PROGRAM USAGE:
+         foo
+         bar
+        usage:
+        \ttoo
+        \ttar
+        Usage: eggs spam
+        BAZZ
+        usage: pit stop
+        PARSE_SECTION;
 
         $this->assertEquals(
             TestParser::parseSection("usage:", $usage),

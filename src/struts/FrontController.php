@@ -140,19 +140,19 @@ class FrontController extends Singleton {
             header('HTTP/1.1 404 Not Found', true, HttpResponse::SC_NOT_FOUND);
 
             echo <<<'HTML_SNIPPET'
-<!doctype html>
-<html lang="en">
-<head>
-<title>404 Not Found</title>
-</head>
-<body>
-<h1>Not Found</h1>
-<p>The requested URL was not found on this server.</p>
-<hr>
-<address>...lamented the MiniStruts.</address>
-</body>
-</html>
-HTML_SNIPPET;
+            <!doctype html>
+            <html lang="en">
+            <head>
+            <title>404 Not Found</title>
+            </head>
+            <body>
+            <h1>Not Found</h1>
+            <p>The requested URL was not found on this server.</p>
+            <hr>
+            <address>...lamented the MiniStruts.</address>
+            </body>
+            </html>
+            HTML_SNIPPET;
         }
         return $response;
     }

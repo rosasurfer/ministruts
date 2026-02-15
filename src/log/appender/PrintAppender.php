@@ -106,7 +106,7 @@ class PrintAppender extends BaseAppender {
                  margin:0; padding:4px; border-width:0;
                  font:normal normal 12px/normal arial,helvetica,sans-serif; line-height:12px;
                  color:black; background-color:lightgray">
-               $msg
+                 $msg
             </div>
             HTML;
 

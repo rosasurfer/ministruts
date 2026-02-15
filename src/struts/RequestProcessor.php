@@ -162,19 +162,19 @@ class RequestProcessor extends CObject {
         else {
             // otherwise generate one
             echo <<<'HTML_SNIPPET'
-<!doctype html>
-<html lang="en">
-<head>
-<title>404 Not Found</title>
-</head>
-<body>
-<h1>Not Found</h1>
-<p>The requested URL was not found on this server.</p>
-<hr>
-<address>...lamented the MiniStruts.</address>
-</body>
-</html>
-HTML_SNIPPET;
+            <!doctype html>
+            <html lang="en">
+            <head>
+            <title>404 Not Found</title>
+            </head>
+            <body>
+            <h1>Not Found</h1>
+            <p>The requested URL was not found on this server.</p>
+            <hr>
+            <address>...lamented the MiniStruts.</address>
+            </body>
+            </html>
+            HTML_SNIPPET;
         }
         return null;
     }
@@ -210,19 +210,19 @@ HTML_SNIPPET;
         else {
             // otherwise generate one
             echo <<<'HTML_SNIPPET'
-<!doctype html>
-<html lang="en">
-<head>
-<title>405 Method Not Allowed</title>
-</head>
-<body>
-<h1>Method Not Allowed</h1>
-<p>The used HTTP method is not allowed for the requested URL.</p>
-<hr>
-<address>...lamented the MiniStruts.</address>
-</body>
-</html>
-HTML_SNIPPET;
+            <!doctype html>
+            <html lang="en">
+            <head>
+            <title>405 Method Not Allowed</title>
+            </head>
+            <body>
+            <h1>Method Not Allowed</h1>
+            <p>The used HTTP method is not allowed for the requested URL.</p>
+            <hr>
+            <address>...lamented the MiniStruts.</address>
+            </body>
+            </html>
+            HTML_SNIPPET;
         }
         return false;
     }

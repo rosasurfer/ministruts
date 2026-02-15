@@ -33,6 +33,6 @@ are beautiful syntax definitions even for more complex tools (no more ugly Symfo
 [here](src/console/docopt/examples/git), or you can try out the online parser [here](https://web.archive.org/web/20221006200023/http://try.docopt.org/#).
 
 ---
-MiniStruts reference: [struts-config.dtd](src/struts/dtd/struts-config.dtd)
+MiniStruts XML reference: [struts-config.dtd](src/struts/dtd/struts-config.dtd)
 
 ORM mapping reference: [README.md](src/db/orm/README.md)

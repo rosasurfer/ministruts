@@ -32,8 +32,8 @@ class Url extends CObject {
     public function __construct(string $uri) {
         $this->uri = $uri;
 
-        // TODO: If called from a non-MiniStruts context (i.e. CLI) this method will fail.
-        // TODO: If a full URL is passed (http://...) this method will fail.
+        // @todo  If called from a non-ministruts context (i.e. CLI) this method will fail.
+        // @todo  If a full URL is passed (http://...) this method will fail.
 
         if (strpos($uri, '/') === 0) {
             // the resulting URI is relative to the application base URI

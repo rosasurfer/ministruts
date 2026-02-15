@@ -11,7 +11,7 @@ use rosasurfer\ministruts\core\exception\UnimplementedFeatureException;
 /**
  * A {@link Proxy} forwards API calls from one object to another. It doesn't modify the called API.
  *
- * In MiniStruts it forwards static method calls to actual instances. The standard behavior to resolve proxied instances is
+ * In this framework it forwards static method calls to actual instances. The standard behavior to resolve proxied instances is
  * a look-up in the application's default service container. Override {@link Proxy::instance()} to change that behavior.
  */
 abstract class Proxy extends StaticClass {
