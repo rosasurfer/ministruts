@@ -223,12 +223,16 @@ class Application extends CObject {
             exit(1);
         }
 
-        // log excessive memory consumption
-        register_shutdown_function(static function(): void {
-            /** @var self $app */
-            $app = self::$instance;
+        // in CLI mode: register SIGINT handler to catch Ctrl-C; scripts must regularly call Process::dispatchSignals()
+        if (CLI && function_exists('pcntl_signal')) {
+            pcntl_signal(SIGINT, static function(int $signo, $signinfo = null): void {
+                exit(1);            // only an explicit exit() will execute destructors
+            });
+        }
 
-            $warnLimit = php_byte_value($app->config->string('log.warn.memory_limit', (string)PHP_INT_MAX));
+        // on shutdown: log excessive memory consumption
+        register_shutdown_function(function(): void {
+            $warnLimit = php_byte_value($this->config->string('log.warn.memory_limit', (string)PHP_INT_MAX));
             $usedBytes = memory_get_peak_usage(true);
             if ($usedBytes > $warnLimit) {
                 Logger::log('Memory consumption exceeded '.prettyBytes($warnLimit).' (peak usage: '.prettyBytes($usedBytes).')', L_WARN, ['class' => self::class]);
