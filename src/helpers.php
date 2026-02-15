@@ -217,6 +217,46 @@ function boolToStr($value): string {
 
 
 /**
+ * Helper for dump-driven development. Appends a stringified variable to a dump file. If the file doesn't exist it is created.
+ *
+ * @param  mixed  $var
+ * @param  bool   $reset    [optional] - whether to reset the dump file (default: no)
+ * @param  string $filename [optional] - custom dump filename, remembered (default: dirname(ini_get('error_log')).'/ddd.log')
+ *
+ * @return mixed - any value to make the call an expression
+ */
+function ddd($var, bool $reset = false, string $filename = '') {
+    static $dumplog;
+
+    if (!isset($dumplog)) {
+        if ($filename == '') {
+            $errorLog = (string) ini_get('error_log');
+            $dir = $errorLog == '' ? (string)getcwd() : dirname($errorLog);
+            $filename = "$dir/ddd.log";
+        }
+        $dumplog = $filename;
+    }
+
+    if (!is_file($dumplog)) {
+        FileSystem::mkDir(dirname($dumplog));
+    }
+    elseif ($reset) {
+        $hFile = fopen($dumplog, 'r+');
+        ftruncate($hFile, 0);
+        fclose($hFile);
+    }
+
+    $str = toString($var);
+
+    if (!strEndsWith($str, NL)) {
+        $str .= NL;
+    }
+    file_put_contents($dumplog, $str, FILE_APPEND|LOCK_EX);
+    return null;
+}
+
+
+/**
  * Send an "X-Debug-???" header with a message. Each sent header name will end with an increasing number.
  *
  * @param  mixed $message
@@ -268,46 +308,6 @@ function dump($var, bool $return = false, bool $flushBuffers = true): ?string {
     if ($return) return ob_get_clean();
 
     $flushBuffers && ob_get_level() && ob_flush();
-    return null;
-}
-
-
-/**
- * Helper for dump-driven development. Appends a stringified variable to a dump file. If the file doesn't exist it is created.
- *
- * @param  mixed  $var
- * @param  bool   $reset    [optional] - whether to reset the dump file (default: no)
- * @param  string $filename [optional] - custom dump filename, remembered (default: dirname(ini_get('error_log')).'/ddd.log')
- *
- * @return mixed - any value to make the call an expression
- */
-function ddd($var, bool $reset = false, string $filename = '') {
-    static $dumplog;
-
-    if (!isset($dumplog)) {
-        if ($filename == '') {
-            $errorLog = (string) ini_get('error_log');
-            $dir = strlen($errorLog) ? dirname($errorLog) : (string)getcwd();
-            $filename = $dir.'/ddd.log';
-        }
-        $dumplog = $filename;
-    }
-
-    if (!is_file($dumplog)) {
-        FileSystem::mkDir(dirname($dumplog));
-    }
-    elseif ($reset) {
-        $hFile = fopen($dumplog, 'r+');
-        ftruncate($hFile, 0);
-        fclose($hFile);
-    }
-
-    $str = toString($var);
-
-    if (!strEndsWith($str, NL)) {
-        $str .= NL;
-    }
-    file_put_contents($dumplog, $str, FILE_APPEND|LOCK_EX);
     return null;
 }
 

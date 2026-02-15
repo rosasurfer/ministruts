@@ -362,12 +362,12 @@ class PHP extends StaticClass {
         /*PHP_INI_ALL   */ $errorLog = ini_get('error_log');
             if (!empty($errorLog) && $errorLog != 'syslog') {
                 if (is_file($errorLog)) {
-                    $hFile = @fopen($errorLog, 'ab');         // try to open
+                    $hFile = @fopen($errorLog, 'a');            // try to open
                     if (is_resource($hFile)) fclose($hFile);
                     else                                                                                           $issues[] = 'Error: error_log "'.$errorLog.'" file is not writable [setup]';
                 }
                 else {
-                    $hFile = @fopen($errorLog, 'wb');         // try to create
+                    $hFile = @fopen($errorLog, 'w');            // try to create
                     if (is_resource($hFile)) fclose($hFile);
                     else                                                                                           $issues[] = 'Error: error_log "'.$errorLog.'" directory is not writable [setup]';
                     is_file($errorLog) && @unlink($errorLog);
