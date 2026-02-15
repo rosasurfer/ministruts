@@ -88,7 +88,7 @@ class HttpSession extends Singleton {
         if ($regenerateId) {
             session_regenerate_id(true);                            // generate new id and delete the old file
         }
-        $request = RequestProxy::instance();
+        $request = RequestProxy::getInstance();
 
         foreach ($_SESSION as $key => $_) {                         // empty the session, don't use: $_SESSION = [];
             unset($_SESSION[$key]);                                 // as $_SESSION may be an instance of Traversable

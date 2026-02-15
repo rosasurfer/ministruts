@@ -10,7 +10,7 @@ use rosasurfer\ministruts\config\Config as ConfigInterface;
  *
  * A {@link Proxy} for the application's {@link ConfigInterface} instance currently registered in the service container.
  *
- * @method static ConfigInterface instance()                                                     Get the object behind the proxy.
+ * @method static ConfigInterface getInstance()                                                  Get the object behind the proxy.
  * @method static ConfigInterface set(int|string $key, mixed $value)                             Set/modify the config setting with the specified key.
  * @method static mixed           get(string $key, mixed $default = null)                        Return the config setting with the specified key or the default value if no such setting is found. Throws an exception if the setting is not found and no default value was specified.
  * @method static bool            bool(string $key, bool $strict = false, bool $default = false) Return the config setting with the specified key interpreted as a boolean. Accepted strict boolean representations are "1" and "0", "true" and "false", "on" and "off", "yes" and "no" (case-insensitive), as well as native booleans. Not existing settings and non-boolean values trigger an exception.

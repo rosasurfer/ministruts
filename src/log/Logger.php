@@ -39,7 +39,7 @@ use const rosasurfer\ministruts\L_WARN;
  *
  * @example
  * <pre>
- *  $config = Config::instance();
+ *  $config = Config::getInstance();
  *  $config['log.level.default']              = L_WARN;         // set the application's default loglevel to L_WARN
  *  $config['log.level.class.ClassA']         = L_DEBUG;        // set the loglevel for class "ClassA" to L_DEBUG
  *  $config['log.level.class.foo\bar\ClassB'] = L_ERROR;        // set the loglevel for class "foo\bar\ClassB" to L_ERROR
@@ -80,7 +80,7 @@ class Logger extends StaticClass {
         static $initialized = false;
         if (!$initialized) {
             // read the configured application loglevel
-            $config = Config::instance();
+            $config = Config::getInstance();
             $value = $config['log.level.default'] ?? '';
             $logLevel = 0;
 
@@ -116,7 +116,7 @@ class Logger extends StaticClass {
      */
     private static function isAppenderEnabled(string $id): bool {
         static $config = null;
-        $config ??= Config::instance();
+        $config ??= Config::getInstance();
 
         switch ($id) {
             case 'print':    return $config->bool("log.appender.$id.enabled", true, PrintAppender::getDefaultEnabled());

@@ -16,7 +16,7 @@ use rosasurfer\ministruts\struts\Request as StrutsRequest;
  *
  * Default implementation: {@link \rosasurfer\ministruts\struts\Request}
  *
- * @method static StrutsRequest  instance()                                                                Get the object behind the proxy.
+ * @method static StrutsRequest  getInstance()                                                             Get the object behind the proxy.
  * @method static string         getMethod()                                                               Return the HTTP method of the request.
  * @method static bool           isGet()                                                                   Whether the request is a GET request.
  * @method static bool           isPost()                                                                  Whether the request is a POST request.

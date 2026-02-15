@@ -119,7 +119,7 @@ class FrontController extends Singleton {
      */
     public static function processRequest(array $options = []): Response {
         $controller = self::me();
-        $request = RequestProxy::instance();
+        $request = RequestProxy::getInstance();
         $response = Response::me();
 
         if (strStartsWith($request->getPath(), '/')) {

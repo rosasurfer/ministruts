@@ -66,8 +66,8 @@ class Command extends CObject {
      * Create a new command.
      */
     final public function __construct() {
-        $this->input = InputProxy::instance();
-        $this->output = OutputProxy::instance();
+        $this->input = InputProxy::getInstance();
+        $this->output = OutputProxy::getInstance();
         $this->configure();
 
         if ($this->name === '') {
