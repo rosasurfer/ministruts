@@ -13,7 +13,7 @@ use rosasurfer\ministruts\console\docopt\DocoptResult;
  *
  * Default implementation: {@link \rosasurfer\ministruts\console\io\Input}
  *
- * @method static Input           instance()                            Get the object behind the proxy.
+ * @method static Input           getInstance()                         Get the object behind the proxy.
  * @method static Input           setDocoptResult(DocoptResult $docopt) Set the internal Docopt result.
  * @method static DocoptResult    getDocoptResult()                     Return the internal Docopt result.
  * @method static bool            isCommand(string $name)               Whether the command with the given name is defined (not whether the command was specified).<br><br> Valid commands consists of only lower-case letters. The same command may be defined multiple times.

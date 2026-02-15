@@ -130,9 +130,9 @@ interface Config extends ArrayAccess, Countable {
      * Return the config setting with the specified key as a typed instance. Not existing settings and non-matching instance values
      * trigger an exception.
      *
-     * @param  string $key                - case-insensitive key
-     * @param  string $classname          - expected class of the instance to return
-     * @param  object $default [optional] - instance to return if the config setting does not exist (default: exception)
+     * @param  string  $key                - case-insensitive key
+     * @param  string  $classname          - expected class of the instance to return
+     * @param  ?object $default [optional] - instance to return if the config setting does not exist (default: exception)
      *
      * @return object - config setting or the specified default value
      *

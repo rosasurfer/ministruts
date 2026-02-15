@@ -12,7 +12,7 @@ use rosasurfer\ministruts\console\io\Output as ConsoleOutput;
  *
  * Default implementation: {@link \rosasurfer\ministruts\console\io\Output}
  *
- * @method static ConsoleOutput instance()            Get the object behind the proxy.
+ * @method static ConsoleOutput getInstance()         Get the object behind the proxy.
  * @method static void          out(mixed $message)   Write a message to STDOUT.
  * @method static void          error(mixed $message) Write a message to STDERR.
  */

@@ -246,7 +246,7 @@ class Tile extends CObject {
      * @return $this
      */
     public function render(): self {
-        $request     = RequestProxy::instance();
+        $request     = RequestProxy::getInstance();
         $namespace   = $this->module->getViewNamespace();
         $appUri      = $request->getApplicationBaseUri();
         $nestedTiles = $this->nestedTiles;

@@ -49,7 +49,7 @@ class Form extends Facade {
         if ($form && (!isset($type) || $form instanceof $type)) {
             return $form;
         }
-        return new EmptyActionForm(Request::instance());
+        return new EmptyActionForm(Request::getInstance());
     }
 
 
@@ -68,6 +68,6 @@ class Form extends Facade {
         if ($form && (!isset($type) || $form instanceof $type)) {
             return $form;
         }
-        return new EmptyActionForm(Request::instance());
+        return new EmptyActionForm(Request::getInstance());
     }
 }

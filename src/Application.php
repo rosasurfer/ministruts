@@ -41,7 +41,7 @@ class Application extends CObject {
 
 
     /**
-     * Create and initialize a new MiniStruts application.
+     * Create and initialize a new application.
      *
      * @param  array<string, ?scalar> $options [optional] - array with explicit application config settings, specifically:
      *

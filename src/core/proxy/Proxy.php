@@ -11,8 +11,8 @@ use rosasurfer\ministruts\core\exception\UnimplementedFeatureException;
 /**
  * A {@link Proxy} forwards API calls from one object to another. It doesn't modify the called API.
  *
- * In MiniStruts it forwards static method calls to actual instances. The standard behavior to resolve proxied instances is
- * a look-up in the application's default service container. Override {@link Proxy::instance()} to change that behavior.
+ * In this framework it forwards static method calls to actual instances. The standard behavior to resolve proxied instances is
+ * a look-up in the application's default service container. Override {@link Proxy::getInstance()} to change that behavior.
  */
 abstract class Proxy extends StaticClass {
 
@@ -36,7 +36,7 @@ abstract class Proxy extends StaticClass {
      *
      * @return object
      */
-    public static function instance(): object {
+    public static function getInstance(): object {
         $key = static::getServiceName();
 
         if (isset(static::$resolvedInstances[$key])) {
@@ -56,9 +56,9 @@ abstract class Proxy extends StaticClass {
      */
     public static function __callStatic(string $method, array $args) {
         if (substr($method, 0, 2) == '__') {
-            throw new IllegalAccessException('Cannot call internal method '.get_class(static::instance()).'::'.$method.'()');
+            throw new IllegalAccessException('Cannot call internal method '.get_class(static::getInstance()).'::'.$method.'()');
         }
-        $instance = static::instance();
+        $instance = static::getInstance();
         return $instance->$method(...$args);
     }
 }
