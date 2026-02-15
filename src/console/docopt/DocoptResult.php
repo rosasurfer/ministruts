@@ -6,6 +6,7 @@ namespace rosasurfer\ministruts\console\docopt;
 use ArrayAccess;
 use ArrayIterator;
 use IteratorAggregate;
+use JsonSerializable;
 use ReturnTypeWillChange;
 
 use rosasurfer\ministruts\core\CObject;
@@ -21,7 +22,7 @@ use const rosasurfer\ministruts\NL;
  * @implements ArrayAccess<string, bool|int|string[]|null>
  * @implements IteratorAggregate<string, bool|int|string[]|null>
  */
-class DocoptResult extends CObject implements ArrayAccess, IteratorAggregate {
+class DocoptResult extends CObject implements ArrayAccess, IteratorAggregate, JsonSerializable {
 
     /** @var array<string, bool|int|string[]|null> */
     protected array $args;
@@ -148,4 +149,17 @@ class DocoptResult extends CObject implements ArrayAccess, IteratorAggregate {
     public function getIterator(): ArrayIterator {
         return new ArrayIterator($this->args);                  // @phpstan-ignore return.type (false positive in PHPStan2+ levels 3-7)
     }                                                           // Template type TValue on class ArrayIterator is not covariant.
+
+
+    /**
+     * {@inheritDoc}
+     *
+     * Return the data which should be encoded as a JSON representation.
+     *
+     * @return mixed[]
+     */
+    public function jsonSerialize(): array
+    {
+        return $this->getArgs();
+    }
 }
