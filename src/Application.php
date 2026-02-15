@@ -224,11 +224,8 @@ class Application extends CObject {
         }
 
         // log excessive memory consumption
-        register_shutdown_function(static function(): void {
-            /** @var self $app */
-            $app = self::$instance;
-
-            $warnLimit = php_byte_value($app->config->string('log.warn.memory_limit', (string)PHP_INT_MAX));
+        register_shutdown_function(function(): void {
+            $warnLimit = php_byte_value($this->config->string('log.warn.memory_limit', (string)PHP_INT_MAX));
             $usedBytes = memory_get_peak_usage(true);
             if ($usedBytes > $warnLimit) {
                 Logger::log('Memory consumption exceeded '.prettyBytes($warnLimit).' (peak usage: '.prettyBytes($usedBytes).')', L_WARN, ['class' => self::class]);
