@@ -34,7 +34,7 @@
         "psr-4": {
             "rosasurfer\\ministruts\\": "src/"
         },
-        "files": ["src/load.php"]
+        "files": ["src/helpers.php"]
     },
     "autoload-dev": {
         "psr-4": {

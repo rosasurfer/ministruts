@@ -1,6 +1,6 @@
 <?php
 /**
- * Helper functions and constants
+ * Helper constants and functions
  */
 declare(strict_types=1);
 
