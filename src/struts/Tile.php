@@ -228,9 +228,8 @@ class Tile extends CObject {
      */
     public function freeze(): self {
         if (!$this->configured) {
-            if (!strlen($this->fileName)) {
-                Struts::configError('<tile name="'.$this->fileName.'": No file configured.');
-            }
+            if ($this->fileName == '') Struts::configError('<tile name="": No file configured.');
+
             foreach ($this->nestedTiles as $tile) {
                 if ($tile) $tile->freeze();
             }

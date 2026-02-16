@@ -47,7 +47,7 @@ class FileDependency extends Dependency {
      * @param  string $fileName - file name
      */
     public function __construct(string $fileName) {
-        if (!strlen($fileName)) throw new InvalidValueException('Invalid parameter $fileName: '.$fileName);
+        if ($fileName == '') throw new InvalidValueException('Invalid parameter $fileName: '.$fileName);
 
         if (file_exists($fileName)) {
             $this->fileName = realpath($fileName);

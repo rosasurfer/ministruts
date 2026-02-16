@@ -113,7 +113,7 @@ class SensitiveContentFilter extends CObject implements ContentFilterInterface {
      * </pre>
      */
     public function filterUri(string $uri): string {
-        if (!strlen($uri)) {
+        if ($uri == '') {
             return $uri;
         }
 

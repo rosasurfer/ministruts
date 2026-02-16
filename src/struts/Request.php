@@ -225,8 +225,9 @@ class Request extends CObject {
     public function getHostname(): string {
         if (!empty($_SERVER['HTTP_HOST'])) {
             $httpHost = strtolower(trim($_SERVER['HTTP_HOST']));    // nginx doesn't set $_SERVER[SERVER_NAME]
-            if (strlen($httpHost))                                  // automatically to $_SERVER[HTTP_HOST]
+            if ($httpHost != '') {                                  // automatically to $_SERVER[HTTP_HOST]
                 return $httpHost;
+            }
         }
         return $_SERVER['SERVER_NAME'] ?? '';
     }
@@ -429,7 +430,7 @@ class Request extends CObject {
         // The variable $_SERVER['QUERY_STRING'] is set by the server and can differ from the transmitted query string.
         // The server variable may hold additional parameters, or it may be empty (e.g. on a mis-configured Nginx).
 
-        if (isset($_SERVER['QUERY_STRING']) && strlen($_SERVER['QUERY_STRING'])) {
+        if (($_SERVER['QUERY_STRING'] ?? '') != '') {
             $query = $_SERVER['QUERY_STRING'];
         }
         else {
@@ -1120,7 +1121,7 @@ class Request extends CObject {
 
         // content (request body)
         $content = $this->getContent();
-        if (strlen($content)) {
+        if ($content != '') {
             $string .= NL.substr($content, 0, 2_048).NL;                    // limit the request body to 2048 bytes
         }
         return $string;

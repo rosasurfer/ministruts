@@ -62,7 +62,7 @@ class PythonFixturesTest extends TestCase {
         $cases = [];
         $i = 1;
         foreach (explode('r"""', $content) as $fixture) {           // split fixtures
-            if (!strlen($fixture)) continue;
+            if ($fixture == '') continue;
 
             $parts = explode('"""', $fixture, 2);
             if (sizeof($parts) < 2) throw new Exception('Missing string close marker');

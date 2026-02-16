@@ -94,7 +94,7 @@ class HttpRequest extends CObject {
      */
     public function setHeader(string $name, ?string $value): self {
         $name = trim($name);
-        if (!strlen($name)) throw new InvalidValueException('Invalid parameter $name: "" (empty)');
+        if ($name == '') throw new InvalidValueException('Invalid parameter $name: "" (empty)');
 
         // drop existing headers of the same name (case-insensitive)
         $existing = \array_intersect_ukey($this->headers, [$name => '1'], 'strcasecmp');
@@ -122,8 +122,8 @@ class HttpRequest extends CObject {
      * @link https://stackoverflow.com/questions/3241326/set-more-than-one-http-header-with-the-same-name
      */
     public function addHeader(string $name, string $value): self {
-        if (!strlen($name))  throw new InvalidValueException('Invalid parameter $name: '.$name);
-        if (!strlen($value)) throw new InvalidValueException('Invalid parameter $value: '.$value);
+        if ($name == '')  throw new InvalidValueException("Invalid parameter \$name: $name");
+        if ($value == '') throw new InvalidValueException("Invalid parameter \$value: $value");
 
         $name  = trim($name);
         $value = trim($value);
@@ -151,7 +151,7 @@ class HttpRequest extends CObject {
      * @return ?string - header value or NULL if no such header was found
      */
     public function getHeader(string $name): ?string {
-        if (!strlen($name)) throw new InvalidValueException('Invalid parameter $name: '.$name);
+        if ($name == '') throw new InvalidValueException('Invalid parameter $name: ""');
 
         $headers = $this->getHeaders($name);
         if ($headers) {

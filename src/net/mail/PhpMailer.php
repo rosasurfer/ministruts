@@ -188,7 +188,7 @@ class PhpMailer extends Mailer {
             /** @var string $header */
             $header = current($headers);
             if (strStartsWithI($header, "$name:")) {
-                return trim(substr($header, strlen($name)+1));
+                return trim(substr($header, strlen($name) + 1));
             }
         }
         return null;

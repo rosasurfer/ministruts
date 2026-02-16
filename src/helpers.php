@@ -542,7 +542,7 @@ function isRelativePath(string $path): bool {
     if (WINDOWS) {
         return !preg_match('/^[a-z]:/i', $path);
     }
-    if (strlen($path) && $path[0]=='/') {
+    if ($path!='' && $path[0]=='/') {
         return false;
     }
     return true;                // an empty string cannot be considered absolute, so it's interpreted as relative
@@ -768,7 +768,7 @@ function objectToArray(object $object, int $access = ACCESS_PUBLIC): array {
  */
 function php_byte_value($value): int {
     if (is_int($value)) return $value;
-    if (!strlen($value)) return 0;
+    if ($value == '')   return 0;
 
     $match = null;
     if (!preg_match('/^([+-]?[0-9]+)([KMG]?)$/i', $value, $match)) {
@@ -1167,11 +1167,11 @@ function strCompareI(?string $a, ?string $b): bool {
  * @return bool
  */
 function strContains(string $haystack, string ...$needle): bool {
-    if (!strlen($haystack)) {
+    if ($haystack == '') {
         return false;
     }
     foreach ($needle as $n) {
-        if (strlen($n) && strpos($haystack, $n) !== false) {
+        if ($n != '' && strpos($haystack, $n) !== false) {
             return true;
         }
     }
@@ -1194,11 +1194,11 @@ function strContains(string $haystack, string ...$needle): bool {
  * @return bool
  */
 function strContainsI(string $haystack, string ...$needle): bool {
-    if (!strlen($haystack)) {
+    if ($haystack == '') {
         return false;
     }
     foreach ($needle as $n) {
-        if (strlen($n) && stripos($haystack, $n) !== false) {
+        if ($n != '' && stripos($haystack, $n) !== false) {
             return true;
         }
     }
@@ -1392,7 +1392,7 @@ function strLeft(string $string, int $length): string {
  * </pre>
  */
 function strLeftTo(string $string, string $limiter, int $count=1, bool $includeLimiter=false, string $onNotFound=''): string {
-    if (!strlen($limiter)) throw new InvalidValueException('Invalid limiting substring: "" (empty)');
+    if ($limiter == '') throw new InvalidValueException('Invalid limiting substring: "" (empty)');
 
     if ($count > 0) {
         $pos = -1;
@@ -1485,7 +1485,7 @@ function strRight(string $string, int $length): string {
  * </pre>
  */
 function strRightFrom(string $string, string $limiter, int $count=1, bool $includeLimiter=false, string $onNotFound=''): string {
-    if (!strlen($limiter)) throw new InvalidValueException('Illegal limiting substring: "" (empty)');
+    if ($limiter == '') throw new InvalidValueException('Illegal limiting substring: "" (empty)');
 
     if ($count > 0) {
         $pos = -1;
@@ -1547,7 +1547,7 @@ function strRightFrom(string $string, string $limiter, int $count=1, bool $inclu
  * @return bool
  */
 function strStartsWith(string $string, string ...$prefix): bool {
-    if (!strlen($string)) {
+    if ($string == '') {
         return false;
     }
     foreach ($prefix as $p) {
@@ -1575,7 +1575,7 @@ function strStartsWith(string $string, string ...$prefix): bool {
  * @return bool
  */
 function strStartsWithI(string $string, string ...$prefix): bool  {
-    if (!strlen($string)) {
+    if ($string == '') {
         return false;
     }
     foreach ($prefix as $p) {

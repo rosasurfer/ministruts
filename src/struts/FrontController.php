@@ -173,9 +173,9 @@ class FrontController extends Singleton {
             throw new RuntimeException('Can not resolve module prefix from request path "'.$requestPath.'" (application base URI: "'.$baseUri.'")');
         }
 
-        $value = substr($requestPath, strlen($baseUri));        // baseUri ends with and prefix doesn't start with a slash
-        if (strlen($value)) {
-            $value = strLeftTo($value, '/').'/';                // the prefix ends with a slash only for non-main modules
+        $value = (string)substr($requestPath, strlen($baseUri));    // baseUri ends with and prefix doesn't start with a slash
+        if ($value != '') {
+            $value = strLeftTo($value, '/').'/';                    // the prefix ends with a slash only for non-main modules
         }
         return isset($this->modules[$value]) ? $value : '';
     }

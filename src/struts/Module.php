@@ -189,7 +189,7 @@ class Module extends CObject {
      */
     protected function setPrefix(string $prefix): self {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-        if ($len=strlen($prefix)) {
+        if ($len = strlen($prefix)) {
             if ($prefix[     0] == '/') Struts::configError('non-main module prefixes must not start with a slash "/" character, found: "'.$prefix.'"');
             if ($prefix[$len-1] != '/') Struts::configError('non-main module prefixes must end with a slash "/" character, found: "'.$prefix.'"');
         }
@@ -218,7 +218,7 @@ class Module extends CObject {
             if ($namespace == '\\') {           // that's again the global namespace
                 $namespace = '';
             }
-            elseif (strlen($namespace)) {
+            elseif ($namespace != '') {
                 if (!$this->isValidNamespace($namespace)) Struts::configError('<struts-config namespace="'.$xml['namespace'].'": invalid module namespace');
                 if (strStartsWith($namespace, '\\')) $namespace  = substr($namespace, 1);
                 if (!strEndsWith($namespace, '\\'))  $namespace .= '\\';
@@ -260,7 +260,7 @@ class Module extends CObject {
 
         foreach ($locations as $i => $location) {
             $location = trim($location);
-            if (!strlen($location)) continue;
+            if ($location == '') continue;
             if (isRelativePath($location)) {
                 $appRoot ??= $config->string('app.dir.root');
                 $location = $appRoot.DIRECTORY_SEPARATOR.$location;
@@ -589,7 +589,7 @@ class Module extends CObject {
                 if ($namespace == '\\') {
                     $namespace = '';
                 }
-                elseif (strlen($namespace)) {
+                elseif ($namespace != '') {
                     if (!$this->isValidNamespace($namespace)) Struts::configError('<tiles namespace="'.$tiles['namespace'].'": Invalid namespace');
                     if (strStartsWith($namespace, '\\')) $namespace  = substr($namespace, 1);
                     if (!strEndsWith($namespace, '\\'))  $namespace .= '\\';
@@ -731,10 +731,10 @@ class Module extends CObject {
         foreach ($xml->{'set'} as $tag) {
             $name = (string) $tag['name'];
             $nodes = $xml->xpath("/struts-config/tiles/tile[@name='".$tile->getName()."']/set[@name='".$name."']") ?: [];
-            if (sizeof($nodes) > 1)            Struts::configError('<tile name="'.$tile->getName().'"> <set name="'.$name.'": Multiple elements with the same name found.');
+            if (sizeof($nodes) > 1)      Struts::configError('<tile name="'.$tile->getName().'"> <set name="'.$name.'": Multiple elements with the same name found.');
 
             if (isset($tag['value'])) {                                 // value is specified as attribute
-                if (strlen((string) $tag) > 0) Struts::configError('<tile name="'.$tile->getName().'"> <set name="'.$name.'": Only one of attribute value or tag body value can be specified.');
+                if ((string) $tag != '') Struts::configError('<tile name="'.$tile->getName().'"> <set name="'.$name.'": Only one of attribute value or tag body value can be specified.');
                 $value = (string) $tag['value'];
             }
             else {                                                      // value is specified as tag content
@@ -787,7 +787,7 @@ class Module extends CObject {
         }
 
         $name = $mapping->getName();
-        if (strlen($name)) {
+        if ($name != '') {
             if (isset($this->mappings['names'][$name])) Struts::configError('All action mappings must have unique name attributes, non-unique name: "'.$name.'"');
             $this->mappings['names'][$name] = $mapping;
         }
@@ -837,7 +837,7 @@ class Module extends CObject {
         // $path: /controller/action/parameter/
 
         $pattern = $path;
-        while (strlen($pattern)) {
+        while ($pattern != '') {
             if (isset($this->mappings['paths'][$pattern])) {    // path keys start and end with a slash "/"
                 return $this->mappings['paths'][$pattern];
             }

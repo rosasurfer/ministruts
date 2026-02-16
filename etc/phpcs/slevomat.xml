@@ -26,7 +26,7 @@
 
 
     <!-- runtime options -->
-    <arg name="report" value="full"/>                   <!-- full display per issue                      -->
+    <arg name="report" value="full"/>                   <!-- detailed display per issue                  -->
     <arg name="basepath" value="../.."/>                <!-- base path to strip from reported file names -->
     <arg name="cache" value="../tmp/phpcs-cache.json"/> <!-- use result cache                            -->
     <arg value="p"/>                                    <!-- show progress                               -->
@@ -108,7 +108,7 @@
       <exclude name="SlevomatCodingStandard.PHP.RequireExplicitAssertion.RequiredExplicitAssertion"/>   <!-- @todo implement PHPStan extension ServiceContainerReturnType -->
 
       <!--
-      @todo
+      @todo analyse
       -->
       <exclude name="SlevomatCodingStandard.Variables"/>
       <exclude name="SlevomatCodingStandard.Operators"/>

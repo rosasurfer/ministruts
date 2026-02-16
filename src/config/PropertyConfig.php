@@ -134,11 +134,11 @@ class PropertyConfig extends CObject implements Config {
         else {
             /** @var string $appEnv */
             $appEnv = $_SERVER['APP_ENVIRONMENT'] ?? '';
-            if (strlen($appEnv)) {
-                $files[] = $configDir."/config.$appEnv.properties";
+            if ($appEnv == '') {
+                $files[] = $configDir.'/config.properties';         // default
             }
             else {
-                $files[] = $configDir.'/config.properties';         // default
+                $files[] = $configDir."/config.$appEnv.properties";
             }
         }
 
@@ -176,7 +176,7 @@ class PropertyConfig extends CObject implements Config {
 
         foreach ($lines as $i => $line) {
             $line = trim($line);
-            if (!strlen($line) || $line[0]=='#')                    // skip empty and comment lines
+            if ($line=='' || $line[0]=='#')                         // skip empty and comment lines
                 continue;
 
             $parts = explode('=', $line, 2);                        // split key/value
@@ -507,7 +507,7 @@ class PropertyConfig extends CObject implements Config {
 
         for ($i=0; $i < $subkeysSize; ++$i) {
             $subkey = trim($subkeys[$i]);
-            if (!strlen($subkey)) throw new InvalidValueException("Invalid parameter \$key: $key");
+            if ($subkey == '') throw new InvalidValueException("Invalid parameter \$key: $key");
 
             if ($i+1 < $subkeysSize) {
                 // not yet the last subkey
@@ -585,7 +585,7 @@ class PropertyConfig extends CObject implements Config {
                     if ($pos === false) throw new InvalidValueException("Invalid parameter \$key: $key");
                     $subkeys[] = substr($k, 1, $pos-1);
                     $k = trim(substr($k, $pos+1));
-                    if (!strlen($k)) break 2;           // last subkey or next char is a key separator
+                    if ($k == '') break 2;              // last subkey or next char is a key separator
 
                     if (strpos($k, '.') !== 0) throw new InvalidValueException("Invalid parameter \$key: $key");
                     $k = substr($k, 1);
@@ -673,7 +673,7 @@ class PropertyConfig extends CObject implements Config {
         foreach ($values as $subkey => $value) {
             $subkey = (string)$subkey;
 
-            if ($subkey==trim($subkey) && (strlen($subkey) || sizeof($values) > 1)) {
+            if ($subkey==trim($subkey) && ($subkey!='' || sizeof($values) > 1)) {
                 $sSubkey = $subkey;
             }
             else {

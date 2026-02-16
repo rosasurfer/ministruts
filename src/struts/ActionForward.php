@@ -77,7 +77,7 @@ class ActionForward extends CObject {
      * @return $this
      */
     public function setName(string $name): self {
-        if (!strlen($name)) throw new InvalidValueException('Invalid parameter $name: '.$name);
+        if ($name == '') throw new InvalidValueException('Invalid parameter $name: ""');
 
         $this->name = $name;
         return $this;
@@ -102,7 +102,7 @@ class ActionForward extends CObject {
      * @return $this
      */
     public function setPath(string $path): self {
-        if (!strlen($path)) throw new InvalidValueException('Invalid parameter $path: '.$path);
+        if ($path == '') throw new InvalidValueException('Invalid parameter $path: ""');
         $this->path = $path;
         return $this;
     }

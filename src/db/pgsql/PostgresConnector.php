@@ -170,7 +170,7 @@ class PostgresConnector extends Connector {
                 }
             }
 
-            if (!strlen($value)) {
+            if ($value == '') {
                 $value = "''";
             }
             else {
@@ -292,7 +292,7 @@ class PostgresConnector extends Connector {
         //$options['time_zone'] = date_default_timezone_get();      // synchronize connection timezone with PHP timezone
 
         foreach ($options as $option => $value) {
-            if (strlen($value)) {
+            if ($value != '') {
                 $this->execute('set '.$option.' to '.$value);       // as is (no quoting)
             }
         }

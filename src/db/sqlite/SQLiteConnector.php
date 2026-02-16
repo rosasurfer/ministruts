@@ -108,7 +108,7 @@ class SQLiteConnector extends Connector {
      * @return $this
      */
     protected function setFile(string $file): self {
-        if (!strlen($file)) throw new InvalidValueException('Invalid parameter $file: "'.$file.'" (empty)');
+        if ($file == '') throw new InvalidValueException('Invalid parameter $file: "'.$file.'" (empty)');
 
         if ($file == ':memory:' || !isRelativePath($file)) {
             $this->file = $file;

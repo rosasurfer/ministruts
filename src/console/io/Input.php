@@ -54,7 +54,7 @@ class Input extends CObject {
         if (!$this->docoptResult) {
             return false;
         }
-        if (!strlen($name) || !key_exists($name, $this->docoptResult->getArgs())) {
+        if ($name=='' || !key_exists($name, $this->docoptResult->getArgs())) {
             return false;
         }
         return (bool) preg_match('/^[a-z]+$/', $name);
@@ -95,7 +95,7 @@ class Input extends CObject {
         if (!$this->docoptResult) {
             return false;
         }
-        if (!($len=strlen($name)) || !key_exists($name, $this->docoptResult->getArgs())) {
+        if (!($len = strlen($name)) || !key_exists($name, $this->docoptResult->getArgs())) {
             return false;
         }
 
@@ -164,8 +164,9 @@ class Input extends CObject {
     public function isOption(string $name): bool {
         if (!$this->docoptResult) return false;
 
-        if (!strlen($name) || !key_exists($name, $this->docoptResult->getArgs()) || $name[0]!='-' || $name=='-' || $name=='--')
+        if ($name=='' || $name[0]!='-' || $name=='-' || $name=='--' || !key_exists($name, $this->docoptResult->getArgs())) {
             return false;
+        }
         return true;
     }
 

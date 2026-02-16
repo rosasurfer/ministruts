@@ -341,7 +341,7 @@ class PHP extends StaticClass {
         /*PHP_INI_SYSTEM*/ if (!ini_get_bool('allow_url_fopen'))                                                   $issues[] = 'Info:  allow_url_fopen is not on [functionality]';
         /*PHP_INI_SYSTEM*/ if ( ini_get_bool('allow_url_include'))                                                 $issues[] = 'Error: allow_url_include is not off [security]';
         /*PHP_INI_ALL   */ foreach (explode(PATH_SEPARATOR, ini_get('include_path') ?: '') as $i => $path) {
-                               if (!strlen($path))                                                                 $issues[] = 'Warn:  include_path['.$i.'] contains an empty path: "'.ini_get('include_path').'" [configuration]';
+                               if ($path == '')                                                                    $issues[] = 'Warn:  include_path['.$i.'] contains an empty path: "'.ini_get('include_path').'" [configuration]';
                            }
         // error handling
         // --------------
@@ -386,7 +386,7 @@ class PHP extends StaticClass {
                 $newOrder = '';
                 $len = strlen($order);
                 for ($i=0; $i < $len; $i++) {
-                    if (\in_array($char=$order[$i], ['G', 'P', 'C'], true)) {
+                    if (\in_array($char = $order[$i], ['G', 'P', 'C'], true)) {
                         $newOrder .= $char;
                     }
                 }

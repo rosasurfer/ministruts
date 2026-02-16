@@ -42,15 +42,9 @@ final class Cache extends StaticClass {
 
         // default cache
         if (!isset($label)) {
-            if (!self::$default) {
-                // create new instance
-                if (extension_loaded('apc') && ini_get_bool(CLI ? 'apc.enable_cli' : 'apc.enabled')) {
-                    self::$default = new ApcCache($label);
-                }
-                else {
-                    self::$default = new ReferencePool($label);
-                }
-            }
+            self::$default ??= extension_loaded('apc') && ini_get_bool(CLI ? 'apc.enable_cli' : 'apc.enabled')
+                               ? new ApcCache($label)
+                               : new ReferencePool($label);
             return self::$default;
         }
 

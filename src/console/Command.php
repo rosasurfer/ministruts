@@ -325,7 +325,7 @@ class Command extends CObject {
     private function validateName(string $name): self {
         if ($name != trim($name)) throw new InvalidValueException("Invalid parameter \$name: \"$name\" (enclosing white space)");
 
-        if (strlen($name) && !preg_match('/^[^\s:]+(:[^\s:]+)*$/', $name)) {
+        if ($name!='' && !preg_match('/^[^\s:]+(:[^\s:]+)*$/', $name)) {
             throw new InvalidValueException("Invalid parameter \$name: \"$name\" (not a command name)");
         }
         return $this;

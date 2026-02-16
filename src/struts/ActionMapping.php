@@ -84,7 +84,8 @@ class ActionMapping extends CObject {
      */
     public function setName(string $name): self {
         if ($this->configured) throw new IllegalStateException('Configuration is frozen');
-        if (!strlen($name=trim($name))) Struts::configError('<mapping name="'.func_get_arg(0).'"'.($this->path ? ' path="'.$this->path.'"':'').': Illegal name (empty value).');
+        $name = trim($name);
+        if ($name == '') Struts::configError('<mapping name="'.func_get_arg(0).'"'.($this->path ? ' path="'.$this->path.'"':'').': Illegal name (empty value).');
 
         $this->name = $name;
         return $this;
@@ -180,7 +181,7 @@ class ActionMapping extends CObject {
 
         //static $pattern = '/^!?[A-Za-z_][A-Za-z0-9_]*(,!?[A-Za-z_][A-Za-z0-9_]*)*$/';
         static $pattern = '/^!?[A-Za-z_][A-Za-z0-9_]*$/';
-        if (!strlen($roles) || !preg_match($pattern, $roles)) Struts::configError('<mapping name="'.$this->name.'" path="'.$this->path.'" roles="'.$roles.'": Invalid roles expression.');
+        if ($roles=='' || !preg_match($pattern, $roles)) Struts::configError('<mapping name="'.$this->name.'" path="'.$this->path.'" roles="'.$roles.'": Invalid roles expression.');
 
         // check for invalid id combinations, e.g. "Member,!Member"
         $tokens = explode(',', $roles);
@@ -407,8 +408,9 @@ class ActionMapping extends CObject {
             if ($this->configured) {                            // at runtime only: append the request's query string
                 $path = $this->path;                            // TODO: Don't lose additional path data. Example:
                 $query = RequestProxy::getQueryString();        //       /path/beautified-url-data/?query-string
-                if (strlen($query))
-                    $path = strLeftTo($path, '?').'?'.$query;
+                if ($query != '') {
+                    $path = strLeftTo($path, '?')."?$query";
+                }
                 $forward->setPath($path);
             }
         }

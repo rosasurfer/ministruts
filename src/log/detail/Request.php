@@ -354,7 +354,7 @@ class Request extends CObject {
         if (!empty($_SERVER['HTTP_HOST'])) {
             $hostname = strtolower(trim($_SERVER['HTTP_HOST']));
             $hostname = strLeftTo($hostname, ':');
-            if (strlen($hostname) > 0) {
+            if ($hostname != '') {
                 return $hostname;
             }
         }

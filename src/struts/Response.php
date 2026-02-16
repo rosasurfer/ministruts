@@ -136,18 +136,18 @@ class Response extends Singleton {
         if (($relParts =parse_url($rel )) === false) throw new InvalidValueException("Invalid parameter \$rel: $rel");
         if (($baseParts=parse_url($base)) === false) throw new InvalidValueException("Invalid parameter \$base: $base");
 
-        if (strlen($relQuery)) {
+        if ($relQuery != '') {
             $relParts['query'] = $relQuery;
             $rel .= '?'.$relQuery;
         }
-        if (strlen($relFragment)) {
+        if ($relFragment != '') {
             $relParts['fragment'] = $relFragment;
             $rel .= '#'.$relFragment;
         }
 
         try {
             // if $rel is empty return $base
-            if (!strlen($rel)) return $base;
+            if ($rel == '') return $base;
 
             // if already an absolute URL return $rel
             if (isset($relParts['scheme'])) return $rel;
@@ -175,7 +175,7 @@ class Response extends Singleton {
             $port  = isset($baseParts['port']) ? ":$baseParts[port]" : '';
             $user  = $baseParts['user'] ?? '';
             $pass  = isset($baseParts['pass']) ? ":$baseParts[pass]" : '';
-            $at    = strlen($user) ? '@' : '';
+            $at    = $user == '' ? '' : '@';
             $path .= $rel;                              // includes $rel query and/or fragment
 
             // resulting absolute URL
