@@ -33,7 +33,6 @@ class FrontController extends Singleton {
     /** @var Module[] - all registered Struts modules with the module prefix as index */
     private array $modules = [];
 
-
     /**
      * Return the {@link Singleton} instance of this class. The instance might be loaded from a cache.
      *

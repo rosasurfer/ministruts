@@ -38,7 +38,6 @@ class FileDependency extends Dependency {
     /** @var ?int - last modification time of the monitored file (Unix timestamp) */
     private ?int $lastModified = null;
 
-
     /**
      * Constructor
      *

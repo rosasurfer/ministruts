@@ -25,7 +25,6 @@ class Lock extends BaseLock {
     /** @var string - key of the locking implementation */
     private string $key;
 
-
     /**
      * Constructor
      *

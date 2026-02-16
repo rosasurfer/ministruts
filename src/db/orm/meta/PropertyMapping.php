@@ -29,7 +29,6 @@ class PropertyMapping extends CObject {
     /** @var string - the property's PHP name */
     protected string $name;
 
-
     /**
      * Constructor
      *

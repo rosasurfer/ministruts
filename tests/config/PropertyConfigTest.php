@@ -19,7 +19,6 @@ class PropertyConfigTest extends TestCase {
 
     protected string $configFile;
 
-
     protected function setUp(): void {
         parent::setUp();
 

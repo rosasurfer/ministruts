@@ -17,7 +17,6 @@ abstract class Singleton extends CObject {
     /** @var self[] - existing instances */
     private static array $instances = [];
 
-
     /**
      * Non-public constructor.
      *

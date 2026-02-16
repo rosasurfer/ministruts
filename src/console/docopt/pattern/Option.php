@@ -25,7 +25,6 @@ class Option extends LeafPattern {
     /** @var int */
     public int $argcount;
 
-
     /**
      * @param  ?string          $short    [optional]
      * @param  ?string          $long     [optional]

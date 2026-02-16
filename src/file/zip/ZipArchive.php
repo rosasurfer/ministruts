@@ -56,7 +56,6 @@ class ZipArchive extends \ZipArchive {
         34                     => ['ER_NOT_ALLOWED'    , 'not allowed in torrentzip'            ],      // 34 (since PHP 8.3.0)
     ];
 
-
     /**
      * {@inheritDoc}
      *

@@ -25,7 +25,6 @@ class CurlHttpResponse extends HttpResponse {
     /** @var int - length of the currently read content in bytes */
     protected int $currentContentLength = 0;
 
-
     /**
      * Constructor
      */

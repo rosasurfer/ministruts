@@ -21,7 +21,6 @@ class HttpSession extends Singleton {
     /** @var bool - Whether the session is considered "new". A session is new if the client doesn't yet know the session id. */
     protected bool $new;
 
-
     /**
      * Return the {@link Singleton} instance.
      *

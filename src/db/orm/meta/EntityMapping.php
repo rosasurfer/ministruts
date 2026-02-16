@@ -33,7 +33,6 @@ class EntityMapping extends CObject {
     /** @var PropertyMapping|false - version mapping of the entity or FALSE for non-versioned entities */
     protected $version;
 
-
     /**
      * Constructor
      *

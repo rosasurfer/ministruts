@@ -16,7 +16,6 @@ class ChainedDependency extends Dependency {
     /** @var ?string - logical dependency type of the instance (AND | OR) */
     private ?string $type = null;
 
-
     /**
      * Constructor
      *

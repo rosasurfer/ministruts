@@ -53,7 +53,6 @@ class Logger extends StaticClass {
     /** default if no application loglevel is configured */
     public const DEFAULT_LOGLEVEL = L_NOTICE;
 
-
     /** @var string[] - loglevels and their string representations */
     private static array $logLevels = [
         L_DEBUG  => 'Debug',
@@ -69,7 +68,6 @@ class Logger extends StaticClass {
 
     /** @var LogAppender[] - enabled appenders and their ids */
     private static array $logAppenders = [];
-
 
     /**
      * Initialize the Logger and instantiate enabled appenders.

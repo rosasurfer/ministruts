@@ -32,7 +32,6 @@ abstract class Result extends CObject implements ResultInterface {
     /** @var int - index of the row fetched by the next unqualified fetch* method call or -1 when hit the end */
     protected int $nextRowIndex = 0;
 
-
     /**
      * Constructor
      *

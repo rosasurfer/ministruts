@@ -18,7 +18,6 @@ abstract class Action extends CObject {
     /** @var ActionForm - holds interpreted user input of the current request */
     protected ActionForm $form;
 
-
     /**
      * Constructor
      *

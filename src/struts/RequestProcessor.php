@@ -29,7 +29,6 @@ class RequestProcessor extends CObject {
     /** @var scalar[] - additional runtime options */
     protected array $options;
 
-
     /**
      * Constructor
      *
@@ -375,10 +374,8 @@ class RequestProcessor extends CObject {
             $forward = $action->executeBefore($request, $response);
 
             // call Action::execute() only if pre-processing hook doesn't signal request completion
-            if ($forward === null) {
-                // TODO: implement dispatch() for DispatchActions; as of now it must be done manually in execute()
-                $forward = $action->execute($request, $response);
-            }
+            $forward ??= $action->execute($request, $response);
+            // TODO: implement dispatch() for DispatchActions; as of now it must be done manually in execute()
         }
         catch (Throwable $ex) {
             header('HTTP/1.1 500 Internal Server Error', true, HttpResponse::SC_INTERNAL_SERVER_ERROR);

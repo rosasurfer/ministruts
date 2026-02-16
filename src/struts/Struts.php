@@ -50,7 +50,6 @@ final class Struts extends StaticClass {
      */
     public const MODULE_KEY = 'org.apache.struts.action.MODULE';
 
-
     /**
      * Helper to throw a Struts configuration exception.
      *

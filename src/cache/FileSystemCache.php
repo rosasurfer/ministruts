@@ -23,7 +23,6 @@ final class FileSystemCache extends CachePeer {
     /** @var string - filepath of the chaching directory */
     private string $directory;
 
-
     /**
      * Constructor
      *

@@ -15,7 +15,6 @@ class DocoptUserNotification extends RuntimeException {
     /** @var int */
     public int $status;
 
-
     /**
      * @param string $message [optional]
      * @param int    $status  [optional]

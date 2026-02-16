@@ -41,7 +41,6 @@ abstract class BaseAppender extends CObject implements AppenderInterface {
     /** @var ContentFilter|null - a configured content filter, if any */
     protected ?ContentFilter $filter = null;
 
-
     /**
      * Constructor
      *

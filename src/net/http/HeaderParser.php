@@ -18,7 +18,6 @@ class HeaderParser extends CObject {
     /** @var ?string */
     protected ?string $lastName = null;
 
-
     /**
      * Parse the passed header section.
      *

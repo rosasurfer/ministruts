@@ -134,7 +134,6 @@ class CurlHttpClient extends HttpClient {
         92                                => 'CURLE_HTTP2_STREAM',
     ];
 
-
     /**
      * Constructor
      *

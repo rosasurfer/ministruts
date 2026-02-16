@@ -22,7 +22,6 @@ class ActionInput extends CObject implements ArrayAccess {
     /** @var array<string, string|array<string|array<string>>> */
     protected array $parameters;
 
-
     /**
      * Constructor
      *

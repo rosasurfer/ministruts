@@ -54,7 +54,6 @@ class ErrorLogAppender extends BaseAppender {
     /** @var LogMessage[] - collected messages */
     protected array $messages = [];
 
-
     /**
      * Constructor
      *

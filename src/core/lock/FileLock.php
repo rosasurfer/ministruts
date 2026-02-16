@@ -19,7 +19,6 @@ final class FileLock extends BaseLock {
     /** @var string - name of the file used by the current instance */
     private string $filename;
 
-
     /**
      * Constructor
      *

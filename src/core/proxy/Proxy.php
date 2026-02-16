@@ -19,7 +19,6 @@ abstract class Proxy extends StaticClass {
     /** @var object[] - resolved instances of proxied objects */
     protected static array $resolvedInstances;
 
-
     /**
      * Return the name of a proxied service.
      *

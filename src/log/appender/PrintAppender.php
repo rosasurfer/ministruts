@@ -46,7 +46,6 @@ class PrintAppender extends BaseAppender {
     /** @var int - counter for displayed HTML messages */
     protected int $msgCounterHtml = 0;
 
-
     /**
      * Print a log message to the screen.
      *

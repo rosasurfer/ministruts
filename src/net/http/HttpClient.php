@@ -24,7 +24,6 @@ abstract class HttpClient extends CObject {
     /** @var string */
     protected string $userAgent = 'Mozilla/5.0';
 
-
     /**
      * Get the current connection timeout.
      *

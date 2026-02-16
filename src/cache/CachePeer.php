@@ -34,9 +34,8 @@ abstract class CachePeer extends CObject {
     /** @var ?ReferencePool */
     private ?ReferencePool $referencePool = null;
 
-
     /**
-     * Constructor.
+     * Constructor
      *
      * @param  ?string $label   [optional] - cache identifier (default: none)
      * @param  mixed[] $options [optional] - additional instantiation options (default: none)

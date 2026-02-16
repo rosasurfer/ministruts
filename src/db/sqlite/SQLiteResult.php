@@ -31,7 +31,6 @@ class SQLiteResult extends Result {
     /** @var int - number of rows returned by the statement */
     protected int $numRows = -1;
 
-
     /**
      * Constructor
      *

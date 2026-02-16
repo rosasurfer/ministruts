@@ -22,7 +22,6 @@ class Windows extends StaticClass {
         193 => ['ERROR_BAD_EXE_FORMAT', 'The command is not a valid Win32 application.'                  ],
     ];
 
-
     /**
      * Return a human-readable version of a Win32 error code.
      *

@@ -18,7 +18,6 @@ class Input extends CObject {
     /** @var ?DocoptResult */
     private ?DocoptResult $docoptResult = null;
 
-
     /**
      * Set the internal Docopt result.
      *

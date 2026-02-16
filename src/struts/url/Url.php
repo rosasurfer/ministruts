@@ -21,7 +21,6 @@ class Url extends CObject {
     /** @var string[] */
     protected array $parameters = [];
 
-
     /**
      * Constructor
      *

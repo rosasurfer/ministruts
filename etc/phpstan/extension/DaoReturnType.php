@@ -37,7 +37,6 @@ class DaoReturnType extends Extension implements DynamicMethodReturnTypeExtensio
         'findAll'    => 'array<'.PersistableObject::class.'>',
     ];
 
-
     /**
      * Return the name of the class supported by this extension.
      *

@@ -54,7 +54,6 @@ class DocoptParser extends CObject {
     /** @var string */
     protected string $version = '';
 
-
     /**
      * Constructor
      *

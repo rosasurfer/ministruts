@@ -36,7 +36,6 @@ class DocoptResult extends CObject implements ArrayAccess, IteratorAggregate, Js
     /** @var string */
     protected string $errorMessage;
 
-
     /**
      * Constructor
      *

@@ -65,7 +65,6 @@ class PropertyConfig extends CObject implements Config {
     /** @var array<(?scalar)|array<?scalar>> - tree structure of config values */
     protected array $properties = [];
 
-
     /**
      * Constructor
      *

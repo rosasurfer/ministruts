@@ -31,7 +31,6 @@ abstract class ActionForm extends CObject {
         UPLOAD_ERR_EXTENSION  => 'Error while uploading the file (UPLOAD_ERR_EXTENSION)',
     ];
 
-
     /**
      * Constructor
      *

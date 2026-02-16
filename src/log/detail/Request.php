@@ -39,7 +39,6 @@ class Request extends CObject {
     /** @var self */
     protected static self $instance;
 
-
     /**
      * Constructor
      */

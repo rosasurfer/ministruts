@@ -32,7 +32,6 @@ final class ConnectionPool extends Singleton {
         __NAMESPACE__.'\\sqlite\\sqliteconnector'   => SQLiteConnector::class,
     ];
 
-
     /**
      * Return the Singleton instance of this class.
      *

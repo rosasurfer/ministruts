@@ -82,7 +82,6 @@ class SQLiteConnector extends Connector {
     /** @var bool - whether a query to execute can skip results */
     private bool $skipResults = false;
 
-
     /**
      * Constructor
      *

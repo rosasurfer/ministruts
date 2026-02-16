@@ -118,7 +118,6 @@ class Module extends CObject {
     /** @var bool - whether this component is fully configured */
     protected bool $configured = false;
 
-
     /**
      * Constructor
      *

@@ -17,7 +17,6 @@ final class ReferencePool extends CachePeer {
     /** @var array<string, mixed> */
     private array $pool = [];
 
-
     /**
      * {@inheritDoc}
      */

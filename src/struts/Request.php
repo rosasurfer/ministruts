@@ -64,7 +64,6 @@ class Request extends CObject {
     /** @var mixed[] - additional variables context */
     protected array $attributes = [];
 
-
     /**
      * Constructor
      */

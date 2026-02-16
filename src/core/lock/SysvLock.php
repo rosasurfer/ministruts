@@ -32,7 +32,6 @@ class SysvLock extends BaseLock {
     /** @var string */
     private string $key;
 
-
     /**
      * Constructor
      *

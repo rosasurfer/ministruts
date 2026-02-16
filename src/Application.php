@@ -39,7 +39,6 @@ class Application extends CObject {
     /** @var Command[] - registered CLI commands */
     protected array $commands = [];
 
-
     /**
      * Create and initialize a new application.
      *

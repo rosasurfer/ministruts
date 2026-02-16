@@ -31,7 +31,6 @@ class Service implements ServiceInterface {
     /** @var ?object */
     protected ?object $instance = null;
 
-
     /**
      * Constructor
      *

@@ -35,7 +35,6 @@ abstract class Dependency extends CObject {
     /** @var int - min. validity of the instance in seconds */
     private int $minValidity = 0;
 
-
     /**
      * Whether an event or state change to be monitored has occurred and invalidated the dependency.
      *

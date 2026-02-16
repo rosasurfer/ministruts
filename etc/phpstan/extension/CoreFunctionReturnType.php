@@ -25,7 +25,6 @@ class CoreFunctionReturnType extends Extension implements DynamicFunctionReturnT
     /** @var array<?Type> */
     protected array $interceptedFunctions;
 
-
     /**
      * Constructor
      */

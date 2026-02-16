@@ -35,7 +35,6 @@ abstract class PersistableObject extends CObject {
     /** @var bool - flag to detect and handle recursive $this->delete() calls */
     private bool $__inDelete = false;
 
-
     /**
      * Constructor.
      *
@@ -440,9 +439,7 @@ abstract class PersistableObject extends CObject {
 
         // assign the returned identity value
         $idName = $mapping['identity']['name'];
-        if ($this->$idName === null) {
-            $this->$idName = $id;
-        }
+        $this->$idName ??= $id;
 
         // post-processing hook
         $this->afterInsert();

@@ -38,7 +38,6 @@ class Container extends CObject implements ContainerInterface {
     /** @var IService[] - list of registered services */
     protected array $services = [];
 
-
     /**
      * Create a new instance and optionally load dependency definitions.
      *

@@ -25,7 +25,6 @@ abstract class Pattern extends CObject {
     /** @var Pattern[] */
     public array $children = [];
 
-
     /**
      * @param  string[] $types [optional]
      *

@@ -22,7 +22,6 @@ class HttpRequest extends CObject {
     /** @var string[] - user-defined HTTP headers */
     protected array $headers = [];
 
-
     /**
      * Constructor
      *

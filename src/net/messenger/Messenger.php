@@ -15,7 +15,6 @@ abstract class Messenger extends CObject {
     /** @var mixed[] */
     protected array $options = [];
 
-
     /**
      * Constructor
      *

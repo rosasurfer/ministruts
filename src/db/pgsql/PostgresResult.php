@@ -44,7 +44,6 @@ class PostgresResult extends Result {
     /** A fatal error occurred. */
     public const STATUS_FATAL_ERROR = \PGSQL_FATAL_ERROR;
 
-
     /**
      * @var  resource|PgSqlResult|null - the database connector's original result handle
      * @phpstan-var PgSqlResultId|null
@@ -56,7 +55,6 @@ class PostgresResult extends Result {
 
     /** @var int - number of rows returned by the statement */
     protected int $numRows;
-
 
     /**
      * Constructor

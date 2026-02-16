@@ -85,7 +85,6 @@ class PostgresConnector extends Connector {
     /** @var int - the last number of affected rows (not reset between queries) */
     protected int $lastAffectedRows = 0;
 
-
     /**
      * Constructor
      *

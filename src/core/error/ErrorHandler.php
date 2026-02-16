@@ -40,7 +40,6 @@ class ErrorHandler extends CObject {
     /** convert PHP errors to exceptions, log both */
     public const MODE_EXCEPTION = 3;
 
-
     /** @var ?int - the configured error reporting level */
     protected static ?int $reportingLevel = null;
 
@@ -61,7 +60,6 @@ class ErrorHandler extends CObject {
 
     /** @var ?string - memory block reserved for handling out-of-memory errors */
     protected static ?string $oomEmergencyMemory = null;
-
 
     /**
      * Setup error handling.

@@ -35,7 +35,6 @@ abstract class DAO extends Singleton {
     /** @var string - the PHP class name of the DAO's entity */
     protected string $entityClass;
 
-
     /**
      * Constructor
      *

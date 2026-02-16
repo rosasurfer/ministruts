@@ -28,7 +28,6 @@ final class Cache extends StaticClass {
     /** @var CachePeer[] - array of further cache implementations */
     private static array $caches;
 
-
     /**
      * Return the {@link Cache} implementation for the specified identifier. Multiple identifiers may represent different
      * cache implementations, e.g. APC cache, filesystem cache, MemCache...

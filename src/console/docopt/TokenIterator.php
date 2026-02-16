@@ -25,7 +25,6 @@ class TokenIterator extends ArrayIterator {
     /** @var class-string<Throwable> */
     protected string $errorClass;
 
-
     /**
      * Constructor
      *

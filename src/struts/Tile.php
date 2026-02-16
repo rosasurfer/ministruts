@@ -60,7 +60,6 @@ class Tile extends CObject {
     /** @var bool - whether this component can still be modified or configuration is frozen */
     protected bool $configured = false;
 
-
     /**
      * Constructor
      *

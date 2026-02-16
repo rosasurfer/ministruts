@@ -30,7 +30,6 @@ class Worker extends CObject {
     /** @var Connector|null - db adapter used for the worker's entity */
     private ?Connector $connector = null;
 
-
     /**
      * Constructor
      *

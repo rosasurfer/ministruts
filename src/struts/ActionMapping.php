@@ -54,7 +54,6 @@ class ActionMapping extends CObject {
     /** @var Module - Module the mapping belongs to */
     protected Module $module;
 
-
     /**
      * Constructor
      *

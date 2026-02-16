@@ -59,7 +59,6 @@ class Command extends CObject {
     /** @var int - the command's error status */
     protected int $status = 0;
 
-
     /**
      * Constructor
      *

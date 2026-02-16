@@ -22,7 +22,6 @@ class Page extends Singleton {
     /** @var mixed[] - stored variables */
     protected array $properties = [];
 
-
     /**
      * Return the {@link Singleton} instance of this class.
      *

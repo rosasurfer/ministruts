@@ -53,7 +53,6 @@ class LogMessage extends CObject {
     /** @var array<string, mixed> - logging context with additional infos (if any) */
     protected array $context;
 
-
     /**
      * Constructor
      *

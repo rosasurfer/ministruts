@@ -34,7 +34,6 @@ class SensitiveContentFilter extends CObject implements ContentFilterInterface {
         'token',
     ];
 
-
     /**
      * A plain string does not constitute a named value and will pass through this filter unmodified.
      *

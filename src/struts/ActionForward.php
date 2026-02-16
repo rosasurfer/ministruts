@@ -26,7 +26,6 @@ class ActionForward extends CObject {
     /** default identifier for looking up a forward after a failed form validation */
     public const VALIDATION_ERROR_KEY = 'error';
 
-
     /** @var string */
     protected string $name;
 
@@ -38,7 +37,6 @@ class ActionForward extends CObject {
 
     /** @var int - type (HTTP status code) of the redirect to issue (if any) */
     protected int $redirectType = HttpResponse::SC_MOVED_TEMPORARILY;
-
 
     /**
      * Constructor

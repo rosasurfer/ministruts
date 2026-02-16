@@ -22,7 +22,6 @@ final class ORM extends StaticClass {
     /** synonym for db type "text" */
     public const STRING = 'string';
 
-
     /**
      * Helper to throw an ORM configuration exception.
      *

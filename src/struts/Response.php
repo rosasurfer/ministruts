@@ -30,7 +30,6 @@ class Response extends Singleton {
     /** @var mixed[] - additional variables context */
     protected array $attributes = [];
 
-
     /**
      * Return the {@link Singleton} instance of this class.
      *

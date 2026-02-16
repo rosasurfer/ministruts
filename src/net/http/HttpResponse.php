@@ -230,7 +230,6 @@ abstract class HttpResponse extends CObject {
      */
     public const SC_HTTP_VERSION_NOT_SUPPORTED = 505;
 
-
     /** @var string[] - HTTP status code descriptions */
     public static array $statusCodes = [
         self::SC_CONTINUE                        => 'SC_CONTINUE'                       ,
@@ -274,7 +273,6 @@ abstract class HttpResponse extends CObject {
         self::SC_GATEWAY_TIMEOUT                 => 'SC_GATEWAY_TIMEOUT'                ,
         self::SC_HTTP_VERSION_NOT_SUPPORTED      => 'SC_HTTP_VERSION_NOT_SUPPORTED'     ,
     ];
-
 
     /**
      * Return the received HTTP status code.
