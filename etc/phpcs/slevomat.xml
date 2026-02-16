@@ -1,7 +1,10 @@
 <?xml version="1.0"?>
 <!-- 
- File format:
-  @see  https://github.com/PHPCSStandards/PHP_CodeSniffer/wiki/Annotated-Ruleset
+ File format: https://github.com/PHPCSStandards/PHP_CodeSniffer/wiki/Annotated-Ruleset
+ 
+ Major Slevomat issue: if-else without curly braces is not supported and breaks the entire run without showing the location of the issue.
+ 
+ @see https://github.com/slevomat/coding-standard/issues/1488
 -->
 <ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="https://github.com/PHPCSStandards/PHP_CodeSniffer/raw/refs/heads/master/phpcs.xsd"
@@ -33,10 +36,11 @@
     <config name="installed_paths" value="../../slevomat/coding-standard"/>
 
     <rule ref="SlevomatCodingStandard">
-      <!-- exclude broken/invalid sniffs -->
+      <!-- exclude broken sniffs -->
       <exclude name="SlevomatCodingStandard.Attributes"/>
       <exclude name="SlevomatCodingStandard.Classes.ClassMemberSpacing.IncorrectCountOfBlankLinesBetweenMembers"/>
       <exclude name="SlevomatCodingStandard.Commenting.DocCommentSpacing.IncorrectLinesCountBetweenDifferentAnnotationsTypes"/>
+      <exclude name="SlevomatCodingStandard.ControlStructures.EarlyExit"/>  <!-- exception "if-else without curly braces is not supported" -->
       <exclude name="SlevomatCodingStandard.ControlStructures.RequireMultiLineTernaryOperator.MultiLineTernaryOperatorNotUsed"/>
       <exclude name="SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter"/>
       <exclude name="SlevomatCodingStandard.Namespaces.AlphabeticallySortedUses"/>
@@ -100,26 +104,18 @@
       <exclude name="SlevomatCodingStandard.TypeHints.UselessConstantTypeHint.UselessDocComment"/>
       <exclude name="SlevomatCodingStandard.Whitespaces.DuplicateSpaces.DuplicateSpaces"/>
 
-
-      <!-- broken -->
-      <exclude name="SlevomatCodingStandard.ControlStructures.EarlyExit"/>
-
-      <!-- rewrite DocOpt parser -->
-      <exclude name="SlevomatCodingStandard.Classes.ForbiddenPublicProperty.ForbiddenPublicProperty"/>
-
-      <!-- implement PHPStan extension ServiceContainerReturnType -->
-      <exclude name="SlevomatCodingStandard.PHP.RequireExplicitAssertion.RequiredExplicitAssertion"/>
+      <exclude name="SlevomatCodingStandard.Classes.ForbiddenPublicProperty.ForbiddenPublicProperty"/>  <!-- @todo rewrite DocOpt parser -->
+      <exclude name="SlevomatCodingStandard.PHP.RequireExplicitAssertion.RequiredExplicitAssertion"/>   <!-- @todo implement PHPStan extension ServiceContainerReturnType -->
 
       <!--
       @todo
       -->
-
       <exclude name="SlevomatCodingStandard.Variables"/>
       <exclude name="SlevomatCodingStandard.Operators"/>
     </rule>
 
 
-    <!-- @todo ========================================================================================================================= -->
+    <!-- @todo severity is intentionally reduced until a final usage decision is made ================================================== -->
     <rule ref="SlevomatCodingStandard.Files.FileLength.FileTooLong">
       <type>warning</type> <!-- Your file is too long. Currently using %d lines. Can be up to 250 lines. -->
       <severity>4</severity>
@@ -168,7 +164,7 @@
     </rule>
 
 
-    <!-- sniff customizations ========================================================================================================== -->
+    <!-- customized sniffs ============================================================================================================= -->
     <rule ref="SlevomatCodingStandard.Classes.DisallowStringExpressionPropertyFetch.DisallowedStringExpressionPropertyFetch">
       <exclude-pattern>*/src/struts/Module.php</exclude-pattern> <!-- allow for SimpleXMLElement -->
     </rule>
