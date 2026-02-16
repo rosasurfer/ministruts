@@ -280,14 +280,13 @@ function debugHeader($message): void {
  * Parse command line arguments and match them against the specified {@link https://docopt.org/#} syntax definition.
  *
  * @param  string                     $doc                - help text, i.e. a syntax definition in Docopt language format
- * @param  string|string[]|null       $args    [optional] - arguments to parse (default: the arguments passed in $_SERVER['argv'])
  * @param  array<string, bool|string> $options [optional] - parser options (default: none)
  *
  * @return DocoptResult - the parsing result
  */
-function docopt(string $doc, $args=null, array $options=[]): DocoptResult {
+function docopt(string $doc, array $options = []): DocoptResult {
     $parser = new DocoptParser($options);
-    return $parser->parse($doc, $args);
+    return $parser->parse($doc);
 }
 
 

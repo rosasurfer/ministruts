@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace rosasurfer\ministruts\tests\docopt;
 
+use rosasurfer\ministruts\console\docopt\DocoptParser;
 use rosasurfer\ministruts\console\docopt\DocoptResult;
 use rosasurfer\ministruts\console\docopt\OptionIterator;
 use rosasurfer\ministruts\console\docopt\TokenIterator;
@@ -16,8 +17,6 @@ use rosasurfer\ministruts\console\docopt\pattern\Optional;
 use rosasurfer\ministruts\console\docopt\pattern\OptionsShortcut;
 use rosasurfer\ministruts\console\docopt\pattern\Required;
 use rosasurfer\ministruts\tests\helper\TestCase;
-
-use function rosasurfer\ministruts\docopt;
 
 /**
  * Tests ported from Python to PHPUnit
@@ -1142,8 +1141,9 @@ class PythonPortedTest extends TestCase {
      *
      * @return DocoptResult
      */
-    protected function docopt(string $doc, $args='', array $options=[]): DocoptResult {
+    protected function docopt(string $doc, $args = '', array $options = []): DocoptResult {
         $options = array_merge(['exit'=>false, 'help'=>false], $options);
-        return docopt($doc, $args, $options);
+        $parser = new DocoptParser($options);
+        return $parser->parse($doc, $args);
     }
 }

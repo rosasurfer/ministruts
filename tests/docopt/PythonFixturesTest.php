@@ -4,9 +4,10 @@ declare(strict_types=1);
 namespace rosasurfer\ministruts\tests\docopt;
 
 use Exception;
+
+use rosasurfer\ministruts\console\docopt\DocoptParser;
 use rosasurfer\ministruts\tests\helper\TestCase;
 
-use function rosasurfer\ministruts\docopt;
 use function rosasurfer\ministruts\json_decode_or_throw;
 use function rosasurfer\ministruts\preg_replace;
 
@@ -27,8 +28,8 @@ class PythonFixturesTest extends TestCase {
      * @dataProvider dataProvider
      */
     public function testPythonFixture(string $usage, string $argv, $expected): void {
-
-        $docoptResult = docopt($usage, $argv, ['exit'=>false]);
+        $parser = new DocoptParser(['exit'=>false]);
+        $docoptResult = $parser->parse($usage, $argv);
         $actual = $docoptResult->isSuccess() ? $docoptResult->getArgs() : 'user-error';
 
         $this->assertEquals($expected, $actual);

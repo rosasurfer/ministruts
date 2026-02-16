@@ -24,5 +24,5 @@ Options:
 
 DOCOPT;
 
-$docoptResult = docopt($doc, null, ['version'=>'1.0.0rc2']);
+$docoptResult = docopt($doc, ['version'=>'1.0.0rc2']);
 echof(toString(json_encode($docoptResult)));

@@ -29,5 +29,5 @@ Options:
 
 DOCOPT;
 
-$docoptResult = docopt($doc, null, ['version'=>'Naval Fate 2.0']);
+$docoptResult = docopt($doc, ['version'=>'Naval Fate 2.0']);
 echof(toString(json_encode($docoptResult)));
