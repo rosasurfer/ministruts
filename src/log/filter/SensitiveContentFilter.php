@@ -10,8 +10,8 @@ use rosasurfer\ministruts\core\CObject;
  * A filter for sensitive named values. The filter matches if the key/name of a value contains one of the configured name patterns.
  * Redacted values are replaced by asterisk "*" characters.
  */
-class SensitiveContentFilter extends CObject implements ContentFilterInterface {
-
+class SensitiveContentFilter extends CObject implements ContentFilterInterface
+{
     /**
      * @var string[] - sensitive name patterns (case-insensitive partial matching)
      *

@@ -20,8 +20,8 @@ use rosasurfer\ministruts\core\CObject;
  *  CachePeer::drop($key);                          // delete a cached value
  * </pre>
  */
-abstract class CachePeer extends CObject {
-
+abstract class CachePeer extends CObject
+{
     /** @var string */
     protected string $label = '';
 

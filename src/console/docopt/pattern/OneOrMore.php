@@ -8,8 +8,8 @@ use UnexpectedValueException;
 /**
  * OneOrMore
  */
-class OneOrMore extends BranchPattern {
-
+class OneOrMore extends BranchPattern
+{
     /**
      * {@inheritDoc}
      */

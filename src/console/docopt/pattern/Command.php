@@ -8,8 +8,8 @@ use rosasurfer\ministruts\console\docopt\SingleMatch;
 /**
  * Command
  */
-class Command extends Argument {
-
+class Command extends Argument
+{
     /**
      * @param  Pattern[] $left
      *

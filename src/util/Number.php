@@ -8,8 +8,8 @@ use rosasurfer\ministruts\core\StaticClass;
 /**
  * Number
  */
-class Number extends StaticClass {
-
+class Number extends StaticClass
+{
     /**
      * Format a numeric value with a currency format.
      *

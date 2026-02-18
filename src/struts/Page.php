@@ -17,8 +17,8 @@ use rosasurfer\ministruts\core\Singleton;
  *  $var = $page->title;                // retrieve the variable named "title"
  * </pre>
  */
-class Page extends Singleton {
-
+class Page extends Singleton
+{
     /** @var mixed[] - stored variables */
     protected array $properties = [];
 

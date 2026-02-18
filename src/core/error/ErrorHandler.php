@@ -29,8 +29,8 @@ use const rosasurfer\ministruts\WINDOWS;
 /**
  * A handler for unhandled PHP errors and exceptions.
  */
-class ErrorHandler extends CObject {
-
+class ErrorHandler extends CObject
+{
     /** no error handling */
     public const MODE_OFF = 1;
 

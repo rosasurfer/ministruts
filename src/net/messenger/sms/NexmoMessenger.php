@@ -13,8 +13,8 @@ use rosasurfer\ministruts\net\messenger\Messenger;
  *
  * @link https://docs.nexmo.com/messaging/sms-api
  */
-class NexmoMessenger extends Messenger {
-
+class NexmoMessenger extends Messenger
+{
     /**
      * {@inheritDoc}
      *

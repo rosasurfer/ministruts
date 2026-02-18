@@ -10,8 +10,8 @@ use rosasurfer\ministruts\core\exception\RuntimeException;
  *
  * An exception marking help infos and syntax errors to be shown to the end user of the CLI application.
  */
-class DocoptUserNotification extends RuntimeException {
-
+class DocoptUserNotification extends RuntimeException
+{
     /** @var int */
     public int $status;
 

@@ -10,5 +10,6 @@ use rosasurfer\ministruts\core\exception\Exception as RosasurferException;
  *
  * Base exception for Struts errors.
  */
-class StrutsException extends RosasurferException {
+class StrutsException extends RosasurferException
+{
 }

@@ -23,8 +23,8 @@ use const rosasurfer\ministruts\NL;
  *
  * An HTTP client executing HTTP requests using CURL.
  */
-class CurlHttpClient extends HttpClient {
-
+class CurlHttpClient extends HttpClient
+{
     /**
      * @var resource|CurlHandle|null - cURL handle
      * @phpstan-var ?CurlHandleId

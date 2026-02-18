@@ -14,8 +14,8 @@ use rosasurfer\ministruts\core\exception\UnimplementedFeatureException;
  * In this framework it forwards static method calls to actual instances. The standard behavior to resolve proxied instances is
  * a look-up in the application's default service container. Override {@link Proxy::getInstance()} to change that behavior.
  */
-abstract class Proxy extends StaticClass {
-
+abstract class Proxy extends StaticClass
+{
     /** @var object[] - resolved instances of proxied objects */
     protected static array $resolvedInstances;
 

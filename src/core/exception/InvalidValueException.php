@@ -6,5 +6,6 @@ namespace rosasurfer\ministruts\core\exception;
 /**
  * InvalidValueException
  */
-class InvalidValueException extends RuntimeException {
+class InvalidValueException extends RuntimeException
+{
 }

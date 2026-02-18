@@ -40,8 +40,8 @@ use const rosasurfer\ministruts\WINDOWS;
  *  'filepath'           = {filename}    // log filename; absolute or relative to $config['app.dir.root'] (default: php.ini setting "error_log")
  * </pre>
  */
-class ErrorLogAppender extends BaseAppender {
-
+class ErrorLogAppender extends BaseAppender
+{
     /** @var int - log destination type */
     protected int $destinationType = ERROR_LOG_DEFAULT;
 

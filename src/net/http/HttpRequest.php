@@ -11,8 +11,8 @@ use function rosasurfer\ministruts\strContains;
 /**
  * HttpRequest
  */
-class HttpRequest extends CObject {
-
+class HttpRequest extends CObject
+{
     /** @var string */
     protected string $url = '';
 

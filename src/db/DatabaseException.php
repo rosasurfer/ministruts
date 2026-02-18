@@ -8,5 +8,6 @@ use rosasurfer\ministruts\core\exception\RuntimeException;
 /**
  * DatabaseException
  */
-class DatabaseException extends RuntimeException {
+class DatabaseException extends RuntimeException
+{
 }

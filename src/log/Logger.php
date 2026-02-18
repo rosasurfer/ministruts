@@ -48,8 +48,8 @@ use const rosasurfer\ministruts\L_WARN;
  *
  * @todo: implement \Psr\Log\LoggerInterface and remove static crap
  */
-class Logger extends StaticClass {
-
+class Logger extends StaticClass
+{
     /** default if no application loglevel is configured */
     public const DEFAULT_LOGLEVEL = L_NOTICE;
 

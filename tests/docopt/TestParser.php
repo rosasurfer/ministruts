@@ -11,8 +11,8 @@ use rosasurfer\ministruts\console\docopt\pattern\Required;
 /**
  *
  */
-class TestParser extends DocoptParser {
-
+class TestParser extends DocoptParser
+{
     /**
      * {@inheritDoc}
      *

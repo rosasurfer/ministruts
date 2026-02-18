@@ -21,8 +21,8 @@ use rosasurfer\ministruts\phpstan\UserTypes as PHPStanUserTypes;
  *
  * @phpstan-import-type ORM_ENTITY from PHPStanUserTypes
  */
-abstract class DAO extends Singleton {
-
+abstract class DAO extends Singleton
+{
     /** @var ?IConnector - the db connector for this DAO */
     private ?IConnector $connector = null;
 

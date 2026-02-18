@@ -25,8 +25,8 @@ use rosasurfer\ministruts\util\PHP;
 /**
  * A class representing the application instance.
  */
-class Application extends CObject {
-
+class Application extends CObject
+{
     /** @var ?Application - the application instance */
     protected static ?self $instance;
 

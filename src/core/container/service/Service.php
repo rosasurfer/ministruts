@@ -17,8 +17,8 @@ use rosasurfer\ministruts\core\exception\ClassNotFoundException;
  *  $request = $service->resolve();
  * </pre>
  */
-class Service implements ServiceInterface {
-
+class Service implements ServiceInterface
+{
     /** @var string */
     protected string $name;
 

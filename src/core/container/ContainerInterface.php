@@ -15,8 +15,8 @@ use Psr\Container\ContainerInterface as PsrContainer;
  *
  * @extends ArrayAccess<string, object>
  */
-interface ContainerInterface extends ArrayAccess, PsrContainer {
-
+interface ContainerInterface extends ArrayAccess, PsrContainer
+{
     /**
      * Whether a dependency with the specified name is registered in the container.
      *

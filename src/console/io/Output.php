@@ -15,8 +15,8 @@ use const rosasurfer\ministruts\NL;
 /**
  * Output
  */
-class Output extends CObject {
-
+class Output extends CObject
+{
     /**
      * Write a message to STDOUT.
      *

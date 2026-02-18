@@ -10,8 +10,8 @@ use rosasurfer\ministruts\core\CObject;
  *
  * An Action contains the logic to execute a specific request and represents the interface to the business layer.
  */
-abstract class Action extends CObject {
-
+abstract class Action extends CObject
+{
     /** @var ActionMapping - encapsulates a single routing configuration */
     protected ActionMapping $mapping;
 

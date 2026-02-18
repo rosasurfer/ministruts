@@ -21,8 +21,8 @@ use rosasurfer\ministruts\tests\helper\TestCase;
 /**
  * Tests ported from Python to PHPUnit
  */
-class PythonPortedTest extends TestCase {
-
+class PythonPortedTest extends TestCase
+{
     /**
      *
      */

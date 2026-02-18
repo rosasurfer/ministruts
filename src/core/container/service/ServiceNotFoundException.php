@@ -10,5 +10,6 @@ use Psr\Container\NotFoundExceptionInterface;
 /**
  * ServiceNotFoundException
  */
-class ServiceNotFoundException extends ContainerException implements NotFoundExceptionInterface {
+class ServiceNotFoundException extends ContainerException implements NotFoundExceptionInterface
+{
 }

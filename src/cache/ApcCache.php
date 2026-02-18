@@ -11,8 +11,8 @@ use rosasurfer\ministruts\core\proxy\Config;
  *
  * Userland cache for regular PHP objects.
  */
-class ApcCache extends CachePeer {
-
+class ApcCache extends CachePeer
+{
     /**
      * Constructor.
      *

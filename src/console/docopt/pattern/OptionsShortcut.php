@@ -8,5 +8,6 @@ namespace rosasurfer\ministruts\console\docopt\pattern;
  *
  * Marker/placeholder for [options] shortcut.
  */
-class OptionsShortcut extends Optional {
+class OptionsShortcut extends Optional
+{
 }

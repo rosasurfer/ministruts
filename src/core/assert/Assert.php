@@ -13,8 +13,8 @@ use function rosasurfer\ministruts\strContains;
  *
  * Efficient assertions to validate arguments.
  */
-class Assert extends StaticClass {
-
+class Assert extends StaticClass
+{
     /**
      * Ensure that the passed value is NULL.
      *

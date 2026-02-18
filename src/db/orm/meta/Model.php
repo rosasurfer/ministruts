@@ -8,5 +8,6 @@ use rosasurfer\ministruts\core\CObject;
 /**
  * Model
  */
-class Model extends CObject {
+class Model extends CObject
+{
 }

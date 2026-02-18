@@ -12,8 +12,8 @@ use PHPMailer\PHPMailer\PHPMailer;
  * communication because it's the only maintained package for standard encryption and authentication protocols (despite it's
  * awkward and legacy design).
  */
-class ClassicMailer extends PHPMailer {
-
+class ClassicMailer extends PHPMailer
+{
     /*
     Known issues:
     -------------

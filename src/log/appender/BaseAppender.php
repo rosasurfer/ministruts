@@ -15,8 +15,8 @@ use const rosasurfer\ministruts\CLI;
  *
  * Implements common functionality of all log appenders.
  */
-abstract class BaseAppender extends CObject implements AppenderInterface {
-
+abstract class BaseAppender extends CObject implements AppenderInterface
+{
     /** @var mixed[] - configuration options */
     protected array $options;
 

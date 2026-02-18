@@ -38,8 +38,8 @@ use const rosasurfer\ministruts\NL;
  *
  * The full URI of a route to a specific module's {@link ActionMapping} is "/{app-base-path}/{module-prefix}/{mapping-path}".
  */
-class Module extends CObject {
-
+class Module extends CObject
+{
     /**
      * Module prefix relative to the base URI of the web application. All module prefixes in an application are unique.
      * The module with the prefix "" (empty string) is the main module of an application.

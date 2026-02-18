@@ -38,8 +38,8 @@ use const rosasurfer\ministruts\NL;
  *  'filter'          = {classname}   // content filter to apply to the resulting output (default: none)
  * </pre>
  */
-class PrintAppender extends BaseAppender {
-
+class PrintAppender extends BaseAppender
+{
     /** @var int - counter for all displayed messages */
     protected int $msgCounter = 0;
 

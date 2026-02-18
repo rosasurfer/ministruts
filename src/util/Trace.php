@@ -23,8 +23,8 @@ use const rosasurfer\ministruts\NL;
  *
  * @phpstan-import-type STACKFRAME from PHPStanUserTypes
  */
-class Trace extends StaticClass {
-
+class Trace extends StaticClass
+{
     /**
      * Convert a PHP-style stacktrace to the more intuitive Java-style.
      *

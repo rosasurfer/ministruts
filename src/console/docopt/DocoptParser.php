@@ -34,8 +34,8 @@ use const rosasurfer\ministruts\NL;
  *
  * A command line argument parser for the {@link https://docopt.org/#} language format.
  */
-class DocoptParser extends CObject {
-
+class DocoptParser extends CObject
+{
     /** @var bool */
     protected bool $optionsFirst = false;
 

@@ -13,8 +13,8 @@ use const rosasurfer\ministruts\WINDOWS;
 /**
  * Base class for custom PHPStan extensions.
  */
-abstract class Extension extends CObject {
-
+abstract class Extension extends CObject
+{
     /**
      * Log a message to the system logger.
      *

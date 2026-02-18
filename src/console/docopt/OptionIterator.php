@@ -15,7 +15,7 @@ use rosasurfer\ministruts\core\ObjectTrait;
  *
  * @extends ArrayIterator<int, Option>
  */
-class OptionIterator extends ArrayIterator {
-
+class OptionIterator extends ArrayIterator
+{
     use ObjectTrait;
 }

@@ -21,8 +21,8 @@ use const rosasurfer\ministruts\NL;
  *
  * A lock using a System-V shared memory segment as a mutex (not supported on Windows).
  */
-class SysvLock extends BaseLock {
-
+class SysvLock extends BaseLock
+{
     /**
      * @var array<resource|SysvSemaphore|null> - semaphore handles
      * @phpstan-var array<SysvSemaphoreId|null>

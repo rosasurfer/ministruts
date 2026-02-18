@@ -6,5 +6,6 @@ namespace rosasurfer\ministruts\core\exception;
 /**
  * IOException
  */
-class IOException extends Exception {
+class IOException extends Exception
+{
 }

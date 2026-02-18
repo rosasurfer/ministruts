@@ -10,8 +10,8 @@ use function rosasurfer\ministruts\preg_match;
 /**
  * HeaderParser
  */
-class HeaderParser extends CObject {
-
+class HeaderParser extends CObject
+{
     /** @var array<string, string[]> */
     protected array $headers = [];
 

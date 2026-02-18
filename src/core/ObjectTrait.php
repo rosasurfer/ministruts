@@ -9,8 +9,8 @@ use rosasurfer\ministruts\util\Trace;
 /**
  * A trait capable of adding {@link CObject} behavior to any class. Used to add error detection features.
  */
-trait ObjectTrait {
-
+trait ObjectTrait
+{
     /**
      * Method signaling read access to inaccessible (protected or private) or non-existing properties.
      *

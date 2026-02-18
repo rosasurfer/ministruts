@@ -11,8 +11,8 @@ use rosasurfer\ministruts\core\exception\InvalidValueException;
  *
  * Represents the HTTP response to an HTTP request made by cURL.
  */
-class CurlHttpResponse extends HttpResponse {
-
+class CurlHttpResponse extends HttpResponse
+{
     /** @var HeaderParser */
     protected HeaderParser $headerParser;
 

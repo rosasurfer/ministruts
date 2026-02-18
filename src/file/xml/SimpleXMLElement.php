@@ -18,8 +18,8 @@ use const rosasurfer\ministruts\NL;
  *
  * A {@link \SimpleXMLElement} with additional functionalities.
  */
-class SimpleXMLElement extends \SimpleXMLElement {
-
+class SimpleXMLElement extends \SimpleXMLElement
+{
     use ObjectTrait;
 
     /**

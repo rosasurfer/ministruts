@@ -12,8 +12,8 @@ use rosasurfer\ministruts\cache\monitor\Dependency;
  * at script termination. However this mechanism provides a simple identity manager, so multiple cache lookups for the same
  * key always yield the same data instance. Every cache implementation uses a ReferencePool instance as it's identy manager.
  */
-final class ReferencePool extends CachePeer {
-
+final class ReferencePool extends CachePeer
+{
     /** @var array<string, mixed> */
     private array $pool = [];
 

@@ -11,8 +11,8 @@ use rosasurfer\ministruts\core\exception\RuntimeException;
 /**
  * A lock using files as the resource to synchronize access on.
  */
-final class FileLock extends BaseLock {
-
+final class FileLock extends BaseLock
+{
     /** @var array<?resource> - all file handles currently used for locking */
     private static array $hFiles = [];
 

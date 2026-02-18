@@ -14,8 +14,8 @@ use function rosasurfer\ministruts\strStartsWith;
 /**
  * Option
  */
-class Option extends LeafPattern {
-
+class Option extends LeafPattern
+{
     /** @var ?string */
     public ?string $short = null;
 

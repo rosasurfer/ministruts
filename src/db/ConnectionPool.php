@@ -15,8 +15,8 @@ use rosasurfer\ministruts\db\sqlite\SQLiteConnector;
  *
  * A pool for multiple database adapter instances. Each instance represents a connection.
  */
-final class ConnectionPool extends Singleton {
-
+final class ConnectionPool extends Singleton
+{
     /** @var IConnector[] - adapter pool */
     private array $pool = [];
 

@@ -16,8 +16,8 @@ use function rosasurfer\ministruts\strLeftTo;
  *
  * An ActionMapping encapsulates the processing instructions for a single route.
  */
-class ActionMapping extends CObject {
-
+class ActionMapping extends CObject
+{
     /** @var bool - whether this component is fully configured */
     protected bool $configured = false;
 

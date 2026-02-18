@@ -19,8 +19,8 @@ use const rosasurfer\ministruts\EOL_WINDOWS;
 /**
  * Mailer
  */
-abstract class Mailer extends CObject {
-
+abstract class Mailer extends CObject
+{
     /** @var mixed[] */
     protected array $options;
 

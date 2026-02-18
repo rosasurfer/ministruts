@@ -8,8 +8,8 @@ use rosasurfer\ministruts\db\ResultInterface as IResult;
 /**
  * Interface for storage mechanism adapters.
  */
-interface ConnectorInterface {
-
+interface ConnectorInterface
+{
     /**
      * Constructor.
      *

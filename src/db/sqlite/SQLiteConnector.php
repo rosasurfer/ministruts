@@ -50,8 +50,8 @@ use const rosasurfer\ministruts\NL;
  *
  * @link  https://bugs.php.net/bug.php?id=64531
  */
-class SQLiteConnector extends Connector {
-
+class SQLiteConnector extends Connector
+{
     /** @var string - DBMS type */
     protected string $type = 'sqlite';
 

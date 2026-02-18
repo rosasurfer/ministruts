@@ -7,5 +7,6 @@ namespace PgSql;
  *
  * @link  https://www.php.net/manual/en/class.pgsql-result.php
  */
-final class Result {
+final class Result
+{
 }

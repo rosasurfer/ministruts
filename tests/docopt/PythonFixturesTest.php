@@ -16,8 +16,8 @@ use const rosasurfer\ministruts\NL;
 /**
  * Unit tests using original Python fixtures
  */
-class PythonFixturesTest extends TestCase {
-
+class PythonFixturesTest extends TestCase
+{
     /**
      * @param  string $usage
      * @param  string $argv

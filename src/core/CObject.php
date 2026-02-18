@@ -7,8 +7,8 @@ namespace rosasurfer\ministruts\core;
  * Base class of all "rosasurfer/ministruts" classes. Other classes may use {@link \rosasurfer\ministruts\core\ObjectTrait}
  * to provide the same functionality.
  */
-class CObject {
-
+class CObject
+{
     use ObjectTrait;
 
     /**

@@ -10,8 +10,8 @@ use rosasurfer\ministruts\core\exception\IOException;
 /**
  * Base class for concrete HTTP clients.
  */
-abstract class HttpClient extends CObject {
-
+abstract class HttpClient extends CObject
+{
     /** @var int */
     protected int $timeout = 30;
 

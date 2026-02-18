@@ -5,5 +5,6 @@
  *
  * @link  http://www.php.net/manual/en/class.sysvsemaphore.php
  */
-final class SysvSemaphore {
+final class SysvSemaphore
+{
 }

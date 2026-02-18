@@ -26,8 +26,8 @@ use const rosasurfer\ministruts\NL;
  * An object representing the current HTTP request. Provides helper methods and an
  * additional variables context with the life-time of the request.
  */
-class Request extends CObject {
-
+class Request extends CObject
+{
     /** @var string */
     protected string $method;
 

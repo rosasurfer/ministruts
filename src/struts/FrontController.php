@@ -28,8 +28,8 @@ use const rosasurfer\ministruts\NL;
  * The implementation must be "request safe" (multiple requests use the same deserialized state), meaning it must not hold
  * variable runtime status.
  */
-class FrontController extends Singleton {
-
+class FrontController extends Singleton
+{
     /** @var Module[] - all registered Struts modules with the module prefix as index */
     private array $modules = [];
 

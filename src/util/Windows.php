@@ -8,8 +8,8 @@ use rosasurfer\ministruts\core\StaticClass;
 /**
  * Windows constants
  */
-class Windows extends StaticClass {
-
+class Windows extends StaticClass
+{
     /** @var int - the maximum path on a drive is "D:\some-256-character-path-string<NUL>" */
     public const MAX_PATH = 260;
 

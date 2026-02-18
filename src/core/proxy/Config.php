@@ -21,8 +21,8 @@ use rosasurfer\ministruts\config\Config as ConfigInterface;
  * @method static object          object(string $key, ?object $default = null)                      Return the config setting with the specified key as an object. Not existing settings and non-object values trigger an exception.
  * @method static object          instance(string $key, string $classname, ?object $default = null) Return the config setting with the specified key as a typed instance. Not existing settings and non-matching instance values trigger an exception.
  */
-class Config extends Proxy {
-
+class Config extends Proxy
+{
     /**
      * {@inheritDoc}
      */

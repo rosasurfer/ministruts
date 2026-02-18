@@ -26,8 +26,8 @@ use function rosasurfer\ministruts\strLeft;
  * Overwrites the return types of {@link DAO::find()}, {@link DAO::findAll()}, {@link DAO::get()} and {@link DAO::getAll()}
  * so that they return concrete model types instead of the general {@link PersistableObject} type.
  */
-class DaoReturnType extends Extension implements DynamicMethodReturnTypeExtension {
-
+class DaoReturnType extends Extension implements DynamicMethodReturnTypeExtension
+{
     /** @var string[] */
     protected static array $supportedMethods = [
       // method name =>  ReturnType::describe(TYPE_ONLY)

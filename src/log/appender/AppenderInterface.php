@@ -8,8 +8,8 @@ use rosasurfer\ministruts\log\LogMessage;
 /**
  * Interface for log appenders.
  */
-interface AppenderInterface {
-
+interface AppenderInterface
+{
     /**
      * Create and initialize a new instance.
      *

@@ -8,8 +8,8 @@ use function rosasurfer\ministruts\array_merge;
 /**
  * BranchPattern
  */
-abstract class BranchPattern extends Pattern {
-
+abstract class BranchPattern extends Pattern
+{
     /**
      * @param  Pattern|Pattern[]|null $children [optional]
      */

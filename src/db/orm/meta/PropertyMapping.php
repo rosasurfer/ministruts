@@ -13,8 +13,8 @@ use rosasurfer\ministruts\phpstan\UserTypes as PHPStanUserTypes;
  *
  * @phpstan-import-type ORM_PROPERTY from PHPStanUserTypes
  */
-class PropertyMapping extends CObject {
-
+class PropertyMapping extends CObject
+{
     /** @var EntityMapping - the entity mapping this mapping is a part of */
     protected EntityMapping $entityMapping;
 

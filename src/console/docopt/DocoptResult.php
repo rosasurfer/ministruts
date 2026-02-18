@@ -22,8 +22,8 @@ use const rosasurfer\ministruts\NL;
  * @implements ArrayAccess<string, bool|int|string[]|null>
  * @implements IteratorAggregate<string, bool|int|string[]|null>
  */
-class DocoptResult extends CObject implements ArrayAccess, IteratorAggregate, JsonSerializable {
-
+class DocoptResult extends CObject implements ArrayAccess, IteratorAggregate, JsonSerializable
+{
     /** @var array<string, bool|int|string[]|null> */
     protected array $args;
 

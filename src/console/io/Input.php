@@ -13,8 +13,8 @@ use function rosasurfer\ministruts\preg_match;
  *
  * An object providing access to parsed command line arguments.
  */
-class Input extends CObject {
-
+class Input extends CObject
+{
     /** @var ?DocoptResult */
     private ?DocoptResult $docoptResult = null;
 

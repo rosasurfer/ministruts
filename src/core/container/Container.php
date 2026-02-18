@@ -33,8 +33,8 @@ use rosasurfer\ministruts\core\container\service\ServiceNotFoundException;
  *  $tile    = $container->factory('tile', ...$args);       // resolve a new instance using the factory pattern
  * </pre>
  */
-class Container extends CObject implements ContainerInterface {
-
+class Container extends CObject implements ContainerInterface
+{
     /** @var IService[] - list of registered services */
     protected array $services = [];
 

@@ -8,8 +8,8 @@ namespace rosasurfer\ministruts\core\container\service;
  *
  * An interface implemented by services to be registered in a dependency injection container.
  */
-interface ServiceInterface {
-
+interface ServiceInterface
+{
     /**
      * Constructor
      *

@@ -10,8 +10,8 @@ use rosasurfer\ministruts\core\CObject;
  *
  * A Messenger factory and abstract base class for all Messenger implementations.
  */
-abstract class Messenger extends CObject {
-
+abstract class Messenger extends CObject
+{
     /** @var mixed[] */
     protected array $options = [];
 

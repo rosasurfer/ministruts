@@ -30,8 +30,8 @@ use const rosasurfer\ministruts\NL;
  *
  * @phpstan-import-type STACKFRAME from PHPStanUserTypes
  */
-class LogMessage extends CObject {
-
+class LogMessage extends CObject
+{
     /** @var string - a logged message */
     protected string $message = '';
 

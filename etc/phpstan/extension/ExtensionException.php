@@ -13,8 +13,8 @@ use const rosasurfer\ministruts\NL;
 /**
  * An exception to provide more meaningful output during a PHPStan analysis.
  */
-class ExtensionException extends RosasurferException {
-
+class ExtensionException extends RosasurferException
+{
     /**
      * Constructor
      *

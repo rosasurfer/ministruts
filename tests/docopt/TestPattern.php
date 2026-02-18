@@ -9,8 +9,8 @@ use rosasurfer\ministruts\console\docopt\pattern\Pattern;
 /**
  *
  */
-abstract class TestPattern extends Pattern {
-
+abstract class TestPattern extends Pattern
+{
     /**
      * {@inheritDoc}
      *

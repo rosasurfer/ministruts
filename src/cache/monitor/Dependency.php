@@ -30,8 +30,8 @@ use rosasurfer\ministruts\core\exception\InvalidValueException;
  * the dependency remains fulfilled and calling $dependency->isValid() returns TRUE. After changing or deleting one
  * of the files, calling $dependency->isValid() returns FALSE.
  */
-abstract class Dependency extends CObject {
-
+abstract class Dependency extends CObject
+{
     /** @var int - min. validity of the instance in seconds */
     private int $minValidity = 0;
 

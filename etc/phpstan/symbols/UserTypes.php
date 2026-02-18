@@ -54,7 +54,8 @@ use rosasurfer\ministruts\db\orm\PersistableObject;
  *     _javastyle?: int,
  * }
  */
-final class UserTypes {
+final class UserTypes
+{
 }
 
 
@@ -76,7 +77,8 @@ final class UserTypes {
  * )
  * </pre>
  */
-final class ORM_ENTITY {
+final class ORM_ENTITY
+{
 }
 
 
@@ -95,7 +97,8 @@ final class ORM_ENTITY {
  * )
  * </pre>
  */
-final class ORM_PROPERTY {
+final class ORM_PROPERTY
+{
 }
 
 
@@ -116,7 +119,8 @@ final class ORM_PROPERTY {
  * )
  * </pre>
  */
-final class ORM_RELATION {
+final class ORM_RELATION
+{
 }
 
 
@@ -135,5 +139,6 @@ final class ORM_RELATION {
  * )
  * </pre>
  */
-final class STACKFRAME {
+final class STACKFRAME
+{
 }

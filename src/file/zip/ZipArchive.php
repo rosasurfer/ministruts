@@ -13,8 +13,8 @@ use const rosasurfer\ministruts\L_WARN;
  *
  * Drop-in replacement for the built-in PHP class with improved error handling.
  */
-class ZipArchive extends \ZipArchive {
-
+class ZipArchive extends \ZipArchive
+{
     use ObjectTrait;
 
     /** @var string[][] */

@@ -9,8 +9,8 @@ use rosasurfer\ministruts\core\proxy\Config;
  * Version-aware URL generation helper. Appends a hash of size and last modification time of a
  * local file to the generated URL to automatically invalidate browser and proxy caches.
  */
-class VersionedUrl extends Url {
-
+class VersionedUrl extends Url
+{
     /**
      * {@inheritDoc}
      */

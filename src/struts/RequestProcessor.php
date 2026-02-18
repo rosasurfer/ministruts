@@ -21,8 +21,8 @@ use function rosasurfer\ministruts\preg_replace;
  *
  * A custom implementation can be configured for all {@link Module}s by re-defining the application dependency "requestProcessor".
  */
-class RequestProcessor extends CObject {
-
+class RequestProcessor extends CObject
+{
     /** @var Module - the Module the instance belongs to */
     protected Module $module;
 

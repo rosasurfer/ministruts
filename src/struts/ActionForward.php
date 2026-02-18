@@ -15,8 +15,8 @@ use function rosasurfer\ministruts\strLeftTo;
  * An ActionForward describes a target a request is forwarded to after processing. It has a logical name (for identification)
  * and points either to a physical resource (a file, a layout or a template) or to an URI.
  */
-class ActionForward extends CObject {
-
+class ActionForward extends CObject
+{
     /** reserved identifier which references a forward to the currently used ActionMapping */
     public const SELF = 'self';
 

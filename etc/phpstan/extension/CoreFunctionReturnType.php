@@ -20,8 +20,8 @@ use function rosasurfer\ministruts\simpleClassName;
  * Removing the return type of the error condition (usually FALSE or NULL) from the resulting return type
  * simplifies PHPStan analysis considerably.
  */
-class CoreFunctionReturnType extends Extension implements DynamicFunctionReturnTypeExtension {
-
+class CoreFunctionReturnType extends Extension implements DynamicFunctionReturnTypeExtension
+{
     /** @var array<?Type> */
     protected array $interceptedFunctions;
 

@@ -10,8 +10,8 @@ use rosasurfer\ministruts\core\proxy\Request;
 /**
  * URL generation helper
  */
-class Url extends CObject {
-
+class Url extends CObject
+{
     /** @var string - URI as passed to the constructor */
     protected string $uri;
 

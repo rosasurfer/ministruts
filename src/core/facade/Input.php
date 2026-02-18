@@ -14,8 +14,8 @@ use rosasurfer\ministruts\struts\Struts;
  *
  * A {@link Facade} for accessing the raw input parameters of the current or the previous HTTP {@link \rosasurfer\ministruts\struts\Request}.
  */
-class Input extends Facade {
-
+class Input extends Facade
+{
     /**
      * Return all raw input parameters of the current HTTP request.
      *

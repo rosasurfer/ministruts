@@ -14,8 +14,8 @@ use function rosasurfer\ministruts\preg_split;
 /**
  * Pattern
  */
-abstract class Pattern extends CObject {
-
+abstract class Pattern extends CObject
+{
     /** @var ?string */
     protected ?string $name = null;
 

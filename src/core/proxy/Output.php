@@ -16,8 +16,8 @@ use rosasurfer\ministruts\console\io\Output as ConsoleOutput;
  * @method static void          out(mixed $message)   Write a message to STDOUT.
  * @method static void          error(mixed $message) Write a message to STDERR.
  */
-class Output extends Proxy {
-
+class Output extends Proxy
+{
     /**
      * {@inheritDoc}
      */

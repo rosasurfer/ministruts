@@ -17,8 +17,8 @@ use const rosasurfer\ministruts\ARRAY_NUM;
  * Represents the result of an executed SQL statement. Depending on the statement type the result may or may not contain
  * a result set.
  */
-class SQLiteResult extends Result {
-
+class SQLiteResult extends Result
+{
     /** @var ?SQLite3Result - the database connector's original result object */
     protected ?SQLite3Result $result = null;
 

@@ -14,8 +14,8 @@ use rosasurfer\ministruts\core\exception\InvalidTypeException;
  *
  * Abstract super class for concrete storage adapters.
  */
-abstract class Connector extends CObject implements ConnectorInterface {
-
+abstract class Connector extends CObject implements ConnectorInterface
+{
     /**
      * Destructor
      *

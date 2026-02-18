@@ -13,8 +13,8 @@ use rosasurfer\ministruts\struts\Request;
  * A variant of {@link Container} suitable for web applications. Registers web app related dependencies provided by
  * the framework and user-defined services loaded from file "{app.dir.config}/services.php".
  */
-class DefaultWebContainer extends Container {
-
+class DefaultWebContainer extends Container
+{
     /**
      * Constructor
      *

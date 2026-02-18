@@ -25,8 +25,8 @@ use function rosasurfer\ministruts\simpleClassName;
  * The configuration of a command will be frozen after it is added to the {@link \rosasurfer\ministruts\Application}.
  * A frozen configuration can't be changed anymore.
  */
-class Command extends CObject {
-
+class Command extends CObject
+{
     public const DOCOPT = '';
 
     /** @var string */

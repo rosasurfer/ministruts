@@ -9,8 +9,8 @@ use rosasurfer\ministruts\core\exception\IllegalStateException;
 /**
  * BaseLock
  */
-abstract class BaseLock extends CObject {
-
+abstract class BaseLock extends CObject
+{
     /**
      * Whether the lock is aquired.
      *

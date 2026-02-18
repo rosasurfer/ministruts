@@ -25,8 +25,8 @@ use rosasurfer\ministruts\console\docopt\DocoptResult;
  * @method static bool|int|string getOption(string $name)               Return the value of the option with the given name.<br><br> If the option is not repetitive and has no arguments a boolean value is returned. If the option is repetitive and has no arguments an integer indicating the number of times the option was specified is returned. If the option has arguments the first argument is returned. The returned value may be the defined default value.<br> See {@link \rosasurfer\ministruts\console\io\Input::isOption()} for the definition of "option".
  * @method static string[]        getOptions(string $name)              Return the values of the options with the given name. The returned values may be the defined default values.<br><br> See {@link \rosasurfer\ministruts\console\io\Input::isOption()} for the definition of "option".
  */
-class CliInput extends Proxy {
-
+class CliInput extends Proxy
+{
     /**
      * {@inheritDoc}
      */

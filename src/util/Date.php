@@ -15,8 +15,8 @@ use const rosasurfer\ministruts\L_WARN;
 /**
  * Date
  */
-class Date extends StaticClass {
-
+class Date extends StaticClass
+{
     /**
      * Calculate the number of days between two dates.
      *

@@ -30,8 +30,8 @@ use function rosasurfer\ministruts\realpath;
  * the dependency remains fulfilled and calling $dependency->isValid() returns TRUE. After changing or deleting the file,
  * calling $dependency->isValid() returns FALSE.
  */
-class FileDependency extends Dependency {
-
+class FileDependency extends Dependency
+{
     /** @var string - name of the monitored file */
     private string $fileName;
 

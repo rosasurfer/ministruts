@@ -53,8 +53,8 @@ use const rosasurfer\ministruts\NL;
  *
  * @link https://www.postgresql.org/docs/9.6/static/libpq-connect.html#LIBPQ-PARAMKEYWORDS)
  */
-class PostgresConnector extends Connector {
-
+class PostgresConnector extends Connector
+{
     /** @var string - DBMS type */
     protected string $type = 'pgsql';
 

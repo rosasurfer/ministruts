@@ -19,8 +19,8 @@ use const rosasurfer\ministruts\ARRAY_ASSOC;
  *
  * A Worker converts database records to PHP objects. For each entity exists a separate Worker instance.
  */
-class Worker extends CObject {
-
+class Worker extends CObject
+{
     /** @var DAO - DAO of the worker's entity */
     private DAO $dao;
 

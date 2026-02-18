@@ -14,8 +14,8 @@ use rosasurfer\ministruts\util\PHP;
 /**
  * An exception representing a regular PHP error. Can only be created by the {@link ErrorHandler}.
  */
-class PHPError extends ErrorException implements RosasurferException {
-
+class PHPError extends ErrorException implements RosasurferException
+{
     use RosasurferExceptionTrait, ObjectTrait;
 
     /**

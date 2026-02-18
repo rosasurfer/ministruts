@@ -67,8 +67,8 @@ use rosasurfer\ministruts\struts\Request as StrutsRequest;
  * @method static ?ActionMapping getMapping()                                                              Return the {@link \rosasurfer\ministruts\struts\ActionMapping} responsible for processing the current request.
  * @method static ?Module        getModule()                                                               Return the {@link \\rosasurfer\ministruts\struts\Module} the current request is assigned to.
  */
-class Request extends Proxy {
-
+class Request extends Proxy
+{
     /**
      * {@inheritDoc}
      */

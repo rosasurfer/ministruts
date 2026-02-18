@@ -22,8 +22,8 @@ use const rosasurfer\ministruts\CLI;
  * An object representing the HTTP response to the current HTTP {@link Request}.
  * Provides helper methods and an additional variables context with the life-time of the request.
  */
-class Response extends Singleton {
-
+class Response extends Singleton
+{
     /** @var int - HTTP status code */
     protected int $status = 0;
 

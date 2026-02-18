@@ -11,8 +11,8 @@ use rosasurfer\ministruts\net\messenger\Messenger;
  *
  * A {@link rosasurfer\ministruts\net\messenger\Messenger} for sending messages to an IRC channel.
  */
-class IRCMessenger extends Messenger {
-
+class IRCMessenger extends Messenger
+{
     /**
      * {@inheritDoc}
      *

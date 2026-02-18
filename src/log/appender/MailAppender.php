@@ -46,8 +46,8 @@ use const rosasurfer\ministruts\NL;
  *  'options'               = []                // optional mailer options, see {@link \rosasurfer\ministruts\net\mail\Mailer::create()}
  * </pre>
  */
-class MailAppender extends BaseAppender {
-
+class MailAppender extends BaseAppender
+{
     /** @var ?string - mail sender */
     protected ?string $sender = null;
 

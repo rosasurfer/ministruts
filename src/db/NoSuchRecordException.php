@@ -8,5 +8,6 @@ namespace rosasurfer\ministruts\db;
  *
  * Thrown if a query expecting a result row can not find one.
  */
-class NoSuchRecordException extends DatabaseException {
+class NoSuchRecordException extends DatabaseException
+{
 }

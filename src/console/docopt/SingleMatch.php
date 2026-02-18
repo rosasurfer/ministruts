@@ -9,8 +9,8 @@ use rosasurfer\ministruts\console\docopt\pattern\Pattern;
 /**
  * SingleMatch
  */
-class SingleMatch extends CObject {
-
+class SingleMatch extends CObject
+{
     /** @var ?int */
     public ?int $pos = null;
 

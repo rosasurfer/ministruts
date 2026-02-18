@@ -10,8 +10,8 @@ use function rosasurfer\ministruts\preg_match_all;
 /**
  * Argument
  */
-class Argument extends LeafPattern {
-
+class Argument extends LeafPattern
+{
     /**
      * {@inheritDoc}
      */

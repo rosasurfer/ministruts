@@ -8,8 +8,8 @@ use rosasurfer\ministruts\core\StaticClass;
 /**
  * A class holding Struts related constants.
  */
-final class Struts extends StaticClass {
-
+final class Struts extends StaticClass
+{
     /**
      * Request or session key under which action messages are stored (if any).
      */

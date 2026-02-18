@@ -10,5 +10,6 @@ use rosasurfer\ministruts\core\StaticClass;
  *
  * In this framework it translates static method calls from one API to another.
  */
-abstract class Facade extends StaticClass {
+abstract class Facade extends StaticClass
+{
 }

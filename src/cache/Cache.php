@@ -18,8 +18,8 @@ use const rosasurfer\ministruts\CLI;
  *
  * @see CachePeer
  */
-final class Cache extends StaticClass {
-
+final class Cache extends StaticClass
+{
     public const EXPIRES_NEVER = 0;
 
     /** @var CachePeer|null - default cache implementation */

@@ -32,8 +32,8 @@ use const rosasurfer\ministruts\WINDOWS;
 /**
  * PHP core related functionality
  */
-class PHP extends StaticClass {
-
+class PHP extends StaticClass
+{
     /**
      * Trigger execution of the garbage collector.
      *

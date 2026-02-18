@@ -18,8 +18,8 @@ use function rosasurfer\ministruts\preg_replace;
  *
  * @extends ArrayIterator<int, string>
  */
-class TokenIterator extends ArrayIterator {
-
+class TokenIterator extends ArrayIterator
+{
     use ObjectTrait;
 
     /** @var class-string<Throwable> */

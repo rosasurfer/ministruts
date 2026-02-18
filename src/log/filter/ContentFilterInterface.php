@@ -6,8 +6,8 @@ namespace rosasurfer\ministruts\log\filter;
 /**
  * An interface for content filters.
  */
-interface ContentFilterInterface {
-
+interface ContentFilterInterface
+{
     /** replacement value for sensitive strings */
     public const SUBSTITUTE = '******';
 

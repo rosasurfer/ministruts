@@ -15,8 +15,8 @@ use const rosasurfer\ministruts\NL;
 /**
  *
  */
-class PropertyConfigTest extends TestCase {
-
+class PropertyConfigTest extends TestCase
+{
     protected string $configFile;
 
     protected function setUp(): void {

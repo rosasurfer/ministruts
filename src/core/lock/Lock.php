@@ -14,8 +14,8 @@ use rosasurfer\ministruts\core\proxy\Config;
  *
  * Delegate to a specific lock implementation.
  */
-class Lock extends BaseLock {
-
+class Lock extends BaseLock
+{
     /** @var string[] - keys of all currently aquired locks */
     private static array $lockedKeys;
 

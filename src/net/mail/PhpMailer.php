@@ -21,8 +21,8 @@ use const rosasurfer\ministruts\WINDOWS;
  *
  * A mailer sending email using the built-in function mail().
  */
-class PhpMailer extends Mailer {
-
+class PhpMailer extends Mailer
+{
     /**
      * {@inheritDoc}
      */

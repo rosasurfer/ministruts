@@ -24,8 +24,8 @@ use function rosasurfer\ministruts\strLeft;
  * @phpstan-import-type ORM_PROPERTY from PHPStanUserTypes
  * @phpstan-import-type ORM_RELATION from PHPStanUserTypes
  */
-abstract class PersistableObject extends CObject {
-
+abstract class PersistableObject extends CObject
+{
     /** @var bool - dirty checking status */
     private bool $__modified = false;
 

@@ -13,8 +13,8 @@ use rosasurfer\ministruts\net\messenger\Messenger;
  *
  * @link https://www.clickatell.com/developers/
  */
-class ClickatellMessenger extends Messenger {
-
+class ClickatellMessenger extends Messenger
+{
     /**
      * {@inheritDoc}
      *

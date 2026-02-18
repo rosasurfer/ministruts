@@ -8,8 +8,8 @@ use Throwable;
 /**
  * An interface defining common functionality for all "rosasurfer/ministruts" exceptions.
  */
-interface ExceptionInterface extends Throwable {
-
+interface ExceptionInterface extends Throwable
+{
     /**
      * Prepend a message to the exception's existing message.
      *

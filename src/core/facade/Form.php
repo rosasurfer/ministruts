@@ -18,8 +18,8 @@ use rosasurfer\ministruts\struts\Struts;
  * The Form facade is used to access either one or the other form's properties. The {@link Forms} facade is used to access properties
  * of both forms together in a single API call.
  */
-class Form extends Facade {
-
+class Form extends Facade
+{
     /**
      * Convenient view helper for fetching form properties when the type of the instance is not known.
      * Returns the current HTTP request's {@link ActionForm} property with the specified name.

@@ -13,8 +13,8 @@ use function rosasurfer\ministruts\array_merge;
 /**
  * LeafPattern
  */
-abstract class LeafPattern extends Pattern {
-
+abstract class LeafPattern extends Pattern
+{
     /**
      * @param  ?string $name
      * @param  mixed   $value [optional]

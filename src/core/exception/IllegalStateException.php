@@ -6,5 +6,6 @@ namespace rosasurfer\ministruts\core\exception;
 /**
  * IllegalStateException
  */
-class IllegalStateException extends RuntimeException {
+class IllegalStateException extends RuntimeException
+{
 }

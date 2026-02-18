@@ -11,8 +11,8 @@ use rosasurfer\ministruts\phpstan\UserTypes as PHPStanUserTypes;
  *
  * @phpstan-import-type ORM_ENTITY from PHPStanUserTypes
  */
-class EntityMapping extends CObject {
-
+class EntityMapping extends CObject
+{
     /** @var string - the entity's class name */
     protected string $className;
 

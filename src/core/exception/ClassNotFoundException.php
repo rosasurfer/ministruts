@@ -6,5 +6,6 @@ namespace rosasurfer\ministruts\core\exception;
 /**
  * ClassNotFoundException
  */
-class ClassNotFoundException extends Exception {
+class ClassNotFoundException extends Exception
+{
 }

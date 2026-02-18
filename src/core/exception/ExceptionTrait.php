@@ -22,8 +22,8 @@ use const rosasurfer\ministruts\NL;
  *
  * @phpstan-import-type STACKFRAME from PHPStanUserTypes
  */
-trait ExceptionTrait {
-
+trait ExceptionTrait
+{
     /**
      * Prepend a message to the exception's existing message. Used to enrich the exception with additional data.
      *

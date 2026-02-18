@@ -13,8 +13,8 @@ use rosasurfer\ministruts\core\exception\RuntimeException;
  *
  * @extends ArrayAccess<string, mixed>
  */
-interface Config extends ArrayAccess, Countable {
-
+interface Config extends ArrayAccess, Countable
+{
     /**
      * Set/modify the config setting with the specified key.
      *

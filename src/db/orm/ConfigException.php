@@ -10,5 +10,6 @@ use rosasurfer\ministruts\core\exception\Exception as RosasurferException;
  *
  * Exception marking ORM configuration errors.
  */
-class ConfigException extends RosasurferException {
+class ConfigException extends RosasurferException
+{
 }

@@ -8,5 +8,6 @@ namespace rosasurfer\ministruts\db;
  *
  * Thrown if a query expecting at least one (more) result row can not find one.
  */
-class NoMoreRecordsException extends DatabaseException {
+class NoMoreRecordsException extends DatabaseException
+{
 }

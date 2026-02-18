@@ -8,8 +8,8 @@ use rosasurfer\ministruts\core\StaticClass;
 /**
  * A class holding ORM related helper functions and constants.
  */
-final class ORM extends StaticClass {
-
+final class ORM extends StaticClass
+{
     // Standard types for PHP properties and database columns.
 
     public const BOOL = 'bool';

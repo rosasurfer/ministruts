@@ -10,8 +10,8 @@ namespace rosasurfer\ministruts\struts;
  * {@link ActionForm} is configured. Ensures that view helpers can always resolve an actual {@link ActionForm} instance,
  * and don't have to deal with potential NULL values. Property getters and array access of properties return NULL for all properties.
  */
-final class EmptyActionForm extends ActionForm {
-
+final class EmptyActionForm extends ActionForm
+{
     /**
      * {@inheritDoc}
      *

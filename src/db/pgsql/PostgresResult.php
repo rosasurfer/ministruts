@@ -16,8 +16,8 @@ use const rosasurfer\ministruts\ARRAY_NUM;
  * Represents the result of an executed SQL statement. Depending on the statement type the result may or may not contain
  * returned rows.
  */
-class PostgresResult extends Result {
-
+class PostgresResult extends Result
+{
     // status codes as returned by pg_result_status(PGSQL_STATUS_LONG)
 
     /** The string sent to the server was empty. */

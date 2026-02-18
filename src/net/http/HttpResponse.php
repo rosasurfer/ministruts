@@ -12,8 +12,8 @@ use rosasurfer\ministruts\core\CObject;
  *
  * @todo  implement HttpResponse::toString() containing all headers
  */
-abstract class HttpResponse extends CObject {
-
+abstract class HttpResponse extends CObject
+{
     // HTTP status codes; @see RFC 2068
 
     /**

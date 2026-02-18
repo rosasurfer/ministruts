@@ -7,5 +7,6 @@ namespace PgSql;
  *
  * @link  https://www.php.net/manual/en/class.pgsql-connection.php
  */
-final class Connection {
+final class Connection
+{
 }

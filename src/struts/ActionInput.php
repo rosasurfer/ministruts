@@ -17,8 +17,8 @@ use rosasurfer\ministruts\core\exception\IllegalAccessException;
  *
  * @implements ArrayAccess<string, string|array<string>>
  */
-class ActionInput extends CObject implements ArrayAccess {
-
+class ActionInput extends CObject implements ArrayAccess
+{
     /** @var array<string, string|array<string|array<string>>> */
     protected array $parameters;
 

@@ -27,8 +27,8 @@ use const rosasurfer\ministruts\NL;
  * Tiles can be used to define layouts (a.k.a. templates) consisting of multiple arranged tiles. A layout can be
  * extended. In an extended layout a single tile (view component) may be swapped by different view content at runtime.
  */
-class Tile extends CObject {
-
+class Tile extends CObject
+{
     /**
      * runtime generated name for anonymous tiles
      *

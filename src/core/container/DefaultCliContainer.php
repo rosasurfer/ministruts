@@ -13,8 +13,8 @@ use rosasurfer\ministruts\core\container\service\Service;
  * A variant of {@link Container} suitable for CLI applications. Registers CLI related dependencies provided by
  * the framework and user-defined dependencies loaded from file "{app.dir.config}/services.php".
  */
-class DefaultCliContainer extends Container {
-
+class DefaultCliContainer extends Container
+{
     /**
      * Constructor
      *

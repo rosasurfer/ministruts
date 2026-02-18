@@ -5,5 +5,6 @@
  *
  * @link  https://www.php.net/manual/en/class.curlhandle.php
  */
-final class CurlHandle {
+final class CurlHandle
+{
 }

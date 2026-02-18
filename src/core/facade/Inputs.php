@@ -13,8 +13,8 @@ namespace rosasurfer\ministruts\core\facade;
  * The {@link Input} facade is used to access either one or the other input parameters. The {@link Inputs} facade is used
  * to access both input parameters together in a single API call.
  */
-class Inputs extends Facade {
-
+class Inputs extends Facade
+{
     /**
      * Return all raw input parameters from the current and the previous HTTP request.
      *

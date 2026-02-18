@@ -8,7 +8,7 @@ namespace rosasurfer\ministruts\core\assert;
  *
  * An assertion-specific InvalidValueException.
  */
-class InvalidValueException extends \rosasurfer\ministruts\core\exception\InvalidValueException {
-
+class InvalidValueException extends \rosasurfer\ministruts\core\exception\InvalidValueException
+{
     use FailedAssertionTrait;
 }

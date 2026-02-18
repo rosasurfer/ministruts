@@ -20,8 +20,8 @@ use const rosasurfer\ministruts\WINDOWS;
  *
  * A mailer sending email directly to a mail server via SMTP.
  */
-class SmtpMailer extends Mailer {
-
+class SmtpMailer extends Mailer
+{
     /** @var string - SMTP hostname or IP address*/
     protected string $host;
 

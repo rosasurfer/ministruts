@@ -6,8 +6,8 @@ namespace rosasurfer\ministruts\console\docopt\pattern;
 /**
  * Either
  */
-class Either extends BranchPattern {
-
+class Either extends BranchPattern
+{
     /**
      * {@inheritDoc}
      */

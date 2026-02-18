@@ -12,8 +12,8 @@ use rosasurfer\ministruts\core\exception\IllegalStateException;
  *
  * Factory and base class for implementation of the Singleton pattern.
  */
-abstract class Singleton extends CObject {
-
+abstract class Singleton extends CObject
+{
     /** @var self[] - existing instances */
     private static array $instances = [];
 

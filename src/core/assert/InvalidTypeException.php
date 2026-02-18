@@ -8,7 +8,7 @@ namespace rosasurfer\ministruts\core\assert;
  *
  * An assertion-specific InvalidTypeException.
  */
-class InvalidTypeException extends \rosasurfer\ministruts\core\exception\InvalidTypeException {
-
+class InvalidTypeException extends \rosasurfer\ministruts\core\exception\InvalidTypeException
+{
     use FailedAssertionTrait;
 }

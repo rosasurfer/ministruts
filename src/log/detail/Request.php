@@ -19,8 +19,8 @@ use const rosasurfer\ministruts\NL;
  *
  * An object to access details of the current HTTP request.
  */
-class Request extends CObject {
-
+class Request extends CObject
+{
     /** @var ?array<string, string> - all received request headers */
     protected ?array $headers = null;
 

@@ -16,8 +16,8 @@ use function rosasurfer\ministruts\preg_match;
  *
  * An object wrapping the current HTTP session.
  */
-class HttpSession extends Singleton {
-
+class HttpSession extends Singleton
+{
     /** @var bool - Whether the session is considered "new". A session is new if the client doesn't yet know the session id. */
     protected bool $new;
 
