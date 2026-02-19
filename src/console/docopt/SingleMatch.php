@@ -18,6 +18,8 @@ class SingleMatch extends CObject
     public ?Pattern $pattern = null;
 
     /**
+     * Constructor
+     *
      * @param  ?int     $pos
      * @param  ?Pattern $pattern
      */

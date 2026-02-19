@@ -9,7 +9,7 @@ use rosasurfer\ministruts\console\docopt\TokenIterator;
 use rosasurfer\ministruts\console\docopt\pattern\Required;
 
 /**
- *
+ * TestParser
  */
 class TestParser extends DocoptParser
 {

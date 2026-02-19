@@ -196,8 +196,8 @@ class PHP extends StaticClass
                                       ?int    &$exitCode = null,
                                       ?string $dir = null,
                                       ?array  $env = null,
-                                       array  $options = []): ?string {
-        //
+                                       array  $options = []): ?string
+    {
         // - Both exec() and shell_exec() execute the command via the shell which supports redirection and piping.
         // - proc_open() is the only function which can access STDERR independently.
         // - On Windows, shell_exec() can't be used. It reads STDOUT through a text-mode pipe. In text mode, the Microsoft CRT treats
@@ -205,7 +205,6 @@ class PHP extends StaticClass
         //   truncated. In between the PHP manual warns that on Windows the underlying pipe may fail.
         //
         // @link  https://bugs.php.net/bug.php?id=78699
-        //
 
         // check whether the process needs to be watched asynchronously
         $argc              = func_num_args();

@@ -23,9 +23,6 @@ use rosasurfer\ministruts\tests\helper\TestCase;
  */
 class PythonPortedTest extends TestCase
 {
-    /**
-     *
-     */
     function testFlatPattern(): void {
         $required = new Required([new OneOrMore(new Argument('N')), new Option('-a'), new Argument('M')]);
 
@@ -36,9 +33,6 @@ class PythonPortedTest extends TestCase
     }
 
 
-    /**
-     *
-     */
     function testOption(): void {
         $this->assertEquals(Option::parse('-h'),         new Option('-h'));
         $this->assertEquals(Option::parse('--help'),     new Option(null, '--help'));
@@ -65,9 +59,6 @@ class PythonPortedTest extends TestCase
     }
 
 
-    /**
-     *
-     */
     public function testOptionName(): void {
         $option = new Option('-h', null);
         $this->assertSame($option->name(), '-h');
@@ -80,9 +71,6 @@ class PythonPortedTest extends TestCase
     }
 
 
-    /**
-     *
-     */
     public function testCommands(): void {
         $this->assertEquals($this->docopt('Usage: prog add',      'add')->getArgs(), ['add' => true ]);
         $this->assertEquals($this->docopt('Usage: prog [add]',       '')->getArgs(), ['add' => false]);
@@ -96,9 +84,6 @@ class PythonPortedTest extends TestCase
     }
 
 
-    /**
-     *
-     */
     public function testFormalUsage(): void {
         $doc =
             "Usage: prog [-hv] ARG\n"
@@ -113,9 +98,6 @@ class PythonPortedTest extends TestCase
     }
 
 
-    /**
-     *
-     */
     public function testParseArgv(): void {
         $o = new OptionIterator([new Option('-h'), new Option('-v', '--verbose'), new Option('-f', '--file', 1)]);
         $ts = static fn(string $src) => new TokenIterator($src);
@@ -168,9 +150,6 @@ class PythonPortedTest extends TestCase
     }
 
 
-    /**
-     *
-     */
     public function testParsePattern(): void {
         $o = new OptionIterator([new Option('-h'), new Option('-v', '--verbose'), new Option('-f', '--file', 1)]);
 
@@ -232,9 +211,6 @@ class PythonPortedTest extends TestCase
     }
 
 
-    /**
-     *
-     */
     public function testOptionMatch(): void {
         $option = new Option('-a');
         $this->assertEquals(
@@ -268,9 +244,6 @@ class PythonPortedTest extends TestCase
     }
 
 
-    /**
-     *
-     */
     function testArgumentMatch(): void {
         $argument = new Argument('N');
         $this->assertEquals(
@@ -298,9 +271,6 @@ class PythonPortedTest extends TestCase
     }
 
 
-    /**
-     *
-     */
     function testCommandMatch(): void {
         $command = new Command('c');
         $this->assertEquals(
@@ -328,9 +298,6 @@ class PythonPortedTest extends TestCase
     }
 
 
-    /**
-     *
-     */
     function testOptionalMatch(): void {
         $optional = new Optional(new Option('-a'));
         $this->assertEquals(
@@ -382,9 +349,6 @@ class PythonPortedTest extends TestCase
     }
 
 
-    /**
-     *
-     */
     function testRequiredMatch(): void {
         $required = new Required(new Option('-a'));
         $this->assertEquals(
@@ -412,9 +376,6 @@ class PythonPortedTest extends TestCase
     }
 
 
-    /**
-     *
-     */
     function testEitherMatch(): void {
         $either = new Either(new Option('-a'), new Option('-b'));
         $this->assertEquals(
@@ -448,9 +409,6 @@ class PythonPortedTest extends TestCase
     }
 
 
-    /**
-     *
-     */
     function testOneOrMoreMatch(): void {
         $oneOrMore = new OneOrMore(new Argument('N'));
         $this->assertEquals(
@@ -508,9 +466,6 @@ class PythonPortedTest extends TestCase
     }
 
 
-    /**
-     *
-     */
     function testListArgumentMatch(): void {
         $input = new Required(new Argument('N'), new Argument('N'));
 
@@ -539,9 +494,6 @@ class PythonPortedTest extends TestCase
     }
 
 
-    /**
-     *
-     */
     function testBasicPatternMatch(): void {
         // ( -a N [ -x Z ] )
         $pattern = new Required(new Option('-a'), new Argument('N'), new Optional(new Option('-x'), new Argument('Z')));
@@ -566,9 +518,6 @@ class PythonPortedTest extends TestCase
     }
 
 
-    /**
-     *
-     */
     function testPatternEither(): void {
         $input = new Option('-a');
         $this->assertEquals(
@@ -625,9 +574,6 @@ class PythonPortedTest extends TestCase
     }
 
 
-    /**
-     *
-     */
     function testPatternFixRepeatingArguments(): void {
         $input = new Option('-a');
         $this->assertEquals($input->fixRepeatingArguments(), new Option('-a'));
@@ -649,9 +595,6 @@ class PythonPortedTest extends TestCase
     }
 
 
-    /**
-     *
-     */
     function testSet(): void {
         $this->assertEquals(new Argument('N'), new Argument('N'));
         $this->assertEquals(
@@ -661,9 +604,6 @@ class PythonPortedTest extends TestCase
     }
 
 
-    /**
-     *
-     */
     function testPatternFixIdentities1(): void {
         $pattern = new Required(new Argument('N'), new Argument('N'));
         $this->assertEquals($pattern->children[0], $pattern->children[1]);
@@ -673,9 +613,6 @@ class PythonPortedTest extends TestCase
     }
 
 
-    /**
-     *
-     */
     function testPatternFixIdentities2(): void {
         $pattern = new Required(new Optional(new Argument('X'), new Argument('N')), new Argument('N'));
         $this->assertEquals($pattern->children[0]->children[1], $pattern->children[1]);
@@ -685,9 +622,6 @@ class PythonPortedTest extends TestCase
     }
 
 
-    /**
-     *
-     */
     function testLongOptionsErrorHandling1(): void {
         // $this->setExpectedException(DocoptFormatError::class);
         // $this->docopt('Usage: prog --non-existent', '--non-existent')
@@ -704,99 +638,66 @@ class PythonPortedTest extends TestCase
     }
 
 
-    /**
-     *
-     */
     function testLongOptionsErrorHandling2(): void {
         $this->expectException(DocoptFormatError::class);
         $this->docopt("Usage: prog --long\nOptions: --long ARG");
     }
 
 
-    /**
-     *
-     */
     function testLongOptionsErrorHandling3(): void {
         $result = $this->docopt("Usage: prog --long ARG\nOptions: --long ARG", '--long');
         $this->assertFalse($result->isSuccess());
     }
 
 
-    /**
-     *
-     */
     function testLongOptionsErrorHandling4(): void {
         $this->expectException(DocoptFormatError::class);
         $this->docopt("Usage: prog --long=ARG\nOptions: --long");
     }
 
 
-    /**
-     *
-     */
     function testLongOptionsErrorHandling5(): void {
         $result = $this->docopt("Usage: prog --long\nOptions: --long", '--long=ARG');
         $this->assertFalse($result->isSuccess());
     }
 
 
-    /**
-     *
-     */
     function testShortOptionsErrorHandling1(): void {
         $this->expectException(DocoptFormatError::class);
         $this->docopt("Usage: prog -x\nOptions: -x  this\n -x  that");
     }
 
 
-    /**
-     *
-     */
     function testShortOptionsErrorHandling2(): void {
         $result = $this->docopt('Usage: prog', '-x');
         $this->assertFalse($result->isSuccess());
     }
 
 
-    /**
-     *
-     */
     function testShortOptionsErrorHandling3(): void {
         $this->expectException(DocoptFormatError::class);
         $this->docopt("Usage: prog -o\nOptions: -o ARG");
     }
 
 
-    /**
-     *
-     */
     function testShortOptionsErrorHandling4(): void {
         $result = $this->docopt("Usage: prog -o ARG\n\n-o ARG", '-o');
         $this->assertFalse($result->isSuccess());
     }
 
 
-    /**
-     *
-     */
     function testMatchingParentheses1(): void {
         $this->expectException(DocoptFormatError::class);
         $this->docopt('Usage: prog [a [b]');
     }
 
 
-    /**
-     *
-     */
     function testMatchingParentheses2(): void {
         $this->expectException(DocoptFormatError::class);
         $this->docopt('Usage: prog [a [b] ] c )');
     }
 
 
-    /**
-     *
-     */
     function testAllowDoubleDash(): void {
         $this->assertEquals(
             $this->docopt("usage: prog [-o] [--] <arg>\nOptions: -o", '-- -o')->getArgs(),
@@ -813,9 +714,6 @@ class PythonPortedTest extends TestCase
     }
 
 
-    /**
-     *
-     */
     function testDocopt(): void {
         $doc = "Usage: prog [-v] A\n\n  Options: -v  Be verbose.";
 
@@ -857,27 +755,18 @@ class PythonPortedTest extends TestCase
     }
 
 
-    /**
-     *
-     */
     function testDocoptFormatError1(): void {
         $this->expectException(DocoptFormatError::class);
         $this->docopt('no usage with colon here');
     }
 
 
-    /**
-     *
-     */
     function testDocoptFormatError2(): void {
         $this->expectException(DocoptFormatError::class);
         $this->docopt("usage: here \n\n and again usage: here");
     }
 
 
-    /**
-     *
-     */
     function testIssue40(): void {
         $result = $this->docopt('usage: prog --help-commands | --help', '--help');
         $this->assertTrue($result['--help']);
@@ -889,9 +778,6 @@ class PythonPortedTest extends TestCase
     }
 
 
-    /**
-     *
-     */
     function testCountMultipleFlags(): void {
         $this->assertEquals($this->docopt('usage: prog [-v]', '-v')->getArgs(), array('-v'=>true));
         $this->assertEquals($this->docopt('usage: prog [-vv]', '')->getArgs(), array('-v'=>0));
@@ -907,9 +793,6 @@ class PythonPortedTest extends TestCase
     }
 
 
-    /**
-     *
-     */
     function testOptionsShortcutParameter(): void {
         $result = $this->docopt('usage: prog [options]', '-foo --bar --spam=eggs');
         $this->assertFalse($result->isSuccess());
@@ -970,9 +853,6 @@ class PythonPortedTest extends TestCase
     }
 
 
-    /**
-     *
-     */
     function testDefaultValueForPositionalArguments(): void {
         $doc = "Usage: prog [--data=<data>...]\n".
                "Options:\n\t-d --data=<arg>    Input data [default: x]";
@@ -1018,18 +898,12 @@ class PythonPortedTest extends TestCase
     //                                       new Option(null, '--verbose')]
 
 
-    /**
-     *
-     */
     public function testIssue59(): void {
         $this->assertEquals($this->docopt("usage: prog --long=<a>", '--long=')->getArgs(), array('--long'=>''));
         $this->assertEquals($this->docopt("usage: prog -l <a>\noptions: -l <a>", array('-l', ''))->getArgs(), array('-l'=>''));
     }
 
 
-    /**
-     *
-     */
     public function testOptionsFirst(): void {
         $this->assertEquals(
             $this->docopt('usage: prog [--opt] [<args>...]', '--opt this that')->getArgs(),
@@ -1054,9 +928,6 @@ class PythonPortedTest extends TestCase
     }
 
 
-    /**
-     *
-     */
     public function testIssue68OptionsShortcutDoesNotIncludeOptionsInUsagePattern(): void {
         $args = $this->docopt("usage: prog [-ab] [options]\noptions: -x\n -y", '-ax');
         $this->assertTrue($args['-a']);
@@ -1066,9 +937,6 @@ class PythonPortedTest extends TestCase
     }
 
 
-    /**
-     *
-     */
     public function testIssue71DoubleDashIsNotAValidOptionArgument(): void {
         $result = $this->docopt("usage: prog [--log=LEVEL] [--] <args>...", "--log -- 1 2");
         $this->assertFalse($result->isSuccess());
@@ -1078,9 +946,6 @@ class PythonPortedTest extends TestCase
     }
 
 
-    /**
-     *
-     */
     public function testParseSection(): void {
         $this->assertEquals(TestParser::parseSection('usage:', 'foo bar fizz buzz'), []);
         $this->assertEquals(TestParser::parseSection('usage:', 'usage: prog'), array('usage: prog'));
@@ -1122,9 +987,6 @@ class PythonPortedTest extends TestCase
     }
 
 
-    /**
-     *
-     */
     public function testIssue126DefaultsNotParsedCorrectlyWhenTabs(): void {
         $section = "Options:\n\t--foo=<arg>  [default: bar]";
         $this->assertEquals(

@@ -66,7 +66,6 @@ abstract class ActionForm extends CObject
      * </pre>
      */
     protected function initActionKey(): void {
-        //
         // PHP breaks transmitted parameters by silently converting dots "." and spaces " " in parameter names to underscores.
         // This especially breaks submit image elements, as the HTML standard appends the clicked image coordinates to the submit
         // parameter.
@@ -101,7 +100,7 @@ abstract class ActionForm extends CObject
         //           [nested.level.with.dots] => value          // custom parameters wrapped in array   => not broken by PHP
         //       )
         //   )
-        //
+
         $params = $this->request->input()->all();
 
         $action = $params['submit']['action'] ?? null;

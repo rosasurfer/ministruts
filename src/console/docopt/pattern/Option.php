@@ -96,7 +96,7 @@ class Option extends LeafPattern
 
 
     /**
-     * @return string
+     * {@inheritDoc}
      */
     public function name(): string {
         return $this->long ?? $this->short;         // @phpstan-ignore return.type (one of them is always set)

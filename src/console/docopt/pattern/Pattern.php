@@ -43,6 +43,8 @@ abstract class Pattern extends CObject
 
 
     /**
+     * Return the name of the pattern.
+     *
      * @return ?string
      */
     public function name(): ?string {

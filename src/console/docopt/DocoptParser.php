@@ -157,6 +157,8 @@ class DocoptParser extends CObject
 
 
     /**
+     * Prints a help or syntax screen and terminates the script. Can be disabled with option["exit"=>false].
+     *
      * @param  DocoptUserNotification $exception
      *
      * @return void
@@ -170,6 +172,8 @@ class DocoptParser extends CObject
 
 
     /**
+     * Convert the usage definition of the DocBlock to a formalized syntax.
+     *
      * @param  string $section
      *
      * @return string
@@ -227,6 +231,8 @@ class DocoptParser extends CObject
 
 
     /**
+     * Parse default options.
+     *
      * @param  string $doc
      *
      * @return OptionIterator
@@ -258,6 +264,8 @@ class DocoptParser extends CObject
 
 
     /**
+     * Parse formalized usage and default options.
+     *
      * @param  string         $source
      * @param  OptionIterator $options
      *

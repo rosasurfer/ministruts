@@ -7,7 +7,7 @@ use rosasurfer\ministruts\console\docopt\pattern\Either;
 use rosasurfer\ministruts\console\docopt\pattern\Pattern;
 
 /**
- *
+ * TestPattern
  */
 abstract class TestPattern extends Pattern
 {

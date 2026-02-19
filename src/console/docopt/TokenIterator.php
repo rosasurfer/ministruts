@@ -70,6 +70,8 @@ class TokenIterator extends ArrayIterator
 
 
     /**
+     * Moves the iterator to the next element.
+     *
      * @return ?string
      */
     public function move(): ?string {

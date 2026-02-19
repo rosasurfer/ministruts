@@ -13,7 +13,7 @@ use rosasurfer\ministruts\tests\helper\TestCase;
 use const rosasurfer\ministruts\NL;
 
 /**
- *
+ * PropertyConfigTest
  */
 class PropertyConfigTest extends TestCase
 {
